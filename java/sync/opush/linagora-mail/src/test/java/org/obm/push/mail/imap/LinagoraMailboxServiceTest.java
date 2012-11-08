@@ -51,7 +51,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Flag;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -60,15 +59,16 @@ import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.base.Charsets;
@@ -105,7 +105,7 @@ public class LinagoraMailboxServiceTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -125,9 +125,8 @@ public class LinagoraMailboxServiceTest {
 	@Test(expected=MailException.class)
 	public void testCreateCaseInsensitiveInbox() throws Exception {
 		MailboxFolder newFolder = folder("inBox");
-		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox());
 	}
@@ -135,9 +134,8 @@ public class LinagoraMailboxServiceTest {
 	@Test
 	public void testCreateSpecialNameMailbox() throws Exception {
 		MailboxFolder newFolder = folder("to&to");
-		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}
@@ -145,9 +143,8 @@ public class LinagoraMailboxServiceTest {
 	@Test
 	public void testCreateUtf8Mailbox() throws Exception {
 		MailboxFolder newFolder = folder("éàêôï");
-		OpushImapFolder result = mailboxService.createFolder(udr, newFolder);
+		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(result).isNotNull();
 		Assertions.assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}

@@ -46,12 +46,10 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.inject.Inject;
@@ -61,7 +59,6 @@ import com.icegreen.greenmail.util.GreenMail;
 public abstract class MailboxServiceSubscribedFoldersTest {
 
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
@@ -81,7 +78,7 @@ public abstract class MailboxServiceSubscribedFoldersTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -91,11 +88,10 @@ public abstract class MailboxServiceSubscribedFoldersTest {
 
 	@Test
 	public void testNewFolderIsCreatedUnsubscribed() throws MailException {
-		OpushImapFolder newFolder = createUnsubscribedFolder("newFolder");
+		createUnsubscribedFolder("newFolder");
 		
 		MailboxFolders subscribedFolders = mailboxService.listSubscribedFolders(udr);
 		
-		assertThat(newFolder.isSubscribed()).isFalse();
 		assertThat(subscribedFolders).isEmpty();
 	}
 
@@ -126,8 +122,8 @@ public abstract class MailboxServiceSubscribedFoldersTest {
 		assertThat(subscribedFolders).isEmpty();
 	}
 
-	private OpushImapFolder createUnsubscribedFolder(String folderName) throws MailException {
+	private void createUnsubscribedFolder(String folderName) throws MailException {
 		MailboxFolder folder = testUtils.folder(folderName);
-		return privateMailboxService.createFolder(udr, folder);
+		mailboxService.createFolder(udr, folder);
 	}
 }

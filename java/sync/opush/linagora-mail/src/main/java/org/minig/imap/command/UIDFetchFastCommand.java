@@ -43,10 +43,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
+import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.Flag;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -95,7 +95,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		if (isOK) {
 			Iterator<IMAPResponse> it = rs.iterator();
 			for (int i = 0; it.hasNext() && i < uids.size(); ) {
-				org.minig.imap.FastFetch.Builder builder = FastFetch.builder();
+				org.obm.push.mail.bean.FastFetch.Builder builder = FastFetch.builder();
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH (")) {

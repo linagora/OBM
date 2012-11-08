@@ -34,9 +34,9 @@ package org.minig.imap.command;
 
 import java.util.List;
 
-import org.minig.imap.NameSpaceInfo;
 import org.minig.imap.command.parser.NamespaceParser;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.NameSpaceInfo;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;

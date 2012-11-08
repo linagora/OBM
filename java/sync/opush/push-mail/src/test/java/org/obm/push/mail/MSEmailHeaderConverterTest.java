@@ -34,11 +34,11 @@ package org.obm.push.mail;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
 import org.obm.DateUtils;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
 import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.collect.Lists;

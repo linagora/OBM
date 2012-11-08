@@ -34,11 +34,11 @@ package org.obm;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.BodyParams;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.mail.conversation.EmailViewAttachment;
 import org.obm.push.mail.FetchInstruction;
+import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.BodyParams;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;

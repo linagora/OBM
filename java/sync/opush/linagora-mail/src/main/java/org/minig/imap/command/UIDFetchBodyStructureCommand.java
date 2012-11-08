@@ -43,8 +43,8 @@ import org.minig.imap.command.parser.BodyStructureParser;
 import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
-import org.minig.imap.mime.MimeMessage;
 import org.minig.imap.mime.impl.AtomHelper;
+import org.obm.push.mail.mime.MimeMessage;
 
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 

@@ -36,9 +36,9 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.minig.imap.NameSpaceInfo;
 import org.minig.imap.command.NamespaceCommand;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.NameSpaceInfo;
 
 public class NamespaceCommandTests {
 

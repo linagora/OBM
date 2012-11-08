@@ -40,9 +40,9 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 
 import com.google.common.collect.Lists;
 

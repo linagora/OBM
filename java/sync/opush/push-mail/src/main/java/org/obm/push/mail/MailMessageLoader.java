@@ -41,11 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.minig.imap.Address;
-import org.minig.imap.FastFetch;
-import org.minig.imap.UIDEnvelope;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
@@ -66,6 +61,11 @@ import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.utils.FileUtils;
@@ -86,10 +86,10 @@ public class MailMessageLoader {
 	private final MailboxConnection mailboxConnection;
 	private final EventService eventService;
 	private final Factory fetcherFactory;
-	private final PrivateMailboxService privateMailboxService;
+	private final MailboxService privateMailboxService;
 
 	
-	public MailMessageLoader(PrivateMailboxService privateMailboxService, MailboxConnection mailboxConnection, EventService eventService, 
+	public MailMessageLoader(MailboxService privateMailboxService, MailboxConnection mailboxConnection, EventService eventService, 
 			MessageFetcher.Factory fetcherFactory) {
 		
 		this.privateMailboxService = privateMailboxService;
@@ -186,7 +186,7 @@ public class MailMessageLoader {
 	private InputStream extractInputStreamInvitation(final IMimePart mp, final UserDataRequest udr, final String collectionPath, final long messageId) 
 			throws IOException {
 		
-		final InputStream part = privateMailboxService.findAttachment(udr, collectionPath, messageId, mp.getAddress());
+		final InputStream part = privateMailboxService.fetchMimePartStream(udr, collectionPath, messageId, mp.getAddress());
 		byte[] data = extractPartData(mp, part);
 		if (data != null) {
 			return new ByteArrayInputStream(data);
@@ -279,7 +279,7 @@ public class MailMessageLoader {
 		try {
 			
 			if (mp.getName() != null || mp.getContentId() != null) {
-				final InputStream part = privateMailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());
+				final InputStream part = privateMailboxService.fetchMimePartStream(udr, collectionPath, uid, mp.getAddress());
 				byte[] data = extractPartData(mp, part);
 				
 				final String id = AttachmentHelper.getAttachmentId(collectionId.toString(), String.valueOf(messageId), 

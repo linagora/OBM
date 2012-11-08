@@ -40,6 +40,8 @@
 		<module>push-servlet</module>
 		<module>protocol</module>
 		<module>push-module</module>
+		<module>mail-backend-interfaces</module>
+		<module>mail-backend-tools</module>
 		<module>mail-backend-testsuite</module>
 	</modules>
 

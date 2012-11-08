@@ -35,9 +35,9 @@ package org.minig.imap.command;
 import java.util.Collection;
 import java.util.List;
 
-import org.minig.imap.FlagsList;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
+import org.obm.push.mail.bean.FlagsList;
 
 public class UIDStoreCommand extends Command<Boolean> {
 

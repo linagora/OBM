@@ -47,7 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.minig.imap.StoreClient;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
@@ -56,7 +55,6 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -64,11 +62,12 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.MimeAddress;
 import org.obm.push.mail.MimePartSelector;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.collect.Iterables;
@@ -87,7 +86,6 @@ public class UIDFetchPartTest {
 
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 	@Inject GreenMail greenMail;
 	@Inject Mime4jUtils mime4jUtils;
 	private String mailbox;
@@ -106,7 +104,7 @@ public class UIDFetchPartTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -292,7 +290,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -300,7 +298,7 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
+		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).hasSize(fetchInstruction.getMimePart().getSize());
@@ -315,7 +313,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -323,7 +321,8 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
+		InputStream mimePartData = mailboxService.fetchPartialMimePartStream(udr, inbox, sentEmail.getUid(), 
+				fetchInstruction.getMimePart().getAddress(), fetchInstruction.getTruncation());
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).hasSize(truncationSize);
@@ -336,7 +335,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				privateMailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.RTF).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -344,7 +343,7 @@ public class UIDFetchPartTest {
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
 		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
-		InputStream mimePartData = privateMailboxService.fetchMimePartData(udr, inbox, sentEmail.getUid(), fetchInstruction);
+		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
 		
 		Assertions.assertThat(data).isEqualTo("bodydata");

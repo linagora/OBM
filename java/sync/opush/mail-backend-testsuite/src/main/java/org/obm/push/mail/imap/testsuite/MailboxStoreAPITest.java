@@ -47,7 +47,6 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -55,6 +54,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.ThrowingInputStream;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 

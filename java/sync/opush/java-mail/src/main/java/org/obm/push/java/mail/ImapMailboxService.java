@@ -47,14 +47,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
-import org.minig.imap.Envelope;
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
-import org.minig.imap.SearchQuery;
-import org.minig.imap.UIDEnvelope;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.mail.conversation.EmailView;
@@ -63,7 +56,6 @@ import org.obm.mail.message.MessageFetcher.Factory;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
@@ -79,19 +71,26 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
 import org.obm.push.mail.EmailViewPartsFetcherImpl;
-import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailMessageLoader;
 import org.obm.push.mail.MailViewToMSEmailConverter;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
-import org.obm.push.mail.MimeAddress;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.ImapCapability;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.EventService;
@@ -112,7 +111,7 @@ import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
 
 @Singleton
-public class ImapMailboxService implements PrivateMailboxService {
+public class ImapMailboxService implements MailboxService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapMailboxService.class);
 
@@ -244,10 +243,10 @@ public class ImapMailboxService implements PrivateMailboxService {
 	}
 
 	@Override
-	public OpushImapFolder createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
+	public void createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException {
 		try {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, null);
-			return store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
+			store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
@@ -463,32 +462,15 @@ public class ImapMailboxService implements PrivateMailboxService {
 	}
 	
 	@Override
-	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress)
-			throws MailException {
-		
-		try {
-			String collectionPath = parseMailBoxName(udr, collectionName);
-			openImapFolderAndGetCorrespondingImapStore(udr, collectionPath);
-			return currentOpushImapFolder().uidFetchPart(mailUid, mimePartAddress);
-		} catch (LocatorClientException e) {
-			throw new MailException(e);
-		} catch (MessagingException e) {
-			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
-			throw new MailException(e);
-		}
-	}
-
-	@Override
-	public Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionName, Integer collectionId) 
+	public Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
 			throws DaoException, MailException {
 		
 		long time = System.currentTimeMillis();
 		try {
-			String collectionPath = parseMailBoxName(udr, collectionName);
-			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, collectionPath);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
 			
-			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
+			logger.info("Mailbox folder[ {} ] will be purged...", mailBoxName);
 			Collection<Long> uids = store.uidSearch(currentOpushImapFolder(), SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
@@ -496,7 +478,7 @@ public class ImapMailboxService implements PrivateMailboxService {
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
-					new Object[]{collectionPath, time, uids.size()});
+					new Object[]{mailBoxName, time, uids.size()});
 			return uids;
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
@@ -636,26 +618,66 @@ public class ImapMailboxService implements PrivateMailboxService {
 	}
 	
 	@Override
-	public InputStream fetchMimePartData(UserDataRequest udr, String collectionName, long uid, 
-			FetchInstruction fetchInstruction) throws MailException {
-
-		Preconditions.checkNotNull(fetchInstruction);
+	public InputStream fetchPartialMimePartStream(UserDataRequest udr, String collectionPath, long uid, MimeAddress partAddress, int limit) 
+			throws MailException {
+		Preconditions.checkNotNull(partAddress);
 		try {
-			String collectionPath = parseMailBoxName(udr, collectionName);
-			openImapFolderAndGetCorrespondingImapStore(udr, collectionPath);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidFetchPart(uid, partAddress, limit);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		}
+	}
+	
+	@Override
+	public InputStream fetchMimePartStream(UserDataRequest udr, String collectionPath, long uid, MimeAddress partAddress)
+			throws MailException {
+		Preconditions.checkNotNull(partAddress);
+		try {
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidFetchPart(uid, partAddress);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (ImapLoginException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		}
+	}
+	
+	@Override
+	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress)
+			throws MailException {
+		
+		try {
+			String mailBoxName = parseMailBoxName(udr, collectionName);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
 			
-			MimeAddress address = fetchInstruction.getMimePart().getAddress();
-			Integer truncation = fetchInstruction.getTruncation();
-			if (truncation != null) {
-				return currentOpushImapFolder().uidFetchPart(uid, address, truncation);
-			} else {
-				return currentOpushImapFolder().uidFetchPart(uid, address);
-			}
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidFetchPart(mailUid, mimePartAddress);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
 			throw new MailException(e);
 		}
 	}

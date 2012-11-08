@@ -36,12 +36,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.Flag;
 import org.obm.icalendar.ICalendar;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.exception.EmailViewBuildException;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.Flag;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;

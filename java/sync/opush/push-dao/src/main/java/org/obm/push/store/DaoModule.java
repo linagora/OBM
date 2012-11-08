@@ -39,7 +39,6 @@ import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
 import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
 import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
-import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
 import org.obm.push.store.jdbc.FolderSnapshotDaoJdbcImpl;
 import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
 import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
@@ -54,7 +53,6 @@ public class DaoModule extends AbstractModule{
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
 		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
 		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);

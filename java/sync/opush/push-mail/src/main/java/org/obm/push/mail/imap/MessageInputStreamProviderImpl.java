@@ -33,7 +33,7 @@ package org.obm.push.mail.imap;
 
 import java.io.InputStream;
 
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.mime.MimeAddress;
 
 import com.google.common.io.LimitInputStream;
 import com.google.inject.Singleton;

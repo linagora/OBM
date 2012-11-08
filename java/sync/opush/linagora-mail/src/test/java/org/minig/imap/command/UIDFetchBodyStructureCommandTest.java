@@ -43,12 +43,12 @@ import org.junit.runner.RunWith;
 
 import org.minig.imap.command.parser.BodyStructureParser;
 import org.minig.imap.impl.IMAPResponse;
-import org.minig.imap.mime.MimeMessage;
 
 import com.google.common.collect.ImmutableList;
 
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.mime.MimeMessage;
 
 @RunWith(SlowFilterRunner.class)
 public class UIDFetchBodyStructureCommandTest {

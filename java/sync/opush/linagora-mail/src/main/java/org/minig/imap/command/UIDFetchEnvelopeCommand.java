@@ -41,10 +41,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.minig.imap.Address;
 import org.minig.imap.EncodedWord;
-import org.minig.imap.Envelope;
-import org.minig.imap.UIDEnvelope;
 import org.minig.imap.impl.DateParser;
 import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.IMAPResponse;
@@ -53,6 +50,9 @@ import org.minig.imap.mime.impl.AtomHelper;
 import org.minig.imap.mime.impl.ParenListParser;
 import org.minig.imap.mime.impl.ParenListParser.TokenType;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.UIDEnvelope;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;

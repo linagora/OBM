@@ -34,8 +34,8 @@ package org.minig.imap.command.parser;
 import java.util.Collections;
 import java.util.List;
 
-import org.minig.imap.NameSpaceInfo;
 import org.minig.imap.impl.MailboxNameUTF7Converter;
+import org.obm.push.mail.bean.NameSpaceInfo;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 

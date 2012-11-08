@@ -77,6 +77,8 @@ import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;

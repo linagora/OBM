@@ -37,7 +37,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 
 import org.minig.imap.EncodedWord;
-import org.minig.imap.mime.BodyParam;
+import org.obm.push.mail.mime.BodyParam;
 
 import com.google.common.base.Function;
 

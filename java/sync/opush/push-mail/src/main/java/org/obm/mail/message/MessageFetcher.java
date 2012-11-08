@@ -34,12 +34,12 @@ package org.obm.mail.message;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.imap.StoreException;
+import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
 
 
 public interface MessageFetcher {

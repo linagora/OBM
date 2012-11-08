@@ -38,8 +38,8 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.minig.imap.CommandIOException;
-import org.minig.imap.FlagsList;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.utils.FileUtils;
 
 public class AppendCommand extends Command<Boolean> {

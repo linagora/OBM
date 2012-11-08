@@ -173,6 +173,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>mail-backend-interfaces</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>

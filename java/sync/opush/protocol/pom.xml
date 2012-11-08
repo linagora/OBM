@@ -23,6 +23,11 @@
 	<dependencies>	
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-interfaces</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>tnefconverter</artifactId>
 			<version>${obm.version}</version>
 		</dependency>

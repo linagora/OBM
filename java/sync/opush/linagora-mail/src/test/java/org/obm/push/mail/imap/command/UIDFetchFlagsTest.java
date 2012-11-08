@@ -43,10 +43,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
 import org.minig.imap.IMAPException;
-import org.minig.imap.SearchQuery;
 import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
@@ -61,7 +58,9 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 
@@ -77,7 +76,6 @@ public class UIDFetchFlagsTest {
 
 	@Inject LinagoraImapClientProvider clientProvider;
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
@@ -97,7 +95,7 @@ public class UIDFetchFlagsTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -194,7 +192,7 @@ public class UIDFetchFlagsTest {
 	
 	private Collection<Flag> uidFetchFlags(long uid) throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return privateMailboxService.fetchFlags(udr, inbox, uid);
+		return mailboxService.fetchFlags(udr, inbox, uid);
 	}
 	
 	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {

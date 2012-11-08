@@ -44,13 +44,12 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
@@ -68,7 +67,6 @@ public abstract class ImapDeleteAPITest {
 	private static final String TRASH = EmailConfiguration.IMAP_TRASH_NAME;
 	
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 	
 	@Inject GreenMail greenMail;
@@ -90,7 +88,7 @@ public abstract class ImapDeleteAPITest {
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 
-	    testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	    testUtils.createFolders(TRASH);
 	}
 	

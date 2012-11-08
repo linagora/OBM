@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
@@ -56,16 +57,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.Flag;
-import org.minig.imap.UIDEnvelope;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.BodyParams;
-import org.minig.imap.mime.ContentType;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
-import org.minig.imap.mime.MimePart;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -78,6 +69,17 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.BodyParams;
+import org.obm.push.mail.mime.ContentType;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.transformer.TestIdentityTransformerFactory;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
@@ -88,7 +90,6 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
-
 @RunWith(SlowFilterRunner.class)
 public class EmailViewPartsFetcherImplTest {
 
@@ -619,7 +620,7 @@ public class EmailViewPartsFetcherImplTest {
 	private Optional<String> getDisplayNameOfMimePart(IMimePart attachment) {
 		IMocksControl mocks = createControl();
 		TransformersFactory transformer = mocks.createMock(TransformersFactory.class);
-		PrivateMailboxService mailboxService = mocks.createMock(PrivateMailboxService.class);
+		MailboxService mailboxService = mocks.createMock(MailboxService.class);
 		List<BodyPreference> preferences = mocks.createMock(List.class);
 		
 		
@@ -631,8 +632,8 @@ public class EmailViewPartsFetcherImplTest {
 		return displayName;
 	}
 	
-	private PrivateMailboxService messageFixtureToMailboxServiceMock() throws Exception {
-		PrivateMailboxService mailboxService = createStrictMock(PrivateMailboxService.class);
+	private MailboxService messageFixtureToMailboxServiceMock() throws Exception {
+		MailboxService mailboxService = createStrictMock(MailboxService.class);
 		mockMailboxServiceFlags(mailboxService);
 		mockMailboxServiceEnvelope(mailboxService);
 		mockMailboxServiceBody(mailboxService);
@@ -640,7 +641,7 @@ public class EmailViewPartsFetcherImplTest {
 		return mailboxService;
 	}
 
-	private void mockMailboxServiceFlags(PrivateMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceFlags(MailboxService mailboxService) throws MailException {
 		Builder<Flag> flagsListBuilder = ImmutableList.builder();
 		if (messageFixture.answered) {
 			flagsListBuilder.add(Flag.ANSWERED);
@@ -655,7 +656,7 @@ public class EmailViewPartsFetcherImplTest {
 				.andReturn(flagsListBuilder.build()).once();
 	}
 
-	private void mockMailboxServiceEnvelope(PrivateMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceEnvelope(MailboxService mailboxService) throws MailException {
 		Envelope envelope = Envelope.builder()
 			.from(messageFixture.from)
 			.to(messageFixture.to)
@@ -668,15 +669,16 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
 	}
 	
-	private void mockMailboxServiceBody(PrivateMailboxService mailboxService) throws MailException {
+	private void mockMailboxServiceBody(MailboxService mailboxService) throws MailException {
 		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, messageFixture.uid))
 			.andReturn(mockAggregateMimeMessage()).once();
 
-		expect(mailboxService.fetchMimePartData(
+		expect(mailboxService.fetchPartialMimePartStream(
 				anyObject(UserDataRequest.class),
 				anyObject(String.class),
 				anyLong(),
-				anyObject(FetchInstruction.class)))
+				anyObject(MimeAddress.class),
+				anyInt()))
 			.andReturn(messageFixture.bodyData).once();
 		
 		expect(mailboxService.findAttachment(udr, messageCollectionName, messageFixture.uid, mimeAddress))

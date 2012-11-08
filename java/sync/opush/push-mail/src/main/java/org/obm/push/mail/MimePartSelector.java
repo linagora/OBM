@@ -35,11 +35,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.minig.imap.mime.ContentType;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.mime.ContentType;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -41,11 +41,11 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.minig.imap.mime.ContentType;
-import org.minig.imap.mime.MimeMessage;
-import org.minig.imap.mime.MimePart;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.mime.ContentType;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;

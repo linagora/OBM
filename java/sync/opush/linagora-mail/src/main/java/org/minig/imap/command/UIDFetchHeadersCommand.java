@@ -42,10 +42,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.minig.imap.IMAPHeaders;
 import org.minig.imap.command.parser.HeadersParser;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
+import org.obm.push.mail.bean.IMAPHeaders;
 
 public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 

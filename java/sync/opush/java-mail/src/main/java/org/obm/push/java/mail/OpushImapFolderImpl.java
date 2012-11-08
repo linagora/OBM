@@ -52,19 +52,19 @@ import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchException;
 import javax.mail.search.SearchTerm;
 
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
-import org.minig.imap.SearchQuery;
 import org.obm.push.bean.EmailHeader;
 import org.obm.push.bean.EmailHeaders;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.mail.imap.StreamedLiteral;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
+import org.obm.push.mail.mime.MimeAddress;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;

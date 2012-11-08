@@ -36,8 +36,8 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.minig.imap.mime.IMimePart;
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeAddress;
 
 public class MimeMessageTestUtils {
 

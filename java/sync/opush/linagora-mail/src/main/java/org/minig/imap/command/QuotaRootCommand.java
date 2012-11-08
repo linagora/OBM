@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.minig.imap.QuotaInfo;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.QuotaInfo;
 
 public class QuotaRootCommand extends SimpleCommand<QuotaInfo> {
 

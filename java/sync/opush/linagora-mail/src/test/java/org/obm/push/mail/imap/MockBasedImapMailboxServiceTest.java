@@ -42,8 +42,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.ListInfo;
-import org.minig.imap.ListResult;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
@@ -59,6 +57,8 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.bean.ListInfo;
+import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.smtp.SmtpSender;
 
 import com.google.common.collect.Sets;

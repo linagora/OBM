@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.mail.conversation;
 
-import org.minig.imap.mime.ContentType;
+import org.obm.push.mail.mime.ContentType;
 
 import com.google.common.base.Objects;
 

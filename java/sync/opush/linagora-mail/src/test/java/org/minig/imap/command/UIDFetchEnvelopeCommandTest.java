@@ -38,14 +38,14 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPResponseParser;
 import org.minig.imap.impl.MinaIMAPMessage;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
 
 import com.google.common.collect.ImmutableList;
 

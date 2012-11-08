@@ -40,8 +40,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.minig.imap.SearchQuery;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.SearchQuery;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;

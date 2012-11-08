@@ -36,13 +36,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.BodyParams;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
-import org.minig.imap.mime.MimePart;
-import org.minig.imap.mime.MimePart.Builder;
 import org.minig.imap.mime.impl.BodyParamParser;
+import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.BodyParams;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePart.Builder;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
@@ -375,7 +375,7 @@ public class BodyStructureParser {
 	
 	private static final Rules parser = Parboiled.createParser(BodyStructureParser.Rules.class);
 	
-	public org.minig.imap.mime.MimeMessage.Builder parseBodyStructureDebug(String payload) {
+	public org.obm.push.mail.mime.MimeMessage.Builder parseBodyStructureDebug(String payload) {
 		Rules parserInstance = parser.newInstance();
 		TracingParseRunner<MimeMessage.Builder> runner = new TracingParseRunner<MimeMessage.Builder>(parserInstance.rule());
 		try {

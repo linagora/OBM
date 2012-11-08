@@ -36,8 +36,6 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Set;
 
-import org.minig.imap.Flag;
-import org.minig.imap.mime.ContentType;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.mail.conversation.EmailView;
@@ -55,6 +53,8 @@ import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.mime.ContentType;
 import org.obm.push.service.EventService;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.sync.calendar.EventExtId;

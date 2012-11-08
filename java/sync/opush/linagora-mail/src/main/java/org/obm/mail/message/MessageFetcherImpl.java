@@ -38,13 +38,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Map;
 
-import org.minig.imap.IMAPHeaders;
 import org.minig.imap.command.parser.HeadersParser;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailMessage;
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.minig.imap.Address;
-import org.minig.imap.mime.IMimePart;
 import org.obm.mail.message.MailMessageAttachment;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.mime.IMimePart;
 
 public class MailMessage implements Serializable, Comparable<MailMessage> {
 

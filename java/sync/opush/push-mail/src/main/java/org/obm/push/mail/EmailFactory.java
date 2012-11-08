@@ -34,8 +34,8 @@ package org.obm.push.mail;
 import java.util.Collection;
 import java.util.Set;
 
-import org.minig.imap.FastFetch;
-import org.obm.push.bean.Email;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.FastFetch;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;

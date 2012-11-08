@@ -34,6 +34,8 @@ package org.minig.imap;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;

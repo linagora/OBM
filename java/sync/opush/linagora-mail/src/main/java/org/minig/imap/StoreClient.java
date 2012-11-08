@@ -46,8 +46,17 @@ import org.minig.imap.impl.ClientSupport;
 import org.minig.imap.impl.IResponseCallback;
 import org.minig.imap.impl.MailThread;
 import org.minig.imap.impl.StoreClientCallback;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.MailboxConnection;
+import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.InternalDate;
+import org.obm.push.mail.bean.ListResult;
+import org.obm.push.mail.bean.NameSpaceInfo;
+import org.obm.push.mail.bean.QuotaInfo;
+import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -34,9 +34,9 @@ package org.minig.imap.command;
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 
 import com.google.common.collect.ImmutableList;
 

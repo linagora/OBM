@@ -42,10 +42,10 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.minig.imap.FlagsList;
-import org.minig.imap.SearchQuery;
 import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MimeAddress;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.mime.MimeAddress;
 
 import com.sun.mail.imap.IMAPMessage;
 

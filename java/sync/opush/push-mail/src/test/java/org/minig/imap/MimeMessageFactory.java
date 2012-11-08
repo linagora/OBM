@@ -33,9 +33,9 @@ package org.minig.imap;
 
 import java.util.Map;
 
-import org.minig.imap.mime.BodyParams;
-import org.minig.imap.mime.MimeMessage;
-import org.minig.imap.mime.MimePart;
+import org.obm.push.mail.mime.BodyParams;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 
 public class MimeMessageFactory {
 

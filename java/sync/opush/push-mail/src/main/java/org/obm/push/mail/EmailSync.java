@@ -36,9 +36,9 @@ import java.util.Date;
 import java.util.Set;
 
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.store.EmailDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

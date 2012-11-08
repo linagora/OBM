@@ -40,10 +40,10 @@ import java.util.HashMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
 
 import com.google.common.collect.ImmutableMap;
 

@@ -43,10 +43,9 @@ import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
@@ -57,7 +56,6 @@ import com.icegreen.greenmail.util.GreenMail;
 public abstract class MailboxServiceAllFoldersTest {
 
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
@@ -77,7 +75,7 @@ public abstract class MailboxServiceAllFoldersTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, privateMailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
@@ -87,7 +85,7 @@ public abstract class MailboxServiceAllFoldersTest {
 	
 	@Test
 	public void testDefaultFolderList() throws Exception {
-		MailboxFolders emails = privateMailboxService.listAllFolders(udr);
+		MailboxFolders emails = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(emails).containsOnly(inbox());
 	}
 	
@@ -95,8 +93,8 @@ public abstract class MailboxServiceAllFoldersTest {
 	@Test
 	public void testListTwoFolders() throws Exception {
 		MailboxFolder newFolder = folder("NEW");
-		privateMailboxService.createFolder(udr, newFolder);
-		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).containsOnly(
 				inbox(),
 				newFolder);
@@ -105,8 +103,8 @@ public abstract class MailboxServiceAllFoldersTest {
 	@Test
 	public void testListInboxSubfolder() throws Exception {
 		MailboxFolder newFolder = folder("INBOX.NEW");
-		privateMailboxService.createFolder(udr, newFolder);
-		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).containsOnly(
 				inbox(),
 				newFolder);
@@ -115,8 +113,8 @@ public abstract class MailboxServiceAllFoldersTest {
 	@Test
 	public void testListInboxDeepSubfolder() throws Exception {
 		MailboxFolder newFolder = folder("INBOX.LEVEL1.LEVEL2.LEVEL3.LEVEL4");
-		privateMailboxService.createFolder(udr, newFolder);
-		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).containsOnly(
 				inbox(),
 				folder("INBOX.LEVEL1"),
@@ -128,8 +126,8 @@ public abstract class MailboxServiceAllFoldersTest {
 	@Test
 	public void testListToplevelFolder() throws Exception {
 		MailboxFolder newFolder = folder("TOP");
-		privateMailboxService.createFolder(udr, newFolder);
-		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).containsOnly(
 				inbox(),
 				folder("TOP"));
@@ -138,8 +136,8 @@ public abstract class MailboxServiceAllFoldersTest {
 	@Test
 	public void testListNestedToplevelFolder() throws Exception {
 		MailboxFolder newFolder = folder("TOP.LEVEL1");
-		privateMailboxService.createFolder(udr, newFolder);
-		MailboxFolders after = privateMailboxService.listAllFolders(udr);
+		mailboxService.createFolder(udr, newFolder);
+		MailboxFolders after = mailboxService.listAllFolders(udr);
 		Assertions.assertThat(after).containsOnly(
 				inbox(),
 				folder("TOP"),

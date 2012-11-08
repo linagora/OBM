@@ -34,9 +34,9 @@ package org.minig.imap.command;
 
 import java.util.List;
 
-import org.minig.imap.ListInfo;
-import org.minig.imap.ListResult;
 import org.minig.imap.impl.IMAPResponse;
+import org.obm.push.mail.bean.ListInfo;
+import org.obm.push.mail.bean.ListResult;
 
 import com.google.common.annotations.VisibleForTesting;
 

@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
@@ -66,12 +65,10 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(Address.class)
-					.add(UserDataRequest.class) 
 					.add(BodyPreference.class)
 					.add(ChangedCollections.class)
 					.add(Credentials.class)
 					.add(Device.class)
-					.add(Email.class)
 					.add(ItemChange.class)
 					.add(ItemDeletion.class)
 					.add(MeetingResponse.class)
@@ -107,7 +104,6 @@ public class BeansTest {
 					.add(MSEmailHeader.class)
 					.add(MSRead.class)
 					.add(MSEventExtId.class)
-					.add(CollectionPath.class)
 					.add(OpushCollection.class)
 					.add(PathsToCollections.class)
 					.build();

@@ -42,9 +42,6 @@ import net.fortuna.ical4j.data.ParserException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.Flag;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -55,6 +52,9 @@ import org.obm.mail.conversation.EmailViewInvitationType;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.exception.EmailViewBuildException;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.Flag;
 
 import com.google.common.collect.Lists;
 

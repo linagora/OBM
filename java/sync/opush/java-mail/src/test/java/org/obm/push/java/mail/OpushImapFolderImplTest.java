@@ -46,8 +46,8 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.minig.imap.SearchQuery;
 import org.obm.push.java.mail.OpushImapFolderImpl;
+import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.utils.DateUtils;
 
 

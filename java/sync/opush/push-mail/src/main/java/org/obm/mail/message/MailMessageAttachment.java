@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.mail.message;
 
-import org.minig.imap.mime.IMimePart;
+import org.obm.push.mail.mime.IMimePart;
 
 public class MailMessageAttachment {
 

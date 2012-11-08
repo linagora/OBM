@@ -43,9 +43,8 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.inject.Inject;
@@ -55,7 +54,6 @@ import com.icegreen.greenmail.util.GreenMail;
 public abstract class SendMailboxServiceTest {
 
 	@Inject MailboxService mailboxService;
-	@Inject PrivateMailboxService privateMailboxService;
 
 	@Inject GreenMail greenMail;
 	@Inject CollectionPathHelper collectionPathHelper;
@@ -82,7 +80,7 @@ public abstract class SendMailboxServiceTest {
 
 	@Test
 	public void testParseSentMailBox() throws Exception {
-		privateMailboxService.createFolder(udr, folder("Sent"));
+		mailboxService.createFolder(udr, folder("Sent"));
 
 		String userSentFolder = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
@@ -92,7 +90,7 @@ public abstract class SendMailboxServiceTest {
 
 	@Test
 	public void testParseSentMailBoxSentIsInsensitive() throws Exception {
-		privateMailboxService.createFolder(udr, folder("SeNt"));
+		mailboxService.createFolder(udr, folder("SeNt"));
 
 		String userSentFolder = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
@@ -102,9 +100,9 @@ public abstract class SendMailboxServiceTest {
 
 	@Test
 	public void testParseSentMailBoxWhenManyNamedSentBox() throws Exception {
-		privateMailboxService.createFolder(udr, folder("AnyFolderSent"));
-		privateMailboxService.createFolder(udr, folder("Sent"));
-		privateMailboxService.createFolder(udr, folder("AnotherSentfolder"));
+		mailboxService.createFolder(udr, folder("AnyFolderSent"));
+		mailboxService.createFolder(udr, folder("Sent"));
+		mailboxService.createFolder(udr, folder("AnotherSentfolder"));
 
 		String userSentFolder = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);
@@ -114,9 +112,9 @@ public abstract class SendMailboxServiceTest {
 	
 	@Test
 	public void testParseSentMailBox_OBMFULL3133() throws Exception {
-		privateMailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
-		privateMailboxService.createFolder(udr, folder("Sent"));
-		privateMailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
+		mailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.696846.Sent"));
+		mailboxService.createFolder(udr, folder("Sent"));
+		mailboxService.createFolder(udr, folder("Bo&AO4-tes partag&AOk-es.6968426.Sent"));
 
 		String userSentFolder = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_SENT_NAME);

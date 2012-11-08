@@ -43,7 +43,13 @@ import java.util.Set;
 
 import org.junit.Ignore;
 import org.minig.imap.impl.MailThread;
-import org.minig.imap.mime.MimeMessage;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.NameSpaceInfo;
+import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.utils.FileUtils;
 
 import com.google.common.collect.Iterables;

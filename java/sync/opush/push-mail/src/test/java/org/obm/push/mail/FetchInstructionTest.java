@@ -39,8 +39,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.mime.IMimePart;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeAddress;
 
 @RunWith(SlowFilterRunner.class)
 public class FetchInstructionTest {

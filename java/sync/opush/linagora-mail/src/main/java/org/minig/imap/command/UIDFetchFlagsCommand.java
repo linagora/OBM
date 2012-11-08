@@ -37,12 +37,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.minig.imap.Flag;
-import org.minig.imap.FlagsList;
 import org.minig.imap.impl.IMAPParsingTools;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.MessageSet;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

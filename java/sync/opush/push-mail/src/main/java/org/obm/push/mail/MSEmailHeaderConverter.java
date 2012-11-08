@@ -34,10 +34,10 @@ package org.obm.push.mail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
 import org.obm.push.utils.UserEmailParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

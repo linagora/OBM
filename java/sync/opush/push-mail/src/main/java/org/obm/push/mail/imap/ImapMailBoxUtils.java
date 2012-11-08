@@ -53,14 +53,14 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimePartDataSource;
 
-import org.minig.imap.Address;
-import org.minig.imap.Envelope;
-import org.minig.imap.FastFetch;
-import org.minig.imap.Flag;
-import org.minig.imap.mime.MimeMessage;
-import org.minig.imap.mime.MimePart;
-import org.obm.push.bean.Email;
 import org.obm.push.mail.MailException;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.Envelope;
+import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;

@@ -40,15 +40,14 @@ import javax.mail.internet.MimeMessage;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.Email;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxFolder;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.PrivateMailboxService;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.MailboxFolder;
 
 import com.google.common.collect.Iterables;
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -61,14 +60,12 @@ public class MailboxTestUtils {
 	private final UserDataRequest udr;
 	private final String mailbox;
 	private final Date beforeTest;
-	private final PrivateMailboxService privateMailboxService;
 	private final CollectionPathHelper collectionPathHelper;
 
-	public MailboxTestUtils(MailboxService mailboxService, PrivateMailboxService privateMailboxService,
+	public MailboxTestUtils(MailboxService mailboxService,
 			UserDataRequest udr, String mailbox, Date beforeTest, CollectionPathHelper collectionPathHelper) {
 		
 		this.mailboxService = mailboxService;
-		this.privateMailboxService = privateMailboxService;
 		this.udr = udr;
 		this.mailbox = mailbox;
 		this.beforeTest = beforeTest;
@@ -113,7 +110,7 @@ public class MailboxTestUtils {
 
 	public void createFolders(String...folderNames) throws MailException {
 		for (String folderName : folderNames) {
-			privateMailboxService.createFolder(udr, folder(folderName));
+			mailboxService.createFolder(udr, folder(folderName));
 		}
 	}
 

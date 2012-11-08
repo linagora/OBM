@@ -42,10 +42,6 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.minig.imap.Flag;
-import org.minig.imap.UIDEnvelope;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.icalendar.ICalendar;
 import org.obm.mail.conversation.EmailView;
 import org.obm.mail.conversation.EmailView.Builder;
@@ -55,6 +51,11 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.slf4j.Logger;
@@ -74,17 +75,17 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private static final Logger logger = LoggerFactory.getLogger(EmailViewPartsFetcherImpl.class);
 
 	private final TransformersFactory transformersFactory;
-	private final PrivateMailboxService privateMailboxService;
+	private final MailboxService mailboxService;
 	private final UserDataRequest udr;
 	private final String collectionName;
 	private final Integer collectionId;
 	private final List<BodyPreference> bodyPreferences;
 
-	public EmailViewPartsFetcherImpl(TransformersFactory transformersFactory, PrivateMailboxService privateMailboxService, 
+	public EmailViewPartsFetcherImpl(TransformersFactory transformersFactory, MailboxService mailboxService, 
 			List<BodyPreference> bodyPreferences, UserDataRequest udr, String collectionName, Integer collectionId) {
 		
 		this.transformersFactory = transformersFactory;
-		this.privateMailboxService = privateMailboxService;
+		this.mailboxService = mailboxService;
 		this.udr = udr;
 		this.collectionName = collectionName;
 		this.collectionId = collectionId;
@@ -120,17 +121,17 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 
 	private void fetchFlags(Builder emailViewBuilder, long uid) throws MailException {
-		Collection<Flag> emailFlags = privateMailboxService.fetchFlags(udr, collectionName, uid);
+		Collection<Flag> emailFlags = mailboxService.fetchFlags(udr, collectionName, uid);
 		emailViewBuilder.flags(emailFlags);
 	}
 
 	private void fetchEnvelope(Builder emailViewBuilder, long uid)throws MailException {
-		UIDEnvelope envelope = privateMailboxService.fetchEnvelope(udr, collectionName, uid);
+		UIDEnvelope envelope = mailboxService.fetchEnvelope(udr, collectionName, uid);
 		emailViewBuilder.envelope(envelope.getEnvelope());
 	}
 	
 	private MimeMessage getMimeMessage(long uid) throws MailException {
-		return privateMailboxService.fetchBodyStructure(udr, collectionName, uid);
+		return mailboxService.fetchBodyStructure(udr, collectionName, uid);
 	}
 
 	private FetchInstruction getFetchInstruction(MimeMessage mimeMessage) {
@@ -170,14 +171,20 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		InputStream bodyData = null;
 		try {
 			if (fetchInstruction.hasMimePartAddressDefined()) {
-				bodyData = privateMailboxService.fetchMimePartData(udr, collectionName, uid, fetchInstruction);
+				MimeAddress address = fetchInstruction.getMimePart().getAddress();
+				Integer truncation = fetchInstruction.getTruncation();
+				if (truncation != null) {
+					bodyData = mailboxService.fetchPartialMimePartStream(udr, collectionName, uid, address, truncation);
+				} else {
+					bodyData = mailboxService.fetchMimePartStream(udr, collectionName, uid, address);
+				}
 				if (bodyData != null) {
 					return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
 				} else {
 					return null;
 				}
 			} else {
-				return privateMailboxService.fetchMailStream(udr, collectionName, uid);
+				return mailboxService.fetchMailStream(udr, collectionName, uid);
 			}
 		} catch (IOException e) {
 			throw new MailException(e);
@@ -248,7 +255,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid)
 			throws MailException, IOException, ParserException {
 
-		InputStream inputStream = privateMailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
+		InputStream inputStream = mailboxService.findAttachment(udr, collectionName, uid, mp.getAddress());
 		ICalendar iCalendar = ICalendar.builder()
 			.inputStream(mp.decodeMimeStream(inputStream)).build();
 		emailViewBuilder.iCalendar(iCalendar);

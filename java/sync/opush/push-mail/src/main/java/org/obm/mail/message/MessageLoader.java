@@ -40,13 +40,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.minig.imap.IMAPHeaders;
-import org.minig.imap.mime.BodyParam;
-import org.minig.imap.mime.IMimePart;
-import org.minig.imap.mime.MimeMessage;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.imap.StoreException;
+import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

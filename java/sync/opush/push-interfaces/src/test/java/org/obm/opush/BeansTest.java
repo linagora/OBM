@@ -35,8 +35,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.MailboxFolder;
-import org.obm.push.mail.MailboxFolders;
+import org.obm.push.backend.CollectionPath;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -55,8 +55,8 @@ public class BeansTest {
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
+					.add(UserDataRequest.class) 
+					.add(CollectionPath.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

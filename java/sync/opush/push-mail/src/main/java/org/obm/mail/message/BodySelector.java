@@ -34,7 +34,7 @@ package org.obm.mail.message;
 import java.util.Collection;
 import java.util.List;
 
-import org.minig.imap.mime.IMimePart;
+import org.obm.push.mail.mime.IMimePart;
 
 import com.google.common.collect.ImmutableList;
 
