@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.mime;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+
+import org.obm.push.mail.bean.IMAPHeaders;
 
 
 public interface IMimePart {
@@ -114,5 +117,7 @@ public interface IMimePart {
 	 * by using Content-Transfer-Encoding header
 	 */
 	InputStream decodeMimeStream(InputStream rawStream);
+
+	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
 
 }

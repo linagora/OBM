@@ -51,7 +51,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
-public class LinagoraImapClientProvider implements ImapClientProvider {
+public class LinagoraImapClientProvider {
 
 	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
 	private static final String STORE_CLIENT_RESOURCE = "store-client";
@@ -111,8 +111,7 @@ public class LinagoraImapClientProvider implements ImapClientProvider {
 		return imapLocation;
 	}
 
-	@Override
-	public StoreClient getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException {
+	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException {
 		StoreClient storeClient = retrieveWorkingStoreClient(udr);
 		if (storeClient != null) {
 			return storeClient;
@@ -158,7 +157,6 @@ public class LinagoraImapClientProvider implements ImapClientProvider {
 	}
 
 
-	@Override
 	public IdleClient getImapIdleClient(UserDataRequest udr)
 			throws LocatorClientException {
 		String login = getLogin(udr);

@@ -41,14 +41,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.obm.mail.MailboxConnection;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.conversation.MessageId;
 import org.obm.mail.imap.StoreException;
 import org.obm.mail.message.MailMessageAttachment;
-import org.obm.mail.message.MessageFetcher;
-import org.obm.mail.message.MessageFetcher.Factory;
 import org.obm.mail.message.MessageLoader;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
@@ -83,19 +80,13 @@ public class MailMessageLoader {
 	private static final Logger logger = LoggerFactory.getLogger(MailMessageLoader.class);
 	
 	private final List<String> htmlMimeSubtypePriority;
-	private final MailboxConnection mailboxConnection;
 	private final EventService eventService;
-	private final Factory fetcherFactory;
-	private final MailboxService privateMailboxService;
+	private final MailboxService mailboxService;
 
 	
-	public MailMessageLoader(MailboxService privateMailboxService, MailboxConnection mailboxConnection, EventService eventService, 
-			MessageFetcher.Factory fetcherFactory) {
-		
-		this.privateMailboxService = privateMailboxService;
-		this.mailboxConnection = mailboxConnection;
+	public MailMessageLoader(MailboxService mailboxService, EventService eventService) {
+		this.mailboxService = mailboxService;
 		this.eventService = eventService;
-		this.fetcherFactory = fetcherFactory;
 		this.htmlMimeSubtypePriority = Arrays.asList("html", "plain");
 	}
 
@@ -104,11 +95,10 @@ public class MailMessageLoader {
 		
 		MSEmail msEmail = null;
 		try {
-			final UIDEnvelope envelope = privateMailboxService.fetchEnvelope(udr, collectionPath, messageId);
-			final MimeMessage mimeMessage = privateMailboxService.fetchBodyStructure(udr, collectionPath, messageId);
+			final UIDEnvelope envelope = mailboxService.fetchEnvelope(udr, collectionPath, messageId);
+			final MimeMessage mimeMessage = mailboxService.fetchBodyStructure(udr, collectionPath, messageId);
 			if (mimeMessage != null) {
-				final MessageFetcher messageFetcher = fetcherFactory.create(mailboxConnection);
-				final MessageLoader helper = new MessageLoader(messageFetcher, htmlMimeSubtypePriority, false, mimeMessage);
+				final MessageLoader helper = new MessageLoader(udr, mailboxService, htmlMimeSubtypePriority, false, mimeMessage, collectionPath);
 				final MailMessage message = helper.fetch();
 				
 				msEmail = convertMailMessageToMSEmail(message, udr, mimeMessage.getUid(), collectionId, messageId, collectionPath);
@@ -130,7 +120,7 @@ public class MailMessageLoader {
 	}
 	
 	private void setMsEmailFlags(final MSEmail msEmail, final UserDataRequest udr, final String collectionPath, final long messageId) {
-		final Collection<FastFetch> fl = privateMailboxService.fetchFast(udr, collectionPath, ImmutableList.<Long> of(messageId));
+		final Collection<FastFetch> fl = mailboxService.fetchFast(udr, collectionPath, ImmutableList.<Long> of(messageId));
 		if (!fl.isEmpty()) {
 			final FastFetch fl0 = fl.iterator().next();
 			msEmail.setRead(fl0.isRead());
@@ -140,7 +130,7 @@ public class MailMessageLoader {
 	}
 	
 	private void fetchMimeData(final MSEmail mm, final UserDataRequest udr, final String collectionPath, final long messageId) {
-		final InputStream mimeData = privateMailboxService.fetchMailStream(udr, collectionPath, messageId);
+		final InputStream mimeData = mailboxService.fetchMailStream(udr, collectionPath, messageId);
 		mm.setMimeData(mimeData);
 	}
 
@@ -186,7 +176,7 @@ public class MailMessageLoader {
 	private InputStream extractInputStreamInvitation(final IMimePart mp, final UserDataRequest udr, final String collectionPath, final long messageId) 
 			throws IOException {
 		
-		final InputStream part = privateMailboxService.fetchMimePartStream(udr, collectionPath, messageId, mp.getAddress());
+		final InputStream part = mailboxService.fetchMimePartStream(udr, collectionPath, messageId, mp.getAddress());
 		byte[] data = extractPartData(mp, part);
 		if (data != null) {
 			return new ByteArrayInputStream(data);
@@ -279,7 +269,7 @@ public class MailMessageLoader {
 		try {
 			
 			if (mp.getName() != null || mp.getContentId() != null) {
-				final InputStream part = privateMailboxService.fetchMimePartStream(udr, collectionPath, uid, mp.getAddress());
+				final InputStream part = mailboxService.fetchMimePartStream(udr, collectionPath, uid, mp.getAddress());
 				byte[] data = extractPartData(mp, part);
 				
 				final String id = AttachmentHelper.getAttachmentId(collectionId.toString(), String.valueOf(messageId), 

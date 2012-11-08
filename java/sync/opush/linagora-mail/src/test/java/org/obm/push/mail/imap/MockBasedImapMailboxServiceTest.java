@@ -42,7 +42,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -57,8 +56,6 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.bean.ListInfo;
-import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.smtp.SmtpSender;
 
 import com.google.common.collect.Sets;
@@ -93,7 +90,7 @@ public class MockBasedImapMailboxServiceTest {
 		EasyMock.replay(smtpSender);
 		
 		LinagoraMailboxService emailManager = 
-				new LinagoraMailboxService(emailConfiguration, smtpSender, null, null, null, null, null, null);
+				new LinagoraMailboxService(emailConfiguration, smtpSender, null, null, null, null);
 
 		emailManager.sendEmail(udr,
 				new Address("test@test.fr"),
@@ -112,7 +109,7 @@ public class MockBasedImapMailboxServiceTest {
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 		
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, null, null, collectionPathHelper, null, null, null);
+				emailConfiguration, null, null, collectionPathHelper, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
@@ -125,7 +122,7 @@ public class MockBasedImapMailboxServiceTest {
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, null, null, collectionPathHelper, null, null, null);
+				emailConfiguration, null, null, collectionPathHelper, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		Assertions.assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
@@ -136,42 +133,15 @@ public class MockBasedImapMailboxServiceTest {
 		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
 
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(folderEndingByINBOX);
-		LinagoraImapClientProvider imapClientProvider = newImapClientProviderMock(folderEndingByINBOX);
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, null, imapClientProvider, collectionPathHelper, null, null, null);
+				emailConfiguration, null, null, collectionPathHelper, null, null);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(folderEndingByINBOX));
 		Assertions.assertThat(parsedMailbox).isEqualTo(folderEndingByINBOX);
 	}
 
-	private LinagoraImapClientProvider newImapClientProviderMock(String...allUserFolders) throws Exception {
-		StoreClient storeClient = newStoreClientMock(allUserFolders);
-		
-		LinagoraImapClientProvider imapClientProvider = EasyMock.createMock(LinagoraImapClientProvider.class);
-		EasyMock.expect(imapClientProvider.getImapClient(udr, null)).andReturn(storeClient);
-		
-		EasyMock.replay(storeClient, imapClientProvider);
-		return imapClientProvider;
-	}
-	
-	private StoreClient newStoreClientMock(String[] allUserFolders) throws Exception {
-		StoreClient storeClient = EasyMock.createMock(StoreClient.class);
-		storeClient.login(false);
-		EasyMock.expectLastCall();
-		storeClient.logout();
-		EasyMock.expectLastCall();
-		
-		ListResult listResult = new ListResult(allUserFolders.length);
-		for (String userFolder : allUserFolders) {
-			listResult.add(new ListInfo(userFolder, true, false));
-		}
-		EasyMock.expect(storeClient.listAll()).andReturn(listResult);
-		
-		return storeClient;
-	}
-	
 	private EmailConfiguration newEmailConfigurationMock() {
 		EmailConfiguration emailConfiguration = EasyMock.createMock(EmailConfiguration.class);
 		EasyMock.expect(emailConfiguration.loginWithDomain()).andReturn(true).once();

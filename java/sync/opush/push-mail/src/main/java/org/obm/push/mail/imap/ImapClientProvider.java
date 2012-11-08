@@ -34,12 +34,11 @@ package org.obm.push.mail.imap;
 import org.minig.imap.IMAPException;
 import org.minig.imap.idle.IdleClient;
 import org.obm.locator.LocatorClientException;
-import org.obm.mail.MailboxConnection;
 import org.obm.push.bean.UserDataRequest;
 
 public interface ImapClientProvider {
 
-	MailboxConnection getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException;
+	ImapStore getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException;
 	IdleClient getImapIdleClient(UserDataRequest udr) throws LocatorClientException;
 	
 }

@@ -40,7 +40,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 
-import org.obm.mail.MailboxConnection;
 import org.obm.push.bean.Resource;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
@@ -53,7 +52,7 @@ import org.obm.push.mail.bean.SearchQuery;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
-public interface ImapStore extends MailboxConnection, Resource {
+public interface ImapStore extends Resource {
 
 	interface Factory {
 		ImapStore create(Session session, IMAPStore store, 

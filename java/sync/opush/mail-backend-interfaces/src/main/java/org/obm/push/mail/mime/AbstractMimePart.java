@@ -31,10 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.mime;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import org.minig.imap.command.parser.HeadersParser;
+import org.obm.push.mail.bean.IMAPHeaders;
 
 
 public abstract class AbstractMimePart implements IMimePart {
@@ -123,4 +132,32 @@ public abstract class AbstractMimePart implements IMimePart {
 			return false;
 		}
 	}
+
+	@Override
+	public IMAPHeaders decodeHeaders(InputStream is) throws IOException {
+		InputStreamReader reader = new InputStreamReader(is, getHeaderCharsetDecoder());
+		Map<String, String> rawHeaders = new HeadersParser().parseRawHeaders(reader);
+		IMAPHeaders h = new IMAPHeaders();
+		h.setRawHeaders(rawHeaders);
+		return h;
+	}
+	
+	/**
+	 * Tries to return a suitable {@link Charset} to decode the headers
+	 */
+	private Charset getHeaderCharsetDecoder() {
+		String encoding = getContentTransfertEncoding();
+		if (encoding == null) {
+			return Charset.forName("utf-8");
+		} else if (encoding.equalsIgnoreCase("8bit")) {
+			return Charset.forName("iso-8859-1");
+		} else {
+			try {
+				return Charset.forName(encoding);
+			} catch (UnsupportedCharsetException uee) {
+				return Charset.forName("utf-8");
+			}
+		}
+	}
+
 }

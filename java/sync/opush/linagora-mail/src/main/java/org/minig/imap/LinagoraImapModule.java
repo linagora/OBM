@@ -1,11 +1,9 @@
 package org.minig.imap;
 
 import org.minig.imap.idle.IdleClient;
-import org.obm.mail.message.MessageFetcher;
-import org.obm.mail.message.MessageFetcherImpl;
+import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.ImapClientProvider;
-import org.obm.push.mail.imap.LinagoraImapClientProvider;
+import org.obm.push.mail.imap.ImapMonitoringImpl;
 import org.obm.push.mail.imap.LinagoraMailboxService;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
@@ -18,11 +16,10 @@ public class LinagoraImapModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		bind(ImapClientProvider.class).to(LinagoraImapClientProvider.class);
+		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
 		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
 		bind(MailboxService.class).to(LinagoraMailboxService.class);
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
-		bind(MessageFetcher.Factory.class).to(MessageFetcherImpl.Factory.class);
 		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);
 	}
 	

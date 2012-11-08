@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -39,22 +40,22 @@ import java.util.Set;
 
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 
@@ -62,9 +63,6 @@ public interface MailboxService {
 	
 	MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException;
 	
-	List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, String collectionPath, 
-			Collection<Long> uids) throws MailException, CollectionNotFoundException, DaoException;
-
 	List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath, 
 			Collection<Long> uid, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException;
 	
@@ -121,4 +119,6 @@ public interface MailboxService {
 			throws MailException;
 	
 	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;
+
+	IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException;
 }

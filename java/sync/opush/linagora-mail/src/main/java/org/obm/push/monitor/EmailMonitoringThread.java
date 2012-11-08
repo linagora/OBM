@@ -41,7 +41,7 @@ import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.ImapClientProvider;
+import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class EmailMonitoringThread implements MonitoringService {
 	private String collectionName;
 	private Boolean remainConnected;  
 	private IdleClient store;
-	private final ImapClientProvider imapClientProvider;
+	private final LinagoraImapClientProvider imapClientProvider;
 	private final PushMonitoringManager pushMonitorManager;
 	private String mailBoxName;
 
@@ -100,7 +100,7 @@ public class EmailMonitoringThread implements MonitoringService {
 			PushMonitoringManager pushMonitorManager,
 			UserDataRequest udr,
 			String collectionName, MailboxService emailManager, 
-			ImapClientProvider imapClientProvider) throws MailException {
+			LinagoraImapClientProvider imapClientProvider) throws MailException {
 		
 		this.pushMonitorManager = pushMonitorManager;
 		this.collectionName = collectionName;

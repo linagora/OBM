@@ -92,6 +92,7 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
@@ -147,6 +148,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final LoginService login;
 	private final EmailDao emailDao;
 	private final EmailSync emailSync;
+	private final EventService eventService;
 
 
 	@Inject
@@ -155,6 +157,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			MappingService mappingService,
+			EventService eventService,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
 
 		super(mappingService, collectionPathBuilderProvider);
@@ -165,6 +168,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
 		this.login = login;
+		this.eventService = eventService;
 	}
 
 	@Override
@@ -520,7 +524,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> mail = mailboxService.fetchMails(udr, collectionId, collectionPath, uids);
+			List<MSEmail> mail = fetchMails(udr, collectionId, collectionPath, uids);
 
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
@@ -561,7 +565,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 
-			List<MSEmail> mail = mailboxService.fetchMails(udr, collectionIdInt, collectionName, uids);
+			List<MSEmail> mail = fetchMails(udr, collectionIdInt, collectionName, uids);
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
 				MSEmail originMail = mail.get(0);
@@ -601,6 +605,22 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		} 
 	}
 
+	public List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
+			String collectionName, Collection<Long> uids) throws MailException {
+		
+		final List<MSEmail> mails = new LinkedList<MSEmail>();
+		String collectionPath = mailboxService.parseMailBoxName(udr, collectionName);
+
+		final MailMessageLoader mailLoader = new MailMessageLoader(mailboxService, eventService);
+		for (final Long uid: uids) {
+			final MSEmail email = mailLoader.fetch(collectionPath, collectionId, uid, udr);
+			if (email != null) {
+				mails.add(email);
+			}
+		}
+		return mails;
+	}
+	
 	private void loadAttachments(Map<String, MSAttachementData> attachments, 
 			UserDataRequest udr, MSEmail originMail) throws ProcessingEmailException {
 		
@@ -668,7 +688,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = mailboxService.fetchMails(udr, collectionId, collectionName, uids);
+			List<MSEmail> emails = fetchMails(udr, collectionId, collectionName, uids);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}

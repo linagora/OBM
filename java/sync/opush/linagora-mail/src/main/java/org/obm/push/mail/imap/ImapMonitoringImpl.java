@@ -62,7 +62,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Map<Integer, EmailMonitoringThread> emailPushMonitors;
-	private final ImapClientProvider imapClientProvider;
+	private final LinagoraImapClientProvider imapClientProvider;
 	private final MailboxService emailManager;
 	private final MappingService mappingService;
 	private final Factory pubSubFactory;
@@ -71,7 +71,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	
 	
 	@Inject
-	private ImapMonitoringImpl(ImapClientProvider imapClientProvider,
+	private ImapMonitoringImpl(LinagoraImapClientProvider imapClientProvider,
 			MappingService mappingService, MailboxService emailManager,
 			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
 		this.mailBackend = mailBackend;

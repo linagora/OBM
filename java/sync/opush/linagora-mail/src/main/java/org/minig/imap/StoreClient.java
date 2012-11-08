@@ -46,7 +46,6 @@ import org.minig.imap.impl.ClientSupport;
 import org.minig.imap.impl.IResponseCallback;
 import org.minig.imap.impl.MailThread;
 import org.minig.imap.impl.StoreClientCallback;
-import org.obm.mail.MailboxConnection;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -63,7 +62,7 @@ import org.slf4j.LoggerFactory;
 /**
  * IMAP client entry point
  */
-public class StoreClient implements MailboxConnection {
+public class StoreClient {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(StoreClient.class);
@@ -220,7 +219,6 @@ public class StoreClient implements MailboxConnection {
 		return cs.uidFetchPart(uid, address, truncation);
 	}
 	
-	@Override
 	public InputStream uidFetchPart(long uid, String address) {
 		return cs.uidFetchPart(uid, address);
 	}

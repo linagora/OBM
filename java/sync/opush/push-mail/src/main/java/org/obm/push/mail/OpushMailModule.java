@@ -33,9 +33,7 @@ package org.obm.push.mail;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.mail.imap.ImapMonitoringImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
@@ -52,7 +50,6 @@ public class OpushMailModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
-		bind(MailMonitoringBackend.class).to(ImapMonitoringImpl.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		bind(SmtpProvider.class).to(SmtpProviderImpl.class);

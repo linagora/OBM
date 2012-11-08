@@ -43,6 +43,8 @@ import java.util.List;
 import org.obm.mail.conversation.MailBody;
 import org.obm.mail.conversation.MailMessage;
 import org.obm.mail.imap.StoreException;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.IMimePart;
@@ -62,20 +64,27 @@ public class MessageLoader {
 			.getLogger(MessageLoader.class);
 	
 	private static final BodyParam formatFlowed = new BodyParam("format", "flowed");
-	private final MessageFetcher messageFetcher;
+	private final MailboxService mailboxService;
 	private final List<String> mimeSubtypeInPriorityOrder;
 	private final boolean bodyOnly;
 	private final MimeMessage message;
+	private final UserDataRequest udr;
 	private int nbAttachments;
 	private MailMessage rootMailMessage;
+
+	private final String collectionPath;
+
 	
-	public MessageLoader(MessageFetcher messageFetcher, List<String> mimeSubtypeInPriorityOrder, boolean bodyOnly, MimeMessage message) {
+	public MessageLoader(UserDataRequest udr, MailboxService mailboxService, List<String> mimeSubtypeInPriorityOrder, 
+			boolean bodyOnly, MimeMessage message, String collectionPath) {
 		super();
-		this.messageFetcher = messageFetcher;
+		this.mailboxService = mailboxService;
 		this.bodyOnly = bodyOnly;
 		this.message = message;
+		this.collectionPath = collectionPath;
 		this.nbAttachments = 0;
 		this.mimeSubtypeInPriorityOrder = mimeSubtypeInPriorityOrder;
+		this.udr = udr;
 	}
 
 	public MailMessage fetch() throws IOException, StoreException {
@@ -94,10 +103,10 @@ public class MessageLoader {
 	}
 
 	private MailMessage fetchOneMessage(IMimePart mimePart)
-			throws IOException, StoreException {
+			throws IOException {
 		
 		MailMessage mm = extractMailMessage(mimePart);
-		IMAPHeaders h = messageFetcher.fetchPartHeaders(message, mimePart);
+		IMAPHeaders h = mailboxService.fetchPartHeaders(udr, collectionPath, message.getUid(), mimePart);
 		copyHeaders(h, mm);
 		mm.setUid(message.getUid());
 
@@ -115,8 +124,7 @@ public class MessageLoader {
 		mm.setSmtpId(h.getRawHeader("Message-ID"));
 	}
 
-	private MailMessage extractMailMessage(IMimePart mimePart) throws IOException,
-			StoreException {
+	private MailMessage extractMailMessage(IMimePart mimePart) throws IOException {
 		MailMessage mailMessage = new MailMessage();
 		IMimePart chosenPart = new BodySelector(mimePart,
 				mimeSubtypeInPriorityOrder).findBodyTextPart();
@@ -155,14 +163,14 @@ public class MessageLoader {
 	}
 	
 	private void fetchQuotedText(IMimePart message, MailMessage mailMessage) 
-		throws IOException,	StoreException {
+		throws IOException {
 		for (IMimePart part: message.getChildren()) {
 			fetchFlowed(mailMessage, part);
 		}
 	}
 
 	private void fetchFlowed(MailMessage mailMessage, IMimePart part)
-			throws IOException, StoreException {
+			throws IOException {
 		if (formatFlowed.equals(part.getBodyParam("format"))) {
 			MailMessage mm = fetchOneMessage(part);
 			if (!mailMessage.getBody().equals(mm.getBody())) {
@@ -207,9 +215,9 @@ public class MessageLoader {
 		}
 	}
 	
-	private MailBody getMailBody(IMimePart chosenPart) throws IOException, StoreException {
+	private MailBody getMailBody(IMimePart chosenPart) throws IOException {
 		MailBody mb = new MailBody();
-		InputStream bodyText = messageFetcher.fetchPart(message, chosenPart);
+		InputStream bodyText = mailboxService.fetchMimePartStream(udr, collectionPath, message.getUid(), chosenPart.getAddress());
 		Charset charsetName = computeSupportedCharset(chosenPart.getCharset());
 		String partText = CharStreams.toString(new InputStreamReader(bodyText, charsetName));
 		mb.addConverted(chosenPart.getFullMimeType(), partText);

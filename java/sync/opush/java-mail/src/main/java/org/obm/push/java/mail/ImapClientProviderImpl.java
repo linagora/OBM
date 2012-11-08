@@ -38,9 +38,7 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.minig.imap.IMAPException;
-import org.minig.imap.idle.IdleClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -48,7 +46,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ImapLoginException;
 import org.obm.push.exception.NoImapClientAvailableException;
-import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapStore.Factory;
@@ -62,7 +59,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.sun.mail.imap.IMAPStore;
 
-public class ImapClientProviderImpl implements ImapClientProvider {
+public class ImapClientProviderImpl {
 
 	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
 	private static final String IMAP_STORE_RESOURCE = "imap-store";
@@ -122,7 +119,6 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		return imapLocation;
 	}
 
-	@Override
 	public ImapStore getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException {
 		try {
 			ImapStore imapStore = retrieveWorkingImapStore(udr, opushImapFolder);
@@ -206,13 +202,6 @@ public class ImapClientProviderImpl implements ImapClientProvider {
 		} else {
 			return user.getLogin();
 		}
-	}
-
-
-	@Override
-	public IdleClient getImapIdleClient(UserDataRequest udr)
-			throws LocatorClientException {
-		throw new NotImplementedException();
 	}
 
 }

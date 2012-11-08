@@ -32,9 +32,12 @@
 
 package org.obm.push.mail.mime;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+
+import org.obm.push.mail.bean.IMAPHeaders;
 
 
 import com.google.common.collect.ImmutableList;
@@ -301,6 +304,11 @@ public class MimeMessage implements IMimePart {
 	@Override
 	public InputStream decodeMimeStream(InputStream rawStream) {
 		return rawStream;
+	}
+	
+	@Override
+	public IMAPHeaders decodeHeaders(InputStream is) throws IOException {
+		return from.decodeHeaders(is);
 	}
 
 }

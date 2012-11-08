@@ -68,7 +68,6 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
-import org.obm.push.mail.imap.ImapClientProvider;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.mail.mime.MimeAddress;
 
@@ -81,7 +80,6 @@ public abstract class MailboxMemoryAPITest {
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
-	@Inject ImapClientProvider clientProvider;
 
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;

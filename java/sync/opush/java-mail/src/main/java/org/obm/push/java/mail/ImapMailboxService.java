@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,12 +50,9 @@ import org.minig.imap.IMAPException;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.mail.conversation.EmailView;
-import org.obm.mail.message.MessageFetcher;
-import org.obm.mail.message.MessageFetcher.Factory;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
@@ -73,7 +69,6 @@ import org.obm.push.mail.EmailFactory;
 import org.obm.push.mail.EmailViewPartsFetcherImpl;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailMessageLoader;
 import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
@@ -81,6 +76,7 @@ import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.SearchQuery;
@@ -89,11 +85,11 @@ import org.obm.push.mail.imap.ImapCapability;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
-import org.obm.push.service.EventService;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +114,6 @@ public class ImapMailboxService implements MailboxService {
 	private static final String WHOLE_HIERARCHY_PATTERN = "*";
 	
 	private final SmtpSender smtpProvider;
-	private final EventService eventService;
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final ImapClientProviderImpl imapClientProvider;
@@ -129,50 +124,26 @@ public class ImapMailboxService implements MailboxService {
 	
 	private final TransformersFactory transformersFactory;
 	
-	private final Factory fetcherFactory;
-	
 	private OpushImapFolderConnection opushImapFolderConnection;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			SmtpSender smtpSender, 
-			EventService eventService, 
 			ImapClientProviderImpl imapClientProvider, 
 			ImapMailBoxUtils imapMailBoxUtils, 
 			CollectionPathHelper collectionPathHelper, 
 			MailViewToMSEmailConverter msEmailConverter,
-			TransformersFactory transformersFactory,
-			MessageFetcher.Factory fetcherFactory) {
+			TransformersFactory transformersFactory) {
 		
 		this.smtpProvider = smtpSender;
-		this.eventService = eventService;
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.collectionPathHelper = collectionPathHelper;
 		this.msEmailConverter = msEmailConverter;
 		this.transformersFactory = transformersFactory;
-		this.fetcherFactory = fetcherFactory;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.opushImapFolderConnection = new OpushImapFolderConnection();
-	}
-
-	@Override
-	public List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
-			String collectionName, Collection<Long> uids) throws MailException {
-		
-		final List<MSEmail> mails = new LinkedList<MSEmail>();
-		String collectionPath = parseMailBoxName(udr, collectionName);
-		ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, collectionPath);
-		
-		final MailMessageLoader mailLoader = new MailMessageLoader(this, store, eventService, fetcherFactory);
-		for (final Long uid: uids) {
-			final MSEmail email = mailLoader.fetch(collectionPath, collectionId, uid, udr);
-			if (email != null) {
-				mails.add(email);
-			}
-		}
-		return mails;
 	}
 
 	@Override
@@ -697,5 +668,18 @@ public class ImapMailboxService implements MailboxService {
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
+	}
+
+	@Override
+	public IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException {
+		MimeAddress address = mimePart.getAddress();
+		String part = null;
+		if (address == null) {
+			part = "HEADER";
+		} else {
+			part = address.getAddress() + ".HEADER";
+		}
+		InputStream is = fetchMimePartStream(udr, collectionPath, uid, new MimeAddress(part));
+		return mimePart.decodeHeaders(is);
 	}
 }

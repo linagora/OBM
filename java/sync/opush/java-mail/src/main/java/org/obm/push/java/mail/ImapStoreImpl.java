@@ -43,7 +43,6 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.mail.MailboxConnection;
 import org.obm.push.exception.FolderCreationException;
 import org.obm.push.exception.ImapCommandException;
 import org.obm.push.exception.ImapLoginException;
@@ -67,7 +66,7 @@ import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 
-public class ImapStoreImpl implements MailboxConnection, ImapStore {
+public class ImapStoreImpl implements ImapStore {
 
 	@Singleton
 	public static class Factory implements ImapStore.Factory {
@@ -292,12 +291,6 @@ public class ImapStoreImpl implements MailboxConnection, ImapStore {
 
 	protected MessageInputStreamProvider getMessageInputStreamProvider() {
 		return messageInputStreamProvider;
-	}
-
-	@Override
-	public InputStream uidFetchPart(long uid, String address) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override 
