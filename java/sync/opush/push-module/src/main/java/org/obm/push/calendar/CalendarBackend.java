@@ -184,7 +184,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		ItemChange ic = new ItemChange();
 		ic.setServerId(mappingService.collectionIdToString(collectionId));
 		ic.setParentId(DEFAULT_CALENDAR_PARENT_ID);
-		ic.setDisplayName(collectionPath.displayName() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX);
+		ic.setDisplayName(collectionPath.backendName() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX);
 		if (isDefaultCalendarCollectionPath(udr, collectionPath)) {
 			ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
 		} else {
@@ -194,7 +194,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private boolean isDefaultCalendarCollectionPath(UserDataRequest udr, CollectionPath collectionPath) {
-		return udr.getUser().getLoginAtDomain().equalsIgnoreCase(collectionPath.displayName());
+		return udr.getUser().getLoginAtDomain().equalsIgnoreCase(collectionPath.backendName());
 	}
 
 	private String getDefaultCalendarName(UserDataRequest udr) {
@@ -205,7 +205,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return collectionPathBuilderProvider.get()
 			.userDataRequest(udr)
 			.pimType(PIMDataType.CALENDAR)
-			.displayName(calendar)
+			.backendName(calendar)
 			.build();
 	}
 

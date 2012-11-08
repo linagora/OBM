@@ -335,7 +335,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.pimType(PIMDataType.CALENDAR))
 			.andReturn(collectionPathBuilder).once();
 		
-		expect(collectionPathBuilder.displayName(displayName))
+		expect(collectionPathBuilder.backendName(displayName))
 			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.build())

@@ -48,7 +48,7 @@ public class CollectionPath {
 		private final CollectionPathHelper collectionPathHelper;
 		private UserDataRequest userDataRequest;
 		private PIMDataType pimType;
-		private String displayName;
+		private String backendName;
 		private String fullyQualifiedCollectionPath;
 
 		@Inject
@@ -66,8 +66,8 @@ public class CollectionPath {
 			return this;
 		}
 		
-		public Builder displayName(String displayName) {
-			this.displayName = displayName;
+		public Builder backendName(String backendName) {
+			this.backendName = backendName;
 			return this;
 		}
 		
@@ -81,20 +81,20 @@ public class CollectionPath {
 			
 			if (Strings.isNullOrEmpty(fullyQualifiedCollectionPath)) {
 				Preconditions.checkState(pimType != null);
-				Preconditions.checkState(displayName != null);
+				Preconditions.checkState(backendName != null);
 				
 				return buildFromPimType();
 			} else {
 				Preconditions.checkState(pimType == null, "Build either from pimType or fullyQualifiedCollectionPath");
-				Preconditions.checkState(displayName == null, "Build either from displayName or fullyQualifiedCollectionPath");
+				Preconditions.checkState(backendName == null, "Build either from backendName or fullyQualifiedCollectionPath");
 
 				return buildFromFullyQualifiedCollectionPath();
 			}
 		}
 
 		private CollectionPath buildFromPimType() {
-			String collectionPath = collectionPathHelper.buildCollectionPath(userDataRequest, pimType, displayName);
-			return new CollectionPath(collectionPath, pimType, displayName);
+			String collectionPath = collectionPathHelper.buildCollectionPath(userDataRequest, pimType, backendName);
+			return new CollectionPath(collectionPath, pimType, backendName);
 		}
 
 		private CollectionPath buildFromFullyQualifiedCollectionPath() {
@@ -106,8 +106,8 @@ public class CollectionPath {
 		}
 		
 		private CollectionPath buildFromDiscoveredPimType(PIMDataType recognizedPimType) {
-			String recognizedDisplayName = collectionPathHelper.extractFolder(userDataRequest, fullyQualifiedCollectionPath, recognizedPimType);
-			return new CollectionPath(fullyQualifiedCollectionPath, recognizedPimType, recognizedDisplayName);
+			String recognizedName = collectionPathHelper.extractFolder(userDataRequest, fullyQualifiedCollectionPath, recognizedPimType);
+			return new CollectionPath(fullyQualifiedCollectionPath, recognizedPimType, recognizedName);
 		}
 
 		private CollectionPath buildFromUnknownPimType() {
@@ -117,21 +117,21 @@ public class CollectionPath {
 
 	private final String collectionPath;
 	private final transient PIMDataType pimType;
-	private final transient String displayName;
+	private final transient String backendName;
 	
 	@VisibleForTesting 
-	protected CollectionPath(String collectionPath, PIMDataType pimType, String displayName) {
+	protected CollectionPath(String collectionPath, PIMDataType pimType, String backendName) {
 		this.collectionPath = collectionPath;
 		this.pimType = pimType;
-		this.displayName = displayName;
+		this.backendName = backendName;
 	}
 	
 	public PIMDataType pimType() {
 		return pimType;
 	}
 
-	public String displayName() {
-		return displayName;
+	public String backendName() {
+		return backendName;
 	}
 
 	public String collectionPath() {

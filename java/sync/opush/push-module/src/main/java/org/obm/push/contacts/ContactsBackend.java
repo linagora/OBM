@@ -161,7 +161,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
 		String parentId = getParentId(udr, collectionPath);
 		FolderType itemType = getItemType(collectionPath);
-		return new ItemChange(serverId, parentId, collectionPath.displayName(), itemType, isNew);
+		return new ItemChange(serverId, parentId, collectionPath.backendName(), itemType, isNew);
 	}
 
 	@VisibleForTesting Set<CollectionPath> deletedCollections(UserDataRequest udr, FolderChanges folderChanges, 
@@ -196,11 +196,11 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return collectionPath(udr, folder.getName());
 	}
 	
-	@VisibleForTesting CollectionPath collectionPath(UserDataRequest udr, String displayName) {
+	@VisibleForTesting CollectionPath collectionPath(UserDataRequest udr, String backendName) {
 		return collectionPathBuilderProvider.get()
 				.userDataRequest(udr)
 				.pimType(getPIMDataType())
-				.displayName(displayName)
+				.backendName(backendName)
 				.build();
 	}
 
@@ -233,7 +233,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	@VisibleForTesting String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws DaoException {
 		try {
-			if (!isDefaultFolder(collectionPath.displayName())) {
+			if (!isDefaultFolder(collectionPath.backendName())) {
 				CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
 				return getServerIdFromCollectionPath(udr, defaultBookCollectionPath.collectionPath());
 			}
@@ -244,7 +244,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private FolderType getItemType(CollectionPath collectionPath) {
-		if (isDefaultFolder(collectionPath.displayName())) {
+		if (isDefaultFolder(collectionPath.backendName())) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {
 			return FolderType.USER_CREATED_CONTACTS_FOLDER;

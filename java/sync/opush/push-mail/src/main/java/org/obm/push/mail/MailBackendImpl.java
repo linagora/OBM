@@ -198,7 +198,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 					collectionPathBuilderProvider.get()
 						.userDataRequest(udr)
 						.pimType(PIMDataType.EMAIL)
-						.displayName(imapFolderName)
+						.backendName(imapFolderName)
 					.build());
 		}
 		return collectionPaths;
@@ -239,14 +239,14 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
 		return new ItemChangeBuilder()
 			.parentId("0")
-			.displayName(imapFolder.displayName())
-			.itemType(folderType(imapFolder.displayName()))
+			.displayName(imapFolder.backendName())
+			.itemType(folderType(imapFolder.backendName()))
 			.serverId(mappingService.collectionIdToString(collectionId))
 			.build();
 	}
 
 	private CollectionPath getWasteBasketPath(UserDataRequest udr) {
-		return collectionPathBuilderProvider.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).displayName(EmailConfiguration.IMAP_TRASH_NAME).build();
+		return collectionPathBuilderProvider.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).backendName(EmailConfiguration.IMAP_TRASH_NAME).build();
 	}
 
 	private MailChanges getSync(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType) 

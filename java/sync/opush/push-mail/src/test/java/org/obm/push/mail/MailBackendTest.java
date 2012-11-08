@@ -167,7 +167,7 @@ public class MailBackendTest {
 	private void expectBuildMailboxesCollectionPaths(Map<String, Integer> mailboxesIds) {
 		
 		for(Entry<String, Integer> mailbox : mailboxesIds.entrySet()) {
-			expect(collectionPathBuilder.displayName(mailbox.getKey())).andReturn(collectionPathBuilder).anyTimes();
+			expect(collectionPathBuilder.backendName(mailbox.getKey())).andReturn(collectionPathBuilder).anyTimes();
 			expect(collectionPathBuilder.build()).andReturn(new MailCollectionPath(mailbox.getKey())).once();
 		}
 	}

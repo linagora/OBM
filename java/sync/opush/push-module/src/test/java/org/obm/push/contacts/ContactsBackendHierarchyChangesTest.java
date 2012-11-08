@@ -470,7 +470,7 @@ public class ContactsBackendHierarchyChangesTest {
 		expect(collectionPathBuilder.pimType(PIMDataType.CONTACTS))
 			.andReturn(collectionPathBuilder).once();
 		
-		expect(collectionPathBuilder.displayName(displayName))
+		expect(collectionPathBuilder.backendName(displayName))
 			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.build())

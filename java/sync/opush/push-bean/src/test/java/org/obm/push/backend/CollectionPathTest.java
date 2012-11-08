@@ -50,7 +50,7 @@ public class CollectionPathTest {
 	public void nullUserDataRequest() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		replay(collectionPathHelper);
-		new CollectionPath.Builder(collectionPathHelper).displayName("displayName").pimType(PIMDataType.CALENDAR).build();
+		new CollectionPath.Builder(collectionPathHelper).backendName("backendName").pimType(PIMDataType.CALENDAR).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -58,11 +58,11 @@ public class CollectionPathTest {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		replay(collectionPathHelper, udr);
-		new CollectionPath.Builder(collectionPathHelper).displayName("displayName").userDataRequest(udr).build();
+		new CollectionPath.Builder(collectionPathHelper).backendName("backendName").userDataRequest(udr).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void nullDisplayName() throws CollectionPathException {
+	public void nullbackendName() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		replay(collectionPathHelper, udr);
@@ -72,26 +72,26 @@ public class CollectionPathTest {
 	@Test
 	public void validCollectionPath() {
 		PIMDataType collectionType = PIMDataType.CALENDAR;
-		String displayName = "displayName";
+		String backendName = "backendName";
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
-		expect(collectionPathHelper.buildCollectionPath(udr, collectionType, displayName)).andReturn("collectionPath");
+		expect(collectionPathHelper.buildCollectionPath(udr, collectionType, backendName)).andReturn("collectionPath");
 		replay(collectionPathHelper, udr);
 		
 		CollectionPath collectionPath = new CollectionPath.Builder(collectionPathHelper)
 			.pimType(collectionType)
-			.displayName(displayName)
+			.backendName(backendName)
 			.userDataRequest(udr)
 			.build();
 		
 		verify(collectionPathHelper, udr);
 		assertThat(collectionPath.collectionPath()).isEqualTo("collectionPath");
-		assertThat(collectionPath.displayName()).isEqualTo(displayName);
+		assertThat(collectionPath.backendName()).isEqualTo(backendName);
 		assertThat(collectionPath.pimType()).isEqualTo(collectionType);
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void testBuildByQualifiedCollectionPathDenyDisplayName() throws CollectionPathException {
+	public void testBuildByQualifiedCollectionPathDenybackendName() throws CollectionPathException {
 		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
 		UserDataRequest udr = createMock(UserDataRequest.class);
 		replay(collectionPathHelper, udr);
@@ -99,7 +99,7 @@ public class CollectionPathTest {
 		new CollectionPath.Builder(collectionPathHelper)
 			.userDataRequest(udr)	
 			.fullyQualifiedCollectionPath("obm:\\\\login@domain\\email\\INBOX")
-			.displayName("displayName")
+			.backendName("backendName")
 			.build();
 	}
 
@@ -133,7 +133,7 @@ public class CollectionPathTest {
 
 		verify(collectionPathHelper, udr);
 		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
-		assertThat(collectionPath.displayName()).isEqualTo("INBOX");
+		assertThat(collectionPath.backendName()).isEqualTo("INBOX");
 		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.EMAIL);
 	}
 
@@ -153,7 +153,7 @@ public class CollectionPathTest {
 
 		verify(collectionPathHelper, udr);
 		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
-		assertThat(collectionPath.displayName()).isNull();
+		assertThat(collectionPath.backendName()).isNull();
 		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.UNKNOWN);
 	}
 
@@ -173,7 +173,7 @@ public class CollectionPathTest {
 
 		verify(collectionPathHelper, udr);
 		assertThat(collectionPath.collectionPath()).isEqualTo(qualifiedCollectionPath);
-		assertThat(collectionPath.displayName()).isNull();
+		assertThat(collectionPath.backendName()).isNull();
 		assertThat(collectionPath.pimType()).isEqualTo(PIMDataType.UNKNOWN);
 	}
 }
