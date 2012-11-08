@@ -38,6 +38,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.easymock.IMocksControl;
@@ -47,11 +48,15 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
+import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.CollectionPath.Builder;
+import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.FolderType;
 import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -380,6 +385,91 @@ public class ContactsBackendTest {
 	}
 	
 	@Test
+	public void changeDisplayNameIsTookFromFolderForAdd() {
+		String folder1Name = "f1";
+		String folder2Name = "f2";
+		FolderChanges changes = FolderChanges.builder().updated(
+				createFolder(folder1Name, 1), createFolder(folder2Name, 2)).build();
+
+		expectBuildCollectionPath(folder1Name);
+		expectBuildCollectionPath(folder2Name);
+
+		mocks.replay();
+		
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
+		Iterable<OpushCollection> actual = contactsBackend.changedCollections(userDataRequest, changes).collections();
+		
+		mocks.verify();
+		
+		assertThat(actual).containsOnly(
+				OpushCollection.builder()
+					.collectionPath(new ContactCollectionPath(folder1Name))
+					.displayName(folder1Name)
+					.build(),
+				OpushCollection.builder()
+					.collectionPath(new ContactCollectionPath(folder2Name))
+					.displayName(folder2Name)
+					.build());
+	}
+	
+	@Test
+	public void changeDisplayNameIsTookFromFolderForDelete() {
+		String folder1Name = "f1";
+		String folder2Name = "f2";
+		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folder1Name);
+		ContactCollectionPath f2CollectionPath = new ContactCollectionPath(folder2Name);
+		FolderChanges changes = FolderChanges.builder().removed(
+				createFolder(folder1Name, 1), createFolder(folder2Name, 2)).build();
+		
+		PathsToCollections adds = PathsToCollections.builder().build();
+		Set<CollectionPath> lastKnown = ImmutableSet.<CollectionPath>of(f1CollectionPath, f2CollectionPath);
+
+		expectBuildCollectionPath(folder1Name);
+		expectBuildCollectionPath(folder2Name);
+
+		mocks.replay();
+		
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
+		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown, adds);
+		
+		mocks.verify();
+		
+		assertThat(actual).containsOnly(f1CollectionPath, f2CollectionPath);
+	}
+	
+	@Test
+	public void createItemChangeGetsDisplayNameFromOpushCollection() throws Exception {
+		AccessToken token = new AccessToken(0, "OBM");
+		expectLoginBehavior(token);
+		
+		expect(mappingService.collectionIdToString(3)).andReturn("3").anyTimes();
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + "technicalName"))
+			.andReturn(3).anyTimes();
+
+		expectBuildCollectionPath(DEFAULT_PARENT_BOOK_NAME);
+		expect(mappingService.collectionIdToString(2)).andReturn("2").anyTimes();
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + DEFAULT_PARENT_BOOK_NAME))
+			.andReturn(2).anyTimes();
+		
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(new ContactCollectionPath("technicalName"))
+				.displayName("great display name!")
+				.build();
+		
+		mocks.replay();
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
+		ItemChange itemChange = contactsBackend.createItemChange(userDataRequest, collection);
+		mocks.verify();
+		
+		assertThat(itemChange).isEqualTo(new ItemChangeBuilder()
+				.displayName("great display name!")
+				.parentId("2")
+				.serverId("3")
+				.itemType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.build());
+	}
+	
+	@Test
 	public void filterUnknownDeletedItemsFromAddressBooksChanged() {
 		String folderOneName = "f1";
 		String folderTwoName = "f2";
@@ -389,7 +479,7 @@ public class ContactsBackendTest {
 		
 		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folderOneName);
 		ImmutableSet<CollectionPath> lastKnown = ImmutableSet.<CollectionPath>of(f1CollectionPath);
-		ImmutableSet<CollectionPath> adds = ImmutableSet.<CollectionPath>of();
+		PathsToCollections adds = PathsToCollections.builder().build();
 
 		expectBuildCollectionPath(folderOneName);
 		expectBuildCollectionPath(folderTwoName);

@@ -100,8 +100,23 @@ public abstract class OpushBackend {
 				.toImmutableSet();
 	}
 
+	protected Iterable<OpushCollection> addedCollections(
+			Set<CollectionPath> lastKnownCollections, PathsToCollections changedCollections) {
+		
+		final Set<CollectionPath> addedPaths = Sets.difference(changedCollections.pathKeys(), lastKnownCollections);
+		return FluentIterable
+				.from(changedCollections.collections())
+				.filter(new Predicate<OpushCollection>() {
+
+					@Override
+					public boolean apply(OpushCollection collection) {
+						return addedPaths.contains(collection.collectionPath());
+					}
+				});
+	}
+
 	protected HierarchyItemsChanges buildHierarchyItemsChanges(UserDataRequest udr,
-			Iterable<CollectionPath> changedCollections, Iterable<CollectionPath> deletedCollections)
+			Iterable<OpushCollection> changedCollections, Iterable<CollectionPath> deletedCollections)
 					throws DaoException, CollectionNotFoundException {
 		
 		return HierarchyItemsChanges.builder()
@@ -111,10 +126,10 @@ public abstract class OpushBackend {
 	}
 
 
-	private List<ItemChange> itemsChanged(UserDataRequest udr, Iterable<CollectionPath> changedCollections)
+	private List<ItemChange> itemsChanged(UserDataRequest udr, Iterable<OpushCollection> changedCollections)
 			throws DaoException, CollectionNotFoundException {
 		List<ItemChange> changes = Lists.newArrayList();
-		for (CollectionPath collectionPath: changedCollections) {
+		for (OpushCollection collectionPath: changedCollections) {
 			ItemChange itemChange = createItemChange(udr, collectionPath);
 			itemChange.setNew(true);
 			changes.add(itemChange);
@@ -131,7 +146,7 @@ public abstract class OpushBackend {
 		return deletes;
 	}
 	
-	protected abstract ItemChange createItemChange(UserDataRequest udr, CollectionPath collectionPath)
+	protected abstract ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
 			throws DaoException, CollectionNotFoundException;
 
 	protected abstract ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)

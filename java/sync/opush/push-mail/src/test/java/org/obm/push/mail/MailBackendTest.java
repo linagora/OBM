@@ -44,6 +44,7 @@ import static org.obm.push.mail.MailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,9 +53,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
+import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -366,6 +369,77 @@ public class MailBackendTest {
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemDeleted);
 	}
 
+	@Test
+	public void collectionDisplayNameForSpecialMailboxes() {
+		Map<String, Integer> changedMailboxes = ImmutableMap.of(
+				EmailConfiguration.IMAP_INBOX_NAME, 1,
+				EmailConfiguration.IMAP_DRAFTS_NAME, 2,
+				EmailConfiguration.IMAP_SENT_NAME, 3,
+				EmailConfiguration.IMAP_TRASH_NAME, 4);
+		
+		expectBuildMailboxesCollectionPaths(changedMailboxes);
+		
+		replayCommonMocks();
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
+		verifyCommonMocks();
+
+		assertThat(specialFolders).hasSize(4);
+		assertThat(Iterables.transform(specialFolders, toDisplayNameFunction()))
+			.containsOnly(
+				EmailConfiguration.IMAP_INBOX_NAME,
+				EmailConfiguration.IMAP_DRAFTS_NAME, 
+				EmailConfiguration.IMAP_SENT_NAME,
+				EmailConfiguration.IMAP_TRASH_NAME);
+	}
+
+	@Test
+	public void collectionDisplayNameForSubscribedMailboxes() {
+		Map<String, Integer> changedMailboxes = ImmutableMap.of(
+				"display name", 1,
+				"another display name", 2);
+		
+		expectBuildMailboxesCollectionPaths(changedMailboxes);
+		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("display name", "another display name"));
+		
+		replayCommonMocks();
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
+		verifyCommonMocks();
+
+		
+		assertThat(subscribedFolders).hasSize(2);
+		assertThat(Iterables.transform(subscribedFolders, toDisplayNameFunction()))
+			.containsOnly("display name", "another display name");
+	}
+	
+	@Test
+	public void createItemChangeGetsDisplayNameFromOpushCollection() throws Exception {
+		CollectionPath collectionPath = createMock(CollectionPath.class);
+		expect(collectionPath.collectionPath()).andReturn(COLLECTION_MAIL_PREFIX + "technicalName");
+		
+		expect(mappingService.collectionIdToString(3)).andReturn("3").anyTimes();
+		expect(mappingService.getCollectionIdFor(udr.getDevice(), COLLECTION_MAIL_PREFIX + "technicalName"))
+			.andReturn(3).anyTimes();
+
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(collectionPath)
+				.displayName("great display name!")
+				.build();
+		
+		replayCommonMocks(); replay(collectionPath);
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		ItemChange itemChange = mailBackend.createItemChange(udr, collection);
+		verifyCommonMocks(); verify(collectionPath);
+		
+		assertThat(itemChange).isEqualTo(new ItemChangeBuilder()
+				.displayName("great display name!")
+				.parentId("0")
+				.serverId("3")
+				.itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.build());
+	}
+
 	private void expectMappingServiceSearchThenCreateCollection(Map<String, Integer> mailboxesIds)
 			throws DaoException, CollectionNotFoundException {
 		
@@ -435,5 +509,15 @@ public class MailBackendTest {
 		public MailCollectionPath(String displayName) {
 			super(COLLECTION_MAIL_PREFIX + displayName, PIMDataType.EMAIL, displayName);
 		}
+	}
+
+	private Function<OpushCollection, String> toDisplayNameFunction() {
+		return new Function<OpushCollection, String>() {
+			
+			@Override
+			public String apply(OpushCollection opushCollection) {
+				return opushCollection.displayName();
+			}
+		};
 	}
 }

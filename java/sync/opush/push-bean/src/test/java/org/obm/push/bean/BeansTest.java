@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
+import org.obm.push.backend.OpushCollection;
+import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
@@ -106,6 +108,8 @@ public class BeansTest {
 					.add(MSRead.class)
 					.add(MSEventExtId.class)
 					.add(CollectionPath.class)
+					.add(OpushCollection.class)
+					.add(PathsToCollections.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

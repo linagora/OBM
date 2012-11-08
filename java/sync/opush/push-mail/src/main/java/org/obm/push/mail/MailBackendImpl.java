@@ -56,6 +56,8 @@ import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushBackend;
+import org.obm.push.backend.OpushCollection;
+import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Email;
@@ -104,17 +106,15 @@ import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -176,36 +176,38 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throws DaoException, MailException {
 		
 		try {
-			ImmutableSet<CollectionPath> currentSubscribedFolders = 
-					ImmutableSet.<CollectionPath>builder()
-						.addAll(listSpecialFolders(udr))
-						.addAll(listSubscribedFolders(udr))
+			PathsToCollections currentSubscribedFolders = PathsToCollections.builder()
+					.putAll(listSpecialFolders(udr))
+					.putAll(listSubscribedFolders(udr))
 					.build();
-			snapshotHierarchy(udr, currentSubscribedFolders, outgoingSyncState);
+			snapshotHierarchy(udr, currentSubscribedFolders.pathKeys(), outgoingSyncState);
 			return computeChanges(udr, lastKnownState, currentSubscribedFolders);
 		} catch (CollectionNotFoundException e) {
 			throw new HierarchyChangesException(e);
 		}
 	}
 	
-	private List<CollectionPath> listSpecialFolders(UserDataRequest udr) {
+	@VisibleForTesting PathsToCollections listSpecialFolders(UserDataRequest udr) {
 		return imapFolderNamesToCollectionPath(udr, SPECIAL_FOLDERS);
 	}
 	
-	private List<CollectionPath> imapFolderNamesToCollectionPath(UserDataRequest udr, Iterable<String> imapFolderNames) {
-		List<CollectionPath> collectionPaths = Lists.newArrayList();
+	private PathsToCollections imapFolderNamesToCollectionPath(UserDataRequest udr, Iterable<String> imapFolderNames) {
+		PathsToCollections.Builder builder = PathsToCollections.builder();
 		for (String imapFolderName: imapFolderNames) {
-			collectionPaths.add(
-					collectionPathBuilderProvider.get()
-						.userDataRequest(udr)
-						.pimType(PIMDataType.EMAIL)
-						.backendName(imapFolderName)
+			CollectionPath collectionPath = collectionPathBuilderProvider.get()
+					.userDataRequest(udr)
+					.pimType(PIMDataType.EMAIL)
+					.backendName(imapFolderName)
+					.build();
+			builder.put(collectionPath, OpushCollection.builder()
+					.collectionPath(collectionPath)
+					.displayName(imapFolderName)
 					.build());
 		}
-		return collectionPaths;
+		return builder.build();
 	}
 	
-	private List<CollectionPath> listSubscribedFolders(UserDataRequest udr) throws MailException {
+	@VisibleForTesting PathsToCollections listSubscribedFolders(UserDataRequest udr) throws MailException {
 		return imapFolderNamesToCollectionPath(udr,
 					FluentIterable
 					.from(
@@ -220,11 +222,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	private HierarchyItemsChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
-			ImmutableSet<CollectionPath> currentSubscribedFolders) throws DaoException, CollectionNotFoundException {
+			PathsToCollections currentSubscribedFolders) throws DaoException, CollectionNotFoundException {
 		
-		ImmutableSet<CollectionPath> previousEmailCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
-		SetView<CollectionPath> newFolders = Sets.difference(currentSubscribedFolders, previousEmailCollections);
-		SetView<CollectionPath> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders);
+		Set<CollectionPath> previousEmailCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
+		Set<CollectionPath> deletedFolders = Sets.difference(previousEmailCollections, currentSubscribedFolders.pathKeys());
+		Iterable<OpushCollection> newFolders = addedCollections(previousEmailCollections, currentSubscribedFolders);
 		
 		return buildHierarchyItemsChanges(udr, newFolders, deletedFolders);
 	}
@@ -234,14 +236,15 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 	
 	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, CollectionPath imapFolder)
+	protected ItemChange createItemChange(UserDataRequest udr, OpushCollection imapFolder)
 			throws DaoException, CollectionNotFoundException {
 		
-		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
+		CollectionPath collectionPath = imapFolder.collectionPath();
+		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 		return new ItemChangeBuilder()
 			.parentId("0")
-			.displayName(imapFolder.backendName())
-			.itemType(folderType(imapFolder.backendName()))
+			.displayName(imapFolder.displayName())
+			.itemType(folderType(imapFolder.displayName()))
 			.serverId(mappingService.collectionIdToString(collectionId))
 			.build();
 	}

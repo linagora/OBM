@@ -108,6 +108,9 @@ public class CalendarBackendTest {
 	private Device device;
 	private UserDataRequest userDataRequest;
 	private AccessToken token;
+	private FolderSyncState lastKnownState;
+	private FolderSyncState outgoingSyncState;
+	private String rootCalendarPath;
 	
 	private MappingService mappingService;
 	private CalendarClient calendarClient;
@@ -124,6 +127,10 @@ public class CalendarBackendTest {
 		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
 		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		this.token = new AccessToken(0, "OBM");
+		this.lastKnownState = new FolderSyncState("1234567890a");
+		this.outgoingSyncState = new FolderSyncState("1234567890b");
+		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
+
 		
 		this.mappingService = createMock(MappingService.class);
 		this.calendarClient = createMock(CalendarClient.class);
@@ -147,10 +154,8 @@ public class CalendarBackendTest {
 	
 	@Test
 	public void testInitialCalendarChanges() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
 		String calendarDisplayName = userDataRequest.getUser().getLoginAtDomain();
-		String defaultCalendarName = "obm:\\\\test@test\\calendar\\" + calendarDisplayName;
+		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
 		
 		int collectionMappingId = 1;
 		List<CollectionPath> knownCollections = ImmutableList.of(); 
@@ -181,10 +186,8 @@ public class CalendarBackendTest {
 	
 	@Test
 	public void testNoCalendarChanges() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
 		String calendarDisplayName = userDataRequest.getUser().getLoginAtDomain();
-		String defaultCalendarName = "obm:\\\\test@test\\calendar\\" + calendarDisplayName;
+		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
 		
 		int collectionMappingId = 1;
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
@@ -315,6 +318,87 @@ public class CalendarBackendTest {
 		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange1);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).hasSize(1);
 		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(expectedItemChange2);
+	}
+
+	@Test
+	public void collectionDisplayNameForCalendar() throws Exception {
+		int calendarMappingId = 1;
+		String calendarBackendName = "test@test";
+		String calendarDisplayName = calendarBackendName + " calendar";
+		String calendarCollectionPath = rootCalendarPath + calendarBackendName;
+
+		Builder collectionPathBuilder = expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
+
+		expectMappingServiceListLastKnowCollection(lastKnownState, ImmutableList.<CollectionPath>of());
+		expectMappingServiceSearchThenCreateCollection(calendarCollectionPath, calendarMappingId);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(calendarMappingId));
+		expectMappingServiceLookupCollection(calendarCollectionPath, calendarMappingId);
+		
+		replay(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
+		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		verify(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
+
+		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(new ItemChangeBuilder()
+				.displayName(calendarDisplayName)
+				.serverId("1")
+				.parentId("0")
+				.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.withNewFlag(true)
+				.build());
+	}
+
+	@Test
+	public void collectionDisplayNameForMultipleCalendar() throws Exception {
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", "my phone");
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
+		
+		int calendarMappingId = 1;
+		String calendarBackendName = "test@test";
+		String calendarDisplayName = calendarBackendName + " calendar";
+		String calendarCollectionPath = rootCalendarPath + calendarBackendName;
+
+		int calendar2MappingId = 2;
+		String calendar2BackendName = "test2@test";
+		String calendar2DisplayName = calendar2BackendName + " calendar";
+		String calendar2CollectionPath = rootCalendarPath + calendar2BackendName;
+		
+		expectLoginBehavior();
+		expectObmSyncCalendarChanges(
+				newCalendarInfo("1", calendarBackendName),
+				newCalendarInfo("2", calendar2BackendName));
+
+		Builder collectionPathBuilder = expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
+		Builder collectionPath2Builder = expectBuildCollectionPath(calendar2BackendName, calendar2CollectionPath);
+
+		expectMappingServiceListLastKnowCollection(lastKnownState, ImmutableList.<CollectionPath>of());
+		expectMappingServiceSearchThenCreateCollection(calendarCollectionPath, calendarMappingId);
+		expectMappingServiceSearchThenCreateCollection(calendar2CollectionPath, calendar2MappingId);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(calendarMappingId, calendar2MappingId));
+		expectMappingServiceLookupCollection(calendarCollectionPath, calendarMappingId);
+		expectMappingServiceLookupCollection(calendar2CollectionPath, calendar2MappingId);
+		
+		replay(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
+				collectionPathBuilderProvider, calendarClient);
+		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		verify(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
+				collectionPathBuilderProvider, calendarClient);
+
+		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(
+				new ItemChangeBuilder()
+					.displayName(calendarDisplayName)
+					.serverId("1")
+					.parentId("0")
+					.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
+					.withNewFlag(true)
+					.build(),
+				new ItemChangeBuilder()
+					.displayName(calendar2DisplayName)
+					.serverId("2")
+					.parentId("0")
+					.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
+					.withNewFlag(true)
+					.build()
+				);
 	}
 
 	private Builder expectBuildCollectionPath(String displayName, String fullCollectionPath) {

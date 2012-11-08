@@ -42,7 +42,10 @@ import javax.naming.NoPermissionException;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.backend.PathsToCollections;
+import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.HierarchyItemsChanges;
@@ -77,7 +80,6 @@ import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Sets;
@@ -115,9 +117,9 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			FolderChanges folderChanges = listAddressBooksChanged(udr, lastKnownState);
 			Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
 			
-			Set<CollectionPath> changedCollections = changedCollections(udr, folderChanges);
+			PathsToCollections changedCollections = changedCollections(udr, folderChanges);
 			Set<CollectionPath> deletedCollections = deletedCollections(udr, folderChanges, lastKnownCollections, changedCollections);
-			Set<CollectionPath> addCollections = Sets.difference(changedCollections, lastKnownCollections);
+			Iterable<OpushCollection> addCollections = addedCollections(lastKnownCollections, changedCollections);
 			snapshotHierarchy(udr, lastKnownCollections, changedCollections, deletedCollections, outgoingSyncState);
 
 			return buildHierarchyItemsChanges(udr, addCollections, deletedCollections);
@@ -125,7 +127,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			throw new HierarchyChangesException(e);
 		}
 	}
-	
+
 	private Date backendLastSyncDate(FolderSyncState lastKnownState) throws DaoException, InvalidSyncKeyException {
 
 		if (lastKnownState.isInitialFolderSync()) {
@@ -146,23 +148,24 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private void snapshotHierarchy(UserDataRequest udr, Set<CollectionPath> lastKnownCollections,
-			Set<CollectionPath> changedItems, Set<CollectionPath> deletedItems,
+			PathsToCollections changedCollections, Set<CollectionPath> deletedCollections,
 			FolderSyncState outgoingSyncState) throws DaoException {
 
-		Set<CollectionPath> remainingKnownCollections = Sets.difference(lastKnownCollections, deletedItems);
-		Set<CollectionPath> currentCollections = Sets.union(remainingKnownCollections, changedItems);
+		Set<CollectionPath> remainingKnownCollections = Sets.difference(lastKnownCollections, deletedCollections);
+		Set<CollectionPath> currentCollections = Sets.union(remainingKnownCollections, changedCollections.pathKeys());
 		snapshotHierarchy(udr, currentCollections, outgoingSyncState);
 	}
 
 	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, CollectionPath collectionPath)
+	protected ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
 			throws DaoException, CollectionNotFoundException {
 		
 		boolean isNew = false;
+		CollectionPath collectionPath = collection.collectionPath();
 		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
 		String parentId = getParentId(udr, collectionPath);
 		FolderType itemType = getItemType(collectionPath);
-		return new ItemChange(serverId, parentId, collectionPath.backendName(), itemType, isNew);
+		return new ItemChange(serverId, parentId, collection.displayName(), itemType, isNew);
 	}
 
 	@Override
@@ -175,35 +178,36 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@VisibleForTesting Set<CollectionPath> deletedCollections(UserDataRequest udr, FolderChanges folderChanges, 
-			Set<CollectionPath> lastKnownCollections, Set<CollectionPath> changedCollections) {
+			Set<CollectionPath> lastKnownCollections, PathsToCollections changedCollections) {
 		
+		PathsToCollections removedCollections = foldersToCollection(udr, folderChanges.getRemoved());
 		return FluentIterable
-				.from(foldersToCollectionPaths(udr, folderChanges.getRemoved()))
+				.from(removedCollections.pathKeys())
 				.filter(Predicates.in(lastKnownCollections))
-				.filter(Predicates.not(Predicates.in(changedCollections)))
+				.filter(Predicates.not(Predicates.in(changedCollections.pathKeys())))
 				.toImmutableSet();
 	}
 
-	private Set<CollectionPath> changedCollections(UserDataRequest udr, FolderChanges folderChanges) {
+	@VisibleForTesting PathsToCollections changedCollections(UserDataRequest udr, FolderChanges folderChanges) {
 		Iterable<Folder> folderChangesSorted = 
 				sortedFolderChangesByDefaultAddressBook(folderChanges, contactConfiguration.getDefaultAddressBookName());
-		return foldersToCollectionPaths(udr, folderChangesSorted);
+		return foldersToCollection(udr, folderChangesSorted);
 	}
 
-	private Set<CollectionPath> foldersToCollectionPaths(final UserDataRequest udr, Iterable<Folder> folders) {
-		return FluentIterable
-				.from(folders)
-				.transform(new Function<Folder, CollectionPath>() {
-
-					@Override
-					public CollectionPath apply(Folder folder) {
-						return collectionPathForFolder(udr, folder);
-					}})
-				.toImmutableSet();
+	private PathsToCollections foldersToCollection(final UserDataRequest udr, Iterable<Folder> folders) {
+		Builder builder = PathsToCollections.builder();
+		for (Folder folder : folders) {
+			OpushCollection collection = collectionFromFolder(udr, folder);
+			builder.put(collection.collectionPath(), collection);
+		}
+		return builder.build();
 	}
 
-	protected CollectionPath collectionPathForFolder(UserDataRequest udr, Folder folder) {
-		return collectionPath(udr, folder.getName());
+	protected OpushCollection collectionFromFolder(UserDataRequest udr, Folder folder) {
+		return OpushCollection.builder()
+				.collectionPath(collectionPath(udr, folder.getName()))
+				.displayName(folder.getName())
+				.build();
 	}
 	
 	@VisibleForTesting CollectionPath collectionPath(UserDataRequest udr, String backendName) {
