@@ -48,7 +48,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
-import org.obm.opush.env.AbstractOpushEnv;
+import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -67,11 +67,9 @@ import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class AutodiscoverHandlerTest {
-
-	private static class AutodiscoverHandlerTestModule extends AbstractOpushEnv {}
 	
 	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(AutodiscoverHandlerTestModule.class);
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
 	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;

@@ -29,13 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.command.meeting;
+package org.obm.opush.env;
 
-import org.obm.opush.env.AbstractOpushEnv;
 
-public class MeetingResponseHandlerTestModule extends AbstractOpushEnv {
+public class DefaultOpushModule  extends AbstractOpushEnv {
 	
-	public MeetingResponseHandlerTestModule() {
+	public DefaultOpushModule() {
 		super();
 	}
 }

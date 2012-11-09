@@ -56,6 +56,7 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 
 	@Override
 	protected void configureImpl() {
+		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(true);
 		bindWithMock(IAddressBook.class);
 		ICalendar calendar = createAndRegisterMock(ICalendar.class);
 		bind(ICalendar.class)

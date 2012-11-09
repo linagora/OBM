@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
@@ -54,6 +55,11 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.imap.LinagoraMailboxService;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
@@ -127,6 +133,11 @@ public class IntegrationTestUtils {
 		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(String.class)))
 			.andReturn(folderSyncState);
 	}
+	
+	public static void expectGetCollectionPath(CollectionDao collectionDao, Integer collectionId, String serverId) throws CollectionNotFoundException, DaoException {
+		expect(collectionDao.getCollectionPath(collectionId))
+			.andReturn(serverId);
+	}
 
 	public static void expectCreateFolderMappingState(FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao) throws DaoException {
 		folderSyncStateBackendMappingDao.createMapping(anyObject(PIMDataType.class), anyObject(FolderSyncState.class));
@@ -180,5 +191,30 @@ public class IntegrationTestUtils {
 	
 	private static String buildCollectionPath(OpushUser opushUser, String dataType, String relativePath) {
 		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + relativePath;
+	}
+
+	public static void expectFetchFlags(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, Collection<Flag> value) {
+		expect(mailboxService.fetchFlags(udr, collectionName, uid))
+			.andReturn(value);
+	}
+
+	public static void expectFetchEnvelope(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, UIDEnvelope envelope) {
+		expect(mailboxService.fetchEnvelope(udr, collectionName, uid))
+			.andReturn(envelope);
+	}
+
+	public static void expectFetchBodyStructure(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, MimeMessage mimeMessage) {
+		expect(mailboxService.fetchBodyStructure(udr, collectionName, uid))
+			.andReturn(mimeMessage);
+	}
+
+	public static void expectFetchMailStream(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, InputStream mailStream) {
+		expect(mailboxService.fetchMailStream(udr, collectionName, uid))
+				.andReturn(mailStream);
+	}
+
+	public static void expectFetchMimePartStream(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, InputStream mailStream, MimeAddress partAddress) {
+		expect(mailboxService.fetchMimePartStream(udr, collectionName, uid, partAddress))
+			.andReturn(mailStream);
 	}
 }

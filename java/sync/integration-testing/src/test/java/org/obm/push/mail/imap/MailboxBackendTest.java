@@ -32,19 +32,11 @@
 package org.obm.push.mail.imap;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -54,23 +46,32 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.IntegrationTestUtils;
+import org.obm.opush.PortNumber;
+import org.obm.opush.SingleUserFixture;
+import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.mail.ImapMessageNotFoundException;
-import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.MailBackendImpl;
+import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
-import org.obm.push.mail.bean.MailboxFolder;
-import org.obm.push.mail.bean.MailboxFolders;
-import org.obm.push.utils.DateUtils;
+import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -78,52 +79,65 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.GreenMailUtil;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class MailboxBackendTest {
 
 	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
-	@Inject MailboxService mailboxService;
+	@Inject MailBackendImpl mailBackendImpl;
 	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject EmailConfiguration emailConfiguration;
+	@Inject SmtpSender smtpSender;
+	@Inject LinagoraImapClientProvider linagoraImapClientProvider;
+	@Inject LinagoraMailboxService linagoraMailboxService;
+	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject @PortNumber int port;
+	@Inject SingleUserFixture singleUserFixture;
+	@Inject OpushServer opushServer;
 
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;
-	private MailboxTestUtils testUtils;
-	private Date beforeTest;
 	private UserDataRequest udr;
 
 	@Before
 	public void setUp() {
-		beforeTest = new Date();
-		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
 	}
 	
 	@After
-	public void tearDown() {
-		greenMail.stop();
+	public void tearDown() throws Exception {
+		opushServer.stop();
 	}
 
 	@Test
 	public void testFetchMimeSinglePartBase64Email() throws Exception {
 		InputStream mailStream = loadEmail("SinglePartBase64.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
 		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
+		int itemId = 2;
+		int collectionId = 1;
+		String serverId = collectionId + ":" + itemId;
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		IntegrationTestUtils.expectGetCollectionPath(collectionDao, collectionId, serverId);
+		
+		mockMailboxServiceFetchFullMail(mailStream, itemId, serverId);
+		
+		IntegrationTestUtils.replayMocks(classToInstanceMap);
+		opushServer.start();
+		
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(
+				ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build()));
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of(serverId), syncCollectionOptions);
+		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
+		
+		IntegrationTestUtils.verifyMocks(classToInstanceMap);
 		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("SinglePartBase64.eml"));
 	}
 
@@ -131,28 +145,91 @@ public class MailboxBackendTest {
 	@Test
 	public void testFetchTextPlainSinglePartBase64Email() throws Exception {
 		InputStream mailStream = loadEmail("SinglePartBase64.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
 		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
+		int itemId = 2;
+		int collectionId = 1;
+		String serverId = collectionId + ":" + itemId;
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		IntegrationTestUtils.expectGetCollectionPath(collectionDao, collectionId, serverId);
+		
+		mockMailboxServiceFetchFullMail(mailStream, collectionId, serverId);
+		
+		IntegrationTestUtils.replayMocks(classToInstanceMap);
+		opushServer.start();
+		
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(
+				ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of("1:1"), syncCollectionOptions);
+		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
 		String bodyText = new String(ByteStreams.toByteArray(actual.getBody().getMimeData()), Charsets.UTF_8);
 		assertThat(bodyText).contains("Envoyé de mon iPhone");
+	}
+	
+	private void mockMailboxServiceFetchFullMail(InputStream mailStream, int collectionId, String collectionPath) {
+		LinagoraMailboxService mailboxService = classToInstanceMap.get(LinagoraMailboxService.class);
+		IntegrationTestUtils.expectFetchFlags(mailboxService, udr, collectionPath, collectionId, ImmutableList.of(Flag.SEEN));
+		IntegrationTestUtils.expectFetchEnvelope(mailboxService, udr, collectionPath, collectionId, buildUIDEnvelope(collectionId));
+		IntegrationTestUtils.expectFetchBodyStructure(mailboxService, udr, collectionPath, collectionId, buildMimeMessage(collectionId));
+		IntegrationTestUtils.expectFetchMailStream(mailboxService, udr, collectionPath, collectionId, mailStream);
 	}
 	
 	@Test
 	public void testFetchWithoutCorrespondingBodyPreference() throws Exception {
 		InputStream mailStream = loadEmail("OBMFULL-4123.eml");
-		mailboxService.storeInInbox(udr, mailStream, false);
 		
-		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		List<MSEmail> emails = mailboxService.fetch(udr, 1, inboxCollectionName, 
-				Arrays.asList(1l), 
-				Arrays.asList(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
-		MSEmail actual = Iterables.getOnlyElement(emails);
+		int itemId = 2;
+		int collectionId = 1;
+		String serverId = collectionId + ":" + itemId;
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		IntegrationTestUtils.expectGetCollectionPath(collectionDao, collectionId, serverId);
+		
+		mockMailboxServiceFetchFullMailWithMimePartAddress(mailStream, collectionId, serverId);
+		
+		IntegrationTestUtils.replayMocks(classToInstanceMap);
+		opushServer.start();
+		
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(
+				ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of("1:1"), syncCollectionOptions);
+		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
 		assertThat(actual.getBody().getMimeData()).hasContentEqualTo(loadEmail("OBMFULL-4123.eml"));
 	}
 
+	private void mockMailboxServiceFetchFullMailWithMimePartAddress(InputStream mailStream, int collectionId, String serverId) {
+		LinagoraMailboxService mailboxService = classToInstanceMap.get(LinagoraMailboxService.class);
+		IntegrationTestUtils.expectFetchFlags(mailboxService, udr, serverId, collectionId, ImmutableList.of(Flag.SEEN));
+		IntegrationTestUtils.expectFetchEnvelope(mailboxService, udr, serverId, collectionId, buildUIDEnvelope(collectionId));
+		IntegrationTestUtils.expectFetchBodyStructure(mailboxService, udr, serverId, collectionId, buildMimeMessage(collectionId));
+		IntegrationTestUtils.expectFetchMimePartStream(mailboxService, udr, serverId, collectionId, mailStream, new MimeAddress("1"));
+	}
+	
+	private MimeMessage buildMimeMessage(long uid) {
+		return MimeMessage.builder()
+				.uid(uid)
+				.addChild(buildMimePart())
+				.size(1)
+				.build();
+	}
+	
+	private MimePart buildMimePart() {
+		return MimePart.builder()
+				.contentType("text/plain; charset= utf-8")
+				.size(1)
+				.build();
+	}
+	
+	private UIDEnvelope buildUIDEnvelope(int uid) {
+		return new UIDEnvelope(uid, buildEnvelope());
+	}
+	
+	private Envelope buildEnvelope() {
+		Address address = new Address(mailbox);
+		return Envelope.builder()
+				.to(ImmutableList.of(address))
+				.cc(ImmutableList.of(address))
+				.from(ImmutableList.of(address))
+				.bcc(ImmutableList.of(address))
+				.replyTo(ImmutableList.of(address))
+				.build();
+	}
 }

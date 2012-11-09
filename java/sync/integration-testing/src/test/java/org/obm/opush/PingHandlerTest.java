@@ -69,6 +69,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
@@ -102,7 +103,7 @@ import com.google.inject.Inject;
 public class PingHandlerTest {
 
 	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(PingHandlerTestModule.class);
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
 	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
