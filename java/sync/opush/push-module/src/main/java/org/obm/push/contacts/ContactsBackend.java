@@ -163,7 +163,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		boolean isNew = false;
 		CollectionPath collectionPath = collection.collectionPath();
 		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
-		String parentId = getParentId(udr, collectionPath);
+		String parentId = contactConfiguration.getDefaultParentId();
 		FolderType itemType = getItemType(collectionPath);
 		return new ItemChange(serverId, parentId, collection.displayName(), itemType, isNew);
 	}
@@ -243,18 +243,6 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 		return mappingService.collectionIdToString(collectionId);
-	}
-	
-	@VisibleForTesting String getParentId(UserDataRequest udr, CollectionPath collectionPath) throws DaoException {
-		try {
-			if (!isDefaultFolder(collectionPath.backendName())) {
-				CollectionPath defaultBookCollectionPath = collectionPath(udr, contactConfiguration.getDefaultAddressBookName());
-				return getServerIdFromCollectionPath(udr, defaultBookCollectionPath.collectionPath());
-			}
-		} catch (CollectionNotFoundException e) {
-			logger.info("Default main address book not found in mapping : " + contactConfiguration.getDefaultAddressBookName());
-		}
-		return contactConfiguration.getDefaultParentId();
 	}
 	
 	private FolderType getItemType(CollectionPath collectionPath) {

@@ -107,7 +107,7 @@ public class ContactsBackendHierarchyChangesTest {
 		accessToken = new AccessToken(0, "OBM");
 		contactParentName = "contacts";
 		contactParentPath = COLLECTION_CONTACT_PREFIX + contactParentName;
-		contactParentId = 115;
+		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);
 
 		mocks = createControl();
@@ -210,11 +210,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceFindCollection(contactParentPath, contactParentId);
 		expectMappingServiceSearchThenCreateCollection(otherCollectionCollectionPath, otherCollectionMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId, otherCollectionMappingId));
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
 
 		expectBuildCollectionPath(otherCollectionDisplayName);
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		
@@ -288,11 +286,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2));
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 
 		expectBuildCollectionPath("both");
 		expectBuildCollectionPath("both");
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -369,11 +365,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 
 		expectBuildCollectionPath("add");
 		expectBuildCollectionPath("known");
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -398,12 +392,10 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
 
 		expectBuildCollectionPath("add");
 		expectBuildCollectionPath("known");
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -429,11 +421,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
 		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
 
 		expectBuildCollectionPath("add");
 		expectBuildCollectionPath("unknown");
-		expectBuildCollectionPath(contactParentName);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);

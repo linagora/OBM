@@ -278,22 +278,6 @@ public class ContactsBackendTest {
 		assertThat(itemChanges).contains(itemChange);
 	}
 
-	@Test
-	public void testGetParentIdFailedReturnsDefaultParentId() throws Exception {
-		expectBuildCollectionPath(DEFAULT_PARENT_BOOK_NAME);
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + DEFAULT_PARENT_BOOK_NAME))
-			.andThrow(new CollectionNotFoundException());
-
-		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, null, null, contactConfiguration, collectionPathBuilderProvider);
-		String parentId = contactsBackend.getParentId(userDataRequest, new ContactCollectionPath("my contacts"));
-
-		mocks.verify();
-		
-		assertThat(parentId).isEqualTo(DEFAULT_PARENT_BOOK_ID);
-	}
-	
 	private void expectGetItemIdFromServerId(int contactId, String serverId) {
 		expect(mappingService.getItemIdFromServerId(serverId))
 			.andReturn(contactId).once();
@@ -446,11 +430,6 @@ public class ContactsBackendTest {
 		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + "technicalName"))
 			.andReturn(3).anyTimes();
 
-		expectBuildCollectionPath(DEFAULT_PARENT_BOOK_NAME);
-		expect(mappingService.collectionIdToString(2)).andReturn("2").anyTimes();
-		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + DEFAULT_PARENT_BOOK_NAME))
-			.andReturn(2).anyTimes();
-		
 		OpushCollection collection = OpushCollection.builder()
 				.collectionPath(new ContactCollectionPath("technicalName"))
 				.displayName("great display name!")
@@ -463,7 +442,7 @@ public class ContactsBackendTest {
 		
 		assertThat(itemChange).isEqualTo(new ItemChangeBuilder()
 				.displayName("great display name!")
-				.parentId("2")
+				.parentId("0")
 				.serverId("3")
 				.itemType(FolderType.USER_CREATED_CONTACTS_FOLDER)
 				.build());
@@ -492,5 +471,24 @@ public class ContactsBackendTest {
 		mocks.verify();
 		
 		assertThat(actual).containsOnly(f1CollectionPath);
+	}
+	
+	@Test
+	public void createItemChangeBuildsWithParentIdFromConfiguration() throws Exception {
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(new ContactCollectionPath("technicalName"))
+				.displayName("displayName")
+				.build();
+
+		expect(mappingService.collectionIdToString(3)).andReturn("3").anyTimes();
+		expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(), COLLECTION_CONTACT_PREFIX + "technicalName"))
+			.andReturn(3).anyTimes();
+		
+		mocks.replay();
+		ContactsBackend contactsBackend = new ContactsBackend(mappingService, null, null, contactConfiguration, collectionPathBuilderProvider);
+		ItemChange itemChange = contactsBackend.createItemChange(userDataRequest, collection);
+		mocks.verify();
+
+		assertThat(itemChange.getParentId()).isEqualTo(DEFAULT_PARENT_BOOK_ID);
 	}
 }
