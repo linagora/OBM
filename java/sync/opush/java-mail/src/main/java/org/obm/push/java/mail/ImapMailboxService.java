@@ -525,8 +525,6 @@ public class ImapMailboxService implements MailboxService {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
-		} catch (ImapMessageNotFoundException e) {
-			throw new MailException(e);
 		}
 		
 		return imapMailBoxUtils.buildFastFetchFromIMAPMessage(imapMessages);

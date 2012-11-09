@@ -65,6 +65,8 @@ import org.obm.push.mail.imap.StreamedLiteral;
 import org.obm.push.mail.imap.command.IMAPCommand;
 import org.obm.push.mail.imap.command.UIDCopyMessage;
 import org.obm.push.mail.mime.MimeAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -76,6 +78,8 @@ import com.sun.mail.imap.protocol.IMAPProtocol;
 
 public class OpushImapFolderImpl implements OpushImapFolder {
 
+	private final static Logger logger = LoggerFactory.getLogger(OpushImapFolderImpl.class);
+	
 	private final MessageInputStreamProvider imapResourceProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final IMAPFolder folder;
@@ -234,12 +238,17 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
-	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {
+	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException {
 		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
 		FetchProfile fetchFastProfile = getFetchFastProfile();
 		for (long uid: uids) {
-			IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
-			imapMessages.put(uid, imapMessage);
+			try {
+				IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
+				imapMessages.put(uid, imapMessage);
+			}
+			catch (ImapMessageNotFoundException e) {
+				logger.debug("Message {} not found", uid);
+			}
 		}
 		return imapMessages;
 	}

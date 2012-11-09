@@ -85,7 +85,7 @@ public interface OpushImapFolder {
 	
 	void open(int mode) throws MessagingException;
 
-	Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException;
 
 	Collection<Long> uidSearch(SearchQuery query) throws MessagingException;
 	

@@ -264,7 +264,7 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException {
+	public Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, Collection<Long> uids) throws ImapCommandException {
 		try {
 			return opushImapFolder.fetchFast(uids);
 		} catch (MessagingException e) {

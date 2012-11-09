@@ -673,13 +673,22 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, messageFixture.uid))
 			.andReturn(mockAggregateMimeMessage()).once();
 
-		expect(mailboxService.fetchPartialMimePartStream(
-				anyObject(UserDataRequest.class),
-				anyObject(String.class),
-				anyLong(),
-				anyObject(MimeAddress.class),
-				anyInt()))
-			.andReturn(messageFixture.bodyData).once();
+		if (messageFixture.estimatedDataSize != 0) {
+			expect(mailboxService.fetchPartialMimePartStream(
+					anyObject(UserDataRequest.class),
+					anyObject(String.class),
+					anyLong(),
+					anyObject(MimeAddress.class),
+					anyInt()))
+				.andReturn(messageFixture.bodyData).once();
+		} else {
+			expect(mailboxService.fetchMimePartStream(
+					anyObject(UserDataRequest.class),
+					anyObject(String.class),
+					anyLong(),
+					anyObject(MimeAddress.class)))
+				.andReturn(messageFixture.bodyData).once();
+		}
 		
 		expect(mailboxService.findAttachment(udr, messageCollectionName, messageFixture.uid, mimeAddress))
 			.andReturn(messageFixture.attachment);
