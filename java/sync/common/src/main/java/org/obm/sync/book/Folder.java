@@ -32,6 +32,8 @@
 package org.obm.sync.book;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 public class Folder {
 
@@ -65,6 +67,8 @@ public class Folder {
 		}
 		
 		public Folder build() {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name can't be null or empty");
+			Preconditions.checkNotNull(uid, "uid can't be null");
 			return new Folder(uid, name, ownerDisplayName);
 		}
 	}

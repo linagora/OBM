@@ -80,7 +80,10 @@ import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
+import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -90,6 +93,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
+	private static final String BACKEND_NAME_SEPARATOR = "-";
+	
 	private final ContactConfiguration contactConfiguration;
 	private final IAddressBook bookClient;
 	
@@ -204,18 +209,20 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	protected OpushCollection collectionFromFolder(UserDataRequest udr, Folder folder) {
+		String backendName = backendNameFromParts(folder.getUid(), folder.getName());
 		return OpushCollection.builder()
-				.collectionPath(collectionPath(udr, folder.getName()))
+				.collectionPath(collectionPathBuilderProvider.get()
+						.userDataRequest(udr)
+						.pimType(getPIMDataType())
+						.backendName(backendName)
+						.build())
 				.displayName(folder.getName())
 				.build();
 	}
 	
-	@VisibleForTesting CollectionPath collectionPath(UserDataRequest udr, String backendName) {
-		return collectionPathBuilderProvider.get()
-				.userDataRequest(udr)
-				.pimType(getPIMDataType())
-				.backendName(backendName)
-				.build();
+	@VisibleForTesting String backendNameFromParts(int uid, String name) {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
+		return Joiner.on(BACKEND_NAME_SEPARATOR).join(String.valueOf(uid), name);
 	}
 
 	private Iterable<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
@@ -293,9 +300,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		List<AddressBook> addressBooks = listAddressBooks(udr);
 		for (AddressBook addressBook: addressBooks) {
-			String colllectionPath = collectionPath(udr, addressBook.getName()).collectionPath();
+			String backendName = backendNameFromParts(addressBook.getUid(), addressBook.getName());
+			String collectionPath = collectionPathBuilderProvider.get()
+					.userDataRequest(udr)
+					.pimType(getPIMDataType())
+					.backendName(backendName)
+					.build()
+					.collectionPath();
 			try {
-				Integer addressBookCollectionId = mappingService.getCollectionIdFor(udr.getDevice(), colllectionPath);
+				Integer addressBookCollectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 				if (addressBookCollectionId.intValue() == collectionId.intValue()) {
 					return addressBook.getUid();
 				}

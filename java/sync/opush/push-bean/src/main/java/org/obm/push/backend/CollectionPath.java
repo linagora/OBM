@@ -81,7 +81,7 @@ public class CollectionPath {
 			
 			if (Strings.isNullOrEmpty(fullyQualifiedCollectionPath)) {
 				Preconditions.checkState(pimType != null);
-				Preconditions.checkState(backendName != null);
+				Preconditions.checkState(!Strings.isNullOrEmpty(backendName));
 				
 				return buildFromPimType();
 			} else {

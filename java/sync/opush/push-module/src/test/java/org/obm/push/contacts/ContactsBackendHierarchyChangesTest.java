@@ -85,7 +85,6 @@ public class ContactsBackendHierarchyChangesTest {
 	private UserDataRequest userDataRequest;
 	private AccessToken accessToken;
 	private String contactParentName;
-	private String contactParentPath;
 	private int contactParentId;
 	private String contactParentIdAsString;
 
@@ -105,10 +104,9 @@ public class ContactsBackendHierarchyChangesTest {
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		accessToken = new AccessToken(0, "OBM");
-		contactParentName = "contacts";
-		contactParentPath = COLLECTION_CONTACT_PREFIX + contactParentName;
 		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);
+		contactParentName = "contacts";
 
 		mocks = createControl();
 		mappingService = mocks.createMock(MappingService.class);
@@ -145,11 +143,11 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		List<CollectionPath> knownCollections = ImmutableList.of(); 
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
-		expectMappingServiceSearchThenCreateCollection(contactParentPath, contactParentId);
+		expectMappingServiceSearchThenCreateCollection(contactParentName, contactParentId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId));
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
+		expectMappingServiceLookupCollection(contactParentName, contactParentId);
 		
-		expectBuildCollectionPath(contactParentName);
+		expectBuildCollectionPath(contactParentName, contactParentId);
 
 		mocks.replay();
 		
@@ -177,9 +175,9 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.<Folder>of());
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
-				new ContactCollectionPath(contactParentName)); 
+				new ContactCollectionPath(contactParentName, contactParentId)); 
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
-		expectMappingServiceFindCollection(contactParentPath, contactParentId);
+		expectMappingServiceFindCollection(contactParentName, contactParentId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId));
 		
 		mocks.replay();
@@ -199,20 +197,19 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
-		String otherCollectionCollectionPath = COLLECTION_CONTACT_PREFIX + otherCollectionDisplayName;
 		
-		Folder change = newFolderObject(otherCollectionDisplayName, Integer.valueOf(contactParentId));
+		Folder change = newFolderObject(otherCollectionDisplayName, Integer.valueOf(otherCollectionMappingId));
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
-				new ContactCollectionPath(contactParentName)); 
+				new ContactCollectionPath(contactParentName, contactParentId)); 
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
-		expectMappingServiceFindCollection(contactParentPath, contactParentId);
-		expectMappingServiceSearchThenCreateCollection(otherCollectionCollectionPath, otherCollectionMappingId);
+		expectMappingServiceFindCollection(contactParentName, contactParentId);
+		expectMappingServiceSearchThenCreateCollection(otherCollectionDisplayName, otherCollectionMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId, otherCollectionMappingId));
-		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
+		expectMappingServiceLookupCollection(otherCollectionDisplayName, otherCollectionMappingId);
 
-		expectBuildCollectionPath(otherCollectionDisplayName);
+		expectBuildCollectionPath(otherCollectionDisplayName, otherCollectionMappingId);
 		
 		mocks.replay();
 		
@@ -239,21 +236,20 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
-		String otherCollectionCollectionPath = COLLECTION_CONTACT_PREFIX + otherCollectionDisplayName;
 
 		Folder contactDeletion = newFolderObject(contactParentName, contactParentId);
 		Folder otherCollectionDeletion = newFolderObject(otherCollectionDisplayName, otherCollectionMappingId);
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.of(contactDeletion, otherCollectionDeletion));
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
-				new ContactCollectionPath(contactParentName),
-				new ContactCollectionPath(otherCollectionDisplayName)); 
+				new ContactCollectionPath(contactParentName, contactParentId),
+				new ContactCollectionPath(otherCollectionDisplayName, otherCollectionMappingId)); 
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
-		expectMappingServiceLookupCollection(contactParentPath, contactParentId);
-		expectMappingServiceLookupCollection(otherCollectionCollectionPath, otherCollectionMappingId);
+		expectMappingServiceLookupCollection(contactParentName, contactParentId);
+		expectMappingServiceLookupCollection(otherCollectionDisplayName, otherCollectionMappingId);
 
-		expectBuildCollectionPath(contactParentName);
-		expectBuildCollectionPath(otherCollectionDisplayName);
+		expectBuildCollectionPath(contactParentName, contactParentId);
+		expectBuildCollectionPath(otherCollectionDisplayName, otherCollectionMappingId);
 		
 		mocks.replay();
 		
@@ -276,26 +272,27 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testSameAddAndDeleteDiscardDelete() throws Exception {
 		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
-
+		int targetCollectionId = 2;
+			
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2));
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", 2));
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", targetCollectionId));
+		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", targetCollectionId));
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
-		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2));
-		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
+		expectMappingServiceSearchThenCreateCollection("both", targetCollectionId);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(targetCollectionId));
+		expectMappingServiceLookupCollection("both", targetCollectionId);
 
-		expectBuildCollectionPath("both");
-		expectBuildCollectionPath("both");
+		expectBuildCollectionPath("both", targetCollectionId);
+		expectBuildCollectionPath("both", targetCollectionId);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("2", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getChangedItems()).containsOnly(new ItemChange(String.valueOf(targetCollectionId),
+				contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
 		assertThat(changes.getDeletedItems()).isEmpty();
 	}
 	
@@ -303,17 +300,18 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testSameLastKnownAndAdd() throws Exception {
 		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
-
-		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("both"));
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2));
+		int targetCollectionId = 2;
+		
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("both", targetCollectionId));
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", targetCollectionId));
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
-		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2));
+		expectMappingServiceFindCollection("both", targetCollectionId);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(targetCollectionId));
 
-		expectBuildCollectionPath("both");
+		expectBuildCollectionPath("both", targetCollectionId);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -329,18 +327,18 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
-				new ContactCollectionPath("both"), new ContactCollectionPath("both2"));
+				new ContactCollectionPath("both", 2), new ContactCollectionPath("both2", 3));
 		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both2", 3));
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "both", 2);
-		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "both2", 3);
+		expectMappingServiceFindCollection("both", 2);
+		expectMappingServiceFindCollection("both2", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
 
-		expectBuildCollectionPath("both");
-		expectBuildCollectionPath("both2");
+		expectBuildCollectionPath("both", 2);
+		expectBuildCollectionPath("both2", 3);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -355,19 +353,19 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
-		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known"));
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
 		Set<Folder> updated = ImmutableSet.of(newFolderObject("known", 2), newFolderObject("add", 3));
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
-		expectMappingServiceFindCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
+		expectMappingServiceSearchThenCreateCollection("add", 3);
+		expectMappingServiceFindCollection("known", 2);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
-		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceLookupCollection("add", 3);
 
-		expectBuildCollectionPath("add");
-		expectBuildCollectionPath("known");
+		expectBuildCollectionPath("add", 3);
+		expectBuildCollectionPath("known", 2);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -383,19 +381,19 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
-		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known"));
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
 		Set<Folder> updated = ImmutableSet.of(newFolderObject("add", 3));
 		Set<Folder> removed = ImmutableSet.of(newFolderObject("known", 2));
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceSearchThenCreateCollection("add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
-		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
-		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "known", 2);
+		expectMappingServiceLookupCollection("add", 3);
+		expectMappingServiceLookupCollection("known", 2);
 
-		expectBuildCollectionPath("add");
-		expectBuildCollectionPath("known");
+		expectBuildCollectionPath("add", 3);
+		expectBuildCollectionPath("known", 2);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -418,12 +416,12 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
-		expectMappingServiceSearchThenCreateCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceSearchThenCreateCollection("add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
-		expectMappingServiceLookupCollection(COLLECTION_CONTACT_PREFIX + "add", 3);
+		expectMappingServiceLookupCollection("add", 3);
 
-		expectBuildCollectionPath("add");
-		expectBuildCollectionPath("unknown");
+		expectBuildCollectionPath("add", 3);
+		expectBuildCollectionPath("unknown", 2);
 		
 		mocks.replay();
 		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
@@ -434,22 +432,24 @@ public class ContactsBackendHierarchyChangesTest {
 		assertThat(changes.getDeletedItems()).isEmpty();
 	}
 	
-	private Builder expectBuildCollectionPath(String displayName) {
-		CollectionPath collectionPath = new ContactCollectionPath(displayName);
-		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath, displayName);
+	private Builder expectBuildCollectionPath(String displayName, int folderUid) {
+		CollectionPath collectionPath = new ContactCollectionPath(displayName, folderUid);
+		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath, displayName, folderUid);
 		expectCollectionPathBuilderPovider(collectionPathBuilder);
 		return collectionPathBuilder;
 	}
 
-	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath, String displayName) {
+	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath, 
+			String displayName, int folderUid) {
+		
 		CollectionPath.Builder collectionPathBuilder = mocks.createMock(CollectionPath.Builder.class);
 		expect(collectionPathBuilder.userDataRequest(userDataRequest))
 			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.pimType(PIMDataType.CONTACTS))
 			.andReturn(collectionPathBuilder).once();
-		
-		expect(collectionPathBuilder.backendName(displayName))
+
+		expect(collectionPathBuilder.backendName(ContactCollectionPath.backendName(displayName, folderUid)))
 			.andReturn(collectionPathBuilder).once();
 		
 		expect(collectionPathBuilder.build())
@@ -486,15 +486,21 @@ public class ContactsBackendHierarchyChangesTest {
 			.andReturn(collectionPaths).once();
 	}
 
-	private void expectMappingServiceFindCollection(String collectionPath, Integer collectionId)
+	private void expectMappingServiceFindCollection(String collectionName, Integer collectionId)
 		throws CollectionNotFoundException, DaoException {
+		
+		String collectionPath = 
+				COLLECTION_CONTACT_PREFIX + ContactCollectionPath.backendName(collectionName, collectionId);
 		
 		expect(mappingService.getCollectionIdFor(device, collectionPath))
 			.andReturn(collectionId).once();
 	}
 	
-	private void expectMappingServiceSearchThenCreateCollection(String collectionPath, Integer collectionId)
+	private void expectMappingServiceSearchThenCreateCollection(String collectionName, Integer collectionId)
 		throws CollectionNotFoundException, DaoException {
+
+		String collectionPath = 
+				COLLECTION_CONTACT_PREFIX + ContactCollectionPath.backendName(collectionName, collectionId);
 		
 		expect(mappingService.getCollectionIdFor(device, collectionPath))
 			.andThrow(new CollectionNotFoundException()).once();
@@ -503,10 +509,10 @@ public class ContactsBackendHierarchyChangesTest {
 			.andReturn(collectionId).once();
 	}
 	
-	private void expectMappingServiceLookupCollection(String collectionPath, Integer collectionId)
+	private void expectMappingServiceLookupCollection(String collectionName, Integer collectionId)
 		throws CollectionNotFoundException, DaoException {
 		
-		expectMappingServiceFindCollection(collectionPath, collectionId);
+		expectMappingServiceFindCollection(collectionName, collectionId);
 		expect(mappingService.collectionIdToString(collectionId))
 			.andReturn(String.valueOf(collectionId)).once();
 	}
@@ -529,8 +535,13 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	private static class ContactCollectionPath extends CollectionPath {
 
-		public ContactCollectionPath(String displayName) {
-			super(COLLECTION_CONTACT_PREFIX + displayName, PIMDataType.CONTACTS, displayName);
+		public ContactCollectionPath(String displayName, int folderUid) {
+			super(String.format("%s%s", COLLECTION_CONTACT_PREFIX, backendName(displayName, folderUid)),
+					PIMDataType.CONTACTS, displayName);
+		}
+		
+		public static String backendName(String displayName, int folderUid) {
+			return String.format("%d-%s", folderUid, displayName);
 		}
 	}
 }
