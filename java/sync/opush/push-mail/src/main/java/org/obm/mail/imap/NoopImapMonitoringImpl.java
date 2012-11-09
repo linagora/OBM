@@ -29,25 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.minig.imap;
+package org.obm.mail.imap;
 
-import org.minig.imap.idle.IdleClient;
-import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.LinagoraMailboxService;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
-import org.obm.push.mail.imap.MinigStoreClient;
-import org.obm.push.mail.imap.MinigStoreClientImpl;
+import java.util.Set;
 
-import com.google.inject.AbstractModule;
+import org.obm.push.backend.ICollectionChangeListener;
+import org.obm.push.backend.MailMonitoringBackend;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 
-public class LinagoraImapModule extends AbstractModule {
-	
+import com.google.inject.Singleton;
+
+@Singleton
+public class NoopImapMonitoringImpl implements MailMonitoringBackend {
+
 	@Override
-	protected void configure() {
-		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
-		bind(MailboxService.class).to(LinagoraMailboxService.class);
-		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
-		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);
+	public void startMonitoringCollection(UserDataRequest udr, Integer collectionId, Set<ICollectionChangeListener> registeredListeners)
+		throws CollectionNotFoundException, DaoException {
 	}
 }
