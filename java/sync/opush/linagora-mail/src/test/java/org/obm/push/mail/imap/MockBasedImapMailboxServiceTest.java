@@ -42,7 +42,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -60,6 +59,7 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.minig.imap.StoreClient;
 
 import com.google.common.collect.Sets;
 

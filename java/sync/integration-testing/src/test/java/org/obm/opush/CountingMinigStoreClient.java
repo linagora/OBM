@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import org.minig.imap.StoreClient;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
+import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

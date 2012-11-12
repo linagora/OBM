@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import org.minig.imap.StoreClient;
 import org.obm.push.bean.Resource;
+import org.obm.push.minig.imap.StoreClient;
 
 public interface MinigStoreClient extends Resource {
 

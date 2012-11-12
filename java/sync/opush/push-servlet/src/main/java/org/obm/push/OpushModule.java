@@ -30,7 +30,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
-import org.minig.imap.LinagoraImapModule;
 import org.obm.configuration.module.LoggerModule;
 
 import com.google.inject.AbstractModule;

@@ -36,13 +36,13 @@ import java.util.Set;
 
 import javax.mail.Session;
 
-import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.idle.IdleClient;
+import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

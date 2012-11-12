@@ -43,8 +43,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
-import org.minig.imap.CommandIOException;
-import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
@@ -78,6 +76,8 @@ import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.minig.imap.CommandIOException;
+import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

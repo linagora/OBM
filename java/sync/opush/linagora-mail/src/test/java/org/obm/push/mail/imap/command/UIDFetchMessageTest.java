@@ -42,7 +42,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
@@ -59,6 +58,7 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -67,7 +67,7 @@ import com.icegreen.greenmail.util.GreenMail;
 public class UIDFetchMessageTest {
 
 	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.minig.imap.MailEnvModule.class);
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.obm.push.minig.imap.MailEnvModule.class);
 
 	@Inject LinagoraImapClientProvider clientProvider;
 

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import org.minig.imap.StoreClient;
+import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Singleton;
 
