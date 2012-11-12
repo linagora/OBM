@@ -2194,14 +2194,5 @@ function mb_chunk_split($str, $len, $glue) {
   return $new;
 }
 
-// recaptcha function 
-$conf_recaptcha_userfile = "$path/../conf/hooks/captcha/usecaptcha.inc";
 
-function recaptcha_activation(){
-	global $conf_recaptcha, $conf_recaptcha_userfile;
-	if ($conf_recaptcha == false) return false;
-	if(!file_exists($conf_recaptcha_userfile)) return true; 
-	require_once($conf_recaptcha_userfile);
-	return hook_userRules_recaptcha();
-}
 </script>

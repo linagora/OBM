@@ -39,7 +39,7 @@ applicable to the OBM software.
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
  
-global $set_lang_default, $set_theme_default, $c_singleNameSpace, $conf_recaptcha_publickey;
+global $set_lang_default, $set_theme_default, $c_singleNameSpace;
 
 $login_javascript_footer = "
 <script type=\"text/javascript\">
@@ -57,9 +57,6 @@ include_once($theme_file);
 
 $lang_file = "obminclude/lang/$set_lang_default/login.inc";
 include_once($lang_file);
-
-$captcha_file = "lib/captcha/recaptchalib.php";
-require_once($captcha_file);
 
 $conf_login_page_incl = "$path/../conf/themes/login.inc";
 if (file_exists($conf_login_page_incl)) {
@@ -87,21 +84,7 @@ $login_action = '';
 
 $login = isset($params['login']) ? $params['login'] : '';
 
-//  reCaptcha  //
-$recaptcha_formadd = '';
-if (recaptcha_activation() == true){
-  $recaptcha_error = null;
-  $recaptcha = recaptcha_get_html($conf_recaptcha_publickey, $recaptcha_error);
-  $captcha_formadd = '
-    <table class="captcha">
-      <tr>
-        <th><label for="captcha">reCAPTCHA</label></th>
-        <td>'.$recaptcha.'</td>
-      </tr> 
-    </table>
-  ';
-}
-
+// here I should plug captcha thing
 
 $template = get_template($lp);
 eval ("\$template = \"$template\";");
