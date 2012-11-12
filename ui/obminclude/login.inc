@@ -78,8 +78,12 @@ if(!$c_singleNameSpace) {
   $domain = $l_domain;
 }
 
-if (isset($params['login'])) {
-  $error = $l_error;
+if ( isset($params['login'])) {
+  if ( isset($params["auth_captcha_failed"]) ) {
+    $error = $l_captcha_error;
+  } else {
+    $error = $l_error;
+  }
 }
 
 $login_action = '';

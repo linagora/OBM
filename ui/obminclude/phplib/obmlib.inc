@@ -176,6 +176,7 @@ class OBM_Challenge_Auth extends Auth {
     global $c_default_domain, $c_singleNameSpace, $l_error;
     
     if ( !$this->auth_validate_captcha() ) {
+      $params["auth_captcha_failed"] = true;
       return false;
     }
 
@@ -445,6 +446,7 @@ class LDAP_Auth extends Auth {
     global $c_default_domain, $c_singleNameSpace, $l_error;
 
     if ( !$this->auth_validate_captcha() ) {
+      $params["auth_captcha_failed"] = true;
       return false;
     }
 

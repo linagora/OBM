@@ -30,6 +30,7 @@
 
 $l_login = "Login";
 $l_password = "Password";
-$l_error = "Either your login or your password is invalid or your session may have expired. Please try again"; 
+$l_error = "Either your login or your password is invalid or your session may have expired. Please try again";
+$l_captcha_error = "It seems you entered a wrong captcha. Please try again";
 $l_domain = "Domain";
 
