@@ -71,6 +71,7 @@ require_once($obminclude . '/global_pref.inc');
 require_once('calendar_query.inc');
 require_once($obminclude . '/of/of_contact.php');
 require_once($obminclude . '/of/of_query.inc');
+require_once($obminclude . '/of/of_captcha.php');
 require_once($obminclude . '/of/of_session.inc');
 
 $params = get_calendar_params();

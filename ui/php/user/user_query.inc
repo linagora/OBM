@@ -31,6 +31,7 @@ applicable to the OBM software.
 
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if (!$obminclude) $obminclude = 'obminclude';
+require_once($obminclude . '/of/of_captcha.php');
 require_once($obminclude . '/of/of_session.inc');
 
 

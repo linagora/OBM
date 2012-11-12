@@ -413,7 +413,7 @@ class Auth {
   function auth_refreshlogin() { ; }
 
   function auth_validate_captcha() {
-    return true;
+    return OBM_captcha::validateCaptcha();
   }
 }
 

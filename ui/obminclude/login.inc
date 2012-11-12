@@ -41,6 +41,8 @@ applicable to the OBM software.
  
 global $set_lang_default, $set_theme_default, $c_singleNameSpace;
 
+require_once("obminclude/of/of_captcha.php");
+
 $login_javascript_footer = "
 <script type=\"text/javascript\">
   if (document.forms.loginform.login.value == '') {
@@ -84,7 +86,7 @@ $login_action = '';
 
 $login = isset($params['login']) ? $params['login'] : '';
 
-// here I should plug captcha thing
+$captcha_formadd = OBM_captcha::getCaptchaHTML();
 
 $template = get_template($lp);
 eval ("\$template = \"$template\";");

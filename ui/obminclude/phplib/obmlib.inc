@@ -24,6 +24,7 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 
 require_once("$obminclude/phplib/ct_sql.inc");
 require_once("$obminclude/of/of_query.inc");
+require_once("$obminclude/of/of_captcha.php");
 require_once("$obminclude/of/of_session.inc");
 require_once("$obminclude/of/of_display.inc");
 
