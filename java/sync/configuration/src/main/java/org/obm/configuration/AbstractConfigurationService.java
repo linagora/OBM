@@ -38,6 +38,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 public abstract class AbstractConfigurationService {
@@ -94,6 +95,11 @@ public abstract class AbstractConfigurationService {
 		} catch (NumberFormatException nfe) {
 			return defaultValue;
 		}
+	}
+	
+	@VisibleForTesting
+	public void setProperty(Object property, Object value) {
+		props.put(property, value);
 	}
 	
 }

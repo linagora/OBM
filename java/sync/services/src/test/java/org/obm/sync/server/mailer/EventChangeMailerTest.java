@@ -125,6 +125,7 @@ public class EventChangeMailerTest {
 		ObmSyncConfigurationService constantService = createMock(ObmSyncConfigurationService.class);
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 		expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
 		replay(constantService);
 		
 		mailService = createMock(MailService.class);
@@ -859,12 +860,12 @@ public class EventChangeMailerTest {
 			Participation status = Participation.accepted();
 			status.setComment(new Comment(null));
 
-			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
-			EasyMock.expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
-			EasyMock.expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(
-					ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+		ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
+		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
+		expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
 
-			EasyMock.replay(constantService);
+		replay(constantService);
 
 			EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
 

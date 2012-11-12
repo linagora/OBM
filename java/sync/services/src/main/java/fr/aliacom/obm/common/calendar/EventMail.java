@@ -66,13 +66,14 @@ public class EventMail {
 	private final String bodyHtml;
 	private String icsContent;
 	private String icsMethod;
+	private CalendarEncoding calendarEncoding;
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject, String bodyTxt, String bodyHtml) {
-		this(from, recipients, subject, bodyTxt, bodyHtml, null, null);
+		this(from, recipients, subject, bodyTxt, bodyHtml, null, null, null);
 	}
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject,
-			String bodyTxt, String bodyHtml, String icsContent, String icsMethod) {
+			String bodyTxt, String bodyHtml, String icsContent, String icsMethod, CalendarEncoding calendarEncoding) {
 				this.from = from;
 				this.recipients = recipients;
 				this.subject = subject;
@@ -80,6 +81,7 @@ public class EventMail {
 				this.bodyHtml = bodyHtml;
 				this.icsContent = icsContent;
 				this.icsMethod = icsMethod;
+				this.calendarEncoding = calendarEncoding;
 	}
 	
 	public MimeMessage buildMimeMail(Session session) throws MessagingException, IOException {
@@ -145,6 +147,11 @@ public class EventMail {
 		MimeBodyPart part = new MimeBodyPart();
 		part.setText(icsContent);
 		part.setHeader("Content-Type", "text/calendar; charset=UTF-8; method=" + icsMethod + ";");
+		
+		if (calendarEncoding != null) {
+			part.setHeader("Content-Transfer-Encoding", calendarEncoding.getValue());
+		}
+		
 		return part;
 	}
 

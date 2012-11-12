@@ -35,6 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Properties;
 
@@ -44,6 +45,8 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -78,6 +81,63 @@ public class MailSendTest {
 		assertThat(content).contains(EventMail.X_OBM_NOTIFICATION_EMAIL);
 	}
 	
+	@Test
+	public void testCalendarEncodingBase64() throws Exception {
+		String icsContent = IOUtils.toString(getClass().getResourceAsStream("sample.ics"));
+		EventMail eventMail = new EventMail(new InternetAddress("sender@test"), ImmutableList.of(newAttendee("attendee1")), SUBJECT, BODY_TEXT, BODY_HTML, icsContent, ICS_METHOD, CalendarEncoding.Base64);
+		String content = writeEventMail(eventMail);
+		LineIterator lineIterator = new LineIterator(new StringReader(content));
+		boolean textCalendarFound = false;
+		
+		while (lineIterator.hasNext()) {
+			if (lineIterator.next().contains("Content-Type: text/calendar")) {
+				textCalendarFound = true;
+				break;
+			}
+		}
+		
+		assertThat(textCalendarFound).isTrue();
+		assertThat(lineIterator.next()).contains("Content-Transfer-Encoding: base64");
+	}
+	
+	@Test
+	public void testCalendarEncodingQuotedPrintable() throws Exception {
+		String icsContent = IOUtils.toString(getClass().getResourceAsStream("sample.ics"));
+		EventMail eventMail = new EventMail(new InternetAddress("sender@test"), ImmutableList.of(newAttendee("attendee1")), SUBJECT, BODY_TEXT, BODY_HTML, icsContent, ICS_METHOD, CalendarEncoding.QuotedPrintable);
+		String content = writeEventMail(eventMail);
+		LineIterator lineIterator = new LineIterator(new StringReader(content));
+		boolean textCalendarFound = false;
+		
+		while (lineIterator.hasNext()) {
+			if (lineIterator.next().contains("Content-Type: text/calendar")) {
+				textCalendarFound = true;
+				break;
+			}
+		}
+		
+		assertThat(textCalendarFound).isTrue();
+		assertThat(lineIterator.next()).contains("Content-Transfer-Encoding: quoted-printable");
+	}
+	
+	@Test
+	public void testCalendarEncodingSevenBit() throws Exception {
+		String icsContent = IOUtils.toString(getClass().getResourceAsStream("sample.ics"));
+		EventMail eventMail = new EventMail(new InternetAddress("sender@test"), ImmutableList.of(newAttendee("attendee1")), SUBJECT, BODY_TEXT, BODY_HTML, icsContent, ICS_METHOD, CalendarEncoding.SevenBit);
+		String content = writeEventMail(eventMail);
+		LineIterator lineIterator = new LineIterator(new StringReader(content));
+		boolean textCalendarFound = false;
+		
+		while (lineIterator.hasNext()) {
+			if (lineIterator.next().contains("Content-Type: text/calendar")) {
+				textCalendarFound = true;
+				break;
+			}
+		}
+		
+		assertThat(textCalendarFound).isTrue();
+		assertThat(lineIterator.next()).contains("Content-Transfer-Encoding: 7bit");
+	}
+	
 	private String writeEventMail(EventMail eventMail) throws IOException, MessagingException {
 		MimeMessage mail = eventMail.buildMimeMail(Session.getDefaultInstance(new Properties()));
 		ByteArrayOutputStream mailByteStream = new ByteArrayOutputStream();
@@ -88,7 +148,11 @@ public class MailSendTest {
 	}
 	
 	private EventMail newEventMail(List<Attendee> attendees) throws AddressException {
-		return new EventMail(new InternetAddress("sender@test"), attendees, SUBJECT, BODY_TEXT, BODY_HTML, ICS, ICS_METHOD);
+		return newEventMail(attendees, null);
+	}
+	
+	private EventMail newEventMail(List<Attendee> attendees, CalendarEncoding calendarEncoding) throws AddressException {
+		return new EventMail(new InternetAddress("sender@test"), attendees, SUBJECT, BODY_TEXT, BODY_HTML, ICS, ICS_METHOD, calendarEncoding);
 	}
 	
 	private Attendee newAttendee(String name) {

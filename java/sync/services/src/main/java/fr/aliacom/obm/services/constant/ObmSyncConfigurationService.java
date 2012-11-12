@@ -34,9 +34,12 @@ package fr.aliacom.obm.services.constant;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.sync.auth.AccessToken;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
 /**
  * Configuration service
@@ -50,8 +53,11 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	private static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
 	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
 	
+	public static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
+	
 	@Inject
-	private ObmSyncConfigurationService() {
+	@VisibleForTesting
+	ObmSyncConfigurationService() {
 		super();
 	}
 
@@ -120,5 +126,21 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	@Override
 	public boolean usePersistentCache() {
 		return false;
+	}
+	
+	public CalendarEncoding getEmailCalendarEncoding() {
+		String strEncoding = getStringValue(EMAIL_CALENDAR_ENCODING_PARAMETER);
+		
+		if (strEncoding == null) {
+			return null;
+		}
+		
+		try {
+			return CalendarEncoding.valueOf(strEncoding);
+		}
+		catch (Exception e) {
+			logger.warn("Invalid calendar encoding '{}', using default behaviour (do not specify an encoding)", strEncoding);
+			return null;
+		}
 	}
 }

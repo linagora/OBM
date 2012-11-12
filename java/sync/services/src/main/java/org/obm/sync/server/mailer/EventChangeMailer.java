@@ -71,6 +71,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.MailService;
+import fr.aliacom.obm.common.calendar.CalendarEncoding;
 import fr.aliacom.obm.common.calendar.EventMail;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -82,12 +83,14 @@ import freemarker.template.TemplateException;
 public class EventChangeMailer extends AbstractMailer {
 
 	private final String baseUrl;
+	private final CalendarEncoding calendarEncoding;
 	
 	@Inject
 	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();
+		this.calendarEncoding = constantService.getEmailCalendarEncoding();
 		configurationLogger.info("OBM web interface URL : {}", baseUrl);
 	}
 	
@@ -102,7 +105,7 @@ public class EventChangeMailer extends AbstractMailer {
 						newUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale, event), 
 						inviteNewUserBodyTxt(event, locale, timezone),
 						inviteNewUserBodyHtml(event, locale, timezone),
-						ics, "REQUEST");
+						ics, "REQUEST", calendarEncoding);
 			sendNotificationMessageToAttendees(attendee, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -143,7 +146,7 @@ public class EventChangeMailer extends AbstractMailer {
 						removedUserTitle(event.getOwnerDisplayName(), event.getTitle(), locale, event), 
 						removedUserBodyTxt(event, locale, timezone),
 						removedUserBodyHtml(event, locale, timezone), 
-						ics, "CANCEL");
+						ics, "CANCEL", calendarEncoding);
 			sendNotificationMessageToAttendees(attendees, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -165,7 +168,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateUserTitle(current.getOwnerDisplayName(), current.getTitle(), locale, current), 
 						inviteUpdateUserBodyTxt(previous, current, locale, timezone),
 						inviteUpdateUserBodyHtml(previous, current, locale, timezone), 
-						ics, "REQUEST");
+						ics, "REQUEST", calendarEncoding);
 			sendNotificationMessageToAttendees(attendees, mail, token);
 		} catch (UnsupportedEncodingException e) {
 			throw new NotificationException(e);
@@ -243,8 +246,7 @@ public class EventChangeMailer extends AbstractMailer {
 						updateParticipationTitle(event.getTitle(), locale),
 						updateParticipationBodyTxt(event, attendeeUpdated, newParticipation, locale, timezone),
 						updateParticipationBodyHtml(event, attendeeUpdated, newParticipation, locale, timezone),
-						ics, "REPLY"
-						);
+						ics, "REPLY", calendarEncoding);
 			sendNotificationMessageToOrganizer(organizer, mail, token);
 			
 		} catch (UnsupportedEncodingException e) {
