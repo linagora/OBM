@@ -65,7 +65,7 @@ applicable to the OBM software.
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;" colspan="2">
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accepter/refuser la réservation</a>
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=waiting_events">Accepter/refuser la réservation</a>
         </td>
     </tr>
 </table>

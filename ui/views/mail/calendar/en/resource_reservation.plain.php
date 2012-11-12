@@ -55,4 +55,4 @@ created by     : <?php echo $creator; ?>
 Comments: <?php echo $targetComment; ?>
 
 :: To accept or refuse this reservation :
-<?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
+<?php echo $this->host; ?>/calendar/calendar_index.php?action=waiting_events
