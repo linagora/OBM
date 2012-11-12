@@ -33,6 +33,8 @@
 package org.minig.imap.idle;
 
 import org.minig.imap.impl.MinaIMAPMessage;
+import org.obm.push.mail.imap.idle.IdleLine;
+import org.obm.push.mail.imap.idle.IdleTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

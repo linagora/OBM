@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.command.parser;
 
-import static org.minig.imap.MimeMessageFactory.createSimpleMimeMessage;
-import static org.minig.imap.MimeMessageFactory.createSimpleMimePart;
-import static org.minig.imap.MimeMessageFactory.createSimpleMimeTree;
-import static org.minig.imap.MimeMessageTestUtils.checkMimeTree;
+import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimeMessage;
+import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimePart;
+import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimeTree;
+import static org.obm.push.mail.imap.MimeMessageTestUtils.checkMimeTree;
 
 import java.util.HashMap;
 

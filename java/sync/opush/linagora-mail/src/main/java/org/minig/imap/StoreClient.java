@@ -55,6 +55,7 @@ import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

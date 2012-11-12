@@ -32,7 +32,6 @@
 package org.obm.push;
 import org.minig.imap.LinagoraImapModule;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.mail.OpushMailModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;

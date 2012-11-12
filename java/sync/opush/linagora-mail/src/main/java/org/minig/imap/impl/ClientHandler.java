@@ -38,7 +38,7 @@ import org.apache.mina.common.IoHandlerAdapter;
 import org.apache.mina.common.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.minig.imap.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

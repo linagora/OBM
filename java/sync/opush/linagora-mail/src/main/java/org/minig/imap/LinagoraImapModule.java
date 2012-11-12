@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap;
 
-import org.minig.imap.idle.IdleClient;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.imap.LinagoraMailboxService;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
+import org.obm.push.mail.imap.idle.IdleClient;
 
 import com.google.inject.AbstractModule;
 

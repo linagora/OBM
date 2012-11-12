@@ -35,11 +35,12 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.minig.imap.idle.IIdleCallback;
-import org.minig.imap.idle.IdleClient;
 import org.minig.imap.idle.IdleClientCallback;
 import org.minig.imap.impl.ClientHandler;
 import org.minig.imap.impl.ClientSupport;
+import org.obm.push.mail.imap.IMAPException;
+import org.obm.push.mail.imap.idle.IIdleCallback;
+import org.obm.push.mail.imap.idle.IdleClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

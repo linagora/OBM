@@ -41,13 +41,13 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 
 import org.obm.push.bean.Resource;
-import org.obm.push.exception.FolderCreationException;
-import org.obm.push.exception.ImapCommandException;
-import org.obm.push.exception.ImapLoginException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.exception.FolderCreationException;
+import org.obm.push.mail.exception.ImapCommandException;
+import org.obm.push.mail.exception.ImapLoginException;
 
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;

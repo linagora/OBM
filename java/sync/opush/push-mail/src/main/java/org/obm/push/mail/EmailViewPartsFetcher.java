@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.obm.mail.conversation.EmailView;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.mail.conversation.EmailView;
 
 public interface EmailViewPartsFetcher {
 

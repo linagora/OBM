@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.obm.mail.conversation.EmailView;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.conversation.EmailView;
 
 public interface MailViewToMSEmailConverter {
 

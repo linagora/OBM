@@ -31,10 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import org.minig.imap.IMAPException;
-import org.minig.imap.idle.IdleClient;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.imap.idle.IdleClient;
 
 public interface ImapClientProvider {
 

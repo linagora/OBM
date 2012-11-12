@@ -35,12 +35,14 @@ package org.minig.imap.idle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.minig.imap.IMAPException;
 import org.minig.imap.impl.ClientSupport;
 import org.minig.imap.impl.IMAPResponse;
 import org.minig.imap.impl.IMAPResponseParser;
 import org.minig.imap.impl.IResponseCallback;
 import org.minig.imap.impl.MinaIMAPMessage;
+import org.obm.push.mail.imap.IMAPException;
+import org.obm.push.mail.imap.idle.IIdleCallback;
+import org.obm.push.mail.imap.idle.IdleLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

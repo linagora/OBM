@@ -33,6 +33,7 @@
 package org.minig.imap;
 
 import org.junit.Ignore;
+import org.obm.push.mail.imap.IMAPException;
 
 @Ignore("It's necessary to do again all tests")
 public class LoginTests extends IMAPTestCase {

@@ -34,8 +34,8 @@ package org.obm.push.mail;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.IMimePart;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 
 public class FetchInstruction {

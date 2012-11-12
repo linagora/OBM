@@ -35,7 +35,7 @@ package org.minig.imap.impl;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.minig.imap.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

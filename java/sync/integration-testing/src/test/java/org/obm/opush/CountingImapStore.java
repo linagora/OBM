@@ -33,8 +33,8 @@ package org.obm.opush;
 
 import javax.mail.Session;
 
-import org.obm.push.exception.ImapLoginException;
 import org.obm.push.java.mail.ImapStoreImpl;
+import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MessageInputStreamProvider;

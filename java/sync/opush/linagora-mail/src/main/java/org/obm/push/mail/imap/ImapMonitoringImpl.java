@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.minig.imap.IMAPException;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MailMonitoringBackend;

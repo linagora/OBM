@@ -44,7 +44,6 @@ import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.minig.imap.CommandIOException;
-import org.minig.imap.IMAPException;
 import org.minig.imap.StoreClient;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;

@@ -38,14 +38,14 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
-import org.minig.imap.IMAPException;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ImapLoginException;
-import org.obm.push.exception.NoImapClientAvailableException;
+import org.obm.push.mail.exception.ImapLoginException;
+import org.obm.push.mail.exception.NoImapClientAvailableException;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapStore.Factory;

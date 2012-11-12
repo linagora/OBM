@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncState;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 
 public interface IEmailSync {

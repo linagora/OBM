@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import org.minig.imap.IMAPException;
 import org.minig.imap.StoreClient;
 import org.obm.push.bean.Resource;
 

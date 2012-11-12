@@ -31,17 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.monitor;
 
-import org.minig.imap.IMAPException;
-import org.minig.imap.idle.IIdleCallback;
-import org.minig.imap.idle.IdleClient;
-import org.minig.imap.idle.IdleLine;
-import org.minig.imap.idle.IdleTag;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
+import org.obm.push.mail.imap.idle.IIdleCallback;
+import org.obm.push.mail.imap.idle.IdleClient;
+import org.obm.push.mail.imap.idle.IdleLine;
+import org.obm.push.mail.imap.idle.IdleTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

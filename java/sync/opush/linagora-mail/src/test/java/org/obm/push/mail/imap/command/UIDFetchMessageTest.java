@@ -42,7 +42,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.minig.imap.IMAPException;
 import org.minig.imap.StoreClient;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
@@ -57,6 +56,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 

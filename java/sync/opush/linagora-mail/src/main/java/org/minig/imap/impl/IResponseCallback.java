@@ -32,7 +32,7 @@
 
 package org.minig.imap.impl;
 
-import org.minig.imap.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 
 public interface IResponseCallback {
 

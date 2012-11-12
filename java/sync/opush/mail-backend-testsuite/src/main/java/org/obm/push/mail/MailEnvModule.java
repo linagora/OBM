@@ -39,7 +39,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.SmtpLocatorException;
+import org.obm.push.mail.exception.SmtpLocatorException;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;

@@ -33,7 +33,7 @@ package org.obm.push.mail.smtp;
 
 import org.columba.ristretto.smtp.SMTPProtocol;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.SmtpLocatorException;
+import org.obm.push.mail.exception.SmtpLocatorException;
 
 public interface SmtpProvider {
 

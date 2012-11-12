@@ -36,6 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.junit.Ignore;
+import org.obm.push.mail.imap.IMAPException;
 
 @Ignore("It's necessary to do again all tests")
 public abstract class LoggedTestCase extends IMAPTestCase {
