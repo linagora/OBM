@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import static org.easymock.EasyMock.*;
 import java.util.Locale;
 
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,32 +44,45 @@ import org.obm.configuration.ConfigurationServiceImpl;
 
 
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.IniFile.Factory;
+
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class MessagesTest {
 
+	private ConfigurationServiceImpl configurationService;
+
 	@Before
 	public void setLocale() {
+		IMocksControl control = createControl();
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
+		Factory factory = control.createMock(IniFile.Factory.class);
+		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
+		control.replay();
+		configurationService = new ConfigurationServiceImpl(factory);
 		Locale.setDefault(Locale.US);
 	}
 
 	@Test
 	public void testResourceBundleFr() {
-		Messages messages = new Messages(new ConfigurationServiceImpl(), Locale.FRENCH);
+		Messages messages = new Messages(configurationService, Locale.FRENCH);
 		String message = messages.newEventTitle("owner", "title");
 		Assert.assertEquals("Nouvel événement de owner : title", message);
 	}
 	
 	@Test
 	public void testResourceBundleEn() {
-		Messages messages = new Messages(new ConfigurationServiceImpl(), Locale.ENGLISH);
+		Messages messages = new Messages(configurationService, Locale.ENGLISH);
 		String message = messages.newEventTitle("owner", "title");
 		Assert.assertEquals("New event from owner: title", message);
 	}
 	
 	@Test
 	public void testResourceBundleZhNotExist() {
-		Messages messages = new Messages(new ConfigurationServiceImpl(), Locale.CHINESE);
+		Messages messages = new Messages(configurationService, Locale.CHINESE);
 		String expectedMessage = "New event from owner: title";
 		String message = messages.newEventTitle("owner", "title");
 		Assert.assertEquals(expectedMessage, message);

@@ -33,6 +33,7 @@ package org.obm.push.service;
 
 import org.obm.configuration.AbstractConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.utils.IniFile;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -45,8 +46,8 @@ public class OpushSyncPermsConfigurationService extends AbstractConfigurationSer
 	private static final String ALLOW_UNKNOWN_PDA_PARAMS = "allow.unknown.pda";
 
 	@Inject
-	protected OpushSyncPermsConfigurationService() {
-		super("/etc/opush/sync_perms.ini");
+	protected OpushSyncPermsConfigurationService(IniFile.Factory iniFileFactory) {
+		super(iniFileFactory.build("/etc/opush/sync_perms.ini"));
 	}
 
 	@Override

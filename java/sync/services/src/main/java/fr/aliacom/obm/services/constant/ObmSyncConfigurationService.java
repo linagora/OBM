@@ -32,6 +32,7 @@
 package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.push.utils.IniFile;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -58,8 +59,8 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	
 	@Inject
 	@VisibleForTesting
-	ObmSyncConfigurationService() {
-		super();
+	ObmSyncConfigurationService(IniFile.Factory iniFileFactory) {
+		super(iniFileFactory);
 	}
 
 	public String getDefaultTemplateFolder() {

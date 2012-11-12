@@ -51,7 +51,7 @@ public class IniFile {
 	public static class Factory {
 
 		@Inject
-		private Factory() {
+		public Factory() {
 			super();
 		}
 		

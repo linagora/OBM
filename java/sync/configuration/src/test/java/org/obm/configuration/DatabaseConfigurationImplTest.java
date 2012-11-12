@@ -32,16 +32,39 @@
 
 package org.obm.configuration;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+
+import org.easymock.IMocksControl;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.IniFile.Factory;
+
+import com.google.common.collect.ImmutableMap;
 
 public class DatabaseConfigurationImplTest {
 
+	private DatabaseConfigurationImpl databaseConfigurationImpl;
+
+	@Before
+	public void setup() {
+		IMocksControl control = createControl();
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
+		Factory factory = control.createMock(IniFile.Factory.class);
+		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
+		control.replay();
+		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory);
+	}
+	
     @Test
     public void testGetDatabasePassword() {
         String password = "\"obm\"";
 
-        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
         Assert.assertEquals(unquotedPassword, "obm");
     }
 
@@ -49,7 +72,7 @@ public class DatabaseConfigurationImplTest {
     public void testGetDatabasePasswordWithQuotes() {
         String password = "obm";
 
-        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
         Assert.assertEquals(unquotedPassword, "obm");
     }
 
@@ -57,7 +80,7 @@ public class DatabaseConfigurationImplTest {
     public void testGetDatabasePasswordWithOnlyQuotes() {
         String password = "\"\"";
 
-        String unquotedPassword = new DatabaseConfigurationImpl().removeEnclosingDoubleQuotes(password);
+        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
         Assert.assertEquals(unquotedPassword, "\"\"");
     }
 }

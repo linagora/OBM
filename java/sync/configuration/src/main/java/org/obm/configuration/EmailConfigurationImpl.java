@@ -33,6 +33,8 @@ package org.obm.configuration;
 
 
 
+import org.obm.push.utils.IniFile;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -56,8 +58,8 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	private static final String BACKEND_IMAP_TRASH_PATH = "imap.mailbox.trash";
 	
 	@Inject
-	private EmailConfigurationImpl() {
-		super(BACKEND_CONF_FILE);
+	private EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
+		super(iniFileFactory.build(BACKEND_CONF_FILE));
 	}	
 	
 	private boolean isOptionEnabled(String option) {

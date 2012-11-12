@@ -32,6 +32,8 @@
 
 package org.obm.configuration;
 
+import org.obm.push.utils.IniFile;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,8 +53,8 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
     @Inject
-    DatabaseConfigurationImpl() {
-        super(GLOBAL_CONFIGURATION_FILE);
+    DatabaseConfigurationImpl(IniFile.Factory iniFileFactory) {
+        super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
     }
 
     @Override

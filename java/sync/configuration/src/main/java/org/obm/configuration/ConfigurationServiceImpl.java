@@ -39,10 +39,12 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.resourcebundle.Control;
+import org.obm.push.utils.IniFile;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -78,8 +80,9 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
     private final ImmutableMap<String, TimeUnit> timeUnits;
 
-	public ConfigurationServiceImpl() {
-		super(GLOBAL_CONFIGURATION_FILE);
+    @Inject
+	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory) {
+		super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
 		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,
 								"minutes", TimeUnit.MINUTES,

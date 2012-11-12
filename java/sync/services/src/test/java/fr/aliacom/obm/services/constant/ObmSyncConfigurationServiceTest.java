@@ -29,12 +29,20 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.services.constant;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.IniFile.Factory;
+
+import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
@@ -42,49 +50,74 @@ import fr.aliacom.obm.common.calendar.CalendarEncoding;
 public class ObmSyncConfigurationServiceTest {
 
 	private ObmSyncConfigurationService service;
+	private IniFile configuration;
+	private IMocksControl control;
+	private Factory factory;
 
 	@Before
 	public void setUp() {
-		service = new ObmSyncConfigurationService();
+		control = createControl();
+		configuration = control.createMock(IniFile.class);
+		factory = control.createMock(IniFile.Factory.class);
+		expect(factory.build(anyObject(String.class))).andReturn(configuration);
 	}
 
 	@Test
 	public void testGetEmailCalendarEncodingInvalidEncoding() {
-		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "InvalidEncoding");
-
+		expect(configuration.getData()).andReturn(
+				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "InvalidEncoding"));
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingEmptyPropertyDefined() {
-		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "");
-
+		expect(configuration.getData()).andReturn(
+				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, ""));
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
+		control.verify();
 	}
 
 	@Test
 	public void testGetEmailCalendarEncodingNoPropertyDefined() {
+		expect(configuration.getData()).andReturn(ImmutableMap.<String, String>of());
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingBase64() {
-		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "Base64");
-
+		expect(configuration.getData()).andReturn(
+				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "Base64"));
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Base64);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingQuotedPrintable() {
-		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "QuotedPrintable");
-
+		expect(configuration.getData()).andReturn(
+				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "QuotedPrintable"));
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.QuotedPrintable);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingSevenBit() {
-		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "SevenBit");
-
+		expect(configuration.getData()).andReturn(
+				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "SevenBit"));
+		control.replay();
+		service = new ObmSyncConfigurationService(factory);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
+		control.verify();
 	}
 }

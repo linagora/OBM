@@ -31,47 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.util.Map;
 
+import org.obm.push.utils.IniFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 public abstract class AbstractConfigurationService {
 
 	protected static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
 
-	protected Properties props;
+	protected Map<String, String> props;
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	protected AbstractConfigurationService() {}
 
-	protected AbstractConfigurationService(String filename) {
-		props = new Properties();
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(filename);
-			props.load(in);
-		} catch (IOException e) {
-			logger.error(filename + " not found", e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					logger.error("error closing ini file inputstream", e);
-				}
-			}
-		}
+	protected AbstractConfigurationService(IniFile iniFile) {
+		props = iniFile.getData();
 	}
 	
 	protected String getStringValue(String prop) {
-		return props.getProperty(prop);
+		return props.get(prop);
 	}
 	
 	protected String getStringValue(String prop, String defaultValue) {
@@ -95,11 +78,6 @@ public abstract class AbstractConfigurationService {
 		} catch (NumberFormatException nfe) {
 			return defaultValue;
 		}
-	}
-	
-	@VisibleForTesting
-	public void setProperty(Object property, Object value) {
-		props.put(property, value);
 	}
 	
 }
