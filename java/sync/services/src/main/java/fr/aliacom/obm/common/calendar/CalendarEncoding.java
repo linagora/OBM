@@ -30,6 +30,7 @@
 package fr.aliacom.obm.common.calendar;
 
 public enum CalendarEncoding {
+	Auto(null), // Auto means we won't specify an encoding, thus the null value
 	Base64("base64"),
 	QuotedPrintable("quoted-printable"),
 	SevenBit("7bit");

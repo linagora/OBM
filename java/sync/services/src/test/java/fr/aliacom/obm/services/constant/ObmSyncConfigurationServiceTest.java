@@ -33,9 +33,12 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
+@RunWith(SlowFilterRunner.class)
 public class ObmSyncConfigurationServiceTest {
 
 	private ObmSyncConfigurationService service;
@@ -49,19 +52,19 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingInvalidEncoding() {
 		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "InvalidEncoding");
 
-		assertThat(service.getEmailCalendarEncoding()).isNull();
+		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingEmptyPropertyDefined() {
 		service.setProperty(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "");
 
-		assertThat(service.getEmailCalendarEncoding()).isNull();
+		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 	}
 
 	@Test
 	public void testGetEmailCalendarEncodingNoPropertyDefined() {
-		assertThat(service.getEmailCalendarEncoding()).isNull();
+		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 	}
 	
 	@Test

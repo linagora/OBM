@@ -50,6 +50,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.obm.sync.calendar.Attendee;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
@@ -69,7 +70,7 @@ public class EventMail {
 	private CalendarEncoding calendarEncoding;
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject, String bodyTxt, String bodyHtml) {
-		this(from, recipients, subject, bodyTxt, bodyHtml, null, null, null);
+		this(from, recipients, subject, bodyTxt, bodyHtml, null, null, CalendarEncoding.Auto);
 	}
 	
 	public EventMail(Address from, List<Attendee> recipients, String subject,
@@ -81,7 +82,7 @@ public class EventMail {
 				this.bodyHtml = bodyHtml;
 				this.icsContent = icsContent;
 				this.icsMethod = icsMethod;
-				this.calendarEncoding = calendarEncoding;
+				this.calendarEncoding = Objects.firstNonNull(calendarEncoding, CalendarEncoding.Auto);
 	}
 	
 	public MimeMessage buildMimeMail(Session session) throws MessagingException, IOException {
@@ -148,7 +149,7 @@ public class EventMail {
 		part.setText(icsContent);
 		part.setHeader("Content-Type", "text/calendar; charset=UTF-8; method=" + icsMethod + ";");
 		
-		if (calendarEncoding != null) {
+		if (!CalendarEncoding.Auto.equals(calendarEncoding)) {
 			part.setHeader("Content-Transfer-Encoding", calendarEncoding.getValue());
 		}
 		

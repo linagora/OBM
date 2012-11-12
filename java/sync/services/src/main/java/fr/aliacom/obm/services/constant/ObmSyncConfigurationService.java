@@ -54,6 +54,7 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
 	
 	public static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
+	public static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
 	
 	@Inject
 	@VisibleForTesting
@@ -132,15 +133,15 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 		String strEncoding = getStringValue(EMAIL_CALENDAR_ENCODING_PARAMETER);
 		
 		if (strEncoding == null) {
-			return null;
+			return DEFAULT_EMAIL_CALENDAR_ENCODING;
 		}
 		
 		try {
 			return CalendarEncoding.valueOf(strEncoding);
 		}
 		catch (Exception e) {
-			logger.warn("Invalid calendar encoding '{}', using default behaviour (do not specify an encoding)", strEncoding);
-			return null;
+			logger.warn("Invalid calendar encoding '{}', using default behaviour (automatic detection of appropriate encoding)", strEncoding);
+			return DEFAULT_EMAIL_CALENDAR_ENCODING;
 		}
 	}
 }
