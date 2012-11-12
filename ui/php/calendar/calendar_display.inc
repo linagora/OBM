@@ -4657,7 +4657,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $selected_alert = $calendar['alert'];
     }
   } else {
-    if (isset($_SESSION['set_cal_alert'])) {
+    if (isset($_SESSION['set_cal_alert']) && !isset($selected_alert)) {
       $selected_alert = $_SESSION['set_cal_alert'];
     }
   }
