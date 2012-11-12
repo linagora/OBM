@@ -47,7 +47,7 @@ public class ComparatorUsingFolderName implements Comparator<Folder> {
 	public int compare(Folder f1, Folder f2) {
 		int stringCompareTo = f1.getName().compareTo(f2.getName());
 		if (stringCompareTo == 0) {
-			return 0;
+			return f2.getUid().compareTo(f1.getUid());
 		} else {
 			if (f1.getName().equals(defaultFolderName)) {
 				return -1;

@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.naming.NoPermissionException;
 
@@ -85,6 +84,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -225,10 +225,11 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return Joiner.on(BACKEND_NAME_SEPARATOR).join(String.valueOf(uid), name);
 	}
 
-	private Iterable<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
-		TreeSet<Folder> treeSet = new TreeSet<Folder>( new ComparatorUsingFolderName(defaultAddressBookName) );
-		treeSet.addAll(folderChanges.getUpdated());
-		return treeSet;
+	@VisibleForTesting Iterable<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
+		return ImmutableSortedSet
+				.orderedBy(new ComparatorUsingFolderName(defaultAddressBookName))
+				.addAll(folderChanges.getUpdated())
+				.build();
 	}
 
 	private FolderChanges listAddressBooksChanged(UserDataRequest udr, FolderSyncState lastKnownState)

@@ -432,6 +432,121 @@ public class ContactsBackendHierarchyChangesTest {
 		assertThat(changes.getDeletedItems()).isEmpty();
 	}
 	
+	@Test
+	public void testTwoAddWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 3));
+		Set<Folder> removed = ImmutableSet.of();
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceSearchThenCreateCollection("both", 2);
+		expectMappingServiceSearchThenCreateCollection("both", 3);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
+		expectMappingServiceLookupCollection("both", 2);
+		expectMappingServiceLookupCollection("both", 3);
+
+		expectBuildCollectionPath("both", 3);
+		expectBuildCollectionPath("both", 2);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).containsOnly(
+				new ItemChange("2", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true),
+				new ItemChange("3", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getDeletedItems()).isEmpty();
+	}
+	
+	@Test
+	public void testTwoAddWithSameNamesAndSameUidsDiscardsOne() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
+		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 2));
+		Set<Folder> removed = ImmutableSet.of();
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceSearchThenCreateCollection("both", 2);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2));
+		expectMappingServiceLookupCollection("both", 2);
+
+		expectBuildCollectionPath("both", 2);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).containsOnly(
+				new ItemChange("2", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
+		assertThat(changes.getDeletedItems()).isEmpty();
+	}
+	
+	@Test
+	public void testTwoDeleteWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
+				new ContactCollectionPath("both", 2),
+				new ContactCollectionPath("both", 3));
+		
+		Set<Folder> updated = ImmutableSet.of();
+		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 3));
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceLookupCollection("both", 2);
+		expectMappingServiceLookupCollection("both", 3);
+		
+		expectBuildCollectionPath("both", 2);
+		expectBuildCollectionPath("both", 3);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).isEmpty();
+		assertThat(changes.getDeletedItems()).containsOnly(
+				ItemDeletion.builder().serverId("2").build(),
+				ItemDeletion.builder().serverId("3").build());
+	}
+	
+	@Test
+	public void testTwoDeleteWithSameNamesAndSameUidsDiscardsOne() throws Exception {
+		FolderSyncState lastKnownState = new FolderSyncState("key1", org.obm.DateUtils.date("2012-05-04T11:02:03"));
+		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
+
+		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
+				new ContactCollectionPath("both", 2),
+				new ContactCollectionPath("both", 3));
+		
+		Set<Folder> updated = ImmutableSet.of();
+		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 2));
+		
+		expectBookClientListBooksChanged(lastKnownState, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		expectMappingServiceFindCollection("both", 3);
+		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
+		expectMappingServiceLookupCollection("both", 2);
+		
+		expectBuildCollectionPath("both", 2);
+		
+		mocks.replay();
+		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		mocks.verify();
+		
+		assertThat(changes.getChangedItems()).isEmpty();
+		assertThat(changes.getDeletedItems()).containsOnly(
+				ItemDeletion.builder().serverId("2").build());
+	}
+	
 	private Builder expectBuildCollectionPath(String displayName, int folderUid) {
 		CollectionPath collectionPath = new ContactCollectionPath(displayName, folderUid);
 		CollectionPath.Builder collectionPathBuilder = expectCollectionPathBuilder(collectionPath, displayName, folderUid);

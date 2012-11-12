@@ -531,4 +531,34 @@ public class ContactsBackendTest {
 		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
 		assertThat(contactsBackend.backendNameFromParts(-1, "name")).isEqualTo("-1-name");
 	}
+	
+	@Test
+	public void testSortingKeepsFolderWithSameNames() {
+		Folder folder1 = createFolder("name", 1);
+		Folder folder2 = createFolder("name", 2);
+		Folder folder3 = createFolder("name", 3);
+		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3).build();
+		
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
+		Iterable<Folder> result = contactsBackend.sortedFolderChangesByDefaultAddressBook(changes, "defaultName");
+		
+		assertThat(result).hasSize(3);
+		assertThat(result).containsOnly(folder1, folder2, folder3);
+	}
+	
+	@Test
+	public void testSortingKeepsFolderWithSameNamesAndSameUid() {
+		Folder folder1 = createFolder("name", 1);
+		Folder folder2 = createFolder("name", 2);
+		Folder folder3 = createFolder("name", 2);
+		Folder folder4 = createFolder("name", 3);
+		Folder folder5 = createFolder("name", 1);
+		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3, folder4, folder5).build();
+		
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
+		Iterable<Folder> result = contactsBackend.sortedFolderChangesByDefaultAddressBook(changes, "defaultName");
+		
+		assertThat(result).hasSize(3);
+		assertThat(result).containsOnly(folder1, folder2, folder4);
+	}
 }
