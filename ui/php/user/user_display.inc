@@ -3474,7 +3474,7 @@ function dis_user_export_pdf($id) {
   $Y = 420;
   $X = 98;
   $Y -= $pdf->getLineHeight();
-  if(array_key_exists('show-domain-in-login-pdf',$ini_array) && $ini_array['show-domain-in-login-pdf']  != 'false') {
+  if(array_key_exists('show-domain-in-login-pdf',$ini_array) && $ini_array['show-domain-in-login-pdf']  == '1') {
     $displayed_login = $login."@".$domain;
   } else {
     $displayed_login = $login;
