@@ -207,7 +207,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		boolean syncAutho = deviceService.syncAuthorized(credentials.getUser(), deviceId);
 		if (initDevice && syncAutho) {
 			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
-					credentials.getUser().getEmail(), deviceType);
+					new Object[]{ credentials.getUser().getEmail(), deviceType });
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}
