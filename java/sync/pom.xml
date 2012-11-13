@@ -38,7 +38,6 @@
 		<jta.version>1.1</jta.version>
 		<commons-lang.version>2.6</commons-lang.version>
 		<slf4j.version>1.6.2</slf4j.version>
-		<logback.version>1.0.0</logback.version>
 		<servlet-api.version>2.5</servlet-api.version>
 		<mail.version>1.4.5</mail.version>
 		<freemarker.version>2.3.19</freemarker.version>
@@ -303,19 +302,19 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-core</artifactId>
-				<version>${logback.version}</version>
+				<version>0.9.29</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>${logback.version}</version>
+				<version>0.9.29</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-access</artifactId>
-				<version>${logback.version}</version>
+				<version>0.9.29</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
