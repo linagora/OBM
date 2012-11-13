@@ -28,7 +28,7 @@ public class SQLUtilsTest {
 		public void testSelectCalendarsConditionSingleElementCollection() {
 			Collection<String> emails = Collections.singleton("test@test.com");
 	
-			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (u.userobm_email LIKE ?) ");
+			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (userobm_email LIKE ?) ");
 		}
 	
 	@Test
@@ -39,7 +39,7 @@ public class SQLUtilsTest {
 			emails.add("test2@test.com");
 			emails.add("test3@test.com");
 	
-			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (u.userobm_email LIKE ? OR u.userobm_email LIKE ? OR u.userobm_email LIKE ?) ");
+			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (userobm_email LIKE ? OR userobm_email LIKE ? OR userobm_email LIKE ?) ");
 		}
 	
 	@Test
@@ -53,7 +53,7 @@ public class SQLUtilsTest {
 			emails.add("test5@test.com");
 			emails.add("test6@test.com");
 	
-			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (u.userobm_email LIKE ? OR u.userobm_email LIKE ? OR u.userobm_email LIKE ? OR u.userobm_email LIKE ? OR u.userobm_email LIKE ? OR u.userobm_email LIKE ?) ");
+			assertThat(SQLUtils.selectCalendarsCondition(emails)).isEqualTo("AND (userobm_email LIKE ? OR userobm_email LIKE ? OR userobm_email LIKE ? OR userobm_email LIKE ? OR userobm_email LIKE ? OR userobm_email LIKE ?) ");
 		}
 
 }

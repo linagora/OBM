@@ -50,7 +50,7 @@ public class SQLUtils {
 		}
 		
 		StringBuilder builder = new StringBuilder("AND (");
-		List<String> userEmails = Collections.nCopies(calendarEmails.size(), "u.userobm_email LIKE ?");
+		List<String> userEmails = Collections.nCopies(calendarEmails.size(), "userobm_email LIKE ?");
 		
 		builder.append(Joiner.on(" OR ").join(userEmails));
 		// To close the AND condition
