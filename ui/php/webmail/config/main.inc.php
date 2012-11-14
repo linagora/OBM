@@ -25,7 +25,6 @@ $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') {
 	$obminclude = 'obminclude';
 }
-
 require_once("$obminclude/global.inc");
 
 // Ugly hack for DB_OBM
@@ -283,7 +282,7 @@ $rcmail_config['session_lifetime'] = 10;
 $rcmail_config['session_domain'] = '';
 
 // session name. Default: 'roundcube_sessid'
-$rcmail_config['session_name'] = null;
+$rcmail_config['session_name'] = 'OBM_Session';
 
 // Backend to use for session storage. Can either be 'db' (default) or 'memcache'
 // If set to memcache, a list of servers need to be specified in 'memcache_hosts'
@@ -418,7 +417,7 @@ $rcmail_config['email_dns_check'] = false;
 // ----------------------------------
 
 // List of active plugins (in plugins/ directory)
-$rcmail_config['plugins'] = array('multiple_smtp_server');
+$rcmail_config['plugins'] = array('multiple_smtp_server', 'obm_auth');
 
 // ----------------------------------
 // USER INTERFACE

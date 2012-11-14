@@ -1678,6 +1678,11 @@ function check_privacy($module, $table, $action, $id='', $p_uid='') {
   }
 }
 
+function getMyId(){
+  global $obm;
+  return $obm['uid'];
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return the privacy select

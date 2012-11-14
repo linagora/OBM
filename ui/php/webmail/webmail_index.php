@@ -29,8 +29,6 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
-
-
 $path = '..';
 $module = 'webmail';
 $obminclude = getenv('OBM_INCLUDE_VAR');
@@ -41,6 +39,35 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 include("$obminclude/global_pref.inc");
 include("webmail_display.inc");
 page_close();
+
+///////////////////////////////////////////////////////////////////////////////
+// Write session in Roundcube DB
+//////////////////////////////////////////////////////////////////////////////
+prepare_session_roundcube();
+
+function prepare_session_roundcube(){
+	global $obm, $full_locale, $obmdb_db;
+	$saved_db = $obmdb_db;
+	$obmdb_db = 'roundcubemail';
+
+	if (!isset($saved_session)){
+		$saved_session = session_id();
+		$query = 'SELECT sess_id FROM session WHERE sess_id=\''.$saved_session.'\'';
+
+		$obm_q = new DB_OBM;
+		$obm_q->query($query);
+
+		if(!$obm_q->next_record()){		
+			$vars = 'language|s:'.strlen($full_locale).':"'.$full_locale.'";obm_user_id|s:'.strlen((string) $obm['uid']).':"'.$obm['uid'].'";';
+			$encoded_vars = base64_encode($vars);
+			$obm_q2 = new DB_OBM;
+			$insert_session_query = 'INSERT INTO session (sess_id, created, changed, ip, vars)
+									 VALUES (\''.$saved_session.'\', NOW(), NOW(), \''.$_SERVER['REMOTE_ADDR'].'\', \''.$encoded_vars.'\')';
+			$obm_q2->query($insert_session_query);
+		}
+		$obmdb_db = $saved_db;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
