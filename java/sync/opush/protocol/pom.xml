@@ -51,7 +51,7 @@
 			<artifactId>xercesImpl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.nekohtml</groupId>
+			<groupId>nekohtml</groupId>
 			<artifactId>nekohtml</artifactId>
 		</dependency>
 		<dependency>

@@ -548,9 +548,9 @@ org.eclipse.jdt.core.compiler.source=1.6
 			  <version>${apache-mime4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>net.sourceforge.nekohtml</groupId>
+				<groupId>nekohtml</groupId>
 				<artifactId>nekohtml</artifactId>
-				<version>1.9.17</version>
+				<version>0.9.5</version>
 			</dependency>
 <dependency>
                         <groupId>xerces</groupId>
