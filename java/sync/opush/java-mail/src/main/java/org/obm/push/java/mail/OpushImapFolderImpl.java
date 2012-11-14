@@ -362,7 +362,9 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	
 	@Override
 	public void close() throws MessagingException {
-		folder.close(false);
+		if (folder.isOpen()) {
+			folder.close(false);
+		}
 	}
 	
 	@Override

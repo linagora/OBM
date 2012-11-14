@@ -87,7 +87,7 @@ public class OpushImapFolderConnection {
 	}
 
 	@VisibleForTesting void openImapFolderIfNeeded(String folderName, ImapStore store) throws MessagingException {
-		if (opushImapFolder != null && !opushImapFolder.isOpen()) {
+		if (opushImapFolder != null && !opushImapFolder.isOpen() && folderName != null) {
 			logger.debug("ImapFolder {} opened", folderName);
 			opushImapFolder = store.openFolder(folderName, Folder.READ_WRITE);
 		}

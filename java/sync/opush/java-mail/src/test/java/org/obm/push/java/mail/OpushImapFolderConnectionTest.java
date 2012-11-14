@@ -59,7 +59,9 @@ public class OpushImapFolderConnectionTest {
 	public void testCloseAndUnsetImapFolder() throws MessagingException {
 		IMAPFolder imapFolder = createStrictMock(IMAPFolder.class);
 		expect(imapFolder.getFullName())
-		.andReturn(null).once();
+			.andReturn(null).once();
+		expect(imapFolder.isOpen())
+			.andReturn(true).once();
 		imapFolder.close(false);
 		expectLastCall().once();
 		
@@ -77,6 +79,8 @@ public class OpushImapFolderConnectionTest {
 		IMAPFolder imapFolder = createStrictMock(IMAPFolder.class);
 		expect(imapFolder.getFullName())
 			.andReturn(null).once();
+		expect(imapFolder.isOpen())
+			.andReturn(true).once();
 		imapFolder.close(false);
 		expectLastCall().andThrow(new MessagingException()).once();
 		
@@ -87,8 +91,15 @@ public class OpushImapFolderConnectionTest {
 		opushImapFolderConnection.closeAndUnsetImapFolder();
 	}
 	
+	@Test
 	public void testCloseImapFolderWhenChangedNullFolderName() throws MessagingException {
 		IMAPFolder imapFolder = createStrictMock(IMAPFolder.class);
+		expect(imapFolder.getFullName())
+			.andReturn("folder").once();
+		expect(imapFolder.isOpen())
+			.andReturn(true).once();
+		imapFolder.close(false);
+		expectLastCall().once();
 		
 		replay(imapFolder);
 		
@@ -104,6 +115,8 @@ public class OpushImapFolderConnectionTest {
 		IMAPFolder imapFolder = createStrictMock(IMAPFolder.class);
 		expect(imapFolder.getFullName())
 			.andReturn("folder").times(2);
+		expect(imapFolder.isOpen())
+			.andReturn(true).once();
 		imapFolder.close(false);
 		expectLastCall().once();
 		
