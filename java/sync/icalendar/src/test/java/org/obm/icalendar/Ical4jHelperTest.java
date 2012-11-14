@@ -1333,20 +1333,8 @@ public class Ical4jHelperTest {
 		
 		Assertions.assertThat(events.size()).isEqualTo(1);
 		Assertions.assertThat(events.get(0).getAttendees()).containsOnly(
-				Attendee.builder().email("usera@obm.lng.org").build(),
-				Attendee.builder().email("userb@obm.lng.org").build(),
+				Attendee.builder().email("usera@obm.lng.org").build(), 
 				Attendee.builder().email("userc@obm.lng.org").build());
-	}
-	
-	@Test
-	public void testParseICSWithIllegalCharacter() throws IOException, ParserException {
-		String icsFilename = "illegalAttendeeCN.ics";
-		List<Event> events = testIcsParsing(icsFilename);
-		
-		Assertions.assertThat(events.size()).isEqualTo(1);
-		Assertions.assertThat(events.get(0).getAttendees()).containsOnly(
-				Attendee.builder().email("usera@obm.lng.org").build(),
-				Attendee.builder().email("userb@obm.lng.org").build());
 	}
 
 	@Test
