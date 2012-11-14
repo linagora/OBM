@@ -124,8 +124,8 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 					ensureAttendeeUnicity(event.getAttendees()));
 			Map<Participation, Set<Attendee>> attendeeGroups = computeParticipationGroups(attendees);
 			Set<Attendee> notify = Sets.union(
-					attendeeGroups.get(Participation.NEEDSACTION_PART),
-					attendeeGroups.get(Participation.ACCEPTED_PART));
+					attendeeGroups.get(Participation.needsAction()),
+					attendeeGroups.get(Participation.accepted()));
 			if (!notify.isEmpty()) {
 				UserSettings settings = settingsService.getSettings(user);
 				eventChangeMailer.notifyRemovedUsers(user, notify, event,
@@ -220,7 +220,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 
 	private boolean organizerMayAttend(final Attendee organizer) {
-		return !Participation.DECLINED_PART.equals(organizer.getParticipation());
+		return !Participation.declined().equals(organizer.getParticipation());
 	}
 
 	private boolean organizerHasEmailAddress(final Attendee organizer) {
@@ -279,12 +279,12 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		TimeZone timezone = settings.timezone();
 		
 		Map<Participation, Set<Attendee>> attendeeGroups = computeParticipationGroups(attendees);
-		Set<Attendee> accepted = attendeeGroups.get(Participation.ACCEPTED_PART);
+		Set<Attendee> accepted = attendeeGroups.get(Participation.accepted());
 		if(accepted != null && !accepted.isEmpty()){
 			eventChangeMailer.notifyAcceptedNewUsers(user, accepted, event, locale, timezone, token);
 		}
 		
-		Set<Attendee> notAccepted = attendeeGroups.get(Participation.NEEDSACTION_PART);
+		Set<Attendee> notAccepted = attendeeGroups.get(Participation.needsAction());
 		if (notAccepted != null && !notAccepted.isEmpty()) {
 			eventChangeMailer.notifyNeedActionNewUsers(user, notAccepted, event, locale, timezone, ics, token);
 		}
@@ -320,7 +320,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			}
 		}
 		
-		final Set<Attendee> notAccepted = atts.get(Participation.NEEDSACTION_PART);
+		final Set<Attendee> notAccepted = atts.get(Participation.needsAction());
 
 		if (notAccepted != null && !notAccepted.isEmpty()) {
 			eventChangeMailer.notifyNeedActionUpdateUsers(user, notAccepted, previous, current, locale, timezone, ics, token);
@@ -338,7 +338,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	private void notifyAcceptedUpdateUsers(ObmUser user, Event previous, Event current, Locale locale, 
 			Map<Participation, ? extends Set<Attendee>> atts, TimeZone timezone, String ics, AccessToken token) {
 		
-		Set<Attendee> attendeesAccepted = atts.get(Participation.ACCEPTED_PART);
+		Set<Attendee> attendeesAccepted = atts.get(Participation.accepted());
 		if (attendeesAccepted != null) {
 			Collection<Attendee> attendeesCanWriteOnCalendar = filterCanWriteOnCalendar(attendeesAccepted);
 			if (attendeesCanWriteOnCalendar != null && !attendeesCanWriteOnCalendar.isEmpty()) {
@@ -421,13 +421,13 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			}
 		}
 		Builder<Participation, Set<Attendee>> ret = ImmutableMap.builder();
-		ret.put(Participation.ACCEPTED_PART, acceptedAttendees);
-		ret.put(Participation.NEEDSACTION_PART, needActionAttendees);
-		ret.put(Participation.DECLINED_PART, declinedAttendees);
-		ret.put(Participation.TENTATIVE_PART, tentativeAttendees);
-		ret.put(Participation.DELEGATED_PART, delegatedAttendees);
-		ret.put(Participation.COMPLETED_PART, completedAttendees);
-		ret.put(Participation.INPROGRESS_PART, inprogressAttendees);
+		ret.put(Participation.accepted(), acceptedAttendees);
+		ret.put(Participation.needsAction(), needActionAttendees);
+		ret.put(Participation.declined(), declinedAttendees);
+		ret.put(Participation.tentative(), tentativeAttendees);
+		ret.put(Participation.delegated(), delegatedAttendees);
+		ret.put(Participation.completed(), completedAttendees);
+		ret.put(Participation.inProgress(), inprogressAttendees);
 		return ret.build();
 	}
 

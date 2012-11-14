@@ -2601,7 +2601,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			evps.setObject(idx++, calendarUser.getUid());
 			evps.setObject(idx++, obmHelper.getDBCP()
 					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
-			State declined = Participation.DECLINED_PART.getState();
+			State declined = Participation.declined().getState();
 			evps.setObject(idx++, obmHelper.getDBCP()
 					.getJdbcObject(ObmHelper.VPARTSTAT, declined.toString()));
 			evps.setTimestamp(idx++, new Timestamp(start.getTime()));

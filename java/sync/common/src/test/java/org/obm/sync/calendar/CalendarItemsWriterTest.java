@@ -192,14 +192,14 @@ private CalendarItemsWriter writer;
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		la.add(at);
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		la.add(at);
 		ev.setAttendees(la);
@@ -236,7 +236,7 @@ private CalendarItemsWriter writer;
 	private List<Attendee> getFakeListOfAttendee() {
 		Attendee john = new Attendee();
 		john.setEmail("john@doe");
-		john.setParticipation(Participation.ACCEPTED_PART);
+		john.setParticipation(Participation.accepted());
 		Attendee jane = new Attendee();
 		jane.setEmail("jane@doe");
 		jane.setParticipation(Participation.builder()

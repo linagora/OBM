@@ -388,7 +388,7 @@ public class EventChangeMailerTest {
 		event.setSequence(4);
 		List<Attendee> attendees = event.getAttendees();
 		Attendee updatedAttendee = attendees.get(2);
-		updatedAttendee.setParticipation(Participation.ACCEPTED_PART);
+		updatedAttendee.setParticipation(Participation.accepted());
 		Participation updatedAttendeeStatus = updatedAttendee.getParticipation();
 		updatedAttendeeStatus.setComment(new Comment("This is a random comment"));
 		event.addAttendee(createAttendee("Raphael ROUGERON", "rrougeron@linagora.com"));
@@ -398,12 +398,11 @@ public class EventChangeMailerTest {
 		String ics = ical4jHelper.buildIcsInvitationReply(event,
 				ServicesToolBox.getIcal4jUserFrom("mbaechler@linagora.com"), accessToken);
 
-		Participation accepted = Participation.ACCEPTED_PART;
 		eventChangeMailer.notifyUpdateParticipation(
 				event,
 				event.findOrganizer(),
 				ServicesToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
-				accepted, Locale.FRENCH, TIMEZONE, ics, accessToken);
+				updatedAttendeeStatus, Locale.FRENCH, TIMEZONE, ics, accessToken);
 		
 		verify(mailService);
 		
@@ -658,7 +657,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att : before.getAttendees()) {
-			att.setParticipation(Participation.NEEDSACTION_PART);
+			att.setParticipation(Participation.needsAction());
 		}
 		after.setSequence(4);
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
@@ -715,7 +714,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2012-02-15T13:00:00"));
 		after.setDuration(7200);
 		for (Attendee att : before.getAttendees()) {
-			att.setParticipation(Participation.NEEDSACTION_PART);
+			att.setParticipation(Participation.needsAction());
 		}
 		after.setSequence(4);
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
@@ -774,7 +773,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
-			att.setParticipation(Participation.ACCEPTED_PART);
+			att.setParticipation(Participation.accepted());
 		}
 		
 		eventChangeMailer.notifyAcceptedUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", accessToken);
@@ -820,7 +819,7 @@ public class EventChangeMailerTest {
 		after.setStartDate(date("2010-11-08T12:00:00"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
-			att.setParticipation(Participation.ACCEPTED_PART);
+			att.setParticipation(Participation.accepted());
 		}
 		eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, accessToken);
 		
@@ -857,7 +856,7 @@ public class EventChangeMailerTest {
 			Event event = new Event();
 			event.setStartDate(new Date());
 			ObmUser obmUser = new ObmUser();
-			Participation status = Participation.ACCEPTED_PART;
+			Participation status = Participation.accepted();
 			status.setComment(new Comment(null));
 
 			ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);

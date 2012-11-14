@@ -119,7 +119,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.ACCEPTED_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.accepted());
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.DECLINED_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.declined());
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 	
 	@Test
@@ -158,7 +158,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.TENTATIVE_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.tentative());
 	}
 	
 	@Test
@@ -184,7 +184,7 @@ public class MSEventToObmEventConverterAttendeeTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Attendee theAttendee = converted.findAttendeeFromEmail(attendee.getEmail());
-		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+		Assertions.assertThat(theAttendee.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 
 	@Test

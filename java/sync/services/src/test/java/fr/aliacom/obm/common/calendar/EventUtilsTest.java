@@ -79,7 +79,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(true);
@@ -97,7 +97,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		at.setObmUser(false);
@@ -115,7 +115,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
@@ -124,7 +124,7 @@ public class EventUtilsTest {
 		at = new Attendee();
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(false);
@@ -141,7 +141,7 @@ public class EventUtilsTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(false);
 		at.setObmUser(true);
@@ -150,7 +150,7 @@ public class EventUtilsTest {
 		at = new Attendee();
 		at.setDisplayName("obm TheUser");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		at.setOrganizer(false);
 		at.setObmUser(true);

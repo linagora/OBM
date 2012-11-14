@@ -180,7 +180,7 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		for (Event eexp : eventExceptions) {
 			Attendee attendee = eexp.findAttendeeFromEmail(attendeeEmail);
 			boolean willAttend = attendee != null
-					&& attendee.getParticipation() != Participation.DECLINED_PART;
+					&& !Participation.declined().equals(attendee.getParticipation());
 			if (!willAttend) {
 				exceptions.add(eexp.getRecurrenceId());
 				eventExceptionsCopy.remove(eexp);

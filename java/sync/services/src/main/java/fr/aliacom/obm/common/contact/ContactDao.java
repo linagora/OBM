@@ -420,7 +420,7 @@ public class ContactDao {
 		Attendee at = new Attendee();
 		at.setEmail(token.getUserEmail());
 		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		e.addAttendee(at);
 
 		logger.info("inserting birthday with date " + cal.getTime());

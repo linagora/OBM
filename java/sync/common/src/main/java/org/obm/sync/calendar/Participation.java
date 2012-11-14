@@ -39,6 +39,34 @@ public class Participation implements Serializable{
 	public static Builder builder() {
 		return new Builder();
 	}
+	
+	public static Participation declined() {
+		return builder().state(State.DECLINED).build();
+	}
+	
+	public static Participation needsAction() {
+		return builder().state(State.NEEDSACTION).build();
+	}
+	
+	public static Participation accepted() {
+		return builder().state(State.ACCEPTED).build();
+	}
+	
+	public static Participation tentative() {
+		return builder().state(State.TENTATIVE).build();
+	}
+	
+	public static Participation delegated() {
+		return builder().state(State.DELEGATED).build();
+	}
+	
+	public static Participation completed() {
+		return builder().state(State.COMPLETED).build();
+	}
+	
+	public static Participation inProgress() {
+		return builder().state(State.INPROGRESS).build();
+	}
 
 	public static class Builder {
 		private State state;
@@ -63,14 +91,6 @@ public class Participation implements Serializable{
 			return new Participation(state, comment);
 		}
 	}
-
-	public static final Participation DECLINED_PART = new Participation(State.DECLINED);
-	public static final Participation NEEDSACTION_PART = new Participation(State.NEEDSACTION);
-	public static final Participation ACCEPTED_PART = new Participation(State.ACCEPTED);
-	public static final Participation TENTATIVE_PART = new Participation(State.TENTATIVE);
-	public static final Participation DELEGATED_PART = new Participation(State.DELEGATED);
-	public static final Participation COMPLETED_PART = new Participation(State.COMPLETED);
-	public static final Participation INPROGRESS_PART = new Participation(State.INPROGRESS);
 
 	private Comment comment;
 	private State state;

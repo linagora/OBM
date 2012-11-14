@@ -60,43 +60,43 @@ public class ObmEventToMsEventConverterParticipationTest {
 	
 	@Test
 	public void testAcceptedParticipation() {
-		AttendeeStatus status = converter.status(Participation.ACCEPTED_PART);
+		AttendeeStatus status = converter.status(Participation.accepted());
 		assertThat(status).isEqualTo(AttendeeStatus.ACCEPT);
 	}
 
 	@Test
 	public void testCompletedParticipation() {
-		AttendeeStatus status = converter.status(Participation.COMPLETED_PART);
+		AttendeeStatus status = converter.status(Participation.completed());
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
 	public void testDeclinedParticipation() {
-		AttendeeStatus status = converter.status(Participation.DECLINED_PART);
+		AttendeeStatus status = converter.status(Participation.declined());
 		assertThat(status).isEqualTo(AttendeeStatus.DECLINE);
 	}
 
 	@Test
 	public void testDelegatedParticipation() {
-		AttendeeStatus status = converter.status(Participation.DELEGATED_PART);
+		AttendeeStatus status = converter.status(Participation.delegated());
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
 	public void testInProgressParticipation() {
-		AttendeeStatus status = converter.status(Participation.INPROGRESS_PART);
+		AttendeeStatus status = converter.status(Participation.inProgress());
 		assertThat(status).isEqualTo(AttendeeStatus.RESPONSE_UNKNOWN);
 	}
 
 	@Test
 	public void testNeedActionParticipation() {
-		AttendeeStatus status = converter.status(Participation.NEEDSACTION_PART);
+		AttendeeStatus status = converter.status(Participation.needsAction());
 		assertThat(status).isEqualTo(AttendeeStatus.NOT_RESPONDED);
 	}
 
 	@Test
 	public void testTentativeParticipation() {
-		AttendeeStatus status = converter.status(Participation.TENTATIVE_PART);
+		AttendeeStatus status = converter.status(Participation.tentative());
 		assertThat(status).isEqualTo(AttendeeStatus.TENTATIVE);
 	}
 

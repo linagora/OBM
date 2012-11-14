@@ -101,7 +101,7 @@ public class AttendeeTest {
 		att1.setObmUser(true);
 		att1.setOrganizer(false);
 		att1.setPercent(0);
-		att1.setParticipation(Participation.ACCEPTED_PART);
+		att1.setParticipation(Participation.accepted());
 		
 		Attendee att2 = new Attendee();
 		att1.setDisplayName("test2");
@@ -109,7 +109,7 @@ public class AttendeeTest {
 		att1.setObmUser(false);
 		att1.setOrganizer(true);
 		att1.setPercent(1);
-		att1.setParticipation(Participation.NEEDSACTION_PART);
+		att1.setParticipation(Participation.needsAction());
 		
 		Assert.assertEquals(att1.hashCode(), att2.hashCode());
 	}

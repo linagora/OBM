@@ -277,7 +277,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 				return attendee.getParticipation();
 			}
 		}
-		return Participation.NEEDSACTION_PART;
+		return Participation.needsAction();
 	}
 
 	private boolean isOrganizer(MSEvent event, MSAttendee at) {
@@ -293,7 +293,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		Attendee att = new Attendee();
 		att.setEmail(email);
 		att.setDisplayName(displayName);
-		att.setParticipation(Participation.ACCEPTED_PART);
+		att.setParticipation(Participation.accepted());
 		att.setParticipationRole(ParticipationRole.REQ);
 		att.setOrganizer(true);
 		return att;
@@ -753,15 +753,15 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 		switch (attendeeStatus) {
 		case DECLINE:
-			return Participation.DECLINED_PART;
+			return Participation.declined();
 		case NOT_RESPONDED:
 		case RESPONSE_UNKNOWN:
-			return Participation.NEEDSACTION_PART;
+			return Participation.needsAction();
 		case TENTATIVE:
-			return Participation.TENTATIVE_PART;
+			return Participation.tentative();
 		default:
 		case ACCEPT:
-			return Participation.ACCEPTED_PART;
+			return Participation.accepted();
 		}
 	}
 

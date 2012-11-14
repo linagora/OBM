@@ -878,7 +878,7 @@ public class EventTest {
 			attendee.setOrganizer(isOrganizer(i));
 			attendee.setPercent(1);
 			attendee.setParticipationRole(ParticipationRole.REQ);
-			attendee.setParticipation(Participation.NEEDSACTION_PART);
+			attendee.setParticipation(Participation.needsAction());
 		}
 		return attendees;
 	}
@@ -1371,22 +1371,22 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setParticipation(Participation.DECLINED_PART);
+		att1.setParticipation(Participation.declined());
 		att1.setCanWriteOnCalendar(false);
 		event.updateParticipation();
 
-		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 	
 	public void testAcceptedAttendeeWithoutDelegationEndsUpInNeedsAction() {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setParticipation(Participation.ACCEPTED_PART);
+		att1.setParticipation(Participation.accepted());
 		att1.setCanWriteOnCalendar(false);
 		event.updateParticipation();
 		
-		assertThat(att1.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 	
 	@Test
@@ -1394,11 +1394,11 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setParticipation(Participation.DECLINED_PART);
+		att1.setParticipation(Participation.declined());
 		att1.setCanWriteOnCalendar(true);
 		event.updateParticipation();
 		
-		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED_PART);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.accepted());
 	}
 	
 	@Test
@@ -1406,11 +1406,11 @@ public class EventTest {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
 		Attendee att1 = Iterables.getFirst(attendees, null);
-		att1.setParticipation(Participation.NEEDSACTION_PART);
+		att1.setParticipation(Participation.needsAction());
 		att1.setCanWriteOnCalendar(true);
 		event.updateParticipation();
 		
-		assertThat(att1.getParticipation()).isEqualTo(Participation.ACCEPTED_PART);
+		assertThat(att1.getParticipation()).isEqualTo(Participation.accepted());
 	}
 
 	@Test
@@ -1445,13 +1445,13 @@ public class EventTest {
 		List<Attendee> attendees = publicEvent.getAttendees();
 
 		for (Attendee attendee : attendees){
-			attendee.setParticipation(Participation.ACCEPTED_PART);
+			attendee.setParticipation(Participation.accepted());
 		}
 		publicEvent.updateParticipation();
 
 		List<Attendee> updatedAttendees = publicEvent.getAttendees();
 		for (Attendee upAtt : updatedAttendees){
-			assertThat(upAtt.getParticipation()).isEqualTo(Participation.NEEDSACTION_PART);
+			assertThat(upAtt.getParticipation()).isEqualTo(Participation.needsAction());
 		}
 	}
 

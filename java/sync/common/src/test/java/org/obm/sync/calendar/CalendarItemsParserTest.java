@@ -104,7 +104,7 @@ public class CalendarItemsParserTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		assertThat(ev.getAttendees()).contains(at);
@@ -112,14 +112,14 @@ public class CalendarItemsParserTest {
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		assertThat(ev.getAttendees()).contains(at);
 		
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase2");
 		at.setEmail("notin2@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		assertThat(ev.getAttendees()).contains(at);
 		
@@ -175,7 +175,7 @@ public class CalendarItemsParserTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		assertThat(ev.getAttendees()).contains(at);
@@ -183,14 +183,14 @@ public class CalendarItemsParserTest {
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		assertThat(ev.getAttendees()).contains(at);
 		
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase2");
 		at.setEmail("notin2@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		assertThat(ev.getAttendees()).contains(at);
 		
@@ -248,7 +248,7 @@ public class CalendarItemsParserTest {
 		Attendee at = new Attendee();
 		at.setDisplayName("John Do");
 		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.NEEDSACTION_PART);
+		at.setParticipation(Participation.needsAction());
 		at.setParticipationRole(ParticipationRole.CHAIR);
 		at.setOrganizer(true);
 		assertThat(ev.getAttendees()).contains(at);
@@ -256,7 +256,7 @@ public class CalendarItemsParserTest {
 		at = new Attendee();
 		at.setDisplayName("noIn TheDatabase");
 		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.ACCEPTED_PART);
+		at.setParticipation(Participation.accepted());
 		at.setParticipationRole(ParticipationRole.OPT);
 		assertThat(ev.getAttendees()).contains(at);
 		

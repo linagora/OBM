@@ -115,12 +115,12 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		event.addAttendees(Arrays.asList(
 				Attendee.builder().email("jaures@sfio.fr")
 					.displayName("Jean Jaures")
-					.participation(Participation.ACCEPTED_PART)
+					.participation(Participation.accepted())
 					.participationRole(ParticipationRole.REQ)
 					.asOrganizer().build(),
 				Attendee.builder().email("blum@sfio.fr")
 					.displayName("Léon Blum")
-					.participation(Participation.NEEDSACTION_PART)
+					.participation(Participation.needsAction())
 					.participationRole(ParticipationRole.OPT)
 					.asAttendee().build()));
 		return event;
@@ -316,7 +316,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		Event secondOccurence = new Event();
 		secondOccurence.addAttendee(Attendee.builder().email("jaures@sfio.fr")
 				.displayName("Jean Jaures")
-				.participation(Participation.DECLINED_PART)
+				.participation(Participation.declined())
 				.participationRole(ParticipationRole.REQ).build());
 		secondOccurence.setDuration(event.getDuration());
 		secondOccurence.setRecurrenceId(date("2004-12-20T21:39:45Z"));

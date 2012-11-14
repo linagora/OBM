@@ -288,7 +288,7 @@ public class CalendarBindingImpl implements ICalendar {
 						cancelEvent(token, calendar, notification, eventId, ev);
 					} else {
 						changeParticipationInternal(
-								token, calendar, ev.getExtId(), Participation.DECLINED_PART, sequence, notification);
+								token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
 					}
 				} else {
 					throw new NotAllowedException(calendar + " has no write right to remove event " + ev.getTitle());
@@ -322,7 +322,7 @@ public class CalendarBindingImpl implements ICalendar {
 		Event removed = calendarDao.removeEventByExtId(token, obmUser, extId, event.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
 		String obmUserEmail = obmUser.getEmail();
-		changeCalendarOwnerParticipation(obmUserEmail, removed, Participation.DECLINED_PART);
+		changeCalendarOwnerParticipation(obmUserEmail, removed, Participation.declined());
 		notifyOnRemoveEvent(token, obmUserEmail, removed, notification);
 		return removed;
 	}
@@ -331,7 +331,7 @@ public class CalendarBindingImpl implements ICalendar {
 		if (event.isInternalEvent()) {
 			eventChangeHandler.delete(event, notification, token);
 		} else {
-			notifyOrganizerForExternalEvent(token, calendar, event, Participation.DECLINED_PART, notification);
+			notifyOrganizerForExternalEvent(token, calendar, event, Participation.declined(), notification);
 		}
 	}
 
@@ -369,7 +369,7 @@ public class CalendarBindingImpl implements ICalendar {
 				if (owner.getEmail().equals(calendarUser.getEmail())) {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
-					changeParticipationInternal(token, calendar, ev.getExtId(), Participation.DECLINED_PART, sequence, notification);
+					changeParticipationInternal(token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
 					return calendarDao.findEventByExtId(token, calendarUser, extId);
 				}
 			}
@@ -479,7 +479,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		if (attendees != null) {
 			for (Attendee attendee : attendees) {
-				attendee.setParticipation(Participation.NEEDSACTION_PART);
+				attendee.setParticipation(Participation.needsAction());
 			}
 		}
 	}
@@ -504,7 +504,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		for (Attendee attendee : newAttendees) {
 			if (attendee.isCanWriteOnCalendar()) {
-				attendee.setParticipation(Participation.ACCEPTED_PART);
+				attendee.setParticipation(Participation.accepted());
 			}
 		}
 	}
@@ -726,7 +726,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private void changeOrganizerParticipationToAccepted(Event event) {
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
-				att.setParticipation(Participation.ACCEPTED_PART);
+				att.setParticipation(Participation.accepted());
 			}
 		}
 	}
@@ -739,7 +739,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private boolean isEventDeclinedForCalendarOwner(Attendee userAsAttendee) {
-		return userAsAttendee != null && userAsAttendee.getParticipation() == Participation.DECLINED_PART;
+		return userAsAttendee != null && Participation.declined().equals(userAsAttendee.getParticipation());
 	}
 
 	private void notifyOrganizerForExternalEvent(AccessToken token,
@@ -1464,7 +1464,7 @@ public class CalendarBindingImpl implements ICalendar {
 			AccessToken at, String calendar, Event event) {
 		for (final Attendee attendee: event.getAttendees()) {
 			if (isAttendeeExistForCalendarOwner(at, calendar, attendee)) {
-				attendee.setParticipation(Participation.ACCEPTED_PART);
+				attendee.setParticipation(Participation.accepted());
 			}	
 		}
 	}
@@ -1566,8 +1566,8 @@ public class CalendarBindingImpl implements ICalendar {
 				if (eventHasOtherAttendees) {
 					Attendee ownerAsAttendee = calendarOwnerAsAttendee(token, calendar, event);
 					Participation participation = ownerAsAttendee.getParticipation();
-					if (!participation.equals(Participation.DECLINED_PART)) {
-						this.changeParticipationInternal(token, calendar, event.getExtId(), Participation.DECLINED_PART,
+					if (!participation.equals(Participation.declined())) {
+						this.changeParticipationInternal(token, calendar, event.getExtId(), Participation.declined(),
 								event.getSequence(), false);
 					}
 				}

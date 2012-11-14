@@ -485,7 +485,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
@@ -526,7 +526,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
@@ -569,7 +569,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
@@ -600,7 +600,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
@@ -631,8 +631,8 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
-			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.NEEDSACTION_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
+			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.needsAction());
 			
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
@@ -673,8 +673,8 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
-			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
+			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.accepted());
 			
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
@@ -714,7 +714,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
 			attendee.setCanWriteOnCalendar(true);
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
@@ -757,8 +757,8 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
-			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
+			Attendee addedAttendee = createRequiredAttendee("addedeAttendee@test", Participation.accepted());
 
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
@@ -801,7 +801,7 @@ public class EventNotificationServiceTest {
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			ObmUser defaultObmUser = getDefaultObmUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.accepted());
 			Event previousEvent = new Event();
 			previousEvent.setStartDate(after());
 			previousEvent.addAttendee(attendee);
@@ -846,8 +846,8 @@ public class EventNotificationServiceTest {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
-			Attendee organizer = createRequiredAttendee("organizer@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
+			Attendee organizer = createRequiredAttendee("organizer@test", Participation.accepted());
 			organizer.setOrganizer(true);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -867,7 +867,7 @@ public class EventNotificationServiceTest {
 			
 			mailer.notifyUpdateParticipation(
 					eq(event), eq(organizer), eq(attendeeUser),
-					eq(Participation.ACCEPTED_PART), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
+					eq(Participation.accepted()), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
 			expectLastCall().once();
 			
 			UserService userService = EasyMock.createMock(UserService.class);
@@ -892,7 +892,7 @@ public class EventNotificationServiceTest {
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
 			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.ACCEPTED_PART, accessToken);
+			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.accepted(), accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
@@ -902,8 +902,8 @@ public class EventNotificationServiceTest {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
-			Attendee organizer = createRequiredAttendee("organizer@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
+			Attendee organizer = createRequiredAttendee("organizer@test", Participation.accepted());
 			organizer.setOrganizer(true);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -923,7 +923,7 @@ public class EventNotificationServiceTest {
 			
 			mailer.notifyUpdateParticipation(
 					eq(event), eq(organizer), eq(attendeeUser),
-					eq(Participation.ACCEPTED_PART), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
+					eq(Participation.accepted()), eq(LOCALE), eq(TIMEZONE), eq(ICS_DATA_REPLY), anyObject(AccessToken.class));
 			expectLastCall().once();
 
 			UserService userService = EasyMock.createMock(UserService.class);
@@ -944,7 +944,7 @@ public class EventNotificationServiceTest {
 			EasyMock.replay(userService, settingsService, settings, mailer, ical4jHelper, calendarFactory);
 			
 			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.ACCEPTED_PART, accessToken);
+			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.accepted(), accessToken);
 			
 			verify(userService, settingsService, settings, mailer, ical4jHelper);
 		}
@@ -954,8 +954,8 @@ public class EventNotificationServiceTest {
 			ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 			
-			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.NEEDSACTION_PART);
-			Attendee organizer = createRequiredAttendee("organizer@test", Participation.ACCEPTED_PART);
+			Attendee attendee = createRequiredAttendee("attendee1@test", Participation.needsAction());
+			Attendee organizer = createRequiredAttendee("organizer@test", Participation.accepted());
 			organizer.setOrganizer(true);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -996,7 +996,7 @@ public class EventNotificationServiceTest {
 			EasyMock.replay(userService, settingsService, settings, mailer, calendarFactory);
 			
 			EventNotificationService eventNotificationService = newEventNotificationServiceImpl(mailer, settingsService, userService, ical4jHelper, calendarFactory);
-			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.ACCEPTED_PART, accessToken);
+			eventNotificationService.notifyUpdatedParticipationAttendees(event, attendeeUser, Participation.accepted(), accessToken);
 			verify(userService, settingsService, settings, mailer);
 		}
 	}
@@ -1008,8 +1008,8 @@ public class EventNotificationServiceTest {
 			final String addedUserMail = "new@testing.org";
 			final String removedUserMail = "old@testing.org";
 
-			List<Attendee> previousAtts = ImmutableList.of(createRequiredAttendee(removedUserMail, Participation.ACCEPTED_PART));
-			List<Attendee> currentAtts = ImmutableList.of(createRequiredAttendee(addedUserMail, Participation.NEEDSACTION_PART));
+			List<Attendee> previousAtts = ImmutableList.of(createRequiredAttendee(removedUserMail, Participation.accepted()));
+			List<Attendee> currentAtts = ImmutableList.of(createRequiredAttendee(addedUserMail, Participation.needsAction()));
 
 			Event previous = new Event();
 			Event current = new Event();
@@ -1026,8 +1026,8 @@ public class EventNotificationServiceTest {
 			Assert.assertTrue(groups.get(AttendeeStateValue.KEPT).isEmpty());
 			Assert.assertEquals(removedUserMail, groups.get(AttendeeStateValue.REMOVED).iterator().next().getEmail());
 			Assert.assertEquals(addedUserMail, groups.get(AttendeeStateValue.ADDED).iterator().next().getEmail());
-			Assert.assertEquals(Participation.ACCEPTED_PART, groups.get(AttendeeStateValue.REMOVED).iterator().next().getParticipation());
-			Assert.assertEquals(Participation.NEEDSACTION_PART,	groups.get(AttendeeStateValue.ADDED).iterator().next().getParticipation());
+			Assert.assertEquals(Participation.accepted(), groups.get(AttendeeStateValue.REMOVED).iterator().next().getParticipation());
+			Assert.assertEquals(Participation.needsAction(),	groups.get(AttendeeStateValue.ADDED).iterator().next().getParticipation());
 		}
 
 		@Test
@@ -1035,8 +1035,8 @@ public class EventNotificationServiceTest {
 			final String addedUserMail = "user2@testing.org";
 			final String keptUserMail = "user1@testing.org";
 			final String removedUserMail = "user0@testing.org";
-			List<Attendee> previousAtts = createRequiredAttendees("user", "@testing.org", Participation.ACCEPTED_PART, 0, 2);
-			List<Attendee> currentAtts = createRequiredAttendees("user", "@testing.org", Participation.NEEDSACTION_PART, 1, 2);
+			List<Attendee> previousAtts = createRequiredAttendees("user", "@testing.org", Participation.accepted(), 0, 2);
+			List<Attendee> currentAtts = createRequiredAttendees("user", "@testing.org", Participation.needsAction(), 1, 2);
 			Event previous = new Event();
 			Event current = new Event();
 			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
@@ -1051,9 +1051,9 @@ public class EventNotificationServiceTest {
 			Assert.assertEquals(keptUserMail, groups.get(AttendeeStateValue.KEPT).iterator().next().getEmail());
 			Assert.assertEquals(removedUserMail, groups.get(AttendeeStateValue.REMOVED).iterator().next().getEmail());
 			Assert.assertEquals(addedUserMail, groups.get(AttendeeStateValue.ADDED).iterator().next().getEmail());
-			Assert.assertEquals(Participation.NEEDSACTION_PART, groups.get(AttendeeStateValue.KEPT).iterator().next().getParticipation());
-			Assert.assertEquals(Participation.ACCEPTED_PART, groups.get(AttendeeStateValue.REMOVED).iterator().next().getParticipation());
-			Assert.assertEquals(Participation.NEEDSACTION_PART, groups.get(AttendeeStateValue.ADDED).iterator().next().getParticipation());
+			Assert.assertEquals(Participation.needsAction(), groups.get(AttendeeStateValue.KEPT).iterator().next().getParticipation());
+			Assert.assertEquals(Participation.accepted(), groups.get(AttendeeStateValue.REMOVED).iterator().next().getParticipation());
+			Assert.assertEquals(Participation.needsAction(), groups.get(AttendeeStateValue.ADDED).iterator().next().getParticipation());
 		}
 
 		@Test

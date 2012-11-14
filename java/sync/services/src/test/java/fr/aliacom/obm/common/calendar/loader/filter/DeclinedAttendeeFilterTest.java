@@ -33,9 +33,9 @@ public class DeclinedAttendeeFilterTest {
 
 	@Test
 	public void testNonRecurrentEvent() {
-		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED_PART);
-		Attendee decliningPhilby = kimPhilby(Participation.DECLINED_PART);
-		Attendee burgess = guyBurgess(Participation.ACCEPTED_PART);
+		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
+		Attendee decliningPhilby = kimPhilby(Participation.declined());
+		Attendee burgess = guyBurgess(Participation.accepted());
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();
@@ -60,8 +60,8 @@ public class DeclinedAttendeeFilterTest {
 
 	@Test
 	public void testNoDeclinedEvent() {
-		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED_PART);
-		Attendee burgess = guyBurgess(Participation.ACCEPTED_PART);
+		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
+		Attendee burgess = guyBurgess(Participation.accepted());
 
 		EventObmId evWithPhilby1Id = new EventObmId(1);
 		Event evWithPhilby1 = new Event();
@@ -86,9 +86,9 @@ public class DeclinedAttendeeFilterTest {
 	public void testRecurrentEvent() {
 		Date currentDate = new Date();
 
-		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED_PART);
-		Attendee decliningPhilby = kimPhilby(Participation.DECLINED_PART);
-		Attendee burgess = guyBurgess(Participation.ACCEPTED_PART);
+		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
+		Attendee decliningPhilby = kimPhilby(Participation.declined());
+		Attendee burgess = guyBurgess(Participation.accepted());
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();
@@ -140,9 +140,9 @@ public class DeclinedAttendeeFilterTest {
 	public void testDeclinedRecurrentEvent() {
 		Date currentDate = new Date();
 
-		Attendee acceptingPhilby = kimPhilby(Participation.ACCEPTED_PART);
-		Attendee decliningPhilby = kimPhilby(Participation.DECLINED_PART);
-		Attendee burgess = guyBurgess(Participation.ACCEPTED_PART);
+		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
+		Attendee decliningPhilby = kimPhilby(Participation.declined());
+		Attendee burgess = guyBurgess(Participation.accepted());
 
 		EventObmId evWithPhilbyId = new EventObmId(1);
 		Event evWithPhilby = new Event();
