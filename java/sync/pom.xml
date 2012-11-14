@@ -28,7 +28,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hornetq.version>2.2.6.Final</hornetq.version>
 		<junit.version>4.10</junit.version>
-		<easymock.version>3.1</easymock.version>
+		<easymock.version>3.0</easymock.version>
 		<fest.version>2.0-mbaechler-SNAPSHOT</fest.version>
 		<guava.version>13.0.1</guava.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
