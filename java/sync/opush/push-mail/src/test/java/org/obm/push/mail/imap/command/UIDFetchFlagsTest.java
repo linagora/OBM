@@ -31,13 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.command;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -112,7 +111,7 @@ public class UIDFetchFlagsTest {
 
 		Collection<Flag> fetchFlags = uidFetchFlags(sentEmail);
 		
-		assertThat(fetchFlags).isEmpty();
+		assertContainsNoFlag(fetchFlags);
 	}
 	
 	@Test
@@ -169,9 +168,13 @@ public class UIDFetchFlagsTest {
 		
 		assertContainsOnlyFlags(fetchFlags, allFlags);
 	}
+	
+	private void assertContainsNoFlag(Collection<Flag> fetchFlags) {
+		assertContainsOnlyFlags(fetchFlags);
+	}
 
 	private void assertContainsOnlyFlags(Collection<Flag> fetchFlags, Flag...expectedFlags) {
-		assertThat(fetchFlags).containsOnly(expectedFlags);
+		Assertions.assertThat(fetchFlags).containsOnly((Object[])expectedFlags);
 	}
 	
 	private FlagsList list(Flag... expectedFlags) {

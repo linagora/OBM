@@ -29,42 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.state;
+package org.obm.push.backend;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.util.TreeSet;
 
-import java.util.List;
-
+import org.fest.assertions.api.Assertions;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
+
+import org.obm.push.contacts.ComparatorUsingFolderName;
+import org.obm.sync.book.Folder;
+
+import com.google.common.collect.ImmutableList;
+
 import org.obm.filter.SlowFilterRunner;
 
-import com.google.common.collect.Lists;
-
 @RunWith(SlowFilterRunner.class)
-public class SyncKeyFactoryTest {
+public class ContactsBackendTest {
 
 	@Test
-	public void testNotNull() {
-		assertThat(new SyncKeyFactory().randomSyncKey()).isNotNull();
-	}
-	
-	@Test
-	public void testNotEmtpy() {
-		assertThat(new SyncKeyFactory().randomSyncKey()).isNotEmpty();
-	}
-	
-	@Test @Slow
-	public void testNotSameKeyForMillionsGeneration() {
-		int syncKeyGenerationCount = 1000000;
-		SyncKeyFactory syncKeyFactory = new SyncKeyFactory();
-
-		List<String> allGeneratedSyncKeys = Lists.newArrayListWithExpectedSize(syncKeyGenerationCount);
-		for (int count = 0; count < syncKeyGenerationCount; count++) {
-			allGeneratedSyncKeys.add(syncKeyFactory.randomSyncKey());
-		}
+	public void sortedByDefaultFolderName() {
+		final String defaultFolderName = "contacts";
 		
-		assertThat(allGeneratedSyncKeys).doesNotHaveDuplicates();
+		Folder f1 = createFolder("users", -1);
+		Folder f2 = createFolder("collected_contacts", 2);
+		Folder f3 = createFolder(defaultFolderName, 3);
+		Folder f4 = createFolder("my address book", 4);
+		
+		ImmutableList<Folder> immutableList = ImmutableList.of(f1, f2, f3, f4);
+		TreeSet<Folder> treeset = new TreeSet<Folder>(
+				new ComparatorUsingFolderName(defaultFolderName));
+		treeset.addAll(immutableList);
+		
+		Assert.assertNotNull(treeset);
+		Assertions.assertThat(treeset).hasSize(4);
+		Assertions.assertThat(treeset).contains(immutableList.toArray());
+		Assertions.assertThat(treeset.first().getName()).isEqualTo(defaultFolderName);
+		Assertions.assertThat(treeset.last().getName()).isEqualTo("users");
 	}
+
+	private Folder createFolder(String name, int uid) {
+		return Folder.builder().name(name).uid(uid).build();
+	}
+	
 }

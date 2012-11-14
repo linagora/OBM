@@ -91,7 +91,6 @@ public class ContinuationTransactionMapImplTest {
 		continuationTransactionMap.getContinuationForDevice(device);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testPutContinuationForDevice() {
 		Cache cache = buildCache();
@@ -111,7 +110,6 @@ public class ContinuationTransactionMapImplTest {
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testPutContinuationForDeviceNoCachedElement() {
 		Cache cache = buildCache();
@@ -129,7 +127,6 @@ public class ContinuationTransactionMapImplTest {
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testDelete() {
 		Cache cache = buildCache();
@@ -147,7 +144,6 @@ public class ContinuationTransactionMapImplTest {
 		assertThat(cache.getKeys()).isEmpty();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testDeleteNotCachedElement() {
 		Cache cache = buildCache();

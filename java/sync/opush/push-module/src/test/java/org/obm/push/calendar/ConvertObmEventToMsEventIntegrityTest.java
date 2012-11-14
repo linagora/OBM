@@ -342,9 +342,9 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		Event event = basicEvent();
 		
 		TimeZone timeZone = TimeZone.getTimeZone("Pacific/Auckland");
-		event.setTimezoneName(timeZone.getID());
+		event.setTimezoneName(timeZone.getDisplayName());
 		
 		MSEvent msEvent = converter.convert(event, new MSEventUid("mseventuid"), jauresUser());
-		assertThat(msEvent.getTimeZone()).isEqualTo(timeZone);
+		assertThat(msEvent.getTimeZone()).equals(timeZone);
 	}
 }
