@@ -50,7 +50,7 @@
 			<artifactId>jms</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
+			<groupId>org.jboss.netty</groupId>
 			<artifactId>netty</artifactId>
 		</dependency>
 		<dependency>
