@@ -38,26 +38,26 @@ public class ParticipationTest {
 
     @Test
     public void testCompleted() {
-        Participation accepted = Participation.completed();
+        Participation completed = Participation.completed();
 
-        assertThat(accepted.getState()).isEqualTo(State.COMPLETED);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(completed.getState()).isEqualTo(State.COMPLETED);
+        assertThat(completed.getComment()).isNull();
     }
 
     @Test
     public void testDeclined() {
-        Participation accepted = Participation.declined();
+        Participation declined = Participation.declined();
 
-        assertThat(accepted.getState()).isEqualTo(State.DECLINED);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(declined.getState()).isEqualTo(State.DECLINED);
+        assertThat(declined.getComment()).isNull();
     }
 
     @Test
     public void testNeedsAction() {
-        Participation accepted = Participation.needsAction();
+        Participation needsAction = Participation.needsAction();
 
-        assertThat(accepted.getState()).isEqualTo(State.NEEDSACTION);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(needsAction.getState()).isEqualTo(State.NEEDSACTION);
+        assertThat(needsAction.getComment()).isNull();
     }
 
     @Test
@@ -70,26 +70,26 @@ public class ParticipationTest {
 
     @Test
     public void testTentative() {
-        Participation accepted = Participation.tentative();
+        Participation tentative = Participation.tentative();
 
-        assertThat(accepted.getState()).isEqualTo(State.TENTATIVE);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(tentative.getState()).isEqualTo(State.TENTATIVE);
+        assertThat(tentative.getComment()).isNull();
     }
 
     @Test
     public void testDelegated() {
-        Participation accepted = Participation.delegated();
+        Participation delegated = Participation.delegated();
 
-        assertThat(accepted.getState()).isEqualTo(State.DELEGATED);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(delegated.getState()).isEqualTo(State.DELEGATED);
+        assertThat(delegated.getComment()).isNull();
     }
 
     @Test
     public void testInProgress() {
-        Participation accepted = Participation.inProgress();
+        Participation inProgress = Participation.inProgress();
 
-        assertThat(accepted.getState()).isEqualTo(State.INPROGRESS);
-        assertThat(accepted.getComment()).isNull();
+        assertThat(inProgress.getState()).isEqualTo(State.INPROGRESS);
+        assertThat(inProgress.getComment()).isNull();
     }
 
 }
