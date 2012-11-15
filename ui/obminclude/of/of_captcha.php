@@ -26,8 +26,27 @@ interface OBM_CaptchaDriver {
 class OBM_captcha {
   private static $driver = null;
   private static $defaultDriver = "OBM_NoCaptchaDriver";
+  private static $captchaActive = null;
+
+  public static function loadHookFile() {
+    global $path;
+    $captchaHookFile = "$path/../conf/hooks/captcha/preload.inc";
+    if( !file_exists($captchaHookFile) ) {
+      self::$captchaActive = true;
+      return ;
+    }
+    require_once($captchaHookFile);
+    self::$captchaActive = hook_captcha_preload();
+  }
+
   public static function loadDriver() {
     global $captcha_driver;
+    if ( self::$captchaActive === null ) {
+      self::loadHookFile();
+    }
+    if ( !self::$captchaActive ) {
+      return ;
+    }
     if ( self::$driver ) {
       return ;
     }
@@ -56,6 +75,9 @@ class OBM_captcha {
 
   public static function getCaptchaHTML() {
     self::loadDriver();
+    if ( !self::$captchaActive ) {
+      return "";
+    }
     if ( !self::$driver ) {
       die("unable to provide captcha HTML, captcha driver is not loaded");
     }
@@ -64,6 +86,9 @@ class OBM_captcha {
 
   public static function validateCaptcha() {
     self::loadDriver();
+    if ( !self::$captchaActive ) {
+      return true;
+    }
     if ( !self::$driver ) {
       die("unable to validate captcha, captcha driver is not loaded");
     }
