@@ -176,6 +176,10 @@ if ($params['form_user_pref']) {
       $_SESSION['set_cal_alert'] = $params['cal_alert'];
       update_user_pref($obm['uid'], 'set_cal_alert', $_SESSION['set_cal_alert'], 1);
   }
+  if ($params['cal_allday_opacity'] != '') {
+  	$_SESSION['set_allday_opacity'] = $params['cal_allday_opacity'];
+  	update_user_pref($obm['uid'], 'set_allday_opacity', $_SESSION['set_allday_opacity'], 1);
+  }
   if ($params['csv_sep'] != '') {
     $_SESSION['set_csv_sep'] = $params['csv_sep'];
     update_user_pref($obm['uid'], 'set_csv_sep', $_SESSION['set_csv_sep']);
@@ -238,6 +242,9 @@ if ($_SESSION['set_cal_interval'] == $ccal_1) $cal_1 = 'checked';
 
 if ($_SESSION['set_csv_sep'] == $ccsvd_sc) $csvd_sc = 'checked';
 if ($_SESSION['set_csv_sep'] == $ccsvd_tab) $csvd_tab = 'checked';
+
+if ($_SESSION['set_allday_opacity'] == 'TRANSPARENT') $cal_allday_opacity_free = 'checked';
+if ($_SESSION['set_allday_opacity'] == 'OPAQUE') $cal_allday_opacity_busy = 'checked';
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
@@ -479,6 +486,13 @@ $display['detail'] .= " /></td>
   <tr id='settings_calendarAlert'>
     <th>$l_set_cal_alert</th>
     <td>$dis_alert</td>
+  </tr>
+  <tr id='settings_calendarAlldayOpacity'>
+    <th>$l_set_allday_opacity</th>
+    <td>
+      <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"cal_allday_opacity\" value=\"OPAQUE\" $cal_allday_opacity_busy />$l_opacity_busy</label></span>
+      <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"cal_allday_opacity\" value=\"TRANSPARENT\" $cal_allday_opacity_free />$l_opacity_free</label></span>
+    </td>
   </tr>
   <tr id='settings_calendarPublicFb'>
     <th><label for='public_fb'>$GLOBALS[l_set_public_fb]</label></th>
