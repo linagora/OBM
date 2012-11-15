@@ -405,15 +405,15 @@ function check_calendar_calendar(form) {
 }
 
 
-function show_hide_calendar_dates(field) {
+function show_hide_calendar_dates(field, alldayOpacity) {
   target = window.document;
   begin = target.getElementById('hour_begin');   
   end = target.getElementById('hour_end');
   if(field.checked) {
     end.style.display = 'none';
     begin.style.display = 'none';
-    $('rd_opacity_free').checked = true;
-    $('rd_opacity_busy').checked = false;
+    $('rd_opacity_free').checked = alldayOpacity == 'TRANSPARENT';
+    $('rd_opacity_busy').checked = alldayOpacity == 'OPAQUE';
   } else {
     end.style.display = 'inline';
     begin.style.display = 'inline';

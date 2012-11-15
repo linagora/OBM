@@ -5446,7 +5446,7 @@ $date_edit_occurrence
   <tr>
     <th><label for=\"cba_all_day\">$l_all_day</label></th>
     <td>
-      <input onchange=\"show_hide_calendar_dates(this)\" onclick=\"show_hide_calendar_dates(this);\" type=\"checkbox\" id=\"cba_all_day\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
+      <input onchange=\"show_hide_calendar_dates(this, '" . $_SESSION["set_allday_opacity"] . "')\" onclick=\"show_hide_calendar_dates(this, '" . $_SESSION["set_allday_opacity"] . "');\" type=\"checkbox\" id=\"cba_all_day\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
     </td>
   </tr>   
   <tr>
