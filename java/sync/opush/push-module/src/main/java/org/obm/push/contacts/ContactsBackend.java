@@ -79,10 +79,7 @@ import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
@@ -92,8 +89,6 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
-
-	private static final String BACKEND_NAME_SEPARATOR = "-";
 	
 	private final ContactConfiguration contactConfiguration;
 	private final IAddressBook bookClient;
@@ -169,7 +164,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		CollectionPath collectionPath = collection.collectionPath();
 		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
 		String parentId = contactConfiguration.getDefaultParentId();
-		FolderType itemType = getItemType(collectionPath);
+		FolderType itemType = getItemType(udr, collection);
 		return new ItemChange(serverId, parentId, collection.displayName(), itemType, isNew);
 	}
 
@@ -209,20 +204,16 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	protected OpushCollection collectionFromFolder(UserDataRequest udr, Folder folder) {
-		String backendName = backendNameFromParts(folder.getUid(), folder.getName());
+		String backendName = ContactCollectionPath.backendName(folder);
 		return OpushCollection.builder()
 				.collectionPath(collectionPathBuilderProvider.get()
 						.userDataRequest(udr)
 						.pimType(getPIMDataType())
 						.backendName(backendName)
 						.build())
+				.ownerLoginAtDomain(folder.getOwnerLoginAtDomain())
 				.displayName(folder.getName())
 				.build();
-	}
-	
-	@VisibleForTesting String backendNameFromParts(int uid, String name) {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-		return Joiner.on(BACKEND_NAME_SEPARATOR).join(String.valueOf(uid), name);
 	}
 
 	@VisibleForTesting Iterable<Folder> sortedFolderChangesByDefaultAddressBook(FolderChanges folderChanges, String defaultAddressBookName) {
@@ -253,16 +244,19 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		return mappingService.collectionIdToString(collectionId);
 	}
 	
-	private FolderType getItemType(CollectionPath collectionPath) {
-		if (isDefaultFolder(collectionPath.backendName())) {
+	private FolderType getItemType(UserDataRequest udr, OpushCollection collection) {
+		if (isDefaultFolder(udr, collection)) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {
 			return FolderType.USER_CREATED_CONTACTS_FOLDER;
 		}
 	}
 	
-	private boolean isDefaultFolder(String folderName) {
-		return folderName.equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName());
+	@VisibleForTesting boolean isDefaultFolder(UserDataRequest udr, OpushCollection collection) {
+		String folderName = ContactCollectionPath.folderName(collection.collectionPath());
+		boolean isOwner = udr.getUser().getLoginAtDomain().equalsIgnoreCase(collection.getOwnerLoginAtDomain());
+		boolean isDefaultAddressBookName = folderName.equalsIgnoreCase(contactConfiguration.getDefaultAddressBookName());
+		return isOwner && isDefaultAddressBookName;
 	}
 	
 	@Override
@@ -301,7 +295,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		List<AddressBook> addressBooks = listAddressBooks(udr);
 		for (AddressBook addressBook: addressBooks) {
-			String backendName = backendNameFromParts(addressBook.getUid(), addressBook.getName());
+			String backendName = ContactCollectionPath.backendName(addressBook);
 			String collectionPath = collectionPathBuilderProvider.get()
 					.userDataRequest(udr)
 					.pimType(getPIMDataType())

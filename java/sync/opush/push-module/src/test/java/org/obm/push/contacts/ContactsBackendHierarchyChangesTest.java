@@ -663,11 +663,11 @@ public class ContactsBackendHierarchyChangesTest {
 
 		public ContactCollectionPath(String displayName, int folderUid) {
 			super(String.format("%s%s", COLLECTION_CONTACT_PREFIX, backendName(displayName, folderUid)),
-					PIMDataType.CONTACTS, displayName);
+					PIMDataType.CONTACTS, backendName(displayName, folderUid));
 		}
 		
 		public static String backendName(String displayName, int folderUid) {
-			return String.format("%d-%s", folderUid, displayName);
+			return String.format("%d:%s", folderUid, displayName);
 		}
 	}
 }

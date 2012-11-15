@@ -45,6 +45,7 @@ public class OpushCollection {
 
 		private CollectionPath collectionPath;
 		private String displayName;
+		private String ownerLoginAtDomain;
 
 		private Builder() {
 			super();
@@ -59,20 +60,27 @@ public class OpushCollection {
 			this.displayName = displayName;
 			return this;
 		}
+
+		public Builder ownerLoginAtDomain(String ownerLoginAtDomain) {
+			this.ownerLoginAtDomain = ownerLoginAtDomain;
+			return this;
+		}
 		
 		public OpushCollection build() {
 			Preconditions.checkState(collectionPath != null);
 			Preconditions.checkState(!Strings.isNullOrEmpty(displayName));
 			
-			return new OpushCollection(collectionPath, displayName);
+			return new OpushCollection(collectionPath, ownerLoginAtDomain, displayName);
 		}
 	}
 
 	private final CollectionPath collectionPath;
+	private final String ownerLoginAtDomain;
 	private final String displayName;
 	
-	private OpushCollection(CollectionPath collectionPath, String displayName) {
+	private OpushCollection(CollectionPath collectionPath, String ownerLoginAtDomain, String displayName) {
 		this.collectionPath = collectionPath;
+		this.ownerLoginAtDomain = ownerLoginAtDomain;
 		this.displayName = displayName;
 	}
 	
@@ -84,9 +92,13 @@ public class OpushCollection {
 		return collectionPath;
 	}
 
+	public String getOwnerLoginAtDomain() {
+		return ownerLoginAtDomain;
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(collectionPath, displayName);
+		return Objects.hashCode(collectionPath, ownerLoginAtDomain, displayName);
 	}
 	
 	@Override
@@ -94,6 +106,7 @@ public class OpushCollection {
 		if (object instanceof OpushCollection) {
 			OpushCollection that = (OpushCollection) object;
 			return Objects.equal(this.collectionPath, that.collectionPath)
+				&& Objects.equal(this.ownerLoginAtDomain, that.ownerLoginAtDomain)
 				&& Objects.equal(this.displayName, that.displayName);
 		}
 		return false;
@@ -103,6 +116,7 @@ public class OpushCollection {
 	public final String toString() {
 		return Objects.toStringHelper(this)
 			.add("collectionPath", collectionPath)
+			.add("ownerLoginAtDomain", ownerLoginAtDomain)
 			.add("displayName", displayName)
 			.toString();
 	}

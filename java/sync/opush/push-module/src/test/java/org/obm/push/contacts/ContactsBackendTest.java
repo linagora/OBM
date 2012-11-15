@@ -120,10 +120,10 @@ public class ContactsBackendTest {
 	public void sortedByDefaultFolderName() {
 		final String defaultFolderName = DEFAULT_PARENT_BOOK_NAME;
 		
-		Folder f1 = createFolder("users", -1);
-		Folder f2 = createFolder("collected_contacts", 2);
-		Folder f3 = createFolder(defaultFolderName, 3);
-		Folder f4 = createFolder("my address book", 4);
+		Folder f1 = Folder.builder().name("users").uid(-1).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder f2 = Folder.builder().name("collected_contacts").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder f3 = Folder.builder().name(defaultFolderName).uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder f4 = Folder.builder().name("my address book").uid(4).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		
 		ImmutableList<Folder> immutableList = ImmutableList.of(f1, f2, f3, f4);
 		TreeSet<Folder> treeset = new TreeSet<Folder>(
@@ -134,10 +134,6 @@ public class ContactsBackendTest {
 		assertThat(treeset).contains(immutableList.toArray());
 		assertThat(treeset.first().getName()).isEqualTo(defaultFolderName);
 		assertThat(treeset.last().getName()).isEqualTo("users");
-	}
-
-	private Folder createFolder(String name, int uid) {
-		return Folder.builder().name(name).uid(uid).build();
 	}
 	
 	@Test
@@ -370,20 +366,23 @@ public class ContactsBackendTest {
 
 		public ContactCollectionPath(String displayName, int folderUid) {
 			super(String.format("%s%s", COLLECTION_CONTACT_PREFIX, ContactsBackendTest.backendName(displayName, folderUid)),
-					PIMDataType.CONTACTS, displayName);
+					PIMDataType.CONTACTS, ContactsBackendTest.backendName(displayName, folderUid));
 		}
 	}
 
 	private static String backendName(String displayName, int folderUid) {
-		return String.format("%d-%s", folderUid, displayName);
+		return String.format("%d:%s", folderUid, displayName);
 	}
 	
 	@Test
-	public void changeDisplayNameIsTookFromFolderForAdd() {
+	public void changeDisplayNameAndOwnerLoginAtDomainAreTakenFromFolderForAdd() {
 		String folder1Name = "f1";
 		String folder2Name = "f2";
-		FolderChanges changes = FolderChanges.builder().updated(
-				createFolder(folder1Name, 1), createFolder(folder2Name, 2)).build();
+		FolderChanges changes = FolderChanges.builder()
+			.updated(
+				Folder.builder().name(folder1Name).uid(1).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name(folder2Name).uid(2).ownerLoginAtDomain("owner@domain").build())
+			.build();
 
 		expectBuildCollectionPath(folder1Name, 1);
 		expectBuildCollectionPath(folder2Name, 2);
@@ -399,10 +398,12 @@ public class ContactsBackendTest {
 				OpushCollection.builder()
 					.collectionPath(new ContactCollectionPath(folder1Name, 1))
 					.displayName(folder1Name)
+					.ownerLoginAtDomain(user.getLoginAtDomain())
 					.build(),
 				OpushCollection.builder()
 					.collectionPath(new ContactCollectionPath(folder2Name, 2))
 					.displayName(folder2Name)
+					.ownerLoginAtDomain("owner@domain")
 					.build());
 	}
 	
@@ -414,8 +415,11 @@ public class ContactsBackendTest {
 		int folder2Uid = 2;
 		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folder1Name, folder1Uid);
 		ContactCollectionPath f2CollectionPath = new ContactCollectionPath(folder2Name, folder2Uid);
-		FolderChanges changes = FolderChanges.builder().removed(
-				createFolder(folder1Name, folder1Uid), createFolder(folder2Name, folder2Uid)).build();
+		FolderChanges changes = FolderChanges.builder()
+				.removed(
+					Folder.builder().name(folder1Name).uid(folder1Uid).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+					Folder.builder().name(folder2Name).uid(folder2Uid).ownerLoginAtDomain("owner@domain").build())
+				.build();
 		
 		PathsToCollections adds = PathsToCollections.builder().build();
 		Set<CollectionPath> lastKnown = ImmutableSet.<CollectionPath>of(f1CollectionPath, f2CollectionPath);
@@ -466,8 +470,8 @@ public class ContactsBackendTest {
 	public void filterUnknownDeletedItemsFromAddressBooksChanged() {
 		String folderOneName = "f1";
 		String folderTwoName = "f2";
-		Folder folder1 = createFolder(folderOneName, 1);
-		Folder folder2 = createFolder(folderTwoName, 2);
+		Folder folder1 = Folder.builder().name(folderOneName).uid(1).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder2 = Folder.builder().name(folderTwoName).uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		FolderChanges changes = FolderChanges.builder().removed(folder1, folder2).build();
 		
 		ContactCollectionPath f1CollectionPath = new ContactCollectionPath(folderOneName, 1);
@@ -507,36 +511,12 @@ public class ContactsBackendTest {
 
 		assertThat(itemChange.getParentId()).isEqualTo(DEFAULT_PARENT_BOOK_ID);
 	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void builderBackendNameWhenNamePartIsNull() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
-		contactsBackend.backendNameFromParts(3, null);
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void builderBackendNameWhenNamePartIsEmpty() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
-		contactsBackend.backendNameFromParts(3, "");
-	}
-
-	@Test
-	public void builderBackendName() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
-		assertThat(contactsBackend.backendNameFromParts(5, "a name")).isEqualTo("5-a name");
-	}
-
-	@Test
-	public void builderBackendNameWhenNegativeUid() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
-		assertThat(contactsBackend.backendNameFromParts(-1, "name")).isEqualTo("-1-name");
-	}
 	
 	@Test
 	public void testSortingKeepsFolderWithSameNames() {
-		Folder folder1 = createFolder("name", 1);
-		Folder folder2 = createFolder("name", 2);
-		Folder folder3 = createFolder("name", 3);
+		Folder folder1 = Folder.builder().name("users").uid(1).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder2 = Folder.builder().name("users").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder3 = Folder.builder().name("users").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3).build();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
@@ -548,11 +528,12 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void testSortingKeepsFolderWithSameNamesAndSameUid() {
-		Folder folder1 = createFolder("name", 1);
-		Folder folder2 = createFolder("name", 2);
-		Folder folder3 = createFolder("name", 2);
-		Folder folder4 = createFolder("name", 3);
-		Folder folder5 = createFolder("name", 1);
+		Folder folder1 = Folder.builder().name("users").uid(1).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder2 = Folder.builder().name("users").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder3 = Folder.builder().name("users").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder4 = Folder.builder().name("users").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder folder5 = Folder.builder().name("users").uid(1).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		
 		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3, folder4, folder5).build();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
@@ -560,5 +541,50 @@ public class ContactsBackendTest {
 		
 		assertThat(result).hasSize(3);
 		assertThat(result).containsOnly(folder1, folder2, folder4);
+	}
+	
+	@Test
+	public void testIsDefaultFolderRightNameAndBadUser() {
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(new ContactCollectionPath(DEFAULT_PARENT_BOOK_NAME, 5))
+				.displayName("displayName")
+				.ownerLoginAtDomain("owner@domain")
+				.build();
+
+		mocks.replay();
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		mocks.verify();
+		
+		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isFalse();
+	}
+	
+	@Test
+	public void testIsDefaultFolderBadNameAndRightUser() {
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(new ContactCollectionPath("contacts book", 5))
+				.displayName("displayName")
+				.ownerLoginAtDomain(userDataRequest.getUser().getLoginAtDomain())
+				.build();
+
+		mocks.replay();
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		mocks.verify();
+		
+		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isFalse();
+	}
+	
+	@Test
+	public void testIsDefaultFolderRightNameAndUser() {
+		OpushCollection collection = OpushCollection.builder()
+				.collectionPath(new ContactCollectionPath(DEFAULT_PARENT_BOOK_NAME, 5))
+				.displayName("displayName")
+				.ownerLoginAtDomain(userDataRequest.getUser().getLoginAtDomain())
+				.build();
+		
+		mocks.replay();
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		mocks.verify();
+		
+		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isTrue();
 	}
 }
