@@ -45,6 +45,7 @@ public class Folder {
 		
 		private Integer uid;
 		private String name;
+		private String ownerLoginAtDomain;
 		private String ownerDisplayName;
 
 		private Builder() {
@@ -60,6 +61,11 @@ public class Folder {
 			this.name = name;
 			return this;
 		}
+
+		public Builder ownerLoginAtDomain(String ownerLoginAtDomain) {
+			this.ownerLoginAtDomain = ownerLoginAtDomain;
+			return this;
+		}
 		
 		public Builder ownerDisplayName(String ownerDisplayName) {
 			this.ownerDisplayName = ownerDisplayName;
@@ -68,19 +74,22 @@ public class Folder {
 		
 		public Folder build() {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name can't be null or empty");
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(ownerLoginAtDomain), "ownerLoginAtDomain can't be null or empty");
 			Preconditions.checkNotNull(uid, "uid can't be null");
-			return new Folder(uid, name, ownerDisplayName);
+			return new Folder(uid, name, ownerLoginAtDomain, ownerDisplayName);
 		}
 	}
 	
 	
 	private final Integer uid;
 	private final String name;
+	private final String ownerLoginAtDomain;
 	private final String ownerDisplayName;
 	
-	private Folder(Integer uid, String name, String ownerDisplayName) {
+	private Folder(Integer uid, String name, String ownerLoginAtDomain, String ownerDisplayName) {
 		this.uid = uid;
 		this.name = name;
+		this.ownerLoginAtDomain = ownerLoginAtDomain;
 		this.ownerDisplayName = ownerDisplayName;
 	}
 
@@ -95,10 +104,14 @@ public class Folder {
 	public String getOwnerDisplayName() {
 		return ownerDisplayName;
 	}
+
+	public String getOwnerLoginAtDomain() {
+		return ownerLoginAtDomain;
+	}
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(uid, name, ownerDisplayName);
+		return Objects.hashCode(uid, name, ownerLoginAtDomain, ownerDisplayName);
 	}
 	
 	@Override
@@ -107,6 +120,7 @@ public class Folder {
 			Folder that = (Folder) object;
 			return Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.name, that.name)
+				&& Objects.equal(this.ownerLoginAtDomain, that.ownerLoginAtDomain)
 				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName);
 		}
 		return false;
@@ -117,6 +131,7 @@ public class Folder {
 		return Objects.toStringHelper(this)
 			.add("uid", uid)
 			.add("name", name)
+			.add("ownerLoginAtDomain", ownerLoginAtDomain)
 			.add("ownerDisplayName", ownerDisplayName)
 			.toString();
 	}

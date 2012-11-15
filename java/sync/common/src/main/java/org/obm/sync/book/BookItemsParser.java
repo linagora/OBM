@@ -277,7 +277,8 @@ public class BookItemsParser extends AbstractItemsParser {
 	private Folder parseFolder(Element root) {
 		Folder.Builder folderBuilder = Folder.builder()
 				.name(s(root, "name"))
-				.ownerDisplayName(DOMUtils.getElementTextInChildren(root, "ownerDisplayName"));
+				.ownerDisplayName(DOMUtils.getElementTextInChildren(root, "ownerDisplayName"))
+				.ownerLoginAtDomain(DOMUtils.getElementTextInChildren(root, "ownerLoginAtDomain"));
 		if (root.hasAttribute("uid")) {
 			folderBuilder.uid(Integer.parseInt(root.getAttribute("uid")));
 		}

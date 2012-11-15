@@ -44,8 +44,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAZ() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(1).build(),
-				Folder.builder().name("z").uid(2).build());
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("z").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(-1);
 	}
@@ -53,8 +53,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAZHigherUid() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(5).build(),
-				Folder.builder().name("z").uid(2).build());
+				Folder.builder().name("a").uid(5).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("z").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(-1);
 	}
@@ -62,8 +62,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAZWhenSameUids() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(1).build(),
-				Folder.builder().name("z").uid(1).build());
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("z").uid(1).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(-1);
 	}
@@ -71,8 +71,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersZA() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("z").uid(1).build(),
-				Folder.builder().name("a").uid(2).build());
+				Folder.builder().name("z").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(1);
 	}
@@ -80,8 +80,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersZAHigherUid() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("z").uid(5).build(),
-				Folder.builder().name("a").uid(2).build());
+				Folder.builder().name("z").uid(5).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(1);
 	}
@@ -89,8 +89,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersZAWhenSameUids() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("z").uid(1).build(),
-				Folder.builder().name("a").uid(1).build());
+				Folder.builder().name("z").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(1);
 	}
@@ -98,8 +98,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAA() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(1).build(),
-				Folder.builder().name("a").uid(2).build());
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(1);
 	}
@@ -107,8 +107,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAAHigherUid() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(5).build(),
-				Folder.builder().name("a").uid(2).build());
+				Folder.builder().name("a").uid(5).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(2).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(-1);
 	}
@@ -116,8 +116,8 @@ public class ComparatorUsingFolderNameTest {
 	@Test
 	public void foldersAAWhenSameUids() {
 		int result = new ComparatorUsingFolderName("defaultName").compare(
-				Folder.builder().name("a").uid(1).build(),
-				Folder.builder().name("a").uid(1).build());
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build(),
+				Folder.builder().name("a").uid(1).ownerLoginAtDomain("login@domain").build());
 		
 		assertThat(result).isEqualTo(0);
 	}

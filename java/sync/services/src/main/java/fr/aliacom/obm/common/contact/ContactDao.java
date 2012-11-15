@@ -1535,10 +1535,11 @@ public class ContactDao {
 	}
 
 	public Set<Folder> findUpdatedFolders(Date timestamp, AccessToken at) throws SQLException {
-		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname"
+		String q = "SELECT a.id, a.name, userobm_id, userobm_lastname, userobm_firstname, userobm_login, domain.domain_name"
 			+ " FROM AddressBook a "
 			+ " INNER JOIN SyncedAddressbook as s ON (addressbook_id=id AND user_id=?) "
 			+ " INNER JOIN UserObm ON (owner=userobm_id) "
+			+ " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) "
 			+ "WHERE (a.syncable OR a.name=?) AND "
 			+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
 
@@ -1584,10 +1585,11 @@ public class ContactDao {
 		ResultSet rs = null;
 		Connection con = null;
 		
-		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname" +
+		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname, userobm_login, domain.domain_name" +
 				   " FROM AddressBook" +
 				   " INNER JOIN DeletedAddressbook ON (addressbook_id = id)" +
 				   " INNER JOIN UserObm ON (owner = userobm_id)" +
+				   " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) " +
 				   " WHERE user_id = ? AND timestamp >= ?";
 		
 		Set<Folder> folders = new HashSet<Folder>();
@@ -1615,10 +1617,11 @@ public class ContactDao {
 		ResultSet rs = null;
 		Connection con = null;
 		
-		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname" +
+		String sql = "SELECT id, name, userobm_id, userobm_lastname, userobm_firstname, userobm_login, domain.domain_name" +
 				   " FROM AddressBook" +
 				   " INNER JOIN DeletedSyncedAddressbook ON (addressbook_id = id)" +
 				   " INNER JOIN UserObm ON (owner = userobm_id)" +
+				   " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) " +
 				   " WHERE user_id = ? AND timestamp >= ?";
 		
 		Set<Folder> folders = new HashSet<Folder>();
@@ -1643,7 +1646,8 @@ public class ContactDao {
 	private Folder buildFolder(AccessToken at, ResultSet rs) throws SQLException {
 		Folder.Builder folderBuilder = Folder.builder()
 				.uid(rs.getInt(1))
-				.name(rs.getString(2));
+				.name(rs.getString(2))
+				.ownerLoginAtDomain(rs.getString(6) + "@" + rs.getString(7));
 		if (rs.getInt(3) != at.getObmId()) {
 			String ownerFirstName = rs.getString(4);
 			String ownerLastName = rs.getString(5);

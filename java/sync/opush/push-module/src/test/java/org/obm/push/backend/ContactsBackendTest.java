@@ -70,7 +70,7 @@ public class ContactsBackendTest {
 	}
 
 	private Folder createFolder(String name, int uid) {
-		return Folder.builder().name(name).uid(uid).build();
+		return Folder.builder().name(name).uid(uid).ownerLoginAtDomain("login@domain").build();
 	}
 	
 }

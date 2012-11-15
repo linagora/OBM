@@ -327,7 +327,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		try {
 			Set<Folder> updated = contactDao.findUpdatedFolders(timestamp, token);
 			if (configuration.syncUsersAsAddressBook()) {
-				updated.addAll(createAddressBookForUsers(timestamp));
+				updated.addAll(createAddressBookForUsers(token, timestamp));
 			}
 			
 			Set<Folder> removed = contactDao.findRemovedFolders(timestamp, token);
@@ -345,11 +345,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 		return false;
 	}
 	
-	private List<Folder> createAddressBookForUsers(Date timestamp) {
+	private List<Folder> createAddressBookForUsers(AccessToken token, Date timestamp) {
 		if (isFirstSync(timestamp)) {
 			return ImmutableList.of(Folder.builder()
 					.uid(contactConfiguration.getAddressBookUserId())
 					.name(contactConfiguration.getAddressBookUsersName())
+					.ownerLoginAtDomain(token.getUserWithDomain())
 					.build());
 		}
 		return ImmutableList.of();

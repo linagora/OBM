@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,6 +57,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -63,6 +65,19 @@ import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class AddressBookBindingImplTest {
+	
+	private AccessToken token;
+
+	@Before
+	public void setUp() {
+		ObmDomain domain = new ObmDomain();
+		domain.setId(123);
+		domain.setName("obm.org");
+		domain.setUuid("01324-56789");
+		token = new AccessToken(1, "");
+		token.setUserLogin("login");
+		token.setDomain(domain);
+	}
 	
 	private ObmHelper mockHelper() throws SQLException {
 		ObmHelper helper = EasyMock.createMock(ObmHelper.class);
@@ -80,8 +95,6 @@ public class AddressBookBindingImplTest {
 	@Test
 	public void testGetSyncGlobalAddressBookSync() throws ServerFault, SQLException {
 		Date timestamp = DateUtils.getEpochCalendar().getTime();
-
-		AccessToken token = new AccessToken(1, "");
 
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");
@@ -117,18 +130,18 @@ public class AddressBookBindingImplTest {
 		allRemovedContacts.addAll(archivedUserIds);
 
 		Set<Folder> updatedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(1).name("updatedContactFolder1").build(),
-				Folder.builder().uid(2).name("updatedContactFolder2").build());				
+				Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
+				Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build());				
 
-		List<Folder> updatedUserFolders = ImmutableList.of(Folder.builder().uid(-1).name("users").build());
+		List<Folder> updatedUserFolders = ImmutableList.of(Folder.builder().uid(-1).name("users").ownerLoginAtDomain("login@obm.org").build());
 
 		Set<Folder> allUpdatedFolders = Sets.newHashSet();
 		allUpdatedFolders.addAll(updatedContactFolders);
 		allUpdatedFolders.addAll(updatedUserFolders);
 
 		Set<Folder> removedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(10).name("removedContactFolder1").build(),
-				Folder.builder().uid(11).name("removedContactFolder2").build());
+				Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
+				Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build());
 		
 		ObmHelper helper = mockHelper();
 
@@ -181,8 +194,6 @@ public class AddressBookBindingImplTest {
 	public void testGetSyncNoGlobalAddressBookSync() throws ServerFault, SQLException {
 		Date timestamp = new Date();
 
-		AccessToken token = new AccessToken(1, "");
-
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");
 
@@ -204,14 +215,14 @@ public class AddressBookBindingImplTest {
 		allRemovedContacts.addAll(removalCandidates);
 
 		Set<Folder> updatedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(1).name("updatedContactFolder1").build(),
-				Folder.builder().uid(2).name("updatedContactFolder2").build());				
+				Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
+				Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build());				
 
 		Set<Folder> allUpdatedFolders = Sets.newHashSet(updatedContactFolders);
 
 		Set<Folder> removedContactFolders = Sets.newHashSet(
-				Folder.builder().uid(10).name("removedContactFolder1").build(),
-				Folder.builder().uid(11).name("removedContactFolder2").build());
+				Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build(),
+				Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build());
 
 		ObmHelper helper = mockHelper();
 

@@ -138,7 +138,7 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState lastKnownState = new FolderSyncState("1234567890a", DateUtils.date("2012-12-15T20:30:45Z"));
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b", DateUtils.date("2012-12-16T20:30:45Z"));
 		
-		Folder change = newFolderObject(contactParentName, contactParentId);
+		Folder change = Folder.builder().name(contactParentName).uid(contactParentId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
 		
 		List<CollectionPath> knownCollections = ImmutableList.of(); 
@@ -198,7 +198,7 @@ public class ContactsBackendHierarchyChangesTest {
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
 		
-		Folder change = newFolderObject(otherCollectionDisplayName, Integer.valueOf(otherCollectionMappingId));
+		Folder change = Folder.builder().name(otherCollectionDisplayName).uid(otherCollectionMappingId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
@@ -237,8 +237,8 @@ public class ContactsBackendHierarchyChangesTest {
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
 
-		Folder contactDeletion = newFolderObject(contactParentName, contactParentId);
-		Folder otherCollectionDeletion = newFolderObject(otherCollectionDisplayName, otherCollectionMappingId);
+		Folder contactDeletion = Folder.builder().name(contactParentName).uid(contactParentId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
+		Folder otherCollectionDeletion = Folder.builder().name(otherCollectionDisplayName).uid(otherCollectionMappingId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.of(contactDeletion, otherCollectionDeletion));
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
@@ -275,8 +275,10 @@ public class ContactsBackendHierarchyChangesTest {
 		int targetCollectionId = 2;
 			
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", targetCollectionId));
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", targetCollectionId));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("both").uid(targetCollectionId).ownerLoginAtDomain(user.getLoginAtDomain()).build());
+		Set<Folder> removed = ImmutableSet.of(
+				Folder.builder().name("both").uid(targetCollectionId).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
@@ -303,7 +305,8 @@ public class ContactsBackendHierarchyChangesTest {
 		int targetCollectionId = 2;
 		
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("both", targetCollectionId));
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", targetCollectionId));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("both").uid(targetCollectionId).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
@@ -328,7 +331,9 @@ public class ContactsBackendHierarchyChangesTest {
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath("both", 2), new ContactCollectionPath("both2", 3));
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both2", 3));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("both2").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
@@ -354,7 +359,9 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("known", 2), newFolderObject("add", 3));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("known").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("add").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
@@ -382,8 +389,10 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("add", 3));
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("known", 2));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("add").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
+		Set<Folder> removed = ImmutableSet.of(
+				Folder.builder().name("known").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
@@ -411,8 +420,10 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("add", 3));
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("unknown", 2));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("add").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
+		Set<Folder> removed = ImmutableSet.of(
+				Folder.builder().name("unknown").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
@@ -438,7 +449,9 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 3));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("both").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
@@ -468,7 +481,9 @@ public class ContactsBackendHierarchyChangesTest {
 		FolderSyncState outgoingSyncState=  new FolderSyncState("key2", org.obm.DateUtils.date("2012-05-04T12:15:05"));
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
-		Set<Folder> updated = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 2));
+		Set<Folder> updated = ImmutableSet.of(
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
@@ -498,7 +513,9 @@ public class ContactsBackendHierarchyChangesTest {
 				new ContactCollectionPath("both", 3));
 		
 		Set<Folder> updated = ImmutableSet.of();
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 3));
+		Set<Folder> removed = ImmutableSet.of(
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("both").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
@@ -528,7 +545,9 @@ public class ContactsBackendHierarchyChangesTest {
 				new ContactCollectionPath("both", 3));
 		
 		Set<Folder> updated = ImmutableSet.of();
-		Set<Folder> removed = ImmutableSet.of(newFolderObject("both", 2), newFolderObject("both", 2));
+		Set<Folder> removed = ImmutableSet.of(
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
+				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
 		expectBookClientListBooksChanged(lastKnownState, updated, removed);
 		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
@@ -630,14 +649,6 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceFindCollection(collectionName, collectionId);
 		expect(mappingService.collectionIdToString(collectionId))
 			.andReturn(String.valueOf(collectionId)).once();
-	}
-
-	private Folder newFolderObject(String displayName, int folderId) {
-		return Folder.builder()
-			.uid(folderId)
-			.ownerDisplayName(displayName)
-			.name(displayName)
-			.build();
 	}
 
 	private void expectLoginBehavior() throws AuthFault {
