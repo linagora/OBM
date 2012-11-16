@@ -32,6 +32,7 @@
 package org.obm;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
 public class FreePortFinder {
@@ -40,7 +41,9 @@ public class FreePortFinder {
 		for (int i = 8000; i < 8100; i++) {
 			ServerSocket socket;
 			try {
-				socket = new ServerSocket(i);
+				socket = new ServerSocket();
+				socket.setReuseAddress(false);
+				socket.bind(new InetSocketAddress(i));
 				socket.close();
 				return i;
 			} catch (IOException portInUse) {
