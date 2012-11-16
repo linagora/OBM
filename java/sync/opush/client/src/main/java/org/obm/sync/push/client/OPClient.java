@@ -111,6 +111,10 @@ public abstract class OPClient {
 		return run(new EmailSyncCommand(key, collectionId));
 	}
 	
+	public SyncResponse syncEmail(String key, int collectionId) throws Exception {
+		return run(new EmailSyncCommand(key, String.valueOf(collectionId)));
+	}
+	
 	public SyncResponse sync(Document doc) throws Exception {
 		return run(new Sync(doc));
 	}

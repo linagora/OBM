@@ -46,7 +46,7 @@ public class SyncResponse {
 		private final SyncCollection syncCollection;
 		private List<ItemChange> itemChanges;
 		private List<ItemChange> itemChangesDeletion;
-		private boolean syncStatevalid;
+		private boolean syncStateValidity;
 		private boolean collectionValidity;
 		private String allocateNewSyncKey;
 		
@@ -57,17 +57,17 @@ public class SyncResponse {
 		public SyncCollection getSyncCollection() {
 			return syncCollection;
 		}
-		public void setSyncStateValid(boolean syncStateValid) {
-			syncStatevalid = syncStateValid;
+		public void setSyncStateValidity(boolean syncStateValidity) {
+			this.syncStateValidity = syncStateValidity;
 		}
 		public void setCollectionValidity(boolean collectionValidity) {
 			this.collectionValidity = collectionValidity;
 		}
-		public boolean isCollectionValid() {
+		public boolean collectionValidity() {
 			return collectionValidity;
 		}
-		public boolean isSyncStatevalid() {
-			return syncStatevalid;
+		public boolean syncStatevalidity() {
+			return syncStateValidity;
 		}
 		public void setItemChanges(List<ItemChange> itemChanges) {
 			this.itemChanges = itemChanges;
@@ -88,7 +88,7 @@ public class SyncResponse {
 			return itemChangesDeletion;
 		}
 		public boolean isValid() {
-			return syncStatevalid && collectionValidity;
+			return syncStateValidity && collectionValidity;
 		}
 	}
 	

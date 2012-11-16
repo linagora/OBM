@@ -141,27 +141,30 @@ public class SyncDecoder {
 		if (isPartial && lastSyncCollection == null) {
 			throw new PartialException();
 		}
+		
+		collection.setDataClass(DOMUtils.getElementText(col, "Class"));
+		collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));
+
+		Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
+		if (windowSizeElement != null) {
+			collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
+		}
+		
+		SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
+		collection.setOptions(options);
+		
 		try {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			collection.setDataType(dataType);
-			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
-			collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));
-
-			Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
-			if (windowSizeElement != null) {
-				collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
-			}
-			
-			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
-			collection.setOptions(options);
-			
-			appendCommand(col, collection);
 		} catch (CollectionNotFoundException e) {
 			collection.setError(SyncStatus.OBJECT_NOT_FOUND);
 		}
+		
+		appendCommand(col, collection);
+		
 		// TODO sync supported
 		// TODO sync <getchanges/>
 

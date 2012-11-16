@@ -163,7 +163,7 @@ public class ProvisionHandlerTest {
 			throws DaoException, AuthFault, CollectionNotFoundException {
 		
 		mockUsersAccess(classToInstanceMap, Sets.newHashSet(user));
-		expectUserCollectionsNeverChange(classToInstanceMap.get(CollectionDao.class), fakeTestUsers);
+		expectUserCollectionsNeverChange(classToInstanceMap.get(CollectionDao.class), fakeTestUsers, Sets.<Integer>newHashSet());
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId)).andReturn(nextPolicyKeyGenerated).once();

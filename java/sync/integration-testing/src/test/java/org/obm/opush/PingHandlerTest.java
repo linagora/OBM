@@ -95,6 +95,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -109,10 +110,12 @@ public class PingHandlerTest {
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 
 	private List<OpushUser> fakeTestUsers;
+	private int pingOnCollectionId;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		pingOnCollectionId = 1432;
 	}
 	
 	@After
@@ -263,7 +266,7 @@ public class PingHandlerTest {
 		mockCalendarBackendHasNoChange(calendarBackend);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, Sets.newHashSet(pingOnCollectionId));
 	}
 
 	private void mockForCalendarHasChangePing(int noChangeIterationCount) 
@@ -364,7 +367,7 @@ public class PingHandlerTest {
 				+ "</HeartbeatInterval>"
 				+ "<Folders>"
 				+ "<Folder>"
-				+ "<Id>1432</Id>"
+				+ "<Id>" + String.valueOf(pingOnCollectionId) +"</Id>"
 				+ "</Folder>"
 				+ "</Folders>"
 				+ "</Ping>");

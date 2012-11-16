@@ -55,7 +55,6 @@ import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.impl.ContinuationServiceImpl;
 import org.obm.push.impl.ContinuationTransactionMapImpl;
-import org.obm.push.protocol.ProtocolModule;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
 import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
@@ -114,7 +113,6 @@ public class OpushImplModule extends AbstractModule {
 		install(qosModule());
 		install(new OpushServletModule());
 		install(new ObmSyncHttpClientModule());
-		install(new ProtocolModule());
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);

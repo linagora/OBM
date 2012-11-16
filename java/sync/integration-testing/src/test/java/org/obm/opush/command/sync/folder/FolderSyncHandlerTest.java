@@ -47,7 +47,6 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,7 +76,6 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
-@Ignore("push is disable since OBMFULL-4125")
 public class FolderSyncHandlerTest {
 
 	@Rule
@@ -106,14 +104,21 @@ public class FolderSyncHandlerTest {
 	@Test
 	public void testInitialFolderSyncContainsINBOX() throws Exception {
 		String initialSyncKey = "0";
+//		int serverId = 4;
 		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
 		FolderSyncState newMappingSyncState = new FolderSyncState(newGeneratedSyncKey);
+				
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
 		expectCollectionDaoAllocateFolderSyncState(classToInstanceMap.get(CollectionDao.class), newMappingSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+
+//		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+//		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, Collections.<Integer>emptySet());
+//		mockCollectionDao(collectionDao, initialSyncKey, serverId);
+
 		
 		replayMocks(classToInstanceMap);
 		
@@ -178,6 +183,9 @@ public class FolderSyncHandlerTest {
 			.changes(Lists.newArrayList(
 					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
 			.build();
+//		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+//		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, Collections.<Integer>emptySet());
+//		mockCollectionDao(collectionDao, syncKey, serverId);
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesForMailboxes(classToInstanceMap, mailboxChanges);

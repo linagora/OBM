@@ -41,9 +41,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,8 +80,10 @@ import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
+import org.obm.sync.push.client.SyncStatus;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -115,7 +119,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
@@ -148,7 +152,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
@@ -184,7 +188,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
@@ -218,7 +222,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
@@ -253,7 +257,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncClasses(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
@@ -278,6 +282,24 @@ public class SyncHandlerTest {
 			.header(MSEmailHeader.builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream(message.getBytes())), emailBodyType, 0, Charsets.UTF_8, false)).build();
+	}
+
+	@Test
+	public void testSyncOnUnexistingCollection() throws Exception {
+		String syncEmailSyncKey = "1";
+		java.util.Collection<Integer> existingCollections = Collections.emptySet();
+		int syncEmailUnexistingCollectionId = 15105;
+		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId);
+
+		org.obm.sync.push.client.Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
+		Assertions.assertThat(unexistingCollection.getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
 
 }

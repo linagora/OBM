@@ -32,6 +32,7 @@
 package org.obm.opush;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Locale;
 
 import javax.xml.transform.TransformerException;
@@ -132,7 +133,7 @@ public class AutodiscoverHandlerTest {
 
 	private void mockCollectionDaoNoChange() throws CollectionNotFoundException, DaoException {
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, Sets.newHashSet(singleUserFixture.jaures));
+		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, Sets.newHashSet(singleUserFixture.jaures), Collections.<Integer>emptySet());
 	}
 	
 	private void mockLoginService() throws AuthFault {

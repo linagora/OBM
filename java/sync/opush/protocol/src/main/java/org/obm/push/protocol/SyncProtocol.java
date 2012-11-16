@@ -55,6 +55,7 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -64,7 +65,7 @@ public class SyncProtocol {
 	private final SyncDecoder syncDecoder;
 
 	@Inject
-	private SyncProtocol(SyncDecoder syncDecoder) {
+	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder) {
 		this.syncDecoder = syncDecoder;
 	}
 	
@@ -88,15 +89,13 @@ public class SyncProtocol {
 				DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
 			}
 			
-			if (!collectionResponse.isValid()) {
-				if (!collectionResponse.isCollectionValid()) {
-					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-					DOMUtils.createElementAndText(ce, "Status", SyncStatus.CONFLICT.asSpecificationValue());
-				} else if (!collectionResponse.isSyncStatevalid()) {
-					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-					DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asSpecificationValue());
-					DOMUtils.createElementAndText(ce, "SyncKey", "0");
-				}
+			if (!collectionResponse.collectionValidity()) {
+				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue());
+			} else if (!collectionResponse.syncStatevalidity()) {
+				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
+				DOMUtils.createElementAndText(ce, "Status", SyncStatus.INVALID_SYNC_KEY.asSpecificationValue());
+				DOMUtils.createElementAndText(ce, "SyncKey", "0");
 			} else {
 				Element sk = DOMUtils.createElement(ce, "SyncKey");
 				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());

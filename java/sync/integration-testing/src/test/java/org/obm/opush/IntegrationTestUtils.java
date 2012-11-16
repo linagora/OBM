@@ -97,7 +97,10 @@ public class IntegrationTestUtils {
 						.anyTimes();
 	}
 	
-	public static void expectUserCollectionsNeverChange(CollectionDao collectionDao, Collection<OpushUser> users) throws DaoException, CollectionNotFoundException {
+	public static void expectUserCollectionsNeverChange(CollectionDao collectionDao,
+			Collection<OpushUser> users, Collection<Integer> unchangedCollectionsIds)
+			throws DaoException, CollectionNotFoundException {
+		
 		Date lastSync = new Date();
 		ItemSyncState syncState = new ItemSyncState("sync state");
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
@@ -105,10 +108,13 @@ public class IntegrationTestUtils {
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 
-		int randomCollectionId = anyInt();
+		int otherCollectionId = anyInt();
 		for (OpushUser opushUser: users) {
-			String collectionPath = IntegrationTestUtils.buildCalendarCollectionPath(opushUser);  
-			expect(collectionDao.getCollectionPath(randomCollectionId)).andReturn(collectionPath).anyTimes();
+			for (Integer unchangedCollectionId : unchangedCollectionsIds) {
+				String collectionPath = IntegrationTestUtils.buildCalendarCollectionPath(opushUser);  
+				expect(collectionDao.getCollectionPath(unchangedCollectionId)).andReturn(collectionPath).anyTimes();
+			}
+			expect(collectionDao.getCollectionPath(otherCollectionId)).andThrow(new CollectionNotFoundException()).anyTimes();
 		}
 	}
 

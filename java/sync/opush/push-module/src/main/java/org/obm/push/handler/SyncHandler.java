@@ -90,6 +90,7 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -394,7 +395,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
-		if ("0".equals(syncCollection.getSyncKey())) {
+		if (syncCollection.getStatus() != SyncStatus.OK) {
+			handleErrorSync(syncCollection, syncCollectionResponse);
+		} else if ("0".equals(syncCollection.getSyncKey())) {
 			handleInitialSync(udr, syncCollection, syncCollectionResponse);
 		} else {
 			handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
@@ -402,18 +405,22 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return syncCollectionResponse;
 	}
 
+	@VisibleForTesting void handleErrorSync(SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) {
+		if (syncCollection.getStatus() == SyncStatus.OBJECT_NOT_FOUND) {
+			syncCollectionResponse.setCollectionValidity(false);
+		}
+	}
+
 	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 
 		syncCollectionResponse.setCollectionValidity(true);
-		syncCollectionResponse.setSyncStateValid(true);
+		syncCollectionResponse.setSyncStateValidity(true);
 		
 		ItemSyncState st = stMachine.getItemSyncState(syncCollection.getSyncKey());
-		if (!collectionExist(syncCollection.getCollectionId())) {
-			syncCollectionResponse.setCollectionValidity(false);
-		} else if (st == null) {
-			syncCollectionResponse.setSyncStateValid(false);
+		if (st == null) {
+			syncCollectionResponse.setSyncStateValidity(false);
 		} else {
 			syncCollection.setItemSyncState(st);
 			Date syncDate = null;
@@ -431,20 +438,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	private boolean collectionExist(Integer collectionId) throws DaoException {
-		try {
-			collectionDao.getCollectionPath(collectionId);
-		} catch (CollectionNotFoundException e) {
-			return false;
-		}
-		return true;
-	}
-
-	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse)
+	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
 			throws DaoException, InvalidServerId {
 		
 		backend.resetCollection(udr, syncCollection.getCollectionId());
-		syncCollectionResponse.setSyncStateValid(true);
+		syncCollectionResponse.setSyncStateValidity(true);
 		syncCollectionResponse.setCollectionValidity(true);
 		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
 		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();

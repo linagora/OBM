@@ -39,6 +39,7 @@ import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChang
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -71,17 +72,17 @@ import com.google.common.collect.ImmutableSet;
 public class EmailSyncTestUtils {
 	
 	public static void mockEmailSyncClasses(
-			String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta, 
+			String syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault,
 			ConversionException {
 		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		mockEmailSync(syncEmailSyncKey, syncEmailCollectionId, delta, fakeTestUsers, classToInstanceMap);
+		mockEmailSync(syncEmailSyncKey, syncEmailCollectionsIds, delta, fakeTestUsers, classToInstanceMap);
 		replayMocks(classToInstanceMap);
 	}
 	
-	private static void mockEmailSync(String syncEmailSyncKey, int syncEmailCollectionId, DataDelta delta,
+	private static void mockEmailSync(String syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta,
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
 			ConversionException {
@@ -96,8 +97,8 @@ public class EmailSyncTestUtils {
 		mockContentsExporter(contentsExporterBackend, delta);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
-		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, syncEmailCollectionId);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, syncEmailCollectionsIds);
+		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, syncEmailCollectionsIds);
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		mockItemTrackingDao(itemTrackingDao);
@@ -151,9 +152,13 @@ public class EmailSyncTestUtils {
 		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
 	}
 
-	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, String syncEmailSyncKey, int syncEmailCollectionId) throws DaoException {
+	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, String syncEmailSyncKey,
+			Collection<Integer> syncEmailCollectionsIds) throws DaoException {
+		
+		for (Integer syncEmailCollectionId : syncEmailCollectionsIds) {
 		expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
 				.andReturn(syncEmailCollectionId).anyTimes();
+		}
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
 				.andReturn((int)(Math.random()*10000)).anyTimes();
 		ItemSyncState state = new ItemSyncState(syncEmailSyncKey);
