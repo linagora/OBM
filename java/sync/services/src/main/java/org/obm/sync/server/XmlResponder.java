@@ -73,6 +73,7 @@ import org.w3c.dom.Element;
 import com.google.common.base.Strings;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserSettings;
 
 public class XmlResponder {
 
@@ -126,11 +127,11 @@ public class XmlResponder {
 	}
 
 	public Document toXML(AccessToken at) throws FactoryConfigurationError {
-		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain());
+		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain(), at.getUserSettings());
 	}
 
 	public Document prepareAccessTokenXML(String sessionId, String userEmail,
-			MavenVersion version, ObmDomain tokenDomain)
+			MavenVersion version, ObmDomain tokenDomain, UserSettings userSettings)
 			throws FactoryConfigurationError {
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/token.xsd", "token");
@@ -145,6 +146,21 @@ public class XmlResponder {
 
 		Element domain = DOMUtils.createElementAndText(root, "domain", tokenDomain.getName());
 		domain.setAttribute("uuid", tokenDomain.getUuid());
+
+		Element settingsElement = DOMUtils.createElement(root, "settings");
+
+		if (userSettings != null) {
+			Map<String, String> rawSettings = userSettings.getRawSettings();
+
+			if (rawSettings != null) {
+				for (Entry<String, String> setting : rawSettings.entrySet()) {
+					Element settingElement = DOMUtils.createElementAndText(settingsElement, "setting", setting.getValue());
+
+					settingElement.setAttribute("name", setting.getKey());
+				}
+			}
+		}
+
 		return doc;
 	}
 

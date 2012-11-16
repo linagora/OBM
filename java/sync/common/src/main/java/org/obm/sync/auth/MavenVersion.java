@@ -37,6 +37,15 @@ public class MavenVersion {
 	private String minor;
 	private String release;
 
+	public MavenVersion() {
+	}
+
+	public MavenVersion(String major, String minor, String release) {
+		this.major = major;
+		this.minor = minor;
+		this.release = release;
+	}
+
 	public String getMajor() {
 		return major;
 	}

@@ -143,6 +143,12 @@ public class LoginHandler implements ISyncHandler {
 			}
 
 			versionValidator.checkObmConnectorVersion(token);
+
+			ObmUser user = userService.getUserFromAccessToken(token);
+			UserSettings settings = settingsService.getSettings(user);
+
+			token.setUserSettings(settings);
+
 			return token;
 		} catch (OBMConnectorVersionException e) {
 			responder.sendError("Connector version not supported");

@@ -38,6 +38,7 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -65,6 +66,8 @@ public class ToolBox {
 		EasyMock.expect(accessToken.getUserEmail()).andReturn(login + '@' + domain.getName()).anyTimes();
 		EasyMock.expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
 		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
+		EasyMock.expect(accessToken.getSessionId()).andReturn("sessionId").anyTimes();
+		EasyMock.expect(accessToken.getVersion()).andReturn(new MavenVersion("0", "0", "0")).anyTimes();
 		return accessToken;
 	}
 

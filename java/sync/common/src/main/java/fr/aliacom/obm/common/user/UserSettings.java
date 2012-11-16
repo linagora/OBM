@@ -39,7 +39,7 @@ import com.google.common.base.Objects;
 
 public class UserSettings {
 
-	private Map<String, String> rawSettings;
+	private final Map<String, String> rawSettings;
 	
 	public UserSettings(Map<String, String> rawSettings) {
 		this.rawSettings = rawSettings;
@@ -63,5 +63,8 @@ public class UserSettings {
 		String timezoneAsString = Objects.firstNonNull(rawSettings.get("set_timezone"), "GMT");
 		return TimeZone.getTimeZone(timezoneAsString);
 	}
-	
+
+	public Map<String, String> getRawSettings() {
+		return rawSettings;
+	}
 }

@@ -38,6 +38,7 @@ import java.util.Map;
 import org.obm.sync.calendar.CalendarInfo;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserSettings;
 
 public class AccessToken {
 
@@ -52,10 +53,9 @@ public class AccessToken {
 	private boolean rootAccount;
 
 	private Map<String, String> isoCodeToNameCache;
-
 	private Map<String, String> serviceProps;
-
 	private Collection<CalendarInfo> calendarRights;
+	private UserSettings userSettings;
 
 	private MavenVersion version;
 	private int conversationUid;
@@ -183,4 +183,11 @@ public class AccessToken {
 		this.userDisplayName = displayName;
 	}
 	
+	public UserSettings getUserSettings() {
+		return userSettings;
+	}
+
+	public void setUserSettings(UserSettings userSettings) {
+		this.userSettings = userSettings;
+	}
 }
