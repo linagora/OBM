@@ -1123,10 +1123,43 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(conComp, null, null);
 		}
 		ret.setUpdated(changedEvent);
-		ret.setDeletedEvents(findDeletedEvents(calendarUser, lastSync, typeFilter,
-				declined));
+
+		Iterable<DeletedEvent> deletedEvents = Iterables.concat(findDeletedEvents(calendarUser, lastSync, typeFilter,declined), findDeletedEventsLinks(calendarUser, lastSync));
+
+		ret.setDeletedEvents(Lists.newArrayList(deletedEvents));
 		
 		return ret;
+	}
+
+	private Collection<DeletedEvent> findDeletedEventsLinks(ObmUser calendarUser, Date lastSync) {
+		List<DeletedEvent> result = new LinkedList<DeletedEvent>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String q = "SELECT deletedeventlink_event_id, deletedeventlink_event_ext_id FROM DeletedEventLink WHERE deletedeventlink_userobm_id=? ";
+		if (lastSync != null) {
+				q += "AND deletedeventlink_time_removed >= ? ";
+		}
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(q);
+			ps.setInt(1, calendarUser.getUid());
+			if (lastSync != null) {
+					ps.setTimestamp(2, new Timestamp(lastSync.getTime()));
+			}
+			rs = ps.executeQuery();
+			while (rs.next()) {
+					result.add(new DeletedEvent(
+							new EventObmId(rs.getInt(1)),
+							new EventExtId(rs.getString(2))));
+			}
+		} catch (SQLException se) {
+				logger.error(se.getMessage(), se);
+		} finally {
+				obmHelper.cleanup(con, ps, rs);
+		}
+		return result;
 	}
 
 	private void touchParentOfDeclinedRecurrentEvents(
@@ -1633,6 +1666,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = null;
 			if (updateAttendees) {
 				removeAttendees(editor, con, attendeetoRemove, ev);
+				insertDeletedEventLinks(editor, con, attendeetoRemove, ev);
 			}
 
 			if (updateAttendees) {
@@ -1655,6 +1689,42 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		
 		indexEvent(editor, ev);
+	}
+
+	private void insertDeletedEventLinks(AccessToken editor, Connection con, List<Attendee> attendeetoRemove, Event ev)
+		throws SQLException {
+			String q = "INSERT INTO DeletedEventLink ( deletedeventlink_userobm_id, deletedeventlink_event_id, deletedeventlink_event_ext_id ) VALUES ( ?, ?, ? ) ";
+			PreparedStatement ps = null;
+			logger.info("Event Modification : will insert {} deleted event links.", attendeetoRemove.size());
+			
+			List<Integer> attendeeUserIds = filterOutContactsAttendees(editor, con, attendeetoRemove);
+
+			try {
+				ps = con.prepareStatement(q);
+
+				for (Integer id : attendeeUserIds) {
+					ps.setInt(1, id);
+					ps.setInt(2, ev.getObmId().getObmId());
+					ps.setString(3, ev.getExtId().getExtId());
+					ps.addBatch();
+				}
+
+				ps.executeBatch();
+			} finally {
+				obmHelper.cleanup(null, ps, null);
+			}
+	}
+
+	private List<Integer> filterOutContactsAttendees(AccessToken editor, Connection con, List<Attendee> attendeetoRemove) throws SQLException {
+		List<Integer> attendeeUserIds = new ArrayList<Integer>();
+		for (Attendee at : attendeetoRemove) {
+			Integer id = userDao.userIdFromEmail(con, at.getEmail(), editor.getDomain().getId());
+
+			if (id != null) {
+				attendeeUserIds.add(id);
+			}
+		}
+		return attendeeUserIds;
 	}
 
 	private PreparedStatement createEventUpdateStatement(Connection con,
