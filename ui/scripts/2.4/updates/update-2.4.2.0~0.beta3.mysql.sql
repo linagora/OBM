@@ -5,6 +5,22 @@
 
 BEGIN;
 
+-- Remove devices sync states of users which have duplicates on addressbook.name
+DELETE
+FROM opush_device
+WHERE EXISTS (
+	SELECT *
+	FROM AddressBook book
+	WHERE book.owner = opush_device.owner
+	AND EXISTS (
+		SELECT book2.id
+		FROM AddressBook book2
+		WHERE book.id <> book2.id
+		AND book.owner = book2.owner
+		AND book.name = book2.name )
+	HAVING COUNT(*) > 1
+);
+
 --
 -- Create a temporary column to store which uid will be inserted in the collection path
 --
