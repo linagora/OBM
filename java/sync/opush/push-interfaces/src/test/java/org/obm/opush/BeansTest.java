@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
+import org.obm.push.backend.OpushCollection;
+import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
@@ -57,6 +59,8 @@ public class BeansTest {
 				ImmutableList.<Class<?>>builder()
 					.add(UserDataRequest.class) 
 					.add(CollectionPath.class)
+					.add(OpushCollection.class)
+					.add(PathsToCollections.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

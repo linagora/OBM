@@ -379,7 +379,7 @@ public class MailBackendTest {
 		expectBuildMailboxesCollectionPaths(changedMailboxes);
 		
 		replayCommonMocks();
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, null, null, collectionPathBuilderProvider);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -402,7 +402,7 @@ public class MailBackendTest {
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("display name", "another display name"));
 		
 		replayCommonMocks();
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, null, null, collectionPathBuilderProvider);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -427,7 +427,7 @@ public class MailBackendTest {
 				.build();
 		
 		replayCommonMocks(); replay(collectionPath);
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, collectionPathBuilderProvider);
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, null, null, collectionPathBuilderProvider);
 		ItemChange itemChange = mailBackend.createItemChange(udr, collection);
 		verifyCommonMocks(); verify(collectionPath);
 		
