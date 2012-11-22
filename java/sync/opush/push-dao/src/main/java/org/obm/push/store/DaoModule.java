@@ -34,6 +34,7 @@ package org.obm.push.store;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
@@ -60,6 +61,7 @@ public class DaoModule extends AbstractModule{
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
 		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
+		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 	}
 
 }
