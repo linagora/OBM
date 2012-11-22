@@ -35,9 +35,9 @@ import org.obm.push.bean.Snapshot;
 
 public interface SnapshotDao {
 	
-	Snapshot get(String deviceId, String syncKey);
+	Snapshot get(String deviceId, String syncKey, Integer collectionId);
 	
-	void put(String deviceId, String syncKey, Snapshot snapshot);
+	void put(Snapshot snapshot);
 	
 	void deleteAll(String deviceId);
 }
