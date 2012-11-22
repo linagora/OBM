@@ -47,24 +47,48 @@ public class EmailEqualsTest {
 	@Test
 	public void testEquals(){
 		Date date = new Date();
-		Email e1 = new Email(10, true, date);
-		Email e2 = new Email(10, true, date);
+		Email e1 = Email.builder()
+				.uid(10)
+				.read(true)
+				.date(date)
+				.build();
+		Email e2 = Email.builder()
+				.uid(10)
+				.read(true)
+				.date(date)
+				.build();
 		Assert.assertEquals(e1, e2);
 	}
 	
 	@Test
 	public void testNotEqualsUid(){
 		Date date = new Date();
-		Email e1 = new Email(10, true, date);
-		Email e2 = new Email(11, true, date);
+		Email e1 = Email.builder()
+				.uid(10)
+				.read(true)
+				.date(date)
+				.build();
+		Email e2 = Email.builder()
+				.uid(11)
+				.read(true)
+				.date(date)
+				.build();
 		Assert.assertNotSame(e1, e2);
 	}
 	
 	@Test
 	public void testNotEqualsRead(){
 		Date date = new Date();
-		Email e1 = new Email(11, false, date);
-		Email e2 = new Email(11, true, date);
+		Email e1 = Email.builder()
+				.uid(11)
+				.read(true)
+				.date(date)
+				.build();
+		Email e2 = Email.builder()
+				.uid(11)
+				.read(false)
+				.date(date)
+				.build();
 		Assert.assertNotSame(e1, e2);
 	}
 	

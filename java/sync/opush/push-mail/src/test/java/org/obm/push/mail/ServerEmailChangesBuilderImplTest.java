@@ -107,7 +107,8 @@ public class ServerEmailChangesBuilderImplTest {
 	@Test
 	public void onOneAddition() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
-				.additions(ImmutableSet.of(new Email(33, false, date("2004-12-13T21:39:45Z"))))
+				.additions(ImmutableSet.of(
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build()))
 				.build();
 		
 		MSEmail emailChangesData = MSEmail.builder()
@@ -145,8 +146,8 @@ public class ServerEmailChangesBuilderImplTest {
 	public void onTwoAdditions() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
 				.additions(ImmutableSet.of(
-						new Email(33, false, date("2004-12-13T21:39:45Z")),
-						new Email(156, false, date("2004-10-10T21:39:45Z"))))
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build(),
+						Email.builder().uid(156).read(false).date(date("2004-10-10T21:39:45Z")).build()))
 				.build();
 		
 		MSEmail email1ChangeData = MSEmail.builder()
@@ -201,7 +202,8 @@ public class ServerEmailChangesBuilderImplTest {
 	@Test
 	public void onOneChange() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
-				.changes(ImmutableSet.of(new Email(33, false, date("2004-12-13T21:39:45Z"))))
+				.changes(ImmutableSet.of(
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build()))
 				.build();
 		
 		MSEmail emailChangesData = MSEmail.builder()
@@ -239,8 +241,8 @@ public class ServerEmailChangesBuilderImplTest {
 	public void onTwoChanges() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
 				.changes(ImmutableSet.of(
-						new Email(33, false, date("2004-12-13T21:39:45Z")),
-						new Email(156, false, date("2004-10-10T21:39:45Z"))))
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build(),
+						Email.builder().uid(156).read(false).date(date("2004-10-10T21:39:45Z")).build()))
 				.build();
 		
 		MSEmail email1ChangeData = MSEmail.builder()
@@ -295,7 +297,8 @@ public class ServerEmailChangesBuilderImplTest {
 	@Test
 	public void onOneDeletion() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
-				.deletions(ImmutableSet.of(new Email(33, false, date("2004-12-13T21:39:45Z"))))
+				.deletions(ImmutableSet.of(
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build()))
 				.build();
 		
 		mocks.replay();
@@ -315,8 +318,8 @@ public class ServerEmailChangesBuilderImplTest {
 	public void onTwoDeletions() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
 				.deletions(ImmutableSet.of(
-						new Email(33, false, date("2004-12-13T21:39:45Z")),
-						new Email(654, false, date("2006-02-03T21:39:45Z"))))
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:45Z")).build(),
+						Email.builder().uid(654).read(false).date(date("2006-02-03T21:39:45Z")).build()))
 				.build();
 		
 		mocks.replay();
@@ -338,9 +341,12 @@ public class ServerEmailChangesBuilderImplTest {
 	@Test
 	public void onOneDeletionOneChangeOneAddition() throws Exception {
 		EmailChanges emailChanges = EmailChanges.builder()
-				.changes(ImmutableSet.of(new Email(33, false, date("2004-12-13T21:39:48Z"))))
-				.deletions(ImmutableSet.of(new Email(39, true, date("2012-10-10T11:49:45Z"))))
-				.additions(ImmutableSet.of(new Email(15, false, date("2008-02-03T20:37:05Z"))))
+				.changes(ImmutableSet.of(
+						Email.builder().uid(33).read(false).date(date("2004-12-13T21:39:48Z")).build()))
+				.deletions(ImmutableSet.of(
+						Email.builder().uid(39).read(true).date(date("2012-10-10T11:49:45Z")).build()))
+				.additions(ImmutableSet.of(
+						Email.builder().uid(15).read(false).date(date("2008-02-03T20:37:05Z")).build()))
 				.build();
 		
 		MSEmail emailChangedData = MSEmail.builder()

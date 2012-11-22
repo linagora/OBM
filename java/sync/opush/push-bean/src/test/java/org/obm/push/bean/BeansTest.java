@@ -48,6 +48,7 @@ import org.obm.push.bean.ms.MSRead;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
+import org.obm.push.mail.bean.Email;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -108,6 +109,9 @@ public class BeansTest {
 					.add(MSEmailHeader.class)
 					.add(MSRead.class)
 					.add(MSEventExtId.class)
+					.add(Email.class)
+					.add(Snapshot.class)
+					.add(SnapshotKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

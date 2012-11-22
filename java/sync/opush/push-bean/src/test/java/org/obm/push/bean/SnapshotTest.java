@@ -29,67 +29,85 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.DateUtils.date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.utils.DateUtils;
 
-import com.google.common.collect.ImmutableSet;
-
-@RunWith(SlowFilterRunner.class)
-public class EmailChangesTest {
-
-	@Test
-	public void buildWithNullDeletions() {
-		EmailChanges emailChanges = EmailChanges.builder()
-			.changes(ImmutableSet.<Email>of())
-			.additions(ImmutableSet.<Email>of())
-			.deletions(null)
+public class SnapshotTest {
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullDeviceId() {
+		Snapshot.builder()
+			.filterType(FilterType.ONE_DAY_BACK)
+			.syncKey("syncKey")
+			.collectionId(1)
 			.build();
-		
-		assertThat(emailChanges.deletions()).isEmpty();
 	}
-
-	@Test
-	public void buildWithNullChanges() {
-		EmailChanges emailChanges = EmailChanges.builder()
-			.deletions(ImmutableSet.<Email>of())
-			.additions(ImmutableSet.<Email>of())
-			.changes(null)
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullFilterType() {
+		Snapshot.builder()
+			.deviceId("deviceId")
+			.syncKey("syncKey")
+			.collectionId(1)
 			.build();
-		
-		assertThat(emailChanges.changes()).isEmpty();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullCollectionId() {
+		Snapshot.builder()
+			.deviceId("deviceId")
+			.filterType(FilterType.ONE_DAY_BACK)
+			.syncKey("syncKey")
+			.build();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullSyncKey() {
+		Snapshot.builder()
+			.deviceId("deviceId")
+			.filterType(FilterType.ONE_DAY_BACK)
+			.collectionId(1)
+			.build();
 	}
 	
 	@Test
-	public void buildWithNullAdditions() {
-		EmailChanges emailChanges = EmailChanges.builder()
-			.changes(ImmutableSet.<Email>of())
-			.deletions(ImmutableSet.<Email>of())
-			.additions(null)
+	public void testBuilder() {
+		FilterType filterType = FilterType.ONE_DAY_BACK;
+		String deviceId = "deviceId";
+		String synckey = "syncKey";
+		Integer collectionId = 1;
+		int uidNext = 2;
+		
+		Email email = Email.builder()
+				.uid(3)
+				.read(false)
+				.date(DateUtils.getCurrentDate())
+				.build();
+		Email email2 = Email.builder()
+				.uid(4)
+				.read(true)
+				.date(DateUtils.getCurrentDate())
+				.build();
+		
+		Snapshot snapshot = Snapshot.builder()
+			.deviceId(deviceId)
+			.filterType(filterType)
+			.syncKey(synckey)
+			.collectionId(collectionId)
+			.uidNext(uidNext)
+			.addEmail(email)
+			.addEmail(email2)
 			.build();
 		
-		assertThat(emailChanges.additions()).isEmpty();
-	}
-
-	@Test
-	public void buildOneEmailInEachCollection() {
-		Email change = Email.builder().uid(1).read(true).date(date("2004-12-13T21:39:45Z")).build();
-		Email deletion = Email.builder().uid(2).read(true).date(date("2005-10-13T21:39:45Z")).build();
-		Email addition = Email.builder().uid(3).read(true).date(date("2006-08-13T21:39:45Z")).build();
-		EmailChanges emailChanges = EmailChanges.builder()
-			.changes(ImmutableSet.<Email>of(change))
-			.deletions(ImmutableSet.<Email>of(deletion))
-			.additions(ImmutableSet.<Email>of(addition))
-			.build();
-
-		assertThat(emailChanges.changes()).containsOnly(change);
-		assertThat(emailChanges.deletions()).containsOnly(deletion);
-		assertThat(emailChanges.additions()).containsOnly(addition);
+		assertThat(snapshot.getDeviceId()).isEqualTo(deviceId);
+		assertThat(snapshot.getFilterType()).isEqualTo(filterType);
+		assertThat(snapshot.getCollectionId()).isEqualTo(collectionId);
+		assertThat(snapshot.getUidNext()).isEqualTo(uidNext);
+		assertThat(snapshot.getEmails()).containsExactly(email, email2);
 	}
 }

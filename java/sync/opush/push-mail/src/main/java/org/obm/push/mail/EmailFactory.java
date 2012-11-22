@@ -51,7 +51,12 @@ public class EmailFactory {
 	}
 
 	public static Email getEmailFromFastFetch(FastFetch fastFetch) {
-		return new Email(fastFetch.getUid(), fastFetch.isRead(), fastFetch.getInternalDate(), fastFetch.isAnswered());
+		return Email.builder()
+				.uid(fastFetch.getUid())
+				.read(fastFetch.isRead())
+				.date(fastFetch.getInternalDate())
+				.answered(fastFetch.isAnswered())
+				.build();
 	}
 		
 }

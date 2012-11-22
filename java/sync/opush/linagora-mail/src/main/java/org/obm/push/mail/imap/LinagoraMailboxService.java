@@ -464,7 +464,11 @@ public class LinagoraMailboxService implements MailboxService {
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
-						return new Email(input.getUid(), input.isRead(), input.getInternalDate());
+						return Email.builder()
+								.uid(input.getUid())
+								.read(input.isRead())
+								.date(input.getInternalDate())
+								.build();
 					}
 				});
 		return emails;	

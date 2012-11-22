@@ -51,6 +51,8 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
+import org.obm.push.mail.bean.Email;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Charsets;
@@ -155,5 +157,44 @@ public class SerializableTest {
 	public void testMSEventUid() throws IOException {
 		MSEventUid msEventUid = new MSEventUid("totototo");
 		objectOutputStream.writeObject(msEventUid);
+	}
+	
+	@Test
+	public void testEmail() throws IOException {
+		Email email = Email.builder()
+				.uid(1)
+				.read(true)
+				.date(DateUtils.getCurrentDate())
+				.answered(true)
+				.build();
+		objectOutputStream.writeObject(email);
+	}
+	
+	@Test
+	public void testSnapshot() throws IOException {
+		Snapshot snapshot = Snapshot.builder()
+				.collectionId(1)
+				.deviceId("deviceId")
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey("syncKey")
+				.uidNext(2)
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.answered(true)
+						.build())
+				.build();
+		objectOutputStream.writeObject(snapshot);
+	}
+	
+	@Test
+	public void testSnapshotKey() throws IOException {
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId("deviceId")
+				.syncKey("syncKey")
+				.collectionId(1)
+				.build();
+		objectOutputStream.writeObject(snapshotKey);
 	}
 }

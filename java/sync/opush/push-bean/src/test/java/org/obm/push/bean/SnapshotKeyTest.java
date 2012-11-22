@@ -29,57 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.bean;
+package org.obm.push.bean;
 
-import org.junit.Before;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.BodyParams;
-import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.MimeAddress;
-import org.obm.sync.bean.EqualsVerifierUtils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class SnapshotKeyTest {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullSyncKey() {
+		SnapshotKey.builder()
+			.deviceId("deviceId")
+			.collectionId(1)
+			.build();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullDeviceId() {
+		SnapshotKey.builder()
+			.syncKey("syncKey")
+			.collectionId(1)
+			.build();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullCollectionId() {
+		SnapshotKey.builder()
+			.deviceId("deviceId")
+			.syncKey("syncKey")
+			.build();
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(BodyParam.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ListInfo.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(MimeAddress.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void testBuilder() {
+		String syncKey = "syncKey";
+		String deviceId = "deviceId";
+		Integer collectionId = 1;
 		
-		equalsVerifierUtilsTest.createEqualsVerifier(ContentType.class)
-			.withPrefabValues(BodyParams.class, 
-				BodyParams.builder().add(new BodyParam("white", "wine")).build(),
-				BodyParams.builder().add(new BodyParam("blond", "beer")).build())
-			.verify();
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
 		
-		equalsVerifierUtilsTest.createEqualsVerifier(BodyParams.class)
-			.withPrefabValues(ImmutableMap.class, 
-				ImmutableMap.of("key", "value"),
-				ImmutableMap.of("first", "second"))
-			.verify();
+		assertThat(snapshotKey.getSyncKey()).isEqualTo(syncKey);
+		assertThat(snapshotKey.getDeviceId()).isEqualTo(deviceId);
+		assertThat(snapshotKey.getCollectionId()).isEqualTo(collectionId);
 	}
-	
 }

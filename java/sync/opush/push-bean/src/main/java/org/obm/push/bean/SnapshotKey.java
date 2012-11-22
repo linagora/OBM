@@ -29,71 +29,83 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.bean;
+package org.obm.push.bean;
 
-import java.util.Date;
-
-import org.obm.push.utils.index.Indexed;
+import java.io.Serializable;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
-public class Email implements Indexed<Long> {
+public class SnapshotKey implements Serializable{
 
-	private final long uid;
-	private final boolean read;
-	private final Date date;
-	private boolean answered;
-	
-	public Email(long uid, boolean read, Date date) {
-		this(uid, read, date, false);
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	public Email(long uid, boolean read, Date date, boolean answered) {
-		super();
-		this.uid = uid;
-		this.read = read;
-		this.date = date;
-		this.answered = answered;
+	public static class Builder {
+		private String syncKey;
+		private String deviceId;
+		private Integer collectionId;
+		
+		private Builder() {}
+		
+		public Builder syncKey(String syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
+		public Builder deviceId(String deviceId) {
+			this.deviceId = deviceId;
+			return this;
+		}
+		
+		public Builder collectionId(Integer collectionId) {
+			this.collectionId = collectionId;
+			return this;
+		}
+
+		public SnapshotKey build() {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey), "syncKey can't be null or empty");
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(deviceId), "deviceId can't be null or empty");
+			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
+			return new SnapshotKey(syncKey, deviceId, collectionId);
+		}
+	}	
+	
+	private final String syncKey;
+	private final String deviceId;
+	private final Integer collectionId;
+
+	private SnapshotKey(String syncKey, String deviceId, Integer collectionId) {
+		this.syncKey = syncKey;
+		this.deviceId = deviceId;
+		this.collectionId = collectionId;
 	}
 
-	public long getUid() {
-		return uid;
+	public String getSyncKey() {
+		return syncKey;
 	}
 
-	@Override
-	public Long getIndex() {
-		return getUid();
-	}
-	
-	public boolean isRead() {
-		return read;
-	}
-	
-	public Date getDate() {
-		return date;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public boolean isAnswered() {
-		return answered;
+	public Integer getCollectionId() {
+		return collectionId;
 	}
-	
-	public void setAnswered(boolean answered) {
-		this.answered = answered;
-	}
-	
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(uid, read, date, answered);
+		return Objects.hashCode(syncKey, deviceId, collectionId);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof Email) {
-			Email that = (Email) object;
-			return Objects.equal(this.uid, that.uid)
-				&& Objects.equal(this.read, that.read)
-				&& Objects.equal(this.date, that.date)
-				&& Objects.equal(this.answered, that.answered);
+		if (object instanceof SnapshotKey) {
+			SnapshotKey that = (SnapshotKey) object;
+			return Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.deviceId, that.deviceId)
+				&& Objects.equal(this.collectionId, that.collectionId);
 		}
 		return false;
 	}
@@ -101,10 +113,9 @@ public class Email implements Indexed<Long> {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("uid", uid)
-			.add("read", read)
-			.add("date", date)
-			.add("answered", answered)
+			.add("syncKey", syncKey)
+			.add("deviceId", deviceId)
+			.add("collectionId", collectionId)
 			.toString();
 	}
 	
