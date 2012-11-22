@@ -31,15 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.util.Locale;
-
-import org.columba.ristretto.smtp.SMTPProtocol;
 import org.easymock.EasyMock;
+import org.obm.FreePortFinder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.exception.SmtpLocatorException;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
@@ -50,16 +46,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetupTest;
 
 public class MailEnvModule extends AbstractModule {
-
-	@Provides @Singleton
-	public GreenMail newMailServer() {
-		Locale.setDefault(Locale.US);
-		return new GreenMail(ServerSetupTest.SMTP_IMAP);
-	}
 	
 	@Override
 	protected void configure() {
@@ -74,22 +62,23 @@ public class MailEnvModule extends AbstractModule {
 			}
 		});
 		
-		bind(EmailConfiguration.class).toInstance(new TestEmailConfiguration(ServerSetupTest.IMAP.getPort()));
-		bind(SmtpProvider.class).toInstance(new SmtpProvider() {
-
-			@Override
-			public SMTPProtocol getSmtpClient(UserDataRequest udr)
-					throws SmtpLocatorException {
-				int smtpPort = ServerSetupTest.SMTP.getPort();
-				String address = "127.0.0.1";
-				return new SMTPProtocol(address, smtpPort);
-			}
-		});
+		bind(EmailConfiguration.class).to(TestEmailConfiguration.class);
+		bind(SmtpProvider.class).to(TestSmtpProvider.class);
 
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
+	}
+	
+	@Provides @Singleton
+	@SmtpPort int getSmtpPort(FreePortFinder freePortFinder) {
+		return freePortFinder.findFreePort();
+	}
+	
+	@Provides @Singleton
+	@ImapPort int getImapPort(FreePortFinder freePortFinder) {
+		return freePortFinder.findFreePort();
 	}
 	
 }

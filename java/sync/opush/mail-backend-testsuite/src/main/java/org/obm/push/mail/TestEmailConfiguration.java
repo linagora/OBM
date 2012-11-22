@@ -33,12 +33,17 @@ package org.obm.push.mail;
 
 import org.obm.configuration.EmailConfiguration;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class TestEmailConfiguration implements EmailConfiguration {
 
 	private final int imapPort;
 	private int imapTimeout;
 
-	public TestEmailConfiguration(int imapPort) {
+	@Inject
+	private TestEmailConfiguration(@ImapPort int imapPort) {
 		this.imapPort = imapPort;
 		this.imapTimeout = 3600000; // one hour
 	}

@@ -29,40 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm;
+package org.obm.push.mail;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import org.columba.ristretto.smtp.SMTPProtocol;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.exception.SmtpLocatorException;
+import org.obm.push.mail.smtp.SmtpProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class FreePortFinder {
+public class TestSmtpProvider implements SmtpProvider {
+	
+	private final int smtpPort;
 
-	private static final int MAX_PORT = 60000;
-	
-	private int port = 8000;
-	
 	@Inject
-	private FreePortFinder() {
+	private TestSmtpProvider(@SmtpPort int smtpPort) {
+		this.smtpPort = smtpPort;
 	}
 	
-	public final int findFreePort() {
-		while (port < MAX_PORT) {
-			try {
-				return assertPortIsFree(port++);
-			} catch (IOException portInUse) {
-			}
-		}
-		throw new RuntimeException("Can't find a free port");
+	@Override
+	public SMTPProtocol getSmtpClient(UserDataRequest udr)
+			throws SmtpLocatorException {
+		String address = "127.0.0.1";
+		return new SMTPProtocol(address, smtpPort);
 	}
-	
-	private int assertPortIsFree(int port) throws IOException {
-		ServerSocket socket = new ServerSocket(port);
-		socket.close();
-		return port;
-	}
-
-	
 }

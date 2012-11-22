@@ -31,71 +31,63 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import org.fest.assertions.api.Assertions;
 import org.fest.assertions.data.MapEntry;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.TestEmailConfiguration;
 
 @RunWith(SlowFilterRunner.class)
 public class LinagoraImapClientProviderTest {
 
-	@Test
-	public void testImapTimeout() {
-		TestEmailConfiguration emailConfiguration = new TestEmailConfiguration(143) {
-			@Override
-			public int imapTimeout() {
-				return 123456;
-			}
-		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
-		
-		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
-				MapEntry.entry("mail.imap.timeout", 123456),
-				MapEntry.entry("mail.imaps.timeout", 123456));
+	private EmailConfiguration emailConfiguration;
+
+	@Before
+	public void setUp() {
+		emailConfiguration = createMock(EmailConfiguration.class);
 	}
 	
 	@Test
-	public void testImapStartTLSTrue() {
-		TestEmailConfiguration emailConfiguration = new TestEmailConfiguration(143) {
-			@Override
-			public boolean activateTls() {
-				return true;
-			}
-		};
+	public void testProviderConfiguration() {
+		expect(emailConfiguration.getImapFetchBlockSize()).andReturn(987);
+		expect(emailConfiguration.activateTls()).andReturn(true).anyTimes();
+		expect(emailConfiguration.imapPort()).andReturn(143);
+		expect(emailConfiguration.loginWithDomain()).andReturn(true);
+		expect(emailConfiguration.imapTimeout()).andReturn(123456);
+		
+		replay(emailConfiguration);
 		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
+		verify(emailConfiguration);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
+				MapEntry.entry("mail.imap.timeout", 123456),
+				MapEntry.entry("mail.imaps.timeout", 123456),
+				MapEntry.entry("mail.imap.fetchsize", 987),
+				MapEntry.entry("mail.imaps.fetchsize", 987),
 				MapEntry.entry("mail.imap.starttls.enable", true));
 	}
 	
 	@Test
 	public void testImapStartTLSFalse() {
-		TestEmailConfiguration emailConfiguration = new TestEmailConfiguration(143) {
-			@Override
-			public boolean activateTls() {
-				return false;
-			}
-		};
+		expect(emailConfiguration.getImapFetchBlockSize()).andReturn(10);
+		expect(emailConfiguration.imapPort()).andReturn(143);
+		expect(emailConfiguration.loginWithDomain()).andReturn(true);
+		expect(emailConfiguration.imapTimeout()).andReturn(123456);
+		expect(emailConfiguration.activateTls()).andReturn(false).anyTimes();
+		
+		replay(emailConfiguration);
 		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
+		verify(emailConfiguration);
 		
 		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
 				MapEntry.entry("mail.imap.starttls.enable", false));
 	}
 	
-	@Test
-	public void testImapFetchBlockSize() {
-		TestEmailConfiguration emailConfiguration = new TestEmailConfiguration(143) {
-			@Override
-			public int getImapFetchBlockSize() {
-				return 987;
-			}
-		};
-		LinagoraImapClientProvider imapClientProvider = new LinagoraImapClientProvider(null, emailConfiguration, null, null);
-		
-		Assertions.assertThat(imapClientProvider.defaultSession.getProperties()).contains(
-				MapEntry.entry("mail.imap.fetchsize", 987),
-				MapEntry.entry("mail.imaps.fetchsize", 987));
-	}
 }

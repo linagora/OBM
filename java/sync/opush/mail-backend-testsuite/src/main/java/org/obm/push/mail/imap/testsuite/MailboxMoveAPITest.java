@@ -50,6 +50,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MailboxTestUtils;
@@ -58,6 +59,7 @@ import org.obm.push.mail.imap.SlowGuiceRunner;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class MailboxMoveAPITest {
@@ -72,6 +74,7 @@ public abstract class MailboxMoveAPITest {
 
 	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -89,7 +92,7 @@ public abstract class MailboxMoveAPITest {
 	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
 	@After

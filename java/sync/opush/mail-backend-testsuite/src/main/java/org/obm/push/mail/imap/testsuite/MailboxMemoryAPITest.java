@@ -61,9 +61,11 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.ImapPort;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
+import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -80,8 +82,10 @@ public abstract class MailboxMemoryAPITest {
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
-
 	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject @ImapPort int imapPort;
+	@Inject @SmtpPort int smtpPort;
+	
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -98,7 +102,8 @@ public abstract class MailboxMemoryAPITest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		maxHeapSize = getTwiceThisHeapSize();
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password, false, maxHeapSize).execute();
+		greenMailProcess = new GreenMailExternalProcess(
+				mailbox, password, imapPort, smtpPort, false, maxHeapSize).execute();
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);

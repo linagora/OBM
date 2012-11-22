@@ -49,9 +49,11 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.ImapPort;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -60,6 +62,7 @@ import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class ExternalGreenMailTest {
@@ -67,19 +70,23 @@ public abstract class ExternalGreenMailTest {
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
-
+	@Inject @ImapPort int imapPort;
+	@Inject @SmtpPort int smtpPort;
+	
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
 	
 	private ClosableProcess greenMailProcess;
+	private ServerSetup smtpServerSetup;
 
 	@Before
 	public void setUp() throws ExternalProcessException, InterruptedException {
+		smtpServerSetup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
 		mailbox = "to@localhost.com";
 		password = "password";
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password).execute();
+		greenMailProcess = new GreenMailExternalProcess(mailbox, password, imapPort, smtpPort).execute();
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
@@ -117,7 +124,7 @@ public abstract class ExternalGreenMailTest {
 	}
 
 	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 		return mailboxService.fetchEmails(udr, inboxPath, before);
 	}

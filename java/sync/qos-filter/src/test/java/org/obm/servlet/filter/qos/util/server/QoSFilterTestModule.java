@@ -51,8 +51,8 @@ public class QoSFilterTestModule extends ServletModule {
 	public static final String SUSPENDING_SERVLET_NAME = "suspending";
 	
 	@Provides @Singleton
-	@PortNumber int getPortNumber() {
-		return FreePortFinder.findFreePort();
+	@PortNumber int getPortNumber(FreePortFinder freePortFinder) {
+		return freePortFinder.findFreePort();
 	}
 	
 	@Provides @Singleton

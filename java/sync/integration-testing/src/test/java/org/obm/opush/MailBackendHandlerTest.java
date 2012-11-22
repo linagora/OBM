@@ -52,17 +52,14 @@ import java.util.concurrent.TimeUnit;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.PortNumber;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
@@ -80,7 +77,10 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.imap.GuiceModule;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -103,12 +103,11 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(MailBackendHandlerTestModule.class)
 public class MailBackendHandlerTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailBackendHandlerTestModule.class);
 
 	@Inject	@PortNumber int port;
 	@Inject	SingleUserFixture singleUserFixture;
@@ -119,6 +118,7 @@ public class MailBackendHandlerTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	
 	private String mailbox;
 	private GreenMailUser greenMailUser;
@@ -164,8 +164,8 @@ public class MailBackendHandlerTest {
 		replayMocks(classToInstanceMap);
 		opushServer.start();
 
-		GreenMailUtil.sendTextEmailTest(mailbox, mailbox, "subject", "body");
-		GreenMailUtil.sendTextEmailTest(mailbox, mailbox, "subject2", "body");
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(2);
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);

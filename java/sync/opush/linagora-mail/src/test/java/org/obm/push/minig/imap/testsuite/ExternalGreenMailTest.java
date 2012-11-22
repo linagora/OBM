@@ -32,9 +32,9 @@
 package org.obm.push.minig.imap.testsuite;
 
 import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.minig.imap.MailEnvModule;
+import org.obm.push.minig.imap.ExternalProcessMailEnvModule;
 
-@GuiceModule(MailEnvModule.class)
+@GuiceModule(ExternalProcessMailEnvModule.class)
 public class ExternalGreenMailTest extends
 		org.obm.push.mail.imap.testsuite.ExternalGreenMailTest {
 

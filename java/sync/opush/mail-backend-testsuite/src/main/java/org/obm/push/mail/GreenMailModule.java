@@ -29,40 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm;
+package org.obm.push.mail;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.util.Locale;
 
-import com.google.inject.Inject;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
-@Singleton
-public class FreePortFinder {
+public class GreenMailModule extends AbstractModule {
 
-	private static final int MAX_PORT = 60000;
-	
-	private int port = 8000;
-	
-	@Inject
-	private FreePortFinder() {
+	@Override
+	protected void configure() {
 	}
 	
-	public final int findFreePort() {
-		while (port < MAX_PORT) {
-			try {
-				return assertPortIsFree(port++);
-			} catch (IOException portInUse) {
-			}
-		}
-		throw new RuntimeException("Can't find a free port");
-	}
-	
-	private int assertPortIsFree(int port) throws IOException {
-		ServerSocket socket = new ServerSocket(port);
-		socket.close();
-		return port;
+	@Provides @Singleton
+	@ImapServerSetup ServerSetup getImapServerSetup(@ImapPort int imapPort) {
+		return new ServerSetup(imapPort, null, ServerSetup.PROTOCOL_IMAP);
 	}
 
+	@Provides @Singleton
+	@SmtpServerSetup ServerSetup getSmtpServerSetup(@SmtpPort int smtpPort) {
+		return new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
+	}
 	
+	@Provides @Singleton
+	/* package */ GreenMail provideGreenmail(
+			@SmtpServerSetup ServerSetup smtpServerSetup,
+			@ImapServerSetup ServerSetup imapServerSetup) {
+		Locale.setDefault(Locale.US);
+		return new GreenMail(new ServerSetup[] {smtpServerSetup, imapServerSetup});
+	}
 }

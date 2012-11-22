@@ -31,10 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import java.util.Locale;
-
-import org.columba.ristretto.smtp.SMTPProtocol;
 import org.easymock.EasyMock;
+import org.obm.FreePortFinder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -42,8 +40,11 @@ import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.GreenMailModule;
+import org.obm.push.mail.ImapPort;
+import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.TestEmailConfiguration;
-import org.obm.push.mail.exception.SmtpLocatorException;
+import org.obm.push.mail.TestSmtpProvider;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
@@ -51,19 +52,12 @@ import org.obm.push.service.EventService;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetupTest;
 
 public class GreenMailEnvModule extends AbstractOverrideModule {
-
-	@Provides @Singleton
-	public GreenMail newMailServer() {
-		Locale.setDefault(Locale.US);
-		return new GreenMail(ServerSetupTest.SMTP_IMAP);
-	}
 	
 	@Override
 	protected void configureImpl() {
+		install(new GreenMailModule());
 		bind(EventService.class).toInstance(EasyMock.createMock(EventService.class));
 		bind(LocatorService.class).toInstance(new LocatorService() {
 			
@@ -74,21 +68,22 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 			}
 		});
 		
-		bind(EmailConfiguration.class).toInstance(new TestEmailConfiguration(ServerSetupTest.IMAP.getPort()));
-		bind(SmtpProvider.class).toInstance(new SmtpProvider() {
-
-			@Override
-			public SMTPProtocol getSmtpClient(UserDataRequest udr)
-					throws SmtpLocatorException {
-				int smtpPort = ServerSetupTest.SMTP.getPort();
-				String address = "127.0.0.1";
-				return new SMTPProtocol(address, smtpPort);
-			}
-		});
+		bind(EmailConfiguration.class).to(TestEmailConfiguration.class);
+		bind(SmtpProvider.class).to(TestSmtpProvider.class);
 
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
 		bind(UserDataRequest.Factory.class).to(TrackableUserDataRequest.Factory.class);
 	}
 	
+	@Provides @Singleton
+	@SmtpPort int getSmtpPort(FreePortFinder freePortFinder) {
+		return freePortFinder.findFreePort();
+	}
+	
+	@Provides @Singleton
+	@ImapPort int getImapPort(FreePortFinder freePortFinder) {
+		return freePortFinder.findFreePort();
+	}
+
 }

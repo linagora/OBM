@@ -29,40 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm;
+package org.obm.push.mail;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.inject.BindingAnnotation;
 
-@Singleton
-public class FreePortFinder {
+@Retention(RetentionPolicy.RUNTIME) 
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER}) 
+@BindingAnnotation
+public @interface ImapServerSetup {
 
-	private static final int MAX_PORT = 60000;
-	
-	private int port = 8000;
-	
-	@Inject
-	private FreePortFinder() {
-	}
-	
-	public final int findFreePort() {
-		while (port < MAX_PORT) {
-			try {
-				return assertPortIsFree(port++);
-			} catch (IOException portInUse) {
-			}
-		}
-		throw new RuntimeException("Can't find a free port");
-	}
-	
-	private int assertPortIsFree(int port) throws IOException {
-		ServerSocket socket = new ServerSocket(port);
-		socket.close();
-		return port;
-	}
-
-	
 }

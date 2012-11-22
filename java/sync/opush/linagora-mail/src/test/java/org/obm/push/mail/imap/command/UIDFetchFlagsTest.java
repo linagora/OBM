@@ -56,6 +56,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.SearchQuery;
@@ -67,6 +68,7 @@ import org.obm.push.minig.imap.StoreClient;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchFlagsTest {
@@ -79,6 +81,7 @@ public class UIDFetchFlagsTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -95,7 +98,7 @@ public class UIDFetchFlagsTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
 	@After

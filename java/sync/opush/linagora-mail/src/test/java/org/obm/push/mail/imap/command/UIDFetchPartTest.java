@@ -62,6 +62,7 @@ import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimePartSelector;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
@@ -75,6 +76,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchPartTest {
@@ -87,6 +89,7 @@ public class UIDFetchPartTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	@Inject Mime4jUtils mime4jUtils;
 	private String mailbox;
 	private String password;
@@ -104,7 +107,7 @@ public class UIDFetchPartTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
 	@After

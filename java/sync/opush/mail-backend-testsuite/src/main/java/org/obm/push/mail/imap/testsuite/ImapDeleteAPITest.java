@@ -49,6 +49,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
@@ -57,6 +58,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class ImapDeleteAPITest {
@@ -70,6 +72,7 @@ public abstract class ImapDeleteAPITest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -88,7 +91,7 @@ public abstract class ImapDeleteAPITest {
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 
-	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	    testUtils.createFolders(TRASH);
 	}
 	
@@ -163,9 +166,9 @@ public abstract class ImapDeleteAPITest {
 	
 	@Test
 	public void testDeleteOneEmailAmongManyEmails() throws Exception {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		Email anEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);

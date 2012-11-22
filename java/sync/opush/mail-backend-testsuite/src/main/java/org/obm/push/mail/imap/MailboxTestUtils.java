@@ -53,6 +53,7 @@ import com.google.common.collect.Iterables;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.user.UserException;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
 public class MailboxTestUtils {
 
@@ -61,19 +62,22 @@ public class MailboxTestUtils {
 	private final String mailbox;
 	private final Date beforeTest;
 	private final CollectionPathHelper collectionPathHelper;
+	private final ServerSetup smtpServerSetup;
 
 	public MailboxTestUtils(MailboxService mailboxService,
-			UserDataRequest udr, String mailbox, Date beforeTest, CollectionPathHelper collectionPathHelper) {
+			UserDataRequest udr, String mailbox, Date beforeTest,
+			CollectionPathHelper collectionPathHelper, ServerSetup smtpServerSetup) {
 		
 		this.mailboxService = mailboxService;
 		this.udr = udr;
 		this.mailbox = mailbox;
 		this.beforeTest = beforeTest;
 		this.collectionPathHelper = collectionPathHelper;
+		this.smtpServerSetup = smtpServerSetup;
 	}
 	
 	public Email sendEmailToInbox() throws MailException {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		return emailInInbox();
 	}
 

@@ -50,25 +50,35 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
-
-import org.obm.filter.SlowFilterRunner;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowFilterRunner.class)
 public class JavaxMailTest {
 
+	public static class EnvModule extends AbstractModule {
+		
+		@Override
+		protected void configure() {
+			install(new GreenMailModule());
+			install(new MailEnvModule());
+		}
+	}
+	
 	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(MailEnvModule.class);
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(EnvModule.class);
 
 	@Inject LocatorService locatorService;
 	@Inject EmailConfiguration emailConfig;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	
 	@Inject GreenMail greenMail;
 	private String mailbox;
@@ -126,6 +136,6 @@ public class JavaxMailTest {
 	}
 
 	private void sendOneEmail() {
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 	}
 }

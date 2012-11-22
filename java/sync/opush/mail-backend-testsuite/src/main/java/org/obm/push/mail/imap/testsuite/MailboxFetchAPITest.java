@@ -57,6 +57,7 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Envelope;
@@ -85,6 +86,7 @@ public abstract class MailboxFetchAPITest {
 	
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject CollectionPathHelper collectionPathHelper;
 	
@@ -105,7 +107,7 @@ public abstract class MailboxFetchAPITest {
 	    this.udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-	    this.testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+	    this.testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
 	@After
@@ -174,7 +176,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
@@ -187,7 +189,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L, 1L));
@@ -201,7 +203,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setAnsweredFlag(udr, inbox, 1);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
@@ -225,7 +227,7 @@ public abstract class MailboxFetchAPITest {
 	@Test
 	public void testFetchBodyStructureOneSimpleTextPlainMessage() throws MailException, AddressException, MessagingException, UserException {
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, ServerSetup.SMTP);
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		

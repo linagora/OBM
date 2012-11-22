@@ -58,6 +58,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
@@ -70,6 +71,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class MailboxServiceTest {
@@ -78,6 +80,7 @@ public abstract class MailboxServiceTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private MailboxTestUtils testUtils;
@@ -94,7 +97,7 @@ public abstract class MailboxServiceTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
 	@After
@@ -105,7 +108,7 @@ public abstract class MailboxServiceTest {
 	@Test
 	public void testFetchFast() throws MailException, InterruptedException {
 		Date before = new Date();
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailboxPath(IMAP_INBOX_NAME), before);
 		Assertions.assertThat(emails).isNotNull().hasSize(1);
@@ -144,7 +147,7 @@ public abstract class MailboxServiceTest {
 		String mailBoxPath = mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);
 		
 		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(udr, mailBoxPath, date));
@@ -168,7 +171,7 @@ public abstract class MailboxServiceTest {
 		String mailBoxPath = mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 		
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
@@ -191,7 +194,7 @@ public abstract class MailboxServiceTest {
 		String mailBoxPath = testUtils.mailboxPath(mailBox);
 		Date date = DateUtils.getMidnightCalendar().getTime();
 		
-		GreenMailUtil.sendTextEmailTest(mailbox, "from@localhost.com", "subject", "body");
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
