@@ -67,7 +67,7 @@ public class GetItemEstimateProtocol {
 			sc.setDataClass(dataClass);
 			sc.setSyncKey(syncKey);
 			SyncCollectionOptions options = new SyncCollectionOptions();
-			options.setFilterType(FilterType.getFilterType(filterType));
+			options.setFilterType(FilterType.fromSpecificationValue(filterType));
 			sc.setOptions(options);
 			try {
 				sc.setCollectionId(Integer.valueOf(collectionId));
