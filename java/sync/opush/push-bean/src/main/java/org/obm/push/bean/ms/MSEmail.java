@@ -53,7 +53,11 @@ import com.google.common.collect.Sets;
 
 public class MSEmail implements IApplicationData, Serializable {
 
-	public static class MSEmailBuilder {
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
 
 		private Long uid;
 		
@@ -68,68 +72,68 @@ public class MSEmail implements IApplicationData, Serializable {
 		private boolean read;
 		private boolean starred;
 		private boolean answered;
-
-		public MSEmailBuilder() {
+		
+		private Builder() {
 			attachments = Sets.newHashSet();
 		}
 		
-		public MSEmailBuilder uid(long uid) {
+		public Builder uid(long uid) {
 			this.uid = uid;
 			return this;
 		}
 
-		public MSEmailBuilder header(MSEmailHeader header) {
+		public Builder header(MSEmailHeader header) {
 			this.header = header;
 			return this;
 		}
 		
-		public MSEmailBuilder subject(String subject) {
+		public Builder subject(String subject) {
 			this.subject = subject;
 			return this;
 		}
 
-		public MSEmailBuilder body(MSEmailBody body) {
+		public Builder body(MSEmailBody body) {
 			this.body = body;
 			return this;
 		}
 		
-		public MSEmailBuilder attachements(Set<MSAttachement> attachements) {
+		public Builder attachements(Set<MSAttachement> attachements) {
 			this.attachments = attachements;
 			return this;
 		}
 		
-		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest) {
+		public Builder meetingRequest(MSMeetingRequest meetingRequest) {
 			return meetingRequest(meetingRequest, MSMessageClass.SCHEDULE_MEETING_REQUEST);
 		}
 		
-		public MSEmailBuilder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
+		public Builder meetingRequest(MSMeetingRequest meetingRequest, MSMessageClass messageClass) {
 			Preconditions.checkArgument(messageClass != null);
 			this.meetingRequest = meetingRequest;
 			this.messageClass = messageClass;
 			return this;
 		}
 		
-		public MSEmailBuilder messageClass(MSMessageClass messageClass) {
+		public Builder messageClass(MSMessageClass messageClass) {
 			this.messageClass = messageClass;
 			return this;
 		}
 		
-		public MSEmailBuilder importance(MSImportance importance) {
+		public Builder importance(MSImportance importance) {
 			this.importance = importance;
 			return this;
 		}
 		
-		public MSEmailBuilder read(boolean read) {
+		public Builder read(boolean read) {
 			this.read = read;
 			return this;
 		}
 		
-		public MSEmailBuilder starred(boolean starred) {
+		public Builder starred(boolean starred) {
 			this.starred = starred;
 			return this;
 		}
 		
-		public MSEmailBuilder answered(boolean answered) {
+		public Builder answered(boolean answered) {
 			this.answered = answered;
 			return this;
 		}

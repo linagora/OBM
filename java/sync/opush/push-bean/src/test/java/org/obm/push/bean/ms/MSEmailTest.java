@@ -43,7 +43,6 @@ import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
-import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.utils.SerializableInputStream;
@@ -55,7 +54,7 @@ public class MSEmailTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireUid() {
-		new MSEmail.MSEmailBuilder()
+		MSEmail.builder()
 				.header(MSEmailHeader.builder().build())
 				.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("text".getBytes())), 
@@ -68,7 +67,7 @@ public class MSEmailTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireBody() {
-		new MSEmail.MSEmailBuilder()
+		MSEmail.builder()
 		.uid(1)
 		.header(MSEmailHeader.builder().build())
 		.build();
@@ -76,7 +75,7 @@ public class MSEmailTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testMSEmailBuilderRequireHeader() {
-		new MSEmail.MSEmailBuilder()
+		MSEmail.builder()
 				.uid(1)
 				.body(new MSEmailBody(new SerializableInputStream(
 					new ByteArrayInputStream("text".getBytes())), 
@@ -89,7 +88,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderDefaultImportanceValue() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.build();
@@ -99,7 +98,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderDefaultMessageClassValue() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest())
@@ -110,7 +109,7 @@ public class MSEmailTest {
 	
 	@Test
 	public void testMSEmailBuilderMessageClassCanceled() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
 		
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), MSMessageClass.SCHEDULE_MEETING_CANCELED)
@@ -121,7 +120,7 @@ public class MSEmailTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMSEmailBuilderPreconditionOnMessageClass() {
-		MSEmailBuilder msEmailBuilder = requirementsInitializedBuilder();
+		MSEmail.Builder msEmailBuilder = requirementsInitializedBuilder();
 
 		MSEmail msEmail = msEmailBuilder
 				.meetingRequest(anyMeetingRequest(), null)
@@ -157,10 +156,10 @@ public class MSEmailTest {
 		Assertions.assertThat(msEmail.getSubject()).isEqualTo("a subject");
 	}
 
-	private MSEmailBuilder requirementsInitializedBuilder() {
+	private MSEmail.Builder requirementsInitializedBuilder() {
 		String message = "text";
 		MSEmailBodyType emailBodyType = MSEmailBodyType.PlainText;
-		return new MSEmail.MSEmailBuilder()
+		return MSEmail.builder()
 				.uid(1l)
 				.header(MSEmailHeader.builder().build())
 					.body(new MSEmailBody(new SerializableInputStream(

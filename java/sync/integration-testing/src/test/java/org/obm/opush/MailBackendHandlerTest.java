@@ -276,7 +276,7 @@ public class MailBackendHandlerTest {
 	}
 	
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {
-		return new MSEmail.MSEmailBuilder()
+		return MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
 			.body(new MSEmailBody(new SerializableInputStream(

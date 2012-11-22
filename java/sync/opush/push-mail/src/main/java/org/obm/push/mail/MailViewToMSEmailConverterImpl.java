@@ -46,7 +46,6 @@ import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.bean.ms.MSEmail.MSEmailBuilder;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.exception.DaoException;
@@ -88,7 +87,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	@Override
 	public MSEmail convert(EmailView emailView, UserDataRequest userDataRequest) throws DaoException {
-		MSEmailBuilder msEmailBuilder = new MSEmail.MSEmailBuilder();
+		MSEmail.Builder msEmailBuilder = MSEmail.builder();
 		msEmailBuilder.uid(emailView.getUid());
 		
 		fillFlags(msEmailBuilder, emailView);
@@ -124,7 +123,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 		return emailView.getSubject();
 	}
 
-	private void fillFlags(MSEmailBuilder msEmailBuilder, EmailView emailView) {
+	private void fillFlags(MSEmail.Builder msEmailBuilder, EmailView emailView) {
 		msEmailBuilder.answered(emailView.hasFlag(Flag.ANSWERED));
 		msEmailBuilder.read(emailView.hasFlag(Flag.SEEN));
 		msEmailBuilder.starred(emailView.hasFlag(Flag.FLAGGED));

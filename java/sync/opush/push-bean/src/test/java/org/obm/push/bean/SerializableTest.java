@@ -96,7 +96,7 @@ public class SerializableTest {
 
 	@Test
 	public void testNewMSEmail() {
-		 org.obm.push.bean.ms.MSEmail msEmail = new org.obm.push.bean.ms.MSEmail.MSEmailBuilder()
+		 org.obm.push.bean.ms.MSEmail msEmail = org.obm.push.bean.ms.MSEmail.builder()
 			.uid(1l)
 			.header(MSEmailHeader.builder().build())
 			.body(new org.obm.push.bean.ms.MSEmailBody(new SerializableInputStream(
