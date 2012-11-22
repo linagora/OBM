@@ -42,8 +42,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.store.ehcache.ObjectStoreManager;
-import org.obm.push.store.ehcache.StoreManagerConfigurationTest;
 import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
@@ -74,7 +72,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	public void loadStores() {
 		List<String> stores = opushCacheManager.listStores();
 		Assert.assertNotNull(stores);
-		Assert.assertEquals(4, stores.size());
+		Assert.assertEquals(5, stores.size());
 	}
 	
 	@Test @Slow
@@ -90,7 +88,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 		Assert.assertNull(opushCacheManager.getStore("test 2"));
 		
-		Assert.assertEquals(6, opushCacheManager.listStores().size());
+		Assert.assertEquals(7, opushCacheManager.listStores().size());
 	}
 	
 	@Test
@@ -107,7 +105,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		opushCacheManager.createNewStore("test 1");
 		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
 
-		Assert.assertEquals(5, opushCacheManager.listStores().size());
+		Assert.assertEquals(6, opushCacheManager.listStores().size());
 	}
 
 }
