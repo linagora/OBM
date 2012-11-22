@@ -66,8 +66,8 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public MailChanges getSync(UserDataRequest udr, MailboxService mailboxService, SyncState state, String collectionName, Integer collectionId) throws DaoException, MailException {
-		Set<Email> emailsFromIMAP = mailboxService.fetchEmails(udr, collectionName, state.getLastSync());
+	public MailChanges getSync(UserDataRequest udr, MailboxService mailboxService, SyncState state, String collectionPath, Integer collectionId) throws DaoException, MailException {
+		Set<Email> emailsFromIMAP = mailboxService.fetchEmails(udr, collectionPath, state.getLastSync());
 		Set<Email> alreadySyncedEmails = emailDao.listSyncedEmails(udr.getDevice().getDatabaseId(), collectionId, state);
 		Set<Email> newAndUpdatedEmails = Sets.difference(emailsFromIMAP, alreadySyncedEmails);
 		Set<Email> deletedEmails = findDeletedEmails(emailsFromIMAP, alreadySyncedEmails);

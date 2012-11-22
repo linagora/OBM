@@ -118,10 +118,10 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionName, long uid) throws MailException {
+	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionPath, long uid) throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			store.select(parseMailBoxName(udr, collectionName));
+			store.select(parseMailBoxName(udr, collectionPath));
 			Map<Long, FlagsList> fetchFlags = store.uidFetchFlags(ImmutableList.of(uid));
 			FlagsList flagsList = fetchFlags.get(uid);
 			if (flagsList == null) {
@@ -183,32 +183,32 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void updateReadFlag(UserDataRequest udr, String collectionName, long uid, boolean read) 
+	public void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		updateMailFlag(udr, collectionName, uid, Flag.SEEN, read);
+		updateMailFlag(udr, collectionPath, uid, Flag.SEEN, read);
 	}
 
-	private void updateMailFlag(UserDataRequest udr, String collectionName, long uid, Flag flag, 
+	private void updateMailFlag(UserDataRequest udr, String collectionPath, long uid, Flag flag, 
 			boolean status) throws MailException {
 		
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			String mailBoxName = parseMailBoxName(udr, collectionName);
-			store.select(mailBoxName);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailboxName);
 			FlagsList fl = new FlagsList();
 			fl.add(flag);
 			store.uidStore(ImmutableList.of(uid), fl, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-					new Object[] { uid, collectionName, flag.asCommandValue(), status });
+					new Object[] { uid, mailboxName, flag.asCommandValue(), status });
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
 	}
 	
 	@Override
-	public String parseMailBoxName(UserDataRequest udr, String collectionName) throws MailException {
-		String boxName = collectionPathHelper.extractFolder(udr, collectionName, PIMDataType.EMAIL);
+	public String parseMailBoxName(UserDataRequest udr, String collectionPath) throws MailException {
+		String boxName = collectionPathHelper.extractFolder(udr, collectionPath, PIMDataType.EMAIL);
 		
 		if (isINBOXSpecificCase(boxName)) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
@@ -220,7 +220,7 @@ public class LinagoraMailboxService implements MailboxService {
 				return i.getName();
 			}
 		}
-		throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + collectionName + " ]");
+		throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + collectionPath + " ]");
 	}
 
 	private boolean isINBOXSpecificCase(String boxName) {
@@ -234,8 +234,8 @@ public class LinagoraMailboxService implements MailboxService {
 
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			String mailBoxName = parseMailBoxName(udr, collectionPath);
-			store.select(mailBoxName);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailboxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
 			logger.info("delete conv id = ", uid);
@@ -296,16 +296,16 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public InputStream fetchMailStream(UserDataRequest udr, String collectionName, long uid) throws MailException {
-		return getMessageInputStream(udr, collectionName, uid);
+	public InputStream fetchMailStream(UserDataRequest udr, String collectionPath, long uid) throws MailException {
+		return getMessageInputStream(udr, collectionPath, uid);
 	}
 
-	private InputStream getMessageInputStream(UserDataRequest udr, String collectionName, long messageUID) 
+	private InputStream getMessageInputStream(UserDataRequest udr, String collectionPath, long messageUID) 
 			throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			String mailBoxName = parseMailBoxName(udr, collectionName);
-			store.select(mailBoxName);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailboxName);
 			return store.uidFetchMessage(messageUID);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -315,8 +315,8 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void setAnsweredFlag(UserDataRequest udr, String collectionName, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(udr, collectionName, uid, Flag.ANSWERED, true);
+	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException {
+		updateMailFlag(udr, collectionPath, uid, Flag.ANSWERED, true);
 	}
 
 	@Override
@@ -379,13 +379,13 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public InputStream findAttachment(UserDataRequest udr, String collectionName, Long mailUid, MimeAddress mimePartAddress)
+	public InputStream findAttachment(UserDataRequest udr, String collectionPath, Long mailUid, MimeAddress mimePartAddress)
 			throws MailException {
 		
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			String mailBoxName = parseMailBoxName(udr, collectionName);
-			store.select(mailBoxName);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailboxName);
 			return store.uidFetchPart(mailUid, Objects.firstNonNull(mimePartAddress.getAddress(), ""));
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -401,8 +401,8 @@ public class LinagoraMailboxService implements MailboxService {
 		long time = System.currentTimeMillis();
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			String mailBoxName = parseMailBoxName(udr, collectionPath);
-			store.select(mailBoxName);
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			store.select(mailboxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
 			Collection<Long> uids = store.uidSearch(SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
@@ -459,8 +459,8 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionName, Collection<Long> uids) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(udr, collectionName, uids);
+	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
+		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, uids);
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
@@ -471,13 +471,13 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public Set<Email> fetchEmails(UserDataRequest udr, String collectionName, Date windows) throws MailException {
+	public Set<Email> fetchEmails(UserDataRequest udr, String collectionPath, Date windows) throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
-			store.select( parseMailBoxName(udr, collectionName) );
+			store.select( parseMailBoxName(udr, collectionPath) );
 			SearchQuery query = SearchQuery.builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
-			Collection<FastFetch> mails = fetchFast(udr, collectionName, uids);
+			Collection<FastFetch> mails = fetchFast(udr, collectionPath, uids);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {
 			throw new MailException(e);

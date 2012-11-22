@@ -334,12 +334,12 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		return new DataDelta(itemChanges, itemsToDelete, mailChanges.getLastSync());
 	}
 	
-	private List<ItemChange> fetchMails(UserDataRequest udr, Integer collectionId, String collection, 
+	private List<ItemChange> fetchMails(UserDataRequest udr, Integer collectionId, String collectionPath, 
 			Collection<Long> emailsUids, List<BodyPreference> bodyPreferences) throws ProcessingEmailException {
 		
 		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
 		try {
-			List<org.obm.push.bean.ms.MSEmail> msMails = msEmailFetcher.fetch(udr, collectionId, collection, emailsUids, bodyPreferences);
+			List<org.obm.push.bean.ms.MSEmail> msMails = msEmailFetcher.fetch(udr, collectionId, collectionPath, emailsUids, bodyPreferences);
 			for (org.obm.push.bean.ms.MSEmail mail: msMails) {
 				itch.add(getItemChange(collectionId, mail.getUid(), mail));
 			}
@@ -561,12 +561,12 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		try {
 			Integer collectionIdInt = Integer.parseInt(collectionId);
-			String collectionName = mappingService.getCollectionPathFor(collectionIdInt);
+			String collectionPath = mappingService.getCollectionPathFor(collectionIdInt);
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
 
-			List<MSEmail> mail = fetchMails(udr, collectionIdInt, collectionName, uids);
+			List<MSEmail> mail = fetchMails(udr, collectionIdInt, collectionPath, uids);
 			if (mail.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
 				MSEmail originMail = mail.get(0);
@@ -580,7 +580,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), originMail, message, originalMailAttachments);
 				send(udr, forwardEmail, saveInSent);
 				try{
-					mailboxService.setAnsweredFlag(udr, collectionName, uid);
+					mailboxService.setAnsweredFlag(udr, collectionPath, uid);
 				} catch (Throwable e) {
 					logger.info("Can't set Answered Flag to mail["+uid+"]");
 				}
@@ -607,14 +607,14 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	private List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
-			String collectionName, Collection<Long> uids) throws MailException {
+			String collectionPath, Collection<Long> uids) throws MailException {
 		
 		final List<MSEmail> mails = new LinkedList<MSEmail>();
-		String collectionPath = mailboxService.parseMailBoxName(udr, collectionName);
+		String collectionName = mailboxService.parseMailBoxName(udr, collectionPath);
 
 		final MailMessageLoader mailLoader = new MailMessageLoader(mailboxService, eventService);
 		for (final Long uid: uids) {
-			final MSEmail email = mailLoader.fetch(collectionPath, collectionId, uid, udr);
+			final MSEmail email = mailLoader.fetch(collectionName, collectionId, uid, udr);
 			if (email != null) {
 				mails.add(email);
 			}

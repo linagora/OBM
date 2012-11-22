@@ -89,7 +89,7 @@ public class EmailMonitoringThread implements MonitoringService {
 	 */
 	protected MailboxService emailManager;
 	private UserDataRequest udr;
-	private String collectionName;
+	private String collectionPath;
 	private Boolean remainConnected;  
 	private IdleClient store;
 	private final LinagoraImapClientProvider imapClientProvider;
@@ -99,16 +99,16 @@ public class EmailMonitoringThread implements MonitoringService {
 	public EmailMonitoringThread(
 			PushMonitoringManager pushMonitorManager,
 			UserDataRequest udr,
-			String collectionName, MailboxService emailManager, 
+			String collectionPath, MailboxService emailManager, 
 			LinagoraImapClientProvider imapClientProvider) throws MailException {
 		
 		this.pushMonitorManager = pushMonitorManager;
-		this.collectionName = collectionName;
+		this.collectionPath = collectionPath;
 		this.imapClientProvider = imapClientProvider;
 		this.remainConnected = false;
 		this.emailManager = emailManager;
 		this.udr = udr;
-		mailBoxName = emailManager.parseMailBoxName(udr, collectionName);
+		mailBoxName = emailManager.parseMailBoxName(udr, collectionPath);
 	}
 
 	public synchronized void startIdle() throws IMAPException {
@@ -119,7 +119,7 @@ public class EmailMonitoringThread implements MonitoringService {
 			store.startIdle(new Callback());
 		}
 		remainConnected = true;
-		logger.info("Start monitoring for collection : '{}'", collectionName);
+		logger.info("Start monitoring for collection : '{}'", collectionPath);
 	}
 	
 	public synchronized void stopIdle() {
@@ -129,7 +129,7 @@ public class EmailMonitoringThread implements MonitoringService {
 			store = null;
 		}
 		remainConnected = false;
-		logger.info("Stop monitoring for collection : '{}'", collectionName);
+		logger.info("Stop monitoring for collection : '{}'", collectionPath);
 	}
 
 	@Override

@@ -60,12 +60,12 @@ public class MSEmailFetcher {
 		this.msEmailConverter = msEmailConverter;
 	}
 
-	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionName,
+	public List<org.obm.push.bean.ms.MSEmail> fetch(UserDataRequest udr, Integer collectionId, String collectionPath,
 			Collection<Long> uids, List<BodyPreference> bodyPreferences) throws EmailViewPartsFetcherException, DaoException {
 		
 		List<org.obm.push.bean.ms.MSEmail> msEmails  = Lists.newLinkedList();
 		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
-				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionName, collectionId);
+				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionPath, collectionId);
 		
 		for (Long uid: uids) {
 			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid);
