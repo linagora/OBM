@@ -65,6 +65,7 @@ public class SingleUserFixture {
 		jaures.deviceType = "BellLabsWiredPhone";
 		jaures.deviceId = "blwp123";
 		jaures.userAgent = "BellLabsWiredPhoneAgent";
+		jaures.device = new Device.Factory().create(2, jaures.deviceType, jaures.userAgent, jaures.deviceId);
 		jaures.accessToken = new AccessToken(1, "o-push");
 		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());
 		jaures.accessToken.setUserEmail(jaures.user.getEmail());

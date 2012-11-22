@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
+import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.protocol.provisioning.Policy;
 
@@ -40,6 +41,7 @@ public class ProvisionResponse {
 	private Long policyKey;
 	private Policy policy;
 	private ProvisionStatus status;
+	private ProvisionPolicyStatus policyStatus;
 	
 	public ProvisionResponse(String policyType) {
 		super();
@@ -72,6 +74,14 @@ public class ProvisionResponse {
 
 	public void setPolicyKey(Long policyKey) {
 		this.policyKey = policyKey;
+	}
+
+	public ProvisionPolicyStatus getPolicyStatus() {
+		return policyStatus;
+	}
+
+	public void setPolicyStatus(ProvisionPolicyStatus policyStatus) {
+		this.policyStatus = policyStatus;
 	}
 	
 }

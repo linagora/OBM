@@ -29,29 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.sync.push.client.commands;
 
-import org.obm.push.bean.Device;
-import org.obm.push.bean.User;
-import org.obm.push.exception.DaoException;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.AccountInfos;
+import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Element;
 
-public interface DeviceDao {
-	
-	/**
-	 * Returns <code>true</code> if the device is authorized to synchronize.
-	 */
-	boolean syncAuthorized(User user, String deviceId) throws DaoException;
+public class ProvisionStepTwo extends Provision {
 
-	public Device getDevice(User user, String deviceId, String userAgent)
-			throws DaoException;
+	private final long acknowledgingPolicyKey;
 
-	public boolean registerNewDevice(User user, String deviceId,
-			String deviceType) throws DaoException;
+	public ProvisionStepTwo(long acknowledgingPolicyKey) {
+		super("ProvisionRequest2.xml");
+		this.acknowledgingPolicyKey = acknowledgingPolicyKey;
+	}
 
-	Long getPolicyKey(User user, String deviceId) throws DaoException;
-
-	long allocateNewPolicyKey(User user, String deviceId) throws DaoException;
-
-	void removePolicyKey(User user, Device device) throws DaoException;
+	@Override
+	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
+		Element policyKeyElement = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "PolicyKey");
+		policyKeyElement.setTextContent(Long.toString(acknowledgingPolicyKey));
+	}
 
 }

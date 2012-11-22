@@ -106,4 +106,11 @@ UPDATE opush_folder_mapping
 --
 ALTER TABLE opush_folder_mapping DROP COLUMN tmp_book_id;
 
+--
+-- Changes related to opush PolicyKey implementation
+--
+ALTER TABLE opush_sync_perms DROP CONSTRAINT opush_sync_perms_policy_fkey;
+ALTER TABLE opush_sync_perms ADD CONSTRAINT opush_sync_perms_policy_fkey FOREIGN KEY (policy) REFERENCES opush_sec_policy ON DELETE CASCADE;
+
+
 COMMIT;

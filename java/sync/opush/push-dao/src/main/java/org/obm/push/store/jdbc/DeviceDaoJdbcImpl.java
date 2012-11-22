@@ -35,6 +35,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
@@ -144,5 +145,117 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ " isn't authorized to synchronize in OBM-UI");
 		}
 		return hasSyncPerm;
+	}
+
+	@Override
+	public Long getPolicyKey(User user, String deviceId) throws DaoException {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("SELECT policy FROM opush_sync_perms "
+					+ "INNER JOIN UserObm ON owner=userobm_id "
+					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
+					+ "INNER JOIN opush_device ON device_id=id "
+					+ "WHERE identifier=? AND lower(userobm_login)=? AND lower(domain_name)=?");
+			ps.setString(1, deviceId);
+			ps.setString(2, user.getLogin());
+			ps.setString(3, user.getDomain());
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				Object policyKey = rs.getObject("policy");
+				if (policyKey != null) {
+					return ((Number) policyKey).longValue();
+				}
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+		return null;
+	}
+
+	@Override
+	public long allocateNewPolicyKey(User user, String deviceId) throws DaoException {
+
+		long newPolicyKeyId = allocateNewPolicyKey();
+		
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("INSERT INTO opush_sync_perms (policy, device_id, owner) "
+					+ "SELECT ?, id, owner FROM opush_device "
+					+ "INNER JOIN UserObm ON owner=userobm_id "
+					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
+					+ "WHERE lower(userobm_login)=? AND lower(domain_name)=? AND identifier=? LIMIT 1");
+
+			ps.setLong(1, newPolicyKeyId);
+			ps.setString(2, user.getLogin());
+			ps.setString(3, user.getDomain());
+			ps.setString(4, deviceId);
+			int newRowCount = ps.executeUpdate();
+			if (newRowCount == 1) {
+				return newPolicyKeyId;
+			} else {
+				throw new DaoException("SyncPerms insertion fails, only one new entry expected but found: " + newRowCount);
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+	}
+
+	private long allocateNewPolicyKey() throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("INSERT INTO opush_sec_policy DEFAULT VALUES;", Statement.RETURN_GENERATED_KEYS);
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			if (rs.next()) {
+				return rs.getLong("id");
+			} else {
+				throw new DaoException("Cannot find the new generated id in result set");
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+	}
+
+	@Override
+	public void removePolicyKey(User user, Device device) throws DaoException {
+		Integer deviceDbId = device.getDatabaseId();
+		
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement("DELETE FROM opush_sec_policy "
+					+ "WHERE id IN ( "
+						+ "SELECT policy FROM opush_sync_perms "
+						+ "INNER JOIN UserObm ON owner=userobm_id "
+						+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
+						+ "WHERE lower(userobm_login)=? AND lower(domain_name)=? AND device_id=?);");
+
+			ps.setString(1, user.getLogin());
+			ps.setString(2, user.getDomain());
+			ps.setInt(3, deviceDbId);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
 	}
 }

@@ -47,6 +47,8 @@ import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.Options;
+import org.obm.sync.push.client.commands.ProvisionStepOne;
+import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.Sync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +117,14 @@ public abstract class OPClient {
 
 	public SyncResponse deleteEmail(String key, int collectionId, String uid) throws Exception {
 		return run(new EmailDeleteSyncRequest(key, collectionId, uid));
+	}
+	
+	public ProvisionResponse provisionStepOne() throws Exception {
+		return run(new ProvisionStepOne());
+	}
+
+	public ProvisionResponse provisionStepTwo(long acknowledgingPolicyKey) throws Exception {
+		return run(new ProvisionStepTwo(acknowledgingPolicyKey));
 	}
 	
 	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, String collectionId) throws Exception {

@@ -29,29 +29,29 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.bean;
 
-import org.obm.push.bean.Device;
-import org.obm.push.bean.User;
-import org.obm.push.exception.DaoException;
+public enum ProvisionPolicyStatus {
 
-public interface DeviceDao {
+	SUCCESS, // 1
+	POLICY_NOT_DEFINED, // 2
+	UNKNOW_POLICY_TYPE_VALUE, // 3
+	SERVER_POLICY_STATE_CORRUPTED, // 4
+	THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY; // 5
 	
-	/**
-	 * Returns <code>true</code> if the device is authorized to synchronize.
-	 */
-	boolean syncAuthorized(User user, String deviceId) throws DaoException;
-
-	public Device getDevice(User user, String deviceId, String userAgent)
-			throws DaoException;
-
-	public boolean registerNewDevice(User user, String deviceId,
-			String deviceType) throws DaoException;
-
-	Long getPolicyKey(User user, String deviceId) throws DaoException;
-
-	long allocateNewPolicyKey(User user, String deviceId) throws DaoException;
-
-	void removePolicyKey(User user, Device device) throws DaoException;
-
+	public String asXmlValue() {
+		switch (this) {
+		case POLICY_NOT_DEFINED:
+			return "2";
+		case UNKNOW_POLICY_TYPE_VALUE:
+			return "3";
+		case SERVER_POLICY_STATE_CORRUPTED:
+			return "4";
+		case THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY:
+			return "5";
+		case SUCCESS:
+		default:
+			return "1";
+		}
+	}
 }

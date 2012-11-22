@@ -29,29 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.sync.push.client.commands;
 
-import org.obm.push.bean.Device;
-import org.obm.push.bean.User;
-import org.obm.push.exception.DaoException;
+import org.obm.sync.push.client.ProvisionResponse;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-public interface DeviceDao {
-	
-	/**
-	 * Returns <code>true</code> if the device is authorized to synchronize.
-	 */
-	boolean syncAuthorized(User user, String deviceId) throws DaoException;
+public abstract class Provision extends TemplateBasedCommand<ProvisionResponse> {
 
-	public Device getDevice(User user, String deviceId, String userAgent)
-			throws DaoException;
+	public Provision(Document doc) {
+		super(NS.Provision, "Provision", doc);
+	}
 
-	public boolean registerNewDevice(User user, String deviceId,
-			String deviceType) throws DaoException;
+	public Provision(String template) {
+		super(NS.Provision, "Provision", template);
+	}
 
-	Long getPolicyKey(User user, String deviceId) throws DaoException;
+	@Override
+	protected ProvisionResponse parseResponse(Element root) {
+		Node statusNode = root.getFirstChild();
+		
+		Node policiesNode = statusNode.getNextSibling();
+		Node policyNode = policiesNode.getFirstChild();
+		Node policyTypeNode = policyNode.getFirstChild();
+		Node policyStatusNode = policyTypeNode.getNextSibling();
+		Node policyKeyNode = policyStatusNode.getNextSibling();
 
-	long allocateNewPolicyKey(User user, String deviceId) throws DaoException;
+		Long policyStatusValue = null;
+		if (policyKeyNode != null) {
+			policyStatusValue = Long.valueOf(policyKeyNode.getTextContent());
+		}
+		boolean policyDataIsPresent = (policyKeyNode != null) && (policyKeyNode.getNextSibling() != null);
 
-	void removePolicyKey(User user, Device device) throws DaoException;
+		return ProvisionResponse.builder()
+				.provisionStatus(Integer.valueOf(statusNode.getTextContent()))
+				.policyStatus(Integer.valueOf(policyStatusNode.getTextContent()))
+				.policyKey(policyStatusValue)
+				.policyType(policyTypeNode.getTextContent())
+				.hasPolicyData(policyDataIsPresent)
+				.build();
+	}
 
 }

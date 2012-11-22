@@ -66,15 +66,15 @@ public class ProvisionProtocol {
 	public Document encodeResponse(ProvisionResponse provisionResponse) throws FactoryConfigurationError {
 		Document ret = DOMUtils.createDoc(null, "Provision");
 		Element root = ret.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", ProvisionStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", provisionResponse.getStatus().asXmlValue());
 		Element policies = DOMUtils.createElement(root, "Policies");
 		Element policyNode = DOMUtils.createElement(policies, "Policy");
 		DOMUtils.createElementAndText(policyNode, "PolicyType", provisionResponse.getPolicyType());
-		DOMUtils.createElementAndText(policyNode, "Status", provisionResponse.getStatus().asXmlValue());
+		DOMUtils.createElementAndText(policyNode, "Status", provisionResponse.getPolicyStatus().asXmlValue());
 		
-		String policyKey = String.valueOf(provisionResponse.getPolicyKey());
+		Long policyKey = provisionResponse.getPolicyKey();
 		if (policyKey != null) {
-			DOMUtils.createElementAndText(policyNode, "PolicyKey", policyKey);
+			DOMUtils.createElementAndText(policyNode, "PolicyKey", String.valueOf(policyKey));
 		}
 		
 		Policy policy = provisionResponse.getPolicy();

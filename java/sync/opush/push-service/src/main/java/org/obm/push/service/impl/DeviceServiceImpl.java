@@ -111,5 +111,10 @@ public class DeviceServiceImpl implements DeviceService {
 	public Device getDevice(User user, String deviceId, String userAgent) throws DaoException {
 		return deviceDao.getDevice(user, deviceId, userAgent);
 	}
+
+	@Override
+	public Long getPolicyKey(User user, String deviceId) throws DaoException {
+		return deviceDao.getPolicyKey(user, deviceId);
+	}
 	
 }

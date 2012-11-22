@@ -79,9 +79,10 @@ public class ActiveSyncServletTest {
 	private String command;
 	private Credentials credentials;
 	private ActiveSyncRequest activeSyncRequest;
+	private PolicyService policyService;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws DaoException {
 		mocksControl = new MocksControl(MockType.DEFAULT);
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		
@@ -108,6 +109,10 @@ public class ActiveSyncServletTest {
 		expect(activeSyncRequest.getDeviceType()).andReturn(deviceType).anyTimes();
 		expect(activeSyncRequest.getUserAgent()).andReturn(userAgent).anyTimes();
 		expect(activeSyncRequest.getMsPolicyKey()).andReturn(null).anyTimes();
+		
+		policyService = mocksControl.createMock(PolicyService.class);
+		expect(policyService.needProvisionning(activeSyncRequest, user)).andReturn(false);
+		
 		expect(request.getParameter("Cmd")).andReturn(command).anyTimes();
 		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
@@ -123,7 +128,7 @@ public class ActiveSyncServletTest {
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		userDataRequest.closeResources();
 		expectLastCall();
-		expect(userDataRequest.getCommand()).andReturn(command).anyTimes();
+		expect(userDataRequest.getCommand()).andReturn(command).atLeastOnce();
 		
 		ActiveSyncServlet activeSyncServlet = createActiveSyncServlet(userDataRequest);
 		mocksControl.replay();
@@ -197,6 +202,6 @@ public class ActiveSyncServletTest {
 		
 		Logger logger = createLogger();
 		
-		return new ActiveSyncServlet(sessionService, backend, deviceService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
+		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
 	}
 }

@@ -71,6 +71,10 @@ import com.google.inject.name.Named;
 public class ActiveSyncServlet extends HttpServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private static final String MS_SERVER_ACTIVESYNC = "14.1";
+	private static final String MS_ASPROTOCOL_VERSIONS = "12.1";
+	
 	private Handlers handlers;
 	private SessionService sessionService;
 	private DeviceService deviceService;
@@ -81,9 +85,12 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final Logger authLogger;
 	private final HttpErrorResponder httpErrorResponder;
 
+	private final PolicyService policyService;
+
 	@Inject
 	@VisibleForTesting ActiveSyncServlet(SessionService sessionService, 
-			IBackend backend, DeviceService deviceService,  
+			IBackend backend, DeviceService deviceService,
+			PolicyService policyService,
 			ResponderImpl.Factory responderFactory, Handlers handlers,
 			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
 			HttpErrorResponder httpErrorResponder) {
@@ -93,6 +100,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.sessionService = sessionService;
 		this.backend = backend;
 		this.deviceService = deviceService;
+		this.policyService = policyService;
 		this.responderFactory = responderFactory;
 		this.handlers = handlers;
 		this.loggerService = loggerService;
@@ -150,17 +158,16 @@ public class ActiveSyncServlet extends HttpServlet {
 
 			checkAuthorizedDevice(asrequest, credentials);
 
-			String policy = asrequest.getMsPolicyKey();
-			if (policy != null && policy.equals("0") && !asrequest.getCommand().equals("Provision")) {
+			if (policyService.needProvisionning(asrequest, credentials.getUser())) {
 				logger.debug("forcing device (ua: {}) provisioning", asrequest.getUserAgent());
-				response.setStatus(449);
+				sendNeedProvisionningResponse(response);
 				return;
 			} else {
-				logger.debug("policy used = {}", policy);
+				logger.debug("policy used = {}", asrequest.getMsPolicyKey());
 			}
 
 			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response);
-			
+		
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
@@ -277,23 +284,31 @@ public class ActiveSyncServlet extends HttpServlet {
 	 * 
 	 */
 	private void sendASHeaders(HttpServletResponse response) {
-		response.setHeader("Server", "Microsoft-IIS/6.0");
-		response.setHeader("MS-Server-ActiveSync", "14.1");
+		response.setHeader("Server", "Microsoft-IIS/7.5");
+		response.setHeader("MS-Server-ActiveSync", MS_SERVER_ACTIVESYNC);
 		response.setHeader("Cache-Control", "private");
 	}
 
-	private void sendOptionsResponse(HttpServletResponse response) {
-		response.setStatus(200);
-		response.setHeader("Server", "Microsoft-IIS/6.0");
-		response.setHeader("MS-Server-ActiveSync", "14.1");
-		response.setHeader("MS-ASProtocolVersions", "12.1");
-		response.setHeader(
-				"MS-ASProtocolCommands",
+	private void sendASSuppotedCommands(HttpServletResponse response) {
+		response.setHeader("MS-ASProtocolCommands",
 				"Sync,SendMail,SmartForward,SmartReply,GetAttachment,GetHierarchy,CreateCollection,DeleteCollection,MoveCollection,FolderSync,FolderCreate,FolderDelete,FolderUpdate,MoveItems,GetItemEstimate,MeetingResponse,Search,Settings,Ping,ItemOperations,Provision,ResolveRecipients,ValidateCert");
+	}
+
+	private void sendOptionsResponse(HttpServletResponse response) {
+		sendASHeaders(response);
+		sendASSuppotedCommands(response);
+		response.setHeader("MS-ASProtocolVersions", MS_ASPROTOCOL_VERSIONS);
 		response.setHeader("Public", "OPTIONS,POST");
 		response.setHeader("Allow", "OPTIONS,POST");
-		response.setHeader("Cache-Control", "private");
 		response.setContentLength(0);
+		response.setStatus(200);
+	}
+
+
+	private void sendNeedProvisionningResponse(HttpServletResponse response) throws IOException {
+		sendASHeaders(response);
+		response.setHeader("Content-type", "text/html");
+		response.sendError(449);
 	}
 
 	private IRequestHandler getHandler(UserDataRequest p) {

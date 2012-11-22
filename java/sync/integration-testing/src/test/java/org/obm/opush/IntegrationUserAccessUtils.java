@@ -83,6 +83,7 @@ public class IntegrationUserAccessUtils {
 				.andReturn(
 						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties()))
 						.anyTimes();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId)).andReturn(0l).anyTimes();
 	}
 	
 	

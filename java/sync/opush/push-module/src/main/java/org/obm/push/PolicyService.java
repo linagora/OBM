@@ -29,29 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push;
 
-import org.obm.push.bean.Device;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
+import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.service.DeviceService;
 
-public interface DeviceDao {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class PolicyService {
+
+	private static final String INITIAL_SYNC_KEY = "0";
 	
-	/**
-	 * Returns <code>true</code> if the device is authorized to synchronize.
-	 */
-	boolean syncAuthorized(User user, String deviceId) throws DaoException;
+	private final DeviceService deviceService;
 
-	public Device getDevice(User user, String deviceId, String userAgent)
-			throws DaoException;
+	@Inject
+	public PolicyService(DeviceService deviceService) {
+		this.deviceService = deviceService;
+	}
+	
+	public boolean needProvisionning(ActiveSyncRequest asrequest, User user) throws DaoException {
+		String msPolicyKey = asrequest.getMsPolicyKey();
+		if (asrequest.getCommand().equals("Provision")) {
+			return false;
+		} else if (INITIAL_SYNC_KEY.equals(msPolicyKey) || !userHasPolicyKeyRegistred(asrequest, user)) {
+			return true;
+		}
+		return false;
+	}
 
-	public boolean registerNewDevice(User user, String deviceId,
-			String deviceType) throws DaoException;
-
-	Long getPolicyKey(User user, String deviceId) throws DaoException;
-
-	long allocateNewPolicyKey(User user, String deviceId) throws DaoException;
-
-	void removePolicyKey(User user, Device device) throws DaoException;
-
+	private boolean userHasPolicyKeyRegistred(ActiveSyncRequest asrequest, User user) throws DaoException {
+		Long userPolicyKey = deviceService.getPolicyKey(user, asrequest.getDeviceId());
+		return userPolicyKey != null;
+	}
+	
 }

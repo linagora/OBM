@@ -31,14 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.Random;
-
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
@@ -49,6 +49,7 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.DeviceDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -58,20 +59,20 @@ import com.google.inject.Singleton;
 @Singleton
 public class ProvisionHandler extends WbxmlRequestHandler {
 
-	private static final long DEFAULT_PKEY = 3378841480L;
-	private final Random random;
+	private static final int INITIAL_POLICYKEY = 0;
 	private final ProvisionProtocol protocol;
+	private final DeviceDao deviceDao;
 
 	@Inject
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
-			Random random, IContentsImporter contentsImporter,
+			DeviceDao deviceDao, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
 			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
-		this.random = random;
+		this.deviceDao = deviceDao;
 		this.protocol = provisionProtocol;
 	}
 	
@@ -85,10 +86,12 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 			sendResponse(responder, ret);
 		} catch (InvalidPolicyKeyException e) {
 			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e);
+		} catch (DaoException e) {
+			sendErrorResponse(responder, ProvisionStatus.GENERAL_SERVER_ERROR, e);
 		}
 	}
 
-	private void sendErrorResponse(Responder responder, ProvisionStatus status, InvalidPolicyKeyException e) {
+	private void sendErrorResponse(Responder responder, ProvisionStatus status, Exception e) {
 		logger.error("Error creating provision response", e);
 		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}
@@ -97,29 +100,34 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse("Provision", ret);
 	}
 
-	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, UserDataRequest udr) {
+	private ProvisionResponse doTheJob(ProvisionRequest provisionRequest, UserDataRequest udr) throws DaoException {
 		ProvisionResponse provisionResponse = new ProvisionResponse(provisionRequest.getPolicyType());
-		final Long nextPolicyKey = nextPolicyKey(provisionRequest.getPolicyKey());
-		if (nextPolicyKey == null) {
-			provisionResponse.setStatus(ProvisionStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
-		} else {
-			provisionResponse.setStatus(ProvisionStatus.SUCCESS);
-			provisionResponse.setPolicyKey(nextPolicyKey);
-		}
-		if (provisionRequest.getPolicyKey() == 0) {
+		provisionResponse.setStatus(ProvisionStatus.SUCCESS);
+		long policyKey = provisionRequest.getPolicyKey();
+		
+		if (policyKey == INITIAL_POLICYKEY) {
+			setUpNewPolicyKey(udr, provisionResponse);
 			provisionResponse.setPolicy(backend.getDevicePolicy(udr));
+		} else if (isCurrentPolicyKey(udr, policyKey)) {
+			setUpNewPolicyKey(udr, provisionResponse);
+		} else {
+			provisionResponse.setPolicyStatus(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
 		}
 		return provisionResponse;
 	}
 
-	private Long nextPolicyKey(long policyKey) {
-		if (policyKey == 0) {
-			return DEFAULT_PKEY;
-		} else if (policyKey == DEFAULT_PKEY) {
-			return Long.valueOf(Math.abs((random.nextInt() >> 2)));
-		} else {
-			return null;
-		}
+	private void setUpNewPolicyKey(UserDataRequest udr, ProvisionResponse provisionResponse) throws DaoException {
+		provisionResponse.setPolicyKey(allocateNewPolicyKey(udr));
+		provisionResponse.setPolicyStatus(ProvisionPolicyStatus.SUCCESS);
 	}
-	
+
+	private boolean isCurrentPolicyKey(UserDataRequest udr, long policyKey) throws DaoException {
+		Long actualPolicyKey = deviceDao.getPolicyKey(udr.getUser(), udr.getDevId());
+		return actualPolicyKey != null && actualPolicyKey.longValue() == policyKey;
+	}
+
+	private long allocateNewPolicyKey(UserDataRequest udr) throws DaoException {
+		deviceDao.removePolicyKey(udr.getUser(), udr.getDevice());
+		return deviceDao.allocateNewPolicyKey(udr.getUser(), udr.getDevId());
+	}
 }

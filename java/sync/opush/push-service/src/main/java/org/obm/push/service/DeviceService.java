@@ -41,5 +41,8 @@ public interface DeviceService {
 			String deviceType, String userAgent);
 
 	boolean syncAuthorized(User user, String deviceId) throws DaoException;
+	
 	Device getDevice(User user, String deviceId, String userAgent) throws DaoException;
+
+	Long getPolicyKey(User user, String deviceId) throws DaoException;
 }
