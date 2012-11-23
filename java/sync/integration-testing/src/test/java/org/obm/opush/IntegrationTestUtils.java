@@ -52,6 +52,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -76,7 +77,7 @@ import com.google.common.collect.Iterables;
 
 public class IntegrationTestUtils {
 
-	public static void expectSyncState(StateMachine stateMachine, String syncKey, ItemSyncState syncState) throws DaoException {
+	public static void expectSyncState(StateMachine stateMachine, SyncKey syncKey, ItemSyncState syncState) throws DaoException {
 		expect(stateMachine.getItemSyncState(syncKey)).andReturn(syncState).anyTimes();
 	}
 	
@@ -113,7 +114,7 @@ public class IntegrationTestUtils {
 			throws DaoException, CollectionNotFoundException {
 		
 		Date lastSync = new Date();
-		ItemSyncState syncState = new ItemSyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
@@ -130,7 +131,7 @@ public class IntegrationTestUtils {
 	}
 
 	public static void expectAllocateFolderState(CollectionDao collectionDao, FolderSyncState folderSyncState) throws DaoException {
-		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(String.class)))
+		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(SyncKey.class)))
 			.andReturn(folderSyncState);
 	}
 	

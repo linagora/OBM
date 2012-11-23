@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.OPClient;
@@ -38,15 +39,15 @@ import org.w3c.dom.Element;
 
 public class EmailDeleteSyncRequest extends Sync {
 
-	private final String syncKey;
+	private final SyncKey syncKey;
 	private final int collectionId;
 	private final String serverId;
 
-	public EmailDeleteSyncRequest(String syncKey, int collectionId,
+	public EmailDeleteSyncRequest(SyncKey key, int collectionId,
 			String serverId) {
 		
 		super("EmailDeleteSyncRequest.xml");
-		this.syncKey = syncKey;
+		this.syncKey = key;
 		this.collectionId = collectionId;
 		this.serverId = serverId;
 	}
@@ -55,7 +56,7 @@ public class EmailDeleteSyncRequest extends Sync {
 	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
 		Element sk = DOMUtils.getUniqueElement(
 				tpl.getDocumentElement(), "SyncKey");
-		sk.setTextContent(syncKey);
+		sk.setTextContent(syncKey.getSyncKey());
 		
 		Element collection = DOMUtils.getUniqueElement(
 				tpl.getDocumentElement(), "CollectionId");

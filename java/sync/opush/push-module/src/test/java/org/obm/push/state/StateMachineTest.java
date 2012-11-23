@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DateUtils;
@@ -61,12 +62,12 @@ public class StateMachineTest {
 	public void testGetFolderSyncStateWithEmptyKey() throws Exception {
 		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		
-		stateMachine.getFolderSyncState("");
+		stateMachine.getFolderSyncState(new SyncKey(""));
 	}
 
 	@Test
 	public void testGetFolderSyncStateWithInitialKey() throws Exception {
-		String initialSyncKey = "0";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 
 		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(initialSyncKey);
@@ -78,7 +79,7 @@ public class StateMachineTest {
 
 	@Test
 	public void testGetFolderSyncStateWithKnownKey() throws Exception {
-		String knownSyncKey = "1234";
+		SyncKey knownSyncKey = new SyncKey("1234");
 		Date knownSyncDate = org.obm.DateUtils.date("2013-01-01T12:00:15");
 		int knownSyncStateId = 156;
 		FolderSyncState knownFolderSyncState = new FolderSyncState(knownSyncKey, knownSyncDate);
@@ -101,7 +102,7 @@ public class StateMachineTest {
 
 	@Test(expected=InvalidSyncKeyException.class)
 	public void testGetFolderSyncStateWithUnknownKey() throws Exception {
-		String unknownSyncKey = "1234";
+		SyncKey unknownSyncKey = new SyncKey("1234");
 		
 		CollectionDao collectionDao = createStrictMock(CollectionDao.class);
 		expect(collectionDao.findFolderStateForKey(unknownSyncKey)).andReturn(null).once();

@@ -32,6 +32,7 @@
 package org.obm.sync.push.client;
 
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.SyncKey;
 
 import com.google.common.base.Objects;
 
@@ -49,7 +50,7 @@ public final class GetItemEstimateSingleFolderResponse implements IEasReponse {
 	}
 	
 	@Override
-	public String getReturnedSyncKey() {
+	public SyncKey getReturnedSyncKey() {
 		throw new IllegalAccessError("GetItemEstimate's response has no SyncKey");
 	}
 

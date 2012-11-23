@@ -35,8 +35,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.protocol.data.EncoderFactory;
 
@@ -48,7 +49,7 @@ public class SyncResponse {
 		private List<ItemChange> itemChangesDeletion;
 		private boolean syncStateValidity;
 		private boolean collectionValidity;
-		private String allocateNewSyncKey;
+		private SyncKey allocateNewSyncKey;
 		
 		public SyncCollectionResponse(SyncCollection syncCollection) {
 			this.syncCollection = syncCollection;
@@ -75,10 +76,10 @@ public class SyncResponse {
 		public List<ItemChange> getItemChanges() {
 			return itemChanges;
 		}
-		public void setNewSyncKey(String allocateNewSyncKey) {
+		public void setNewSyncKey(SyncKey allocateNewSyncKey) {
 			this.allocateNewSyncKey = allocateNewSyncKey;
 		}
-		public String getAllocateNewSyncKey() {
+		public SyncKey getAllocateNewSyncKey() {
 			return allocateNewSyncKey;
 		}
 		public void setItemChangesDeletion(List<ItemChange> itemChangesDeletion) {

@@ -113,6 +113,7 @@ public class BeansTest {
 					.add(Snapshot.class)
 					.add(SnapshotKey.class)
 					.add(DeviceId.class)
+					.add(SyncKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

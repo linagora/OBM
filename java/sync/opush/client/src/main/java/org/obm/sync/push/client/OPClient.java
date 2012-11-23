@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
@@ -100,7 +101,7 @@ public abstract class OPClient {
 		run(new Options());
 	}
 
-	public FolderSyncResponse folderSync(String key) throws Exception {
+	public FolderSyncResponse folderSync(SyncKey key) throws Exception {
 		return run(new FolderSync(key));
 	}
 
@@ -108,11 +109,11 @@ public abstract class OPClient {
 		return run(new Sync(folders));
 	}
 
-	public SyncResponse syncEmail(String key, String collectionId) throws Exception {
+	public SyncResponse syncEmail(SyncKey key, String collectionId) throws Exception {
 		return run(new EmailSyncCommand(key, collectionId));
 	}
 	
-	public SyncResponse syncEmail(String key, int collectionId) throws Exception {
+	public SyncResponse syncEmail(SyncKey key, int collectionId) throws Exception {
 		return run(new EmailSyncCommand(key, String.valueOf(collectionId)));
 	}
 	
@@ -120,7 +121,7 @@ public abstract class OPClient {
 		return run(new Sync(doc));
 	}
 
-	public SyncResponse deleteEmail(String key, int collectionId, String uid) throws Exception {
+	public SyncResponse deleteEmail(SyncKey key, int collectionId, String uid) throws Exception {
 		return run(new EmailDeleteSyncRequest(key, collectionId, uid));
 	}
 	
@@ -132,7 +133,7 @@ public abstract class OPClient {
 		return run(new ProvisionStepTwo(acknowledgingPolicyKey));
 	}
 	
-	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(String key, int collectionId) throws Exception {
+	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(SyncKey key, int collectionId) throws Exception {
 		return run(new GetItemEstimateEmailFolderCommand(key, collectionId));
 	}
 	

@@ -38,7 +38,6 @@ import org.obm.push.mail.bean.Email;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class Snapshot implements Serializable {
@@ -50,7 +49,7 @@ public class Snapshot implements Serializable {
 	public static class Builder {
 		private DeviceId deviceId;
 		private FilterType filterType;
-		private String syncKey;
+		private SyncKey syncKey;
 		private Integer collectionId;
 		private int uidNext;
 		private Collection<Email> emails;
@@ -69,7 +68,7 @@ public class Snapshot implements Serializable {
 			return this;
 		}
 		
-		public Builder syncKey(String syncKey) {
+		public Builder syncKey(SyncKey syncKey) {
 			this.syncKey = syncKey;
 			return this;
 		}
@@ -97,7 +96,7 @@ public class Snapshot implements Serializable {
 		public Snapshot build() {
 			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			Preconditions.checkArgument(filterType != null, "filterType can't be null or empty");
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey), "syncKey can't be null or empty");
+			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
 			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
 			return new Snapshot(deviceId, filterType, syncKey, collectionId, uidNext, emails);
 		}
@@ -105,12 +104,12 @@ public class Snapshot implements Serializable {
 	
 	private final DeviceId deviceId;
 	private final FilterType filterType;
-	private final String syncKey;
+	private final SyncKey syncKey;
 	private final Integer collectionId;
 	private final int uidNext;
 	private final Collection<Email> emails;
 	
-	private Snapshot(DeviceId deviceId, FilterType filterType, String syncKey, Integer collectionId, int uidNext, Collection<Email> emails) {
+	private Snapshot(DeviceId deviceId, FilterType filterType, SyncKey syncKey, Integer collectionId, int uidNext, Collection<Email> emails) {
 		this.deviceId = deviceId;
 		this.filterType = filterType;
 		this.syncKey = syncKey;
@@ -127,7 +126,7 @@ public class Snapshot implements Serializable {
 		return filterType;
 	}
 	
-	public String getSyncKey() {
+	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 

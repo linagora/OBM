@@ -31,15 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
+import org.obm.push.bean.SyncKey;
+
 public class FolderSyncRequest {
 	
-	private final String syncKey;
+	private final SyncKey syncKey;
 	
-	public FolderSyncRequest(String syncKey) {
+	public FolderSyncRequest(SyncKey syncKey) {
 		this.syncKey = syncKey;
 	}
 	
-	public String getSyncKey() {
+	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 }

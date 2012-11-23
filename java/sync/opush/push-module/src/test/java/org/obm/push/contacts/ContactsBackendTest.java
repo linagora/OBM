@@ -58,6 +58,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -144,7 +145,7 @@ public class ContactsBackendTest {
 	@Test
 	public void testGetItemEstimateSize() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
+		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
 		lastKnownState.setLastSync(currentDate);
 
 		expectLoginBehavior(token);

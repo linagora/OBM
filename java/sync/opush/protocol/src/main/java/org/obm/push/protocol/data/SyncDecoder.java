@@ -46,6 +46,7 @@ import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
@@ -135,23 +136,24 @@ public class SyncDecoder {
 			throw new PartialException();
 		}
 		
-		collection.setDataClass(DOMUtils.getElementText(col, "Class"));
-		collection.setSyncKey(DOMUtils.getElementText(col, "SyncKey"));
-
-		Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
-		if (windowSizeElement != null) {
-			collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
-		}
-		
-		SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
-		collection.setOptions(options);
-		
 		try {
 			collection.setCollectionId(collectionId);
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			collection.setCollectionPath(collectionPath);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			collection.setDataType(dataType);
+			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
+			collection.setSyncKey(new SyncKey(DOMUtils.getElementText(col, "SyncKey")));
+
+			Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
+			if (windowSizeElement != null) {
+				collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
+			}
+			
+			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
+			collection.setOptions(options);
+			
+			appendCommand(col, collection);
 		} catch (CollectionNotFoundException e) {
 			collection.setError(SyncStatus.OBJECT_NOT_FOUND);
 		}

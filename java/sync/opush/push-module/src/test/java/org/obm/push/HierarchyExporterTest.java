@@ -54,6 +54,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -149,8 +150,8 @@ public class HierarchyExporterTest {
 	@Test
 	public void testNothingChanges() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncKey = new FolderSyncState("1234567890b");
+		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncKey = new FolderSyncState(new SyncKey("1234567890b"));
 		outgoingSyncKey.setLastSync(currentDate);
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
@@ -190,8 +191,8 @@ public class HierarchyExporterTest {
 		String mailParentCollectionId = "2";
 		
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
+		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
 		outgoingSyncState.setLastSync(currentDate);
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);

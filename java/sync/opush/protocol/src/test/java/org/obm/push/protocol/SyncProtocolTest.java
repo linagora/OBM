@@ -46,6 +46,7 @@ import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -82,7 +83,7 @@ public class SyncProtocolTest {
 		int collectionId = 515;
 		SyncCollectionResponse collectionResponse = newSyncCollectionResponse(collectionId);
 
-		collectionResponse.setNewSyncKey("123456789");
+		collectionResponse.setNewSyncKey(new SyncKey("123456789"));
 		collectionResponse.setCollectionValidity(true);
 		collectionResponse.setSyncStateValidity(true);
 		
@@ -166,7 +167,7 @@ public class SyncProtocolTest {
 	private SyncCollectionResponse newSyncCollectionResponse(int collectionId) {
 		String collectionPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setSyncKey("123456789");
+		syncCollection.setSyncKey(new SyncKey("123456789"));
 		SyncCollectionResponse collectionResponse = new SyncResponse.SyncCollectionResponse(syncCollection);
 		collectionResponse.setItemChanges(Collections.<ItemChange>emptyList());
 		collectionResponse.setItemChangesDeletion(Collections.<ItemChange>emptyList());

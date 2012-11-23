@@ -47,7 +47,7 @@ public class SyncCollection implements Serializable {
 	private String dataClass;
 	private Integer collectionId;
 	private String collectionPath;
-	private String syncKey;
+	private SyncKey syncKey;
 	private Integer windowSize;
 	private boolean moreAvailable;
 	private Set<SyncCollectionChange> changes;
@@ -100,11 +100,11 @@ public class SyncCollection implements Serializable {
 		this.collectionId = collectionId;
 	}
 
-	public String getSyncKey() {
+	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 
-	public void setSyncKey(String syncKey) {
+	public void setSyncKey(SyncKey syncKey) {
 		this.syncKey = syncKey;
 	}
 

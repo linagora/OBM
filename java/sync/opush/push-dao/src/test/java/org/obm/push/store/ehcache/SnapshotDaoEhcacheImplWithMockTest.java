@@ -46,6 +46,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.utils.DateUtils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -59,7 +60,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 
 	@Test
 	public void getNull() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		SnapshotKey buildKey = SnapshotKey.builder()
@@ -87,7 +88,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void get() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 2;
 		SnapshotKey snapshotKey = SnapshotKey.builder()
@@ -132,7 +133,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void put() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 2;
 		SnapshotKey snapshotKey = SnapshotKey.builder()
@@ -184,7 +185,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 		
 		SnapshotKey snapshotKey = SnapshotKey.builder()
 					.deviceId(deviceId)
-					.syncKey("syncKey")
+					.syncKey(new SyncKey("syncKey"))
 					.collectionId(2)
 					.build();
 		expect(cache.getKeys())

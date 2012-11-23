@@ -66,6 +66,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
@@ -346,7 +347,7 @@ public class MeetingResponseHandlerTest {
 	private void expectCollectionDaoUnchange(CollectionDao collectionDao) throws DaoException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		
-		ItemSyncState syncState = new ItemSyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		
 		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<SyncCollection>of());

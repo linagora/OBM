@@ -48,6 +48,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
@@ -61,7 +62,7 @@ public class MappingServiceImplTest {
 
 	@Test
 	public void testListCollection() throws DaoException, CollectionPathException {
-		String incomingSyncKey = "1234-12345678-1234";
+		SyncKey incomingSyncKey = new SyncKey("1234-12345678-1234");
 
 		String collectionEmail = "obm:\\\\login@domain\\email\\INBOX";
 		String collectionCalendar = "obm:\\\\login@domain\\calendar\\login@domain";

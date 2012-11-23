@@ -51,6 +51,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -72,7 +73,7 @@ import com.google.common.collect.ImmutableSet;
 public class EmailSyncTestUtils {
 	
 	public static void mockEmailSyncClasses(
-			String syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta, 
+			SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault,
 			ConversionException {
@@ -82,7 +83,7 @@ public class EmailSyncTestUtils {
 		replayMocks(classToInstanceMap);
 	}
 	
-	private static void mockEmailSync(String syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta,
+	private static void mockEmailSync(SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta,
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
 			ConversionException {
@@ -152,11 +153,11 @@ public class EmailSyncTestUtils {
 		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
 	}
 
-	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, String syncEmailSyncKey,
+	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, SyncKey syncEmailSyncKey,
 			Collection<Integer> syncEmailCollectionsIds) throws DaoException {
 		
 		for (Integer syncEmailCollectionId : syncEmailCollectionsIds) {
-		expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
+			expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
 				.andReturn(syncEmailCollectionId).anyTimes();
 		}
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))

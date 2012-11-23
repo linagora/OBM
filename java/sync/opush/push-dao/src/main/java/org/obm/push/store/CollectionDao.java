@@ -38,6 +38,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -59,11 +60,11 @@ public interface CollectionDao {
 	 */
 	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
 
-	FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException;
+	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException;
 	
-	ItemSyncState findItemStateForKey(String syncKey) throws DaoException ;
+	ItemSyncState findItemStateForKey(SyncKey syncKey) throws DaoException ;
 	
-	FolderSyncState findFolderStateForKey(String syncKey) throws DaoException ;
+	FolderSyncState findFolderStateForKey(SyncKey syncKey) throws DaoException ;
 
 	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
 

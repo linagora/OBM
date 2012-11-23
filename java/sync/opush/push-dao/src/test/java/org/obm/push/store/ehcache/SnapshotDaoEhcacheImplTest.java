@@ -49,6 +49,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	
 	@Test
 	public void getNull() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer connectionId = 1;
 		
@@ -92,7 +93,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	
 	@Test
 	public void put() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		int uidNext = 2;
@@ -116,7 +117,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	
 	@Test
 	public void get() {
-		String syncKey = "synckey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		int uidNext = 2;
@@ -145,8 +146,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	public void deleteAllNullDeviceId() {
 		DeviceId deviceId = new DeviceId("deviceId");
 		DeviceId deviceId2 = new DeviceId("deviceId2");
-		String syncKey = "synckey1";
-		String syncKey2 = "synckey2";
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
 		Integer collectionId = 1;
 		Integer collectionId2 = 2;
 		Snapshot snapshot = Snapshot.builder()
@@ -184,8 +185,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	public void deleteAll() {
 		DeviceId deviceId = new DeviceId("deviceId");
 		DeviceId deviceId2 = new DeviceId("deviceId2");
-		String syncKey = "synckey1";
-		String syncKey2 = "synckey2";
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
 		Integer collectionId = 1;
 		Integer collectionId2 = 2;
 		Snapshot snapshot = Snapshot.builder()
@@ -219,9 +220,9 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	public void deleteAllWithMultipleSyncKeys() {
 		DeviceId deviceId = new DeviceId("deviceId");
 		DeviceId deviceId2 = new DeviceId("deviceId2");
-		String syncKey = "synckey1";
-		String syncKey2 = "synckey2";
-		String syncKey3 = "synckey3";
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
+		SyncKey syncKey3 = new SyncKey("synckey3");
 		Integer collectionId = 1;
 		Integer collectionId2 = 2;
 		Snapshot snapshot = Snapshot.builder()
@@ -262,8 +263,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	public void deleteAllWithMultipleCollectionId() {
 		DeviceId deviceId = new DeviceId("deviceId");
 		DeviceId deviceId2 = new DeviceId("deviceId2");
-		String syncKey = "synckey1";
-		String syncKey2 = "synckey2";
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
 		Integer collectionId = 1;
 		Integer collectionId2 = 2;
 		Integer collectionId3 = 3;

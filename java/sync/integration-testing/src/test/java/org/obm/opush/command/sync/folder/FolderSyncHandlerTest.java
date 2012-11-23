@@ -59,6 +59,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -103,9 +104,8 @@ public class FolderSyncHandlerTest {
 
 	@Test
 	public void testInitialFolderSyncContainsINBOX() throws Exception {
-		String initialSyncKey = "0";
-//		int serverId = 4;
-		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		FolderSyncState newMappingSyncState = new FolderSyncState(newGeneratedSyncKey);
 				
 		
@@ -140,9 +140,9 @@ public class FolderSyncHandlerTest {
 
 	@Test
 	public void testFolderSyncHasNoChange() throws Exception {
-		String currentSyncKey = "12341234-1234-1234-1234-123456123456";
+		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
-		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 		
@@ -169,9 +169,9 @@ public class FolderSyncHandlerTest {
 	
 	@Test
 	public void testFolderSyncHasChanges() throws Exception {
-		String currentSyncKey = "12341234-1234-1234-1234-123456123456";
+		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
-		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 		
@@ -219,9 +219,9 @@ public class FolderSyncHandlerTest {
 
 	@Test
 	public void testFolderSyncHasDeletions() throws Exception {
-		String currentSyncKey = "12341234-1234-1234-1234-123456123456";
+		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
-		String newGeneratedSyncKey = "d58ea559-d1b8-4091-8ba5-860e6fa54875";
+		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 
@@ -266,13 +266,13 @@ public class FolderSyncHandlerTest {
 	}
 
 	private void expectCollectionDaoFindFolderSyncState(CollectionDao collectionDao,
-			String currentSyncKey, FolderSyncState newSyncState) throws DaoException {
+			SyncKey currentSyncKey, FolderSyncState newSyncState) throws DaoException {
 		
 		expect(collectionDao.findFolderStateForKey(currentSyncKey)).andReturn(new FolderSyncState(currentSyncKey));
 		expectCollectionDaoAllocateFolderSyncState(collectionDao, newSyncState);
 	}
 
-	private FolderSyncState newFolderSyncState(String newGeneratedSyncKey, int newSyncStateId) {
+	private FolderSyncState newFolderSyncState(SyncKey newGeneratedSyncKey, int newSyncStateId) {
 		FolderSyncState folderSyncState = new FolderSyncState(newGeneratedSyncKey);
 		folderSyncState.setId(newSyncStateId);
 		return folderSyncState;

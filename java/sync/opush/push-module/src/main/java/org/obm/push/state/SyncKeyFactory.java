@@ -33,6 +33,8 @@ package org.obm.push.state;
 
 import java.util.UUID;
 
+import org.obm.push.bean.SyncKey;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 
@@ -41,8 +43,8 @@ public class SyncKeyFactory {
 
 	@VisibleForTesting SyncKeyFactory() {}
 	
-	public String randomSyncKey() {
-		return UUID.randomUUID().toString();
+	public SyncKey randomSyncKey() {
+		return new SyncKey(UUID.randomUUID().toString());
 	}
 	
 }

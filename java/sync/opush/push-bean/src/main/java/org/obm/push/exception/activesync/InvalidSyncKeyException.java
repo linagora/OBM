@@ -31,16 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception.activesync;
 
+import org.obm.push.bean.SyncKey;
+
 public class InvalidSyncKeyException extends Exception {
 
 	private final Integer collectionId;
-	private final String syncKey;
+	private final SyncKey syncKey;
 
-	public InvalidSyncKeyException(String syncKey) {
+	public InvalidSyncKeyException(SyncKey syncKey) {
 		this(null, syncKey);
 	}
 	
-	public InvalidSyncKeyException(Integer collectionId, String syncKey) {
+	public InvalidSyncKeyException(Integer collectionId, SyncKey syncKey) {
 		super(String.format(
 				"A client provided an unknown SyncKey (%s), may be expected after database migration", 
 				syncKey));

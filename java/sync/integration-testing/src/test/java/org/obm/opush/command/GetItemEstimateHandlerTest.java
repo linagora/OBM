@@ -58,6 +58,7 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.state.StateMachine;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
@@ -91,7 +92,7 @@ public class GetItemEstimateHandlerTest {
 
 	@Test
 	public void testGetItemEstimateWithValidCollectionAndSyncKey() throws Exception {
-		String syncKey = "1";
+		SyncKey syncKey = new SyncKey("1");
 		ItemSyncState expectedSyncState = new ItemSyncState(syncKey);
 		int collectionId = 15105;
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
@@ -109,7 +110,7 @@ public class GetItemEstimateHandlerTest {
 
 	@Test
 	public void testGetItemEstimateWithUnexistingCollection() throws Exception {
-		String syncKey = "1";
+		SyncKey syncKey = new SyncKey("1");
 		ItemSyncState expectedSyncState = new ItemSyncState(syncKey);
 		int unexistingCollectionId = 15105;
 		Set<Integer> existingCollections = Collections.<Integer>emptySet();
@@ -127,7 +128,7 @@ public class GetItemEstimateHandlerTest {
 
 	@Test
 	public void testGetItemEstimateWithInvalidSyncKey() throws Exception {
-		String invalidSyncKey = "1";
+		SyncKey invalidSyncKey = new SyncKey("1");
 		ItemSyncState expectedSyncState = null;
 		int collectionId = 15105;
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
@@ -143,7 +144,7 @@ public class GetItemEstimateHandlerTest {
 		Assertions.assertThat(response.getEstimate()).isNull();
 	}
 
-	private void mockAccessAndStateThenStart(Set<Integer> existingCollections, String syncKey, ItemSyncState syncState)
+	private void mockAccessAndStateThenStart(Set<Integer> existingCollections, SyncKey syncKey, ItemSyncState syncState)
 			throws Exception {
 		expectSyncState(classToInstanceMap.get(StateMachine.class), syncKey, syncState);
 

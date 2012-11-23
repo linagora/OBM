@@ -48,14 +48,14 @@ public abstract class SyncState implements Serializable {
 
 	private Date lastSync;
 	private boolean lastSyncFiltred;
-	private String key;
+	private SyncKey key;
 	private int id;
 
-	protected SyncState(String syncKey) {
+	protected SyncState(SyncKey syncKey) {
 		this(syncKey, null);
 	}
 
-	protected SyncState(String key, Date lastSync) {
+	protected SyncState(SyncKey key, Date lastSync) {
 		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		this.lastSyncFiltred = false;
 		this.key = key;
@@ -69,11 +69,11 @@ public abstract class SyncState implements Serializable {
 		this.lastSync = lastSync;
 	}
 
-	public String getKey() {
+	public SyncKey getKey() {
 		return key;
 	}
 
-	public void setKey(String key) {
+	public void setKey(SyncKey key) {
 		this.key = key;
 	}
 

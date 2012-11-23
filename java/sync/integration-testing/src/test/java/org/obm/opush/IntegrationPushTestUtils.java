@@ -42,6 +42,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -120,7 +121,7 @@ public class IntegrationPushTestUtils {
 		return HierarchyCollectionChanges.builder().build();
 	}
 	
-	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, String newSyncKey) {
+	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, SyncKey newSyncKey) {
 		expect(classToInstanceMap.get(SyncKeyFactory.class).randomSyncKey()).andReturn(newSyncKey).once();
 	}
 

@@ -35,7 +35,6 @@ import java.io.Serializable;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 public class SnapshotKey implements Serializable{
 
@@ -44,13 +43,13 @@ public class SnapshotKey implements Serializable{
 	}
 	
 	public static class Builder {
-		private String syncKey;
+		private SyncKey syncKey;
 		private DeviceId deviceId;
 		private Integer collectionId;
 		
 		private Builder() {}
 		
-		public Builder syncKey(String syncKey) {
+		public Builder syncKey(SyncKey syncKey) {
 			this.syncKey = syncKey;
 			return this;
 		}
@@ -65,24 +64,24 @@ public class SnapshotKey implements Serializable{
 		}
 
 		public SnapshotKey build() {
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey), "syncKey can't be null or empty");
+			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
 			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
 			return new SnapshotKey(syncKey, deviceId, collectionId);
 		}
 	}	
 	
-	private final String syncKey;
+	private final SyncKey syncKey;
 	private final DeviceId deviceId;
 	private final Integer collectionId;
 
-	private SnapshotKey(String syncKey, DeviceId deviceId, Integer collectionId) {
+	private SnapshotKey(SyncKey syncKey, DeviceId deviceId, Integer collectionId) {
 		this.syncKey = syncKey;
 		this.deviceId = deviceId;
 		this.collectionId = collectionId;
 	}
 
-	public String getSyncKey() {
+	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 

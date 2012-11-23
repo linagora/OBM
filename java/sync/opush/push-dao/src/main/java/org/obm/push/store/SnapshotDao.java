@@ -33,10 +33,11 @@ package org.obm.push.store;
 
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.Snapshot;
+import org.obm.push.bean.SyncKey;
 
 public interface SnapshotDao {
 	
-	Snapshot get(DeviceId deviceId, String syncKey, Integer collectionId);
+	Snapshot get(DeviceId deviceId, SyncKey syncKey, Integer collectionId);
 	
 	void put(Snapshot snapshot);
 	

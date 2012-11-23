@@ -36,11 +36,11 @@ import java.util.Date;
 
 public class ItemSyncState extends SyncState implements Serializable {
 
-	public ItemSyncState(String syncKey) {
+	public ItemSyncState(SyncKey syncKey) {
 		this(syncKey, null);
 	}
 
-	public ItemSyncState(String key, Date lastSync) {
+	public ItemSyncState(SyncKey key, Date lastSync) {
 		super(key, lastSync);
 	}
 	

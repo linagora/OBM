@@ -32,16 +32,19 @@
 package org.obm.sync.push.client;
 
 import java.util.Map;
+
+import org.obm.push.bean.SyncKey;
+
 import com.google.common.base.Objects;
 
 public final class FolderSyncResponse implements IEasReponse {
 
 	private final FolderHierarchy fl;
-	private final String key;
+	private final SyncKey key;
 	private final int status;
 	private final int count;
 
-	public FolderSyncResponse(String key, Map<FolderType, Folder> fl, int status, int count) {
+	public FolderSyncResponse(SyncKey key, Map<FolderType, Folder> fl, int status, int count) {
 		this.status = status;
 		this.count = count;
 		this.fl = new FolderHierarchy(fl);
@@ -49,7 +52,7 @@ public final class FolderSyncResponse implements IEasReponse {
 	}
 	
 	@Override
-	public String getReturnedSyncKey() {
+	public SyncKey getReturnedSyncKey() {
 		return key;
 	}
 

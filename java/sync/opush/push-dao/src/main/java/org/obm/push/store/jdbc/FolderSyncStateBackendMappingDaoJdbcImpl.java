@@ -69,7 +69,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 					"WHERE data_type = ? " + 
 					"AND opush_folder_sync_state.sync_key = ?"); 
 			ps.setObject(1, dbcp.getJdbcObject(dataType.getDbFieldName(), dataType.getDbValue()));
-			ps.setString(2, folderSyncState.getKey());
+			ps.setString(2, folderSyncState.getKey().getSyncKey());
 
 			rs = ps.executeQuery();
 			if (rs.next()) {

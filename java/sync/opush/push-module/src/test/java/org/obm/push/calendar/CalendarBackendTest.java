@@ -68,6 +68,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -128,8 +129,8 @@ public class CalendarBackendTest {
 		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		this.token = new AccessToken(0, "OBM");
-		this.lastKnownState = new FolderSyncState("1234567890a");
-		this.outgoingSyncState = new FolderSyncState("1234567890b");
+		this.lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
+		this.outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
 		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
 
 		
@@ -211,8 +212,8 @@ public class CalendarBackendTest {
 
 	@Test
 	public void testInitialCalendarChangesWhenMultipleCalendar() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
+		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
@@ -271,8 +272,8 @@ public class CalendarBackendTest {
 
 	@Test
 	public void testDeletionWhenMultipleCalendar() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
-		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
+		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
@@ -485,7 +486,7 @@ public class CalendarBackendTest {
 	@Test
 	public void testGetEstimateSize() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
+		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
 		lastKnownState.setLastSync(currentDate);
 		int collectionId = 1;
 
@@ -525,7 +526,7 @@ public class CalendarBackendTest {
 	@Test 
 	public void testGetChanged() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState("1234567890a");
+		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
 		lastKnownState.setLastSync(currentDate);
 		int collectionId = 1;
 

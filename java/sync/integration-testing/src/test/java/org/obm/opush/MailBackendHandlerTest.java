@@ -70,6 +70,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -142,10 +143,10 @@ public class MailBackendHandlerTest {
 
 	@Test
 	public void testDeleteMail() throws Exception {
-		String syncEmailSyncKey = "1";
+		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int serverId = 1234;
 		String syncEmailId = ":2";
-		ItemSyncState syncState = new ItemSyncState("sync state");
+		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
 		DataDelta delta = new DataDeltaBuilder()
 		.addChanges(
 			new ItemChangesBuilder()
@@ -230,7 +231,7 @@ public class MailBackendHandlerTest {
 		expect(collectionDao.getCollectionPath(serverId))
 			.andReturn(IntegrationTestUtils.buildEmailInboxCollectionPath(singleUserFixture.jaures)).anyTimes();
 		
-		expect(collectionDao.findItemStateForKey(anyObject(String.class)))
+		expect(collectionDao.findItemStateForKey(anyObject(SyncKey.class)))
 			.andReturn(syncState).anyTimes();
 		
 		int lastUpdateState = 1;

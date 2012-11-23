@@ -82,7 +82,7 @@ public class SerializableTest {
 	public void testSyncCollection() throws IOException {
 		SyncCollection syncCollection = new SyncCollection();
 		syncCollection.addChange(new SyncCollectionChange("serverId", "clientId", "modType", new MSContact(), PIMDataType.CALENDAR));
-		syncCollection.setItemSyncState(new ItemSyncState("key", new Date()));
+		syncCollection.setItemSyncState(new ItemSyncState(new SyncKey("key"), new Date()));
 		objectOutputStream.writeObject(syncCollection);
 	}
 	
@@ -176,7 +176,7 @@ public class SerializableTest {
 				.collectionId(1)
 				.deviceId(new DeviceId("deviceId"))
 				.filterType(FilterType.THREE_DAYS_BACK)
-				.syncKey("syncKey")
+				.syncKey(new SyncKey("syncKey"))
 				.uidNext(2)
 				.addEmail(Email.builder()
 						.uid(1)
@@ -192,7 +192,7 @@ public class SerializableTest {
 	public void testSnapshotKey() throws IOException {
 		SnapshotKey snapshotKey = SnapshotKey.builder()
 				.deviceId(new DeviceId("deviceId"))
-				.syncKey("syncKey")
+				.syncKey(new SyncKey("syncKey"))
 				.collectionId(1)
 				.build();
 		objectOutputStream.writeObject(snapshotKey);
@@ -202,5 +202,11 @@ public class SerializableTest {
 	public void testDeviceId() throws IOException {
 		DeviceId deviceId = new DeviceId("deviceId");
 		objectOutputStream.writeObject(deviceId);
+	}
+
+	@Test
+	public void testSyncKey() throws IOException {
+		SyncKey syncKey = new SyncKey("syncKey");
+		objectOutputStream.writeObject(syncKey);
 	}
 }

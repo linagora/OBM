@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.SyncKey;
 
 import com.google.common.collect.Lists;
 
@@ -53,7 +54,9 @@ public class SyncKeyFactoryTest {
 	
 	@Test
 	public void testNotEmtpy() {
-		assertThat(new SyncKeyFactory().randomSyncKey()).isNotEmpty();
+		SyncKey randomSyncKey = new SyncKeyFactory().randomSyncKey();
+		assertThat(randomSyncKey.getSyncKey()).isNotNull();
+		assertThat(randomSyncKey.getSyncKey()).isNotEmpty();
 	}
 	
 	@Ignore("too slow : https://github.com/alexruiz/fest-assert-2.x/issues/122")
@@ -62,7 +65,7 @@ public class SyncKeyFactoryTest {
 		int syncKeyGenerationCount = 1000000;
 		SyncKeyFactory syncKeyFactory = new SyncKeyFactory();
 
-		List<String> allGeneratedSyncKeys = Lists.newArrayListWithExpectedSize(syncKeyGenerationCount);
+		List<SyncKey> allGeneratedSyncKeys = Lists.newArrayListWithExpectedSize(syncKeyGenerationCount);
 		for (int count = 0; count < syncKeyGenerationCount; count++) {
 			allGeneratedSyncKeys.add(syncKeyFactory.randomSyncKey());
 		}

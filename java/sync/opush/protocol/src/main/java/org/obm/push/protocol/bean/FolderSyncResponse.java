@@ -33,6 +33,7 @@ package org.obm.push.protocol.bean;
 
 import java.util.List;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -40,9 +41,9 @@ import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 public class FolderSyncResponse {
 	
 	private final HierarchyCollectionChanges hierarchyItemsChanges;
-	private final String newSyncKey;
+	private final SyncKey newSyncKey;
 	
-	public FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, String newSyncKey) {
+	public FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, SyncKey newSyncKey) {
 		this.hierarchyItemsChanges = hierarchyItemsChanges;
 		this.newSyncKey = newSyncKey;
 	}
@@ -66,7 +67,7 @@ public class FolderSyncResponse {
 		return hierarchyItemsChanges.getCollectionDeletions();
 	}
 	
-	public String getNewSyncKey() {
+	public SyncKey getNewSyncKey() {
 		return newSyncKey;
 	}
 	

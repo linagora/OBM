@@ -48,6 +48,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -87,7 +88,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 					"INNER JOIN opush_folder_snapshot ON opush_folder_snapshot.collection_id = opush_folder_mapping.id " +
 					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = opush_folder_snapshot.folder_sync_state_id " +
 					"WHERE opush_folder_sync_state.sync_key = ?");
-			ps.setString(1, folderSyncState.getKey());
+			ps.setString(1, folderSyncState.getKey().getSyncKey());
 			ResultSet resultSet = ps.executeQuery();
 
 			while (resultSet.next()) {
@@ -191,7 +192,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
-			ps.setString(1, state.getKey());
+			ps.setString(1, state.getKey().getSyncKey());
 			ps.setInt(2, devDbId);
 			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
 			ps.setInt(4, collectionId);
@@ -208,7 +209,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public FolderSyncState allocateNewFolderSyncState(Device device, String newSyncKey) throws DaoException {
+	public FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		
@@ -216,7 +217,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_folder_sync_state" +
 					" (sync_key, device_id) VALUES (?, ?)");
-			ps.setString(1, newSyncKey);
+			ps.setString(1, newSyncKey.getSyncKey());
 			ps.setInt(2, device.getDatabaseId());
 			ps.executeUpdate();
 			FolderSyncState folderSyncState = new FolderSyncState(newSyncKey);
@@ -230,7 +231,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	@Override
-	public ItemSyncState findItemStateForKey(String syncKey) throws DaoException {
+	public ItemSyncState findItemStateForKey(SyncKey syncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -240,7 +241,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps = con.prepareStatement(
 					"SELECT " + SYNC_STATE_FIELDS 
 					+ " FROM " + SYNC_STATE_ITEM_TABLE + " WHERE sync_key=?");
-			ps.setString(1, syncKey);
+			ps.setString(1, syncKey.getSyncKey());
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -255,7 +256,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public FolderSyncState findFolderStateForKey(String syncKey) throws DaoException {
+	public FolderSyncState findFolderStateForKey(SyncKey syncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -265,11 +266,11 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps = con.prepareStatement(
 					"SELECT " + SYNC_STATE_FOLDER_FIELDS 
 					+ " FROM " + SYNC_STATE_FOLDER_TABLE + " WHERE sync_key=?");
-			ps.setString(1, syncKey);
+			ps.setString(1, syncKey.getSyncKey());
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				String rsSyncKey = rs.getString("sync_key");
+				SyncKey rsSyncKey = new SyncKey(rs.getString("sync_key"));
 				FolderSyncState folderSyncState = new FolderSyncState(rsSyncKey);
 				folderSyncState.setId(rs.getInt("id"));
 				return folderSyncState;
@@ -309,7 +310,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	private ItemSyncState buildItemSyncState(ResultSet rs) throws SQLException {
 		Date lastSync = JDBCUtils.getDate(rs, "last_sync");
-		String syncKey = rs.getString("sync_key");
+		SyncKey syncKey = new SyncKey(rs.getString("sync_key"));
 		ItemSyncState syncState = new ItemSyncState(syncKey, lastSync);
 		syncState.setId(rs.getInt("id"));
 		return syncState;
@@ -341,7 +342,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 	
 	private FolderSyncState buildFolderSyncState(ResultSet rs) throws SQLException {
-		String syncKey = rs.getString("sync_key");
+		SyncKey syncKey = new SyncKey(rs.getString("sync_key"));
 		FolderSyncState syncState = new FolderSyncState(syncKey);
 		syncState.setId(rs.getInt("id"));
 		return syncState;

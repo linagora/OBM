@@ -38,6 +38,7 @@ import net.sf.ehcache.Element;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.store.SnapshotDao;
 
 import com.google.common.base.Objects;
@@ -59,7 +60,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 	}
 
 	@Override
-	public Snapshot get(DeviceId deviceId, String syncKey, Integer collectionId) {
+	public Snapshot get(DeviceId deviceId, SyncKey syncKey, Integer collectionId) {
 		SnapshotKey key = SnapshotKey.builder()
 			.deviceId(deviceId)
 			.syncKey(syncKey)

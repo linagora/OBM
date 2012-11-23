@@ -34,6 +34,7 @@ package org.obm.sync.push.client.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Folder;
@@ -49,9 +50,9 @@ import org.w3c.dom.NodeList;
  */
 public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 
-	private String syncKey;
+	private SyncKey syncKey;
 
-	public FolderSync(String syncKey) {
+	public FolderSync(SyncKey syncKey) {
 		super(NS.FolderHierarchy, "FolderSync", "FolderSyncRequest.xml");
 		this.syncKey = syncKey;
 	}
@@ -60,12 +61,12 @@ public class FolderSync extends TemplateBasedCommand<FolderSyncResponse> {
 	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
 		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(),
 				"SyncKey");
-		sk.setTextContent(syncKey);
+		sk.setTextContent(syncKey.getSyncKey());
 	}
 
 	@Override
 	protected FolderSyncResponse parseResponse(Element root) {
-		String key = DOMUtils.getElementText(root, "SyncKey");
+		SyncKey key = new SyncKey(DOMUtils.getElementText(root, "SyncKey"));
 		int status = Integer.valueOf(DOMUtils.getElementText(root, "Status"));
 		int count = Integer.valueOf(DOMUtils.getElementText(root, "Count"));
 		Map<FolderType, Folder> ret = new HashMap<FolderType, Folder>(count + 1);

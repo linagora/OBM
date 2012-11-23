@@ -57,6 +57,7 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -397,7 +398,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if (syncCollection.getStatus() != SyncStatus.OK) {
 			handleErrorSync(syncCollection, syncCollectionResponse);
-		} else if ("0".equals(syncCollection.getSyncKey())) {
+		} else if (SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncCollection.getSyncKey())) {
 			handleInitialSync(udr, syncCollection, syncCollectionResponse);
 		} else {
 			handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
@@ -431,7 +432,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						contentsExporter.fetch(udr, syncCollection));
 			}
 			identifyNewItems(syncCollectionResponse, st);
-			String newSyncKey = 
+			SyncKey newSyncKey = 
 					stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), syncDate, 
 							syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion());
 			syncCollectionResponse.setNewSyncKey(newSyncKey);
@@ -446,7 +447,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		syncCollectionResponse.setCollectionValidity(true);
 		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
 		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
-		String newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);
+		SyncKey newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 
@@ -455,7 +456,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			throws DaoException, InvalidServerId {
 		
 		for (ItemChange change: syncCollectionResponse.getItemChanges()) {
-			boolean isItemAddition = st.getKey().equals("0") || 
+			boolean isItemAddition = st.getKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
 					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
 			change.setNew(isItemAddition);
 		}

@@ -48,7 +48,7 @@ public class SnapshotKeyTest {
 	@Test (expected=IllegalArgumentException.class)
 	public void testNullDeviceId() {
 		SnapshotKey.builder()
-			.syncKey("syncKey")
+			.syncKey(new SyncKey("syncKey"))
 			.collectionId(1)
 			.build();
 	}
@@ -57,13 +57,13 @@ public class SnapshotKeyTest {
 	public void testNullCollectionId() {
 		SnapshotKey.builder()
 			.deviceId(new DeviceId("deviceId"))
-			.syncKey("syncKey")
+			.syncKey(new SyncKey("syncKey"))
 			.build();
 	}
 	
 	@Test
 	public void testBuilder() {
-		String syncKey = "syncKey";
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		

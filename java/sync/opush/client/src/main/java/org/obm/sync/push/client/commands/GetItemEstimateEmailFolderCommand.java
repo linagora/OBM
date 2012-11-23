@@ -32,6 +32,7 @@
 package org.obm.sync.push.client.commands;
 
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
@@ -40,19 +41,19 @@ import org.w3c.dom.Element;
 
 public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
 
-	private final String syncKey;
+	private final SyncKey syncKey;
 	private final int collectionId;
 
-	public GetItemEstimateEmailFolderCommand(String syncKey, int collectionId) {
+	public GetItemEstimateEmailFolderCommand(SyncKey key, int collectionId) {
 		super(NS.GetItemEstimate, "GetItemEstimate", "GetItemEstimateRequestEmail.xml");
-		this.syncKey = syncKey;
+		this.syncKey = key;
 		this.collectionId = collectionId;
 	}
 
 	@Override
 	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
 		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:SyncKey");
-		sk.setTextContent(syncKey);
+		sk.setTextContent(syncKey.getSyncKey());
 		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
 		collection.setTextContent(String.valueOf(collectionId));
 	}

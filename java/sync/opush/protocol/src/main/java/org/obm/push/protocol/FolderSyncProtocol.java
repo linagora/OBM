@@ -34,6 +34,7 @@ package org.obm.push.protocol;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -53,7 +54,7 @@ public class FolderSyncProtocol {
 		if (doc == null) {
 			throw new NoDocumentException("Document of FolderSync request is null.");
 		}
-		String syncKey = DOMUtils.getElementText(doc.getDocumentElement(), "SyncKey");
+		SyncKey syncKey = new SyncKey(DOMUtils.getElementText(doc.getDocumentElement(), "SyncKey"));
 		return new FolderSyncRequest(syncKey);
 	}
 
@@ -64,7 +65,7 @@ public class FolderSyncProtocol {
 		DOMUtils.createElementAndText(root, "Status", "1");
 		
 		Element sk = DOMUtils.createElement(root, "SyncKey");
-		sk.setTextContent(folderSyncResponse.getNewSyncKey());
+		sk.setTextContent(folderSyncResponse.getNewSyncKey().getSyncKey());
 
 		Element changes = DOMUtils.createElement(root, "Changes");
 		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));

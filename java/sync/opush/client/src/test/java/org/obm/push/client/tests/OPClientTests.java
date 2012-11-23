@@ -39,6 +39,7 @@ import static org.junit.Assert.fail;
 import java.util.Map;
 
 import org.junit.Ignore;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Folder;
@@ -62,7 +63,7 @@ public class OPClientTests extends AbstractPushTest {
 
 	public FolderSyncResponse testInitialFolderSync() {
 		try {
-			FolderSyncResponse resp = opc.folderSync("0");
+			FolderSyncResponse resp = opc.folderSync(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 			assertNotNull(resp);
 			assertNotNull(resp.getFolders());
 			assertTrue(resp.getFolders().size() > 0);

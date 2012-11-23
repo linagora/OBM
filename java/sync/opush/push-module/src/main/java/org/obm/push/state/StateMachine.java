@@ -40,6 +40,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -80,12 +81,12 @@ public class StateMachine {
 		return collectionDao.lastKnownState(device, collectionId);
 	}
 	
-	public ItemSyncState getItemSyncState(String syncKey) throws DaoException {
+	public ItemSyncState getItemSyncState(SyncKey syncKey) throws DaoException {
 		return collectionDao.findItemStateForKey(syncKey);
 	}
 	
-	public FolderSyncState getFolderSyncState(String syncKey) throws DaoException, InvalidSyncKeyException {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey));
+	public FolderSyncState getFolderSyncState(SyncKey syncKey) throws DaoException, InvalidSyncKeyException {
+		Preconditions.checkArgument(syncKey != null && !Strings.isNullOrEmpty(syncKey.getSyncKey()));
 		
 		if (FolderSyncState.isSyncKeyOfInitialFolderSync(syncKey)) {
 			return new FolderSyncState(syncKey);
@@ -94,7 +95,7 @@ public class StateMachine {
 		}
 	}
 
-	private FolderSyncState findFolderSyncState(String syncKey) throws DaoException, InvalidSyncKeyException {
+	private FolderSyncState findFolderSyncState(SyncKey syncKey) throws DaoException, InvalidSyncKeyException {
 		FolderSyncState folderSyncStateForKey = collectionDao.findFolderStateForKey(syncKey);
 		if (folderSyncStateForKey == null) {
 			throw new InvalidSyncKeyException(syncKey);
@@ -103,7 +104,7 @@ public class StateMachine {
 	}
 	
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {
-		String newSk = syncKeyFactory.randomSyncKey();
+		SyncKey newSk = syncKeyFactory.randomSyncKey();
 		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk);
 		newFolderState.setLastSync(DateUtils.getCurrentDate());
 		
@@ -111,10 +112,10 @@ public class StateMachine {
 		return newFolderState;
 	}
 	
-	public String allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
+	public SyncKey allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
 
-		String newSk = syncKeyFactory.randomSyncKey();
+		SyncKey newSk = syncKeyFactory.randomSyncKey();
 		ItemSyncState newState = new ItemSyncState(newSk, lastSync);
 		int syncStateId = collectionDao.updateState(udr.getDevice(), collectionId, newState);
 		newState.setId(syncStateId);

@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
-import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -64,6 +64,7 @@ import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.ms.MSEmail;
@@ -111,8 +112,8 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testSyncDefaultMailFolderUnchange() throws Exception {
-		String initialSyncKey = "0";
-		String syncEmailSyncKey = "1";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int syncEmailCollectionId = 4;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
@@ -136,8 +137,8 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testSyncOneInboxMail() throws Exception {
-		String initialSyncKey = "0";
-		String syncEmailSyncKey = "13424";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 
 		DataDelta delta = new DataDeltaBuilder()
@@ -169,8 +170,8 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testSyncTwoInboxMails() throws Exception {
-		String initialSyncKey = "0";
-		String syncEmailSyncKey = "13424";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 		
 		DataDelta delta = new DataDeltaBuilder()
@@ -207,8 +208,8 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testSyncOneInboxDeletedMail() throws Exception {
-		String initialSyncKey = "0";
-		String syncEmailSyncKey = "13424";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 		
 		DataDelta delta = new DataDeltaBuilder()
@@ -239,8 +240,8 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testSyncInboxOneNewOneDeletedMail() throws Exception {
-		String initialSyncKey = "0";
-		String syncEmailSyncKey = "13424";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 		DataDelta delta = new DataDeltaBuilder()
 			.addChanges(
@@ -272,7 +273,7 @@ public class SyncHandlerTest {
 		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":122"));
 	}
 	
-	private FolderSyncState newSyncState(String syncEmailSyncKey) {
+	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
 		return new FolderSyncState(syncEmailSyncKey);
 	}
 	
@@ -286,7 +287,7 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testSyncOnUnexistingCollection() throws Exception {
-		String syncEmailSyncKey = "1";
+		SyncKey syncEmailSyncKey = new SyncKey("1");
 		java.util.Collection<Integer> existingCollections = Collections.emptySet();
 		int syncEmailUnexistingCollectionId = 15105;
 		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();

@@ -39,6 +39,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
@@ -59,7 +60,7 @@ public class GetItemEstimateProtocol {
 			final Element ce = (Element) collections.item(i);
 			final String dataClass = DOMUtils.getElementText(ce, "Class");
 			final String filterType = DOMUtils.getElementText(ce, "FilterType");
-			final String syncKey = DOMUtils.getElementText(ce, "SyncKey");
+			final SyncKey syncKey = new SyncKey(DOMUtils.getElementText(ce, "SyncKey"));
 			final Element fid = DOMUtils.getUniqueElement(ce, "CollectionId");
 			final String collectionId = fid.getTextContent();
 	

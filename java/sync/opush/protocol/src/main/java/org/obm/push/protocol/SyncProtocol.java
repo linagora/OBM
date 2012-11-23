@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -101,7 +102,7 @@ public class SyncProtocol {
 				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
 				DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asSpecificationValue());
 
-				if (!collectionResponse.getSyncCollection().getSyncKey().equals("0")) {
+				if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
 					if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
 						buildUpdateItemChange(syncResponse.getUserDataRequest(), collectionResponse, 
 								syncResponse.getProcessedClientIds(), ce, syncResponse.getEncoderFactory());
@@ -111,7 +112,7 @@ public class SyncProtocol {
 					}
 				}
 				
-				sk.setTextContent(collectionResponse.getAllocateNewSyncKey());
+				sk.setTextContent(collectionResponse.getAllocateNewSyncKey().getSyncKey());
 			}
 			
 		}

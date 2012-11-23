@@ -43,7 +43,7 @@ public class SnapshotTest {
 	public void testNullDeviceId() {
 		Snapshot.builder()
 			.filterType(FilterType.ONE_DAY_BACK)
-			.syncKey("syncKey")
+			.syncKey(new SyncKey("syncKey"))
 			.collectionId(1)
 			.build();
 	}
@@ -52,7 +52,7 @@ public class SnapshotTest {
 	public void testNullFilterType() {
 		Snapshot.builder()
 			.deviceId(new DeviceId("deviceId"))
-			.syncKey("syncKey")
+			.syncKey(new SyncKey("syncKey"))
 			.collectionId(1)
 			.build();
 	}
@@ -62,7 +62,7 @@ public class SnapshotTest {
 		Snapshot.builder()
 			.deviceId(new DeviceId("deviceId"))
 			.filterType(FilterType.ONE_DAY_BACK)
-			.syncKey("syncKey")
+			.syncKey(new SyncKey("syncKey"))
 			.build();
 	}
 	
@@ -79,7 +79,7 @@ public class SnapshotTest {
 	public void testBuilder() {
 		FilterType filterType = FilterType.ONE_DAY_BACK;
 		DeviceId deviceId = new DeviceId("deviceId");
-		String synckey = "syncKey";
+		SyncKey synckey = new SyncKey("syncKey");
 		Integer collectionId = 1;
 		int uidNext = 2;
 		
