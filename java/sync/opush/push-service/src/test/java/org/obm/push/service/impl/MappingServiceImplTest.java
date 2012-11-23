@@ -45,6 +45,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
@@ -72,7 +73,7 @@ public class MappingServiceImplTest {
 		CollectionPath expectedCollectionPathTasks = new CollectionPathTest(collectionTasks, PIMDataType.TASKS, "login@domain");
 		
 		UserDataRequest udr = createMock(UserDataRequest.class);
-		expect(udr.getDevice()).andReturn(new Device(1, "DevType", "DevId", null));
+		expect(udr.getDevice()).andReturn(new Device(1, "DevType", new DeviceId("DevId"), null));
 
 		CollectionDao collectionDao = mockCollectionDaoForCollectionPaths(
 				collectionEmail, collectionCalendar, collectionContacts, collectionTasks);

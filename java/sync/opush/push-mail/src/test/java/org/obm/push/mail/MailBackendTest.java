@@ -61,6 +61,7 @@ import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
@@ -112,7 +113,7 @@ public class MailBackendTest {
 	@Before
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		collectionPathBuilder = createMock(Builder.class);
 		expect(collectionPathBuilder.userDataRequest(udr)).andReturn(collectionPathBuilder).anyTimes();

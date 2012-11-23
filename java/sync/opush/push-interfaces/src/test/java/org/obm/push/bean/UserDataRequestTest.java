@@ -64,7 +64,7 @@ public class UserDataRequestTest {
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		credentials = new Credentials(user, "test");
 		command = "command";
-		device = new Device(1, "devType", "devId", new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
 		protocolVersion = new BigDecimal(1.23);
 	}
 	

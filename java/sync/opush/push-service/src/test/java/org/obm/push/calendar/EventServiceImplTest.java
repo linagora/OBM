@@ -42,6 +42,7 @@ import org.obm.icalendar.Ical4jUser;
 import org.obm.icalendar.Ical4jUser.Factory;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
@@ -209,7 +210,7 @@ public class EventServiceImplTest {
 	}
 
 	private Device device() {
-		return new Device(1, "devType", "devId", null);
+		return new Device(1, "devType", new DeviceId("devId"), null);
 	}
 
 	private MSEventUid msEventUid() {

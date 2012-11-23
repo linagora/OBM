@@ -44,6 +44,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -51,7 +52,7 @@ import org.xml.sax.SAXException;
 
 public class XMLOPClient extends OPClient {
 
-	public XMLOPClient(String loginAtDomain, String password, String devId,
+	public XMLOPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, int port) {
 		
 		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));

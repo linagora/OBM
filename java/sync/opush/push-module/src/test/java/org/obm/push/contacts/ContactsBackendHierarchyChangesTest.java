@@ -50,6 +50,7 @@ import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
@@ -100,7 +101,7 @@ public class ContactsBackendHierarchyChangesTest {
 	@Before
 	public void setUp() throws Exception {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		accessToken = new AccessToken(0, "OBM");
 		contactParentId = 0;

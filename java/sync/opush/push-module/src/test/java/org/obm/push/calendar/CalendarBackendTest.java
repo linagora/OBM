@@ -57,6 +57,7 @@ import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
@@ -124,7 +125,7 @@ public class CalendarBackendTest {
 	@Before
 	public void setUp() {
 		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		this.token = new AccessToken(0, "OBM");
 		this.lastKnownState = new FolderSyncState("1234567890a");
@@ -214,7 +215,7 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 
 		int calendar1MappingId = 1;
@@ -274,7 +275,7 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 
 		int calendar1MappingId = 1;
@@ -349,7 +350,7 @@ public class CalendarBackendTest {
 
 	@Test
 	public void collectionDisplayNameForMultipleCalendar() throws Exception {
-		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		
 		int calendarMappingId = 1;

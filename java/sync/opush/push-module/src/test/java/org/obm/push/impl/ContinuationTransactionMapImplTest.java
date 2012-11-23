@@ -49,6 +49,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 
@@ -60,7 +61,7 @@ public class ContinuationTransactionMapImplTest {
 	
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", "devId", new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
 	}
 	
 	@Test

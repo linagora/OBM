@@ -36,6 +36,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.push.bean.DeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	private byte[] data;
 	private String protocolVersion;
 	private String deviceType;
-	private String deviceId;
+	private DeviceId deviceId;
 	private int cmdCode;
 	
 	private String attachmentName;
@@ -108,7 +109,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 			byte[] devId = new byte[data[i]];
 			System.arraycopy(data, i + 1, devId, 0, data[i]); // i==4
 			i += data[i] + 1; // i is now on policy key size
-			deviceId = new String(Base64.encodeBase64(devId));
+			deviceId = new DeviceId(new String(Base64.encodeBase64(devId)));
 		}
 
 		int policyKey = 0;
@@ -210,7 +211,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 			return Base64CommandCodes.getCmd(cmdCode);
 		}
 		if (key.equalsIgnoreCase("DeviceId")) {
-			return deviceId;
+			return deviceId.getDeviceId();
 		}
 		if (key.equalsIgnoreCase("AttachmentName")) {
 			return attachmentName;
@@ -261,7 +262,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	}
 
 	@Override
-	public String getDeviceId() {
+	public DeviceId getDeviceId() {
 		return deviceId;
 	}
 

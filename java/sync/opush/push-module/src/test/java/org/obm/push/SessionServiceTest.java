@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -60,7 +61,7 @@ public class SessionServiceTest {
 	private User user;
 	private Credentials credentials;
 	private ActiveSyncRequest activeSyncRequest;
-	private String deviceId;
+	private DeviceId deviceId;
 	private String command;
 	private Device device;
 	private UserDataRequest userDataRequest;
@@ -69,7 +70,7 @@ public class SessionServiceTest {
 	public void setup() {
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		credentials = new Credentials(user, "test");
-		deviceId = "devId";
+		deviceId = new DeviceId("devId");
 		command = "autodiscover";
 		device = new Device(1, "devType", deviceId, new Properties());
 		bindActiveSyncRequest();

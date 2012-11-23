@@ -36,6 +36,8 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.obm.push.bean.DeviceId;
+
 public interface ActiveSyncRequest {
 	String getParameter(String key);
 
@@ -45,7 +47,7 @@ public interface ActiveSyncRequest {
 
 	HttpServletRequest getHttpServletRequest();
 	
-	public String getDeviceId();
+	public DeviceId getDeviceId();
 	public String getDeviceType();
 	public String getUserAgent();
 	

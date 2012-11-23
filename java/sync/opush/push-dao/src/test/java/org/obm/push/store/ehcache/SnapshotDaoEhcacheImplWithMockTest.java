@@ -42,6 +42,7 @@ import net.sf.ehcache.Element;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
@@ -59,7 +60,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	@Test
 	public void getNull() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		SnapshotKey buildKey = SnapshotKey.builder()
 				.syncKey(syncKey)
@@ -87,7 +88,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	@Test
 	public void get() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 2;
 		SnapshotKey snapshotKey = SnapshotKey.builder()
 				.syncKey(syncKey)
@@ -132,7 +133,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	@Test
 	public void put() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 2;
 		SnapshotKey snapshotKey = SnapshotKey.builder()
 				.syncKey(syncKey)
@@ -175,7 +176,7 @@ public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void deleteAll() {
-		String deviceId = "deviceId1";
+		DeviceId deviceId = new DeviceId("deviceId");
 		
 		ObjectStoreManager objectStoreManager = createObjectStoreManager();
 		

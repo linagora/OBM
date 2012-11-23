@@ -29,30 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.bean;
 
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.User;
-import org.obm.push.exception.DaoException;
+import java.io.Serializable;
 
-public interface DeviceDao {
+import com.google.common.base.Objects;
+
+public class DeviceId implements Serializable {
+	private final String deviceId;
+
+	public DeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
 	
-	/**
-	 * Returns <code>true</code> if the device is authorized to synchronize.
-	 */
-	boolean syncAuthorized(User user, DeviceId deviceId) throws DaoException;
+	public String getDeviceId() {
+		return deviceId;
+	}
 
-	Device getDevice(User user, DeviceId deviceId, String userAgent)
-			throws DaoException;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(deviceId);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof DeviceId) {
+			DeviceId that = (DeviceId) object;
+			return Objects.equal(this.deviceId, that.deviceId);
+		}
+		return false;
+	}
 
-	void registerNewDevice(User user, DeviceId deviceId,
-			String deviceType) throws DaoException;
-
-	Long getPolicyKey(User user, DeviceId deviceId) throws DaoException;
-
-	long allocateNewPolicyKey(User user, DeviceId deviceId) throws DaoException;
-
-	void removePolicyKey(User user, Device device) throws DaoException;
-
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("deviceId", deviceId)
+			.toString();
+	}
 }

@@ -53,6 +53,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -72,7 +73,7 @@ public class ActiveSyncServletTest {
 	private User user;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
-	private String deviceId;
+	private DeviceId deviceId;
 	private String deviceType;
 	private String userAgent;
 	private int requestId;
@@ -88,7 +89,7 @@ public class ActiveSyncServletTest {
 		
 		activeSyncRequest = mocksControl.createMock(ActiveSyncRequest.class);
 		
-		deviceId = "devId";
+		deviceId = new DeviceId("devId");
 		deviceType = "devType";
 		userAgent = user.getLoginAtDomain();
 		requestId = 1;

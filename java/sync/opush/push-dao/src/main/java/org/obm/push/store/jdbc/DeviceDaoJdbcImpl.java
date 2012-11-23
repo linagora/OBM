@@ -39,6 +39,7 @@ import java.sql.SQLException;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
@@ -59,7 +60,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Device getDevice(User user, String deviceId, String userAgent) 
+	public Device getDevice(User user, DeviceId deviceId, String userAgent) 
 			throws DaoException {
 	
 		Connection con = null;
@@ -71,7 +72,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "WHERE identifier=? AND userobm_login=? AND domain_name=?");
-			ps.setString(1, deviceId);
+			ps.setString(1, deviceId.getDeviceId());
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
 			rs = ps.executeQuery();
@@ -80,7 +81,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 				String devId = rs.getString("identifier");
 				String devType = rs.getString("type");
 				
-				return deviceFactory.create(databaseId, devType, userAgent, devId);
+				return deviceFactory.create(databaseId, devType, userAgent, new DeviceId(devId));
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -91,7 +92,8 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public void registerNewDevice(User user, String deviceId, String deviceType) throws DaoException {
+	public void registerNewDevice(User user, DeviceId deviceId,
+			String deviceType) throws DaoException {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -102,7 +104,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "SELECT ?, ?, userobm_id FROM UserObm "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "WHERE userobm_login=? AND domain_name=?");
-			ps.setString(1, deviceId);
+			ps.setString(1, deviceId.getDeviceId());
 			ps.setString(2, deviceType);
 			ps.setString(3, user.getLogin());
 			ps.setString(4, user.getDomain());
@@ -120,7 +122,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 	
 	@Override
-	public boolean syncAuthorized(User user, String deviceId) throws DaoException {
+	public boolean syncAuthorized(User user, DeviceId deviceId) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -131,7 +133,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN Domain d ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device od ON device_id=id "
 					+ "WHERE od.identifier=? AND u.userobm_login=? AND d.domain_name=?");
-			ps.setString(1, deviceId);
+			ps.setString(1, deviceId.getDeviceId());
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
 
@@ -149,7 +151,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Long getPolicyKey(User user, String deviceId) throws DaoException {
+	public Long getPolicyKey(User user, DeviceId deviceId) throws DaoException {
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -161,7 +163,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device ON device_id=id "
 					+ "WHERE identifier=? AND userobm_login=? AND domain_name=?");
-			ps.setString(1, deviceId);
+			ps.setString(1, deviceId.getDeviceId());
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
 			rs = ps.executeQuery();
@@ -180,7 +182,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public long allocateNewPolicyKey(User user, String deviceId) throws DaoException {
+	public long allocateNewPolicyKey(User user, DeviceId deviceId) throws DaoException {
 
 		long newPolicyKeyId = allocateNewPolicyKey();
 		
@@ -198,7 +200,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			ps.setLong(1, newPolicyKeyId);
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
-			ps.setString(4, deviceId);
+			ps.setString(4, deviceId.getDeviceId());
 			int newRowCount = ps.executeUpdate();
 			if (newRowCount == 1) {
 				return newPolicyKeyId;

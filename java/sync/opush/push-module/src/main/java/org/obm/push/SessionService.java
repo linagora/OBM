@@ -33,9 +33,10 @@ package org.obm.push;
 
 import java.math.BigDecimal;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
@@ -60,7 +61,7 @@ public class SessionService {
 	}
 	
 	public UserDataRequest getSession(
-			Credentials credentials, String devId, ActiveSyncRequest request) throws DaoException {
+			Credentials credentials, DeviceId devId, ActiveSyncRequest request) throws DaoException {
 
 		String sessionId = credentials.getUser().getLoginAtDomain() + "/" + devId;
 		return createSession(credentials, request, sessionId);
@@ -70,7 +71,7 @@ public class SessionService {
 			ActiveSyncRequest r, String sessionId) throws DaoException {
 		
 		String userAgent = r.getUserAgent();
-		String devId = r.getDeviceId();
+		DeviceId devId = r.getDeviceId();
 		
 		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent);
 		

@@ -45,7 +45,7 @@ public class SnapshotKey implements Serializable{
 	
 	public static class Builder {
 		private String syncKey;
-		private String deviceId;
+		private DeviceId deviceId;
 		private Integer collectionId;
 		
 		private Builder() {}
@@ -54,7 +54,7 @@ public class SnapshotKey implements Serializable{
 			this.syncKey = syncKey;
 			return this;
 		}
-		public Builder deviceId(String deviceId) {
+		public Builder deviceId(DeviceId deviceId) {
 			this.deviceId = deviceId;
 			return this;
 		}
@@ -66,17 +66,17 @@ public class SnapshotKey implements Serializable{
 
 		public SnapshotKey build() {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey), "syncKey can't be null or empty");
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(deviceId), "deviceId can't be null or empty");
+			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
 			return new SnapshotKey(syncKey, deviceId, collectionId);
 		}
 	}	
 	
 	private final String syncKey;
-	private final String deviceId;
+	private final DeviceId deviceId;
 	private final Integer collectionId;
 
-	private SnapshotKey(String syncKey, String deviceId, Integer collectionId) {
+	private SnapshotKey(String syncKey, DeviceId deviceId, Integer collectionId) {
 		this.syncKey = syncKey;
 		this.deviceId = deviceId;
 		this.collectionId = collectionId;
@@ -86,7 +86,7 @@ public class SnapshotKey implements Serializable{
 		return syncKey;
 	}
 
-	public String getDeviceId() {
+	public DeviceId getDeviceId() {
 		return deviceId;
 	}
 

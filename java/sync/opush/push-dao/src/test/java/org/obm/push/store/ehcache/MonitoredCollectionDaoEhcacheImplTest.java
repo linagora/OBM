@@ -49,6 +49,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -134,6 +135,6 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", "DevId", null);
+		return new Device(1, "DevType", new DeviceId("DevId"), null);
 	}
 }

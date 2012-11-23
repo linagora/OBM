@@ -53,6 +53,7 @@ import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.MSContact;
@@ -103,7 +104,7 @@ public class ContactsBackendTest {
 	@Before
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		token = new AccessToken(0, "OBM");
 		

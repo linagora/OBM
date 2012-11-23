@@ -55,6 +55,7 @@ import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
@@ -336,6 +337,6 @@ public class CalendarEncoderTest {
 	}
 
 	private Device getFakeDevice() {
-		return new Device(1, "devType", "devId", new Properties());
+		return new Device(1, "devType", new DeviceId("devId"), new Properties());
 	}
 }

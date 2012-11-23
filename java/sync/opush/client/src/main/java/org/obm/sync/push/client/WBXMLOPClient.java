@@ -42,11 +42,13 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 
@@ -55,7 +57,7 @@ public class WBXMLOPClient extends OPClient {
 
 	private final WBXMLTools wbxmlTools;
 
-	public WBXMLOPClient(String loginAtDomain, String password, String devId,
+	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, int port, WBXMLTools wbxmlTools) {
 
 		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
@@ -76,9 +78,8 @@ public class WBXMLOPClient extends OPClient {
 		RequestEntity requestEntity = getRequestEntity(namespace, doc);
 		
 		PostMethod pm = null;
-		pm = new PostMethod(ai.getUrl() + "?User=" + ai.getLogin()
-				+ "&DeviceId=" + ai.getDevId() + "&DeviceType="
-				+ ai.getDevType() + "&Cmd=" + cmd);
+		pm = new PostMethod(buildUrl(ai.getUrl(), ai.getLogin(),
+				ai.getDevId(), ai.getDevType(), cmd));
 		pm.setRequestHeader("Content-Length", String.valueOf(requestEntity.getContentLength()));
 		pm.setRequestEntity(requestEntity);
 		pm.setRequestHeader("Content-Type", requestEntity.getContentType());
@@ -156,6 +157,14 @@ public class WBXMLOPClient extends OPClient {
 			pm.releaseConnection();
 		}
 		return xml;
+	}
+
+	@VisibleForTesting
+	static String buildUrl(String url, String login, DeviceId deviceId, String devType, String cmd) {
+		return url + "?User=" + login
+				+ "&DeviceId=" + deviceId.getDeviceId()
+				+ "&DeviceType=" + devType
+				+ "&Cmd=" + cmd;
 	}
 
 	private byte[] getResponse(PostMethod pm) throws IOException {

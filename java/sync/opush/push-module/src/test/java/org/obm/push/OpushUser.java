@@ -33,6 +33,7 @@ package org.obm.push;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 
@@ -45,7 +46,7 @@ public class OpushUser {
 		result.login = login;
 		result.password = password;
 		result.credentials = new Credentials(user, password);
-		result.device = new Device.Factory().create(1, "linphone", "linagent", "my phone");
+		result.device = new Device.Factory().create(1, "linphone", "linagent", new DeviceId("my phone"));
 		result.userDataRequest = new UserDataRequest(result.credentials, null, result.device, null);
 		return result;
 	}

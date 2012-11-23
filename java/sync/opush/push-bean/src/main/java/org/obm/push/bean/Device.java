@@ -47,7 +47,7 @@ public class Device implements Serializable {
 	
 	public static class Factory {
 	
-		public Device create(Integer databaseId, String devType, String userAgent, String devId) {
+		public Device create(Integer databaseId, String devType, String userAgent, DeviceId devId) {
 			Properties hints = getHints(userAgent, devType);
 			String rewritenDevType = rewriteDevType(userAgent, devType);
 			return new Device(databaseId, rewritenDevType, devId, hints);
@@ -99,10 +99,10 @@ public class Device implements Serializable {
 	
 	private final String devType;
 	private final Properties hints;
-	private final String devId;
+	private final DeviceId devId;
 	private final Integer databaseId;
 	
-	public Device(Integer databaseId, String devType, String devId, Properties hints) {
+	public Device(Integer databaseId, String devType, DeviceId devId, Properties hints) {
 		this.databaseId = databaseId;
 		this.devType = devType;
 		this.devId = devId;
@@ -121,7 +121,7 @@ public class Device implements Serializable {
 		return devType;
 	}
 
-	public String getDevId() {
+	public DeviceId getDevId() {
 		return devId;
 	}
 	

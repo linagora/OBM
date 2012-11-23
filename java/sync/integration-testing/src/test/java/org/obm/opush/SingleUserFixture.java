@@ -33,6 +33,7 @@ package org.obm.opush;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.auth.AccessToken;
@@ -46,7 +47,7 @@ public class SingleUserFixture {
 		public User user;
 		public String password;
 		public String deviceType;
-		public String deviceId;
+		public DeviceId deviceId;
 		public String userAgent;
 		public AccessToken accessToken;
 		public Credentials credentials;
@@ -63,7 +64,7 @@ public class SingleUserFixture {
 		jaures.user = userFactory.createUser("jaures@sfio.fr", "jaures@sfio.fr", "Jean Jaures");
 		jaures.password = "jaures";
 		jaures.deviceType = "BellLabsWiredPhone";
-		jaures.deviceId = "blwp123";
+		jaures.deviceId = new DeviceId("blwp123");
 		jaures.userAgent = "BellLabsWiredPhoneAgent";
 		jaures.device = new Device.Factory().create(2, jaures.deviceType, jaures.userAgent, jaures.deviceId);
 		jaures.accessToken = new AccessToken(1, "o-push");

@@ -142,7 +142,7 @@ public class SerializableTest {
 	
 	@Test
 	public void testDevice() throws IOException {
-		Device obj = new Device(1, "toto", "toto", new Properties());
+		Device obj = new Device(1, "toto", new DeviceId("toto"), new Properties());
 		objectOutputStream.writeObject(obj);
 	}
 
@@ -174,7 +174,7 @@ public class SerializableTest {
 	public void testSnapshot() throws IOException {
 		Snapshot snapshot = Snapshot.builder()
 				.collectionId(1)
-				.deviceId("deviceId")
+				.deviceId(new DeviceId("deviceId"))
 				.filterType(FilterType.THREE_DAYS_BACK)
 				.syncKey("syncKey")
 				.uidNext(2)
@@ -191,10 +191,16 @@ public class SerializableTest {
 	@Test
 	public void testSnapshotKey() throws IOException {
 		SnapshotKey snapshotKey = SnapshotKey.builder()
-				.deviceId("deviceId")
+				.deviceId(new DeviceId("deviceId"))
 				.syncKey("syncKey")
 				.collectionId(1)
 				.build();
 		objectOutputStream.writeObject(snapshotKey);
+	}
+	
+	@Test
+	public void testDeviceId() throws IOException {
+		DeviceId deviceId = new DeviceId("deviceId");
+		objectOutputStream.writeObject(deviceId);
 	}
 }

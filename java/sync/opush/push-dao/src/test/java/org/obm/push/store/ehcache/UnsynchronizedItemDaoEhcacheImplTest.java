@@ -48,6 +48,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.change.item.ItemChange;
@@ -181,7 +182,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", "DevId", null);
+		return new Device(1, "DevType", new DeviceId("DevId"), null);
 	}
 	
 	private boolean contains(Set<ItemChange> expected, ItemChange actual) {

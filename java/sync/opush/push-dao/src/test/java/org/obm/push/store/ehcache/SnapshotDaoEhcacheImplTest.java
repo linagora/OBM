@@ -45,6 +45,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
@@ -81,7 +82,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void getNull() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer connectionId = 1;
 		
 		Snapshot snapshot = snapshotDaoEhcacheImpl.get(deviceId, syncKey, connectionId);
@@ -92,7 +93,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void put() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		int uidNext = 2;
 		Email email = Email.builder()
@@ -116,7 +117,7 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void get() {
 		String syncKey = "synckey";
-		String deviceId = "deviceId";
+		DeviceId deviceId = new DeviceId("deviceId");
 		Integer collectionId = 1;
 		int uidNext = 2;
 		Email email = Email.builder()
@@ -142,8 +143,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	
 	@Test
 	public void deleteAllNullDeviceId() {
-		String deviceId = "deviceId1";
-		String deviceId2 = "deviceId2";
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
 		String syncKey = "synckey1";
 		String syncKey2 = "synckey2";
 		Integer collectionId = 1;
@@ -181,8 +182,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	}
 	@Test
 	public void deleteAll() {
-		String deviceId = "deviceId1";
-		String deviceId2 = "deviceId2";
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
 		String syncKey = "synckey1";
 		String syncKey2 = "synckey2";
 		Integer collectionId = 1;
@@ -216,8 +217,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 	
 	@Test
 	public void deleteAllWithMultipleSyncKeys() {
-		String deviceId = "deviceId1";
-		String deviceId2 = "deviceId2";
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
 		String syncKey = "synckey1";
 		String syncKey2 = "synckey2";
 		String syncKey3 = "synckey3";
@@ -259,8 +260,8 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
 	@Test
 	public void deleteAllWithMultipleCollectionId() {
-		String deviceId = "deviceId1";
-		String deviceId2 = "deviceId2";
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
 		String syncKey = "synckey1";
 		String syncKey2 = "synckey2";
 		Integer collectionId = 1;

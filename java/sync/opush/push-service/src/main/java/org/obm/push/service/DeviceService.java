@@ -32,17 +32,18 @@
 package org.obm.push.service;
 
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 
 public interface DeviceService {
 	
-	void initDevice(User loginAtDomain, String deviceId,
+	void initDevice(User loginAtDomain, DeviceId deviceId,
 			String deviceType, String userAgent);
 
-	boolean syncAuthorized(User user, String deviceId) throws DaoException;
+	boolean syncAuthorized(User user, DeviceId deviceId) throws DaoException;
 	
-	Device getDevice(User user, String deviceId, String userAgent) throws DaoException;
+	Device getDevice(User user, DeviceId deviceId, String userAgent) throws DaoException;
 
-	Long getPolicyKey(User user, String deviceId) throws DaoException;
+	Long getPolicyKey(User user, DeviceId deviceId) throws DaoException;
 }

@@ -32,18 +32,20 @@
 package org.obm.sync.push.client;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.push.bean.DeviceId;
+
 import com.google.common.base.Objects;
 
 public final class AccountInfos {
 	private String login;
 	private String password;
 	private String userId;
-	private String devId;
+	private DeviceId devId;
 	private String devType;
 	private String url;
 	private String userAgent;
 
-	public AccountInfos(String login, String password, String devId,
+	public AccountInfos(String login, String password, DeviceId devId,
 			String devType, String url, String userAgent) {
 		this.login = login;
 		int idx = login.indexOf('@');
@@ -71,7 +73,7 @@ public final class AccountInfos {
 		return userId;
 	}
 
-	public String getDevId() {
+	public DeviceId getDevId() {
 		return devId;
 	}
 

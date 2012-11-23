@@ -44,6 +44,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -63,7 +64,7 @@ public class ImapClientProviderImplTest {
 	@Before
 	public void setup() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", "my phone");
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		mocksControl = EasyMock.createControl();
 	}

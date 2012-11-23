@@ -46,6 +46,7 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;
@@ -205,7 +206,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 	
 	private void checkAuthorizedDevice(ActiveSyncRequest request, Credentials credentials) throws AuthFault, DaoException {
-		String deviceId = request.getDeviceId();
+		DeviceId deviceId = request.getDeviceId();
 		String deviceType = request.getDeviceType();
 		String userAgent = request.getUserAgent();
 		
@@ -220,7 +221,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private void processActiveSyncMethod(IContinuation continuation,
-			Credentials credentials, String devId,
+			Credentials credentials, DeviceId devId,
 			ActiveSyncRequest request, HttpServletResponse response)
 			throws IOException, DaoException {
 

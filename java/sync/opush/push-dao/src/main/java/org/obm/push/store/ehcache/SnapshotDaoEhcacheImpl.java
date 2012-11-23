@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SnapshotKey;
 import org.obm.push.store.SnapshotDao;
@@ -58,7 +59,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 	}
 
 	@Override
-	public Snapshot get(String deviceId, String syncKey, Integer collectionId) {
+	public Snapshot get(DeviceId deviceId, String syncKey, Integer collectionId) {
 		SnapshotKey key = SnapshotKey.builder()
 			.deviceId(deviceId)
 			.syncKey(syncKey)
@@ -83,9 +84,9 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 
 	private class SnapshotHasDeviceIdPredicate implements Predicate<SnapshotKey> {
 
-		private final String deviceId;
+		private final DeviceId deviceId;
 		
-		private SnapshotHasDeviceIdPredicate(String deviceId) {
+		private SnapshotHasDeviceIdPredicate(DeviceId deviceId) {
 			this.deviceId = deviceId;
 		}
 		
@@ -96,7 +97,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 	}
 	
 	@Override
-	public void deleteAll(String deviceId) {
+	public void deleteAll(DeviceId deviceId) {
 		List<SnapshotKey> keys = store.getKeys();
 		Iterable<SnapshotKey> toRemove = Iterables.filter(keys, new SnapshotHasDeviceIdPredicate(deviceId));
 		for (SnapshotKey snapshotKey : toRemove) {

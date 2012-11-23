@@ -55,6 +55,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.User;
@@ -223,7 +224,7 @@ public class EventConverterTest {
 	
 	private UserDataRequest buildUserDataRequest(Credentials credentials) {
 		UserDataRequest udr = new UserDataRequest(credentials,
-				"Sync", new Device(1, "devType", "devId", new Properties()), new BigDecimal("12.5"));
+				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties()), new BigDecimal("12.5"));
 		return udr;
 	}
 	

@@ -36,6 +36,8 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.obm.push.bean.DeviceId;
+
 
 public class SimpleQueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
 
@@ -64,8 +66,8 @@ public class SimpleQueryString extends AbstractActiveSyncRequest implements Acti
 	}
 
 	@Override
-	public String getDeviceId() {
-		return p("DeviceId");
+	public DeviceId getDeviceId() {
+		return new DeviceId(p("DeviceId"));
 	}
 
 	@Override

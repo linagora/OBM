@@ -37,6 +37,7 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProtocolVersion;
@@ -73,7 +74,7 @@ public class AbstractPushTest {
 		String userAgent = p(p, "userAgent");
 
 		wbxmlTools = new WBXMLTools();
-		opc = new WBXMLOPClient(login, password, devId, devType, userAgent, 9142, wbxmlTools);
+		opc = new WBXMLOPClient(login, password, new DeviceId(devId), devType, userAgent, 9142, wbxmlTools);
 	}
 
 	@After

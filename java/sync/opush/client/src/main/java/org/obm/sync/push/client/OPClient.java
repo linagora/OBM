@@ -41,6 +41,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
@@ -66,7 +67,7 @@ public abstract class OPClient {
 	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
-	protected OPClient(String loginAtDomain, String password, String devId,
+	protected OPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, String url) {
 
 		setProtocolVersion(ProtocolVersion.V121);

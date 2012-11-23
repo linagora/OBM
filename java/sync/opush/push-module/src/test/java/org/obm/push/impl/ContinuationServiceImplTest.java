@@ -48,6 +48,7 @@ import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -59,7 +60,7 @@ public class ContinuationServiceImplTest {
 
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", "devId", new Properties());
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
 	}
 	
 	@Test

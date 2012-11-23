@@ -33,6 +33,7 @@ package org.obm.push.service.impl;
 
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.DeviceService;
@@ -61,7 +62,8 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 	
 	@Override
-	public void initDevice(User loginAtDomain, String deviceId, String deviceType, String userAgent) {
+	public void initDevice(User loginAtDomain, DeviceId deviceId, 
+			String deviceType, String userAgent) {
 		try {
 			Device opushDeviceId = deviceDao.getDevice(loginAtDomain, deviceId, userAgent);
 			if (opushDeviceId == null) {
@@ -74,7 +76,7 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 	
 	@Override
-	public boolean syncAuthorized(User loginAtDomain, String deviceId) throws DaoException {
+	public boolean syncAuthorized(User loginAtDomain, DeviceId deviceId) throws DaoException {
 		if (userIsBlacklisted(loginAtDomain)) {
 			return false;
 		}
@@ -101,12 +103,12 @@ public class DeviceServiceImpl implements DeviceService {
 	}
 
 	@Override
-	public Device getDevice(User user, String deviceId, String userAgent) throws DaoException {
+	public Device getDevice(User user, DeviceId deviceId, String userAgent) throws DaoException {
 		return deviceDao.getDevice(user, deviceId, userAgent);
 	}
 
 	@Override
-	public Long getPolicyKey(User user, String deviceId) throws DaoException {
+	public Long getPolicyKey(User user, DeviceId deviceId) throws DaoException {
 		return deviceDao.getPolicyKey(user, deviceId);
 	}
 	

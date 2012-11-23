@@ -79,7 +79,7 @@ public class UserDataRequest {
 		return credentials.getPassword();
 	}
 
-	public String getDevId() {
+	public DeviceId getDevId() {
 		return device.getDevId();
 	}
 

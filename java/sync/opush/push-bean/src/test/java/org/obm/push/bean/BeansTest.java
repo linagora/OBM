@@ -112,6 +112,7 @@ public class BeansTest {
 					.add(Email.class)
 					.add(Snapshot.class)
 					.add(SnapshotKey.class)
+					.add(DeviceId.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

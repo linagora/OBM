@@ -48,7 +48,7 @@ public class Snapshot implements Serializable {
 	}
 	
 	public static class Builder {
-		private String deviceId;
+		private DeviceId deviceId;
 		private FilterType filterType;
 		private String syncKey;
 		private Integer collectionId;
@@ -59,7 +59,7 @@ public class Snapshot implements Serializable {
 			emails = Lists.newArrayList();
 		}
 		
-		public Builder deviceId(String deviceId) {
+		public Builder deviceId(DeviceId deviceId) {
 			this.deviceId = deviceId;
 			return this;
 		}
@@ -95,7 +95,7 @@ public class Snapshot implements Serializable {
 		}
 		
 		public Snapshot build() {
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(deviceId), "deviceId can't be null or empty");
+			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			Preconditions.checkArgument(filterType != null, "filterType can't be null or empty");
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(syncKey), "syncKey can't be null or empty");
 			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
@@ -103,14 +103,14 @@ public class Snapshot implements Serializable {
 		}
 	}
 	
-	private final String deviceId;
+	private final DeviceId deviceId;
 	private final FilterType filterType;
 	private final String syncKey;
 	private final Integer collectionId;
 	private final int uidNext;
 	private final Collection<Email> emails;
 	
-	private Snapshot(String deviceId, FilterType filterType, String syncKey, Integer collectionId, int uidNext, Collection<Email> emails) {
+	private Snapshot(DeviceId deviceId, FilterType filterType, String syncKey, Integer collectionId, int uidNext, Collection<Email> emails) {
 		this.deviceId = deviceId;
 		this.filterType = filterType;
 		this.syncKey = syncKey;
@@ -119,7 +119,7 @@ public class Snapshot implements Serializable {
 		this.emails = emails;
 	}
 
-	public String getDeviceId() {
+	public DeviceId getDeviceId() {
 		return deviceId;
 	}
 
