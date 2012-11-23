@@ -41,8 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class MinaIMAPMessage {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(ImapMessageSet.class);
+	private final static Logger logger = LoggerFactory.getLogger(MinaIMAPMessage.class);
 
 	private List<byte[]> frags;
 	private String messageLine;
