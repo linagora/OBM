@@ -29,53 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.bean.change.item;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.obm.push.backend.CollectionPath;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ItemChange;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.bean.Builder;
 
-public interface MappingService {
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
-	String collectionIdToString(Integer collectionId);
-
-	int createCollectionMapping(Device device, String col)
-			throws DaoException;
+public class ItemChangesBuilder implements Builder<List<ItemChange>> {
 	
-	Date getLastBackendMapping(PIMDataType dataType, FolderSyncState folderSyncState)
-			throws DaoException;
+	private final List<Builder<ItemChange>> builders;
 	
-	void createBackendMapping(PIMDataType pimDataType, FolderSyncState outgoingSyncState)
-			throws DaoException;
+	public ItemChangesBuilder() {
+		builders = new ArrayList<Builder<ItemChange>>();
+	}
 	
-	String getCollectionPathFor(Integer collectionId)
-			throws CollectionNotFoundException, DaoException;
-
-	Integer getCollectionIdFor(Device device, String collection) throws CollectionNotFoundException, DaoException;
+	public ItemChangesBuilder addItemChange(ItemChangeBuilder itemChangeBuilder) {
+		builders.add(itemChangeBuilder);
+		return this;
+	}
 	
-	List<ItemChange> buildItemsToDeleteFromUids(Integer collectionId,
-			Collection<Long> uids);
-
-	ItemChange getItemChange(Integer collectionId, String clientId);
-
-	String getServerIdFor(Integer collectionId, String clientId);
-	
-	Integer getItemIdFromServerId(String serverId);
-
-	Integer getCollectionIdFromServerId(String serverId);
-	
-	List<CollectionPath> listCollections(UserDataRequest udr, FolderSyncState folderSyncState) throws DaoException;
-
-	void snapshotCollections(FolderSyncState outgoingSyncState, Set<Integer> collectionIds)
-			throws DaoException;
+	@Override
+	public List<ItemChange> build() {
+		return Lists.transform(builders, new Function<Builder<ItemChange>, ItemChange>() {
+			@Override
+			public ItemChange apply(Builder<ItemChange> input) {
+				return input.build();
+			}
+		});
+	}
 }

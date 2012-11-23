@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean.hierarchy;
+package org.obm.push.bean.change.hierarchy;
 
 import java.io.Serializable;
 

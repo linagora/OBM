@@ -29,34 +29,67 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.change.item;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
-public class ItemChangesBuilder implements Builder<List<ItemChange>> {
+public class ItemDeletion implements Serializable {
 	
-	private final List<Builder<ItemChange>> builders;
-	
-	public ItemChangesBuilder() {
-		builders = new ArrayList<Builder<ItemChange>>();
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	public ItemChangesBuilder addItemChange(ItemChangeBuilder itemChangeBuilder) {
-		builders.add(itemChangeBuilder);
-		return this;
+	public static class Builder {
+		
+		private String serverId;
+		
+		private Builder() {
+			super();
+		}
+		
+		public Builder serverId(String serverId) {
+			this.serverId = serverId;
+			return this;
+		}
+		
+		public ItemDeletion build() {
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(serverId));
+			return new ItemDeletion(serverId);
+		}
+	}
+	
+	private final String serverId;
+
+	private ItemDeletion(String serverId) {
+		this.serverId = serverId;
+	}
+	
+	public String getServerId() {
+		return serverId;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(serverId);
 	}
 	
 	@Override
-	public List<ItemChange> build() {
-		return Lists.transform(builders, new Function<Builder<ItemChange>, ItemChange>() {
-			@Override
-			public ItemChange apply(Builder<ItemChange> input) {
-				return input.build();
-			}
-		});
+	public final boolean equals(Object object){
+		if (object instanceof ItemDeletion) {
+			ItemDeletion that = (ItemDeletion) object;
+			return Objects.equal(this.serverId, that.serverId);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("serverId", serverId)
+			.toString();
 	}
 }

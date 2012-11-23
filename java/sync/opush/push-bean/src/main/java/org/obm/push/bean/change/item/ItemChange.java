@@ -29,59 +29,78 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean.hierarchy;
+package org.obm.push.bean.change.item;
 
 import java.io.Serializable;
 
+import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.MSEmail;
+
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
-public class CollectionDeletion implements Serializable {
+public class ItemChange implements Serializable {
 	
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static class Builder {
-		
-		private String collectionId;
-		
-		private Builder() {
-			super();
-		}
-		
-		public Builder collectionId(String collectionId) {
-			this.collectionId = collectionId;
-			return this;
-		}
-		
-		public CollectionDeletion build() {
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(collectionId));
-			return new CollectionDeletion(collectionId);
-		}
-	}
-	
-	private final String collectionId;
+	private IApplicationData data;
+	private String serverId;
+	private boolean isNew;
 
-	private CollectionDeletion(String collectionId) {
-		this.collectionId = collectionId;
+	public ItemChange() {
+		this(null);
 	}
 	
-	public String getCollectionId() {
-		return collectionId;
+	public ItemChange(String serverId) {
+		this(serverId, false);
+	}
+
+	public ItemChange(String serverId, boolean isNew) {
+		super();
+		this.serverId = serverId;
+		this.isNew = isNew;
+	}
+	
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+
+	public IApplicationData getData() {
+		return data;
+	}
+
+	public void setData(IApplicationData data) {
+		this.data = data;
+	}
+
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
+	}
+
+	public boolean isMSEmail() {
+		if (getData() instanceof MSEmail) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(collectionId);
+		return Objects.hashCode(serverId, isNew, data);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof CollectionDeletion) {
-			CollectionDeletion that = (CollectionDeletion) object;
-			return Objects.equal(this.collectionId, that.collectionId);
+		if (object instanceof ItemChange) {
+			ItemChange that = (ItemChange) object;
+			return Objects.equal(this.serverId, that.serverId)
+				&& Objects.equal(this.isNew, that.isNew)
+				&& Objects.equal(this.data, that.data);
 		}
 		return false;
 	}
@@ -89,7 +108,8 @@ public class CollectionDeletion implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("collectionId", collectionId)
+			.add("serverId", serverId)
+			.add("isNew", isNew)
 			.toString();
 	}
 }

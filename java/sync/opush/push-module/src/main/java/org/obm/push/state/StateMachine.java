@@ -38,11 +38,11 @@ import java.util.Set;
 
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;

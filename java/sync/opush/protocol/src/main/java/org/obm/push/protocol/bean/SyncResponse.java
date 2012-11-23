@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.protocol.data.EncoderFactory;
 
 public class SyncResponse {

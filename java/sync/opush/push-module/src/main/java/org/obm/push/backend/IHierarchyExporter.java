@@ -33,7 +33,7 @@ package org.obm.push.backend;
 
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 

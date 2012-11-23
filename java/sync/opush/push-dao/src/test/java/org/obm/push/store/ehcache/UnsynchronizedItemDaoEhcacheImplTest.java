@@ -48,9 +48,9 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.change.item.ItemChange;
 import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;

@@ -33,9 +33,9 @@ package org.obm.push.protocol.bean;
 
 import java.util.List;
 
-import org.obm.push.bean.hierarchy.CollectionChange;
-import org.obm.push.bean.hierarchy.CollectionDeletion;
-import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
+import org.obm.push.bean.change.hierarchy.CollectionChange;
+import org.obm.push.bean.change.hierarchy.CollectionDeletion;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 
 public class FolderSyncResponse {
 	

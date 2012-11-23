@@ -36,7 +36,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.change.item.ItemChange;
+
 import com.google.common.base.Objects;
 
 public class DataDelta {

@@ -35,8 +35,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.push.bean.Builder;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangesBuilder;
+import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemChangesBuilder;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;

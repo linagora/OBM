@@ -39,7 +39,7 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;

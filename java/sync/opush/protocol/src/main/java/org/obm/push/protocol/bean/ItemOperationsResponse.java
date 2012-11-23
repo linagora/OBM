@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.change.item.ItemChange;
 
 public class ItemOperationsResponse {
 

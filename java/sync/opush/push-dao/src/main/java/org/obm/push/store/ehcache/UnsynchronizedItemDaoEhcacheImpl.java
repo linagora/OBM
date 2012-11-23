@@ -40,7 +40,7 @@ import net.sf.ehcache.Element;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.common.collect.Sets;

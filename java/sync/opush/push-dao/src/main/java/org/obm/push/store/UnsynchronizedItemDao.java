@@ -35,7 +35,7 @@ import java.util.Collection;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.ItemChange;
+import org.obm.push.bean.change.item.ItemChange;
 
 public interface UnsynchronizedItemDao {
 	

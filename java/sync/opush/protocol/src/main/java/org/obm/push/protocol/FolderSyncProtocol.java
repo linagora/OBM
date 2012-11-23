@@ -34,8 +34,8 @@ package org.obm.push.protocol;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.hierarchy.CollectionChange;
-import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.change.hierarchy.CollectionChange;
+import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;

@@ -29,59 +29,79 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.change.hierarchy;
 
-import java.io.Serializable;
+import java.util.List;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
-public class ItemDeletion implements Serializable {
-	
+public class HierarchyCollectionChanges {
+
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		
-		private String serverId;
-		
+		private List<CollectionChange> changes;
+		private List<CollectionDeletion> deletions;
+
 		private Builder() {
-			super();
+			changes = Lists.newArrayList();
+			deletions = Lists.newArrayList();
 		}
 		
-		public Builder serverId(String serverId) {
-			this.serverId = serverId;
+		public Builder changes(List<CollectionChange> changes) {
+			Preconditions.checkNotNull(changes);
+			this.changes.addAll(changes);
 			return this;
 		}
 		
-		public ItemDeletion build() {
-			Preconditions.checkArgument(!Strings.isNullOrEmpty(serverId));
-			return new ItemDeletion(serverId);
+		public Builder deletions(List<CollectionDeletion> deletions) {
+			Preconditions.checkNotNull(deletions);
+			this.deletions.addAll(deletions);
+			return this;
+		}
+		
+		public Builder mergeItems(HierarchyCollectionChanges hierarchyItemsChanges) {
+			changes(hierarchyItemsChanges.getCollectionChanges());
+			deletions(hierarchyItemsChanges.getCollectionDeletions());
+			return this;
+		}
+		
+		public HierarchyCollectionChanges build() {
+			return new HierarchyCollectionChanges(changes, deletions);
 		}
 	}
 	
-	private final String serverId;
+	private final List<CollectionChange> changes;
+	private final List<CollectionDeletion> deletions;
 
-	private ItemDeletion(String serverId) {
-		this.serverId = serverId;
+	private HierarchyCollectionChanges(List<CollectionChange> changes, List<CollectionDeletion> deletions) {
+		this.changes = changes;
+		this.deletions = deletions;
 	}
 	
-	public String getServerId() {
-		return serverId;
+	public List<CollectionChange> getCollectionChanges() {
+		return changes;
+	}
+	
+	public List<CollectionDeletion> getCollectionDeletions() {
+		return deletions;
 	}
 
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(serverId);
+	public int hashCode(){
+		return Objects.hashCode(changes, deletions);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
-		if (object instanceof ItemDeletion) {
-			ItemDeletion that = (ItemDeletion) object;
-			return Objects.equal(this.serverId, that.serverId);
+	public boolean equals(Object object){
+		if (object instanceof HierarchyCollectionChanges) {
+			HierarchyCollectionChanges that = (HierarchyCollectionChanges) object;
+			return Objects.equal(this.changes, that.changes)
+				&& Objects.equal(this.deletions, that.deletions);
 		}
 		return false;
 	}
@@ -89,7 +109,8 @@ public class ItemDeletion implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("serverId", serverId)
+			.add("changes", changes)
+			.add("deletions", deletions)
 			.toString();
 	}
 }
