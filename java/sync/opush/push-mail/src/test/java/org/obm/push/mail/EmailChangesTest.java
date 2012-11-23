@@ -31,41 +31,65 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import org.junit.Before;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.FetchInstruction;
-import org.obm.push.mail.conversation.EmailViewAttachment;
-import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.BodyParams;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.push.mail.bean.Email;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public class EmailChangesTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	@Test
+	public void buildWithNullDeletions() {
+		EmailChanges emailChanges = EmailChanges.builder()
+			.changes(ImmutableSet.<Email>of())
+			.additions(ImmutableSet.<Email>of())
+			.deletions(null)
+			.build();
+		
+		assertThat(emailChanges.deletions()).isEmpty();
+	}
+
+	@Test
+	public void buildWithNullChanges() {
+		EmailChanges emailChanges = EmailChanges.builder()
+			.deletions(ImmutableSet.<Email>of())
+			.additions(ImmutableSet.<Email>of())
+			.changes(null)
+			.build();
+		
+		assertThat(emailChanges.changes()).isEmpty();
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(FetchInstruction.class)
-					.add(EmailChanges.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	public void buildWithNullAdditions() {
+		EmailChanges emailChanges = EmailChanges.builder()
+			.changes(ImmutableSet.<Email>of())
+			.deletions(ImmutableSet.<Email>of())
+			.additions(null)
+			.build();
 		
-		equalsVerifierUtilsTest.createEqualsVerifier(EmailViewAttachment.class)
-			.withPrefabValues(BodyParams.class, 
-					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
-					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
-			.verify();
+		assertThat(emailChanges.additions()).isEmpty();
+	}
+
+	@Test
+	public void buildOneEmailInEachCollection() {
+		Email change = new Email(1, true, date("2004-12-13T21:39:45Z"));
+		Email deletion = new Email(2, true, date("2005-10-13T21:39:45Z"));
+		Email addition = new Email(3, true, date("2006-08-13T21:39:45Z"));
+		EmailChanges emailChanges = EmailChanges.builder()
+			.changes(ImmutableSet.<Email>of(change))
+			.deletions(ImmutableSet.<Email>of(deletion))
+			.additions(ImmutableSet.<Email>of(addition))
+			.build();
+
+		assertThat(emailChanges.changes()).containsOnly(change);
+		assertThat(emailChanges.deletions()).containsOnly(deletion);
+		assertThat(emailChanges.additions()).containsOnly(addition);
 	}
 }

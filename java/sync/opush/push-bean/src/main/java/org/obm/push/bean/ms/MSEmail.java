@@ -36,7 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
@@ -271,18 +270,17 @@ public class MSEmail implements IApplicationData, Serializable {
 	public final boolean equals(Object obj) {
 		if (obj instanceof MSEmail) {
 			MSEmail other = (MSEmail) obj;
-			return new EqualsBuilder()
-				.append(answered, other.answered)
-				.append(attachments, other.attachments)
-				.append(header, other.header)
-				.append(body, other.body)
-				.append(importance, other.importance)
-				.append(meetingRequest, other.meetingRequest)
-				.append(messageClass, other.messageClass)
-				.append(read, other.read)
-				.append(starred, other.starred)
-				.append(uid, other.uid)
-				.isEquals();
+			return Objects.equal(this.answered, other.answered)
+				&& Objects.equal(this.answered, other.answered)
+				&& Objects.equal(this.attachments, other.attachments)
+				&& Objects.equal(this.header, other.header)
+				&& Objects.equal(this.body, other.body)
+				&& Objects.equal(this.importance, other.importance)
+				&& Objects.equal(this.meetingRequest, other.meetingRequest)
+				&& Objects.equal(this.messageClass, other.messageClass)
+				&& Objects.equal(this.read, other.read)
+				&& Objects.equal(this.starred, other.starred)
+				&& Objects.equal(this.uid, other.uid);
 		}
 		return false;
 	}

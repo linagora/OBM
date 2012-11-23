@@ -35,21 +35,89 @@ import java.util.Set;
 
 import org.obm.push.mail.bean.Email;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
+
 public class EmailChanges {
 
-	public EmailChanges() {
-		super();
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+	
+		private Set<Email> deletions;
+		private Set<Email> changes;
+		private Set<Email> additions;
+		
+		private Builder() {
+			super();
+		}
+
+		public Builder deletions(Set<Email> deletions) {
+			this.deletions = deletions;
+			return this;
+		}
+
+		public Builder changes(Set<Email> changes) {
+			this.changes = changes;
+			return this;
+		}
+
+		public Builder additions(Set<Email> additions) {
+			this.additions = additions;
+			return this;
+		}
+		
+		public EmailChanges build() {
+			if (deletions == null) {
+				deletions = ImmutableSet.<Email>of();
+			}
+			if (changes == null) {
+				changes = ImmutableSet.<Email>of();
+			}
+			if (additions == null) {
+				additions = ImmutableSet.<Email>of();
+			}
+			return new EmailChanges(deletions, changes, additions);
+		}
+	}
+
+	private final Set<Email> deletions;
+	private final Set<Email> changes;
+	private final Set<Email> additions;
+	
+	private EmailChanges(Set<Email> deletions, Set<Email> changes, Set<Email> additions) {
+		this.deletions = deletions;
+		this.changes = changes;
+		this.additions = additions;
 	}
 	
 	public Set<Email> deletions() {
-		throw new UnsupportedOperationException();
+		return deletions;
 	}
 
 	public Set<Email> changes() {
-		throw new UnsupportedOperationException();
+		return changes;
 	}
 
 	public Set<Email> additions() {
-		throw new UnsupportedOperationException();
+		return additions;
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(deletions, changes, additions);
+	}
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof EmailChanges) {
+			EmailChanges other = (EmailChanges) obj;
+			return Objects.equal(this.deletions, other.deletions)
+				&& Objects.equal(this.changes, other.changes)
+				&& Objects.equal(this.additions, other.additions);
+		}
+		return false;
 	}
 }
