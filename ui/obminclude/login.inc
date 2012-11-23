@@ -53,6 +53,7 @@ $login_javascript_footer = "
 </script>
 ";
 
+SI18n::set_locale($set_lang_default);
 
 $theme_file = "resources/themes/$set_theme_default/theme.inc";
 include_once($theme_file);

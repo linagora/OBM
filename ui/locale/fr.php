@@ -123,5 +123,7 @@ return array(
     => "Vous utilisez la version libre et gratuite d'<a href=\"http://www.obm.org/\">OBM</a> développée et supportée par <a href=\"http://www.linagora.com/\">Linagora</a>.",
   "Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>."
     => "Contribuez à la R&amp;D du produit en souscrivant à une <a href=\"http://pro.obm.org/\">offre entreprise</a>.",
- 'OBM free/busy information sharing : %firstname% %name%' => 'Partage de l\'agenda des disponibilités : %firstname% %name%'
+ 'OBM free/busy information sharing : %firstname% %name%' => 'Partage de l\'agenda des disponibilités : %firstname% %name%',
+  "Captcha" => "Captcha",
+  "Verification" => "Vérification"		
 );
