@@ -34,8 +34,8 @@ package org.obm.push.protocol;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;
@@ -69,29 +69,29 @@ public class FolderSyncProtocol {
 		Element changes = DOMUtils.createElement(root, "Changes");
 		DOMUtils.createElementAndText(changes, "Count", String.valueOf(folderSyncResponse.getCount()));
 		
-		for (ItemChange itemChange: folderSyncResponse.getItemsAddedAndUpdated()) {
+		for (CollectionChange collectionChange: folderSyncResponse.getCollectionsAddedAndUpdated()) {
 			Element addedOrUpdated;
-			if (itemChange.isNew()) {
+			if (collectionChange.isNew()) {
 				addedOrUpdated = DOMUtils.createElement(changes, "Add");
 			} else {
 				addedOrUpdated = DOMUtils.createElement(changes, "Update");
 			}
-			addItemChange(addedOrUpdated, itemChange);
+			addCollectionChange(addedOrUpdated, collectionChange);
 		}
 		
-		for (ItemDeletion itemDeleted: folderSyncResponse.getItemsDeleted()) {
+		for (CollectionDeletion collectionDeleted: folderSyncResponse.getCollectionsDeleted()) {
 			Element deleted = DOMUtils.createElement(changes, "Delete");
-			DOMUtils.createElementAndText(deleted, "ServerId", itemDeleted.getServerId());
+			DOMUtils.createElementAndText(deleted, "ServerId", collectionDeleted.getCollectionId());
 		}
 		
 		return ret;
 	}
 
-	private void addItemChange(Element addedOrUpdated, ItemChange itemChange) {
-		DOMUtils.createElementAndText(addedOrUpdated, "ServerId", itemChange.getServerId());
-		DOMUtils.createElementAndText(addedOrUpdated, "ParentId", itemChange.getParentId());
-		DOMUtils.createElementAndText(addedOrUpdated, "DisplayName", itemChange.getDisplayName());
-		DOMUtils.createElementAndText(addedOrUpdated, "Type", itemChange.getItemType()
+	private void addCollectionChange(Element addedOrUpdated, CollectionChange collectionChange) {
+		DOMUtils.createElementAndText(addedOrUpdated, "ServerId", collectionChange.getCollectionId());
+		DOMUtils.createElementAndText(addedOrUpdated, "ParentId", collectionChange.getParentCollectionId());
+		DOMUtils.createElementAndText(addedOrUpdated, "DisplayName", collectionChange.getDisplayName());
+		DOMUtils.createElementAndText(addedOrUpdated, "Type", collectionChange.getFolderType()
 				.asIntString());
 	}
 

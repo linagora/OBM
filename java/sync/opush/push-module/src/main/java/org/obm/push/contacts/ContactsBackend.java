@@ -47,15 +47,16 @@ import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -109,7 +110,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
+	public HierarchyCollectionChanges getHierarchyChanges(UserDataRequest udr, 
 			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException, InvalidSyncKeyException {
 
@@ -157,23 +158,25 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
+	protected CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection collection)
 			throws DaoException, CollectionNotFoundException {
 		
-		boolean isNew = false;
 		CollectionPath collectionPath = collection.collectionPath();
-		String serverId = getServerIdFromCollectionPath(udr, collectionPath.collectionPath());
-		String parentId = contactConfiguration.getDefaultParentId();
-		FolderType itemType = getItemType(udr, collection);
-		return new ItemChange(serverId, parentId, collection.displayName(), itemType, isNew);
+		return CollectionChange.builder()
+				.collectionId(getCollectionIdFromCollectionPath(udr, collectionPath.collectionPath()))
+				.parentCollectionId(contactConfiguration.getDefaultParentId())
+				.folderType(getFolderType(udr, collection))
+				.displayName(collection.displayName())
+				.isNew(true)
+				.build();
 	}
 
 	@Override
-	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+	protected CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath collectionPath)
 			throws CollectionNotFoundException, DaoException {
 		
-		return ItemDeletion.builder()
-				.serverId(getServerIdFromCollectionPath(udr, collectionPath.collectionPath()))
+		return CollectionDeletion.builder()
+				.collectionId(getCollectionIdFromCollectionPath(udr, collectionPath.collectionPath()))
 				.build();
 	}
 
@@ -237,14 +240,14 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 	
-	private String getServerIdFromCollectionPath(UserDataRequest udr, String collectionPath)
+	private String getCollectionIdFromCollectionPath(UserDataRequest udr, String collectionPath)
 			throws DaoException, CollectionNotFoundException {
 		
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 		return mappingService.collectionIdToString(collectionId);
 	}
 	
-	private FolderType getItemType(UserDataRequest udr, OpushCollection collection) {
+	private FolderType getFolderType(UserDataRequest udr, OpushCollection collection) {
 		if (isDefaultFolder(udr, collection)) {
 			return FolderType.DEFAULT_CONTACTS_FOLDER;
 		} else {

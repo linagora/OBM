@@ -52,14 +52,13 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.impl.MappingService;
@@ -151,20 +150,20 @@ public class ContactsBackendHierarchyChangesTest {
 
 		mocks.replay();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		mocks.verify();
 		
-		ItemChange expectedItemChange = new ItemChangeBuilder()
-				.serverId(String.valueOf(contactParentId))
-				.parentId("0")
+		CollectionChange expectedItemChange = CollectionChange.builder()
+				.collectionId(String.valueOf(contactParentId))
+				.parentCollectionId("0")
 				.displayName(contactParentName)
-				.itemType(FolderType.DEFAULT_CONTACTS_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.DEFAULT_CONTACTS_FOLDER)
+				.isNew(true)
 				.build();
-		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(1);
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).hasSize(1);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(expectedItemChange);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -182,12 +181,12 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		mocks.replay();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		mocks.verify();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -213,20 +212,20 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		mocks.replay();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		mocks.verify();
 
-		ItemChange expectedItemChange = new ItemChangeBuilder()
-				.serverId(String.valueOf(otherCollectionMappingId))
-				.parentId(contactParentIdAsString)
+		CollectionChange expectedItemChange = CollectionChange.builder()
+				.collectionId(String.valueOf(otherCollectionMappingId))
+				.parentCollectionId(contactParentIdAsString)
 				.displayName(otherCollectionDisplayName)
-				.itemType(FolderType.USER_CREATED_CONTACTS_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.isNew(true)
 				.build();
-		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(1);
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).hasSize(1);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(expectedItemChange);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -253,19 +252,19 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		mocks.replay();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		mocks.verify();
 
-		ItemDeletion expectedItemDeletion = ItemDeletion.builder()
-				.serverId(String.valueOf(contactParentId))
+		CollectionDeletion expectedItemDeletion = CollectionDeletion.builder()
+				.collectionId(String.valueOf(contactParentId))
 				.build();
-		ItemDeletion expectedItem2Deletion = ItemDeletion.builder()
-				.serverId(String.valueOf(otherCollectionMappingId))
+		CollectionDeletion expectedItem2Deletion = CollectionDeletion.builder()
+				.collectionId(String.valueOf(otherCollectionMappingId))
 				.build();
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-		assertThat(hierarchyItemsChanges.getDeletedItems()).hasSize(2);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(expectedItemDeletion, expectedItem2Deletion);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).hasSize(2);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(expectedItemDeletion, expectedItem2Deletion);
 	}
 	
 	@Test
@@ -290,12 +289,17 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", targetCollectionId);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(new ItemChange(String.valueOf(targetCollectionId),
-				contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).containsOnly(CollectionChange.builder()
+				.collectionId(String.valueOf(targetCollectionId))
+				.parentCollectionId(contactParentIdAsString)
+				.displayName("both")
+				.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.isNew(true)
+				.build());
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -317,11 +321,11 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", targetCollectionId);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).isEmpty();
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).isEmpty();
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -346,11 +350,11 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both2", 3);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).isEmpty();
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).isEmpty();
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 
 	@Test
@@ -375,12 +379,18 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("known", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
+					.collectionId("3")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("add")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build());
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 
 	@Test
@@ -405,13 +415,19 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("known", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).containsOnly(
-				ItemDeletion.builder().serverId("2").build());
+		assertThat(changes.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
+					.collectionId("3")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("add")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build());
+		assertThat(changes.getCollectionDeletions()).containsOnly(
+				CollectionDeletion.builder().collectionId("2").build());
 	}
 	
 	@Test
@@ -435,12 +451,18 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("unknown", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("3", contactParentIdAsString, "add", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
+					.collectionId("3")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("add")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build());
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -466,13 +488,25 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("2", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true),
-				new ItemChange("3", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
+					.collectionId("2")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("both")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build(),
+				CollectionChange.builder()
+					.collectionId("3")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("both")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build());
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -495,12 +529,18 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).containsOnly(
-				new ItemChange("2", contactParentIdAsString, "both", FolderType.USER_CREATED_CONTACTS_FOLDER, true));
-		assertThat(changes.getDeletedItems()).isEmpty();
+		assertThat(changes.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
+					.collectionId("2")
+					.parentCollectionId(contactParentIdAsString)
+					.displayName("both")
+					.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+					.isNew(true)
+					.build());
+		assertThat(changes.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -526,13 +566,13 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", 3);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).isEmpty();
-		assertThat(changes.getDeletedItems()).containsOnly(
-				ItemDeletion.builder().serverId("2").build(),
-				ItemDeletion.builder().serverId("3").build());
+		assertThat(changes.getCollectionChanges()).isEmpty();
+		assertThat(changes.getCollectionDeletions()).containsOnly(
+				CollectionDeletion.builder().collectionId("2").build(),
+				CollectionDeletion.builder().collectionId("3").build());
 	}
 	
 	@Test
@@ -558,12 +598,12 @@ public class ContactsBackendHierarchyChangesTest {
 		expectBuildCollectionPath("both", 2);
 		
 		mocks.replay();
-		HierarchyItemsChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges changes = contactsBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		mocks.verify();
 		
-		assertThat(changes.getChangedItems()).isEmpty();
-		assertThat(changes.getDeletedItems()).containsOnly(
-				ItemDeletion.builder().serverId("2").build());
+		assertThat(changes.getCollectionChanges()).isEmpty();
+		assertThat(changes.getCollectionDeletions()).containsOnly(
+				CollectionDeletion.builder().collectionId("2").build());
 	}
 	
 	private Builder expectBuildCollectionPath(String displayName, int folderUid) {

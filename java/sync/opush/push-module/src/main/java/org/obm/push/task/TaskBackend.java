@@ -38,13 +38,13 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -111,10 +111,10 @@ public class TaskBackend implements PIMBackend {
 	}
 
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(
+	public HierarchyCollectionChanges getHierarchyChanges(
 			UserDataRequest userDataRequest, FolderSyncState lastKnownState,
 			FolderSyncState outgoingSyncState) throws DaoException {
-		return HierarchyItemsChanges.builder().build();
+		return HierarchyCollectionChanges.builder().build();
 	}
 	
 }

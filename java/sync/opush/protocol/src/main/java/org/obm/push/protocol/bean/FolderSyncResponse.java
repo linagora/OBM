@@ -31,39 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.Collection;
+import java.util.List;
 
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 
 public class FolderSyncResponse {
 	
-	private final HierarchyItemsChanges hierarchyItemsChanges;
+	private final HierarchyCollectionChanges hierarchyItemsChanges;
 	private final String newSyncKey;
 	
-	public FolderSyncResponse(HierarchyItemsChanges hierarchyItemsChanges, String newSyncKey) {
+	public FolderSyncResponse(HierarchyCollectionChanges hierarchyItemsChanges, String newSyncKey) {
 		this.hierarchyItemsChanges = hierarchyItemsChanges;
 		this.newSyncKey = newSyncKey;
 	}
 	
 	public int getCount() {
 		int count = 0;
-		if (getItemsAddedAndUpdated() != null) {
-			count += getItemsAddedAndUpdated().size();
+		if (getCollectionsAddedAndUpdated() != null) {
+			count += getCollectionsAddedAndUpdated().size();
 		}
-		if (getItemsDeleted() != null) {
-			count += getItemsDeleted().size();
+		if (getCollectionsDeleted() != null) {
+			count += getCollectionsDeleted().size();
 		}
 		return count;
 	}
 
-	public Collection<ItemChange> getItemsAddedAndUpdated() {
-		return hierarchyItemsChanges.getChangedItems();
+	public List<CollectionChange> getCollectionsAddedAndUpdated() {
+		return hierarchyItemsChanges.getCollectionChanges();
 	}
 	
-	public Collection<ItemDeletion> getItemsDeleted() {
-		return hierarchyItemsChanges.getDeletedItems();
+	public List<CollectionDeletion> getCollectionsDeleted() {
+		return hierarchyItemsChanges.getCollectionDeletions();
 	}
 	
 	public String getNewSyncKey() {

@@ -40,6 +40,8 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
@@ -67,6 +69,8 @@ public class BeansTest {
 					.add(ChangedCollections.class)
 					.add(Credentials.class)
 					.add(Device.class)
+					.add(CollectionChange.class)
+					.add(CollectionDeletion.class)
 					.add(ItemChange.class)
 					.add(ItemDeletion.class)
 					.add(MeetingResponse.class)

@@ -60,11 +60,8 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -74,6 +71,9 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -168,20 +168,20 @@ public class CalendarBackendTest {
 
 		replay(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		verify(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
 		
-		ItemChange expectedItemChange = new ItemChangeBuilder()
-				.serverId(String.valueOf(collectionMappingId))
-				.parentId("0")
+		CollectionChange expectedItemChange = CollectionChange.builder()
+				.collectionId(String.valueOf(collectionMappingId))
+				.parentCollectionId("0")
 				.displayName(calendarDisplayName + " calendar")
-				.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
 				.build();
-		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(1);
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).hasSize(1);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(expectedItemChange);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -200,12 +200,12 @@ public class CalendarBackendTest {
 
 		replay(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		verify(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 
 	@Test
@@ -243,29 +243,29 @@ public class CalendarBackendTest {
 		replay(loginService, mappingService, collectionPathBuilder1, collectionPathBuilder2,
 				collectionPathBuilderProvider, calendarClient);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		verify(loginService, mappingService, collectionPathBuilder1, collectionPathBuilder2,
 				collectionPathBuilderProvider, calendarClient);
 
-		ItemChange expectedItemChange1 = new ItemChangeBuilder()
-				.serverId(String.valueOf(calendar1MappingId))
-				.parentId("0")
+		CollectionChange expectedItemChange1 = CollectionChange.builder()
+				.collectionId(String.valueOf(calendar1MappingId))
+				.parentCollectionId("0")
 				.displayName(calendar1DisplayName + " calendar")
-				.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
 				.build();
-		ItemChange expectedItemChange2 = new ItemChangeBuilder()
-				.serverId(String.valueOf(calendar2MappingId))
-				.parentId("0")
+		CollectionChange expectedItemChange2 = CollectionChange.builder()
+				.collectionId(String.valueOf(calendar2MappingId))
+				.parentCollectionId("0")
 				.displayName(calendar2DisplayName + " calendar")
-				.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.USER_CREATED_CALENDAR_FOLDER)
+				.isNew(true)
 				.build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(2);
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange1, expectedItemChange2);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).hasSize(2);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(expectedItemChange1, expectedItemChange2);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 
 	@Test
@@ -299,25 +299,25 @@ public class CalendarBackendTest {
 		
 		replay(loginService, mappingService, collectionPathBuilder1, collectionPathBuilderProvider, calendarClient);
 		
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
 		verify(loginService, mappingService, collectionPathBuilder1, collectionPathBuilderProvider, calendarClient);
 
-		ItemChange expectedItemChange1 = new ItemChangeBuilder()
-				.serverId(String.valueOf(calendar1MappingId))
-				.parentId("0")
+		CollectionChange expectedItemChange1 = CollectionChange.builder()
+				.collectionId(String.valueOf(calendar1MappingId))
+				.parentCollectionId("0")
 				.displayName(calendar1DisplayName + " calendar")
-				.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
-				.withNewFlag(true)
+				.folderType(FolderType.USER_CREATED_CALENDAR_FOLDER)
+				.isNew(true)
 				.build();
-		ItemDeletion expectedItemChange2 = ItemDeletion.builder()
-				.serverId(String.valueOf(calendar2MappingId))
+		CollectionDeletion expectedItemChange2 = CollectionDeletion.builder()
+				.collectionId(String.valueOf(calendar2MappingId))
 				.build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).hasSize(1);
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(expectedItemChange1);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).hasSize(1);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(expectedItemChange2);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).hasSize(1);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(expectedItemChange1);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).hasSize(1);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(expectedItemChange2);
 	}
 
 	@Test
@@ -335,15 +335,15 @@ public class CalendarBackendTest {
 		expectMappingServiceLookupCollection(calendarCollectionPath, calendarMappingId);
 		
 		replay(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		verify(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
 
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(new ItemChangeBuilder()
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(CollectionChange.builder()
 				.displayName(calendarDisplayName)
-				.serverId("1")
-				.parentId("0")
-				.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
-				.withNewFlag(true)
+				.collectionId("1")
+				.parentCollectionId("0")
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
 				.build());
 	}
 
@@ -379,24 +379,24 @@ public class CalendarBackendTest {
 		
 		replay(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
 				collectionPathBuilderProvider, calendarClient);
-		HierarchyItemsChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		verify(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
 				collectionPathBuilderProvider, calendarClient);
 
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(
-				new ItemChangeBuilder()
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(
+				CollectionChange.builder()
 					.displayName(calendarDisplayName)
-					.serverId("1")
-					.parentId("0")
-					.itemType(FolderType.DEFAULT_CALENDAR_FOLDER)
-					.withNewFlag(true)
+					.collectionId("1")
+					.parentCollectionId("0")
+					.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+					.isNew(true)
 					.build(),
-				new ItemChangeBuilder()
+				CollectionChange.builder()
 					.displayName(calendar2DisplayName)
-					.serverId("2")
-					.parentId("0")
-					.itemType(FolderType.USER_CREATED_CALENDAR_FOLDER)
-					.withNewFlag(true)
+					.collectionId("2")
+					.parentCollectionId("0")
+					.folderType(FolderType.USER_CREATED_CALENDAR_FOLDER)
+					.isNew(true)
 					.build()
 				);
 	}

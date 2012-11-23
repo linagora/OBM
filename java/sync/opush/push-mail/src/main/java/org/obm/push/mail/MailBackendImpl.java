@@ -63,11 +63,8 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -75,6 +72,9 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -179,7 +179,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
+	public HierarchyCollectionChanges getHierarchyChanges(UserDataRequest udr, 
 			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException, MailException {
 		
@@ -229,7 +229,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 					.toImmutableList());
 	}
 
-	private HierarchyItemsChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
+	private HierarchyCollectionChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
 			PathsToCollections currentSubscribedFolders) throws DaoException, CollectionNotFoundException {
 		
 		Set<CollectionPath> previousEmailCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
@@ -244,26 +244,27 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 	
 	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, OpushCollection imapFolder)
+	protected CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection imapFolder)
 			throws DaoException, CollectionNotFoundException {
 		
 		CollectionPath collectionPath = imapFolder.collectionPath();
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
-		return new ItemChangeBuilder()
-			.parentId("0")
+		return CollectionChange.builder()
+			.collectionId(mappingService.collectionIdToString(collectionId))
+			.parentCollectionId("0")
 			.displayName(imapFolder.displayName())
-			.itemType(folderType(imapFolder.displayName()))
-			.serverId(mappingService.collectionIdToString(collectionId))
+			.folderType(folderType(imapFolder.displayName()))
+			.isNew(true)
 			.build();
 	}
 
 	@Override
-	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath imapFolder)
+	protected CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath imapFolder)
 			throws CollectionNotFoundException, DaoException {
 
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), imapFolder.collectionPath());
-		return ItemDeletion.builder()
-				.serverId(mappingService.collectionIdToString(collectionId))
+		return CollectionDeletion.builder()
+				.collectionId(mappingService.collectionIdToString(collectionId))
 				.build();
 	}
 	

@@ -47,17 +47,18 @@ import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.ItemChangeBuilder;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
@@ -124,7 +125,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public HierarchyItemsChanges getHierarchyChanges(UserDataRequest udr, 
+	public HierarchyCollectionChanges getHierarchyChanges(UserDataRequest udr, 
 			FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException {
 
@@ -142,7 +143,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private HierarchyItemsChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
+	private HierarchyCollectionChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
 			PathsToCollections contactsCollections) throws DaoException, CollectionNotFoundException {
 
 		Set<CollectionPath> lastKnownCollections = lastKnownCollectionPath(udr, lastKnownState, getPIMDataType());
@@ -185,31 +186,36 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	protected ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
+	protected CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection collection)
 			throws CollectionNotFoundException, DaoException {
 		
 		CollectionPath collectionPath = collection.collectionPath();
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 		
-		ItemChange ic = new ItemChange();
-		ic.setServerId(mappingService.collectionIdToString(collectionId));
-		ic.setParentId(DEFAULT_CALENDAR_PARENT_ID);
-		ic.setDisplayName(collection.displayName());
+		return CollectionChange.builder()
+				.collectionId(mappingService.collectionIdToString(collectionId))
+				.parentCollectionId(DEFAULT_CALENDAR_PARENT_ID)
+				.displayName(collection.displayName())
+				.folderType(getCollectionFolderType(udr, collectionPath))
+				.isNew(true)
+				.build();
+	}
+
+	private FolderType getCollectionFolderType(UserDataRequest udr, CollectionPath collectionPath) {
 		if (isDefaultCalendarCollectionPath(udr, collectionPath)) {
-			ic.setItemType(FolderType.DEFAULT_CALENDAR_FOLDER);
+			return FolderType.DEFAULT_CALENDAR_FOLDER;
 		} else {
-			ic.setItemType(FolderType.USER_CREATED_CALENDAR_FOLDER);
+			return FolderType.USER_CREATED_CALENDAR_FOLDER;
 		}
-		return ic;
 	}
 
 	@Override
-	protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+	protected CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath collectionPath)
 			throws CollectionNotFoundException, DaoException {
 		
 		Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
-		return ItemDeletion.builder()
-				.serverId(mappingService.collectionIdToString(collectionId))
+		return CollectionDeletion.builder()
+				.collectionId(mappingService.collectionIdToString(collectionId))
 				.build();
 	}
 	

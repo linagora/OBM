@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createControl;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Set;
@@ -43,10 +43,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath.Builder;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.impl.MappingService;
@@ -70,13 +70,13 @@ public class OpushBackendTest {
 		opushBackend = new OpushBackend(mappingService, collectionPathBuilderProvider) {
 
 			@Override
-			protected ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
+			protected CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection collection)
 					throws DaoException, CollectionNotFoundException {
 				throw new NotImplementedException();
 			}
 
 			@Override
-			protected ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+			protected CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath collectionPath)
 					throws DaoException, CollectionNotFoundException {
 				throw new NotImplementedException();
 			}

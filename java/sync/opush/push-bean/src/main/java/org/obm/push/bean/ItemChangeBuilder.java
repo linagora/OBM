@@ -48,24 +48,6 @@ public class ItemChangeBuilder implements Builder<ItemChange> {
 		return this;
 	}
 	
-	public ItemChangeBuilder parentId(String parentId) {
-		Preconditions.checkState(itemChange.getParentId() == null, "parentId already defined");
-		itemChange.setParentId(parentId);
-		return this;
-	}
-	
-	public ItemChangeBuilder displayName(String displayName) {
-		Preconditions.checkState(itemChange.getDisplayName() == null, "displayName already defined");
-		itemChange.setDisplayName(displayName);
-		return this;
-	}
-	
-	public ItemChangeBuilder itemType(FolderType itemType) {
-		Preconditions.checkState(itemChange.getItemType() == null, "itemType already defined");
-		itemChange.setItemType(itemType);
-		return this;
-	}
-	
 	public ItemChangeBuilder withNewFlag(boolean isNew) {
 		Preconditions.checkState(!newIsDefined, "new flag already defined");
 		itemChange.setNew(isNew);

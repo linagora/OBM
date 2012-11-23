@@ -38,8 +38,8 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -124,7 +124,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		
 		FolderSyncState incomingSyncState = stMachine.getFolderSyncState(folderSyncRequest.getSyncKey());
 		FolderSyncState outgoingSyncState = stMachine.allocateNewFolderSyncState(udr);
-		HierarchyItemsChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, incomingSyncState, outgoingSyncState);
 		return new FolderSyncResponse(hierarchyItemsChanges, outgoingSyncState.getKey());
 	}
 

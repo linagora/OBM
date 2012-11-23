@@ -63,14 +63,13 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
@@ -201,30 +200,30 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 		
-		ItemChange inboxItemChange = new ItemChangeBuilder().serverId("1")
-			.parentId("0").itemType(FolderType.DEFAULT_INBOX_FOLDER)
-			.displayName("INBOX").withNewFlag(true).build();
+		CollectionChange inboxItemChange = CollectionChange.builder().collectionId("1")
+			.parentCollectionId("0").folderType(FolderType.DEFAULT_INBOX_FOLDER)
+			.displayName("INBOX").isNew(true).build();
 		
-		ItemChange draftsItemChange = new ItemChangeBuilder().serverId("2")
-			.parentId("0").itemType(FolderType.DEFAULT_DRAFTS_FOLDER)
-			.displayName("Drafts").withNewFlag(true).build();
+		CollectionChange draftsItemChange = CollectionChange.builder().collectionId("2")
+			.parentCollectionId("0").folderType(FolderType.DEFAULT_DRAFTS_FOLDER)
+			.displayName("Drafts").isNew(true).build();
 		
-		ItemChange sentItemChange = new ItemChangeBuilder().serverId("3")
-			.parentId("0").itemType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
-			.displayName("Sent").withNewFlag(true).build();
+		CollectionChange sentItemChange = CollectionChange.builder().collectionId("3")
+			.parentCollectionId("0").folderType(FolderType.DEFAULT_SENT_EMAIL_FOLDER)
+			.displayName("Sent").isNew(true).build();
 		
-		ItemChange trashItemChange = new ItemChangeBuilder().serverId("4")
-			.parentId("0").itemType(FolderType.DEFAULT_DELETED_ITEMS_FOLDER)
-			.displayName("Trash").withNewFlag(true).build();
+		CollectionChange trashItemChange = CollectionChange.builder().collectionId("4")
+			.parentCollectionId("0").folderType(FolderType.DEFAULT_DELETED_ITEMS_FOLDER)
+			.displayName("Trash").isNew(true).build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).contains(
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).contains(
 				inboxItemChange, draftsItemChange, sentItemChange, trashItemChange);
 
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -248,12 +247,12 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
@@ -282,16 +281,16 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
 		verifyCommonMocks();
 
-		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("5")
-				.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-				.displayName("NewFolder").withNewFlag(true).build();
+		CollectionChange newFolderItemChange = CollectionChange.builder().collectionId("5")
+				.parentCollectionId("0").folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.displayName("NewFolder").isNew(true).build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(newFolderItemChange);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 
 	
@@ -318,13 +317,13 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
 		verifyCommonMocks();
 		
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(
-				ItemDeletion.builder().serverId("5").build());
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(
+				CollectionDeletion.builder().collectionId("5").build());
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
 	}
 	
 	@Test
@@ -354,18 +353,22 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
 		verifyCommonMocks();
 		
-		ItemChange newFolderItemChange = new ItemChangeBuilder().serverId("5")
-			.parentId("0").itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
-			.displayName("changedFolder").withNewFlag(true).build();
+		CollectionChange newFolderItemChange = CollectionChange.builder()
+				.collectionId("5")
+				.parentCollectionId("0")
+				.folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.displayName("changedFolder")
+				.isNew(true)
+				.build();
 		
-		ItemDeletion oldFolderItemDeleted = ItemDeletion.builder().serverId("6").build();
+		CollectionDeletion oldFolderItemDeleted = CollectionDeletion.builder().collectionId("6").build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(newFolderItemChange);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(oldFolderItemDeleted);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(newFolderItemChange);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(oldFolderItemDeleted);
 	}
 
 	@Test
@@ -428,14 +431,15 @@ public class MailBackendTest {
 		
 		replayCommonMocks(); replay(collectionPath);
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, mappingService, null, null, collectionPathBuilderProvider);
-		ItemChange itemChange = mailBackend.createItemChange(udr, collection);
+		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
 		verifyCommonMocks(); verify(collectionPath);
 		
-		assertThat(itemChange).isEqualTo(new ItemChangeBuilder()
+		assertThat(itemChange).isEqualTo(CollectionChange.builder()
 				.displayName("great display name!")
-				.parentId("0")
-				.serverId("3")
-				.itemType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.parentCollectionId("0")
+				.collectionId("3")
+				.folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.isNew(true)
 				.build());
 	}
 

@@ -35,8 +35,8 @@ import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.HierarchyItemsChanges.Builder;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges.Builder;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
@@ -62,12 +62,12 @@ public class HierarchyExporter implements IHierarchyExporter {
 	}
 
 	@Override
-	public HierarchyItemsChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState,
+	public HierarchyCollectionChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState,
 			FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException {
 		
-		Builder builder = HierarchyItemsChanges.builder();
+		Builder builder = HierarchyCollectionChanges.builder();
 		for (PIMBackend backend: backends) {
-			HierarchyItemsChanges hierarchyChanges = backend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
+			HierarchyCollectionChanges hierarchyChanges = backend.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 			builder.mergeItems(hierarchyChanges);
 			
 			updateBackendSyncState(backend, outgoingSyncState);

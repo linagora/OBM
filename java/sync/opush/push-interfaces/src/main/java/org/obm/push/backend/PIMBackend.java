@@ -34,13 +34,13 @@ package org.obm.push.backend;
 import java.util.List;
 
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemChange;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -83,6 +83,6 @@ public interface PIMBackend {
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
 
-	HierarchyItemsChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
+	HierarchyCollectionChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException, InvalidSyncKeyException;
 }

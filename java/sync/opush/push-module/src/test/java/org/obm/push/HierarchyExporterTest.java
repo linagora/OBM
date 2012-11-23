@@ -52,13 +52,13 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
@@ -87,42 +87,62 @@ public class HierarchyExporterTest {
 	
 	@Test
 	public void testHierarchyItemsChangesBuilder() {
-		HierarchyItemsChanges itemsChanges = HierarchyItemsChanges.builder().build();
-		assertThat(itemsChanges.getChangedItems()).isEmpty();
-		assertThat(itemsChanges.getDeletedItems()).isEmpty();
+		HierarchyCollectionChanges itemsChanges = HierarchyCollectionChanges.builder().build();
+		assertThat(itemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(itemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testHierarchyItemsChangesBuilderChangesNPE() {
-		HierarchyItemsChanges.builder().changes(null).build();
+		HierarchyCollectionChanges.builder().changes(null).build();
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testHierarchyItemsChangesBuilderDeletionsNPE() {
-		HierarchyItemsChanges.builder().deletions(null).build();
+		HierarchyCollectionChanges.builder().deletions(null).build();
 	}
 	
 	@Test
 	public void testHierarchyItemsChangesBuilderMergeItems() {
-		ItemChange item1 = new ItemChange("1-ADD");
-		ItemChange item2 = new ItemChange("1.1-ADD");
-		ItemChange item3 = new ItemChange("2-ADD");
-		ItemDeletion item4 = ItemDeletion.builder().serverId("2-REMOVE").build();
+		CollectionChange item1 = CollectionChange.builder()
+				.collectionId("1-ADD")
+				.parentCollectionId("0")
+				.displayName("1")
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
+				.build();
+		CollectionChange item2 = CollectionChange.builder()
+				.collectionId("1.1-ADD")
+				.parentCollectionId("0")
+				.displayName("2")
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
+				.build();
+		CollectionChange item3 = CollectionChange.builder()
+				.collectionId("2-ADD")
+				.parentCollectionId("0")
+				.displayName("3")
+				.folderType(FolderType.DEFAULT_CALENDAR_FOLDER)
+				.isNew(true)
+				.build();
+		CollectionDeletion item4 = CollectionDeletion.builder()
+				.collectionId("2-REMOVE")
+				.build();
 
-		HierarchyItemsChanges hierarchyItemsChanges1 = HierarchyItemsChanges.builder()
+		HierarchyCollectionChanges hierarchyItemsChanges1 = HierarchyCollectionChanges.builder()
 			.changes(Lists.newArrayList(item1, item2)).build();
 		
-		HierarchyItemsChanges hierarchyItemsChanges2 = HierarchyItemsChanges.builder()
+		HierarchyCollectionChanges hierarchyItemsChanges2 = HierarchyCollectionChanges.builder()
 		.changes(Lists.newArrayList(item3)).deletions(Lists.newArrayList(item4)).build();
 		
-		HierarchyItemsChanges hierarchyItemsChanges = HierarchyItemsChanges.builder()
+		HierarchyCollectionChanges hierarchyItemsChanges = HierarchyCollectionChanges.builder()
 				.mergeItems(hierarchyItemsChanges1)
 				.mergeItems(hierarchyItemsChanges2).build();
 		
-		assertThat(hierarchyItemsChanges.getChangedItems())
+		assertThat(hierarchyItemsChanges.getCollectionChanges())
 			.containsOnly(item1, item2, item3);
 		
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(item4);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(item4);
 	}
 	
 	@Test
@@ -154,19 +174,20 @@ public class HierarchyExporterTest {
 		IHierarchyExporter hierarchyExporter = buildHierarchyExporter(
 				folderExporter, mappingService, contactsBackend, calendarBackend, mailBackend);
 
-		HierarchyItemsChanges hierarchyItemsChanges =
+		HierarchyCollectionChanges hierarchyItemsChanges =
 				hierarchyExporter.getChanged(userDataRequest, incomingSyncState, outgoingSyncKey);
 		
 		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).isEmpty();
-		assertThat(hierarchyItemsChanges.getDeletedItems()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
 	}
 	
 	@Test
 	public void testFolderChanges() throws Exception {
-		String contactCollectionId = "5";
-		String mailCollectionId = "2";
+		String contactParentCollectionId = "5";
+		String mailParentCollectionId = "2";
+		
 		Date currentDate = DateUtils.getCurrentDate();
 		FolderSyncState incomingSyncState = new FolderSyncState("1234567890a");
 		FolderSyncState outgoingSyncState = new FolderSyncState("1234567890b");
@@ -180,19 +201,43 @@ public class HierarchyExporterTest {
 
 		expectGetPIMDataType(contactsBackend, calendarBackend, mailBackend);
 		
-		ItemChange contact1 = new ItemChange("1", contactCollectionId, "ONE", FolderType.USER_CREATED_CONTACTS_FOLDER, true);
-		ItemChange contact2 = new ItemChange("2", contactCollectionId, "TWO", FolderType.USER_CREATED_CONTACTS_FOLDER, true);
-		ItemDeletion contactDeleted = ItemDeletion.builder().serverId("3").build();
+		CollectionChange contact1 = CollectionChange.builder()
+				.collectionId("1")
+				.parentCollectionId(contactParentCollectionId)
+				.displayName("ONE")
+				.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.isNew(true).build();
+		CollectionChange contact2 = CollectionChange.builder()
+				.collectionId("2")
+				.parentCollectionId(contactParentCollectionId)
+				.displayName("TWO")
+				.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.isNew(true).build(); 
+		CollectionDeletion contactDeleted = CollectionDeletion.builder()
+				.collectionId("3")
+				.build();
 		expectHierarchyChangesForBackend(contactsBackend, incomingSyncState, outgoingSyncState,
-				HierarchyItemsChanges.builder()
+				HierarchyCollectionChanges.builder()
 					.changes(ImmutableList.of(contact1, contact2))
 					.deletions(ImmutableList.of(contactDeleted)).build());
 
-		ItemChange mail1 = new ItemChange("1", mailCollectionId, "ONE", FolderType.USER_CREATED_EMAIL_FOLDER, true);
-		ItemChange mail2 = new ItemChange("2", mailCollectionId, "TWO", FolderType.USER_CREATED_EMAIL_FOLDER, true);
-		ItemDeletion mailDeleted = ItemDeletion.builder().serverId("3").build();
+		CollectionChange mail1 = CollectionChange.builder()
+				.collectionId("1")
+				.parentCollectionId(mailParentCollectionId)
+				.displayName("ONE")
+				.folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.isNew(true).build();  
+		CollectionChange mail2 = CollectionChange.builder()
+				.collectionId("2")
+				.parentCollectionId(mailParentCollectionId)
+				.displayName("TWO")
+				.folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
+				.isNew(true).build();
+		CollectionDeletion mailDeleted = CollectionDeletion.builder()
+				.collectionId("3")
+				.build();
 		expectHierarchyChangesForBackend(mailBackend, incomingSyncState, outgoingSyncState, 
-				HierarchyItemsChanges.builder()
+				HierarchyCollectionChanges.builder()
 				.changes(ImmutableList.of(mail1, mail2))
 				.deletions(ImmutableList.of(mailDeleted)).build());
 		
@@ -209,13 +254,13 @@ public class HierarchyExporterTest {
 		IHierarchyExporter hierarchyExporter = buildHierarchyExporter(
 				folderExporter, mappingService, contactsBackend, calendarBackend, mailBackend);
 		
-		HierarchyItemsChanges hierarchyItemsChanges =
+		HierarchyCollectionChanges hierarchyItemsChanges =
 				hierarchyExporter.getChanged(userDataRequest, incomingSyncState, outgoingSyncState);
 		
 		verify(mailBackend, calendarBackend, contactsBackend, mappingService);
 		
-		assertThat(hierarchyItemsChanges.getChangedItems()).containsOnly(contact1, contact2, mail1, mail2);
-		assertThat(hierarchyItemsChanges.getDeletedItems()).containsOnly(contactDeleted, mailDeleted);
+		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(contact1, contact2, mail1, mail2);
+		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(contactDeleted, mailDeleted);
 	}
 
 	private void expectCreateBackendMappingForBackends(MappingService mappingService,
@@ -248,12 +293,12 @@ public class HierarchyExporterTest {
 		return new Backends(Sets.newHashSet(contactsBackend, calendarBackend, mailBackend));
 	}
 	
-	private HierarchyItemsChanges buildEmptyHierarchyItemsChanges() {
-		return HierarchyItemsChanges.builder().build();
+	private HierarchyCollectionChanges buildEmptyHierarchyItemsChanges() {
+		return HierarchyCollectionChanges.builder().build();
 	}
 	
 	private void expectHierarchyChangesForBackend(PIMBackend backend,
-		FolderSyncState incomingSyncState, FolderSyncState outgoingSyncState, HierarchyItemsChanges hierarchyItemsChanges) 
+		FolderSyncState incomingSyncState, FolderSyncState outgoingSyncState, HierarchyCollectionChanges hierarchyItemsChanges) 
 				throws DaoException, InvalidSyncKeyException {
 		
 		expect(backend.getHierarchyChanges(userDataRequest, incomingSyncState, outgoingSyncState))

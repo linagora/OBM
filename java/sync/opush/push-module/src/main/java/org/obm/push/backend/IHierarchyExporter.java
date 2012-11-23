@@ -32,8 +32,8 @@
 package org.obm.push.backend;
 
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.HierarchyItemsChanges;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 
@@ -46,6 +46,6 @@ public interface IHierarchyExporter {
 
 	String getRootFolderUrl(UserDataRequest udr);
 
-	HierarchyItemsChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState, FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException;
+	HierarchyCollectionChanges getChanged(UserDataRequest udr, FolderSyncState incomingSyncState, FolderSyncState outgoingSyncState) throws DaoException, InvalidSyncKeyException;
 
 }

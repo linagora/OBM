@@ -37,11 +37,11 @@ import java.util.Set;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.impl.MappingService;
@@ -115,40 +115,38 @@ public abstract class OpushBackend {
 				});
 	}
 
-	protected HierarchyItemsChanges buildHierarchyItemsChanges(UserDataRequest udr,
+	protected HierarchyCollectionChanges buildHierarchyItemsChanges(UserDataRequest udr,
 			Iterable<OpushCollection> changedCollections, Iterable<CollectionPath> deletedCollections)
 					throws DaoException, CollectionNotFoundException {
 		
-		return HierarchyItemsChanges.builder()
-			.changes(itemsChanged(udr, changedCollections))
-			.deletions(itemsDeleted(udr, deletedCollections))
+		return HierarchyCollectionChanges.builder()
+			.changes(collectionsChanged(udr, changedCollections))
+			.deletions(collectionsDeleted(udr, deletedCollections))
 			.build();
 	}
 
 
-	private List<ItemChange> itemsChanged(UserDataRequest udr, Iterable<OpushCollection> changedCollections)
+	private List<CollectionChange> collectionsChanged(UserDataRequest udr, Iterable<OpushCollection> changedCollections)
 			throws DaoException, CollectionNotFoundException {
-		List<ItemChange> changes = Lists.newArrayList();
+		List<CollectionChange> changes = Lists.newArrayList();
 		for (OpushCollection collectionPath: changedCollections) {
-			ItemChange itemChange = createItemChange(udr, collectionPath);
-			itemChange.setNew(true);
-			changes.add(itemChange);
+			changes.add(createCollectionChange(udr, collectionPath));
 		}
 		return changes;
 	}
 
-	private List<ItemDeletion> itemsDeleted(UserDataRequest udr, Iterable<CollectionPath> deletedCollections)
+	private List<CollectionDeletion> collectionsDeleted(UserDataRequest udr, Iterable<CollectionPath> deletedCollections)
 			throws DaoException, CollectionNotFoundException {
-		List<ItemDeletion> deletes = Lists.newArrayList();
+		List<CollectionDeletion> deletes = Lists.newArrayList();
 		for (CollectionPath collectionPath: deletedCollections) {
-			deletes.add(createItemDeleted(udr, collectionPath));
+			deletes.add(createCollectionDeletion(udr, collectionPath));
 		}
 		return deletes;
 	}
 	
-	protected abstract ItemChange createItemChange(UserDataRequest udr, OpushCollection collection)
+	protected abstract CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection collection)
 			throws DaoException, CollectionNotFoundException;
 
-	protected abstract ItemDeletion createItemDeleted(UserDataRequest udr, CollectionPath collectionPath)
+	protected abstract CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath collectionPath)
 			throws DaoException, CollectionNotFoundException;
 }

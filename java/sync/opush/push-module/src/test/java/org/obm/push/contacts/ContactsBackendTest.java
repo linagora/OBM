@@ -56,12 +56,12 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemChangeBuilder;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.hierarchy.CollectionChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.impl.MappingService;
@@ -279,7 +279,7 @@ public class ContactsBackendTest {
 		
 		mocks.verify();
 		
-		ItemChange itemChange = new ItemChange(serverIdAsString, null, null, null, false);
+		ItemChange itemChange = new ItemChange(serverIdAsString, false);
 		itemChange.setData(new ContactConverter().convert(contact));
 		
 		assertThat(itemChanges).hasSize(1);
@@ -453,14 +453,15 @@ public class ContactsBackendTest {
 		
 		mocks.replay();
 		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
-		ItemChange itemChange = contactsBackend.createItemChange(userDataRequest, collection);
+		CollectionChange itemChange = contactsBackend.createCollectionChange(userDataRequest, collection);
 		mocks.verify();
 		
-		assertThat(itemChange).isEqualTo(new ItemChangeBuilder()
+		assertThat(itemChange).isEqualTo(CollectionChange.builder()
 				.displayName("great display name!")
-				.parentId("0")
-				.serverId("3")
-				.itemType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.parentCollectionId("0")
+				.collectionId("3")
+				.folderType(FolderType.USER_CREATED_CONTACTS_FOLDER)
+				.isNew(true)
 				.build());
 	}
 	
@@ -504,10 +505,10 @@ public class ContactsBackendTest {
 		
 		mocks.replay();
 		ContactsBackend contactsBackend = new ContactsBackend(mappingService, null, null, contactConfiguration, collectionPathBuilderProvider);
-		ItemChange itemChange = contactsBackend.createItemChange(userDataRequest, collection);
+		CollectionChange itemChange = contactsBackend.createCollectionChange(userDataRequest, collection);
 		mocks.verify();
 
-		assertThat(itemChange.getParentId()).isEqualTo(DEFAULT_PARENT_BOOK_ID);
+		assertThat(itemChange.getParentCollectionId()).isEqualTo(DEFAULT_PARENT_BOOK_ID);
 	}
 	
 	@Test

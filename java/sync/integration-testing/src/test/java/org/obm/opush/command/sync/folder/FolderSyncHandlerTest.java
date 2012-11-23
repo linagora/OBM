@@ -59,9 +59,9 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.HierarchyItemsChanges;
-import org.obm.push.bean.ItemChange;
-import org.obm.push.bean.ItemDeletion;
+import org.obm.push.bean.hierarchy.CollectionChange;
+import org.obm.push.bean.hierarchy.CollectionDeletion;
+import org.obm.push.bean.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
@@ -175,13 +175,19 @@ public class FolderSyncHandlerTest {
 		int newSyncStateId = 1156;
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 		
-		String serverId = "4:1";
+		String collectionId = "4";
 		String parentId = "23";
 		
 		org.obm.push.bean.FolderType itemChangeType = org.obm.push.bean.FolderType.USER_CREATED_EMAIL_FOLDER;
-		HierarchyItemsChanges mailboxChanges = HierarchyItemsChanges.builder()
+		HierarchyCollectionChanges mailboxChanges = HierarchyCollectionChanges.builder()
 			.changes(Lists.newArrayList(
-					new ItemChange(serverId, parentId, "aNewImapFolder", itemChangeType, true)))
+					CollectionChange.builder()
+						.collectionId(collectionId)
+						.parentCollectionId(parentId)
+						.displayName("aNewImapFolder")
+						.folderType(itemChangeType)
+						.isNew(true)
+						.build()))
 			.build();
 //		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 //		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, Collections.<Integer>emptySet());
@@ -219,11 +225,11 @@ public class FolderSyncHandlerTest {
 		int newSyncStateId = 1156;
 		FolderSyncState newSyncState = newFolderSyncState(newGeneratedSyncKey, newSyncStateId);
 
-		String serverId = "4:1";
+		String collectionId = "4";
 		
-		HierarchyItemsChanges mailboxChanges = HierarchyItemsChanges.builder()
+		HierarchyCollectionChanges mailboxChanges = HierarchyCollectionChanges.builder()
 			.deletions(Lists.newArrayList(
-					ItemDeletion.builder().serverId(serverId).build()))
+					CollectionDeletion.builder().collectionId(collectionId).build()))
 			.build();
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
@@ -246,11 +252,11 @@ public class FolderSyncHandlerTest {
 		assertThat(folderSyncResponse.getCount()).isEqualTo(1);
 		assertThat(folderSyncResponse.getFolders()).hasSize(1);
 		Folder inbox = Iterables.getOnlyElement(folderSyncResponse.getFolders().values());
-		assertThat(inbox.getServerId()).isEqualTo(serverId);
+		assertThat(inbox.getServerId()).isEqualTo(collectionId);
 	}
 
-	private HierarchyItemsChanges buildHierarchyItemsChangeEmpty() {
-		return HierarchyItemsChanges.builder().build();
+	private HierarchyCollectionChanges buildHierarchyItemsChangeEmpty() {
+		return HierarchyCollectionChanges.builder().build();
 	}
 
 	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, FolderSyncState newSyncState) 
