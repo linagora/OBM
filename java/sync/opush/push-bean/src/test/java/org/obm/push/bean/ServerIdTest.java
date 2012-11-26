@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import org.junit.Assert;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -100,43 +101,58 @@ public class ServerIdTest {
 	@Test
 	public void testSimpleCollectionIdString() throws InvalidServerId {
 		ServerId serverId = new ServerId("123");
-		Assert.assertEquals(123, serverId.getCollectionId());
-		Assert.assertNull(serverId.getItemId());
-		Assert.assertFalse(serverId.isItem());
+		assertThat(serverId.getCollectionId()).isEqualTo(123);
+		assertThat(serverId.getItemId()).isNull();
+		assertThat(serverId.isItem()).isFalse();
 	}
 	
 	@Test
 	public void testSimpleServerIdString() throws InvalidServerId {
 		ServerId serverId = new ServerId("123:345");
-		Assert.assertEquals(123, serverId.getCollectionId());
-		Assert.assertEquals(Integer.valueOf(345), serverId.getItemId());
-		Assert.assertTrue(serverId.isItem());
+		assertThat(serverId.getCollectionId()).isEqualTo(123);
+		assertThat(serverId.getItemId()).isEqualTo(Integer.valueOf(345));
+		assertThat(serverId.isItem()).isTrue();
 	}
 	
 	@Test
 	public void testSimpleEquals() throws InvalidServerId {
 		ServerId serverId1 = new ServerId("123:345");
 		ServerId serverId2 = new ServerId("123:345");
-		Assert.assertTrue(serverId1.equals(serverId2));
-		Assert.assertTrue(serverId2.equals(serverId1));
-		Assert.assertEquals(serverId1.hashCode(), serverId2.hashCode());
+		assertThat(serverId1.equals(serverId2)).isTrue();
+		assertThat(serverId2.equals(serverId1)).isTrue();
+		assertThat(serverId1.hashCode()).isEqualTo(serverId2.hashCode());
 	}
 	
 	@Test
 	public void testNotEquals() throws InvalidServerId {
 		ServerId serverId1 = new ServerId("123:456");
 		ServerId serverId2 = new ServerId("123:345");
-		Assert.assertFalse(serverId1.equals(serverId2));
-		Assert.assertFalse(serverId2.equals(serverId1));
-		Assert.assertFalse(serverId1.hashCode() == serverId2.hashCode());
+		assertThat(serverId1.hashCode()).isNotEqualTo(serverId2.hashCode());
+		assertThat(serverId1).isNotEqualTo(serverId2);
+		assertThat(serverId2).isNotEqualTo(serverId1);
 	}
 	
 	@Test
 	public void testNotEquals2() throws InvalidServerId {
 		ServerId serverId1 = new ServerId("123");
 		ServerId serverId2 = new ServerId("123:345");
-		Assert.assertFalse(serverId1.equals(serverId2));
-		Assert.assertFalse(serverId2.equals(serverId1));
-		Assert.assertFalse(serverId1.hashCode() == serverId2.hashCode());
+		assertThat(serverId1.hashCode()).isNotEqualTo(serverId2.hashCode());
+		assertThat(serverId1).isNotEqualTo(serverId2);
+		assertThat(serverId2).isNotEqualTo(serverId1);
+	}
+	
+	@Test
+	public void testBuildServerIdAsStringZero() {
+		assertThat(ServerId.buildServerIdString(0, 0)).isEqualTo("0:0");
+	}
+
+	@Test
+	public void testBuildServerIdAsStringNegative() {
+		assertThat(ServerId.buildServerIdString(-10, -5)).isEqualTo("-10:-5");
+	}
+
+	@Test
+	public void testBuildServerIdAsString() {
+		assertThat(ServerId.buildServerIdString(10, 5)).isEqualTo("10:5");
 	}
 }

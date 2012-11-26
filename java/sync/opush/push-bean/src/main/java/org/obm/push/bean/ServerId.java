@@ -36,12 +36,14 @@ import java.util.NoSuchElementException;
 
 import org.obm.push.exception.activesync.InvalidServerId;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.base.Objects;
 
 public class ServerId {
 
+	private static final String SERVER_ID_SEPRATOR = ":";
+	
 	private final int collectionId;
 	private final Integer itemId;
 
@@ -52,7 +54,7 @@ public class ServerId {
 	}
 
 	private Iterator<String> splitServerId(String serverId) throws InvalidServerId {
-		Iterable<String> parts = Splitter.on(':').split(serverId);
+		Iterable<String> parts = Splitter.on(SERVER_ID_SEPRATOR).split(serverId);
 		if (Iterables.size(parts) > 2) {
 			throw new InvalidServerId("two many parts for a serverId");
 		}
@@ -96,7 +98,11 @@ public class ServerId {
 	
 	@Override
 	public String toString() {
-		return collectionId + ":" + itemId;
+		if (isItem()) {
+			return buildServerIdString(collectionId, itemId);
+		} else {
+			return String.valueOf(collectionId);
+		}
 	}
 
 	@Override
@@ -113,8 +119,9 @@ public class ServerId {
 		}
 		return false;
 	}
-	
 
-
+	public static String buildServerIdString(long collectionId, long itemId) {
+		return String.valueOf(collectionId) + SERVER_ID_SEPRATOR + String.valueOf(itemId);
+	}
 	
 }
