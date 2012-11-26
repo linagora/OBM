@@ -29,23 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.mail.exception;
 
-import java.io.Serializable;
-import java.util.Date;
-
-public class ItemSyncState extends SyncState implements Serializable {
-
-	public static ItemSyncState newInitialSyncState() {
-		return new ItemSyncState(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-	}
+public class FilterTypeChangedException extends Exception {
 	
-	public ItemSyncState(SyncKey syncKey) {
-		this(syncKey, null);
+	public FilterTypeChangedException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public ItemSyncState(SyncKey key, Date lastSync) {
-		super(key, lastSync);
+	public FilterTypeChangedException(String message) {
+		super(message);
 	}
 	
 }
