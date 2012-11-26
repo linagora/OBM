@@ -166,7 +166,8 @@ public class SessionManagement {
 		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
-		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
+		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
+		
 		if (obmDomain == null) {
 			logNoDomain(login.getDomain());
 			return null;
@@ -188,7 +189,8 @@ public class SessionManagement {
 		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
-		ObmDomain obmDomain = domainService.findDomainByName(login.getDomain());
+		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
+		
 		if (obmDomain == null) {
 			logNoDomain(login.getDomain());
 			return null;

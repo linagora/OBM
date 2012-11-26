@@ -102,34 +102,33 @@ public class LoginHandler implements ISyncHandler {
 	}
 
 	private void trustedLogin(Request request, XmlResponder responder) {
-		final AccessToken token = doLogin(request, responder, trustedBinding);
-
-		// Send token if loggin succeeded
-		// Do nothing otherwise as an error would have been sent already
-		if (token != null)
-			responder.sendToken(token);
+		doLogin(request, responder, trustedBinding);
 	}
 
 	private void authLogin(Request request, XmlResponder responder) {
-		responder.sendToken(doLogin(request, responder, binding));
+		doLogin(request, responder, binding);
 	}
 
-	private AccessToken doLogin(Request request, XmlResponder responder, LoginBindingImpl loginBinding) {
+	private void doLogin(Request request, XmlResponder responder, LoginBindingImpl loginBinding) {
 		try {
 			request.createSession();
 
 			String origin = request.getParameter("origin");
+			
 			if (origin == null) {
-				responder.sendError("login refused with null origin");
-				return null;
+				responder.sendError("Login refused with null 'origin' parameter");
+				return;
 			}
 
 			String login = request.getParameter("login");
+			
+			if (login == null) {
+				responder.sendError("Login refused with null 'login' parameter");
+				return;
+			}
+			
 			String pass = request.getParameter("password");
-
-			boolean isPasswordHashed = request.getParameter("isPasswordHashed") != null
-				? Boolean.valueOf(request.getParameter("isPasswordHashed"))
-				: false;
+			boolean isPasswordHashed = Boolean.valueOf(request.getParameter("isPasswordHashed"));
 
 			if (logger.isDebugEnabled()) {
 				request.dumpHeaders();
@@ -137,27 +136,30 @@ public class LoginHandler implements ISyncHandler {
 
 			AccessToken token = loginBinding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
 				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
+			
 			if(token == null) {
 				responder.sendError("Login failed for user '" + login + "'");
-				return null;
+				return;
 			}
 
 			versionValidator.checkObmConnectorVersion(token);
 
-			ObmUser user = userService.getUserFromAccessToken(token);
-			UserSettings settings = settingsService.getSettings(user);
+			fillTokenWithUserSettings(token);
 
-			token.setUserSettings(settings);
-
-			return token;
+			responder.sendToken(token);
 		} catch (OBMConnectorVersionException e) {
 			responder.sendError("Connector version not supported");
 			notifyConnectorVersionError(e);
-			return null;
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
-			return null;
 		}
+	}
+	
+	private void fillTokenWithUserSettings(AccessToken token) {
+		ObmUser user = userService.getUserFromAccessToken(token);
+		UserSettings settings = settingsService.getSettings(user);
+
+		token.setUserSettings(settings);
 	}
 
 	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
