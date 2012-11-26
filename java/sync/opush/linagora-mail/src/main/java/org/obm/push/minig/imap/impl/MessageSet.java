@@ -32,74 +32,173 @@
 
 package org.obm.push.minig.imap.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomains;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.google.common.collect.Ranges;
+import com.google.common.collect.Sets;
 
 public class MessageSet {
 
-	private final static Logger logger = LoggerFactory
-			.getLogger(MessageSet.class);
-
-	public static final String asString(Collection<Long> uids) {
-		TreeSet<Long> sortedUids = new TreeSet<Long>(uids);
-		StringBuilder sb = new StringBuilder(uids.size() * 7);
-		long firstUid = 0;
-		long lastUid = 0;
-		boolean firstLoop = true;
-		for (Long currentValue: sortedUids) {
-			if (firstUid > 0 && currentValue == lastUid + 1) {
-				lastUid = currentValue;
-				firstLoop = false;
-				continue;
-			}
-			if (firstUid > 0 && lastUid > 0 && lastUid > firstUid) {
-				sb.append(':');
-				sb.append(lastUid);
-				firstUid = 0;
-				lastUid = 0;
-			}
-			if (!firstLoop) {
-				sb.append(',');
-			}
-			sb.append(currentValue);
-			firstUid = currentValue;
-			lastUid = currentValue;
-			firstLoop = false;
-		}
-		if (firstUid > 0 && lastUid > 0 && lastUid > firstUid) {
-			sb.append(':');
-			sb.append(lastUid);
-		}
-
-		String ret = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("computed set string: " + ret);
-		}
-		return ret;
-
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static Builder from(MessageSet set) {
+		return new Builder(set);
 	}
 
-	public static ArrayList<Long> asLongCollection(String set, int sizeHint) {
-		String[] parts = set.split(",");
-		ArrayList<Long> ret = new ArrayList<Long>(sizeHint > 0 ? sizeHint
-				: parts.length);
-		for (String s : parts) {
-			if (!s.contains(":")) {
-				ret.add(Long.parseLong(s));
-			} else {
-				String[] p = s.split(":");
-				long start = Long.parseLong(p[0]);
-				long end = Long.parseLong(p[1]);
-				for (long l = start; l <= end; l++) {
-					ret.add(l);
+	public static class Builder implements org.obm.push.bean.Builder<MessageSet> {
+
+		private final class LowerEndpointComparator implements Comparator<Range<Long>> {
+			@Override
+			public int compare(Range<Long> o1, Range<Long> o2) {
+				long distance = o1.lowerEndpoint() - o2.lowerEndpoint();
+				if (distance == 0) {
+					return 0;
+				} else {
+					return distance > 0 ? 1 : -1;
 				}
 			}
 		}
-		return ret;
+
+		private SortedSet<Range<Long>> ranges;
+
+		private Builder() {
+			ranges = Sets.newTreeSet(new LowerEndpointComparator());
+		}
+		
+		public Builder(MessageSet set) {
+			this();
+			ranges.addAll(set.ranges);
+		}
+
+		public Builder add(long value) {
+			return add(Ranges.singleton(value));
+		}
+		
+		public Builder add(Range<Long> value) {
+			Optional<Range<Long>> connectedRange = findRangeConnecterOrContiguousTo(value);
+			if (connectedRange.isPresent()) {
+				replaceWithSpanningRange(connectedRange.get(), value);
+			} else {
+				ranges.add(value);
+			}
+			return this;
+		}
+		
+		public Builder add(MessageSet set) {
+			for (Range<Long> range: set.ranges) {
+				add(range);
+			}
+			return this;
+		}
+		
+		private void replaceWithSpanningRange(Range<Long> connectedRange, Range<Long> other) {
+			ranges.remove(connectedRange);
+			add(connectedRange.span(other));
+		}
+
+		private Optional<Range<Long>> findRangeConnecterOrContiguousTo(Range<Long> other) {
+			for (Range<Long> range: ranges) {
+				if (range.isConnected(other) ||isContiguous(other, range)) {
+					return Optional.of(range);
+				}
+			}
+			return Optional.absent();
+		}
+
+		private boolean isContiguous(Range<Long> other, Range<Long> range) {
+			return Math.abs(range.upperEndpoint() - other.lowerEndpoint()) == 1
+					|| Math.abs(range.lowerEndpoint() - other.upperEndpoint()) == 1;
+		}
+		
+		@Override
+		public MessageSet build() {
+			return new MessageSet(ranges);
+		}
+	}
+
+	private final Set<Range<Long>> ranges;
+	
+	private MessageSet(Set<Range<Long>> ranges) {
+		this.ranges = ranges;
+	}
+	
+	public String asImapString() {
+		List<String> rangesAsStrings = Lists.newArrayList();
+		for (Range<Long> range: ranges) {
+			if (!range.isEmpty()) {
+				rangesAsStrings.add(rangeAsString(range));
+			}
+		}
+		return Joiner.on(',').join(rangesAsStrings);
+	}
+
+	public Iterable<Long> asDiscreteValues() {
+		return Iterables.concat(Iterables.transform(ranges, new Function<Range<Long>, Set<Long>>() {
+			@Override
+			public Set<Long> apply(Range<Long> input) {
+				return input.asSet(DiscreteDomains.longs());
+			}
+		}));
+	}
+	
+	public int rangeNumber() {
+		return ranges.size();
+	}
+	
+	private String rangeAsString(Range<Long> range) {
+		ContiguousSet<Long> rangeAsSet = range.asSet(DiscreteDomains.longs());
+		if (rangeAsSet.size() == 1) {
+			return singleValueRangeAsString(rangeAsSet);
+		} else {
+			return intervalRangeAsString(rangeAsSet);
+		}
+	}
+
+	private String singleValueRangeAsString(ContiguousSet<Long> rangeAsSet) {
+		return String.valueOf(rangeAsSet.first());
+	}
+	
+	private String intervalRangeAsString(ContiguousSet<Long> rangeAsSet) {
+		return String.format("%d:%d", rangeAsSet.first(), rangeAsSet.last());
+	}
+	
+	public static final String asString(Collection<Long> uids) {
+		Builder builder = builder();
+		for (Long uid: uids) {
+			builder.add(uid);
+		}
+		return builder.build().asImapString();
+	}
+
+	public static Collection<Long> asLongCollection(String set) {
+		String[] parts = set.split(",");
+		Builder builder = builder();
+		for (String s : parts) {
+			if (!s.contains(":")) {
+				builder.add(Long.valueOf(s));
+			} else {
+				String[] p = s.split(":");
+				long start = Long.valueOf(p[0]);
+				long end = Long.valueOf(p[1]);
+				builder.add(Ranges.closed(start, end));
+			}
+		}
+		return ImmutableList.copyOf(builder.build().asDiscreteValues());
 	}
 
 }

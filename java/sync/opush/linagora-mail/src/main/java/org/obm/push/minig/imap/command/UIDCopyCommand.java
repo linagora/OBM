@@ -85,7 +85,7 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 		int space = payload.lastIndexOf(" ", idx);
 		String set = payload.substring(space + 1, idx);
 		logger.debug("set to parse: " + set);
-		Collection<Long> ret = MessageSet.asLongCollection(set, uids.size());
+		Collection<Long> ret = MessageSet.asLongCollection(set);
 		return ret;
 	}
 
