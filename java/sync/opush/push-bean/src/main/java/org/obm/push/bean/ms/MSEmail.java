@@ -44,13 +44,14 @@ import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
+import org.obm.push.utils.index.Indexed;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-public class MSEmail implements IApplicationData, Serializable {
+public class MSEmail implements IApplicationData, Serializable, Indexed<Long> {
 
 	public static Builder builder() {
 		return new Builder();
@@ -189,6 +190,11 @@ public class MSEmail implements IApplicationData, Serializable {
 		this.read = read;
 		this.starred = starred;
 		this.answered = answered;
+	}
+	
+	@Override
+	public Long getIndex() {
+		return getUid();
 	}
 
 	public MSAddress getDisplayTo() {
