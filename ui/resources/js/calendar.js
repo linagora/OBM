@@ -2539,7 +2539,7 @@ Obm.CalendarQuickForm = new Class({
     	this.gotoURI += '&title='+encodeURIComponent(this.form.tf_title.value);
     }
     if(this.eventData.all_day == '1'  && obm.vars.consts.calendarRange != 'month'){
-      this.gotoURI += '&all_day=1&opacity=TRANSPARENT'
+      this.gotoURI += '&all_day=1';
     } 
     gotoUriContainsActionNew = new RegExp("action=new");
     if(action == "new" || gotoUriContainsActionNew.test(this.gotoURI))

@@ -4672,6 +4672,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $tagid = $c_none ;
     $tagcolor = "#eff0f2" ;
   }
+  
+  if ($action == "new" && $all_day) {
+    $opacity = $_SESSION["set_allday_opacity"];
+  }
 
   if ($opacity == 'TRANSPARENT') {
     $l_check_free = "checked='checked'";
