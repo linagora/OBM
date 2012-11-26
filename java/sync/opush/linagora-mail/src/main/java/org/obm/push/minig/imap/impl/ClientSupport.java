@@ -89,6 +89,7 @@ import org.obm.push.minig.imap.command.UIDNextCommand;
 import org.obm.push.minig.imap.command.UIDSearchCommand;
 import org.obm.push.minig.imap.command.UIDStoreCommand;
 import org.obm.push.minig.imap.command.UIDThreadCommand;
+import org.obm.push.minig.imap.command.UIDValidityCommand;
 import org.obm.push.minig.imap.command.UnSubscribeCommand;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.tls.MinigTLSFilter;
@@ -346,5 +347,9 @@ public class ClientSupport {
 	
 	public long uidNext(String mailbox) {
 		return run(new UIDNextCommand(mailbox));
+	}
+	
+	public long uidValidity(String mailbox) {
+		return run(new UIDValidityCommand(mailbox));
 	}
 }

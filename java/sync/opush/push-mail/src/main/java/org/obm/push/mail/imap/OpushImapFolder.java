@@ -100,4 +100,6 @@ public interface OpushImapFolder {
 	boolean isOpen() throws MessagingException;
 	
 	long uidNext(String mailbox) throws MessagingException;
+	
+	long uidValidity(String mailbox) throws MessagingException;
 }

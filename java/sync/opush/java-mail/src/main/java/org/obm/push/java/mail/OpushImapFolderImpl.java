@@ -376,4 +376,9 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	public long uidNext(String mailbox) throws MessagingException {
 		return folder.getUIDNext();
 	}
+
+	@Override
+	public long uidValidity(String mailbox) throws MessagingException {
+		return folder.getUIDValidity();
+	}
 }

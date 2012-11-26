@@ -596,4 +596,17 @@ public class LinagoraMailboxService implements MailboxService {
 			throw new MailException(e);
 		}
 	}
+
+	@Override
+	public long fetchUIDValidity(UserDataRequest udr, String collectionPath) throws MailException {
+		try {
+			StoreClient store = imapClientProvider.getImapClient(udr);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			return store.uidValidity(mailBoxName);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		}
+	}
 }

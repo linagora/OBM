@@ -672,4 +672,23 @@ public class ImapMailboxService implements MailboxService {
 			throw new MailException(e);
 		}
 	}
+
+	@Override
+	public long fetchUIDValidity(UserDataRequest udr, String collectionPath) throws MailException {
+		
+		try {
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidValidity(mailBoxName);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		}
+	}
 }

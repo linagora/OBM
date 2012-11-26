@@ -239,4 +239,8 @@ public class StoreClient {
 	public long uidNext(String mailbox) {
 		return cs.uidNext(mailbox);
 	}
+	
+	public long uidValidity(String mailbox) {
+		return cs.uidValidity(mailbox);
+	}
 }

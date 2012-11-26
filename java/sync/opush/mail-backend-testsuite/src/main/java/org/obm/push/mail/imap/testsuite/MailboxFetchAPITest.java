@@ -349,4 +349,12 @@ public abstract class MailboxFetchAPITest {
 		long uIDNext = mailboxService.fetchUIDNext(udr, inbox);
 		assertThat(uIDNext).isEqualTo(4);
 	}
+	
+	@Test
+	public void testFetchUIDValidity() {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		long uIDValidity = mailboxService.fetchUIDValidity(udr, inbox);
+		assertThat(uIDValidity).isGreaterThan(-1);
+	}
 }
