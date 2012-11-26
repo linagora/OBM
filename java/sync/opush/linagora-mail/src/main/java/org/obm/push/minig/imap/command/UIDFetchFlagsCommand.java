@@ -120,20 +120,13 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	private long getUid(String fullPayload) {
 		try {
-			String longAsString = getNumberForField(fullPayload, "UID ");
+			String longAsString = IMAPParsingTools.getStringHasNumberForField(fullPayload, "UID ");
 			return Long.valueOf(longAsString);
 		} catch(NumberFormatException e) {
 			throw new MailException("Cannot find UID in response : " + fullPayload);
 		}
 	}
 
-	private String getNumberForField(String fullPayload, String field) {
-		String uidStartToken = field;
-		int uidIdx = fullPayload.indexOf(uidStartToken);
-		String content = fullPayload.substring(uidIdx + uidStartToken.length());
-		return IMAPParsingTools.getNextNumber(content);
-	}
-	
 	private void parseFlags(String flags, FlagsList flagsList) {
 		// TODO this is probably slow as hell
 		if (flags.contains("\\Seen")) {

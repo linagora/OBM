@@ -113,22 +113,14 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 	}
 
 	private int getSize(String fullPayload) {
-		String intAsString = getNumberForField(fullPayload, "RFC822.SIZE ");
+		String intAsString = IMAPParsingTools.getStringHasNumberForField(fullPayload, "RFC822.SIZE ");
 		return Integer.valueOf(intAsString);
 	}
 
 	private Long getUid(String fullPayload) {
-		String longAsString = getNumberForField(fullPayload, "UID ");
+		String longAsString = IMAPParsingTools.getStringHasNumberForField(fullPayload, "UID ");
 		return Long.valueOf(longAsString);		
 	}
-	
-	private String getNumberForField(String fullPayload, String field) {
-		String uidStartToken = field;
-		int uidIdx = fullPayload.indexOf(uidStartToken);
-		String content = fullPayload.substring(uidIdx + uidStartToken.length());
-		return IMAPParsingTools.getNextNumber(content);
-	}
-	
 	
 	private String getBodyStructurePayload(String fullPayload) {
 		String bodystructureStartToken = "BODYSTRUCTURE ";

@@ -40,6 +40,13 @@ import com.google.common.collect.Lists;
 
 public class IMAPParsingTools {
 	
+	public static String getStringHasNumberForField(String fullPayload, String field) {
+		String uidStartToken = field;
+		int uidIdx = fullPayload.indexOf(uidStartToken);
+		String content = fullPayload.substring(uidIdx + uidStartToken.length());
+		return getNextNumber(content);
+	}
+	
 	public static String getNextNumber(String content) {
 		if (content == null) {
 			return null;

@@ -129,20 +129,13 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
 	private long getUid(String fullPayload) {
 		try {
-			String longAsString = getNumberForField(fullPayload, "UID ");
+			String longAsString = IMAPParsingTools.getStringHasNumberForField(fullPayload, "UID ");
 			return Long.valueOf(longAsString);
 		} catch(NumberFormatException e) {
 			throw new MailException("Cannot find UID in response : " + fullPayload);
 		}
 	}
 	
-	private String getNumberForField(String fullPayload, String field) {
-		String uidStartToken = field;
-		int uidIdx = fullPayload.indexOf(uidStartToken);
-		String content = fullPayload.substring(uidIdx + uidStartToken.length());
-		return IMAPParsingTools.getNextNumber(content);
-	}
-
 	@VisibleForTesting String getEnvelopePayload(String fullPayload) {
 		String envelopeStartToken = "ENVELOPE ";
 		int bsIdx = fullPayload.indexOf(envelopeStartToken);
