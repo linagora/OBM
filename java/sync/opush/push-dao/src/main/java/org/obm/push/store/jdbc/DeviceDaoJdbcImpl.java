@@ -218,7 +218,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		ResultSet rs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_sec_policy DEFAULT VALUES");
+			ps = con.prepareStatement("INSERT INTO opush_sec_policy (id, device_password_enabled) VALUES(DEFAULT, DEFAULT)");
 			if (ps.executeUpdate() != 1) {
 				throw new DaoException("Cannot find the new generated id in result set");
 			}
