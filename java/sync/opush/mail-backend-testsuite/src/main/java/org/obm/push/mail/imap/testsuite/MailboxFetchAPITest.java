@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.testsuite;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -40,7 +42,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeMessage;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -132,8 +133,8 @@ public abstract class MailboxFetchAPITest {
 		
 		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 1l);
 
-		Assertions.assertThat(uidEnvelope).isNotNull();
-		Assertions.assertThat(uidEnvelope).isEqualTo(new UIDEnvelope(1l, envelope));
+		assertThat(uidEnvelope).isNotNull();
+		assertThat(uidEnvelope).isEqualTo(new UIDEnvelope(1l, envelope));
 	}
 	
 	@Test(expected=MailException.class)
@@ -154,15 +155,15 @@ public abstract class MailboxFetchAPITest {
 		mailboxService.delete(udr, mailboxPath, emailWillBeDeleted.getUid());
 		
 		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, mailboxPath, email3.getUid());
-		Assertions.assertThat(uidEnvelope).isNotNull();
-		Assertions.assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
+		assertThat(uidEnvelope).isNotNull();
+		assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
 	}
 	
 	@Test
 	public void testFetchFastNoUid() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of());
-		Assertions.assertThat(result).isEmpty();
+		assertThat(result).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -180,7 +181,7 @@ public abstract class MailboxFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
+		assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
 	
@@ -193,7 +194,7 @@ public abstract class MailboxFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L, 1L));
-		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
+		assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).
 				size(messageContent.length()).build());
 	}
 	
@@ -207,7 +208,7 @@ public abstract class MailboxFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setAnsweredFlag(udr, inbox, 1);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, ImmutableList.<Long>of(1L));
-		Assertions.assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).answered().
+		assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());
 	}
 	
@@ -215,7 +216,7 @@ public abstract class MailboxFetchAPITest {
 	public void testFetchBodyStructureNoUid() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<org.obm.push.mail.mime.MimeMessage> result = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of());
-		Assertions.assertThat(result).isEmpty();
+		assertThat(result).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -234,12 +235,12 @@ public abstract class MailboxFetchAPITest {
 		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 
-		Assertions.assertThat(collections).hasSize(1);
-		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		assertThat(collections).hasSize(1);
+		assertThat(onlyElement.getUid()).isEqualTo(1L);
 
-		Assertions.assertThat(onlyElement.getMimePart().isMultipart()).isFalse();
-		Assertions.assertThat(onlyElement.getMimePart().getChildren()).isEmpty();
-		Assertions.assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("text/plain");
+		assertThat(onlyElement.getMimePart().isMultipart()).isFalse();
+		assertThat(onlyElement.getMimePart().getChildren()).isEmpty();
+		assertThat(onlyElement.getMimePart().getFullMimeType()).isEqualTo("text/plain");
 	}
 	
 	@Test
@@ -258,28 +259,28 @@ public abstract class MailboxFetchAPITest {
 		IMimePart textPlain = multiPartAlternative.getChildren().get(0);
 		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
 		
-		Assertions.assertThat(collections).hasSize(1);
-		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		assertThat(collections).hasSize(1);
+		assertThat(onlyElement.getUid()).isEqualTo(1L);
 		
-		Assertions.assertThat(multiPartMixed.isMultipart()).isTrue();
+		assertThat(multiPartMixed.isMultipart()).isTrue();
 		
-		Assertions.assertThat(multiPartMixed.getFullMimeType()).isEqualTo("multipart/mixed");
-		Assertions.assertThat(multiPartMixed.getBodyParam("boundary")).
+		assertThat(multiPartMixed.getFullMimeType()).isEqualTo("multipart/mixed");
+		assertThat(multiPartMixed.getBodyParam("boundary")).
 			isEqualTo(new BodyParam("boundary", "----=_Part_0_1330682067197"));
 		
-		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
+		assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
 		
-		Assertions.assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
-		Assertions.assertThat(textPlain.getContentTransfertEncoding()).isEqualTo("8bit");
+		assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
+		assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		assertThat(textPlain.getContentTransfertEncoding()).isEqualTo("8bit");
 		
-		Assertions.assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
-		Assertions.assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
-		Assertions.assertThat(textHtml.getContentTransfertEncoding()).isEqualTo("8bit");
+		assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
+		assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		assertThat(textHtml.getContentTransfertEncoding()).isEqualTo("8bit");
 		
-		Assertions.assertThat(attachment.getFullMimeType()).isEqualTo("application/octet-stream");
-		Assertions.assertThat(attachment.getContentTransfertEncoding()).isEqualTo("base64");
-		Assertions.assertThat(attachment.isInvitation()).isFalse();
+		assertThat(attachment.getFullMimeType()).isEqualTo("application/octet-stream");
+		assertThat(attachment.getContentTransfertEncoding()).isEqualTo("base64");
+		assertThat(attachment.isInvitation()).isFalse();
 	}
 	
 	@Test
@@ -297,26 +298,26 @@ public abstract class MailboxFetchAPITest {
 		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
 		IMimePart textCalendar = multiPartAlternative.getChildren().get(2);
 		
-		Assertions.assertThat(collections.size()).isEqualTo(1);
-		Assertions.assertThat(onlyElement.getUid()).isEqualTo(1L);
+		assertThat(collections.size()).isEqualTo(1);
+		assertThat(onlyElement.getUid()).isEqualTo(1L);
 		
-		Assertions.assertThat(multiPartAlternative.isMultipart()).isTrue();
+		assertThat(multiPartAlternative.isMultipart()).isTrue();
 		
-		Assertions.assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
-		Assertions.assertThat(multiPartAlternative.getBodyParam("boundary")).
+		assertThat(multiPartAlternative.getFullMimeType()).isEqualTo("multipart/alternative");
+		assertThat(multiPartAlternative.getBodyParam("boundary")).
 			isEqualTo(new BodyParam("boundary", "----=_Part_2_1320656625672"));
 		
-		Assertions.assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		assertThat(textPlain.getFullMimeType()).isEqualTo("text/plain");
+		assertThat(textPlain.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
 		
-		Assertions.assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
-		Assertions.assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		assertThat(textHtml.getFullMimeType()).isEqualTo("text/html");
+		assertThat(textHtml.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
 		
-		Assertions.assertThat(textCalendar.getFullMimeType()).isEqualTo("text/calendar");
-		Assertions.assertThat(textCalendar.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
-		Assertions.assertThat(textCalendar.getBodyParam("method")).isEqualTo(new BodyParam("method", "REPLY"));
-		Assertions.assertThat(textCalendar.getContentTransfertEncoding()).isEqualTo("base64");
-		Assertions.assertThat(textCalendar.isInvitation()).isFalse();
+		assertThat(textCalendar.getFullMimeType()).isEqualTo("text/calendar");
+		assertThat(textCalendar.getBodyParam("charset")).isEqualTo(new BodyParam("charset", "utf-8"));
+		assertThat(textCalendar.getBodyParam("method")).isEqualTo(new BodyParam("method", "REPLY"));
+		assertThat(textCalendar.getContentTransfertEncoding()).isEqualTo("base64");
+		assertThat(textCalendar.isInvitation()).isFalse();
 	}
 	
 	@Ignore("The parsing of a message complex rfc822 is not implemented in GreenMail")
@@ -328,5 +329,24 @@ public abstract class MailboxFetchAPITest {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
 		mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
+	}
+	
+	@Test
+	public void testFetchUIDNextEmptyMailbox() {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		long uIDNext = mailboxService.fetchUIDNext(udr, inbox);
+		assertThat(uIDNext).isEqualTo(1);
+	}
+	
+	@Test
+	public void testFetchUIDNext() {
+		testUtils.sendEmailToInbox();
+		testUtils.sendEmailToInbox();
+		testUtils.sendEmailToInbox();
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		long uIDNext = mailboxService.fetchUIDNext(udr, inbox);
+		assertThat(uIDNext).isEqualTo(4);
 	}
 }

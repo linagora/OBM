@@ -85,6 +85,7 @@ import org.obm.push.minig.imap.command.UIDFetchHeadersCommand;
 import org.obm.push.minig.imap.command.UIDFetchInternalDateCommand;
 import org.obm.push.minig.imap.command.UIDFetchMessageCommand;
 import org.obm.push.minig.imap.command.UIDFetchPartCommand;
+import org.obm.push.minig.imap.command.UIDNextCommand;
 import org.obm.push.minig.imap.command.UIDSearchCommand;
 import org.obm.push.minig.imap.command.UIDStoreCommand;
 import org.obm.push.minig.imap.command.UIDThreadCommand;
@@ -341,5 +342,9 @@ public class ClientSupport {
 	
 	public boolean isConnected() {
 		return session.isConnected();
+	}
+	
+	public long uidNext(String mailbox) {
+		return run(new UIDNextCommand(mailbox));
 	}
 }

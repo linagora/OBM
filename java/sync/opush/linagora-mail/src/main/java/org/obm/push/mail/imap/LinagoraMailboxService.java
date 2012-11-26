@@ -583,5 +583,17 @@ public class LinagoraMailboxService implements MailboxService {
 		InputStream is = fetchMimePartStream(udr, collectionPath, uid, new MimeAddress(part));
 		return mimePart.decodeHeaders(is);
 	}
-	
+
+	@Override
+	public long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException {
+		try {
+			StoreClient store = imapClientProvider.getImapClient(udr);
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			return store.uidNext(mailBoxName);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		}
+	}
 }

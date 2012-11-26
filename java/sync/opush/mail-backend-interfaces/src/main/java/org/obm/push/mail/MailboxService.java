@@ -118,4 +118,5 @@ public interface MailboxService {
 
 	void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException;
 
+	long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException;
 }

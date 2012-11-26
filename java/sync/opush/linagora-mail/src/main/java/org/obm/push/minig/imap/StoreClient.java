@@ -235,4 +235,8 @@ public class StoreClient {
 	public boolean isConnected() {
 		return cs.isConnected();
 	}
+	
+	public long uidNext(String mailbox) {
+		return cs.uidNext(mailbox);
+	}
 }

@@ -98,4 +98,6 @@ public interface OpushImapFolder {
 	String getFullName();
 	
 	boolean isOpen() throws MessagingException;
+	
+	long uidNext(String mailbox) throws MessagingException;
 }

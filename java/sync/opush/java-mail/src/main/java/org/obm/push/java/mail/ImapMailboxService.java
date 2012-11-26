@@ -653,4 +653,23 @@ public class ImapMailboxService implements MailboxService {
 		InputStream is = fetchMimePartStream(udr, collectionPath, uid, new MimeAddress(part));
 		return mimePart.decodeHeaders(is);
 	}
+
+	@Override
+	public long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException {
+		
+		try {
+			String mailBoxName = parseMailBoxName(udr, collectionPath);
+			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
+			OpushImapFolder imapFolder = store.select(mailBoxName);
+			return imapFolder.uidNext(mailBoxName);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (ImapMessageNotFoundException e) {
+			throw new MailException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (ImapCommandException e) {
+			throw new MailException(e);
+		}
+	}
 }

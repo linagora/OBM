@@ -371,4 +371,9 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	public boolean isOpen() throws MessagingException {
 		return folder.isOpen();
 	}
+
+	@Override
+	public long uidNext(String mailbox) throws MessagingException {
+		return folder.getUIDNext();
+	}
 }
