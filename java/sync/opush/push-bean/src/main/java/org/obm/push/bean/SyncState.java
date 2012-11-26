@@ -85,7 +85,7 @@ public abstract class SyncState implements Serializable {
 		this.lastSyncFiltred = lastSyncFiltred;
 	}
 
-	public void updatingLastSync(FilterType filterType) {
+	public void updateLastWindowStartDate(FilterType filterType) {
 		if (filterType != null) {
 			Calendar calendar = filterType.getFilteredDate();
 			if (getLastSync() != null && calendar.getTime().after(getLastSync())) {

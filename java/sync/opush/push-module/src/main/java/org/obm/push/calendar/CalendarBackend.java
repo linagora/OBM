@@ -254,7 +254,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		String calendar = parseCalendarName(collectionPath);
 
-		state.updatingLastSync(syncCollectionOptions.getFilterType());
+		state.updateLastWindowStartDate(syncCollectionOptions.getFilterType());
 		try {
 			
 			EventChanges changes = null;

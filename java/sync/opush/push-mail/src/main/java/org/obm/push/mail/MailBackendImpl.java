@@ -277,7 +277,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			state.updatingLastSync(filterType);
+			state.updateLastWindowStartDate(filterType);
 			return emailSync.getSync(udr, mailboxService, state, collectionPath, collectionId);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
