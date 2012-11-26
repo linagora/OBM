@@ -31,14 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils.index;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.fest.assertions.api.Assertions;
+import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -59,13 +63,23 @@ public class IndexUtilsTest {
 		public Integer getIndex() {
 			return index;
 		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			return Objects.equal(this.index, ((IntIndexed)obj).index);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(index);
+		}
 	}
 	
 	@Test
 	public void testEmptyList() {
 		ImmutableList<Indexed<Integer>> emptyList = ImmutableList.of();
 		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
-		Assertions.assertThat(listIndexes).isEmpty();
+		assertThat(listIndexes).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -87,8 +101,65 @@ public class IndexUtilsTest {
 		ImmutableList<IntIndexed> emptyList = 
 				ImmutableList.of(new IntIndexed(0), new IntIndexed(1), new IntIndexed(2));
 		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
-		Assertions.assertThat(listIndexes).containsOnly(0, 1, 2);
+		assertThat(listIndexes).containsOnly(0, 1, 2);
 	}
 	
+	@Test
+	public void testMapEmpty() {
+		List<Indexed<Integer>> emptyList = ImmutableList.of();
+		Map<Integer, Indexed<Integer>> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).isEmpty();
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testMapNull() {
+		@SuppressWarnings("unused")
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes((List<IntIndexed>)null);
+	}
+
+	@Test
+	public void testMapWithOneElement() {
+		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5));
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(5, new IntIndexed(5)));
+	}
+
+	@Test
+	public void testMapWithOneNegativeElement() {
+		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(-5));
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(-5, new IntIndexed(-5)));
+	}
 	
+	@Test
+	public void testMapWithTwoElement() {
+		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5), new IntIndexed(-5));
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).hasSize(2).contains(
+				MapEntry.entry(5, new IntIndexed(5)),
+				MapEntry.entry(-5, new IntIndexed(-5)));
+	}
+	
+	@Test
+	public void testMapWithManyElement() {
+		List<IntIndexed> emptyList = ImmutableList.of(
+				new IntIndexed(5), new IntIndexed(-5), new IntIndexed(10), new IntIndexed(20), new IntIndexed(150));
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).hasSize(5).contains(
+				MapEntry.entry(5, new IntIndexed(5)),
+				MapEntry.entry(-5, new IntIndexed(-5)),
+				MapEntry.entry(10, new IntIndexed(10)),
+				MapEntry.entry(20, new IntIndexed(20)),
+				MapEntry.entry(150, new IntIndexed(150)));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testMapWithTwoSameIndexes() {
+		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5), new IntIndexed(5));
+		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(5, new IntIndexed(5)));
+	}
 }

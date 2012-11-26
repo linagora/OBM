@@ -33,6 +33,10 @@ package org.obm.push.utils.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 public class IndexUtils {
 
@@ -47,4 +51,16 @@ public class IndexUtils {
 		return indexes;
 	}
 	
+	public static 
+		<T extends Number, I extends Indexed<T>, C extends Collection<I>> 
+			Map<T, I>  mapByIndexes(C objects) {
+		
+		return Maps.uniqueIndex(objects, new Function<I, T>() {
+
+			@Override
+			public T apply(I input) {
+				return input.getIndex();
+			}
+		});
+	}
 }
