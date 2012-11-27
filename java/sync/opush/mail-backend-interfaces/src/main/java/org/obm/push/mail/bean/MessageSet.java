@@ -109,6 +109,10 @@ public class MessageSet implements Serializable {
 			return this;
 		}
 		
+		public Builder extendTo(long value) {
+			return add(Ranges.closed(ranges.last().upperEndpoint(), value)); 
+		}
+		
 		public Builder add(Range<Long> value) {
 			Optional<Range<Long>> connectedRange = findRangeConnecterOrContiguousTo(value);
 			if (connectedRange.isPresent()) {
