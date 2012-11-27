@@ -2382,7 +2382,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
     if ($event_duration == 3600) {
       $event_duration = "86400";
     }
-    $opacity = 'TRANSPARENT';
+    $opacity = $_SESSION["set_allday_opacity"];
   }
 
   $event_privacy = 0;
