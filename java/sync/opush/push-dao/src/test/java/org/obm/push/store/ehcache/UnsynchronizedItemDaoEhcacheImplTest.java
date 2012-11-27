@@ -51,7 +51,9 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
@@ -147,20 +149,20 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	@Test @Slow
 	public void addTwoItemsDifferentTypeOnTheSameCollection() {
 		ItemChange itemChange1 = buildItemChange("test 1");
-		ItemChange itemChange2 = buildItemChange("test 2");
+		ItemDeletion itemDeletion2 = ItemDeletion.builder().serverId("test 2").build();
 		ItemChange itemChange3 = buildItemChange("test 3");
 		
 		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
 				ImmutableList.of(itemChange1));
 		unSynchronizedItemImpl.storeItemsToRemove(credentials, getFakeDeviceId(), 1, 
-				ImmutableList.of(itemChange2));
+				ImmutableList.of(itemDeletion2));
 		
 		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(itemChanges);
 		Assert.assertEquals(1, itemChanges.size());
 		
 		Assert.assertTrue( contains(itemChanges, itemChange1) );
-		Assert.assertFalse( contains(itemChanges, itemChange2) );
+		Assert.assertFalse( contains(itemChanges, itemDeletion2) );
 		Assert.assertFalse( contains(itemChanges, itemChange3) );
 	}
 	
@@ -185,8 +187,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		return new Device(1, "DevType", new DeviceId("DevId"), null);
 	}
 	
-	private boolean contains(Set<ItemChange> expected, ItemChange actual) {
-		for (ItemChange itemChange: expected) {
+	private boolean contains(Set<? extends ASItem> expected, ASItem actual) {
+		for (ASItem itemChange: expected) {
 			if (itemChange.getServerId().equals(actual.getServerId())) {
 				return true;
 			}

@@ -33,7 +33,6 @@ package org.obm.push.service.impl;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -41,8 +40,9 @@ import org.obm.push.backend.CollectionPath;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -127,18 +127,14 @@ public class MappingServiceImpl implements MappingService {
 	}
 	
 	@Override
-	public List<ItemChange> buildItemsToDeleteFromUids(Integer collectionId, Collection<Long> uids) {
-		List<ItemChange> deletions = new LinkedList<ItemChange>();
+	public List<ItemDeletion> buildItemsToDeleteFromUids(Integer collectionId, Collection<Long> uids) {
+		List<ItemDeletion> deletions = Lists.newLinkedList();
 		for (Long uid: uids) {
-			deletions.add( getItemChange(collectionId, uid.toString()) );
+			deletions.add(ItemDeletion.builder()
+					.serverId(ServerId.buildServerIdString(collectionId, uid))
+					.build());
 		}
 		return deletions;
-	}
-
-
-	@Override
-	public ItemChange getItemChange(Integer collectionId, String clientId) {
-		return new ItemChange( getServerIdFor(collectionId, clientId) );
 	}
 
 	@Override

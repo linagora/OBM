@@ -55,6 +55,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -118,7 +119,7 @@ public class EmailSyncTestUtils {
 		expect(unsynchronizedItemDao.listItemsToRemove(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
-				anyInt())).andReturn(ImmutableList.<ItemChange>of()).anyTimes();
+				anyInt())).andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
 		unsynchronizedItemDao.clearItemsToRemove(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),

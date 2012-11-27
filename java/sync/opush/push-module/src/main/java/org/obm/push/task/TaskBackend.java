@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
@@ -67,7 +66,7 @@ public class TaskBackend implements PIMBackend {
 	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
 			SyncCollectionOptions options) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException {
-		return new DataDeltaBuilder().withSyncDate(new Date()).build();
+		return DataDelta.newEmptyDelta(new Date());
 	}
 	
 	@Override

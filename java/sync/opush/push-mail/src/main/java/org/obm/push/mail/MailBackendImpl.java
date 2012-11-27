@@ -75,6 +75,7 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -331,8 +332,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		List<ItemChange> itemChanges = fetchMails(udr, collectionId, 
 				mappingService.getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids(), bodyPreferences);
-		List<ItemChange> itemsToDelete = mappingService.buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
-		return new DataDelta(itemChanges, itemsToDelete, mailChanges.getLastSync());
+		List<ItemDeletion> itemsToDelete = mappingService.buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
+		
+		return DataDelta.builder()
+				.changes(itemChanges)
+				.deletions(itemsToDelete)
+				.syncDate(mailChanges.getLastSync())
+				.build();
 	}
 	
 	private List<ItemChange> fetchMails(UserDataRequest udr, Integer collectionId, String collectionPath, 

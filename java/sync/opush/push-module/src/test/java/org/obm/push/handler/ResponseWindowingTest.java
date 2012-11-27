@@ -48,9 +48,9 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -225,14 +225,14 @@ public class ResponseWindowingTest {
 		OpushUser user = OpushUser.create("usera@domain", "pw");
 
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
 		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deletions(2);
-		List<ItemChange> actual = 
+		List<ItemDeletion> actual = 
 				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
 		
 		verify(unsynchronizedItemDao);
@@ -249,7 +249,7 @@ public class ResponseWindowingTest {
 	}
 
 	private DataDelta emptyDelta() {
-		return new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), DateUtils.date("2012-01-01"));
+		return DataDelta.newEmptyDelta(DateUtils.date("2012-01-01"));
 	}
 
 	private DataDelta deletions(int nbDeletions) {
@@ -257,10 +257,11 @@ public class ResponseWindowingTest {
 	}
 	
 	private DataDelta deletionsWithOffset(int nbDeletions, int offset) {
-		return new DataDelta(
-				buildItemChangeList(0, "addServerId", 0), 
-				buildItemChangeList(nbDeletions, "delServerId", offset), 
-				DateUtils.date("2012-01-01"));
+		return DataDelta.builder()
+				.changes(buildItemChangeList(0, "addServerId", 0)) 
+				.deletions(buildItemDeletions(nbDeletions, "delServerId", offset)) 
+				.syncDate(DateUtils.date("2012-01-01"))
+				.build();
 	}
 
 	private DataDelta deltas(int nbAdditions) {
@@ -268,10 +269,11 @@ public class ResponseWindowingTest {
 	}
 	
 	private DataDelta deltasWithOffset(int nbAdditions, int offset) {
-		return new DataDelta(
-				buildItemChangeList(nbAdditions, "addServerId", offset), 
-				buildItemChangeList(0, "delServerId", 0), 
-				DateUtils.date("2012-01-01"));
+		return DataDelta.builder()
+				.changes(buildItemChangeList(nbAdditions, "addServerId", offset)) 
+				.deletions(buildItemDeletions(0, "delServerId", 0))
+				.syncDate(DateUtils.date("2012-01-01"))
+				.build();
 	}
 	
 	private ArrayList<ItemChange> buildItemChangeList(int nbChanges, String serverIdPrefix, int offset) {
@@ -286,6 +288,14 @@ public class ResponseWindowingTest {
 		return changes;
 	}
 
+	private List<ItemDeletion> buildItemDeletions(int nbChanges, String serverIdPrefix, int offset) {
+		List<ItemDeletion> changes = Lists.newArrayList();
+		for (int i = 0; i < nbChanges; ++i) {
+			changes.add(ItemDeletion.builder().serverId(serverIdPrefix + (i + offset)).build());
+		}
+		return changes;
+	}
+	
 	private SyncCollection syncCollection(int windowSize) {
 		SyncCollection syncCollection = new SyncCollection(1, "path");
 		syncCollection.setWindowSize(windowSize);

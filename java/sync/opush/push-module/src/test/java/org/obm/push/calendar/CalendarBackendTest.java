@@ -76,6 +76,7 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -581,11 +582,6 @@ public class CalendarBackendTest {
 			.andReturn("" + event.getObmId().getObmId());
 		}
 		
-		for (DeletedEvent deletedEvent : deletedEvents) {
-			expect(mappingService.getItemChange(collectionId, deletedEvent.getId().serializeToString()))
-				.andReturn(new ItemChange(deletedEvent.getId().serializeToString()));
-		}
-		
 		return eventChanges;
 	}
 
@@ -829,10 +825,8 @@ public class CalendarBackendTest {
 			.updates(Arrays.asList(event))
 			.lastSync(org.obm.DateUtils.date("2012-10-10"))
 			.build();
-		ItemChange expectedItemChange = new ItemChange("123456");
 		
 		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
-		expect(mappingService.getItemChange(collectionId, eventObmId.serializeToString())).andReturn(expectedItemChange).atLeastOnce();
 		
 		
 		replay(calendarClient, mappingService);
@@ -840,7 +834,10 @@ public class CalendarBackendTest {
 		DataDelta dataDelta = calendarBackend.buildDataDelta(userDataRequest, collectionId, token, eventChanges);
 		
 		verify(calendarClient, mappingService);
-		assertThat(dataDelta.getDeletions()).hasSize(1).containsOnly(expectedItemChange);
+		assertThat(dataDelta.getDeletions()).hasSize(1).containsOnly(
+				ItemDeletion.builder()
+					.serverId("1:132453")
+					.build());
 	}
 
 }

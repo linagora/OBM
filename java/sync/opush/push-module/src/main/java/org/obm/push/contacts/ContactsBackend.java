@@ -50,6 +50,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
@@ -57,6 +58,7 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -284,13 +286,18 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			addUpd.add(convertContactToItemChange(collectionId, contact));
 		}
 
-		List<ItemChange> deletions = new LinkedList<ItemChange>();
+		List<ItemDeletion> deletions = new LinkedList<ItemDeletion>();
 		for (Integer remove : contactChanges.getRemoved()) {
-			ItemChange change = mappingService.getItemChange(collectionId, String.valueOf(remove));
-			deletions.add(change);
+			deletions.add(ItemDeletion.builder()
+					.serverId(ServerId.buildServerIdString(collectionId, remove))
+					.build());
 		}
 
-		return new DataDelta(addUpd, deletions, contactChanges.getLastSync());
+		return DataDelta.builder()
+				.changes(addUpd)
+				.deletions(deletions)
+				.syncDate(contactChanges.getLastSync())
+				.build();
 	}
 
 	private Integer findAddressBookIdFromCollectionId(UserDataRequest udr, Integer collectionId) 

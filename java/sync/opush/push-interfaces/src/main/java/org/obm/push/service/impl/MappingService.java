@@ -41,7 +41,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
@@ -63,10 +63,8 @@ public interface MappingService {
 
 	Integer getCollectionIdFor(Device device, String collection) throws CollectionNotFoundException, DaoException;
 	
-	List<ItemChange> buildItemsToDeleteFromUids(Integer collectionId,
+	List<ItemDeletion> buildItemsToDeleteFromUids(Integer collectionId,
 			Collection<Long> uids);
-
-	ItemChange getItemChange(Integer collectionId, String clientId);
 
 	String getServerIdFor(Integer collectionId, String clientId);
 	

@@ -38,7 +38,7 @@ import org.obm.push.bean.MSEmail;
 
 import com.google.common.base.Objects;
 
-public class ItemChange implements Serializable {
+public class ItemChange implements ASItem, Serializable {
 	
 	private IApplicationData data;
 	private String serverId;
@@ -58,6 +58,7 @@ public class ItemChange implements Serializable {
 		this.isNew = isNew;
 	}
 	
+	@Override
 	public String getServerId() {
 		return serverId;
 	}

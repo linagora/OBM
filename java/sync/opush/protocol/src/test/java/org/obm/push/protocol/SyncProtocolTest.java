@@ -50,6 +50,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
@@ -170,7 +171,7 @@ public class SyncProtocolTest {
 		syncCollection.setSyncKey(new SyncKey("123456789"));
 		SyncCollectionResponse collectionResponse = new SyncResponse.SyncCollectionResponse(syncCollection);
 		collectionResponse.setItemChanges(Collections.<ItemChange>emptyList());
-		collectionResponse.setItemChangesDeletion(Collections.<ItemChange>emptyList());
+		collectionResponse.setItemChangesDeletion(Collections.<ItemDeletion>emptyList());
 		return collectionResponse;
 	}
 }

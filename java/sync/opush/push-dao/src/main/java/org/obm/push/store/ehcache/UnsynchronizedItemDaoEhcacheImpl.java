@@ -41,6 +41,7 @@ import net.sf.ehcache.Element;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.common.collect.Sets;
@@ -72,7 +73,7 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 	}
 
 	@Override
-	public void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic) {
+	public void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemDeletion> ic) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		storeItems(ic, key);
 	}
@@ -84,7 +85,7 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 	}
 	
 	@Override
-	public Set<ItemChange> listItemsToRemove(Credentials credentials, Device device, int collectionId) {
+	public Set<ItemDeletion> listItemsToRemove(Credentials credentials, Device device, int collectionId) {
 		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
 		return listItem(key);
 	}
@@ -95,8 +96,8 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		clearItems(key);
 	}
 
-	private void storeItems(Collection<ItemChange> ic, Key key) {
-		HashSet<ItemChange> itemChanges = Sets.newHashSet(ic);
+	private <T> void storeItems(Collection<T> ic, Key key) {
+		HashSet<T> itemChanges = Sets.newHashSet(ic);
 		store.put( new Element(key, itemChanges) );
 	}
 	
@@ -104,12 +105,12 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		store.put( new Element(key, Sets.newHashSet()) );
 	}
 	
-	private Set<ItemChange> listItem(Key key) {
+	private <T> Set<T> listItem(Key key) {
 		Element element = store.get(key);
 		if (element != null) {
-			return (Set<ItemChange>) element.getValue();
+			return (Set<T>) element.getValue();
 		} else {
-			return new HashSet<ItemChange>();
+			return new HashSet<T>();
 		}
 	}
 

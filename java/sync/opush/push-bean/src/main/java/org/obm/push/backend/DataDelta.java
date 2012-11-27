@@ -31,32 +31,75 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 public class DataDelta {
 	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		
+		private List<ItemChange> changes;
+		private List<ItemDeletion> deletions;
+		private Date syncDate;
+		
+		private Builder() {
+			super();
+		}
+
+		public Builder changes(List<ItemChange> changes) {
+			this.changes = changes;
+			return this;
+		}
+
+		public Builder deletions(List<ItemDeletion> deletions) {
+			this.deletions = deletions;
+			return this;
+		}
+
+		public Builder syncDate(Date syncDate) {
+			this.syncDate = syncDate;
+			return this;
+		}
+		
+		public DataDelta build() {
+			Preconditions.checkNotNull(syncDate);
+			if (changes == null) {
+				changes = ImmutableList.of();
+			}
+			if (deletions == null) {
+				deletions = ImmutableList.of();
+			}
+			return new DataDelta(changes, deletions, syncDate);
+		}
+		
+	}
+	
 	private final List<ItemChange> changes;
-	private final List<ItemChange> deletions;
+	private final List<ItemDeletion> deletions;
 	private final Date syncDate;
 	
-	public DataDelta(Collection<ItemChange> changes, Collection<ItemChange> deletions, Date syncDate) {
+	private DataDelta(List<ItemChange> changes, List<ItemDeletion> deletions, Date syncDate) {
 		this.syncDate = syncDate;
-		this.changes = new ArrayList<ItemChange>(changes);
-		this.deletions = new ArrayList<ItemChange>(deletions);
+		this.changes = ImmutableList.copyOf(changes);
+		this.deletions = ImmutableList.copyOf(deletions);
 	}
 
 	public List<ItemChange> getChanges() {
 		return changes;
 	}
 	
-	public List<ItemChange> getDeletions() {
+	public List<ItemDeletion> getDeletions() {
 		return deletions;
 	}
 	
@@ -87,5 +130,13 @@ public class DataDelta {
 	public String statistics() {
 		return String.format("%d changes, %d deletions, syncdate %tc", 
 					changes.size(), deletions.size(), syncDate);
+	}
+
+	public static DataDelta newEmptyDelta(Date lastSync) {
+		return DataDelta.builder()
+				.changes(ImmutableList.<ItemChange>of())
+				.deletions(ImmutableList.<ItemDeletion>of())
+				.syncDate(lastSync)
+				.build();
 	}
 }

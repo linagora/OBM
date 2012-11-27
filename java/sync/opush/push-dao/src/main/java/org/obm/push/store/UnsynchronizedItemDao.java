@@ -36,6 +36,7 @@ import java.util.Collection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 
 public interface UnsynchronizedItemDao {
 	
@@ -45,9 +46,9 @@ public interface UnsynchronizedItemDao {
 
 	void clearItemsToAdd(Credentials credentials, Device device, int collectionId);
 	
-	void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic);
+	void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemDeletion> ic);
 
-	Collection<ItemChange> listItemsToRemove(Credentials credentials, Device device, int collectionId);
+	Collection<ItemDeletion> listItemsToRemove(Credentials credentials, Device device, int collectionId);
 
 	void clearItemsToRemove(Credentials credentials, Device device, int collectionId);
 

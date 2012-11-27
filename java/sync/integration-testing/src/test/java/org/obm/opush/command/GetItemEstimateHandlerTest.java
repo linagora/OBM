@@ -55,7 +55,6 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.command.sync.EmailSyncTestUtils;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
@@ -148,7 +147,7 @@ public class GetItemEstimateHandlerTest {
 			throws Exception {
 		expectSyncState(classToInstanceMap.get(StateMachine.class), syncKey, syncState);
 
-		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		EmailSyncTestUtils.mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		
 		opushServer.start();

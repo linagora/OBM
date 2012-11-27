@@ -37,7 +37,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-public class ItemDeletion implements Serializable {
+public class ItemDeletion implements ASItem, Serializable {
 	
 	public static Builder builder() {
 		return new Builder();
@@ -68,6 +68,7 @@ public class ItemDeletion implements Serializable {
 		this.serverId = serverId;
 	}
 	
+	@Override
 	public String getServerId() {
 		return serverId;
 	}

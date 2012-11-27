@@ -42,6 +42,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -170,9 +171,9 @@ public class SyncProtocol {
 		
 		Element commands = DOMUtils.createElement(ce, "Commands");
 		
-		List<ItemChange> itemChangesDeletion = c.getItemChangesDeletion();
-		for (ItemChange ic: itemChangesDeletion) {
-			serializeDeletion(commands, ic);
+		List<ItemDeletion> itemChangesDeletion = c.getItemChangesDeletion();
+		for (ItemDeletion deletion: itemChangesDeletion) {
+			serializeDeletion(commands, deletion);
 		}
 		
 		for (ItemChange ic : c.getItemChanges()) {
@@ -247,9 +248,9 @@ public class SyncProtocol {
 		return clientId != null;
 	}
 	
-	private static void serializeDeletion(Element commands, ItemChange ic) {
+	private static void serializeDeletion(Element commands, ItemDeletion deletion) {
 		Element del = DOMUtils.createElement(commands, "Delete");
-		DOMUtils.createElementAndText(del, "ServerId", ic.getServerId());
+		DOMUtils.createElementAndText(del, "ServerId", deletion.getServerId());
 	}
 	
 }

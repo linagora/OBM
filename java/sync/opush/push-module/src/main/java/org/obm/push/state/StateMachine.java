@@ -43,7 +43,9 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
@@ -113,7 +115,7 @@ public class StateMachine {
 	}
 	
 	public SyncKey allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
-		Collection<ItemChange> changes, Collection<ItemChange> deletedItems) throws DaoException, InvalidServerId {
+		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems) throws DaoException, InvalidServerId {
 
 		SyncKey newSk = syncKeyFactory.randomSyncKey();
 		ItemSyncState newState = new ItemSyncState(newSk, lastSync);
@@ -124,17 +126,17 @@ public class StateMachine {
 			itemTrackingDao.markAsSynced(newState, listNewItems(changes));
 		}
 		if (deletedItems != null && !deletedItems.isEmpty()) {
-			itemTrackingDao.markAsDeleted(newState, itemChangesAsServerIdSet(deletedItems));
+			itemTrackingDao.markAsDeleted(newState, itemDeletionsAsServerIdSet(deletedItems));
 		}
 		
 		log(udr, newState);
 		return newSk;
 	}
 
-	private Set<ServerId> itemChangesAsServerIdSet(Iterable<ItemChange> changes) throws InvalidServerId {
+	private Set<ServerId> itemDeletionsAsServerIdSet(Iterable<ItemDeletion> deletions) throws InvalidServerId {
 		Set<ServerId> ids = Sets.newHashSet();
-		for (ItemChange change: changes) {
-			addServerItemId(ids, change);
+		for (ItemDeletion deletion: deletions) {
+			addServerItemId(ids, deletion);
 		}
 		return ids;
 	}
@@ -149,7 +151,7 @@ public class StateMachine {
 		return serverIds;
 	}
 
-	private void addServerItemId(Set<ServerId> serverIds, ItemChange change) throws InvalidServerId {
+	private void addServerItemId(Set<ServerId> serverIds, ASItem change) throws InvalidServerId {
 		ServerId serverId = new ServerId( change.getServerId() );
 		if (serverId.isItem()) {
 			serverIds.add(serverId);

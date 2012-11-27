@@ -62,7 +62,6 @@ import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
@@ -76,6 +75,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.mail.SmtpServerSetup;
@@ -147,13 +147,14 @@ public class MailBackendHandlerTest {
 		int serverId = 1234;
 		String syncEmailId = ":2";
 		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
-		DataDelta delta = new DataDeltaBuilder()
-		.addChanges(
-			new ItemChangesBuilder()
-				.addItemChange(
-					new ItemChangeBuilder().serverId(serverId + syncEmailId)
-						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-		.withSyncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder()
+			.changes(new ItemChangesBuilder()
+				.addItemChange(new ItemChangeBuilder()
+					.serverId(serverId + syncEmailId)
+					.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+				.build())
+			.syncDate(new Date())
+			.build();
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockDao(serverId, syncState);
@@ -217,12 +218,12 @@ public class MailBackendHandlerTest {
 		expectLastCall().anyTimes();
 		
 		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, serverId))
-			.andReturn(ImmutableSet.<ItemChange> of()).anyTimes();
+			.andReturn(ImmutableSet.<ItemDeletion>of()).anyTimes();
 		
 		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, serverId);
 		expectLastCall().anyTimes();
 		
-		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, serverId, Lists.<ItemChange> newArrayList());
+		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, serverId, Lists.<ItemDeletion>newArrayList());
 		expectLastCall().anyTimes();
 	}
 	

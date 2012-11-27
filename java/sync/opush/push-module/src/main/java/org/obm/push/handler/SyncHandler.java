@@ -62,6 +62,7 @@ import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -254,13 +255,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			lastSync = delta.getSyncDate();
 		} else {
 			lastSync = c.getSyncState().getLastSync();
-			delta = new DataDelta(ImmutableList.<ItemChange>of(), ImmutableList.<ItemChange>of(), lastSync);
+			delta = DataDelta.newEmptyDelta(lastSync);
 		}
 
 		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, processedClientIds);
 		syncCollectionResponse.setItemChanges(changed);
 	
-		List<ItemChange> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, processedClientIds);
+		List<ItemDeletion> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, processedClientIds);
 		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
 		return lastSync;
@@ -445,8 +446,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		backend.resetCollection(udr, syncCollection.getCollectionId());
 		syncCollectionResponse.setSyncStateValidity(true);
 		syncCollectionResponse.setCollectionValidity(true);
-		ImmutableList<ItemChange> changed = ImmutableList.<ItemChange>of();
-		ImmutableList<ItemChange> deleted = ImmutableList.<ItemChange>of();
+		List<ItemChange> changed = ImmutableList.of();
+		List<ItemDeletion> deleted = ImmutableList.of();
 		SyncKey newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}

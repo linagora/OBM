@@ -60,13 +60,13 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.DataDeltaBuilder;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.store.CollectionDao;
@@ -84,6 +84,7 @@ import org.obm.sync.push.client.SyncResponse;
 import org.obm.sync.push.client.SyncStatus;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
@@ -115,7 +116,7 @@ public class SyncHandlerTest {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int syncEmailCollectionId = 4;
-		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
@@ -141,13 +142,14 @@ public class SyncHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 
-		DataDelta delta = new DataDeltaBuilder()
-			.addChanges(
-				new ItemChangesBuilder()
+		DataDelta delta = DataDelta.builder()
+			.changes(new ItemChangesBuilder()
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-			.withSyncDate(new Date()).build();
+							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+					.build())
+			.syncDate(new Date())
+			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -174,16 +176,17 @@ public class SyncHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 		
-		DataDelta delta = new DataDeltaBuilder()
-			.addChanges(
-				new ItemChangesBuilder()
+		DataDelta delta = DataDelta.builder()
+			.changes(new ItemChangesBuilder()
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
 					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":1")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-			.withSyncDate(new Date()).build();
+							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+					.build())
+			.syncDate(new Date())
+			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -212,12 +215,11 @@ public class SyncHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
 		
-		DataDelta delta = new DataDeltaBuilder()
-			.addDeletions(
-				new ItemChangesBuilder().addItemChange(
-					new ItemChangeBuilder().serverId(syncEmailCollectionId + ":0")
-						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-			.withSyncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder()
+			.deletions(ImmutableList.of(
+					ItemDeletion.builder().serverId(syncEmailCollectionId + ":0").build()))
+			.syncDate(new Date())
+			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -243,16 +245,16 @@ public class SyncHandlerTest {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey syncEmailSyncKey = new SyncKey("13424");
 		int syncEmailCollectionId = 432;
-		DataDelta delta = new DataDeltaBuilder()
-			.addChanges(
-				new ItemChangesBuilder().addItemChange(
+		DataDelta delta = DataDelta.builder()
+			.changes(new ItemChangesBuilder()
+					.addItemChange(
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-			.addDeletions(
-				new ItemChangesBuilder().addItemChange(
-						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":122")
-							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText))))
-			.withSyncDate(new Date()).build();
+							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+					.build())
+			.deletions(ImmutableList.of(
+					ItemDeletion.builder().serverId(syncEmailCollectionId + ":122").build()))
+			.syncDate(new Date())
+			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -290,7 +292,7 @@ public class SyncHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		java.util.Collection<Integer> existingCollections = Collections.emptySet();
 		int syncEmailUnexistingCollectionId = 15105;
-		DataDelta delta = new DataDeltaBuilder().withSyncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);

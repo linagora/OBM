@@ -32,7 +32,6 @@
 package org.obm.push.calendar;
 
 import java.security.InvalidParameterException;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +50,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
@@ -59,6 +59,7 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
@@ -286,12 +287,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			DaoException, ConversionException {
 		final String userEmail = calendarClient.getUserEmail(token);
 		Preconditions.checkNotNull(userEmail, "User has no email address");
-		
-		List<ItemChange> additions = addOrUpdateEventFilter(changes.getUpdated(), userEmail, collectionId, udr);
-		List<ItemChange> deletions = removeEventFilter(changes.getDeletedEvents(), collectionId);
-		Date syncDate = changes.getLastSync();
-		
-		return new DataDelta(additions, deletions, syncDate);
+
+		return DataDelta.builder()
+				.changes(addOrUpdateEventFilter(changes.getUpdated(), userEmail, collectionId, udr))
+				.deletions(removeEventFilter(changes.getDeletedEvents(), collectionId))
+				.syncDate(changes.getLastSync())
+				.build();
 	}
 
 	private List<ItemChange> addOrUpdateEventFilter(List<Event> events, String userEmail,
@@ -308,17 +309,15 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return items;
 	}
 	
-	private List<ItemChange> removeEventFilter(List<DeletedEvent> eventsRemoved, Integer collectionId) {
+	private List<ItemDeletion> removeEventFilter(List<DeletedEvent> eventsRemoved, Integer collectionId) {
 		
-		List<ItemChange> deletions = Lists.newArrayList();
+		List<ItemDeletion> deletions = Lists.newArrayList();
 		for (final DeletedEvent eventRemove : eventsRemoved) {
-			deletions.add(getItemChange(collectionId, eventRemove.getId()));
+			deletions.add(ItemDeletion.builder()
+					.serverId(ServerId.buildServerIdString(collectionId, eventRemove.getId().getObmId()))
+					.build());
 		}
 		return deletions;
-	}
-	
-	private ItemChange getItemChange(Integer collectionId,	EventObmId eventIdRemove) {
-		return mappingService.getItemChange(collectionId, eventIdRemove.serializeToString());
 	}
 
 	private boolean checkIfEventCanBeAdded(Event event, String userEmail) {
