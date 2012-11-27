@@ -29,41 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.minig.imap.command;
 
-import java.util.Collection;
-import java.util.List;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.obm.push.mail.bean.FlagsList;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
 
-public class UIDStoreCommand extends Command<Boolean> {
+import com.google.common.collect.ImmutableList;
 
-	private ImapMessageSet imapMessageSet;
-	private FlagsList fl;
-	private boolean set;
-
-	public UIDStoreCommand(Collection<Long> uids, FlagsList fl, boolean set) {
-		MessageSet messageSet = MessageSet.builder().addAll(uids).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
-		this.fl = fl;
-		this.set = set;
+@RunWith(SlowFilterRunner.class)
+public class UIDCopyCommandTest {
+	
+	@Test
+	public void testBuildCommand() {
+		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(
+				ImmutableList.of(1l), "Trash");
+		
+		String command = uidCopyCommand.buildCommand().getCommandString();
+		
+		assertThat(command).isEqualTo("UID COPY 1 \"Trash\"");
 	}
-
-	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		data = isOK;
+	
+	@Test
+	public void testResponseReceived() {
+		String response = 
+				"* OK [COPY 23 1 2]";
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		
+		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(ImmutableList.of(1l), "Trash");
+		uidCopyCommand.responseReceived(ImmutableList.of(imapResponse));
+		
+		assertThat(uidCopyCommand.data).containsOnly(2l);
 	}
-
-	@Override
-	protected CommandArgument buildCommand() {
-		String cmd = "UID STORE " + imapMessageSet.asString() + " "
-				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.asCommandValue();
-		return new CommandArgument(cmd, null);
-	}
-
 }

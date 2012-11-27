@@ -37,28 +37,29 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 
-	private TreeSet<Long> uids;
+	private ImapMessageSet imapMessageSet;
 	private final BodyStructureParser bodyStructureParser;
 
 	public UIDFetchBodyStructureCommand(BodyStructureParser bodyStructureParser, Collection<Long> uid) {
 		this.bodyStructureParser = bodyStructureParser;
-		this.uids = new TreeSet<Long>(uid);
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + MessageSet.asString(uids) + " (UID RFC822.SIZE BODYSTRUCTURE)";
+		String cmd = "UID FETCH " + imapMessageSet.asString() + " (UID RFC822.SIZE BODYSTRUCTURE)";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}

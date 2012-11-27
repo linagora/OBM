@@ -37,15 +37,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 
 public class UIDCopyCommand extends Command<Collection<Long>> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 	private String destMailbox;
 
 	public UIDCopyCommand(Collection<Long> uid, String destMailbox) {
-		this.uids = uid;
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 		this.destMailbox = destMailbox;
 	}
 
@@ -53,7 +55,7 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("UID COPY ");
-		sb.append(MessageSet.asString(uids));
+		sb.append(imapMessageSet.asString());
 		sb.append(' ');
 		sb.append(toUtf7(destMailbox));
 		String cmd = sb.toString();
@@ -85,8 +87,7 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 		int space = payload.lastIndexOf(" ", idx);
 		String set = payload.substring(space + 1, idx);
 		logger.debug("set to parse: " + set);
-		Collection<Long> ret = MessageSet.asLongCollection(set);
-		return ret;
+		return ImapMessageSet.wrap(MessageSet.parseMessageSet(set)).asLongCollection();
 	}
 
 }

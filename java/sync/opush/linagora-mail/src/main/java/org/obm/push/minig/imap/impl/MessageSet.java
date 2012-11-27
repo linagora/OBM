@@ -34,18 +34,13 @@ package org.obm.push.minig.imap.impl;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomains;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
@@ -58,6 +53,22 @@ public class MessageSet {
 	
 	public static Builder from(MessageSet set) {
 		return new Builder(set);
+	}
+
+	public static MessageSet parseMessageSet(String set) {
+		String[] parts = set.split(",");
+		Builder builder = MessageSet.builder();
+		for (String s : parts) {
+			if (!s.contains(":")) {
+				builder.add(Long.valueOf(s));
+			} else {
+				String[] p = s.split(":");
+				long start = Long.valueOf(p[0]);
+				long end = Long.valueOf(p[1]);
+				builder.add(Ranges.closed(start, end));
+			}
+		}
+		return builder.build();
 	}
 
 	public static class Builder implements org.obm.push.bean.Builder<MessageSet> {
@@ -87,6 +98,13 @@ public class MessageSet {
 
 		public Builder add(long value) {
 			return add(Ranges.singleton(value));
+		}
+		
+		public Builder addAll(Collection<Long> values) {
+			for (Long value : values) {
+				add(value);
+			}
+			return this;
 		}
 		
 		public Builder add(Range<Long> value) {
@@ -137,16 +155,10 @@ public class MessageSet {
 		this.ranges = ranges;
 	}
 	
-	public String asImapString() {
-		List<String> rangesAsStrings = Lists.newArrayList();
-		for (Range<Long> range: ranges) {
-			if (!range.isEmpty()) {
-				rangesAsStrings.add(rangeAsString(range));
-			}
-		}
-		return Joiner.on(',').join(rangesAsStrings);
+	public Set<Range<Long>> getRanges() {
+		return ranges;
 	}
-
+	
 	public Iterable<Long> asDiscreteValues() {
 		return Iterables.concat(Iterables.transform(ranges, new Function<Range<Long>, Set<Long>>() {
 			@Override
@@ -159,46 +171,4 @@ public class MessageSet {
 	public int rangeNumber() {
 		return ranges.size();
 	}
-	
-	private String rangeAsString(Range<Long> range) {
-		ContiguousSet<Long> rangeAsSet = range.asSet(DiscreteDomains.longs());
-		if (rangeAsSet.size() == 1) {
-			return singleValueRangeAsString(rangeAsSet);
-		} else {
-			return intervalRangeAsString(rangeAsSet);
-		}
-	}
-
-	private String singleValueRangeAsString(ContiguousSet<Long> rangeAsSet) {
-		return String.valueOf(rangeAsSet.first());
-	}
-	
-	private String intervalRangeAsString(ContiguousSet<Long> rangeAsSet) {
-		return String.format("%d:%d", rangeAsSet.first(), rangeAsSet.last());
-	}
-	
-	public static final String asString(Collection<Long> uids) {
-		Builder builder = builder();
-		for (Long uid: uids) {
-			builder.add(uid);
-		}
-		return builder.build().asImapString();
-	}
-
-	public static Collection<Long> asLongCollection(String set) {
-		String[] parts = set.split(",");
-		Builder builder = builder();
-		for (String s : parts) {
-			if (!s.contains(":")) {
-				builder.add(Long.valueOf(s));
-			} else {
-				String[] p = s.split(":");
-				long start = Long.valueOf(p[0]);
-				long end = Long.valueOf(p[1]);
-				builder.add(Ranges.closed(start, end));
-			}
-		}
-		return ImmutableList.copyOf(builder.build().asDiscreteValues());
-	}
-
 }

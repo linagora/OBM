@@ -45,24 +45,26 @@ import java.util.Map;
 import org.minig.imap.command.parser.HeadersParser;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 
 public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 	private String[] headers;
 
 	public UIDFetchHeadersCommand(Collection<Long> uid, String[] headers) {
-		this.uids = uid;
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 		this.headers = headers;
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
-		if (!uids.isEmpty()) {
+		if (!imapMessageSet.isEmpty()) {
 			sb.append("UID FETCH ");
-			sb.append(MessageSet.asString(uids));
+			sb.append(imapMessageSet.asString());
 			sb.append(" (UID BODY.PEEK[HEADER.FIELDS (");
 			for (int i = 0; i < headers.length; i++) {
 				if (i > 0) {
@@ -83,15 +85,15 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
-		if (uids.isEmpty()) {
+		if (imapMessageSet.isEmpty()) {
 			data = Collections.emptyList();
 			return;
 		}
 		
 		if (isOK) {
-			data = new ArrayList<IMAPHeaders>(uids.size());
+			data = new ArrayList<IMAPHeaders>(imapMessageSet.size());
 			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < uids.size(); ) {
+			for (int i = 0; it.hasNext() && i < imapMessageSet.size(); ) {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH")) {

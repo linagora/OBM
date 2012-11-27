@@ -49,6 +49,7 @@ import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 import org.obm.push.minig.imap.mime.impl.AtomHelper;
 import org.obm.push.minig.imap.mime.impl.ParenListParser;
@@ -63,18 +64,19 @@ import com.google.common.base.Charsets;
  */
 public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 
 	public UIDFetchEnvelopeCommand(Collection<Long> uid) {
-		this.uids = uid;
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
-		if (!uids.isEmpty()) {
+		if (!imapMessageSet.isEmpty()) {
 			sb.append("UID FETCH ");
-			sb.append(MessageSet.asString(uids));
+			sb.append(imapMessageSet.asString());
 			sb.append(" (UID ENVELOPE)");
 		} else {
 			sb.append("NOOP");
@@ -88,15 +90,15 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 
-		if (uids.isEmpty()) {
+		if (imapMessageSet.isEmpty()) {
 			data = Collections.emptyList();
 			return;
 		}
 		
 		if (isOK) {
-			List<UIDEnvelope> tmp = new ArrayList<UIDEnvelope>(uids.size());
+			List<UIDEnvelope> tmp = new ArrayList<UIDEnvelope>(imapMessageSet.size());
 			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < uids.size();) {
+			for (int i = 0; it.hasNext() && i < imapMessageSet.size();) {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH")) {

@@ -30,40 +30,75 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.command;
+package org.obm.push.minig.imap.impl;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.obm.push.mail.bean.FlagsList;
-import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomains;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 
-public class UIDStoreCommand extends Command<Boolean> {
+public class ImapMessageSet {
+	
+	private final MessageSet set;
 
-	private ImapMessageSet imapMessageSet;
-	private FlagsList fl;
-	private boolean set;
+	public static ImapMessageSet wrap(MessageSet set) {
+		return new ImapMessageSet(set);
+	}
 
-	public UIDStoreCommand(Collection<Long> uids, FlagsList fl, boolean set) {
-		MessageSet messageSet = MessageSet.builder().addAll(uids).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
-		this.fl = fl;
+	private ImapMessageSet(MessageSet set) {
 		this.set = set;
 	}
-
-	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		data = isOK;
+	
+	public MessageSet getMessageSet() {
+		return set;
+	}
+	
+	private String singleValueRangeAsString(ContiguousSet<Long> rangeAsSet) {
+		return String.valueOf(rangeAsSet.first());
+	}
+	
+	private String intervalRangeAsString(ContiguousSet<Long> rangeAsSet) {
+		return String.format("%d:%d", rangeAsSet.first(), rangeAsSet.last());
+	}
+	
+	private String rangeAsString(Range<Long> range) {
+		ContiguousSet<Long> rangeAsSet = range.asSet(DiscreteDomains.longs());
+		if (rangeAsSet.size() == 1) {
+			return singleValueRangeAsString(rangeAsSet);
+		} else {
+			return intervalRangeAsString(rangeAsSet);
+		}
+	}
+	
+	public String asString() {
+		List<String> rangesAsStrings = Lists.newArrayList();
+		for (Range<Long> range: set.getRanges()) {
+			if (!range.isEmpty()) {
+				rangesAsStrings.add(rangeAsString(range));
+			}
+		}
+		return Joiner.on(',').join(rangesAsStrings);
+	}
+	
+	public Collection<Long> asLongCollection() {
+		return ImmutableList.copyOf(set.asDiscreteValues());
 	}
 
-	@Override
-	protected CommandArgument buildCommand() {
-		String cmd = "UID STORE " + imapMessageSet.asString() + " "
-				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.asCommandValue();
-		return new CommandArgument(cmd, null);
+	public int size() {
+		return Iterators.size(set.asDiscreteValues().iterator());
 	}
-
+	
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+	
+	public boolean contains(long value) {
+		return Iterators.contains(set.asDiscreteValues().iterator(), value); 
+	}
 }

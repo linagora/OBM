@@ -42,27 +42,28 @@ import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 
 	public UIDFetchFlagsCommand(Collection<Long> uid) {
-		this.uids = ImmutableSet.copyOf(uid);
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
 
 		StringBuilder sb = new StringBuilder();
-		if (!uids.isEmpty()) {
+		if (!imapMessageSet.isEmpty()) {
 			sb.append("UID FETCH ");
-			sb.append(MessageSet.asString(uids));
+			sb.append(imapMessageSet.asString());
 			sb.append(" (UID FLAGS)");
 		} else {
 			sb.append("NOOP");
@@ -76,7 +77,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
-		if (uids.isEmpty()) {
+		if (imapMessageSet.isEmpty()) {
 			data = ImmutableMap.<Long, FlagsList>of();
 			return;
 		}
@@ -104,7 +105,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 				}
 
 				long uid = getUid(payload);
-				if (uids.contains(uid)) {
+				if (imapMessageSet.contains(uid)) {
 					FlagsList flagsList = new FlagsList();
 					parseFlags(flags, flagsList);
 					result.put(uid, flagsList);

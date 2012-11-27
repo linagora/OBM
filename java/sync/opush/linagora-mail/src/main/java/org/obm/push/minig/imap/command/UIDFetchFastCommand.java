@@ -46,6 +46,7 @@ import java.util.Set;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 
 import com.google.common.collect.ImmutableSet;
@@ -57,11 +58,12 @@ import com.google.common.collect.ImmutableSet.Builder;
  */
 public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 	DateFormat df;
 
 	public UIDFetchFastCommand(Collection<Long> uid) {
-		this.uids = uid;
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 		//22-Mar-2010 14:26:18 +0100
 		df = new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH);
 	}
@@ -70,9 +72,9 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 	protected CommandArgument buildCommand() {
 
 		StringBuilder sb = new StringBuilder();
-		if (!uids.isEmpty()) {
+		if (!imapMessageSet.isEmpty()) {
 			sb.append("UID FETCH ");
-			sb.append(MessageSet.asString(uids));
+			sb.append(imapMessageSet.asString());
 			sb.append(" (FLAGS INTERNALDATE RFC822.SIZE)");
 		} else {
 			sb.append("NOOP");
@@ -86,7 +88,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
-		if (uids.isEmpty()) {
+		if (imapMessageSet.isEmpty()) {
 			data = ImmutableSet.of();
 			return;
 		}
@@ -94,7 +96,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		Builder<FastFetch> buildSet = ImmutableSet.builder();
 		if (isOK) {
 			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < uids.size(); ) {
+			for (int i = 0; it.hasNext() && i < imapMessageSet.size(); ) {
 				org.obm.push.mail.bean.FastFetch.Builder builder = FastFetch.builder();
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();

@@ -34,14 +34,14 @@ package org.obm.push.minig.imap.impl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.junit.Test;
-import org.obm.push.minig.imap.impl.MessageSet;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.Ranges;
 
+@RunWith(SlowFilterRunner.class) @Slow
 public class MessageSetTest {
 
 	@Test
@@ -138,54 +138,31 @@ public class MessageSetTest {
 		assertThat(secondSet.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l);
 	}
 	
-	@Test
-	public void testParseAsString1() {
-		String actual = MessageSet.asString(Arrays.asList(1l, 2l, 3l, 8l, 9l, 10l, 12l));
-		assertThat(actual).isEqualTo("1:3,8:10,12");
+	@Test(expected=NullPointerException.class)
+	public void testParseMessageSetNull() {
+		MessageSet.parseMessageSet(null);
 	}
-
-	@Test
-	public void testParseAsCollection1() {
-		Collection<Long> actual = MessageSet.asLongCollection("1:3,8:10,12");
-		assertThat(actual).containsExactly(1l, 2l, 3l, 8l, 9l, 10l, 12l);
-	}
-
 	
-	@Test
-	public void testParseAsString2() {
-		String actual = MessageSet.asString(Arrays.asList(8l, 2l, 3l, 4l, 9l, 10l, 12l, 13l));
-		assertThat(actual).isEqualTo("2:4,8:10,12:13");
+	@Test(expected=NumberFormatException.class)
+	public void testParseMessageSetNumber() {
+		MessageSet.parseMessageSet("");
 	}
 	
 	@Test
-	public void testParseAsCollection2() {
-		Collection<Long> actual = MessageSet.asLongCollection("2:4,8:10,12:13");
-		assertThat(actual).containsExactly(2l, 3l, 4l, 8l, 9l, 10l, 12l, 13l);
+	public void testParseMessageSet() {
+		MessageSet messageSet = MessageSet.parseMessageSet("1");
+		assertThat(messageSet.asDiscreteValues()).containsOnly(1l);
 	}
 	
 	@Test
-	public void testParseAsString3() {
-		String actual = MessageSet.asString(Arrays.asList(1l, 2l));
-		assertThat(actual).isEqualTo("1:2");
+	public void testParseMessageSetRange() {
+		MessageSet messageSet = MessageSet.parseMessageSet("1:3");
+		assertThat(messageSet.asDiscreteValues()).containsOnly(1l, 2l, 3l);
 	}
 	
 	@Test
-	public void testParseAsCollection3() {
-		Collection<Long> actual = MessageSet.asLongCollection("1:2");
-		assertThat(actual).containsExactly(1l, 2l);
+	public void testParseMessageSetMultipleRanges() {
+		MessageSet messageSet = MessageSet.parseMessageSet("1:3,8:10");
+		assertThat(messageSet.asDiscreteValues()).containsOnly(1l, 2l, 3l, 8l, 9l, 10l);
 	}
-	
-	@Test
-	public void testParseAsString4() {
-		String actual = MessageSet.asString(Arrays.asList(1l));
-		assertThat(actual).isEqualTo("1");
-	}
-	
-	@Test
-	public void testParseAsCollection4() {
-		Collection<Long> actual = MessageSet.asLongCollection("1");
-		assertThat(actual).containsExactly(1l);
-	}
-	
-	
 }

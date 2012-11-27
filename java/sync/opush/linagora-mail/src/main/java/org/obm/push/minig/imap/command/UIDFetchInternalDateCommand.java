@@ -43,15 +43,17 @@ import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.impl.MessageSet;
 
 public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 
-	private Collection<Long> uids;
+	private ImapMessageSet imapMessageSet;
 	DateFormat df;
 
 	public UIDFetchInternalDateCommand(Collection<Long> uid) {
-		this.uids = uid;
+		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
+		imapMessageSet = ImapMessageSet.wrap(messageSet);
 		//22-Mar-2010 14:26:18 +0100
 		df = new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH);
 	}
@@ -60,9 +62,9 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 	protected CommandArgument buildCommand() {
 
 		StringBuilder sb = new StringBuilder();
-		if (!uids.isEmpty()) {
+		if (!imapMessageSet.isEmpty()) {
 			sb.append("UID FETCH ");
-			sb.append(MessageSet.asString(uids));
+			sb.append(imapMessageSet.asString());
 			sb.append(" (UID INTERNALDATE)");
 		} else {
 			sb.append("NOOP");
@@ -76,7 +78,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 	public void responseReceived(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
-		if (uids.isEmpty()) {
+		if (imapMessageSet.isEmpty()) {
 			data = new InternalDate[0];
 			return;
 		}
