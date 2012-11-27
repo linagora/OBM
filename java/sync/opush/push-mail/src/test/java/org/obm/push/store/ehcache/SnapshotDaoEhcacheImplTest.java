@@ -43,14 +43,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
-import org.obm.push.bean.Snapshot;
-import org.obm.push.bean.SnapshotKey;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 
@@ -58,7 +59,7 @@ import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
+public class SnapshotDaoEhcacheImplTest {
 
 	private ObjectStoreManager objectStoreManager;
 	private SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl;
@@ -69,10 +70,19 @@ public class SnapshotDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		objectStoreManager = new ObjectStoreManager( initConfigurationServiceMock(), logger);
 		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
 	}
 	
+	private ConfigurationService initConfigurationServiceMock() {
+		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
+		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(false);
+		EasyMock.replay(configurationService);
+		
+		return configurationService;
+	}
+
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();

@@ -44,10 +44,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
-import org.obm.push.bean.Snapshot;
-import org.obm.push.bean.SnapshotKey;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.utils.DateUtils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -56,7 +56,7 @@ import com.google.common.collect.ImmutableList;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Cache.class, ObjectStoreManager.class})
-public class SnapshotDaoEhcacheImplWithMockTest extends StoreManagerConfigurationTest {
+public class SnapshotDaoEhcacheImplWithMockTest {
 
 	@Test
 	public void getNull() {

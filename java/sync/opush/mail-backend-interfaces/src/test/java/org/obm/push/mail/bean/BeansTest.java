@@ -66,6 +66,9 @@ public class BeansTest {
 					.add(MailboxFolder.class)
 					.add(MailboxFolders.class)
 					.add(MimeAddress.class)
+					.add(Email.class)
+					.add(Snapshot.class)
+					.add(SnapshotKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		

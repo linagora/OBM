@@ -29,29 +29,28 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.mail.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.push.mail.bean.Email;
-import org.obm.push.utils.DateUtils;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.mail.bean.SnapshotKey;
 
-public class SnapshotTest {
+public class SnapshotKeyTest {
 	
 	@Test (expected=IllegalArgumentException.class)
-	public void testNullDeviceId() {
-		Snapshot.builder()
-			.filterType(FilterType.ONE_DAY_BACK)
-			.syncKey(new SyncKey("syncKey"))
+	public void testNullSyncKey() {
+		SnapshotKey.builder()
+			.deviceId(new DeviceId("deviceId"))
 			.collectionId(1)
 			.build();
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
-	public void testNullFilterType() {
-		Snapshot.builder()
-			.deviceId(new DeviceId("deviceId"))
+	public void testNullDeviceId() {
+		SnapshotKey.builder()
 			.syncKey(new SyncKey("syncKey"))
 			.collectionId(1)
 			.build();
@@ -59,55 +58,26 @@ public class SnapshotTest {
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testNullCollectionId() {
-		Snapshot.builder()
+		SnapshotKey.builder()
 			.deviceId(new DeviceId("deviceId"))
-			.filterType(FilterType.ONE_DAY_BACK)
 			.syncKey(new SyncKey("syncKey"))
-			.build();
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullSyncKey() {
-		Snapshot.builder()
-			.deviceId(new DeviceId("deviceId"))
-			.filterType(FilterType.ONE_DAY_BACK)
-			.collectionId(1)
 			.build();
 	}
 	
 	@Test
 	public void testBuilder() {
-		FilterType filterType = FilterType.ONE_DAY_BACK;
+		SyncKey syncKey = new SyncKey("synckey");
 		DeviceId deviceId = new DeviceId("deviceId");
-		SyncKey synckey = new SyncKey("syncKey");
 		Integer collectionId = 1;
-		int uidNext = 2;
 		
-		Email email = Email.builder()
-				.uid(3)
-				.read(false)
-				.date(DateUtils.getCurrentDate())
-				.build();
-		Email email2 = Email.builder()
-				.uid(4)
-				.read(true)
-				.date(DateUtils.getCurrentDate())
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
 				.build();
 		
-		Snapshot snapshot = Snapshot.builder()
-			.deviceId(deviceId)
-			.filterType(filterType)
-			.syncKey(synckey)
-			.collectionId(collectionId)
-			.uidNext(uidNext)
-			.addEmail(email)
-			.addEmail(email2)
-			.build();
-		
-		assertThat(snapshot.getDeviceId()).isEqualTo(deviceId);
-		assertThat(snapshot.getFilterType()).isEqualTo(filterType);
-		assertThat(snapshot.getCollectionId()).isEqualTo(collectionId);
-		assertThat(snapshot.getUidNext()).isEqualTo(uidNext);
-		assertThat(snapshot.getEmails()).containsExactly(email, email2);
+		assertThat(snapshotKey.getSyncKey()).isEqualTo(syncKey);
+		assertThat(snapshotKey.getDeviceId()).isEqualTo(deviceId);
+		assertThat(snapshotKey.getCollectionId()).isEqualTo(collectionId);
 	}
 }

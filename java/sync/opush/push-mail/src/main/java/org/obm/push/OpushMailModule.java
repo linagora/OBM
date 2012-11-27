@@ -48,6 +48,8 @@ import org.obm.push.mail.transformer.HtmlToText;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.store.EmailDao;
+import org.obm.push.store.SnapshotDao;
+import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
@@ -71,6 +73,7 @@ public class OpushMailModule extends AbstractModule {
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
 		transformers.addBinding().to(HtmlToText.Factory.class);
+		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 	}
 
 }

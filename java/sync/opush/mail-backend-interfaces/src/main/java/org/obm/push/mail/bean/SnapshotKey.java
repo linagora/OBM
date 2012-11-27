@@ -29,9 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.mail.bean;
 
 import java.io.Serializable;
+
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;

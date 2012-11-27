@@ -29,52 +29,80 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.mail.bean;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.utils.DateUtils;
 
-public class SnapshotKeyTest {
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullSyncKey() {
-		SnapshotKey.builder()
-			.deviceId(new DeviceId("deviceId"))
-			.collectionId(1)
-			.build();
+@RunWith(SlowFilterRunner.class)
+public class SerializableTest {
+
+	private ObjectOutputStream objectOutputStream;
+
+
+	@Before
+	public void buildOutputStream() throws IOException {
+		objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());	
 	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullDeviceId() {
-		SnapshotKey.builder()
-			.syncKey(new SyncKey("syncKey"))
-			.collectionId(1)
-			.build();
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullCollectionId() {
-		SnapshotKey.builder()
-			.deviceId(new DeviceId("deviceId"))
-			.syncKey(new SyncKey("syncKey"))
-			.build();
+
+	@Test
+	public void testEmail() throws IOException {
+		Email email = Email.builder()
+				.uid(1)
+				.read(true)
+				.date(DateUtils.getCurrentDate())
+				.answered(true)
+				.build();
+		objectOutputStream.writeObject(email);
 	}
 	
 	@Test
-	public void testBuilder() {
-		SyncKey syncKey = new SyncKey("synckey");
-		DeviceId deviceId = new DeviceId("deviceId");
-		Integer collectionId = 1;
-		
-		SnapshotKey snapshotKey = SnapshotKey.builder()
-				.deviceId(deviceId)
-				.syncKey(syncKey)
-				.collectionId(collectionId)
+	public void testSnapshot() throws IOException {
+		Snapshot snapshot = Snapshot.builder()
+				.collectionId(1)
+				.deviceId(new DeviceId("deviceId"))
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(new SyncKey("syncKey"))
+				.uidNext(2)
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.answered(true)
+						.build())
 				.build();
-		
-		assertThat(snapshotKey.getSyncKey()).isEqualTo(syncKey);
-		assertThat(snapshotKey.getDeviceId()).isEqualTo(deviceId);
-		assertThat(snapshotKey.getCollectionId()).isEqualTo(collectionId);
+		objectOutputStream.writeObject(snapshot);
+	}
+	
+	@Test
+	public void testSnapshotKey() throws IOException {
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId(new DeviceId("deviceId"))
+				.syncKey(new SyncKey("syncKey"))
+				.collectionId(1)
+				.build();
+		objectOutputStream.writeObject(snapshotKey);
+	}
+	
+	@Test
+	public void testDeviceId() throws IOException {
+		DeviceId deviceId = new DeviceId("deviceId");
+		objectOutputStream.writeObject(deviceId);
+	}
+
+	@Test
+	public void testSyncKey() throws IOException {
+		SyncKey syncKey = new SyncKey("syncKey");
+		objectOutputStream.writeObject(syncKey);
 	}
 }

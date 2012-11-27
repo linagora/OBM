@@ -32,8 +32,8 @@
 package org.obm.push.store;
 
 import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.Snapshot;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.mail.bean.Snapshot;
 
 public interface SnapshotDao {
 	

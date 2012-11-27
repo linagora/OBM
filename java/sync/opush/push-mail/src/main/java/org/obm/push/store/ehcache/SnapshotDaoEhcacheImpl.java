@@ -36,9 +36,9 @@ import java.util.List;
 import net.sf.ehcache.Element;
 
 import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.Snapshot;
-import org.obm.push.bean.SnapshotKey;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.store.SnapshotDao;
 
 import com.google.common.base.Objects;
