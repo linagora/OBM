@@ -35,6 +35,8 @@ package org.obm.push.minig.imap.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.obm.push.mail.bean.MessageSet;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomains;

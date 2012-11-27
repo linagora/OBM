@@ -38,12 +38,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
 import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {

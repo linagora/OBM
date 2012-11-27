@@ -42,9 +42,9 @@ import java.util.List;
 import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
 
 public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 

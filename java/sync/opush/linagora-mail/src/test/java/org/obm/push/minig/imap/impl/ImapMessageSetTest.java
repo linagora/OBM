@@ -42,6 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.MessageSet;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ImapMessageSetTest {

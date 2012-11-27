@@ -44,9 +44,9 @@ import java.util.Map;
 
 import org.minig.imap.command.parser.HeadersParser;
 import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
 
 public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 

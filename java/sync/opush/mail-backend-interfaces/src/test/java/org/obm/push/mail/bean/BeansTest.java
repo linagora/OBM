@@ -69,6 +69,7 @@ public class BeansTest {
 					.add(Email.class)
 					.add(Snapshot.class)
 					.add(SnapshotKey.class)
+					.add(MessageSet.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		

@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.impl;
+package org.obm.push.mail.bean;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.DiscreteDomains;
 import com.google.common.collect.Iterables;
@@ -170,5 +171,26 @@ public class MessageSet {
 	
 	public int rangeNumber() {
 		return ranges.size();
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(ranges);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MessageSet) {
+			MessageSet that = (MessageSet) object;
+			return Objects.equal(this.ranges, that.ranges);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("ranges", ranges)
+			.toString();
 	}
 }

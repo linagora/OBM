@@ -40,10 +40,10 @@ import java.util.Map;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.impl.MessageSet;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

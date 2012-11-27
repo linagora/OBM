@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.impl;
+package org.obm.push.mail.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.MessageSet;
 
 import com.google.common.collect.Ranges;
 
