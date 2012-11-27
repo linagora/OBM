@@ -31,14 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.exception;
 
-public class FilterTypeChangedException extends Exception {
-	
-	public FilterTypeChangedException(String message, Throwable cause) {
-		super(message, cause);
-	}
+import org.obm.push.bean.FilterType;
 
-	public FilterTypeChangedException(String message) {
-		super(message);
+public class FilterTypeChangedException extends RuntimeException {
+	
+	public FilterTypeChangedException(FilterType first, FilterType second) {
+		super(buildMessage(first, second));
 	}
 	
+	private static String buildMessage(FilterType first, FilterType second) {
+		return String.format("FilterType changed, first:%s second:%s", first, second);
+	}
 }

@@ -76,6 +76,7 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.bean.change.item.ServerItemChanges;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -92,10 +93,14 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
+import org.obm.push.store.SnapshotDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.DateUtils;
@@ -117,8 +122,10 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -150,15 +157,24 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final EmailDao emailDao;
 	private final EmailSync emailSync;
 	private final EventService eventService;
+	private final DateService dateService;
 	private final MSEmailFetcher msEmailFetcher;
+	private final SnapshotDao snapshotDao;
+	private final EmailChangesComputer emailChangesComputer;
+	private final ServerEmailChangesBuilder serverEmailChangesBuilder;
+
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
+			SnapshotDao snapshotDao,
+			EmailChangesComputer emailChangesComputer,
+			ServerEmailChangesBuilder serverEmailChangesBuilder,
 			MappingService mappingService,
 			EventService eventService,
+			DateService dateService,
 			MSEmailFetcher msEmailFetcher,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
 
@@ -170,7 +186,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
 		this.login = login;
+		this.snapshotDao = snapshotDao;
+		this.emailChangesComputer = emailChangesComputer;
+		this.serverEmailChangesBuilder = serverEmailChangesBuilder;
 		this.eventService = eventService;
+		this.dateService = dateService;
 		this.msEmailFetcher = msEmailFetcher;
 	}
 
@@ -299,33 +319,91 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		return dataDelta.getItemEstimateSize();
 	}
 	
+	/**
+	 * @throws FilterTypeChangedException when a snapshot 
+	 * exists for the given syncKey and the snapshot.filterType != options.filterType
+	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException {
-		
-		MailChanges mailChanges = getSync(udr, state, collectionId, syncCollectionOptions.getFilterType());
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options)
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+					ProcessingEmailException, FilterTypeChangedException {
+
 		try {
-			updateData(udr.getDevice().getDatabaseId(), collectionId, state.getLastSync(), 
-					mailChanges.getRemovedEmailsUids(), mailChanges.getNewAndUpdatedEmails());
-			return getDataDelta(udr, collectionId, mailChanges, syncCollectionOptions.getBodyPreferences());
-		} catch (DaoException e) {
+			Date dataDeltaDate = dateService.getCurrentDate();
+			String collectionPath = mappingService.getCollectionPathFor(collectionId);
+			
+			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getKey(), collectionId);
+			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
+			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionPath, previousStateSnapshot, options, dataDeltaDate);
+			takeSnapshot(udr, collectionId, collectionPath, state, options, newManagedEmails);
+			
+			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
+			ServerItemChanges serverItemChanges = serverEmailChangesBuilder.build(udr, collectionId,
+					collectionPath, options.getBodyPreferences(), emailChanges);
+			
+			return DataDelta.builder()
+					.changes(serverItemChanges.getItemChanges())
+					.deletions(serverItemChanges.getItemDeletions())
+					.syncDate(dataDeltaDate)
+					.build();
+			
+		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
 
-	private void updateData(Integer devId, Integer collectionId, Date lastSync, Collection<Long> removedEmailUids,
-			Collection<Email> newAndUpdatedEmails) throws DaoException {
+	private void takeSnapshot(UserDataRequest udr, Integer collectionId, String collectionPath, 
+			SyncState state, SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails) {
 		
-		if (removedEmailUids != null && !removedEmailUids.isEmpty()) {
-			emailDao.deleteSyncEmails(devId, collectionId, lastSync, removedEmailUids);
+		snapshotDao.put(Snapshot.builder()
+				.emails(managedEmails)
+				.collectionId(collectionId)
+				.deviceId(udr.getDevId())
+				.filterType(syncCollectionOptions.getFilterType())
+				.syncKey(state.getKey())
+				.uidNext(Ints.checkedCast(mailboxService.fetchUIDNext(udr, collectionPath)))
+				.build());
+	}
+
+	@VisibleForTesting Collection<Email> getManagedEmails(Snapshot previousStateSnapshot) {
+		if (previousStateSnapshot != null) {
+			return previousStateSnapshot.getEmails();
 		}
+		return ImmutableSet.of(); 
+	}
+
+	@VisibleForTesting Set<Email> searchEmailsToManage(UserDataRequest udr, String collectionPath,
+			Snapshot previousStateSnapshot, SyncCollectionOptions actualOptions,
+			Date dataDeltaDate) throws FilterTypeChangedException {
 		
-		if (newAndUpdatedEmails != null && !newAndUpdatedEmails.isEmpty()) {
-			markEmailsAsSynced(devId, collectionId, lastSync, newAndUpdatedEmails);
+		assertSnapshotHasSameOptionsThanRequest(previousStateSnapshot, actualOptions);
+		if (mustSyncByDate(previousStateSnapshot)) {
+			Date searchEmailsFromDate = actualOptions.getFilterType().getFilteredDate(dataDeltaDate);
+			return mailboxService.fetchEmails(udr, collectionPath, searchEmailsFromDate);
+		}
+		throw new UnsupportedOperationException("Sync by UIDs not implemented yet");
+	}
+
+	private void assertSnapshotHasSameOptionsThanRequest(Snapshot snapshot, SyncCollectionOptions options)
+			throws FilterTypeChangedException {
+		
+		if (!snapshotIsAbsent(snapshot) && filterTypeHasChanged(snapshot, options)) {
+			throw new FilterTypeChangedException(snapshot.getFilterType(), options.getFilterType());
 		}
 	}
-	
+
+	@VisibleForTesting boolean mustSyncByDate(Snapshot previousStateSnapshot) {
+		return snapshotIsAbsent(previousStateSnapshot);
+	}
+
+	private boolean snapshotIsAbsent(Snapshot previousStateSnapshot) {
+		return previousStateSnapshot == null;
+	}
+
+	private boolean filterTypeHasChanged(Snapshot snapshot, SyncCollectionOptions options) {
+		return snapshot.getFilterType() != options.getFilterType();
+	}
+
 	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges, 
 			List<BodyPreference> bodyPreferences) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException {

@@ -46,8 +46,14 @@ public class Configuration {
 		public boolean loginWithDomain = true;
 	}
 	
+	public static class Transaction {
+		public int timeoutInSeconds = 10;
+		public boolean usePersistentCache = false;
+	}
+	
 	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
 	public SyncPerms syncPerms = new SyncPerms();
 	public Mail mail = new Mail();
+	public Transaction transaction = new Transaction();
 	
 }

@@ -43,7 +43,6 @@ import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -73,7 +72,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 
-@Ignore("Implementation has not yet been done")
 @RunWith(SlowFilterRunner.class)
 public class MailBackendImplTest {
 
@@ -107,8 +105,8 @@ public class MailBackendImplTest {
 		dateService = control.createMock(DateService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, 
-				null, mappingService, null, null, null);
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, snapshotDao,
+				emailChangesComputer, serverEmailChangesBuilder, mappingService, null, dateService, null, null);
 	}
 	
 	@Test
@@ -246,6 +244,175 @@ public class MailBackendImplTest {
 		
 		control.replay();
 		testee.getChanged(udr, new ItemSyncState(syncKey), collectionId, syncCollectionOptions);
+	}
+	
+	@Test
+	public void testGetManagedEmailsIsEmptyForNull() {
+		control.replay();
+		assertThat(testee.getManagedEmails(null)).isEmpty();
+		control.verify();
+	}
+	
+	@Test
+	public void testGetManagedEmailsAreTookFromSnapshot() {
+		Snapshot snapshot = Snapshot.builder()
+			.addEmail(Email.builder()
+				.uid(5)
+				.date(date("2004-12-14T22:00:00"))
+				.read(false)
+				.answered(false)
+				.build())
+			.addEmail(Email.builder()
+				.uid(15)
+				.date(date("2014-12-14T22:00:00"))
+				.read(true)
+				.answered(true)
+				.build())
+			.collectionId(collectionId)
+			.deviceId(device.getDevId())
+			.filterType(FilterType.ALL_ITEMS)
+			.uidNext(5000)
+			.syncKey(new SyncKey("156"))
+			.build();
+
+		control.replay();
+		assertThat(testee.getManagedEmails(snapshot)).containsOnly(
+			Email.builder()
+				.uid(5)
+				.date(date("2004-12-14T22:00:00"))
+				.read(false)
+				.answered(false)
+				.build(),
+			Email.builder()
+				.uid(15)
+				.date(date("2014-12-14T22:00:00"))
+				.read(true)
+				.answered(true)
+				.build());
+		control.verify();
+	}
+	
+	@Test
+	public void testMustSyncByDateIsTrueWhenNoSnapshot() {
+		control.replay();
+		assertThat(testee.mustSyncByDate(null)).isTrue();
+		control.verify();
+	}
+	
+	@Test
+	public void testMustSyncByDateIsFalseWhenPreviousSnapshot() {
+		Snapshot snapshot = Snapshot.builder()
+				.addEmail(Email.builder()
+					.uid(5)
+					.date(date("2004-12-14T22:00:00"))
+					.read(false)
+					.answered(false)
+					.build())
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.filterType(FilterType.ALL_ITEMS)
+				.uidNext(5000)
+				.syncKey(new SyncKey("156"))
+				.build();
+
+		control.replay();
+		assertThat(testee.mustSyncByDate(snapshot)).isFalse();
+		control.verify();
+	}
+	
+	@Test
+	public void testSearchEmailsToManagerIsByDateForNullWithoutEmails() {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setFilterType(FilterType.ALL_ITEMS);
+		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
+		Date fromDate = options.getFilterType().getFilteredDateTodayAtMidnight();
+		
+		Set<Email> emailsExpected = ImmutableSet.of();
+		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
+			.andReturn(emailsExpected);
+
+		control.replay();
+		Set<Email> result = testee.searchEmailsToManage(udr, collectionPath, null, options, date("2004-10-14T22:00:00"));
+		control.verify();
+		
+		assertThat(result).isEmpty();
+	}
+	
+	@Test
+	public void testSearchEmailsToManagerIsByDateForNullWithEmails() {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setFilterType(FilterType.ALL_ITEMS);
+		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
+		Date fromDate = options.getFilterType().getFilteredDateTodayAtMidnight();
+		
+		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
+			.andReturn(ImmutableSet.of(
+					Email.builder()
+					.uid(5)
+					.date(date("2004-12-14T22:00:00"))
+					.read(false)
+					.answered(false)
+					.build()));
+
+		control.replay();
+		Set<Email> result = testee.searchEmailsToManage(udr, collectionPath, null, options, date("2004-10-14T22:00:00"));
+		control.verify();
+		
+		assertThat(result).containsOnly(
+			Email.builder()
+				.uid(5)
+				.date(date("2004-12-14T22:00:00"))
+				.read(false)
+				.answered(false)
+				.build());
+	}
+	
+	@Test(expected=FilterTypeChangedException.class)
+	public void testSearchEmailsToManagerThrowExecptionWhenDifferentFolderType() {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		options.setFilterType(FilterType.ALL_ITEMS);
+		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Snapshot snapshot = Snapshot.builder()
+				.addEmail(Email.builder()
+					.uid(5)
+					.date(date("2004-12-14T22:00:00"))
+					.read(false)
+					.answered(false)
+					.build())
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.filterType(FilterType.ONE_MONTHS_BACK)
+				.uidNext(5000)
+				.syncKey(new SyncKey("156"))
+				.build();
+
+		control.replay();
+		testee.searchEmailsToManage(udr, collectionPath, snapshot, options, date("2004-10-14T22:00:00"));
+	}
+	
+	@Test(expected=UnsupportedOperationException.class)
+	public void testSearchEmailsToManagerIsByUIDsWhenPreviousSnapshot() {
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Snapshot snapshot = Snapshot.builder()
+				.addEmail(Email.builder()
+					.uid(5)
+					.date(date("2004-12-14T22:00:00"))
+					.read(false)
+					.answered(false)
+					.build())
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.filterType(FilterType.ALL_ITEMS)
+				.uidNext(5000)
+				.syncKey(new SyncKey("156"))
+				.build();
+		
+		control.replay();
+		testee.searchEmailsToManage(udr, collectionPath, snapshot, syncCollectionOptions, date("2004-10-14T22:00:00"));
 	}
 
 	private void expectBuildItemChangesByFetchingMSEmailsData(List<BodyPreference> bodyPreferences,

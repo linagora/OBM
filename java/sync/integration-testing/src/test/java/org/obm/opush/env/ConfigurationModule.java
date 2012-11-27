@@ -65,6 +65,10 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 		ConfigurationService configurationService = getMock(ConfigurationService.class);
 		expect(configurationService.getResourceBundle(anyObject(Locale.class)))
 			.andReturn(configuration.bundle).anyTimes();
+		expect(configurationService.transactionTimeoutInSeconds())
+			.andReturn(configuration.transaction.timeoutInSeconds).anyTimes();
+		expect(configurationService.usePersistentCache())
+			.andReturn(configuration.transaction.usePersistentCache).anyTimes();
 		
 		SyncPermsConfigurationService syncPerms = getMock(SyncPermsConfigurationService.class);
 		expect(syncPerms.getBlackListUser()).andReturn(configuration.syncPerms.blacklist).anyTimes();
