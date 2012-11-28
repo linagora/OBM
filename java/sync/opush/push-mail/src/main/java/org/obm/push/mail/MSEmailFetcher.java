@@ -41,6 +41,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -53,7 +54,7 @@ public class MSEmailFetcher {
 	private final MailViewToMSEmailConverter msEmailConverter;
 
 	@Inject
-	private MSEmailFetcher(MailboxService mailboxService, TransformersFactory transformersFactory, 
+	@VisibleForTesting MSEmailFetcher(MailboxService mailboxService, TransformersFactory transformersFactory, 
 			MailViewToMSEmailConverter msEmailConverter) {
 		this.mailboxService = mailboxService;
 		this.transformersFactory = transformersFactory;
