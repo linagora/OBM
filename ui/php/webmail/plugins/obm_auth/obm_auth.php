@@ -43,7 +43,7 @@ class obm_auth extends rcube_plugin
   {
     $rcmail = rcmail::get_instance();
 
-    if (isset($_SESSION['obm_user_id'])) {
+    if (isset($_SESSION['obm_user_id']) && is_numeric($_SESSION['obm_user_id'])) {
       $query = 'SELECT userobm_password_type FROM userobm WHERE userobm_id='.$_SESSION['obm_user_id'];
 
       $obm_q = new DB_OBM;
@@ -69,7 +69,7 @@ class obm_auth extends rcube_plugin
 
     $obm_user_id = $rcmail->config->get('obm_user_id');
 
-    if ($obm_user_id) {
+    if ($obm_user_id && is_numeric($obm_user_id)) {
       $obm_q = new DB_OBM;
 
       $query = 'SELECT userobm_email, userobm_password, domain_name 
@@ -80,11 +80,10 @@ class obm_auth extends rcube_plugin
       $obm_q->query($query);
 
       $obm_q->next_record();
-      $username = explode("\n", $obm_q->f('userobm_email'));
-      $username = array_map('trim', $username);
-      $args['user'] = $username[0].'@'.$obm_q->f('domain_name');
+      $username_array = explode("\n", $obm_q->f('userobm_email'));
+      $username_array = array_map('trim', $username);
+      $args['user'] = $username_array[0].'@'.$obm_q->f('domain_name');
       $args['pass'] = $obm_q->f('userobm_password');
-
       $args['cookiecheck'] = false;
       $args['valid'] = true;
     }
