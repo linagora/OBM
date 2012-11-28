@@ -7080,7 +7080,7 @@ Class CalendarView {
     } else if ($this->cal_range == "month") {
       $begin->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
       $end = clone $begin;
-      $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
     } else if ($this->cal_range == "custom") {
       $end = clone $this->get_date();
       $end->addDay($this->ndays);
