@@ -93,9 +93,11 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.minig.imap.impl.MessageSetUtils;
 import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
@@ -317,91 +319,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges, syncCollectionOptions.getBodyPreferences());
 		return dataDelta.getItemEstimateSize();
 	}
-	
-	/**
-	 * @throws FilterTypeChangedException when a snapshot 
-	 * exists for the given syncKey and the snapshot.filterType != options.filterType
-	 */
-	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options)
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
-					ProcessingEmailException, FilterTypeChangedException {
-
-		try {
-			Date dataDeltaDate = dateService.getCurrentDate();
-			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			
-			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getSyncKey(), collectionId);
-			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
-			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionPath, previousStateSnapshot, options, dataDeltaDate);
-			takeSnapshot(udr, collectionId, collectionPath, state, options, newManagedEmails);
-			
-			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
-			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
-					collectionPath, options.getBodyPreferences(), emailChanges);
-			
-			return DataDelta.builder()
-					.changes(serverItemChanges.getItemChanges())
-					.deletions(serverItemChanges.getItemDeletions())
-					.syncDate(dataDeltaDate)
-					.build();
-			
-		} catch (EmailViewPartsFetcherException e) {
-			throw new ProcessingEmailException(e);
-		}
-	}
-
-	private void takeSnapshot(UserDataRequest udr, Integer collectionId, String collectionPath, 
-			SyncState state, SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails) {
-		
-		snapshotDao.put(Snapshot.builder()
-				.emails(managedEmails)
-				.collectionId(collectionId)
-				.deviceId(udr.getDevId())
-				.filterType(syncCollectionOptions.getFilterType())
-				.syncKey(state.getSyncKey())
-				.uidNext(mailboxService.fetchUIDNext(udr, collectionPath))
-				.build());
-	}
-
-	@VisibleForTesting Collection<Email> getManagedEmails(Snapshot previousStateSnapshot) {
-		if (previousStateSnapshot != null) {
-			return previousStateSnapshot.getEmails();
-		}
-		return ImmutableSet.of(); 
-	}
-
-	@VisibleForTesting Set<Email> searchEmailsToManage(UserDataRequest udr, String collectionPath,
-			Snapshot previousStateSnapshot, SyncCollectionOptions actualOptions,
-			Date dataDeltaDate) throws FilterTypeChangedException {
-		
-		assertSnapshotHasSameOptionsThanRequest(previousStateSnapshot, actualOptions);
-		if (mustSyncByDate(previousStateSnapshot)) {
-			Date searchEmailsFromDate = actualOptions.getFilterType().getFilteredDate(dataDeltaDate);
-			return mailboxService.fetchEmails(udr, collectionPath, searchEmailsFromDate);
-		}
-		throw new UnsupportedOperationException("Sync by UIDs not implemented yet");
-	}
-
-	private void assertSnapshotHasSameOptionsThanRequest(Snapshot snapshot, SyncCollectionOptions options)
-			throws FilterTypeChangedException {
-		
-		if (!snapshotIsAbsent(snapshot) && filterTypeHasChanged(snapshot, options)) {
-			throw new FilterTypeChangedException(snapshot.getFilterType(), options.getFilterType());
-		}
-	}
-
-	@VisibleForTesting boolean mustSyncByDate(Snapshot previousStateSnapshot) {
-		return snapshotIsAbsent(previousStateSnapshot);
-	}
-
-	private boolean snapshotIsAbsent(Snapshot previousStateSnapshot) {
-		return previousStateSnapshot == null;
-	}
-
-	private boolean filterTypeHasChanged(Snapshot snapshot, SyncCollectionOptions options) {
-		return snapshot.getFilterType() != options.getFilterType();
-	}
 
 	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges, 
 			List<BodyPreference> bodyPreferences) throws ProcessingEmailException, 
@@ -442,6 +359,100 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		ic.setServerId(mappingService.getServerIdFor(collectionId, "" + uid));
 		ic.setData(data);
 		return ic;
+	}
+	
+	/**
+	 * @throws FilterTypeChangedException when a snapshot 
+	 * exists for the given syncKey and the snapshot.filterType != options.filterType
+	 */
+	@Override
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options)
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+					ProcessingEmailException, FilterTypeChangedException {
+
+		try {
+			Date dataDeltaDate = dateService.getCurrentDate();
+			String collectionPath = mappingService.getCollectionPathFor(collectionId);
+			long currentUIDNext = mailboxService.fetchUIDNext(udr, collectionPath);
+			
+			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getSyncKey(), collectionId);
+			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
+			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
+			takeSnapshot(udr, collectionId, state, options, newManagedEmails, currentUIDNext);
+			
+			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
+			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
+					collectionPath, options.getBodyPreferences(), emailChanges);
+			
+			return DataDelta.builder()
+					.changes(serverItemChanges.getItemChanges())
+					.deletions(serverItemChanges.getItemDeletions())
+					.syncDate(dataDeltaDate)
+					.build();
+			
+		} catch (EmailViewPartsFetcherException e) {
+			throw new ProcessingEmailException(e);
+		}
+	}
+
+	private void takeSnapshot(UserDataRequest udr, Integer collectionId,
+			SyncState state, SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails, long currentUIDNext) {
+		
+		snapshotDao.put(Snapshot.builder()
+				.emails(managedEmails)
+				.collectionId(collectionId)
+				.deviceId(udr.getDevId())
+				.filterType(syncCollectionOptions.getFilterType())
+				.syncKey(state.getSyncKey())
+				.uidNext(currentUIDNext)
+				.build());
+	}
+
+	@VisibleForTesting Collection<Email> getManagedEmails(Snapshot previousStateSnapshot) {
+		if (previousStateSnapshot != null) {
+			return previousStateSnapshot.getEmails();
+		}
+		return ImmutableSet.of(); 
+	}
+
+	@VisibleForTesting Collection<Email> searchEmailsToManage(UserDataRequest udr, String collectionPath,
+			Snapshot previousStateSnapshot, SyncCollectionOptions actualOptions,
+			Date dataDeltaDate, long currentUIDNext) throws FilterTypeChangedException {
+		
+		assertSnapshotHasSameOptionsThanRequest(previousStateSnapshot, actualOptions);
+		if (mustSyncByDate(previousStateSnapshot)) {
+			Date searchEmailsFromDate = actualOptions.getFilterType().getFilteredDate(dataDeltaDate);
+			return mailboxService.fetchEmails(udr, collectionPath, searchEmailsFromDate);
+		}
+		return searchSnapshotAndActualChanges(udr, collectionPath, previousStateSnapshot, currentUIDNext);
+	}
+
+	private void assertSnapshotHasSameOptionsThanRequest(Snapshot snapshot, SyncCollectionOptions options)
+			throws FilterTypeChangedException {
+		
+		if (!snapshotIsAbsent(snapshot) && filterTypeHasChanged(snapshot, options)) {
+			throw new FilterTypeChangedException(snapshot.getFilterType(), options.getFilterType());
+		}
+	}
+
+	@VisibleForTesting boolean mustSyncByDate(Snapshot previousStateSnapshot) {
+		return snapshotIsAbsent(previousStateSnapshot);
+	}
+
+	private boolean snapshotIsAbsent(Snapshot previousStateSnapshot) {
+		return previousStateSnapshot == null;
+	}
+
+	private boolean filterTypeHasChanged(Snapshot snapshot, SyncCollectionOptions options) {
+		return snapshot.getFilterType() != options.getFilterType();
+	}
+
+	private Collection<Email> searchSnapshotAndActualChanges(UserDataRequest udr, 
+			String collectionPath, Snapshot previousStateSnapshot, long currentUIDNext) {
+		
+		MessageSet messageSet = MessageSetUtils.computeEmailsUID(previousStateSnapshot, currentUIDNext);
+		Iterable<Long> emailsUIDToFetch = messageSet.asDiscreteValues();
+		return mailboxService.fetchEmails(udr, collectionPath, ImmutableList.copyOf(emailsUIDToFetch));
 	}
 	
 	private Map<Integer, Collection<Long>> getEmailUidByCollectionId(List<String> fetchIds) {
