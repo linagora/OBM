@@ -47,8 +47,8 @@ public final class SyncResponse {
 		return cl;
 	}
 	
-	public Collection getCollection(String key) {
-		return cl.get(key);
+	public Collection getCollection(String collectionId) {
+		return cl.get(collectionId);
 	}
 	
 	public Collection getCollection(int key) {

@@ -31,41 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import org.obm.opush.env.AbstractOpushGreenMailEnv;
 import org.obm.opush.env.AbstractOverrideModule;
-import org.obm.push.backend.IContentsExporter;
-import org.obm.push.service.DateService;
-import org.obm.push.state.SyncKeyFactory;
 
-public class ModuleUtils {
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
-	public static AbstractOverrideModule buildContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = new AbstractOverrideModule() {
+public class MailBackendGetChangedTestModule  extends AbstractOpushGreenMailEnv {
+	
+	public MailBackendGetChangedTestModule() {
+		super();
+	}
+	
+	@Override
+	protected Module overrideModule() throws Exception {
+		Module overrideModule = super.overrideModule();
 
-			@Override
-			protected void configureImpl() {
-				bindWithMock(IContentsExporter.class);
-			}
-		};
-		return contentsExporterBackend;
+		Module syncKeyFactoryModule = bindSyncKeyFactory();
+		Module dateServiceModule = bindDateService();
+		
+		return Modules.combine(overrideModule, syncKeyFactoryModule, dateServiceModule);
 	}
 
-	public static AbstractOverrideModule buildSyncKeyFactoryModule() {
-		return new AbstractOverrideModule() {
-
-			@Override
-			protected void configureImpl() {
-				bindWithMock(SyncKeyFactory.class);
-			}
-		};
+	private Module bindDateService() {
+		AbstractOverrideModule dateServiceModule = ModuleUtils.buildDateServiceModule();
+		getMockMap().addMap(dateServiceModule.getMockMap());
+		return dateServiceModule;
 	}
 
-	public static AbstractOverrideModule buildDateServiceModule() {
-		return new AbstractOverrideModule() {
-
-			@Override
-			protected void configureImpl() {
-				bindWithMock(DateService.class);
-			}
-		};
+	private Module bindSyncKeyFactory() {
+		AbstractOverrideModule syncKeyFactoryModule = ModuleUtils.buildSyncKeyFactoryModule();
+		getMockMap().addMap(syncKeyFactoryModule.getMockMap());
+		return syncKeyFactoryModule;
 	}
 }

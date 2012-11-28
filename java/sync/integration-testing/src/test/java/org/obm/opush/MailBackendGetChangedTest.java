@@ -1,0 +1,241 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
+package org.obm.opush;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
+import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
+import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
+import static org.obm.opush.IntegrationTestUtils.replayMocks;
+import static org.obm.opush.IntegrationTestUtils.verifyMocks;
+import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.fest.assertions.api.Assertions;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.PortNumber;
+import org.obm.configuration.EmailConfiguration;
+import org.obm.filter.Slow;
+import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.push.ContinuationService;
+import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.exception.DaoException;
+import org.obm.push.mail.SmtpServerSetup;
+import org.obm.push.mail.imap.GuiceModule;
+import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.service.DateService;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.ItemTrackingDao;
+import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
+import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.push.client.Add;
+import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.SyncResponse;
+
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.icegreen.greenmail.imap.ImapHostManager;
+import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetup;
+
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(MailBackendGetChangedTestModule.class)
+public class MailBackendGetChangedTest {
+
+	@Inject	@PortNumber int port;
+	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
+	@Inject	SingleUserFixture singleUserFixture;
+	@Inject	OpushServer opushServer;
+	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject GreenMail greenMail;
+	@Inject ImapConnectionCounter imapConnectionCounter;
+	@Inject PendingQueriesLock pendingQueries;
+	
+	private UnsynchronizedItemDao unsynchronizedItemDao;
+	private ItemTrackingDao itemTrackingDao;
+	private CollectionDao collectionDao;
+	private DateService dateService;
+
+	private GreenMailUser greenMailUser;
+	private ImapHostManager imapHostManager;
+	private OpushUser user;
+	private String mailbox;
+	private String inboxCollectionPath;
+	private int inboxCollectionId;
+	private String inboxCollectionIdAsString;
+	private OPClient opClient;
+
+	@Before
+	public void init() throws Exception {
+		user = singleUserFixture.jaures;
+		greenMail.start();
+		mailbox = user.user.getLoginAtDomain();
+		greenMailUser = greenMail.setUser(mailbox, user.password);
+		imapHostManager = greenMail.getManagers().getImapHostManager();
+		imapHostManager.createMailbox(greenMailUser, "Trash");
+
+		inboxCollectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
+		inboxCollectionId = 1234;
+		inboxCollectionIdAsString = String.valueOf(inboxCollectionId);
+		
+		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
+		collectionDao = classToInstanceMap.get(CollectionDao.class);
+		dateService = classToInstanceMap.get(DateService.class);
+		opClient = buildWBXMLOpushClient(user, port);
+
+		bindCollectionIdToPath();
+	}
+
+	private void bindCollectionIdToPath() throws Exception {
+		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
+		
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		SyncCollection syncCollection = new SyncCollection(inboxCollectionId, inboxCollectionPath);
+		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
+			.andReturn(syncCollection).anyTimes();
+		
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Collection.class));
+		expectLastCall().anyTimes();
+	}
+
+	@After
+	public void shutdown() throws Exception {
+		opushServer.stop();
+	}
+
+	@Test
+	public void testInitialGetChangedWithNoSnapshot() throws Exception {
+		String emailId1 = ":1";
+		String emailId2 = ":2";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		int allocatedStateId = 3;
+		int allocatedStateId2 = 4;
+		
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), user.userDataRequest, 0);
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
+		
+		ItemSyncState allocatedState = new ItemSyncState(secondAllocatedSyncKey, date("2012-10-10T16:22:53"));
+		expect(dateService.getCurrentDate()).andReturn(allocatedState.getLastSync());
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedSyncKey, allocatedStateId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, allocatedState, allocatedStateId2);
+		expectUnsynchronizedItemToNeverExceedWindowSize();
+
+		expect(itemTrackingDao.isServerIdSynced(allocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(allocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		replayMocks(classToInstanceMap);
+		opushServer.start();
+		sendTwoEmailsToImapServer();
+		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString);
+		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString);
+		verifyMocks(classToInstanceMap);
+		
+		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
+		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).containsOnly(
+				new Add(inboxCollectionIdAsString + emailId1),
+				new Add(inboxCollectionIdAsString + emailId2));
+
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+	}
+
+	private void expectUnsynchronizedItemToNeverExceedWindowSize() {
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
+				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
+				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, inboxCollectionId);
+		expectLastCall().anyTimes();
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, inboxCollectionId);
+		expectLastCall().anyTimes();
+	}
+
+	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState, int allocatedStateId)
+			throws DaoException {
+		expect(collectionDao.findItemStateForKey(requestSyncKey)).andReturn(allocatedState).times(2);
+		expect(collectionDao.updateState(user.device, inboxCollectionId, allocatedState))
+				.andReturn(allocatedStateId);
+	}
+
+	private void expectCollectionDaoPerformInitialSync(SyncKey initialSyncKey, SyncKey allocatedSyncKey, int allocatedStateId)
+			throws DaoException {
+		
+		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
+		ItemSyncState syncState = new ItemSyncState(allocatedSyncKey, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+		expect(collectionDao.updateState(user.device, inboxCollectionId, syncState))
+			.andReturn(allocatedStateId);
+		collectionDao.resetCollection(user.device, inboxCollectionId);
+		expectLastCall();
+	}
+
+	private void sendTwoEmailsToImapServer() throws InterruptedException {
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", smtpServerSetup);
+		greenMail.waitForIncomingEmail(2);
+	}
+
+	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {
+		MailFolder inboxFolder = imapHostManager.getFolder(greenMailUser, mailbox);
+		Assertions.assertThat(inboxFolder.getMessageCount()).isEqualTo(expectedNumberOfEmails);
+	}
+}

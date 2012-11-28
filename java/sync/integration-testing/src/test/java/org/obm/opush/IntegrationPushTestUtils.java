@@ -121,8 +121,13 @@ public class IntegrationPushTestUtils {
 		return HierarchyCollectionChanges.builder().build();
 	}
 	
-	public static void mockNextGeneratedSyncKey(ClassToInstanceAgregateView<Object> classToInstanceMap, SyncKey newSyncKey) {
-		expect(classToInstanceMap.get(SyncKeyFactory.class).randomSyncKey()).andReturn(newSyncKey).once();
+	public static void mockNextGeneratedSyncKey(
+			ClassToInstanceAgregateView<Object> classToInstanceMap, SyncKey...nextSyncKeys) {
+		
+		SyncKeyFactory syncKeyFactory = classToInstanceMap.get(SyncKeyFactory.class);
+		for (SyncKey nextSyncKey : nextSyncKeys) {
+			expect(syncKeyFactory.randomSyncKey()).andReturn(nextSyncKey).once();
+		}
 	}
 
 	public static CollectionChange buildInboxFolder() {
