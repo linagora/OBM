@@ -36,6 +36,8 @@ import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.mail.imap.NoopImapMonitoringImpl;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.mail.EmailChangesComputer;
+import org.obm.push.mail.EmailChangesComputerImpl;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailBackendImpl;
 import org.obm.push.mail.MailViewToMSEmailConverter;
@@ -69,6 +71,8 @@ public class OpushMailModule extends AbstractModule {
 		pimBackends.addBinding().to(MailBackend.class);
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
 		bind(ServerEmailChangesBuilder.class).to(ServerEmailChangesBuilderImpl.class);
+		bind(EmailChangesComputer.class).to(EmailChangesComputerImpl.class);
+
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);

@@ -39,7 +39,6 @@ import java.util.Set;
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.utils.DateUtils;
@@ -47,7 +46,7 @@ import org.obm.push.utils.DateUtils;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowFilterRunner.class)
 public class EmailChangesComputerImplTest {
 
 	@Test(expected=NullPointerException.class)
@@ -67,16 +66,16 @@ public class EmailChangesComputerImplTest {
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		EmailChanges emailChanges = emailChangesComputerImpl.computeChanges(ImmutableSet.<Email> of(), ImmutableSet.<Email> of());
 		
-		assertThat(emailChanges.getDeletions()).isEmpty();
-		assertThat(emailChanges.getChanges()).isEmpty();
-		assertThat(emailChanges.getAdditions()).isEmpty();
+		assertThat(emailChanges.deletions()).isEmpty();
+		assertThat(emailChanges.changes()).isEmpty();
+		assertThat(emailChanges.additions()).isEmpty();
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testComputeChangesDuplicateKeys() {
 		Date currentDate = DateUtils.getCurrentDate();
-		Email email = new Email(1, true, currentDate);
-		Email email2 = new Email(1, false, currentDate);
+		Email email = Email.builder().uid(1).read(true).date(currentDate).build();
+		Email email2 = Email.builder().uid(1).read(false).date(currentDate).build();
 		
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		emailChangesComputerImpl.computeChanges(ImmutableSet.<Email> of(email, email2), ImmutableSet.<Email> of());
@@ -85,8 +84,8 @@ public class EmailChangesComputerImplTest {
 	@Test
 	public void testComputeChangesOnlyDeletions() {
 		Date currentDate = DateUtils.getCurrentDate();
-		Email email = new Email(1, true, currentDate);
-		Email email2 = new Email(2, true, currentDate);
+		Email email = Email.builder().uid(1).read(true).date(currentDate).build();
+		Email email2 = Email.builder().uid(2).read(true).date(currentDate).build();
 		
 		ImmutableSet<Email> before = ImmutableSet.<Email> of(email, email2);
 		ImmutableSet<Email> actual = ImmutableSet.<Email> of();
@@ -94,36 +93,36 @@ public class EmailChangesComputerImplTest {
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		EmailChanges emailChanges = emailChangesComputerImpl.computeChanges(before, actual);
 		
-		assertThat(emailChanges.getDeletions()).containsOnly(email, email2);
-		assertThat(emailChanges.getChanges()).isEmpty();
-		assertThat(emailChanges.getAdditions()).isEmpty();
+		assertThat(emailChanges.deletions()).containsOnly(email, email2);
+		assertThat(emailChanges.changes()).isEmpty();
+		assertThat(emailChanges.additions()).isEmpty();
 	}
 	
 	@Test
 	public void testComputeChangesOnlyChanges() {
 		Date currentDate = DateUtils.getCurrentDate();
-		Email email = new Email(1, false, currentDate);
-		Email email2 = new Email(2, false, currentDate);
+		Email email = Email.builder().uid(1).read(false).date(currentDate).build();
+		Email email2 = Email.builder().uid(2).read(false).date(currentDate).build();
 		
 		ImmutableSet<Email> before = ImmutableSet.<Email> of(email, email2);
 		
-		Email email3 = new Email(1, true, currentDate);
-		Email email4 = new Email(2, true, currentDate);
+		Email email3 = Email.builder().uid(1).read(true).date(currentDate).build();
+		Email email4 = Email.builder().uid(2).read(true).date(currentDate).build();
 		ImmutableSet<Email> actual = ImmutableSet.<Email> of(email3, email4);
 		
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		EmailChanges emailChanges = emailChangesComputerImpl.computeChanges(before, actual);
 		
-		assertThat(emailChanges.getDeletions()).isEmpty();
-		assertThat(emailChanges.getChanges()).containsOnly(email3, email4);
-		assertThat(emailChanges.getAdditions()).isEmpty();
+		assertThat(emailChanges.deletions()).isEmpty();
+		assertThat(emailChanges.changes()).containsOnly(email3, email4);
+		assertThat(emailChanges.additions()).isEmpty();
 	}
 	
 	@Test
 	public void testComputeChangesOnlyAdditions() {
 		Date currentDate = DateUtils.getCurrentDate();
-		Email email = new Email(1, true, currentDate);
-		Email email2 = new Email(2, true, currentDate);
+		Email email = Email.builder().uid(1).read(true).date(currentDate).build();
+		Email email2 = Email.builder().uid(2).read(true).date(currentDate).build();
 		
 		ImmutableSet<Email> before = ImmutableSet.<Email> of();
 		ImmutableSet<Email> actual = ImmutableSet.<Email> of(email, email2);
@@ -131,30 +130,30 @@ public class EmailChangesComputerImplTest {
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		EmailChanges emailChanges = emailChangesComputerImpl.computeChanges(before, actual);
 		
-		assertThat(emailChanges.getDeletions()).isEmpty();
-		assertThat(emailChanges.getChanges()).isEmpty();
-		assertThat(emailChanges.getAdditions()).containsOnly(email, email2);
+		assertThat(emailChanges.deletions()).isEmpty();
+		assertThat(emailChanges.changes()).isEmpty();
+		assertThat(emailChanges.additions()).containsOnly(email, email2);
 	}
 	
 	@Test
 	public void testComputeChangesMixed() {
 		Date currentDate = DateUtils.getCurrentDate();
-		Email deleted = new Email(1, true, currentDate);
-		Email changed = new Email(2, false, currentDate);
-		Email same = new Email(4, false, currentDate);
+		Email deleted = Email.builder().uid(1).read(true).date(currentDate).build();
+		Email changed = Email.builder().uid(2).read(false).date(currentDate).build();
+		Email same = Email.builder().uid(4).read(false).date(currentDate).build();
 		ImmutableSet<Email> before = ImmutableSet.<Email> of(deleted, changed, same);
 		
-		Email changed2 = new Email(2, true, currentDate);
-		Email added = new Email(3, false, currentDate);
-		Email same2 = new Email(4, false, currentDate);
+		Email changed2 = Email.builder().uid(2).read(true).date(currentDate).build();
+		Email added = Email.builder().uid(3).read(false).date(currentDate).build();
+		Email same2 = Email.builder().uid(4).read(false).date(currentDate).build();
 		ImmutableSet<Email> actual = ImmutableSet.<Email> of(changed2, added, same2);
 		
 		EmailChangesComputerImpl emailChangesComputerImpl = new EmailChangesComputerImpl();
 		EmailChanges emailChanges = emailChangesComputerImpl.computeChanges(before, actual);
 		
-		assertThat(emailChanges.getDeletions()).containsOnly(deleted);
-		assertThat(emailChanges.getChanges()).containsOnly(changed2);
-		assertThat(emailChanges.getAdditions()).containsOnly(added);
+		assertThat(emailChanges.deletions()).containsOnly(deleted);
+		assertThat(emailChanges.changes()).containsOnly(changed2);
+		assertThat(emailChanges.additions()).containsOnly(added);
 	}
 	
 	@Test
@@ -168,19 +167,19 @@ public class EmailChangesComputerImplTest {
 		int numberOfEmails = 20000 * 3;
 		for (int i = 0; i < numberOfEmails; i++) {
 			if (threeValues == null) {
-				Email deleted = new Email(i, true, currentDate);
+				Email deleted = Email.builder().uid(i).read(true).date(currentDate).build();
 				before.add(deleted);
 				threeValues = true;
 				continue;
 			} else if (threeValues){
-				Email changed = new Email(i, false, currentDate);
+				Email changed = Email.builder().uid(i).read(false).date(currentDate).build();
 				before.add(changed);
-				Email changed2 = new Email(i, true, currentDate);
+				Email changed2 = Email.builder().uid(i).read(true).date(currentDate).build();
 				actual.add(changed2);
 				threeValues = false;
 				continue;
 			} else {
-				Email added = new Email(i, true, currentDate);
+				Email added = Email.builder().uid(i).read(true).date(currentDate).build();
 				actual.add(added);
 				threeValues = null;
 			}
@@ -192,8 +191,8 @@ public class EmailChangesComputerImplTest {
 		stopWatch.stop();
 		System.out.println("Execution time : " + stopWatch.getTime());
 		
-		assertThat(emailChanges.getDeletions()).hasSize(numberOfEmails / 3);
-		assertThat(emailChanges.getChanges()).hasSize(numberOfEmails / 3);
-		assertThat(emailChanges.getAdditions()).hasSize(numberOfEmails / 3);
+		assertThat(emailChanges.deletions()).hasSize(numberOfEmails / 3);
+		assertThat(emailChanges.changes()).hasSize(numberOfEmails / 3);
+		assertThat(emailChanges.additions()).hasSize(numberOfEmails / 3);
 	}
 }
