@@ -139,6 +139,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableBiMap;
@@ -604,8 +605,9 @@ public class Ical4jHelper {
 	}
 
 	private void appendUid(Event event, Uid uid) {
-		String extIdBaseValue = (uid != null) ? uid.getValue() : EventExtId.generateUid().toString();
-		event.setExtId(new EventExtId(extIdBaseValue));
+		String extId = uid != null && !Strings.isNullOrEmpty(uid.getValue()) ? uid.getValue() : EventExtId.generateUid().toString();
+		
+		event.setExtId(new EventExtId(extId));
 	}
 
 	private void appendDescription(Event event, Description description) {

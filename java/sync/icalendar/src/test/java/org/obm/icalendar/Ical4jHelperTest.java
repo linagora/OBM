@@ -31,12 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,31 +79,31 @@ import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.fest.assertions.api.Assertions;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.junit.internal.matchers.StringContains;
 import org.junit.internal.matchers.TypeSafeMatcher;
+import org.junit.runner.RunWith;
 import org.obm.DateUtils;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.UserEmailParserUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
-import org.obm.sync.calendar.Comment;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 
 import com.google.common.base.Splitter;
@@ -116,9 +112,6 @@ import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class Ical4jHelperTest {
@@ -230,7 +223,7 @@ public class Ical4jHelperTest {
 		String icsWithoutTimestamps = stripTimestamps(ics);
 		String expectedICSWithoutTimestamps = stripTimestamps(expectedICS);
 
-		Assertions.assertThat(icsWithoutTimestamps).isNotNull().isNotEmpty()
+		assertThat(icsWithoutTimestamps).isNotNull().isNotEmpty()
 				.isEqualTo(expectedICSWithoutTimestamps);
 	}
 	
@@ -272,50 +265,50 @@ public class Ical4jHelperTest {
 
 		Recur recur = getIcal4jHelper().getRecur(event.getRecurrence(), event.getStartDate());
 
-		Assertions.assertThat(recur.getDayList()).containsOnly(WeekDay.MO,
+		assertThat(recur.getDayList()).containsOnly(WeekDay.MO,
 				WeekDay.TU, WeekDay.WE, WeekDay.TH, WeekDay.FR);
-		Assertions.assertThat(recur.getInterval()).isEqualTo(eventRecurrence.getFrequence());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.WEEKLY);
-		Assertions.assertThat(recur.getUntil()).isNull();
+		assertThat(recur.getInterval()).isEqualTo(eventRecurrence.getFrequence());
+		assertThat(recur.getFrequency()).isEqualTo(Recur.WEEKLY);
+		assertThat(recur.getUntil()).isNull();
 	}
 
 	@Test
 	public void testGetRecurOnNotRecurrentEvent() {
 		EventRecurrence eventRecurrence = new EventRecurrence();
 		Recur recur = getIcal4jHelper().getRecur(eventRecurrence, new Date());
-		Assertions.assertThat(recur).isNull();
+		assertThat(recur).isNull();
 	}
 
 	@Test
 	public void testGetDailyRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.daily, new Date());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.DAILY);
+		assertThat(recur.getFrequency()).isEqualTo(Recur.DAILY);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetMonthlyByDayRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.monthlybyday, new Date());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
-		Assertions.assertThat(recur.getDayList()).contains(WeekDay.getMonthlyOffset(new GregorianCalendar()));
+		assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
+		assertThat(recur.getDayList()).contains(WeekDay.getMonthlyOffset(new GregorianCalendar()));
 	}
 
 	@Test
 	public void testGetMonthlyByDateRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.monthlybydate, new Date());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
+		assertThat(recur.getFrequency()).isEqualTo(Recur.MONTHLY);
 	}
 
 	@Test
 	public void testGetYearlyRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.yearly, new Date());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
+		assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
 	}
 
 	@Test
 	public void testGetYearlyByDayRecur() {
 		Recur recur = getFakeRecurByRecurrenceKind(RecurrenceKind.yearlybyday, new Date());
-		Assertions.assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
+		assertThat(recur.getFrequency()).isEqualTo(Recur.YEARLY);
 	}
 
 	private Recur getFakeRecurByRecurrenceKind(RecurrenceKind recurrenceKind, Date date) {
@@ -503,7 +496,7 @@ public class Ical4jHelperTest {
 				RecurrenceDay.Wednesday, RecurrenceDay.Thursday, RecurrenceDay.Friday),
 				er.getDays());
 		assertEquals(RecurrenceKind.weekly, er.getKind());
-		Assertions.assertThat(er.getExceptions()).hasSize(1);
+		assertThat(er.getExceptions()).hasSize(1);
 	}
 
 	
@@ -668,8 +661,8 @@ public class Ical4jHelperTest {
 		
 		ExDate ret = getIcal4jHelper().getExDate(event);
 		assertEquals(2, ret.getDates().size());
-		Assertions.assertThat(ret.getDates()).containsOnly(expectedExceptionOne, expectedExceptionTwo);
-		Assertions.assertThat(ret.getDates().isUtc());
+		assertThat(ret.getDates()).containsOnly(expectedExceptionOne, expectedExceptionTwo);
+		assertThat(ret.getDates().isUtc());
 	}
 
 	@Test
@@ -714,10 +707,10 @@ public class Ical4jHelperTest {
 
 		DateTime expectedExceptionOne = new DateTime(deletedExceptionOne);
 		DateTime expectedExceptionTwo = new DateTime(deletedExceptionTwo);
-		Assertions.assertThat(ret.getDates()).hasSize(2);
-		Assertions.assertThat(ret.getDates()).containsOnly(
+		assertThat(ret.getDates()).hasSize(2);
+		assertThat(ret.getDates()).containsOnly(
 				expectedExceptionOne, expectedExceptionTwo);
-		Assertions.assertThat(ret.getDates().isUtc());
+		assertThat(ret.getDates().isUtc());
 	}
 
 	@Test
@@ -981,7 +974,7 @@ public class Ical4jHelperTest {
 		assertEquals(er.getFrequence(), 1);
 		er.setKind(RecurrenceKind.weekly);
 
-		Assertions.assertThat(er.getExceptions()).hasSize(2);
+		assertThat(er.getExceptions()).hasSize(2);
 	}
 
 	@Test @Slow
@@ -1215,7 +1208,7 @@ public class Ical4jHelperTest {
 
 		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, ical4jUser, token);
 
-		Assertions.assertThat(icsReply).doesNotContain("COMMENT");
+		assertThat(icsReply).doesNotContain("COMMENT");
 	}
 
 	private void checkStringLengthLessThan(String ics, int length) {
@@ -1262,14 +1255,14 @@ public class Ical4jHelperTest {
 		String icsRequest = getIcal4jHelper().buildIcsInvitationRequest(obmUser, event, token);
 
 		String UNTIL = "UNTIL=20120330T110000Z";
-		Assertions.assertThat(icsRequest).contains(UNTIL);
+		assertThat(icsRequest).contains(UNTIL);
 	}
 
 	@Test @Slow
 	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2891.ics";
 		List<Event> events = testIcsParsing(icsFilename);
-		Assertions.assertThat(events).isNotNull().isNotEmpty();
+		assertThat(events).isNotNull().isNotEmpty();
 	}
 
 	private List<Event> testIcsParsing(String icsFilename) throws IOException,
@@ -1283,7 +1276,7 @@ public class Ical4jHelperTest {
 	public void executeJIRA2940() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2940.ics";
 		List<Event> events = testIcsParsing(icsFilename);
-		Assertions.assertThat(events).isNotNull();
+		assertThat(events).isNotNull();
 	}
 	
 	@Test
@@ -1291,9 +1284,9 @@ public class Ical4jHelperTest {
 		String icsFilename = "default-part-stat.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 		Event event = Iterables.getOnlyElement(events);
-		Assertions.assertThat(event.getAttendees()).hasSize(2);
+		assertThat(event.getAttendees()).hasSize(2);
 		Attendee userc = event.getAttendees().get(1);
-		Assertions.assertThat(userc.getParticipation()).isNotNull().isEqualTo(Participation.needsAction());
+		assertThat(userc.getParticipation()).isNotNull().isEqualTo(Participation.needsAction());
 	}
 
 	@Test
@@ -1301,12 +1294,12 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963sorted.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 
-		Assertions.assertThat(events).hasSize(2);
+		assertThat(events).hasSize(2);
 
 		Event firstParentEvent = events.get(0);
 		Event secondParentEvent = events.get(1);
-		Assertions.assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
-		Assertions.assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
 	}
 
 	@Test
@@ -1314,12 +1307,12 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963unsorted.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 
-		Assertions.assertThat(events).hasSize(2);
+		assertThat(events).hasSize(2);
 
 		Event firstParentEvent = events.get(0);
 		Event secondParentEvent = events.get(1);
-		Assertions.assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
-		Assertions.assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		assertThat(firstParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
+		assertThat(secondParentEvent.getRecurrence().getEventExceptions()).hasSize(2);
 	}
 
 	@Test
@@ -1327,7 +1320,7 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963onlyRecurrenceId.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 
-		Assertions.assertThat(events).isEmpty();
+		assertThat(events).isEmpty();
 	}
 	
 	@Test
@@ -1335,8 +1328,8 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-3355.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 		
-		Assertions.assertThat(events.size()).isEqualTo(1);
-		Assertions.assertThat(events.get(0).getAttendees()).containsOnly(
+		assertThat(events.size()).isEqualTo(1);
+		assertThat(events.get(0).getAttendees()).containsOnly(
 				Attendee.builder().email("usera@obm.lng.org").build(),
 				Attendee.builder().email("userb@obm.lng.org").build(),
 				Attendee.builder().email("userc@obm.lng.org").build());
@@ -1347,8 +1340,8 @@ public class Ical4jHelperTest {
 		String icsFilename = "illegalAttendeeCN.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 		
-		Assertions.assertThat(events.size()).isEqualTo(1);
-		Assertions.assertThat(events.get(0).getAttendees()).containsOnly(
+		assertThat(events.size()).isEqualTo(1);
+		assertThat(events.get(0).getAttendees()).containsOnly(
 				Attendee.builder().email("usera@obm.lng.org").build(),
 				Attendee.builder().email("userb@obm.lng.org").build());
 	}
@@ -1368,9 +1361,9 @@ public class Ical4jHelperTest {
 
 		String DTSTAMP = "DTSTAMP:20120101T091213Z";
 
-		Assertions.assertThat(icsRequest).contains(DTSTAMP);
-		Assertions.assertThat(icsCancel).contains(DTSTAMP);
-		Assertions.assertThat(icsReply).contains(DTSTAMP);
+		assertThat(icsRequest).contains(DTSTAMP);
+		assertThat(icsCancel).contains(DTSTAMP);
+		assertThat(icsReply).contains(DTSTAMP);
 	}
 
 	@Test
@@ -1387,9 +1380,9 @@ public class Ical4jHelperTest {
 		String icsReply = new Ical4jHelper().buildIcsInvitationReply(event, obmUser, token);
 
 		String DTSTAMP = "DTSTAMP:20120102T101415Z";
-		Assertions.assertThat(icsRequest).contains(DTSTAMP);
-		Assertions.assertThat(icsCancel).contains(DTSTAMP);
-		Assertions.assertThat(icsReply).contains(DTSTAMP);
+		assertThat(icsRequest).contains(DTSTAMP);
+		assertThat(icsCancel).contains(DTSTAMP);
+		assertThat(icsReply).contains(DTSTAMP);
 	}
 
 	@Test
@@ -1406,6 +1399,15 @@ public class Ical4jHelperTest {
 		stream.close();
 
 		String ics = new Ical4jHelper().buildIcs(obmUser, events, token);
-		Assertions.assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
+		assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
+	}
+	
+	@Test
+	public void testParseIcsWithEmptyUid() throws Exception {
+		String ics = IOUtils.toString(getStreamICS("meetingWithEmptyUid.ics"));
+		List<Event> events = getIcal4jHelper().parseICS(ics, getDefaultObmUser());
+
+		assertThat(events).hasSize(1);
+		assertThat(events.get(0).getExtId().getExtId()).isNotNull();
 	}
 }
