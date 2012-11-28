@@ -640,6 +640,14 @@ Obm.CalendarManager = new Class({
               var weeks = obm.calendarManager.getEventWeeks(evt);
               var start = weeks[0];
 
+              if (evt.event.periodic){
+                evt.event.location = obm.vars.consts.calendarDetailconsultURL+evt.event.id;
+                evt.linkContainer.addEvent('click', function(e){
+                  e.preventDefault();
+                  obm.calendarOccurenceEditPopup.compute(evt.event, evt.event.location);
+                }.bind(evt));
+              }
+
               if (evt.event.left) {
                 oldBegin = begin
                 begin = evt.event.index*1000;
