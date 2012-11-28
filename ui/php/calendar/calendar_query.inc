@@ -2395,6 +2395,8 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   if ($calendar['template_id'] > 0) {
     $t = run_query_calendar_get_template($calendar['template_id']);
     $q = $t[0]; 
+    $datebegin_tpl = new Of_Date($q->f('event_date'), 'GMT');
+    $datebegin = $datebegin_tpl->setDay($datebegin->getDay())->setMonth($datebegin->getMonth())->setYear($datebegin->getYear());
     $attendees = $t[1];
     $event_duration = $q->f('event_duration');
     $calendar['duration'] = $event_duration;
