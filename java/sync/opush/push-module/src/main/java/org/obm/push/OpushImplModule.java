@@ -64,10 +64,12 @@ import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 import org.obm.push.qos.OpushQoSKeyProvider;
+import org.obm.push.service.DateService;
 import org.obm.push.service.DeviceService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
 import org.obm.push.service.PushPublishAndSubscribe;
+import org.obm.push.service.impl.DateServiceImpl;
 import org.obm.push.service.impl.DeviceServiceImpl;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.service.impl.MappingServiceImpl;
@@ -140,6 +142,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(ASTimeZoneConverter.class).to(ASTimeZoneConverterImpl.class);
 		bind(ContinuationTransactionMap.class).to(ContinuationTransactionMapImpl.class);
 		bind(ContinuationService.class).to(ContinuationServiceImpl.class);
+		bind(DateService.class).to(DateServiceImpl.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
