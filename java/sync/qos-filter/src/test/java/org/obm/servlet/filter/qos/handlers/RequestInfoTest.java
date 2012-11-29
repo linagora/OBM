@@ -44,7 +44,7 @@ public class RequestInfoTest
 		RequestInfo<Integer> info = RequestInfo.create(2);
 		assertThat(info.getNumberOfRunningRequests()).isEqualTo(0);
 		assertThat(info.getKey()).isEqualTo(2);
-		assertThat(info.getTimestamp()).isLessThan(System.currentTimeMillis());
+		assertThat(info.getTimestamp()).isLessThanOrEqualTo(System.currentTimeMillis());
 	}
 
 	@Test
