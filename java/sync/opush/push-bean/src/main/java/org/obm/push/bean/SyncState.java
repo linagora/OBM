@@ -32,7 +32,6 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.obm.push.utils.DateUtils;
@@ -87,9 +86,9 @@ public abstract class SyncState implements Serializable {
 
 	public void updateLastWindowStartDate(FilterType filterType) {
 		if (filterType != null) {
-			Calendar calendar = filterType.getFilteredDate();
-			if (getLastSync() != null && calendar.getTime().after(getLastSync())) {
-				setLastSync(calendar.getTime());
+			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
+			if (getLastSync() != null && filteredDate.after(getLastSync())) {
+				setLastSync(filteredDate);
 				setLastSyncFiltred(true);
 			}
 		}

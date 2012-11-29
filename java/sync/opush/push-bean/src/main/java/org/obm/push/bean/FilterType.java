@@ -31,9 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -65,38 +67,36 @@ public enum FilterType {
 		if (specValueToEnum.containsKey(specificationValue)) {
 			return specValueToEnum.get(specificationValue);
 		}
-		return ALL_ITEMS;
+		throw new IllegalArgumentException("No filter type for '" + specificationValue + "'");
 	}
 
-	public Calendar getFilteredDate() {
-		Calendar date = DateUtils.getMidnightCalendar();
+	public Date getFilteredDateTodayAtMidnight() {
+		return getFilteredDate(DateUtils.getMidnightCalendar().getTime());
+	}
+
+	public Date getFilteredDate(Date fromDate) {
+		DateTime fromUTCDate = new DateTime(fromDate).withZone(DateTimeZone.UTC);
 		switch (this) {
 		case ALL_ITEMS:
-			return DateUtils.getEpochPlusOneSecondCalendar();
+			return DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		case ONE_DAY_BACK:
-			date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH)-1);
-			return date;
+			return fromUTCDate.minusDays(1).toDate();
 		case THREE_DAYS_BACK:
-			date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH)-3);
-			return date;
+			return fromUTCDate.minusDays(3).toDate();
 		case ONE_WEEK_BACK:
-			date.set(Calendar.WEEK_OF_MONTH, date.get(Calendar.WEEK_OF_MONTH)-1);
-			return date;
+			return fromUTCDate.minusWeeks(1).toDate();
 		case TWO_WEEKS_BACK:
-			date.set(Calendar.WEEK_OF_MONTH, date.get(Calendar.WEEK_OF_MONTH)-2);
-			return date;
+			return fromUTCDate.minusWeeks(2).toDate();
 		case ONE_MONTHS_BACK:
-			date.set(Calendar.MONTH, date.get(Calendar.MONTH)-1);
-			return date;
+			return fromUTCDate.minusMonths(1).toDate();
 		case THREE_MONTHS_BACK:
-			date.set(Calendar.MONTH, date.get(Calendar.MONTH)-3);
-			return date;
+			return fromUTCDate.minusMonths(3).toDate();
 		case SIX_MONTHS_BACK:
-			date.set(Calendar.MONTH, date.get(Calendar.MONTH)-6);
-			return date;
-		default:
-			return date;
+			return fromUTCDate.minusMonths(6).toDate();
+		case FILTER_BY_NO_INCOMPLETE_TASKS:
+			return fromDate;
 		}
+		throw new IllegalStateException("No filtered date available");
 	}
 	
 	private static Map<String, FilterType> specValueToEnum;
