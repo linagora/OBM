@@ -2335,7 +2335,7 @@ Obm.CalendarQuickForm = new Class({
     } else if (type == 'dayMonthLabel') {
       var dayContainer = target.parentNode.id.split('_');
 			if(!obm.calendarManager.write) return false;
-			var d = getMonthlyGridDate(str);
+			var d = getMonthlyGridDate(dayContainer);
 			this.setDefaultFormValues(d,1, 3600);
     } else {
       $('sel_template').style.display ='none';
