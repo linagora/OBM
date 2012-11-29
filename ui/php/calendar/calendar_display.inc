@@ -770,6 +770,14 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
   return "<div id='calendarLayout'>$block</div>";
 }
 
+/**
+ * Returns the number of displayed days in the week view, depending on the user preferences.
+ */
+function get_number_of_displayed_days_in_weekview() {
+  $display_days = $_SESSION['set_cal_display_days'];
+  
+  return empty($display_days) ? 7 : substr_count($display_days, 1);
+}
 
 /**
  * Display the HTML week view
@@ -779,11 +787,7 @@ function dis_calendar_day_agenda($current_view, $calendar_entity, $writable_enti
  * @param array $writable_entity : entities with write access
  */
 function dis_calendar_week_agenda($current_view, $calendar_entity, $writable_entity) {
-
-  $display_days = $_SESSION['set_cal_display_days'];
-  if (empty($display_days)) $display_days = '1111111';
-
-  $ndays = substr_count($display_days, 1);
+  $ndays = get_number_of_displayed_days_in_weekview();
   $date = clone $current_view->get_date();
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
 
@@ -883,10 +887,13 @@ function dis_calendar_navbar($current_view) {
  *
  * display navigation bar label
  */
-function dis_calendar_navbar_label($current_view,$ndays=7) {
+function dis_calendar_navbar_label($current_view,$ndays=-1) {
   $range = $current_view->get_cal_range();
   $date = clone $current_view->get_date();
   if ($ndays == 1) $range = 'day';
+  else if ($ndays == -1) {
+    $ndays = get_number_of_displayed_days_in_weekview();
+  }
 
   switch($range) {
     case 'day':
