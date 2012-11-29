@@ -32,10 +32,10 @@
 package org.obm.sync.calendar;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import java.util.UUID;
 
 public class EventExtId implements Serializable {
 
@@ -55,6 +55,10 @@ public class EventExtId implements Serializable {
 
 	public static UUID generateUid() {
 		return UUID.randomUUID();
+	}
+	
+	public static EventExtId newExtId() {
+		return new EventExtId(generateUid().toString());
 	}
 	
 	@Override

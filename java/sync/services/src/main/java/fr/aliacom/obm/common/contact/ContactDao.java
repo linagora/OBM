@@ -81,12 +81,13 @@ import org.obm.sync.book.Phone;
 import org.obm.sync.book.Website;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.exception.ContactNotFoundException;
@@ -405,6 +406,8 @@ public class ContactDao {
 		cal.setTime(startDate);
 
 		Event e = new Event();
+		
+		e.setExtId(EventExtId.newExtId());
 		e.setTitle(displayName);
 		e.setStartDate(cal.getTime());
 		e.setDuration(3600);
