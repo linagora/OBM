@@ -33,13 +33,7 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.mockAccessToken;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.isNull;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -1964,23 +1958,64 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-		public void testInheritsParticipationOnExceptions() {
-			List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.declined());
-			Event beforeException = createEvent(expectedAttendeesException);
+	public void testInheritsParticipationOnExceptions() {
+		DateTime eventDate = DateTime.now();
+		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.declined());
+		Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
+		Event afterException = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(1).toDate());
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		before.addEventException(createEventException(expectedAttendeesException, eventDate.plusDays(1).toDate()));
+		before.setExtId(new EventExtId("Event"));
+		after.addEventException(afterException);
+		after.setExtId(new EventExtId("Event"));
+		
+		calendarService.inheritsParticipationOnExceptions(before, after);
+		
+		assertAttendeesHaveSameParticipation(afterException.getAttendees(), expectedAttendeesException);
+	}
+	
+	@Test
+	public void testInheritsParticipationOnExceptionsMultipleExceptions() {
+		DateTime eventDate = DateTime.now();
+		List<Attendee> expectedAttendeesException_1 = createOrganiserAndContactAttendees(Participation.declined());
+		List<Attendee> expectedAttendeesException_2 = createOrganiserAndContactAttendees(Participation.needsAction());
+		List<Attendee> expectedAttendeesException_3 = createOrganiserAndContactAttendees(Participation.tentative());
+		Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
+		Event afterException_1 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(1).toDate());
+		Event afterException_2 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(2).toDate());
+		Event afterException_3 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(3).toDate());
+		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		
+		before.addEventException(createEventException(expectedAttendeesException_1, eventDate.plusDays(1).toDate()));
+		before.addEventException(createEventException(expectedAttendeesException_2, eventDate.plusDays(2).toDate()));
+		before.addEventException(createEventException(expectedAttendeesException_3, eventDate.plusDays(3).toDate()));
+		before.setExtId(new EventExtId("Event"));
+		
+		after.addEventException(afterException_1);
+		after.addEventException(afterException_2);
+		after.addEventException(afterException_3);
+		after.setExtId(new EventExtId("Event"));
+		
+		calendarService.inheritsParticipationOnExceptions(before, after);
+		
+		assertAttendeesHaveSameParticipation(afterException_1.getAttendees(), expectedAttendeesException_1);
+		assertAttendeesHaveSameParticipation(afterException_2.getAttendees(), expectedAttendeesException_2);
+		assertAttendeesHaveSameParticipation(afterException_3.getAttendees(), expectedAttendeesException_3);
+	}
+	
+	private void assertAttendeesHaveSameParticipation(List<Attendee> newAttendees, List<Attendee> expectedAttendees) {
+		assertThat(expectedAttendees).hasSameSizeAs(newAttendees);
+		
+		for (Attendee attendee : newAttendees) {
+			int indexOfAttendee = expectedAttendees.indexOf(attendee);
 			
-			Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-			before.addEventException(beforeException);
-			
-			Event afterException = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-			Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-			after.addEventException(afterException);
-			
-			CalendarBindingImpl calendarService = 
-					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-			
-			calendarService.inheritsParticipationOnExceptions(before, after);
-			assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
+			assertThat(indexOfAttendee).isGreaterThan(-1);
+			assertThat(attendee.getParticipation()).isEqualTo(expectedAttendees.get(indexOfAttendee).getParticipation());
 		}
+	}
 
 	@Test
 	public void testRecursiveInheritsParticipationFromExistingEvent() {
@@ -2126,23 +2161,16 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testBuildTreeMap() {
+		DateTime eventDate = DateTime.now();
 		List<Attendee> attendees = createOrganiserAndContactAttendees(Participation.accepted());
-		Event firstException = createEvent(attendees);
-		firstException.setExtId(new EventExtId("012"));
-		Event secondException = createEvent(attendees);
-		secondException.setExtId(new EventExtId("123"));
-		Event thirdException = createEvent(attendees);
-		thirdException.setExtId(new EventExtId("234"));
-		Event[] expectedEvents = new Event[] { firstException, secondException, thirdException };
+		Event firstException = createEventException(attendees, eventDate.plusDays(1).toDate());
+		Event secondException = createEventException(attendees, eventDate.plusDays(2).toDate());
+		Event thirdException = createEventException(attendees, eventDate.plusDays(3).toDate());
 		
-		ImmutableList<Event> events = ImmutableList.<Event> of(thirdException, secondException, firstException);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
+		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(ImmutableList.of(firstException, secondException, thirdException));
 		
-		CalendarBindingImpl calendarService = 
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		
-		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(events);
-		Event[] eventsArray = Iterables.toArray(treeMap.keySet(), Event.class);
-		assertThat(eventsArray).isEqualTo(expectedEvents);
+		assertThat(treeMap.keySet()).containsExactly(firstException, secondException, thirdException);
 	}
 
     @Test
@@ -2270,9 +2298,18 @@ public class CalendarBindingImplTest {
 
 	private Event createEvent(List<Attendee> expectedAttendees) {
 		Event event = new Event();
+		
 		event.addAttendees(expectedAttendees);
 		
 		return event;
+	}
+	
+	private Event createEventException(List<Attendee> expectedAttendees, Date recurrenceId) {
+		Event exception = createEvent(expectedAttendees);
+		
+		exception.setRecurrenceId(recurrenceId);
+		
+		return exception;
 	}
 
 	private List<Attendee> createOrganiserAndContactAttendees(Participation contactState) {
