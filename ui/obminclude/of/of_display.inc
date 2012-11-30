@@ -1160,6 +1160,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.consts.obmUrl = '$path';
   obm.vars.consts.firstHour = $GLOBALS[ccalendar_first_hour];
   obm.vars.consts.lastHour = $GLOBALS[ccalendar_last_hour];
+  obm.vars.consts.charLimit = 100;
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;

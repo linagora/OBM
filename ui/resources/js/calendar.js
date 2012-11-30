@@ -1422,8 +1422,39 @@ Obm.CalendarManager = new Class({
         $('spinner').hide();
       }
     }).post($merge({ajax : 1, action : 'async_indexing'}, eventData));
-  }
+  },
 
+  /*
+   * Set Tooltip with descrition (shrinked if necessary)
+   */
+  setTooltip: function(description, title, location, time) {
+    description = description || '';
+    if (location != ''){
+      location = '\n'+location;
+    }
+
+    var suffix = ' [...]';
+    var charLimit = obm.vars.consts.charLimit - suffix.length;
+    var tooltip = '';
+    if(description != ''){
+      if(description.length > charLimit){
+        tooltip = description.substr(0, charLimit);
+        tooltip = tooltip.substr(0, Math.min(tooltip.length, tooltip.lastIndexOf(" ")));
+        tooltip = tooltip+suffix;
+      }else{
+        tooltip = description;
+      }
+      tooltip = tooltip+location;
+    } else {
+      tooltip = title+location;
+    }
+
+    var allDay = '00:00 - 00:00';
+    if (time != '' && time != allDay){
+      tooltip = time+'\n'+tooltip;
+    }
+    return tooltip;
+  }
 });
 
 
@@ -1577,7 +1608,7 @@ Obm.CalendarInDayEvent = new Class({
     var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     serieClass = 'evt_'+this.event.id;
     this.element = new Element('div').addClass('event '+serieClass)
-                                     .setProperties({'id':id,'title':this.event.title}); 
+                                     .setProperties({'id':id,'title':this.event.title});
     var opacity = '';
     if (this.event.opacity == 'TRANSPARENT') opacity = 'transparent'; 
     this.content = new Element('dl').addClass(this.event.klass+' '+opacity).setOpacity(this.getOpacity()).injectInside(this.element);
@@ -1651,8 +1682,9 @@ Obm.CalendarInDayEvent = new Class({
       var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' - ' + end.format(obm.vars.regexp.dispTimeFormat);
       this.locationContainer.set('text',location);
     }
-    
-    this.element.setProperty('title', title + ' ' + location);
+
+    var tooltip = obm.calendarManager.setTooltip(this.event.description, title, location,'');
+    this.element.setProperty('title', tooltip);
     this.timeContainer.set('text',time);
     this.titleContainer.set('text',title);
   },
@@ -1895,8 +1927,17 @@ Obm.CalendarAllDayEvent = new Class({
     if (this.event.all_day) {
       time = title;
     }
-    
-    this.element.setProperty('title', title);
+
+    var location = '';
+    if (this.event.location != '') {
+      location = '(' + Obm.utils.locationDecode(this.event.location) + ')';
+    }
+
+    var end =  new Obm.DateTime((this.event.time+this.event.duration) * 1000);
+    var tooltipTime = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' - ' + end.format(obm.vars.regexp.dispTimeFormat);
+
+    var tooltip = obm.calendarManager.setTooltip(this.event.description, title, location, tooltipTime);
+    this.element.setProperty('title', tooltip);
     this.titleContainer.set('text',time);
   },
 
