@@ -38,6 +38,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -61,13 +62,13 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection) 
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) 
 					throws DaoException, CollectionNotFoundException, 
 					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getChanged(udr, syncCollection.getSyncState(), 
-				syncCollection.getCollectionId(), syncCollection.getOptions());
+				syncCollection.getCollectionId(), syncCollection.getOptions(), newSyncKey);
 	}
 
 	@Override

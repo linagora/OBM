@@ -139,7 +139,7 @@ public class FolderSyncHandlerTest {
 
 	@Test
 	public void testFolderSyncHasNoChange() throws Exception {
-		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
+		SyncKey newSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
 		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
@@ -148,7 +148,7 @@ public class FolderSyncHandlerTest {
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesForMailboxes(classToInstanceMap, buildHierarchyItemsChangeEmpty());
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
-		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), currentSyncKey, newSyncState);
+		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 
 		replayMocks(classToInstanceMap);
@@ -156,7 +156,7 @@ public class FolderSyncHandlerTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, port);
-		FolderSyncResponse folderSyncResponse = opClient.folderSync(currentSyncKey);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);
 
@@ -168,7 +168,7 @@ public class FolderSyncHandlerTest {
 	
 	@Test
 	public void testFolderSyncHasChanges() throws Exception {
-		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
+		SyncKey newSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
 		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
@@ -195,7 +195,7 @@ public class FolderSyncHandlerTest {
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesForMailboxes(classToInstanceMap, mailboxChanges);
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
-		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), currentSyncKey, newSyncState);
+		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
 		replayMocks(classToInstanceMap);
@@ -203,7 +203,7 @@ public class FolderSyncHandlerTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, port);
-		FolderSyncResponse folderSyncResponse = opClient.folderSync(currentSyncKey);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);
 
@@ -218,7 +218,7 @@ public class FolderSyncHandlerTest {
 
 	@Test
 	public void testFolderSyncHasDeletions() throws Exception {
-		SyncKey currentSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
+		SyncKey newSyncKey = new SyncKey("12341234-1234-1234-1234-123456123456");
 
 		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
 		int newSyncStateId = 1156;
@@ -234,7 +234,7 @@ public class FolderSyncHandlerTest {
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesForMailboxes(classToInstanceMap, mailboxChanges);
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
-		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), currentSyncKey, newSyncState);
+		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
 		replayMocks(classToInstanceMap);
@@ -242,7 +242,7 @@ public class FolderSyncHandlerTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, port);
-		FolderSyncResponse folderSyncResponse = opClient.folderSync(currentSyncKey);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);
 
@@ -265,10 +265,10 @@ public class FolderSyncHandlerTest {
 	}
 
 	private void expectCollectionDaoFindFolderSyncState(CollectionDao collectionDao,
-			SyncKey currentSyncKey, FolderSyncState newSyncState) throws DaoException {
+			SyncKey newSyncKey, FolderSyncState newSyncState) throws DaoException {
 		
-		expect(collectionDao.findFolderStateForKey(currentSyncKey)).andReturn(FolderSyncState.builder().syncKey(currentSyncKey).build());
-		expectCollectionDaoAllocateFolderSyncState(collectionDao, currentSyncKey, newSyncState);
+		expect(collectionDao.findFolderStateForKey(newSyncKey)).andReturn(FolderSyncState.builder().syncKey(newSyncKey).build());
+		expectCollectionDaoAllocateFolderSyncState(collectionDao, newSyncState.getSyncKey(), newSyncState);
 	}
 
 	private FolderSyncState newFolderSyncState(SyncKey newGeneratedSyncKey, int newSyncStateId) {

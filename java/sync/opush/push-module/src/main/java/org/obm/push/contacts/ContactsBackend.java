@@ -52,6 +52,7 @@ import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
@@ -269,13 +270,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException {
 		
-		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions);
+		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws UnexpectedObmSyncServerException, 
+			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws UnexpectedObmSyncServerException, 
 			DaoException, CollectionNotFoundException {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);

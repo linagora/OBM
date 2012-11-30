@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -46,7 +47,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 
 public interface IContentsExporter {
 
-	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection)
+	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey)
 			throws DaoException, CollectionNotFoundException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
 

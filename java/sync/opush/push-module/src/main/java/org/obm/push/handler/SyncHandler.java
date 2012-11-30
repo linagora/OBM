@@ -85,6 +85,7 @@ import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
+import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -132,6 +133,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final ResponseWindowingService responseWindowingProcessor;
 	private final ContinuationService continuationService;
 	private final boolean enablePush;
+	private final SyncKeyFactory syncKeyFactory;
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
@@ -141,7 +143,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
 			ResponseWindowingService responseWindowingProcessor,
 			ContinuationService continuationService,
-			@Named("enable-push") boolean enablePush) {
+			@Named("enable-push") boolean enablePush,
+			SyncKeyFactory syncKeyFactory) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -154,6 +157,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.responseWindowingProcessor = responseWindowingProcessor;
 		this.continuationService = continuationService;
 		this.enablePush = enablePush;
+		this.syncKeyFactory = syncKeyFactory;
 	}
 
 	@Override
@@ -243,7 +247,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private Date doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
-			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
+			SyncKey newSyncKey, SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		DataDelta delta = null;
@@ -251,7 +255,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(udr, c);
+			delta = contentsExporter.getChanged(udr, c, newSyncKey);
 			
 			lastSync = delta.getSyncDate();
 		} else {
@@ -427,17 +431,17 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} else {
 			syncCollection.setItemSyncState(st);
 			Date syncDate = null;
+			SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
 			if (syncCollection.getFetchIds().isEmpty()) {
-				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
+				syncDate = doUpdates(udr, syncCollection, processedClientIds, newSyncKey, syncCollectionResponse);
 			} else {
 				syncDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 				syncCollectionResponse.setItemChanges(
 						contentsExporter.fetch(udr, syncCollection));
 			}
 			identifyNewItems(syncCollectionResponse, st);
-			SyncKey newSyncKey = 
-					stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), syncDate, 
-							syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion());
+			stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), syncDate, 
+					syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion(), newSyncKey);
 			syncCollectionResponse.setNewSyncKey(newSyncKey);
 		}
 	}
@@ -450,11 +454,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		syncCollectionResponse.setCollectionValidity(true);
 		List<ItemChange> changed = ImmutableList.of();
 		List<ItemDeletion> deleted = ImmutableList.of();
-		SyncKey newSyncKey = stMachine.allocateNewSyncKey(udr, 
+		SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
+		stMachine.allocateNewSyncKey(udr, 
 				syncCollection.getCollectionId(), 
 				DateUtils.getEpochPlusOneSecondCalendar().getTime(), 
-				changed, 
-				deleted);
+				changed,
+				deleted,
+				newSyncKey);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 

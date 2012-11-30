@@ -52,6 +52,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
@@ -241,13 +242,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException {
 		
-		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions);
+		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws DaoException,
+			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException {
 		
 		AccessToken token = login(udr);

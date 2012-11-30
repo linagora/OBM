@@ -192,7 +192,7 @@ public class MailBackendHandlerTest {
 
 	private void bindChangedToDelta(DataDelta delta) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
-		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), anyObject(SyncCollection.class)))
+		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
 			.andReturn(delta).once();
 	}
 

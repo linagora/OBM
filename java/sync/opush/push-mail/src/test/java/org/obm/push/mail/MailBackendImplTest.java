@@ -112,15 +112,15 @@ public class MailBackendImplTest {
 	
 	@Test
 	public void testInitialGetChangesWithInitialSyncKey() throws Exception {
-		testInitialGetChangesUsingSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		testInitialGetChangesUsingSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY, new SyncKey("1234"));
 	}
 	
 	@Test
 	public void testInitialGetChangesWithNotInitialSyncKey() throws Exception {
-		testInitialGetChangesUsingSyncKey(new SyncKey("1234"));
+		testInitialGetChangesUsingSyncKey(new SyncKey("1234"), new SyncKey("5678"));
 	}
 
-	private void testInitialGetChangesUsingSyncKey(SyncKey syncKey) throws Exception {
+	private void testInitialGetChangesUsingSyncKey(SyncKey syncKey, SyncKey newSyncKey) throws Exception {
 		long uidNext = 45612;
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
@@ -145,12 +145,12 @@ public class MailBackendImplTest {
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
 		expectSnapshotDaoHasNoEntry(syncKey);
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
-		expectSnapshotDaoRecordOneSnapshot(syncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
+		expectSnapshotDaoRecordOneSnapshot(newSyncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
 		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 		
 		assertThat(actual.getDeletions()).isEmpty();
@@ -160,6 +160,7 @@ public class MailBackendImplTest {
 	@Test
 	public void testInitialWhenNoChange() throws Exception {
 		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey newSyncKey = new SyncKey("1234");
 		long uidNext = 45612;
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
@@ -175,12 +176,12 @@ public class MailBackendImplTest {
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
 		expectSnapshotDaoHasNoEntry(syncKey);
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
-		expectSnapshotDaoRecordOneSnapshot(syncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
+		expectSnapshotDaoRecordOneSnapshot(newSyncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
 		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 
 		assertThat(actual.getDeletions()).isEmpty();
@@ -210,7 +211,7 @@ public class MailBackendImplTest {
 				.deviceId(device.getDevId())
 				.filterType(FilterType.THREE_DAYS_BACK)
 				.uidNext(5000)
-				.syncKey(new SyncKey("156"))
+				.syncKey(syncKey)
 				.build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
@@ -219,12 +220,13 @@ public class MailBackendImplTest {
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		
 		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
+		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, new SyncKey("5678"));
 	}
 	
 	@Test
 	public void testNotInitial() throws Exception {
 		SyncKey syncKey = new SyncKey("1234");
+		SyncKey newSyncKey = new SyncKey("5678");
 		ImmutableList<BodyPreference> bodyPreferences = ImmutableList.<BodyPreference>of();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
@@ -280,7 +282,7 @@ public class MailBackendImplTest {
 				.uidNext(previousUIDNext)
 				.syncKey(syncKey)
 				.build());
-		expectSnapshotDaoRecordOneSnapshot(syncKey, currentUIDNext, syncCollectionOptions, fetchedEmails);
+		expectSnapshotDaoRecordOneSnapshot(newSyncKey, currentUIDNext, syncCollectionOptions, fetchedEmails);
 		
 		EmailChanges emailChanges = EmailChanges.builder()
 				.changes(ImmutableSet.<Email> of(modifiedEmail))
@@ -293,7 +295,7 @@ public class MailBackendImplTest {
 		expectServerItemChanges(bodyPreferences, emailChanges, modifiedEmail, newEmail, deletedEmail);
 		
 		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
+		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
 		
 		control.verify();
 	}

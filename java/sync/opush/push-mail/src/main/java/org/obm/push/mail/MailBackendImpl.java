@@ -69,6 +69,7 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
@@ -366,9 +367,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options)
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
-					ProcessingEmailException, FilterTypeChangedException {
+	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options, SyncKey newSyncKey)
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
 
 		try {
 			Date dataDeltaDate = dateService.getCurrentDate();
@@ -378,7 +378,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getSyncKey(), collectionId);
 			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
 			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
-			takeSnapshot(udr, collectionId, state, options, newManagedEmails, currentUIDNext);
+			takeSnapshot(udr, collectionId, options, newManagedEmails, currentUIDNext, newSyncKey);
 			
 			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
 			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
@@ -395,15 +395,15 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		}
 	}
 
-	private void takeSnapshot(UserDataRequest udr, Integer collectionId,
-			SyncState state, SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails, long currentUIDNext) {
+	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 
+			SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails, long currentUIDNext, SyncKey newSyncKey) {
 		
 		snapshotDao.put(Snapshot.builder()
 				.emails(managedEmails)
 				.collectionId(collectionId)
 				.deviceId(udr.getDevId())
 				.filterType(syncCollectionOptions.getFilterType())
-				.syncKey(state.getSyncKey())
+				.syncKey(newSyncKey)
 				.uidNext(currentUIDNext)
 				.build());
 	}

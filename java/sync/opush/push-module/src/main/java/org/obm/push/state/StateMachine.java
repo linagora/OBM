@@ -113,11 +113,10 @@ public class StateMachine {
 		return newFolderState;
 	}
 	
-	public SyncKey allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
-		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems) throws DaoException, InvalidServerId {
+	public void allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
+		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems, SyncKey newSyncKey) throws DaoException, InvalidServerId {
 
-		SyncKey newSk = syncKeyFactory.randomSyncKey();
-		ItemSyncState newState = collectionDao.updateState(udr.getDevice(), collectionId, newSk, lastSync);
+		ItemSyncState newState = collectionDao.updateState(udr.getDevice(), collectionId, newSyncKey, lastSync);
 		
 		if (changes != null && !changes.isEmpty()) {
 			itemTrackingDao.markAsSynced(newState, listNewItems(changes));
@@ -127,7 +126,6 @@ public class StateMachine {
 		}
 		
 		log(udr, newState);
-		return newSk;
 	}
 
 	private Set<ServerId> itemDeletionsAsServerIdSet(Iterable<ItemDeletion> deletions) throws InvalidServerId {

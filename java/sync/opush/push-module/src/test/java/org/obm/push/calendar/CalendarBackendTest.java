@@ -529,9 +529,10 @@ public class CalendarBackendTest {
 	@Test 
 	public void testGetChanged() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
+		SyncKey syncKey = new SyncKey("1234567890a");
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncDate(currentDate)
-				.syncKey(new SyncKey("1234567890a"))
+				.syncKey(syncKey)
 				.build();
 		int collectionId = 1;
 
@@ -556,7 +557,7 @@ public class CalendarBackendTest {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
 		
-		DataDelta dataDelta = calendarBackend.getChanged(userDataRequest, lastKnownState, collectionId, syncCollectionOptions);
+		DataDelta dataDelta = calendarBackend.getChanged(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
 		
 		verify(loginService, mappingService, calendarClient, eventService);
 		

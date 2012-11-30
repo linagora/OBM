@@ -176,7 +176,8 @@ public class EmailSyncTestUtils {
 
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 
-				anyObject(SyncCollection.class)))
+				anyObject(SyncCollection.class),
+				anyObject(SyncKey.class)))
 				.andReturn(delta).once();
 		
 		expect(contentsExporter.getItemEstimateSize(
