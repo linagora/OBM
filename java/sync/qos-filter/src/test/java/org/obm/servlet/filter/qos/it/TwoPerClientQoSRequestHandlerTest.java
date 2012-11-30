@@ -58,7 +58,9 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
+import org.obm.servlet.filter.qos.util.BlockingServletUtils;
 import org.obm.servlet.filter.qos.util.server.BlockingServlet;
+import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -86,10 +88,13 @@ public class TwoPerClientQoSRequestHandlerTest {
 	private AsyncServletRequestUtils async;
 	private ExecutorService threadpool;
 
+	private BlockingServletUtils blockingServletUtils;
+
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(4);
-		async = new AsyncServletRequestUtils(threadpool, port, blockingServlet);
+		async = new AsyncServletRequestUtils(threadpool, port, QoSFilterTestModule.BLOCKING_SERVLET_NAME);
+		blockingServletUtils = new BlockingServletUtils(blockingServlet);
 		server.start();
 		System.out.println("test started");
 	}
@@ -107,13 +112,13 @@ public class TwoPerClientQoSRequestHandlerTest {
 		control.replay();
 
 		Future<StatusLine> request1 = async.asyncHttpGet();
-		async.waitingServletRequestHandling();
+		blockingServletUtils.waitingServletRequestHandling();
 		Future<StatusLine> request2 = async.asyncHttpGet();
-		async.waitingServletRequestHandling();
+		blockingServletUtils.waitingServletRequestHandling();
 		Future<StatusLine> request3 = async.asyncHttpGet();
 		StatusLine response3 = async.retrieveRequestStatus(request3);
-		async.unlockServerRequestHandling("unlock request1");
-		async.unlockServerRequestHandling("unlock request2");
+		blockingServletUtils.unlockServerRequestHandling("unlock request1");
+		blockingServletUtils.unlockServerRequestHandling("unlock request2");
 		StatusLine response2 = async.retrieveRequestStatus(request2);
 		StatusLine response1 = async.retrieveRequestStatus(request1);
 		
@@ -132,13 +137,13 @@ public class TwoPerClientQoSRequestHandlerTest {
 		control.replay();
 
 		Future<StatusLine> request1 = async.asyncHttpGet();
-		async.waitingServletRequestHandling();
+		blockingServletUtils.waitingServletRequestHandling();
 		Future<StatusLine> request2 = async.asyncHttpGet();
-		async.waitingServletRequestHandling();
+		blockingServletUtils.waitingServletRequestHandling();
 		List<Future<StatusLine>> requests = async.asyncHttpGets(10);
 		List<StatusLine> responses = async.retrieveRequestsStatus(requests);
-		async.unlockServerRequestHandling("unlock request1");
-		async.unlockServerRequestHandling("unlock request2");
+		blockingServletUtils.unlockServerRequestHandling("unlock request1");
+		blockingServletUtils.unlockServerRequestHandling("unlock request2");
 		StatusLine response1 = async.retrieveRequestStatus(request1);
 		StatusLine response2 = async.retrieveRequestStatus(request2);
 		

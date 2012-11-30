@@ -31,67 +31,49 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.util;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.ArrayDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import org.apache.http.StatusLine;
-import org.apache.http.client.fluent.Async;
-import org.apache.http.client.fluent.Request;
+import org.eclipse.jetty.continuation.Continuation;
+import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 
-public class AsyncServletRequestUtils {
+public class SuspendingServletUtils {
 
-	private final Async async;
-	private final String serviceUri;
-	
-	public AsyncServletRequestUtils(ExecutorService executorService, int port, String servletName) {
-		this.async = Async.newInstance().use(executorService);
-		this.serviceUri = "http://localhost:" + port + "/" + servletName;
+	private final SuspendingServlet suspendingServlet;
+	private ArrayDeque<Continuation> continuationQueue;
 
-	}
-	
-	public List<Integer> codes(List<StatusLine> statusList) {
-		List<Integer> codes = Lists.newArrayList();
-		for (StatusLine statusLine: statusList) {
-			codes.add(statusLine.getStatusCode());
-		}
-		return codes;
-	}
-	
-	public List<StatusLine> retrieveRequestsStatus(List<Future<StatusLine>> requests) throws InterruptedException, ExecutionException, TimeoutException {
-		List<StatusLine> statusList = Lists.newArrayList();
-		for (Future<StatusLine> future: requests) {
-			statusList.add(retrieveRequestStatus(future));
-		}
-		return statusList;
+	public SuspendingServletUtils(SuspendingServlet suspendingServlet) {
+		this.suspendingServlet = suspendingServlet;
+		continuationQueue = Queues.newArrayDeque();
 	}
 
-	public StatusLine retrieveRequestStatus(Future<StatusLine> request)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		return request.get(15, TimeUnit.SECONDS);
+	public void unlockServerRequestHandling() {
+		Continuation first = continuationQueue.pop();
+		first.resume();
+		
 	}
 
-
-	public List<Future<StatusLine>> asyncHttpGets(int number) {
-		List<Future<StatusLine>> list = Lists.newArrayList();
+	public void unlockServerRequestsHandling(int number) {
 		for (int i = 0; i < number; ++i) {
-			list.add(async.execute(httpGet(), new HttpStatusHandler()));
+			unlockServerRequestHandling();
 		}
-		return list;
 	}
 	
-	public Future<StatusLine> asyncHttpGet() {
-		System.out.println("CLIENT: sending request");
-		return async.execute(httpGet(), new HttpStatusHandler());
+	public void waitingServletRequestHandling() throws InterruptedException {
+		Continuation continuation = suspendingServlet.getOutgoingMessages().poll(15, TimeUnit.SECONDS);
+		if (continuation != null) {
+			continuationQueue.push(continuation);
+		}
 	}
+	
 
-	public Request httpGet() {
-		return Request.Get(serviceUri);
+	public boolean tryWaitingServletRequestHandling() throws InterruptedException {
+		Continuation continuation = suspendingServlet.getOutgoingMessages().poll(2, TimeUnit.SECONDS);
+		if (continuation != null) {
+			continuationQueue.push(continuation);
+		}
+		return continuation != null;
 	}
-	
 }

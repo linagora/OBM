@@ -29,56 +29,51 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.util.server;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.thread.QueuedThreadPool;
-import org.obm.FreePortFinder;
-import org.obm.PortNumber;
-import org.obm.servlet.filter.qos.QoSFilter;
+import java.io.IOException;
+import java.util.concurrent.LinkedBlockingQueue;
 
-import com.google.inject.Provides;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationSupport;
+
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.servlet.GuiceFilter;
-import com.google.inject.servlet.ServletModule;
 
-public class QoSFilterTestModule extends ServletModule {
+@Singleton
+public class SuspendingServlet extends HttpServlet {
+
+	private final LinkedBlockingQueue<Continuation> outgoingMessages;
 	
-	public static final String BLOCKING_SERVLET_NAME = "blocking";
-	public static final String SUSPENDING_SERVLET_NAME = "suspending";
-	
-	@Provides @Singleton
-	@PortNumber int getPortNumber() {
-		return FreePortFinder.findFreePort();
+	@Inject
+	private SuspendingServlet() {
+		outgoingMessages = new LinkedBlockingQueue<Continuation>();
 	}
 	
-	@Provides @Singleton
-	protected Server buildServerWithModules(@PortNumber int portNumber) {
-		Server server = new Server(portNumber);
-		server.setThreadPool(new QueuedThreadPool(5));
-		SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
-		selectChannelConnector.setPort(portNumber);
-		selectChannelConnector.setReuseAddress(false);
-		server.setConnectors(new Connector[] {selectChannelConnector});
-		Context root = new Context(server, "/", Context.SESSIONS);
-		root.addFilter(GuiceFilter.class, "/*", 0);
-		root.addServlet(DefaultServlet.class, "/");
-		return server;
-	}
-
 	@Override
-	protected void configureServlets() {
-		
-		super.configureServlets();
-
-		install(new org.obm.servlet.filter.qos.QoSFilterModule());
-		
-		filter("/*").through(new ContinuationFilter());
-		filter("/*").through(QoSFilter.class);
-		serve("/" + BLOCKING_SERVLET_NAME).with(BlockingServlet.class);
-		serve("/" + SUSPENDING_SERVLET_NAME).with(SuspendingServlet.class);
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Continuation continuation = ContinuationSupport.getContinuation(req);
+		if (continuation.isResumed() || !continuation.isInitial()) {
+			continuation(resp);
+		} else {
+			System.out.println("entering servlet");
+			continuation.suspend();
+			outgoingMessages.offer(continuation);
+			System.out.println("outgoint sent, waiting for incoming");
+			return;			
+		}
 	}
+	
+	private void continuation(HttpServletResponse resp) throws IOException {
+		System.out.println("done");
+		resp.getWriter().write("ok");
+	}
+	
+	public LinkedBlockingQueue<Continuation> getOutgoingMessages() {
+		return outgoingMessages;
+	}
+	
 }

@@ -33,7 +33,6 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,16 +57,15 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
-import org.obm.servlet.filter.qos.util.BlockingServletUtils;
-import org.obm.servlet.filter.qos.util.KeyByRequestProvider;
-import org.obm.servlet.filter.qos.util.server.BlockingServlet;
+import org.obm.servlet.filter.qos.util.SuspendingServletUtils;
 import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
+import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class OnePerClientQoSSuspendRequestHandlerTest {
+public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	
 	private static class Configuration extends NPerClientQosSuspendConfiguration {
 		@Override
@@ -84,20 +82,20 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
 	@Inject Server server;
-	@Inject BlockingServlet blockingServlet;
+	@Inject SuspendingServlet suspendingServlet;
 
 	private AsyncServletRequestUtils async;
 
 	private ExecutorService threadpool;
 
-	private BlockingServletUtils blockingServletUtils;
+	private SuspendingServletUtils suspendingServletUtils;
 
 
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(12);
-		async = new AsyncServletRequestUtils(threadpool, port, QoSFilterTestModule.BLOCKING_SERVLET_NAME);
-		blockingServletUtils = new BlockingServletUtils(blockingServlet);
+		async = new AsyncServletRequestUtils(threadpool, port, QoSFilterTestModule.SUSPENDING_SERVLET_NAME);
+		suspendingServletUtils = new SuspendingServletUtils(suspendingServlet);
 		server.start();
 		System.out.println("test started");
 	}
@@ -110,85 +108,21 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 	}
 
 	@Test
-	public void oneAcceptedOneSuspend() throws InterruptedException, ExecutionException, TimeoutException {
+	public void suspendedContinuationIsNotTakenIntoAccount() throws InterruptedException, ExecutionException, TimeoutException {
 		expect(businessKeyProvider.provideKey(anyObject(HttpServletRequest.class))).andReturn("sameKey").anyTimes();
 		control.replay();
 
 		Future<StatusLine> request1 = async.asyncHttpGet();
-		blockingServletUtils.waitingServletRequestHandling();
+		System.out.println("waiting");
+		suspendingServletUtils.waitingServletRequestHandling();
 		Future<StatusLine> request2 = async.asyncHttpGet();
-		boolean requestHandlingNotified = blockingServletUtils.tryWaitingServletRequestHandling();
-		blockingServletUtils.unlockServerRequestHandling("unlock request1");
-		blockingServletUtils.unlockServerRequestHandling("unlock request2");
+		boolean requestHandlingNotified = suspendingServletUtils.tryWaitingServletRequestHandling();
+		suspendingServletUtils.unlockServerRequestHandling();
+		suspendingServletUtils.unlockServerRequestHandling();
 		StatusLine response1 = async.retrieveRequestStatus(request1);
 		StatusLine response2 = async.retrieveRequestStatus(request2);
 
-		assertThat(requestHandlingNotified).isFalse();
-		assertThat(response1).isNotNull();
-		assertThat(response2).isNotNull();
-		assertThat(response1.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
-		assertThat(response2.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
-		control.verify();
-	}
-
-	
-	@Test
-	public void oneAcceptedTenSuspend() throws InterruptedException, ExecutionException, TimeoutException {
-		expect(businessKeyProvider.provideKey(anyObject(HttpServletRequest.class))).andReturn("sameKey").anyTimes();
-		control.replay();
-
-		Future<StatusLine> request1 = async.asyncHttpGet();
-		List<Future<StatusLine>> requests = async.asyncHttpGets(10);
-		blockingServletUtils.waitingServletRequestHandling();
-		boolean requestHandlingNotified = blockingServletUtils.tryWaitingServletRequestHandling();
-		blockingServletUtils.unlockServerRequestsHandling(11);
-		StatusLine response1 = async.retrieveRequestStatus(request1);
-		List<StatusLine> responses = async.retrieveRequestsStatus(requests);
-		
-		assertThat(requestHandlingNotified).isFalse();
-		assertThat(response1).isNotNull();
-		assertThat(responses).isNotNull();
-		assertThat(response1.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
-		assertThat(async.codes(responses)).containsOnly(org.apache.http.HttpStatus.SC_OK);
-		control.verify();
-	}
-	
-	@Test
-	public void acceptedTwoSerialRequests() throws InterruptedException, ExecutionException, TimeoutException {
-		expect(businessKeyProvider.provideKey(anyObject(HttpServletRequest.class))).andReturn("sameKey").anyTimes();
-		control.replay();
-
-		Future<StatusLine> request1 = async.asyncHttpGet();
-		blockingServletUtils.waitingServletRequestHandling();
-		blockingServletUtils.unlockServerRequestHandling("unlock request1");
-		Future<StatusLine> request2 = async.asyncHttpGet();
-		blockingServletUtils.unlockServerRequestHandling("unlock request2");
-		
-		StatusLine response1 = async.retrieveRequestStatus(request1);
-		StatusLine response2 = async.retrieveRequestStatus(request2);
-		
-		assertThat(response1).isNotNull();
-		assertThat(response2).isNotNull();
-		assertThat(response1.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
-		assertThat(response2.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
-		control.verify();
-	}
-	
-	@Test
-	public void acceptedTwoRequestsWithDifferentKeys() throws InterruptedException, ExecutionException, TimeoutException {
-		expect(businessKeyProvider.provideKey(anyObject(HttpServletRequest.class))).andDelegateTo(new KeyByRequestProvider()).anyTimes(); 
-		control.replay();
-
-		Future<StatusLine> request1 = async.asyncHttpGet();
-		blockingServletUtils.waitingServletRequestHandling();
-		Future<StatusLine> request2 = async.asyncHttpGet();
-		blockingServletUtils.waitingServletRequestHandling();
-		blockingServletUtils.unlockServerRequestHandling("unlock request1");
-		blockingServletUtils.unlockServerRequestHandling("unlock request2");
-		
-		StatusLine response1 = async.retrieveRequestStatus(request1);
-		StatusLine response2 = async.retrieveRequestStatus(request2);
-		
+		assertThat(requestHandlingNotified).isTrue();
 		assertThat(response1).isNotNull();
 		assertThat(response2).isNotNull();
 		assertThat(response1.getStatusCode()).isEqualTo(org.apache.http.HttpStatus.SC_OK);
