@@ -85,15 +85,17 @@ public class SnapshotTest {
 		DeviceId deviceId = new DeviceId("deviceId");
 		SyncKey synckey = new SyncKey("syncKey");
 		Integer collectionId = 1;
-		int uidNext = 2;
+		long uidNext = 2;
 		
+		long emailUID = 3;
 		Email email = Email.builder()
-				.uid(3)
+				.uid(emailUID)
 				.read(false)
 				.date(DateUtils.getCurrentDate())
 				.build();
+		long emailUID2 = 4;
 		Email email2 = Email.builder()
-				.uid(4)
+				.uid(emailUID2)
 				.read(true)
 				.date(DateUtils.getCurrentDate())
 				.build();
@@ -113,5 +115,6 @@ public class SnapshotTest {
 		assertThat(snapshot.getCollectionId()).isEqualTo(collectionId);
 		assertThat(snapshot.getUidNext()).isEqualTo(uidNext);
 		assertThat(snapshot.getEmails()).containsExactly(email, email2);
+		assertThat(snapshot.getMessageSet().asDiscreteValues()).containsOnly(uidNext, emailUID, emailUID2);
 	}
 }

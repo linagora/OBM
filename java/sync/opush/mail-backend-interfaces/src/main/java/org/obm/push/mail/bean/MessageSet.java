@@ -32,6 +32,7 @@
 
 package org.obm.push.mail.bean;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
@@ -46,7 +47,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 
-public class MessageSet {
+public class MessageSet implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();
@@ -72,9 +73,9 @@ public class MessageSet {
 		return builder.build();
 	}
 
-	public static class Builder implements org.obm.push.bean.Builder<MessageSet> {
+	public static class Builder implements org.obm.push.bean.Builder<MessageSet>, Serializable {
 
-		private final class LowerEndpointComparator implements Comparator<Range<Long>> {
+		private final class LowerEndpointComparator implements Comparator<Range<Long>>, Serializable {
 			@Override
 			public int compare(Range<Long> o1, Range<Long> o2) {
 				long distance = o1.lowerEndpoint() - o2.lowerEndpoint();
@@ -182,7 +183,7 @@ public class MessageSet {
 	public final boolean equals(Object object){
 		if (object instanceof MessageSet) {
 			MessageSet that = (MessageSet) object;
-			return Objects.equal(this.ranges, that.ranges);
+			return Objects.equal(this.ranges, that.ranges); 
 		}
 		return false;
 	}

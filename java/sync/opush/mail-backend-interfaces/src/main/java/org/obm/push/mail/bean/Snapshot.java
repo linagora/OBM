@@ -37,7 +37,6 @@ import java.util.Collection;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.mail.bean.Email;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -54,7 +53,7 @@ public class Snapshot implements Serializable {
 		private FilterType filterType;
 		private SyncKey syncKey;
 		private Integer collectionId;
-		private int uidNext;
+		private long uidNext;
 		private Collection<Email> emails;
 		
 		private Builder() {
@@ -81,7 +80,7 @@ public class Snapshot implements Serializable {
 			return this;
 		}
 		
-		public Builder uidNext(int uidNext) {
+		public Builder uidNext(long uidNext) {
 			this.uidNext = uidNext;
 			return this;
 		}
@@ -109,16 +108,27 @@ public class Snapshot implements Serializable {
 	private final FilterType filterType;
 	private final SyncKey syncKey;
 	private final Integer collectionId;
-	private final int uidNext;
+	private final long uidNext;
 	private final Collection<Email> emails;
+	private final MessageSet messageSet;
 	
-	private Snapshot(DeviceId deviceId, FilterType filterType, SyncKey syncKey, Integer collectionId, int uidNext, Collection<Email> emails) {
+	private Snapshot(DeviceId deviceId, FilterType filterType, SyncKey syncKey, Integer collectionId, long uidNext, Collection<Email> emails) {
 		this.deviceId = deviceId;
 		this.filterType = filterType;
 		this.syncKey = syncKey;
 		this.collectionId = collectionId;
 		this.uidNext = uidNext;
 		this.emails = emails;
+		this.messageSet = generateMessageSet();
+	}
+
+	private MessageSet generateMessageSet() {
+		MessageSet.Builder builder = MessageSet.builder();
+		builder.add(uidNext);
+		for (Email email : emails) {
+			builder.add(email.getUid());
+		}
+		return builder.build();
 	}
 
 	public DeviceId getDeviceId() {
@@ -137,7 +147,7 @@ public class Snapshot implements Serializable {
 		return collectionId;
 	}
 
-	public int getUidNext() {
+	public long getUidNext() {
 		return uidNext;
 	}
 
@@ -145,9 +155,13 @@ public class Snapshot implements Serializable {
 		return emails;
 	}
 
+	public MessageSet getMessageSet() {
+		return messageSet;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(deviceId, filterType, syncKey, collectionId, uidNext, emails);
+		return Objects.hashCode(deviceId, filterType, syncKey, collectionId, uidNext, emails, messageSet);
 	}
 	
 	@Override
@@ -159,7 +173,8 @@ public class Snapshot implements Serializable {
 				Objects.equal(this.syncKey, that.syncKey) && 
 				Objects.equal(this.collectionId, that.collectionId) && 
 				Objects.equal(this.uidNext, that.uidNext) && 
-				Objects.equal(this.emails, that.emails); 
+				Objects.equal(this.emails, that.emails) &&  
+				Objects.equal(this.messageSet, that.messageSet); 
 		}
 		return false;
 	}
@@ -173,6 +188,7 @@ public class Snapshot implements Serializable {
 			.add("collectionId", collectionId)
 			.add("uidNext", uidNext)
 			.add("emails", emails)
+			.add("messageSet", messageSet)
 			.toString();
 	}
 }
