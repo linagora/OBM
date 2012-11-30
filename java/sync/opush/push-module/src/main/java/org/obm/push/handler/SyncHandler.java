@@ -430,6 +430,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
 			} else {
+				syncDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 				syncCollectionResponse.setItemChanges(
 						contentsExporter.fetch(udr, syncCollection));
 			}

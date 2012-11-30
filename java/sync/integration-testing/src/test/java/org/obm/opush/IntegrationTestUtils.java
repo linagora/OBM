@@ -40,11 +40,13 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.ContinuationService;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
@@ -54,6 +56,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.Flag;
@@ -217,5 +220,10 @@ public class IntegrationTestUtils {
 	public static void expectFetchMimePartStream(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, InputStream mailStream, MimeAddress partAddress) {
 		expect(mailboxService.fetchMimePartStream(udr, collectionName, uid, partAddress))
 			.andReturn(mailStream);
+	}
+	
+	public static void expectContentExporterFetching(IContentsExporter iContentsExporter, UserDataRequest userDataRequest, List<ItemChange> itemChanges) throws Exception {
+		expect(iContentsExporter.fetch(eq(userDataRequest), anyObject(SyncCollection.class)))
+			.andReturn(itemChanges);
 	}
 }

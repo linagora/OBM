@@ -35,11 +35,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
+import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
 import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -60,10 +62,13 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -274,6 +279,49 @@ public class SyncHandlerTest {
 		assertThat(inboxCollection.getAdds()).containsOnly(new Add(syncEmailCollectionId + ":123"));
 		assertThat(inboxCollection.getDeletes()).containsOnly(new Delete(syncEmailCollectionId + ":122"));
 	}
+
+	@Test
+	public void testSyncInboxFetchIdsNotEmpty() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
+		int syncEmailCollectionId = 432;
+		String serverId = syncEmailCollectionId + ":123";
+		List<ItemChange> itemChanges = new ItemChangesBuilder()
+				.addItemChange(
+					new ItemChangeBuilder().serverId(serverId)
+						.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
+				.build();
+		DataDelta delta = DataDelta.builder()
+			.changes(itemChanges)
+			.deletions(ImmutableList.of(
+					ItemDeletion.builder().serverId(syncEmailCollectionId + ":122").build()))
+			.syncDate(new Date())
+			.build();
+
+		UserDataRequest userDataRequest = new UserDataRequest(singleUserFixture.jaures.credentials, 
+				"Sync", 
+				singleUserFixture.jaures.device, 
+				new BigDecimal(12.1).setScale(1, BigDecimal.ROUND_HALF_UP));
+		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), userDataRequest, 0);
+		expectContentExporterFetching(classToInstanceMap.get(IContentsExporter.class), userDataRequest, itemChanges);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, ImmutableList.<Integer> of(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
+		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
+		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getServerId(), serverId);
+
+		assertThat(syncEmailResponse).isNotNull();
+		Collection inboxCollection = syncEmailResponse.getCollection(String.valueOf(inbox.getServerId()));
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getAdds()).isEmpty();
+		assertThat(inboxCollection.getDeletes()).isEmpty();
+	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
 		return FolderSyncState.builder().syncKey(syncEmailSyncKey).build();
@@ -304,5 +352,4 @@ public class SyncHandlerTest {
 		org.obm.sync.push.client.Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);
 		Assertions.assertThat(unexistingCollection.getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
-
 }
