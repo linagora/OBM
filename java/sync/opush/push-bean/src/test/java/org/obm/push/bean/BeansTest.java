@@ -61,7 +61,6 @@ public class BeansTest {
 	public void init() {
 		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
-	
 	@Test
 	public void test() {
 		ImmutableList<Class<?>> list = 

@@ -125,7 +125,7 @@ public class FolderSyncHandler extends WbxmlRequestHandler {
 		FolderSyncState incomingSyncState = stMachine.getFolderSyncState(folderSyncRequest.getSyncKey());
 		FolderSyncState outgoingSyncState = stMachine.allocateNewFolderSyncState(udr);
 		HierarchyCollectionChanges hierarchyItemsChanges = hierarchyExporter.getChanged(udr, incomingSyncState, outgoingSyncState);
-		return new FolderSyncResponse(hierarchyItemsChanges, outgoingSyncState.getKey());
+		return new FolderSyncResponse(hierarchyItemsChanges, outgoingSyncState.getSyncKey());
 	}
 
 }

@@ -43,15 +43,15 @@ import com.google.common.base.Objects;
  */
 public abstract class SyncState implements Serializable {
 
-	private Date lastSync;
-	private boolean lastSyncFiltred;
-	private SyncKey key;
+	private Date syncDate;
+	private boolean syncFiltred;
+	private SyncKey syncKey;
 	private int id;
 
-	protected SyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
-		this.lastSync = lastSync;
-		this.lastSyncFiltred = lastSyncFiltred;
-		this.key = key;
+	protected SyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
+		this.syncDate = syncDate;
+		this.syncFiltred = syncFiltred;
+		this.syncKey = syncKey;
 		this.id = id;
 	}
 	
@@ -59,42 +59,42 @@ public abstract class SyncState implements Serializable {
 		this(syncKey, null);
 	}
 
-	protected SyncState(SyncKey key, Date lastSync) {
-		this.lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-		this.lastSyncFiltred = false;
-		this.key = key;
+	protected SyncState(SyncKey syncKey, Date syncDate) {
+		this.syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+		this.syncFiltred = false;
+		this.syncKey = syncKey;
 	}
 
-	public Date getLastSync() {
-		return lastSync;
+	public Date getSyncDate() {
+		return syncDate;
 	}
 
-	public void setLastSync(Date lastSync) {
-		this.lastSync = lastSync;
+	public void setSyncDate(Date syncDate) {
+		this.syncDate = syncDate;
 	}
 
-	public SyncKey getKey() {
-		return key;
+	public SyncKey getSyncKey() {
+		return syncKey;
 	}
 
-	public void setKey(SyncKey key) {
-		this.key = key;
+	public void setSyncKey(SyncKey syncKey) {
+		this.syncKey = syncKey;
 	}
 
-	public Boolean isLastSyncFiltred() {
-		return lastSyncFiltred;
+	public Boolean isSyncFiltred() {
+		return syncFiltred;
 	}
 
-	public void setLastSyncFiltred(boolean lastSyncFiltred) {
-		this.lastSyncFiltred = lastSyncFiltred;
+	public void setSyncFiltred(boolean syncFiltred) {
+		this.syncFiltred = syncFiltred;
 	}
 
 	public void updateLastWindowStartDate(FilterType filterType) {
 		if (filterType != null) {
 			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
-			if (getLastSync() != null && filteredDate.after(getLastSync())) {
-				setLastSync(filteredDate);
-				setLastSyncFiltred(true);
+			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
+				setSyncDate(filteredDate);
+				setSyncFiltred(true);
 			}
 		}
 	}
@@ -109,16 +109,16 @@ public abstract class SyncState implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(lastSync, lastSyncFiltred, key, id);
+		return Objects.hashCode(syncDate, syncFiltred, syncKey, id);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof SyncState) {
 			SyncState that = (SyncState) object;
-			return Objects.equal(this.lastSync, that.lastSync)
-				&& Objects.equal(this.lastSyncFiltred, that.lastSyncFiltred)
-				&& Objects.equal(this.key, that.key)
+			return Objects.equal(this.syncDate, that.syncDate)
+				&& Objects.equal(this.syncFiltred, that.syncFiltred)
+				&& Objects.equal(this.syncKey, that.syncKey)
 				&& Objects.equal(this.id, that.id);
 		}
 		return false;
@@ -127,9 +127,9 @@ public abstract class SyncState implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("lastSync", lastSync)
-			.add("lastSyncFiltred", lastSyncFiltred)
-			.add("key", key)
+			.add("syncDate", syncDate)
+			.add("syncFiltred", syncFiltred)
+			.add("syncKey", syncKey)
 			.add("id", id)
 			.toString();
 	}

@@ -51,9 +51,9 @@ public class FolderSyncState extends SyncState implements Serializable {
 		
 		@Override
 		public FolderSyncState build() {
-			Preconditions.checkArgument(key != null, "key can't be null or empty");
-			lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-			return new FolderSyncState(lastSync, lastSyncFiltred, key, id);
+			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
+			syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			return new FolderSyncState(syncDate, syncFiltred, syncKey, id);
 		}
 	}
 	
@@ -61,25 +61,25 @@ public class FolderSyncState extends SyncState implements Serializable {
 		this(syncKey, null);
 	}
 
-	public FolderSyncState(SyncKey key, Date lastSync) {
-		super(key, lastSync);
+	public FolderSyncState(SyncKey syncKey, Date syncDate) {
+		super(syncKey, syncDate);
 	}
 
 	public FolderSyncState(SyncState syncState) {
-		super(syncState.getKey(), syncState.getLastSync());
+		super(syncState.getSyncKey(), syncState.getSyncDate());
 		setId(syncState.getId());
-		setLastSyncFiltred(syncState.isLastSyncFiltred());
+		setSyncFiltred(syncState.isSyncFiltred());
 	}
 	
 	public boolean isInitialFolderSync() {
-		return isSyncKeyOfInitialFolderSync(getKey());
+		return isSyncKeyOfInitialFolderSync(getSyncKey());
 	}
 	
 	public static boolean isSyncKeyOfInitialFolderSync(SyncKey syncKey) {
 		return SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncKey);
 	}
 	
-	private FolderSyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
-		super(lastSync, lastSyncFiltred, key, id);
+	private FolderSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
+		super(syncDate, syncFiltred, syncKey, id);
 	}
 }

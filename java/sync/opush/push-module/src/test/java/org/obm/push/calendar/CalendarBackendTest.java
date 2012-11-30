@@ -488,7 +488,7 @@ public class CalendarBackendTest {
 	public void testGetEstimateSize() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
 		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		lastKnownState.setLastSync(currentDate);
+		lastKnownState.setSyncDate(currentDate);
 		int collectionId = 1;
 
 		expectLoginBehavior();
@@ -528,7 +528,7 @@ public class CalendarBackendTest {
 	public void testGetChanged() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
 		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		lastKnownState.setLastSync(currentDate);
+		lastKnownState.setSyncDate(currentDate);
 		int collectionId = 1;
 
 		expectLoginBehavior();

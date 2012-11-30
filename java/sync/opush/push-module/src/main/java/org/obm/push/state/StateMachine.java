@@ -108,7 +108,7 @@ public class StateMachine {
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {
 		SyncKey newSk = syncKeyFactory.randomSyncKey();
 		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk);
-		newFolderState.setLastSync(DateUtils.getCurrentDate());
+		newFolderState.setSyncDate(DateUtils.getCurrentDate());
 		
 		log(udr, newFolderState);
 		return newFolderState;
@@ -161,7 +161,7 @@ public class StateMachine {
 	private void log(UserDataRequest udr, SyncState newState) {
 		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
-				new Object[]{newState.getKey(), collectionPath, newState.getLastSync()});
+				new Object[]{newState.getSyncKey(), collectionPath, newState.getSyncDate()});
 	}
 	
 }

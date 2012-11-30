@@ -171,7 +171,7 @@ public class MailBackendGetChangedTest {
 		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
 		
 		ItemSyncState allocatedState = new ItemSyncState(secondAllocatedSyncKey, date("2012-10-10T16:22:53"));
-		expect(dateService.getCurrentDate()).andReturn(allocatedState.getLastSync());
+		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedSyncKey, allocatedStateId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, allocatedState, allocatedStateId2);
 		expectUnsynchronizedItemToNeverExceedWindowSize();

@@ -125,7 +125,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -332,7 +331,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Date dataDeltaDate = dateService.getCurrentDate();
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			
-			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getKey(), collectionId);
+			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getSyncKey(), collectionId);
 			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
 			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionPath, previousStateSnapshot, options, dataDeltaDate);
 			takeSnapshot(udr, collectionId, collectionPath, state, options, newManagedEmails);
@@ -360,8 +359,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				.collectionId(collectionId)
 				.deviceId(udr.getDevId())
 				.filterType(syncCollectionOptions.getFilterType())
-				.syncKey(state.getKey())
-				.uidNext(Ints.checkedCast(mailboxService.fetchUIDNext(udr, collectionPath)))
+				.syncKey(state.getSyncKey())
+				.uidNext(mailboxService.fetchUIDNext(udr, collectionPath))
 				.build());
 	}
 

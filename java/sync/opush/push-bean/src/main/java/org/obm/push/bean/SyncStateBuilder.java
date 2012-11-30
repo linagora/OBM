@@ -34,23 +34,23 @@ package org.obm.push.bean;
 import java.util.Date;
 
 public abstract class SyncStateBuilder<T extends SyncState> {
-	protected Date lastSync;
-	protected boolean lastSyncFiltred;
-	protected SyncKey key;
+	protected Date syncDate;
+	protected boolean syncFiltred;
+	protected SyncKey syncKey;
 	protected int id;
 	
-	public SyncStateBuilder<T> lastSync(Date lastSync) {
-		this.lastSync = lastSync;
+	public SyncStateBuilder<T> syncDate(Date syncDate) {
+		this.syncDate = syncDate;
 		return this;
 	}
 	
-	public SyncStateBuilder<T> lastSyncFiltred(boolean lastSyncFiltred) {
-		this.lastSyncFiltred = lastSyncFiltred;
+	public SyncStateBuilder<T> syncFiltred(boolean syncFiltred) {
+		this.syncFiltred = syncFiltred;
 		return this;
 	}
 	
-	public SyncStateBuilder<T> key(SyncKey key) {
-		this.key = key;
+	public SyncStateBuilder<T> syncKey(SyncKey syncKey) {
+		this.syncKey = syncKey;
 		return this;
 	}
 	

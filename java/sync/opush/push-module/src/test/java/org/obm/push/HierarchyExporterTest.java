@@ -152,7 +152,7 @@ public class HierarchyExporterTest {
 		Date currentDate = DateUtils.getCurrentDate();
 		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
 		FolderSyncState outgoingSyncKey = new FolderSyncState(new SyncKey("1234567890b"));
-		outgoingSyncKey.setLastSync(currentDate);
+		outgoingSyncKey.setSyncDate(currentDate);
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
@@ -193,7 +193,7 @@ public class HierarchyExporterTest {
 		Date currentDate = DateUtils.getCurrentDate();
 		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
 		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
-		outgoingSyncState.setLastSync(currentDate);
+		outgoingSyncState.setSyncDate(currentDate);
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 

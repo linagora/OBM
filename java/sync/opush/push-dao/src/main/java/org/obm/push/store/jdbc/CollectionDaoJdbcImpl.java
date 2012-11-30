@@ -88,7 +88,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 					"INNER JOIN opush_folder_snapshot ON opush_folder_snapshot.collection_id = opush_folder_mapping.id " +
 					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = opush_folder_snapshot.folder_sync_state_id " +
 					"WHERE opush_folder_sync_state.sync_key = ?");
-			ps.setString(1, folderSyncState.getKey().getSyncKey());
+			ps.setString(1, folderSyncState.getSyncKey().getSyncKey());
 			ResultSet resultSet = ps.executeQuery();
 
 			while (resultSet.next()) {
@@ -192,9 +192,9 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
-			ps.setString(1, state.getKey().getSyncKey());
+			ps.setString(1, state.getSyncKey().getSyncKey());
 			ps.setInt(2, devDbId);
-			ps.setTimestamp(3, new Timestamp(state.getLastSync().getTime()));
+			ps.setTimestamp(3, new Timestamp(state.getSyncDate().getTime()));
 			ps.setInt(4, collectionId);
 			if (ps.executeUpdate() == 0) {
 				throw new DaoException("No SyncState inserted");

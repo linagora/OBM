@@ -72,8 +72,8 @@ public class StateMachineTest {
 		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(initialSyncKey);
 		
-		assertThat(folderSyncState.getKey()).isEqualTo(initialSyncKey);
-		assertThat(folderSyncState.getLastSync()).isEqualTo(DateUtils.getEpochPlusOneSecondCalendar().getTime());
+		assertThat(folderSyncState.getSyncKey()).isEqualTo(initialSyncKey);
+		assertThat(folderSyncState.getSyncDate()).isEqualTo(DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		assertThat(folderSyncState.isInitialFolderSync()).isTrue();
 	}
 
@@ -95,8 +95,8 @@ public class StateMachineTest {
 		verify(collectionDao);
 
 		assertThat(folderSyncState.getId()).isEqualTo(knownSyncStateId);
-		assertThat(folderSyncState.getKey()).isEqualTo(knownSyncKey);
-		assertThat(folderSyncState.getLastSync()).isEqualTo(knownSyncDate);
+		assertThat(folderSyncState.getSyncKey()).isEqualTo(knownSyncKey);
+		assertThat(folderSyncState.getSyncDate()).isEqualTo(knownSyncDate);
 		assertThat(folderSyncState.isInitialFolderSync()).isFalse();
 	}
 

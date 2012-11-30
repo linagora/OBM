@@ -636,8 +636,8 @@ public class ContactsBackendHierarchyChangesTest {
 
 	private void expectBookClientListBooksChanged(FolderSyncState lastKnownState,
 			Set<Folder> changes, Set<Folder> deletions) throws ServerFault {
-		expect(bookClient.listAddressBooksChanged(accessToken, lastKnownState.getLastSync()))
-			.andReturn(new FolderChanges(changes, deletions, lastKnownState.getLastSync())).once();
+		expect(bookClient.listAddressBooksChanged(accessToken, lastKnownState.getSyncDate()))
+			.andReturn(new FolderChanges(changes, deletions, lastKnownState.getSyncDate())).once();
 	}
 
 	private void expectCollectionPathBuilderPovider(CollectionPath.Builder collectionPathBuilder) {
@@ -656,7 +656,7 @@ public class ContactsBackendHierarchyChangesTest {
 			List<CollectionPath> collectionPaths) throws DaoException {
 		
 		expect(mappingService.getLastBackendMapping(PIMDataType.CONTACTS, incomingSyncState))
-			.andReturn(incomingSyncState.getLastSync()).once();
+			.andReturn(incomingSyncState.getSyncDate()).once();
 		
 		expect(mappingService.listCollections(userDataRequest, incomingSyncState))
 			.andReturn(collectionPaths).once();

@@ -147,7 +147,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		if (lastSyncDate != null) {
 			return lastSyncDate;
 		}
-		throw new InvalidSyncKeyException(lastKnownState.getKey());
+		throw new InvalidSyncKeyException(lastKnownState.getSyncKey());
 	}
 
 	private void snapshotHierarchy(UserDataRequest udr, Set<CollectionPath> lastKnownCollections,
@@ -279,7 +279,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			DaoException, CollectionNotFoundException {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
-		ContactChanges contactChanges = listContactsChanged(udr, state.getLastSync(), addressBookId);
+		ContactChanges contactChanges = listContactsChanged(udr, state.getSyncDate(), addressBookId);
 
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {

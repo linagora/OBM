@@ -235,7 +235,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 			ps = con.prepareStatement("SELECT mail_uid, is_read, timestamp FROM opush_sync_mail WHERE collection_id = ? AND device_id = ? AND timestamp >= ?");
 			ps.setInt(1, collectionId);
 			ps.setInt(2, devId);
-			Date lastSync = syncState.getLastSync();
+			Date lastSync = syncState.getSyncDate();
 			ps.setDate(3, JDBCUtils.getDateWithoutTime(lastSync), DateUtils.getCurrentGMTCalendar());
 			evrs = ps.executeQuery();
 			while (evrs.next()) {

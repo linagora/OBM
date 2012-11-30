@@ -69,7 +69,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 					"WHERE data_type = ? " + 
 					"AND opush_folder_sync_state.sync_key = ?"); 
 			ps.setObject(1, dbcp.getJdbcObject(dataType.getDbFieldName(), dataType.getDbValue()));
-			ps.setString(2, folderSyncState.getKey().getSyncKey());
+			ps.setString(2, folderSyncState.getSyncKey().getSyncKey());
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -93,7 +93,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 						"(data_type, folder_sync_state_id, last_sync) VALUES (?, ?, ?)");
 			ps.setObject(1, dbcp.getJdbcObject(dataType.getDbFieldName(), dataType.getDbValue()));
 			ps.setInt(2, folderSyncState.getId());
- 			ps.setTimestamp(3, DateUtils.toTimestamp(folderSyncState.getLastSync()));
+ 			ps.setTimestamp(3, DateUtils.toTimestamp(folderSyncState.getSyncDate()));
 			if (ps.executeUpdate() == 0) {
 				throw new DaoException("No SyncState inserted");
 			} 

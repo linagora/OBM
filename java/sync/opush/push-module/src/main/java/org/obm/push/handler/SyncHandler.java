@@ -254,7 +254,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			
 			lastSync = delta.getSyncDate();
 		} else {
-			lastSync = c.getSyncState().getLastSync();
+			lastSync = c.getSyncState().getSyncDate();
 			delta = DataDelta.newEmptyDelta(lastSync);
 		}
 
@@ -457,7 +457,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			throws DaoException, InvalidServerId {
 		
 		for (ItemChange change: syncCollectionResponse.getItemChanges()) {
-			boolean isItemAddition = st.getKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
+			boolean isItemAddition = st.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
 					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
 			change.setNew(isItemAddition);
 		}

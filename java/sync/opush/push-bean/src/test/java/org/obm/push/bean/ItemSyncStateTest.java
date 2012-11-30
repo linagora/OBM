@@ -51,9 +51,9 @@ public class ItemSyncStateTest {
 	@Test
 	public void testSyncDateDefaultValue() {
 		ItemSyncState syncState = ItemSyncState.builder()
-			.key(new SyncKey("123"))
+			.syncKey(new SyncKey("123"))
 			.build();
-		assertThat(syncState.getLastSync()).isNotNull();
+		assertThat(syncState.getSyncDate()).isNotNull();
 	}
 	
 	@Test
@@ -63,15 +63,15 @@ public class ItemSyncStateTest {
 		int id = 1;
 		
 		ItemSyncState syncState = ItemSyncState.builder()
-				.key(syncKey)
-				.lastSync(currentDate)
+				.syncKey(syncKey)
+				.syncDate(currentDate)
 				.id(id)
-				.lastSyncFiltred(true)
+				.syncFiltred(true)
 				.build();
 		
-		assertThat(syncState.getKey()).isEqualTo(syncKey);
-		assertThat(syncState.getLastSync()).isEqualTo(currentDate);
+		assertThat(syncState.getSyncKey()).isEqualTo(syncKey);
+		assertThat(syncState.getSyncDate()).isEqualTo(currentDate);
 		assertThat(syncState.getId()).isEqualTo(id);
-		assertThat(syncState.isLastSyncFiltred()).isTrue();
+		assertThat(syncState.isSyncFiltred()).isTrue();
 	}
 }

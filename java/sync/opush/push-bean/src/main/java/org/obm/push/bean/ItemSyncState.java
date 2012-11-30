@@ -51,9 +51,9 @@ public class ItemSyncState extends SyncState implements Serializable {
 		
 		@Override
 		public ItemSyncState build() {
-			Preconditions.checkArgument(key != null, "key can't be null or empty");
-			lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-			return new ItemSyncState(lastSync, lastSyncFiltred, key, id);
+			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
+			syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			return new ItemSyncState(syncDate, syncFiltred, syncKey, id);
 		}
 	}
 	
@@ -65,11 +65,11 @@ public class ItemSyncState extends SyncState implements Serializable {
 		this(syncKey, null);
 	}
 
-	public ItemSyncState(SyncKey key, Date lastSync) {
-		super(key, lastSync);
+	public ItemSyncState(SyncKey syncKey, Date syncDate) {
+		super(syncKey, syncDate);
 	}
 	
-	private ItemSyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
-		super(lastSync, lastSyncFiltred, key, id);
+	private ItemSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
+		super(syncDate, syncFiltred, syncKey, id);
 	}
 }
