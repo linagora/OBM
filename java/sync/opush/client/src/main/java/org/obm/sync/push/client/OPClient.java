@@ -46,6 +46,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
+import org.obm.sync.push.client.commands.EmailSyncFetchCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.Options;
@@ -111,6 +112,10 @@ public abstract class OPClient {
 
 	public SyncResponse syncEmail(SyncKey key, String collectionId) throws Exception {
 		return run(new EmailSyncCommand(key, collectionId));
+	}
+
+	public SyncResponse syncEmailWithFetch(SyncKey key, String collectionId, String serverId) throws Exception {
+		return run(new EmailSyncFetchCommand(key, collectionId, serverId));
 	}
 	
 	public SyncResponse syncEmail(SyncKey key, int collectionId) throws Exception {
