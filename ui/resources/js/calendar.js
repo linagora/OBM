@@ -1245,6 +1245,7 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     if (response.error == 0) {
+      if(obm.vars.consts.calendarRange == "month") this.current = obm.vars.consts.currentMonth;
       this.refresh();
       obm.calendarManager.eventIndexing(response.eventId);
       showOkMessage(response.message);
