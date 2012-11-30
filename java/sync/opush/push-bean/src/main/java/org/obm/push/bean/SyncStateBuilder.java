@@ -31,45 +31,33 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.io.Serializable;
 import java.util.Date;
 
-import org.obm.push.utils.DateUtils;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-
-public class ItemSyncState extends SyncState implements Serializable {
-
-	public static Builder builder() {
-		return new Builder();
+public abstract class SyncStateBuilder<T extends SyncState> {
+	protected Date lastSync;
+	protected boolean lastSyncFiltred;
+	protected SyncKey key;
+	protected int id;
+	
+	public SyncStateBuilder<T> lastSync(Date lastSync) {
+		this.lastSync = lastSync;
+		return this;
 	}
 	
-	public static class Builder extends SyncStateBuilder<ItemSyncState> {
-		
-		private Builder() {}
-		
-		@Override
-		public ItemSyncState build() {
-			Preconditions.checkArgument(key != null, "key can't be null or empty");
-			lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-			return new ItemSyncState(lastSync, lastSyncFiltred, key, id);
-		}
+	public SyncStateBuilder<T> lastSyncFiltred(boolean lastSyncFiltred) {
+		this.lastSyncFiltred = lastSyncFiltred;
+		return this;
 	}
 	
-	public static ItemSyncState newInitialSyncState() {
-		return new ItemSyncState(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+	public SyncStateBuilder<T> key(SyncKey key) {
+		this.key = key;
+		return this;
 	}
 	
-	public ItemSyncState(SyncKey syncKey) {
-		this(syncKey, null);
-	}
-
-	public ItemSyncState(SyncKey key, Date lastSync) {
-		super(key, lastSync);
+	public SyncStateBuilder<T> id(int id) {
+		this.id = id;
+		return this;
 	}
 	
-	private ItemSyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
-		super(lastSync, lastSyncFiltred, key, id);
-	}
+	public abstract T build();
 }

@@ -38,8 +38,6 @@ import org.obm.push.utils.DateUtils;
 
 import com.google.common.base.Objects;
 
-
-
 /**
  * Stores the last sync date for a given sync key & collection
  */
@@ -50,6 +48,13 @@ public abstract class SyncState implements Serializable {
 	private SyncKey key;
 	private int id;
 
+	protected SyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
+		this.lastSync = lastSync;
+		this.lastSyncFiltred = lastSyncFiltred;
+		this.key = key;
+		this.id = id;
+	}
+	
 	protected SyncState(SyncKey syncKey) {
 		this(syncKey, null);
 	}

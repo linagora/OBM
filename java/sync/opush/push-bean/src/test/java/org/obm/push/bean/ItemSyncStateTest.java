@@ -31,45 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.io.Serializable;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Date;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-
-public class ItemSyncState extends SyncState implements Serializable {
-
-	public static Builder builder() {
-		return new Builder();
+@RunWith(SlowFilterRunner.class)
+public class ItemSyncStateTest {
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testPreconditionOn() {
+		ItemSyncState.builder().build();
 	}
 	
-	public static class Builder extends SyncStateBuilder<ItemSyncState> {
+	@Test
+	public void testSyncDateDefaultValue() {
+		ItemSyncState syncState = ItemSyncState.builder()
+			.key(new SyncKey("123"))
+			.build();
+		assertThat(syncState.getLastSync()).isNotNull();
+	}
+	
+	@Test
+	public void testSyncStateBuilder() {
+		SyncKey syncKey = new SyncKey("123");
+		Date currentDate = DateUtils.getCurrentDate();
+		int id = 1;
 		
-		private Builder() {}
+		ItemSyncState syncState = ItemSyncState.builder()
+				.key(syncKey)
+				.lastSync(currentDate)
+				.id(id)
+				.lastSyncFiltred(true)
+				.build();
 		
-		@Override
-		public ItemSyncState build() {
-			Preconditions.checkArgument(key != null, "key can't be null or empty");
-			lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-			return new ItemSyncState(lastSync, lastSyncFiltred, key, id);
-		}
-	}
-	
-	public static ItemSyncState newInitialSyncState() {
-		return new ItemSyncState(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-	}
-	
-	public ItemSyncState(SyncKey syncKey) {
-		this(syncKey, null);
-	}
-
-	public ItemSyncState(SyncKey key, Date lastSync) {
-		super(key, lastSync);
-	}
-	
-	private ItemSyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
-		super(lastSync, lastSyncFiltred, key, id);
+		assertThat(syncState.getKey()).isEqualTo(syncKey);
+		assertThat(syncState.getLastSync()).isEqualTo(currentDate);
+		assertThat(syncState.getId()).isEqualTo(id);
+		assertThat(syncState.isLastSyncFiltred()).isTrue();
 	}
 }

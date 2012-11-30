@@ -34,8 +34,29 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.obm.push.utils.DateUtils;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
 public class FolderSyncState extends SyncState implements Serializable {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder extends SyncStateBuilder<FolderSyncState> {
+		
+		private Builder() {}
+		
+		@Override
+		public FolderSyncState build() {
+			Preconditions.checkArgument(key != null, "key can't be null or empty");
+			lastSync = Objects.firstNonNull(lastSync, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			return new FolderSyncState(lastSync, lastSyncFiltred, key, id);
+		}
+	}
+	
 	public FolderSyncState(SyncKey syncKey) {
 		this(syncKey, null);
 	}
@@ -56,5 +77,9 @@ public class FolderSyncState extends SyncState implements Serializable {
 	
 	public static boolean isSyncKeyOfInitialFolderSync(SyncKey syncKey) {
 		return SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncKey);
+	}
+	
+	private FolderSyncState(Date lastSync, boolean lastSyncFiltred, SyncKey key, int id) {
+		super(lastSync, lastSyncFiltred, key, id);
 	}
 }
