@@ -35,6 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Date;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -73,5 +74,44 @@ public class FolderSyncStateTest {
 		assertThat(syncState.getSyncDate()).isEqualTo(currentDate);
 		assertThat(syncState.getId()).isEqualTo(id);
 		assertThat(syncState.isSyncFiltred()).isTrue();
+	}
+	
+	@Test
+	public void testNewWindowedSyncStateSameFilterType() {
+		SyncKey syncKey = new SyncKey("123");
+		Date currentDate = DateUtils.getCurrentDate();
+		int id = 1;
+		
+		FolderSyncState syncState = FolderSyncState.builder()
+				.syncKey(syncKey)
+				.syncDate(currentDate)
+				.id(id)
+				.syncFiltred(false)
+				.build();
+		
+		SyncState newSyncState = syncState.newWindowedSyncState(null);
+		assertThat(newSyncState).isEqualTo(syncState);
+		assertThat(newSyncState.isSyncFiltred()).isFalse();
+	}
+	
+	@Test
+	public void testNewWindowedSyncStateDifferentFilterType() {
+		SyncKey syncKey = new SyncKey("123");
+		Date currentDate = new DateTime(DateUtils.getCurrentDate()).minusDays(2).toDate();
+		Date expectedDate = new DateTime(DateUtils.getMidnightCalendar()).minusDays(1).toDate();
+		int id = 1;
+		
+		FolderSyncState syncState = FolderSyncState.builder()
+				.syncKey(syncKey)
+				.syncDate(currentDate)
+				.id(id)
+				.syncFiltred(false)
+				.build();
+		
+		SyncState newSyncState = syncState.newWindowedSyncState(FilterType.ONE_DAY_BACK);
+		assertThat(newSyncState.getSyncKey()).isEqualTo(syncKey);
+		assertThat(newSyncState.getSyncDate()).isEqualTo(expectedDate);
+		assertThat(newSyncState.getId()).isEqualTo(id);
+		assertThat(newSyncState.isSyncFiltred()).isTrue();
 	}
 }

@@ -136,8 +136,14 @@ public class ContactsBackendHierarchyChangesTest {
 
 	@Test
 	public void testDefaultContactChanges() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"), DateUtils.date("2012-12-15T20:30:45Z"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"), DateUtils.date("2012-12-16T20:30:45Z"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890a"))
+				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
+				.build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890b"))
+				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
+				.build();
 		
 		Folder change = Folder.builder().name(contactParentName).uid(contactParentId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
@@ -170,8 +176,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testNoContactsChanges() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"), DateUtils.date("2012-12-15T20:30:45Z"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"), DateUtils.date("2012-12-16T20:30:45Z"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890a"))
+				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
+				.build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890b"))
+				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
+				.build();
 
 		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.<Folder>of());
 
@@ -193,8 +205,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testOnlyChanges() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"), DateUtils.date("2012-12-15T20:30:45Z"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"), DateUtils.date("2012-12-16T20:30:45Z"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890a"))
+				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
+				.build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890b"))
+				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
+				.build();
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
@@ -232,8 +250,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testOnlyDeletions() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"), DateUtils.date("2012-12-15T20:30:45Z"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"), DateUtils.date("2012-12-16T20:30:45Z"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890a"))
+				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
+				.build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder()
+				.syncKey(new SyncKey("1234567890b"))
+				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
+				.build();
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
@@ -271,8 +295,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testSameAddAndDeleteDiscardDelete() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 		int targetCollectionId = 2;
 			
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
@@ -306,8 +336,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testSameLastKnownAndAdd() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 		int targetCollectionId = 2;
 		
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("both", targetCollectionId));
@@ -332,8 +368,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testTwoSameLastKnownAndAdd() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath("both", 2), new ContactCollectionPath("both2", 3));
@@ -361,8 +403,14 @@ public class ContactsBackendHierarchyChangesTest {
 
 	@Test
 	public void testOneLastKnownInTwoAdd() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
 		Set<Folder> updated = ImmutableSet.of(
@@ -397,8 +445,14 @@ public class ContactsBackendHierarchyChangesTest {
 
 	@Test
 	public void testOneAddOneKnownDelete() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
 		Set<Folder> updated = ImmutableSet.of(
@@ -434,8 +488,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testOneAddOneUnknownDelete() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
 		Set<Folder> updated = ImmutableSet.of(
@@ -469,8 +529,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testTwoAddWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
 		Set<Folder> updated = ImmutableSet.of(
@@ -513,8 +579,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testTwoAddWithSameNamesAndSameUidsDiscardsOne() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
 		Set<Folder> updated = ImmutableSet.of(
@@ -547,8 +619,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testTwoDeleteWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath("both", 2),
@@ -579,8 +657,14 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	@Test
 	public void testTwoDeleteWithSameNamesAndSameUidsDiscardsOne() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("key1"), org.obm.DateUtils.date("2012-05-04T11:02:03"));
-		FolderSyncState outgoingSyncState=  new FolderSyncState(new SyncKey("key2"), org.obm.DateUtils.date("2012-05-04T12:15:05"));
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncKey(new SyncKey("key1"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
+				.build();
+		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
+				.syncKey(new SyncKey("key2"))
+				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
+				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath("both", 2),

@@ -39,7 +39,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 
@@ -58,9 +57,9 @@ public interface CollectionDao {
 	 * Create a new SyncState entry in database and returns its unique id
 	 * @return SyncState database unique id
 	 */
-	int updateState(Device device, Integer collectionId, SyncState state) throws DaoException;
+	ItemSyncState updateState(Device device, Integer collectionId, SyncKey syncKey, Date syncDate) throws DaoException;
 
-	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException;
+	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey, Date newSyncDate) throws DaoException;
 	
 	ItemSyncState findItemStateForKey(SyncKey syncKey) throws DaoException ;
 	

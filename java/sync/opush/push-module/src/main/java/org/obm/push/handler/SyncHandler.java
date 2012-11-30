@@ -89,6 +89,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -282,7 +283,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				Map<String, String> processedClientIds = processModification(udr, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
-				ItemSyncState syncState = new ItemSyncState(collection.getSyncKey());
+				ItemSyncState syncState = ItemSyncState.builder().syncKey(collection.getSyncKey()).build();
 				collection.setItemSyncState(syncState);
 			}
 		}
@@ -448,7 +449,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		syncCollectionResponse.setCollectionValidity(true);
 		List<ItemChange> changed = ImmutableList.of();
 		List<ItemDeletion> deleted = ImmutableList.of();
-		SyncKey newSyncKey = stMachine.allocateNewSyncKey(udr, syncCollection.getCollectionId(), null, changed, deleted);
+		SyncKey newSyncKey = stMachine.allocateNewSyncKey(udr, 
+				syncCollection.getCollectionId(), 
+				DateUtils.getEpochPlusOneSecondCalendar().getTime(), 
+				changed, 
+				deleted);
 		syncCollectionResponse.setNewSyncKey(newSyncKey);
 	}
 

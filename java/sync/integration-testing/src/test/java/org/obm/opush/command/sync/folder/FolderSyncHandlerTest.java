@@ -106,13 +106,12 @@ public class FolderSyncHandlerTest {
 	public void testInitialFolderSyncContainsINBOX() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey newGeneratedSyncKey = new SyncKey("d58ea559-d1b8-4091-8ba5-860e6fa54875");
-		FolderSyncState newMappingSyncState = new FolderSyncState(newGeneratedSyncKey);
-				
+		FolderSyncState newMappingSyncState = FolderSyncState.builder().syncKey(newGeneratedSyncKey).build();
 		
 		mockUsersAccess(classToInstanceMap, userAsList);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockNextGeneratedSyncKey(classToInstanceMap, newGeneratedSyncKey);
-		expectCollectionDaoAllocateFolderSyncState(classToInstanceMap.get(CollectionDao.class), newMappingSyncState);
+		expectCollectionDaoAllocateFolderSyncState(classToInstanceMap.get(CollectionDao.class), newGeneratedSyncKey, newMappingSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 
 //		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
@@ -259,23 +258,24 @@ public class FolderSyncHandlerTest {
 		return HierarchyCollectionChanges.builder().build();
 	}
 
-	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, FolderSyncState newSyncState) 
+	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, SyncKey syncKey, FolderSyncState newSyncState) 
 			throws DaoException {
 	
-		expect(collectionDao.allocateNewFolderSyncState(user.device, newSyncState.getSyncKey())).andReturn(newSyncState);
+		expect(collectionDao.allocateNewFolderSyncState(user.device, syncKey, newSyncState.getSyncDate())).andReturn(newSyncState);
 	}
 
 	private void expectCollectionDaoFindFolderSyncState(CollectionDao collectionDao,
 			SyncKey currentSyncKey, FolderSyncState newSyncState) throws DaoException {
 		
-		expect(collectionDao.findFolderStateForKey(currentSyncKey)).andReturn(new FolderSyncState(currentSyncKey));
-		expectCollectionDaoAllocateFolderSyncState(collectionDao, newSyncState);
+		expect(collectionDao.findFolderStateForKey(currentSyncKey)).andReturn(FolderSyncState.builder().syncKey(currentSyncKey).build());
+		expectCollectionDaoAllocateFolderSyncState(collectionDao, currentSyncKey, newSyncState);
 	}
 
 	private FolderSyncState newFolderSyncState(SyncKey newGeneratedSyncKey, int newSyncStateId) {
-		FolderSyncState folderSyncState = new FolderSyncState(newGeneratedSyncKey);
-		folderSyncState.setId(newSyncStateId);
-		return folderSyncState;
+		return FolderSyncState.builder()
+				.id(newSyncStateId)
+				.syncKey(newGeneratedSyncKey)
+				.build();
 	}
 
 }

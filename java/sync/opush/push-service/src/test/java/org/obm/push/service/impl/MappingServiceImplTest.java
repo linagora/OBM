@@ -88,7 +88,7 @@ public class MappingServiceImplTest {
 		replay(udr, collectionDao, collectionPathBuilderProvider);
 		
 		MappingServiceImpl mappingServiceImpl= new MappingServiceImpl(collectionDao, null, null,collectionPathBuilderProvider);
-		List<CollectionPath> listCollections = mappingServiceImpl.listCollections(udr, new FolderSyncState(incomingSyncKey));
+		List<CollectionPath> listCollections = mappingServiceImpl.listCollections(udr, FolderSyncState.builder().syncKey(incomingSyncKey).build());
 		
 		assertThat(listCollections).containsOnly(
 				expectedCollectionPathEmail,

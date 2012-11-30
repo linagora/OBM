@@ -49,7 +49,6 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -185,21 +184,25 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public int updateState(Device device, Integer collectionId, SyncState state) throws DaoException {
+	public ItemSyncState updateState(Device device, Integer collectionId, SyncKey syncKey, Date syncDate) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("INSERT INTO opush_sync_state (sync_key, device_id, last_sync, collection_id) VALUES (?, ?, ?, ?)");
-			ps.setString(1, state.getSyncKey().getSyncKey());
+			ps.setString(1, syncKey.getSyncKey());
 			ps.setInt(2, devDbId);
-			ps.setTimestamp(3, new Timestamp(state.getSyncDate().getTime()));
+			ps.setTimestamp(3, new Timestamp(syncDate.getTime()));
 			ps.setInt(4, collectionId);
 			if (ps.executeUpdate() == 0) {
 				throw new DaoException("No SyncState inserted");
 			} else {
-				return dbcp.lastInsertId(con);
+				return ItemSyncState.builder()
+						.syncDate(syncDate)
+						.syncKey(syncKey)
+						.id(dbcp.lastInsertId(con))
+						.build();
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -209,7 +212,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException {
+	public FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey, Date newSyncDate) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		
@@ -220,8 +223,11 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setString(1, newSyncKey.getSyncKey());
 			ps.setInt(2, device.getDatabaseId());
 			ps.executeUpdate();
-			FolderSyncState folderSyncState = new FolderSyncState(newSyncKey);
-			folderSyncState.setId(dbcp.lastInsertId(con));
+			FolderSyncState folderSyncState = FolderSyncState.builder()
+					.syncDate(newSyncDate)
+					.syncKey(newSyncKey)
+					.id(dbcp.lastInsertId(con))
+					.build();
 			return folderSyncState;
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -271,8 +277,10 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				SyncKey rsSyncKey = new SyncKey(rs.getString("sync_key"));
-				FolderSyncState folderSyncState = new FolderSyncState(rsSyncKey);
-				folderSyncState.setId(rs.getInt("id"));
+				FolderSyncState folderSyncState = FolderSyncState.builder()
+						.syncKey(rsSyncKey)
+						.id(rs.getInt("id"))
+						.build();
 				return folderSyncState;
 			}
 		} catch (SQLException e) {
@@ -311,8 +319,11 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	private ItemSyncState buildItemSyncState(ResultSet rs) throws SQLException {
 		Date lastSync = JDBCUtils.getDate(rs, "last_sync");
 		SyncKey syncKey = new SyncKey(rs.getString("sync_key"));
-		ItemSyncState syncState = new ItemSyncState(syncKey, lastSync);
-		syncState.setId(rs.getInt("id"));
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncKey(syncKey)
+				.syncDate(lastSync)
+				.id(rs.getInt("id"))
+				.build();
 		return syncState;
 	}
 
@@ -343,8 +354,10 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	private FolderSyncState buildFolderSyncState(ResultSet rs) throws SQLException {
 		SyncKey syncKey = new SyncKey(rs.getString("sync_key"));
-		FolderSyncState syncState = new FolderSyncState(syncKey);
-		syncState.setId(rs.getInt("id"));
+		FolderSyncState syncState = FolderSyncState.builder()
+				.syncKey(syncKey)
+				.id(rs.getInt("id"))
+				.build();
 		return syncState;
 	}
 

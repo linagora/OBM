@@ -130,8 +130,8 @@ public class CalendarBackendTest {
 		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"));
 		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, null);
 		this.token = new AccessToken(0, "OBM");
-		this.lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		this.outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
+		this.lastKnownState = FolderSyncState.builder().syncKey(new SyncKey("1234567890a")).build();
+		this.outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234567890b")).build();
 		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
 
 		
@@ -213,8 +213,8 @@ public class CalendarBackendTest {
 
 	@Test
 	public void testInitialCalendarChangesWhenMultipleCalendar() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
+		FolderSyncState lastKnownState = FolderSyncState.builder().syncKey(new SyncKey("1234567890a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234567890b")).build();
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
@@ -273,8 +273,8 @@ public class CalendarBackendTest {
 
 	@Test
 	public void testDeletionWhenMultipleCalendar() throws Exception {
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
+		FolderSyncState lastKnownState = FolderSyncState.builder().syncKey(new SyncKey("1234567890a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234567890b")).build();
 		String rootCalendarPath = "obm:\\\\test@domain\\calendar\\";
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"));
@@ -487,8 +487,10 @@ public class CalendarBackendTest {
 	@Test
 	public void testGetEstimateSize() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		lastKnownState.setSyncDate(currentDate);
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890a"))
+				.build();
 		int collectionId = 1;
 
 		expectLoginBehavior();
@@ -527,8 +529,10 @@ public class CalendarBackendTest {
 	@Test 
 	public void testGetChanged() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		lastKnownState.setSyncDate(currentDate);
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890a"))
+				.build();
 		int collectionId = 1;
 
 		expectLoginBehavior();

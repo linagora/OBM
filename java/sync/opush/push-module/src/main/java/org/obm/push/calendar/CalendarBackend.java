@@ -255,14 +255,14 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		String calendar = parseCalendarName(collectionPath);
 
-		state.updateLastWindowStartDate(syncCollectionOptions.getFilterType());
+		SyncState newState = state.newWindowedSyncState(syncCollectionOptions.getFilterType());
 		try {
 			
 			EventChanges changes = null;
-			if (state.isSyncFiltred()) {
-				changes = calendarClient.getSyncEventDate(token, calendar, state.getSyncDate());
+			if (newState.isSyncFiltred()) {
+				changes = calendarClient.getSyncEventDate(token, calendar, newState.getSyncDate());
 			} else {
-				changes = calendarClient.getSync(token, calendar, state.getSyncDate());
+				changes = calendarClient.getSync(token, calendar, newState.getSyncDate());
 			}
 			
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
@@ -272,7 +272,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 					buildDataDelta(udr, collectionId, token, changes);
 			
 			logger.info("getContentChanges( {}, {}, lastSync = {} ) => {}",
-				new Object[]{calendar, collectionPath, state.getSyncDate(), delta.statistics()});
+				new Object[]{calendar, collectionPath, newState.getSyncDate(), delta.statistics()});
 			
 			return delta;
 		} catch (ServerFault e) {

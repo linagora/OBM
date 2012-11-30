@@ -40,6 +40,7 @@ import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -161,9 +162,12 @@ public class EmailSyncTestUtils {
 			expect(collectionDao.getCollectionMapping(anyObject(Device.class), anyObject(String.class)))
 				.andReturn(syncEmailCollectionId).anyTimes();
 		}
-		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncState.class)))
-				.andReturn((int)(Math.random()*10000)).anyTimes();
-		ItemSyncState state = new ItemSyncState(syncEmailSyncKey);
+		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncKey.class), anyObject(Date.class)))
+				.andReturn(ItemSyncState.builder()
+						.syncKey(syncEmailSyncKey)
+						.id((int)(Math.random()*10000))
+						.build()).anyTimes();
+		ItemSyncState state = ItemSyncState.builder().syncKey(syncEmailSyncKey).build();
 		expect(collectionDao.findItemStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
 	}
 

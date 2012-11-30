@@ -150,9 +150,11 @@ public class HierarchyExporterTest {
 	@Test
 	public void testNothingChanges() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncKey = new FolderSyncState(new SyncKey("1234567890b"));
-		outgoingSyncKey.setSyncDate(currentDate);
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234567890a")).build();
+		FolderSyncState outgoingSyncKey = FolderSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890b"))
+				.build();
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
@@ -191,9 +193,11 @@ public class HierarchyExporterTest {
 		String mailParentCollectionId = "2";
 		
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234567890b"));
-		outgoingSyncState.setSyncDate(currentDate);
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234567890a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890b"))
+				.build();
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 

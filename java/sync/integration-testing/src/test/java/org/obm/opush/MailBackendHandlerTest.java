@@ -146,7 +146,7 @@ public class MailBackendHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int serverId = 1234;
 		String syncEmailId = ":2";
-		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
+		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
 		DataDelta delta = DataDelta.builder()
 			.changes(new ItemChangesBuilder()
 				.addItemChange(new ItemChangeBuilder()
@@ -235,9 +235,8 @@ public class MailBackendHandlerTest {
 		expect(collectionDao.findItemStateForKey(anyObject(SyncKey.class)))
 			.andReturn(syncState).anyTimes();
 		
-		int lastUpdateState = 1;
-		expect(collectionDao.updateState(eq(user.device), eq(serverId), anyObject(SyncState.class)))
-			.andReturn(lastUpdateState).anyTimes();
+		expect(collectionDao.updateState(eq(user.device), eq(serverId), anyObject(SyncKey.class), anyObject(Date.class)))
+			.andReturn(syncState).anyTimes();
 		
 		expect(collectionDao.getCollectionMapping(eq(user.device), anyObject(String.class)))
 			.andReturn(serverId).anyTimes();

@@ -276,7 +276,7 @@ public class SyncHandlerTest {
 	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
-		return new FolderSyncState(syncEmailSyncKey);
+		return FolderSyncState.builder().syncKey(syncEmailSyncKey).build();
 	}
 	
 	private MSEmail applicationData(String message, MSEmailBodyType emailBodyType) {

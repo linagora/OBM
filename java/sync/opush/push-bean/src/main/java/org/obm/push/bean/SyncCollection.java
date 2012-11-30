@@ -177,7 +177,7 @@ public class SyncCollection implements Serializable {
 	}
 	
 	public void newSyncSate() {
-		this.itemSyncState = new ItemSyncState(this.getSyncKey());
+		this.itemSyncState = ItemSyncState.builder().syncKey(this.getSyncKey()).build();
 	}
 	
 	@Override

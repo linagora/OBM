@@ -75,7 +75,6 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.OPClient;
@@ -170,10 +169,18 @@ public class MailBackendGetChangedTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
 		
-		ItemSyncState allocatedState = new ItemSyncState(secondAllocatedSyncKey, date("2012-10-10T16:22:53"));
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncKey(firstAllocatedSyncKey)
+				.id(allocatedStateId)
+				.build();
+		ItemSyncState allocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(allocatedStateId2)
+				.build();
 		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
-		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedSyncKey, allocatedStateId);
-		expectCollectionDaoPerformSync(firstAllocatedSyncKey, allocatedState, allocatedStateId2);
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, allocatedState);
 		expectUnsynchronizedItemToNeverExceedWindowSize();
 
 		expect(itemTrackingDao.isServerIdSynced(allocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
@@ -210,20 +217,19 @@ public class MailBackendGetChangedTest {
 		expectLastCall().anyTimes();
 	}
 
-	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState, int allocatedStateId)
+	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState)
 			throws DaoException {
 		expect(collectionDao.findItemStateForKey(requestSyncKey)).andReturn(allocatedState).times(2);
-		expect(collectionDao.updateState(user.device, inboxCollectionId, allocatedState))
-				.andReturn(allocatedStateId);
+		expect(collectionDao.updateState(user.device, inboxCollectionId, allocatedState.getSyncKey(), allocatedState.getSyncDate()))
+				.andReturn(allocatedState);
 	}
 
-	private void expectCollectionDaoPerformInitialSync(SyncKey initialSyncKey, SyncKey allocatedSyncKey, int allocatedStateId)
+	private void expectCollectionDaoPerformInitialSync(SyncKey initialSyncKey, ItemSyncState itemSyncState)
 			throws DaoException {
 		
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
-		ItemSyncState syncState = new ItemSyncState(allocatedSyncKey, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-		expect(collectionDao.updateState(user.device, inboxCollectionId, syncState))
-			.andReturn(allocatedStateId);
+		expect(collectionDao.updateState(user.device, inboxCollectionId, itemSyncState.getSyncKey(), itemSyncState.getSyncDate()))
+			.andReturn(itemSyncState);
 		collectionDao.resetCollection(user.device, inboxCollectionId);
 		expectLastCall();
 	}

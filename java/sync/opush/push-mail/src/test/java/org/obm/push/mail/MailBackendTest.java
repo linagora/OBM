@@ -184,8 +184,8 @@ public class MailBackendTest {
 	
 	@Test
 	public void initialHierarchyContainsBaseFolders() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234"));
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234")).build();
 
 		Map<String, Integer> mailboxesIds = ImmutableMap.of(
 			"INBOX", 1,
@@ -231,8 +231,8 @@ public class MailBackendTest {
 	
 	@Test
 	public void emptyHierarchyChanges() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234b"));
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234b")).build();
 
 		Map<String, Integer> mailboxesIds = ImmutableMap.of(
 			"INBOX", 1,
@@ -260,8 +260,8 @@ public class MailBackendTest {
 	
 	@Test
 	public void newImapFolder() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234b"));
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234b")).build();
 
 		Map<String, Integer> mailboxesIds = ImmutableMap.of(
 			"INBOX", 1,
@@ -299,8 +299,8 @@ public class MailBackendTest {
 	
 	@Test
 	public void deletedImapFolder() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234b"));
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234b")).build();
 
 		Map<String, Integer> mailboxesIds = ImmutableMap.of(
 			"INBOX", 1,
@@ -331,8 +331,8 @@ public class MailBackendTest {
 	
 	@Test
 	public void deletedAndAddedImapFolders() throws Exception {
-		FolderSyncState incomingSyncState = new FolderSyncState(new SyncKey("1234a"));
-		FolderSyncState outgoingSyncState = new FolderSyncState(new SyncKey("1234b"));
+		FolderSyncState incomingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234a")).build();
+		FolderSyncState outgoingSyncState = FolderSyncState.builder().syncKey(new SyncKey("1234b")).build();
 
 		Map<String, Integer> mailboxesIds = ImmutableMap.of(
 			"INBOX", 1,

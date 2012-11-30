@@ -82,8 +82,11 @@ public class StateMachineTest {
 		SyncKey knownSyncKey = new SyncKey("1234");
 		Date knownSyncDate = org.obm.DateUtils.date("2013-01-01T12:00:15");
 		int knownSyncStateId = 156;
-		FolderSyncState knownFolderSyncState = new FolderSyncState(knownSyncKey, knownSyncDate);
-		knownFolderSyncState.setId(knownSyncStateId);
+		FolderSyncState knownFolderSyncState = FolderSyncState.builder()
+				.syncDate(knownSyncDate)
+				.syncKey(knownSyncKey)
+				.id(knownSyncStateId)
+				.build();
 		
 		CollectionDao collectionDao = createStrictMock(CollectionDao.class);
 		expect(collectionDao.findFolderStateForKey(knownSyncKey)).andReturn(knownFolderSyncState).once();

@@ -57,20 +57,6 @@ public class FolderSyncState extends SyncState implements Serializable {
 		}
 	}
 	
-	public FolderSyncState(SyncKey syncKey) {
-		this(syncKey, null);
-	}
-
-	public FolderSyncState(SyncKey syncKey, Date syncDate) {
-		super(syncKey, syncDate);
-	}
-
-	public FolderSyncState(SyncState syncState) {
-		super(syncState.getSyncKey(), syncState.getSyncDate());
-		setId(syncState.getId());
-		setSyncFiltred(syncState.isSyncFiltred());
-	}
-	
 	public boolean isInitialFolderSync() {
 		return isSyncKeyOfInitialFolderSync(getSyncKey());
 	}
@@ -82,4 +68,20 @@ public class FolderSyncState extends SyncState implements Serializable {
 	private FolderSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
 		super(syncDate, syncFiltred, syncKey, id);
 	}
+	
+	@Override
+	public SyncState newWindowedSyncState(FilterType filterType) {
+		if (filterType != null) {
+			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
+			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
+				return FolderSyncState.builder()
+						.syncDate(filteredDate)
+						.syncFiltred(true)
+						.syncKey(getSyncKey())
+						.id(getId())
+						.build();
+			}
+		}
+		return this;
+	}	
 }

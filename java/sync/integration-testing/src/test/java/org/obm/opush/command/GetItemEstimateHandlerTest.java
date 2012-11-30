@@ -92,7 +92,7 @@ public class GetItemEstimateHandlerTest {
 	@Test
 	public void testGetItemEstimateWithValidCollectionAndSyncKey() throws Exception {
 		SyncKey syncKey = new SyncKey("1");
-		ItemSyncState expectedSyncState = new ItemSyncState(syncKey);
+		ItemSyncState expectedSyncState = ItemSyncState.builder().syncKey(syncKey).build();
 		int collectionId = 15105;
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);
@@ -110,7 +110,7 @@ public class GetItemEstimateHandlerTest {
 	@Test
 	public void testGetItemEstimateWithUnexistingCollection() throws Exception {
 		SyncKey syncKey = new SyncKey("1");
-		ItemSyncState expectedSyncState = new ItemSyncState(syncKey);
+		ItemSyncState expectedSyncState = ItemSyncState.builder().syncKey(syncKey).build();
 		int unexistingCollectionId = 15105;
 		Set<Integer> existingCollections = Collections.<Integer>emptySet();
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);

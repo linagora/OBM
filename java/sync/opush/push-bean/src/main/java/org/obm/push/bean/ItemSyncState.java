@@ -58,18 +58,28 @@ public class ItemSyncState extends SyncState implements Serializable {
 	}
 	
 	public static ItemSyncState newInitialSyncState() {
-		return new ItemSyncState(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-	}
-	
-	public ItemSyncState(SyncKey syncKey) {
-		this(syncKey, null);
-	}
-
-	public ItemSyncState(SyncKey syncKey, Date syncDate) {
-		super(syncKey, syncDate);
+		return ItemSyncState.builder()
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build();
 	}
 	
 	private ItemSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
 		super(syncDate, syncFiltred, syncKey, id);
 	}
+	
+	@Override
+	public SyncState newWindowedSyncState(FilterType filterType) {
+		if (filterType != null) {
+			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
+			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
+				return ItemSyncState.builder()
+					.syncDate(filteredDate)
+					.syncFiltred(true)
+					.syncKey(getSyncKey())
+					.id(getId())
+					.build();
+			}
+		}
+		return this;
+	}	
 }

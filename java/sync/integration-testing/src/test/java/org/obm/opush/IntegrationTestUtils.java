@@ -114,7 +114,7 @@ public class IntegrationTestUtils {
 			throws DaoException, CollectionNotFoundException {
 		
 		Date lastSync = new Date();
-		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
+		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
@@ -131,7 +131,7 @@ public class IntegrationTestUtils {
 	}
 
 	public static void expectAllocateFolderState(CollectionDao collectionDao, FolderSyncState folderSyncState) throws DaoException {
-		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(SyncKey.class)))
+		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(SyncKey.class), anyObject(Date.class)))
 			.andReturn(folderSyncState);
 	}
 	

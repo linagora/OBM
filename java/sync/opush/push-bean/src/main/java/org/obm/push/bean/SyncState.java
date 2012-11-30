@@ -34,8 +34,6 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.obm.push.utils.DateUtils;
-
 import com.google.common.base.Objects;
 
 /**
@@ -55,57 +53,23 @@ public abstract class SyncState implements Serializable {
 		this.id = id;
 	}
 	
-	protected SyncState(SyncKey syncKey) {
-		this(syncKey, null);
-	}
-
-	protected SyncState(SyncKey syncKey, Date syncDate) {
-		this.syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
-		this.syncFiltred = false;
-		this.syncKey = syncKey;
-	}
-
 	public Date getSyncDate() {
 		return syncDate;
-	}
-
-	public void setSyncDate(Date syncDate) {
-		this.syncDate = syncDate;
 	}
 
 	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 
-	public void setSyncKey(SyncKey syncKey) {
-		this.syncKey = syncKey;
-	}
-
 	public Boolean isSyncFiltred() {
 		return syncFiltred;
 	}
-
-	public void setSyncFiltred(boolean syncFiltred) {
-		this.syncFiltred = syncFiltred;
-	}
-
-	public void updateLastWindowStartDate(FilterType filterType) {
-		if (filterType != null) {
-			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
-			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
-				setSyncDate(filteredDate);
-				setSyncFiltred(true);
-			}
-		}
-	}
-
+	
 	public int getId() {
 		return this.id;
 	}
 	
-	public void setId(int id) {
-		this.id = id;
-	}
+	public abstract SyncState newWindowedSyncState(FilterType filterType);
 
 	@Override
 	public final int hashCode(){

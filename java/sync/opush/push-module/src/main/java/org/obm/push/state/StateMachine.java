@@ -91,7 +91,7 @@ public class StateMachine {
 		Preconditions.checkArgument(syncKey != null && !Strings.isNullOrEmpty(syncKey.getSyncKey()));
 		
 		if (FolderSyncState.isSyncKeyOfInitialFolderSync(syncKey)) {
-			return new FolderSyncState(syncKey);
+			return FolderSyncState.builder().syncKey(syncKey).build();
 		} else {
 			return findFolderSyncState(syncKey);
 		}
@@ -107,8 +107,7 @@ public class StateMachine {
 	
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {
 		SyncKey newSk = syncKeyFactory.randomSyncKey();
-		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk);
-		newFolderState.setSyncDate(DateUtils.getCurrentDate());
+		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk, DateUtils.getCurrentDate());
 		
 		log(udr, newFolderState);
 		return newFolderState;
@@ -118,9 +117,7 @@ public class StateMachine {
 		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems) throws DaoException, InvalidServerId {
 
 		SyncKey newSk = syncKeyFactory.randomSyncKey();
-		ItemSyncState newState = new ItemSyncState(newSk, lastSync);
-		int syncStateId = collectionDao.updateState(udr.getDevice(), collectionId, newState);
-		newState.setId(syncStateId);
+		ItemSyncState newState = collectionDao.updateState(udr.getDevice(), collectionId, newSk, lastSync);
 		
 		if (changes != null && !changes.isEmpty()) {
 			itemTrackingDao.markAsSynced(newState, listNewItems(changes));

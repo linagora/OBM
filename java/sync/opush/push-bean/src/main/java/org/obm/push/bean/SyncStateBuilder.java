@@ -39,24 +39,28 @@ public abstract class SyncStateBuilder<T extends SyncState> {
 	protected SyncKey syncKey;
 	protected int id;
 	
-	public SyncStateBuilder<T> syncDate(Date syncDate) {
+	@SuppressWarnings("unchecked")
+	public <C extends SyncStateBuilder<T>> C syncDate(Date syncDate) {
 		this.syncDate = syncDate;
-		return this;
+		return (C) this;
 	}
 	
-	public SyncStateBuilder<T> syncFiltred(boolean syncFiltred) {
+	@SuppressWarnings("unchecked")
+	public <C extends SyncStateBuilder<T>> C syncFiltred(boolean syncFiltred) {
 		this.syncFiltred = syncFiltred;
-		return this;
+		return (C) this;
 	}
 	
-	public SyncStateBuilder<T> syncKey(SyncKey syncKey) {
+	@SuppressWarnings("unchecked")
+	public <C extends SyncStateBuilder<T>> C syncKey(SyncKey syncKey) {
 		this.syncKey = syncKey;
-		return this;
+		return (C) this;
 	}
 	
-	public SyncStateBuilder<T> id(int id) {
+	@SuppressWarnings("unchecked")
+	public <C extends SyncStateBuilder<T>> C id(int id) {
 		this.id = id;
-		return this;
+		return (C) this;
 	}
 	
 	public abstract T build();

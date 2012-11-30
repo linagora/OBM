@@ -347,7 +347,7 @@ public class MeetingResponseHandlerTest {
 	private void expectCollectionDaoUnchange(CollectionDao collectionDao) throws DaoException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		
-		ItemSyncState syncState = new ItemSyncState(new SyncKey("sync state"));
+		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		
 		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<SyncCollection>of());

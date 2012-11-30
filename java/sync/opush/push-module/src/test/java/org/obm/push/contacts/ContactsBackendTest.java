@@ -145,8 +145,10 @@ public class ContactsBackendTest {
 	@Test
 	public void testGetItemEstimateSize() throws Exception {
 		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState lastKnownState = new FolderSyncState(new SyncKey("1234567890a"));
-		lastKnownState.setSyncDate(currentDate);
+		FolderSyncState lastKnownState = FolderSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890a"))
+				.build();
 
 		expectLoginBehavior(token);
 

@@ -149,7 +149,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, new ItemSyncState(syncKey), collectionId, syncCollectionOptions);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(actual.getDeletions()).isEmpty();
@@ -179,7 +179,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, new ItemSyncState(syncKey), collectionId, syncCollectionOptions);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
 		control.verify();
 
 		assertThat(actual.getDeletions()).isEmpty();
@@ -218,7 +218,7 @@ public class MailBackendImplTest {
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		
 		control.replay();
-		testee.getChanged(udr, new ItemSyncState(syncKey), collectionId, syncCollectionOptions);
+		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
 	}
 	
 	@Test(expected=UnsupportedOperationException.class)
@@ -243,7 +243,7 @@ public class MailBackendImplTest {
 				.build());
 		
 		control.replay();
-		testee.getChanged(udr, new ItemSyncState(syncKey), collectionId, syncCollectionOptions);
+		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions);
 	}
 	
 	@Test
