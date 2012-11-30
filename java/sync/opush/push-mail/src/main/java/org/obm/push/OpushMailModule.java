@@ -42,8 +42,8 @@ import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailBackendImpl;
 import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailViewToMSEmailConverterImpl;
-import org.obm.push.mail.ServerEmailChangesBuilder;
-import org.obm.push.mail.ServerEmailChangesBuilderImpl;
+import org.obm.push.mail.EmailChangesFetcher;
+import org.obm.push.mail.EmailChangesFetcherImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
@@ -70,7 +70,7 @@ public class OpushMailModule extends AbstractModule {
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(MailBackend.class);
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
-		bind(ServerEmailChangesBuilder.class).to(ServerEmailChangesBuilderImpl.class);
+		bind(EmailChangesFetcher.class).to(EmailChangesFetcherImpl.class);
 		bind(EmailChangesComputer.class).to(EmailChangesComputerImpl.class);
 
 		Multibinder<Transformer.Factory> transformers = 

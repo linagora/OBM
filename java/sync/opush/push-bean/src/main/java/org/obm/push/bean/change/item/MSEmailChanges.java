@@ -38,7 +38,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-public class ServerItemChanges {
+public class MSEmailChanges {
 
 	public static Builder builder() {
 		return new Builder();
@@ -65,15 +65,15 @@ public class ServerItemChanges {
 			return this;
 		}
 		
-		public ServerItemChanges build() {
-			return new ServerItemChanges(changes, deletions);
+		public MSEmailChanges build() {
+			return new MSEmailChanges(changes, deletions);
 		}
 	}
 	
 	private final List<ItemChange> changes;
 	private final List<ItemDeletion> deletions;
 
-	private ServerItemChanges(List<ItemChange> changes, List<ItemDeletion> deletions) {
+	private MSEmailChanges(List<ItemChange> changes, List<ItemDeletion> deletions) {
 		this.changes = changes;
 		this.deletions = deletions;
 	}
@@ -93,8 +93,8 @@ public class ServerItemChanges {
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof ServerItemChanges) {
-			ServerItemChanges that = (ServerItemChanges) object;
+		if (object instanceof MSEmailChanges) {
+			MSEmailChanges that = (MSEmailChanges) object;
 			return Objects.equal(this.changes, that.changes)
 				&& Objects.equal(this.deletions, that.deletions);
 		}

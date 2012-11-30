@@ -49,7 +49,7 @@ import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ServerItemChanges;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
@@ -62,7 +62,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
-public class ServerEmailChangesBuilderImplTest {
+public class EmailChangesFetcherImplTest {
 
 	private int collectionId;
 	private String collectionPath;
@@ -86,7 +86,7 @@ public class ServerEmailChangesBuilderImplTest {
 	@Test(expected=NullPointerException.class)
 	public void onNullChanges() throws Exception {
 		mocks.replay();
-		new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 				udr, collectionId, collectionPath, bodyPreferences, null);
 	}
 	
@@ -95,8 +95,8 @@ public class ServerEmailChangesBuilderImplTest {
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -128,8 +128,8 @@ public class ServerEmailChangesBuilderImplTest {
 			.andReturn(ImmutableList.of(emailChangesData));
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -180,8 +180,8 @@ public class ServerEmailChangesBuilderImplTest {
 			.andReturn(ImmutableList.of(email1ChangeData, email2ChangeData));
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -223,8 +223,8 @@ public class ServerEmailChangesBuilderImplTest {
 			.andReturn(ImmutableList.of(emailChangesData));
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -275,8 +275,8 @@ public class ServerEmailChangesBuilderImplTest {
 			.andReturn(ImmutableList.of(email1ChangeData, email2ChangeData));
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -302,8 +302,8 @@ public class ServerEmailChangesBuilderImplTest {
 				.build();
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -323,8 +323,8 @@ public class ServerEmailChangesBuilderImplTest {
 				.build();
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		
@@ -380,8 +380,8 @@ public class ServerEmailChangesBuilderImplTest {
 			.andReturn(ImmutableList.of(emailAddedData));
 		
 		mocks.replay();
-		ServerItemChanges result = 
-				new ServerEmailChangesBuilderImpl(msEmailFetcher).build(
+		MSEmailChanges result = 
+				new EmailChangesFetcherImpl(msEmailFetcher).fetch(
 						udr, collectionId, collectionPath, bodyPreferences, emailChanges);
 		mocks.verify();
 		

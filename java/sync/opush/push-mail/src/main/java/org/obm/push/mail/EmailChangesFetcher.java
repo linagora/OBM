@@ -35,13 +35,13 @@ import java.util.List;
 
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ServerItemChanges;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 
-public interface ServerEmailChangesBuilder {
+public interface EmailChangesFetcher {
 
-	ServerItemChanges build(UserDataRequest udr,
+	MSEmailChanges fetch(UserDataRequest udr,
 			int collectionId, String collectionPath,
 			List<BodyPreference> bodyPreferences, EmailChanges emailChanges)
 					throws EmailViewPartsFetcherException, DaoException;

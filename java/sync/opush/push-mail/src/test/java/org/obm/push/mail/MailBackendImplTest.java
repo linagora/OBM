@@ -57,7 +57,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
-import org.obm.push.bean.change.item.ServerItemChanges;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -85,7 +85,7 @@ public class MailBackendImplTest {
 	private MappingService mappingService;
 	private SnapshotDao snapshotDao;
 	private EmailChangesComputer emailChangesComputer;
-	private ServerEmailChangesBuilder serverEmailChangesBuilder;
+	private EmailChangesFetcher serverEmailChangesBuilder;
 	private MailBackendImpl testee;
 	private DateService dateService;
 
@@ -101,7 +101,7 @@ public class MailBackendImplTest {
 		snapshotDao = control.createMock(SnapshotDao.class);
 		mappingService = control.createMock(MappingService.class);
 		emailChangesComputer = control.createMock(EmailChangesComputer.class);
-		serverEmailChangesBuilder = control.createMock(ServerEmailChangesBuilder.class);
+		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
 		dateService = control.createMock(DateService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
@@ -136,7 +136,7 @@ public class MailBackendImplTest {
 
 		ItemChange itemChange1 = new ItemChangeBuilder().serverId(collectionId + ":" + 245).withNewFlag(true).withApplicationData(email1Data).build();
 		ItemChange itemChange2 = new ItemChangeBuilder().serverId(collectionId + ":" + 546).withNewFlag(true).withApplicationData(email2Data).build();
-		ServerItemChanges itemChanges = ServerItemChanges.builder()
+		MSEmailChanges itemChanges = MSEmailChanges.builder()
 			.changes(ImmutableList.of(itemChange1, itemChange2))
 			.build();
 		
@@ -168,7 +168,7 @@ public class MailBackendImplTest {
 		Set<Email> actualEmailsInServer = ImmutableSet.of();
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
-		ServerItemChanges itemChanges = ServerItemChanges.builder().build();
+		MSEmailChanges itemChanges = MSEmailChanges.builder().build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
@@ -416,10 +416,10 @@ public class MailBackendImplTest {
 	}
 
 	private void expectBuildItemChangesByFetchingMSEmailsData(List<BodyPreference> bodyPreferences,
-			EmailChanges emailChanges, ServerItemChanges itemChanges)
+			EmailChanges emailChanges, MSEmailChanges itemChanges)
 					throws EmailViewPartsFetcherException, DaoException {
 		
-		expect(serverEmailChangesBuilder.build(udr, collectionId, collectionPath, bodyPreferences, emailChanges))
+		expect(serverEmailChangesBuilder.fetch(udr, collectionId, collectionPath, bodyPreferences, emailChanges))
 			.andReturn(itemChanges);
 	}
 

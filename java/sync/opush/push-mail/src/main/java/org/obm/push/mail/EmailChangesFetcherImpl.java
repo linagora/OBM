@@ -38,7 +38,7 @@ import java.util.Set;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.ServerItemChanges;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -57,21 +57,21 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ServerEmailChangesBuilderImpl implements ServerEmailChangesBuilder {
+public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 
 	private final MSEmailFetcher msEmailFetcher;
 
 	@Inject
-	@VisibleForTesting ServerEmailChangesBuilderImpl(MSEmailFetcher msEmailFetcher) {
+	@VisibleForTesting EmailChangesFetcherImpl(MSEmailFetcher msEmailFetcher) {
 		this.msEmailFetcher = msEmailFetcher;
 	}
 	
 	@Override
-	public ServerItemChanges build(UserDataRequest udr,
+	public MSEmailChanges fetch(UserDataRequest udr,
 			int collectionId, String collectionPath,
 			List<BodyPreference> bodyPreferences, EmailChanges emailChanges) throws EmailViewPartsFetcherException, DaoException {
 		Preconditions.checkNotNull(emailChanges, "emailChanges can not be null");
-		return ServerItemChanges.builder()
+		return MSEmailChanges.builder()
 				.deletions(emailDeletions(collectionId, emailChanges.deletions()))
 				.changes(emailAdditions(udr, collectionId, collectionPath, bodyPreferences, emailChanges.additions()))
 				.changes(emailChanges(udr, collectionId, collectionPath, bodyPreferences, emailChanges.changes()))

@@ -76,7 +76,7 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
-import org.obm.push.bean.change.item.ServerItemChanges;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -161,7 +161,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final MSEmailFetcher msEmailFetcher;
 	private final SnapshotDao snapshotDao;
 	private final EmailChangesComputer emailChangesComputer;
-	private final ServerEmailChangesBuilder serverEmailChangesBuilder;
+	private final EmailChangesFetcher emailChangesFetcher;
 
 
 	@Inject
@@ -171,7 +171,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotDao snapshotDao,
 			EmailChangesComputer emailChangesComputer,
-			ServerEmailChangesBuilder serverEmailChangesBuilder,
+			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
 			EventService eventService,
 			DateService dateService,
@@ -188,7 +188,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.login = login;
 		this.snapshotDao = snapshotDao;
 		this.emailChangesComputer = emailChangesComputer;
-		this.serverEmailChangesBuilder = serverEmailChangesBuilder;
+		this.emailChangesFetcher = emailChangesFetcher;
 		this.eventService = eventService;
 		this.dateService = dateService;
 		this.msEmailFetcher = msEmailFetcher;
@@ -338,7 +338,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			takeSnapshot(udr, collectionId, collectionPath, state, options, newManagedEmails);
 			
 			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
-			ServerItemChanges serverItemChanges = serverEmailChangesBuilder.build(udr, collectionId,
+			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
 					collectionPath, options.getBodyPreferences(), emailChanges);
 			
 			return DataDelta.builder()
