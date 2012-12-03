@@ -50,6 +50,8 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventType;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -85,7 +87,7 @@ public class EventIndexer extends SolrRequest {
 	private final UserDao userDao;
 
 	
-	private EventIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, UserDao userDao, ObmDomain domain, Event e) {
+	@VisibleForTesting EventIndexer(CommonsHttpSolrServer srv, ObmHelper obmHelper, UserDao userDao, ObmDomain domain, Event e) {
 		super(srv);
 		
 		this.obmHelper = obmHelper;
@@ -117,6 +119,21 @@ public class EventIndexer extends SolrRequest {
 	}
 
 	private boolean doIndex() throws IOException, SolrServerException {
+		SolrInputDocument sid = buildDocument();
+
+		try {
+			addTagsToEvent(sid);
+			server.add(sid);
+			server.commit();
+			logger.info("[" + e.getObmId() + "] indexed in SOLR");
+		} catch (SQLException t) {
+			//tags seems to be not so important
+			logger.error(t.getMessage(), t);
+		}
+		return true;
+	}
+
+	@VisibleForTesting SolrInputDocument buildDocument() {
 		SolrInputDocument sid = new SolrInputDocument();
 
 		f(sid, "id", e.getObmId().getObmId());
@@ -134,8 +151,7 @@ public class EventIndexer extends SolrRequest {
 		f(sid, "duration", e.getDuration());
 
 		// owner: login ownerEmail: lAtDomain
-		ObmUser u = userDao.findUserByLogin(e.getOwner(),
-				domain);
+		ObmUser u = userDao.findUser(getOwner(), domain);
 
 		f(sid, "owner", u.getLastName(), u.getFirstName(), u.getLogin(),
 				u.getEmail());
@@ -156,34 +172,38 @@ public class EventIndexer extends SolrRequest {
 				(e.isRecurrent() ? "periodic" : null),
 				(e.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
 				(e.getPrivacy() == EventPrivacy.PRIVATE ? "private" : null));
+		return sid;
+	}
+
+	private String getOwner() {
+		if (!Strings.isNullOrEmpty(e.getOwner())) {
+			return e.getOwner();
+		} else {
+			return e.getOwnerEmail();
+		}
+	}
+
+	private void addTagsToEvent(SolrInputDocument sid) throws SQLException {
 
 		// state is unused
-
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement st = null;
 		try {
 			con = obmHelper.getConnection();
 			st = con.prepareStatement("SELECT eventtag_label FROM Event " +
-                    "INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id=?");
+					"INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id=?");
 			// query tag...
 			st.setInt(1, e.getObmId().getObmId());
 			rs = st.executeQuery();
 			if (rs.next()) {
 				f(sid, "tag", rs.getString(1));
 			}
-
-			server.add(sid);
-			server.commit();
-			logger.info("[" + e.getObmId() + "] indexed in SOLR");
-		} catch (SQLException t) {
-			logger.error(t.getMessage(), t);
 		} finally {
 			obmHelper.cleanup(con, st, rs);
 		}
-		return true;
 	}
-
+	
 	private void f(SolrInputDocument sid, String field,
 			Collection<Object> values) {
 		if (values != null && !values.isEmpty()) {
