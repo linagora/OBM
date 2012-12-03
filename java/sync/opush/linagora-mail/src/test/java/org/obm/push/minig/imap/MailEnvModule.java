@@ -10,8 +10,8 @@ public class MailEnvModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new LinagoraImapModule());
-		install(new org.obm.push.mail.MailEnvModule());
 		install(new GreenMailProviderModule());
+		install(new org.obm.push.mail.MailEnvModule());
 		
 	}
 	

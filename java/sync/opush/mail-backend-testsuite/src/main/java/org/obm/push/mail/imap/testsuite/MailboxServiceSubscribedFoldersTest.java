@@ -47,7 +47,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.imap.MailboxTestUtils;
@@ -55,7 +54,6 @@ import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class MailboxServiceSubscribedFoldersTest {
@@ -64,7 +62,6 @@ public abstract class MailboxServiceSubscribedFoldersTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private MailboxTestUtils testUtils;
@@ -81,7 +78,8 @@ public abstract class MailboxServiceSubscribedFoldersTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper,
+				greenMail.getSmtp().getServerSetup());
 	}
 	
 	@After

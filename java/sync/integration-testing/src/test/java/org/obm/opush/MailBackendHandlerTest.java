@@ -77,7 +77,6 @@ import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
@@ -118,8 +117,8 @@ public class MailBackendHandlerTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	
+	private ServerSetup smtpServerSetup;
 	private String mailbox;
 	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
@@ -129,6 +128,7 @@ public class MailBackendHandlerTest {
 	public void init() throws AuthorizationException, FolderException {
 		user = singleUserFixture.jaures;
 		greenMail.start();
+		smtpServerSetup = greenMail.getSmtp().getServerSetup();
 		mailbox = singleUserFixture.jaures.user.getLoginAtDomain();
 		greenMailUser = greenMail.setUser(mailbox, singleUserFixture.jaures.password);
 		imapHostManager = greenMail.getManagers().getImapHostManager();

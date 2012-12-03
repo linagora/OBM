@@ -79,9 +79,9 @@ public class JavaxMailTest {
 
 	@Inject LocatorService locatorService;
 	@Inject EmailConfiguration emailConfig;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
-	
 	@Inject GreenMail greenMail;
+
+	private ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private String emailHost;
@@ -89,6 +89,7 @@ public class JavaxMailTest {
 	@Before
 	public void setUp() {
 	    greenMail.start();
+	    smtpServerSetup = greenMail.getSmtp().getServerSetup();
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);

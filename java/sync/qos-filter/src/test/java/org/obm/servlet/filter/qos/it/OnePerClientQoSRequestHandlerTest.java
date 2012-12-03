@@ -92,9 +92,9 @@ public class OnePerClientQoSRequestHandlerTest {
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(4);
+		server.start();
 		async = new AsyncServletRequestUtils(threadpool, server.getPort(), QoSFilterTestModule.BLOCKING_SERVLET_NAME);
 		blockingServletUtils = new BlockingServletUtils(blockingServlet);
-		server.start();
 		System.out.println("test started");
 	}
 	

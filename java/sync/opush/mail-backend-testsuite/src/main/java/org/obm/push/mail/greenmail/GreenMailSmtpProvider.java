@@ -29,69 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.greenmail;
 
-import org.obm.configuration.EmailConfiguration;
+import org.columba.ristretto.smtp.SMTPProtocol;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.exception.SmtpLocatorException;
+import org.obm.push.mail.smtp.SmtpProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.icegreen.greenmail.util.GreenMail;
 
 @Singleton
-public class TestEmailConfiguration implements EmailConfiguration {
-
-	private final int imapPort;
-	private int imapTimeout;
+public class GreenMailSmtpProvider implements SmtpProvider {
+	
+	private final GreenMail greenMail;
 
 	@Inject
-	private TestEmailConfiguration(@ImapPort int imapPort) {
-		this.imapPort = imapPort;
-		this.imapTimeout = 3600000; // one hour
+	private GreenMailSmtpProvider(GreenMail greenMail) {
+		this.greenMail = greenMail;
 	}
 	
 	@Override
-	public boolean activateTls() {
-		return false;
+	public SMTPProtocol getSmtpClient(UserDataRequest udr)
+			throws SmtpLocatorException {
+		String address = "127.0.0.1";
+		int smtpPort = greenMail.getSmtp().getPort();
+		return new SMTPProtocol(address, smtpPort);
 	}
-
-	@Override
-	public boolean loginWithDomain() {
-		return true;
-	}
-
-	@Override
-	public int getMessageMaxSize() {
-		return 1024;
-	}
-
-	@Override
-	public int imapPort() {
-		return imapPort;
-	}
-
-	@Override
-	public int imapTimeout() {
-		return imapTimeout;
-	}
-
-	@Override
-	public int getImapFetchBlockSize() {
-		return 1 << 20;
-	}
-
-	public String imapMailboxDraft() {
-		return IMAP_DRAFTS_NAME;
-	}
-
-	public String imapMailboxSent() {
-		return IMAP_SENT_NAME;
-	}
-
-	public String imapMailboxTrash() {
-		return IMAP_TRASH_NAME;
-	}
-
-	public void setImapTimeoutInSecond(int timeout) {
-		imapTimeout = timeout * 1000;
-	}
-	
 }

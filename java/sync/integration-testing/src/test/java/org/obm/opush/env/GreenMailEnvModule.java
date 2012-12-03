@@ -32,7 +32,6 @@
 package org.obm.opush.env;
 
 import org.easymock.EasyMock;
-import org.obm.FreePortFinder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -40,21 +39,16 @@ import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.ImapPort;
-import org.obm.push.mail.SmtpPort;
-import org.obm.push.mail.TestEmailConfiguration;
-import org.obm.push.mail.TestSmtpProvider;
+import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
+import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.service.EventService;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-
 public class GreenMailEnvModule extends AbstractOverrideModule {
-	
+
 	@Override
 	protected void configureImpl() {
 		install(new GreenMailProviderModule());
@@ -68,22 +62,11 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 			}
 		});
 		
-		bind(EmailConfiguration.class).to(TestEmailConfiguration.class);
-		bind(SmtpProvider.class).to(TestSmtpProvider.class);
+		bind(EmailConfiguration.class).to(GreenMailEmailConfiguration.class);
+		bind(SmtpProvider.class).to(GreenMailSmtpProvider.class);
 
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
 		bind(UserDataRequest.Factory.class).to(TrackableUserDataRequest.Factory.class);
 	}
-	
-	@Provides @Singleton
-	@SmtpPort int getSmtpPort(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-	
-	@Provides @Singleton
-	@ImapPort int getImapPort(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-
 }

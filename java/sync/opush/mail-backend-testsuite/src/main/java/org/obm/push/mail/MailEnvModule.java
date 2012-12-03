@@ -32,10 +32,11 @@
 package org.obm.push.mail;
 
 import org.easymock.EasyMock;
-import org.obm.FreePortFinder;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
+import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
@@ -43,12 +44,10 @@ import org.obm.push.service.EventService;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 
 public class MailEnvModule extends AbstractModule {
-	
+
 	@Override
 	protected void configure() {
 		bind(EventService.class).toInstance(EasyMock.createMock(EventService.class));
@@ -61,24 +60,13 @@ public class MailEnvModule extends AbstractModule {
 				return "127.0.0.1";
 			}
 		});
-		
-		bind(EmailConfiguration.class).to(TestEmailConfiguration.class);
-		bind(SmtpProvider.class).to(TestSmtpProvider.class);
+
+		bind(EmailConfiguration.class).to(GreenMailEmailConfiguration.class);
+		bind(SmtpProvider.class).to(GreenMailSmtpProvider.class);
 
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
 	}
-	
-	@Provides @Singleton
-	@SmtpPort int getSmtpPort(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-	
-	@Provides @Singleton
-	@ImapPort int getImapPort(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-	
 }

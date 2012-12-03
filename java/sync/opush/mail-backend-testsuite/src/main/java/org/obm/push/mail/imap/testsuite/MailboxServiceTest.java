@@ -58,7 +58,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
@@ -80,7 +79,7 @@ public abstract class MailboxServiceTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
+	ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private MailboxTestUtils testUtils;
@@ -91,6 +90,7 @@ public abstract class MailboxServiceTest {
 	public void setUp() {
 		beforeTest = new Date();
 		greenMail.start();
+		smtpServerSetup = greenMail.getSmtp().getServerSetup();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);

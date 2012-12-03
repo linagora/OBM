@@ -47,7 +47,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -77,7 +76,6 @@ public class ProvisionHandlerTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ProvisionHandlerTestModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -101,7 +99,7 @@ public class ProvisionHandlerTest {
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -119,7 +117,7 @@ public class ProvisionHandlerTest {
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(userRegistredPolicyKey);
 
 		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -138,7 +136,7 @@ public class ProvisionHandlerTest {
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(acknowledgingPolicyKey);
 
 		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);

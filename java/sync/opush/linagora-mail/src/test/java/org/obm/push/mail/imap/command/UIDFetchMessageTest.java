@@ -54,7 +54,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
@@ -63,7 +62,6 @@ import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
-import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UIDFetchMessageTest {
@@ -76,7 +74,6 @@ public class UIDFetchMessageTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;
 	@Inject GreenMail greenMail;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -93,7 +90,9 @@ public class UIDFetchMessageTest {
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
+		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper,
+	    		greenMail.getSmtp().getServerSetup());
+
 	}
 	
 	@After

@@ -71,7 +71,11 @@ public class QoSFilterTestModule extends ServletModule {
 			
 			@Override
 			public int getPort() {
-				return selectChannelConnector.getLocalPort();
+				int port = selectChannelConnector.getLocalPort();
+				if (port > 0) {
+					return port;
+				}
+				throw new IllegalStateException("Could not get server's listening port. Assert to start the server first.");
 			}
 		};
 	}

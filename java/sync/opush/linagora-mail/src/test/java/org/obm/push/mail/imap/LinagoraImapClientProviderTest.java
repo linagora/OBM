@@ -58,7 +58,6 @@ public class LinagoraImapClientProviderTest {
 	public void testProviderConfiguration() {
 		expect(emailConfiguration.getImapFetchBlockSize()).andReturn(987);
 		expect(emailConfiguration.activateTls()).andReturn(true).anyTimes();
-		expect(emailConfiguration.imapPort()).andReturn(143);
 		expect(emailConfiguration.loginWithDomain()).andReturn(true);
 		expect(emailConfiguration.imapTimeout()).andReturn(123456);
 		
@@ -77,7 +76,6 @@ public class LinagoraImapClientProviderTest {
 	@Test
 	public void testImapStartTLSFalse() {
 		expect(emailConfiguration.getImapFetchBlockSize()).andReturn(10);
-		expect(emailConfiguration.imapPort()).andReturn(143);
 		expect(emailConfiguration.loginWithDomain()).andReturn(true);
 		expect(emailConfiguration.imapTimeout()).andReturn(123456);
 		expect(emailConfiguration.activateTls()).andReturn(false).anyTimes();

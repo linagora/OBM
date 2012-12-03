@@ -72,7 +72,6 @@ public class ImapClientProviderImpl {
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final MessageInputStreamProvider messageInputStreamProvider;
 	private final boolean loginWithDomain;
-	private final int imapPort;
 	@VisibleForTesting final Session defaultSession;
 
 	@Inject
@@ -85,7 +84,6 @@ public class ImapClientProviderImpl {
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.messageInputStreamProvider = messageInputStreamProvider;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
-		this.imapPort = emailConfiguration.imapPort();
 		
 		Properties imapProperties = buildProperties(emailConfiguration);
 		this.defaultSession = Session.getInstance(imapProperties);
@@ -188,7 +186,7 @@ public class ImapClientProviderImpl {
 					new Object[]{login, loginWithDomain});
 
 			IMAPStore store = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
-			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, imapMailBoxUtils, login, udr.getPassword(), imapHost, imapPort);
+			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, imapMailBoxUtils, login, udr.getPassword(), imapHost);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);

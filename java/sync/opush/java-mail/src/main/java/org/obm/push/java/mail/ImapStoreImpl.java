@@ -43,6 +43,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MailboxFolder;
@@ -61,6 +62,7 @@ import org.obm.push.mail.imap.StreamedLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
@@ -70,11 +72,19 @@ public class ImapStoreImpl implements ImapStore {
 
 	@Singleton
 	public static class Factory implements ImapStore.Factory {
+		
+		private final EmailConfiguration emailConfiguration;
+
+		@Inject
+		private Factory(EmailConfiguration emailConfiguration) {
+			this.emailConfiguration = emailConfiguration;
+			
+		}
 
 		@Override
 		public ImapStore create(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
-				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host, int port) {
-			return new ImapStoreImpl(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port);
+				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host) {
+			return new ImapStoreImpl(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, emailConfiguration.imapPort());
 		}
 		
 	}

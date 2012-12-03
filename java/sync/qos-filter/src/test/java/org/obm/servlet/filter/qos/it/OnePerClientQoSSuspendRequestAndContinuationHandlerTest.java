@@ -92,9 +92,9 @@ public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(12);
+		server.start();
 		async = new AsyncServletRequestUtils(threadpool, server.getPort(), QoSFilterTestModule.SUSPENDING_SERVLET_NAME);
 		suspendingServletUtils = new SuspendingServletUtils(suspendingServlet);
-		server.start();
 		System.out.println("test started");
 	}
 	

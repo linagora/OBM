@@ -155,8 +155,6 @@ public class ImapClientProviderImplTest {
 		EmailConfiguration emailConfiguration = mocksControl.createMock(EmailConfiguration.class);
 		expect(emailConfiguration.loginWithDomain())
 			.andReturn(true).once();
-		expect(emailConfiguration.imapPort())
-			.andReturn(143).once();
 		expect(emailConfiguration.activateTls())
 			.andReturn(false).once();
 		expect(emailConfiguration.imapTimeout())

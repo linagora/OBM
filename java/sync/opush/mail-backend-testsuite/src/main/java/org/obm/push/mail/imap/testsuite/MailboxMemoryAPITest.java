@@ -61,11 +61,9 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.ImapPort;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
-import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -76,6 +74,7 @@ import org.obm.push.mail.mime.MimeAddress;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
+@Ignore("OBMFULL-4371, external greenmail has to provide its listening imap and smtp ports")
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class MailboxMemoryAPITest {
 	
@@ -83,8 +82,6 @@ public abstract class MailboxMemoryAPITest {
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
 	@Inject CollectionPathHelper collectionPathHelper;
-	@Inject @ImapPort int imapPort;
-	@Inject @SmtpPort int smtpPort;
 	
 	private String mailbox;
 	private String password;
@@ -93,6 +90,8 @@ public abstract class MailboxMemoryAPITest {
 	private String inboxPath;
 	
 	private ClosableProcess greenMailProcess;
+	private int imapPort;
+	private int smtpPort;
 	
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();

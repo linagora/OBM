@@ -58,7 +58,6 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Envelope;
@@ -87,10 +86,10 @@ public abstract class MailboxFetchAPITest {
 	
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject CollectionPathHelper collectionPathHelper;
 	
+	private ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -102,6 +101,7 @@ public abstract class MailboxFetchAPITest {
 	public void setUp() {
 		this.beforeTest = new Date();
 		this.greenMail.start();
+		this.smtpServerSetup = greenMail.getSmtp().getServerSetup();
 		this.mailbox = "to@localhost.com";
 	    this.password = "password";
 	    this.greenMailUser = this.greenMail.setUser(mailbox, password);

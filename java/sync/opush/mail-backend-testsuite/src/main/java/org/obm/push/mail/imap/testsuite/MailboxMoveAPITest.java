@@ -50,7 +50,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MailboxTestUtils;
@@ -74,7 +73,7 @@ public abstract class MailboxMoveAPITest {
 
 	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject GreenMail greenMail;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
+	private ServerSetup smtpServerSetup;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
@@ -86,6 +85,7 @@ public abstract class MailboxMoveAPITest {
 	public void setUp() {
 		beforeTest = new Date();
 	    greenMail.start();
+	    smtpServerSetup = greenMail.getSmtp().getServerSetup();
 	    mailbox = "to@localhost.com";
 	    password = "password";
 	    greenMail.setUser(mailbox, password);

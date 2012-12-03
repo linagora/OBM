@@ -39,6 +39,7 @@ import java.util.Set;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -49,11 +50,9 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.ImapPort;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
@@ -64,20 +63,21 @@ import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+@Ignore("OBMFULL-4371, external greenmail has to provide its listening imap and smtp ports")
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class ExternalGreenMailTest {
 
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
-	@Inject @ImapPort int imapPort;
-	@Inject @SmtpPort int smtpPort;
 	
 	@Inject CollectionPathHelper collectionPathHelper;
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
-	
+
+	private int imapPort;
+	private int smtpPort;
 	private ClosableProcess greenMailProcess;
 	private ServerSetup smtpServerSetup;
 

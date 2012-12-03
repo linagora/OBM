@@ -29,18 +29,66 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.greenmail;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.obm.configuration.EmailConfiguration;
 
-import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.icegreen.greenmail.util.GreenMail;
 
-@Retention(RetentionPolicy.RUNTIME) 
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER}) 
-@BindingAnnotation
-public @interface ImapPort {
+@Singleton
+public class GreenMailEmailConfiguration implements EmailConfiguration {
+
+	private final int imapTimeout;
+	private final GreenMail greenMail;
+
+	@Inject
+	private GreenMailEmailConfiguration(GreenMail greenMail) {
+		this.greenMail = greenMail;
+		this.imapTimeout = 3600000; // one hour
+	}
+	
+	@Override
+	public boolean activateTls() {
+		return false;
+	}
+
+	@Override
+	public boolean loginWithDomain() {
+		return true;
+	}
+
+	@Override
+	public int getMessageMaxSize() {
+		return 1024;
+	}
+
+	@Override
+	public int imapPort() {
+		return greenMail.getImap().getPort();
+	}
+
+	@Override
+	public int imapTimeout() {
+		return imapTimeout;
+	}
+
+	@Override
+	public int getImapFetchBlockSize() {
+		return 1 << 20;
+	}
+
+	public String imapMailboxDraft() {
+		return IMAP_DRAFTS_NAME;
+	}
+
+	public String imapMailboxSent() {
+		return IMAP_SENT_NAME;
+	}
+
+	public String imapMailboxTrash() {
+		return IMAP_TRASH_NAME;
+	}
 
 }

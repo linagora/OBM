@@ -33,11 +33,6 @@ package org.obm.push.mail.greenmail;
 
 import java.util.Locale;
 
-import org.obm.push.mail.ImapPort;
-import org.obm.push.mail.ImapServerSetup;
-import org.obm.push.mail.SmtpPort;
-import org.obm.push.mail.SmtpServerSetup;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -46,25 +41,23 @@ import com.icegreen.greenmail.util.ServerSetup;
 
 public class GreenMailProviderModule extends AbstractModule {
 
+	private static final int AUTOMATIC_PORT = 0;
+
 	@Override
 	protected void configure() {
 	}
-	
-	@Provides @Singleton
-	@ImapServerSetup ServerSetup getImapServerSetup(@ImapPort int imapPort) {
-		return new ServerSetup(imapPort, null, ServerSetup.PROTOCOL_IMAP);
+
+	private ServerSetup getImapServerSetup() {
+		return new ServerSetup(AUTOMATIC_PORT, null, ServerSetup.PROTOCOL_IMAP);
 	}
 
-	@Provides @Singleton
-	@SmtpServerSetup ServerSetup getSmtpServerSetup(@SmtpPort int smtpPort) {
-		return new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
+	private ServerSetup getSmtpServerSetup() {
+		return new ServerSetup(AUTOMATIC_PORT, null, ServerSetup.PROTOCOL_SMTP);
 	}
 	
 	@Provides @Singleton
-	/* package */ GreenMail provideGreenmail(
-			@SmtpServerSetup ServerSetup smtpServerSetup,
-			@ImapServerSetup ServerSetup imapServerSetup) {
+	/* package */ GreenMail provideGreenmail() {
 		Locale.setDefault(Locale.US);
-		return new GreenMail(new ServerSetup[] {smtpServerSetup, imapServerSetup});
+		return new GreenMail(new ServerSetup[] {getSmtpServerSetup(), getImapServerSetup()});
 	}
 }

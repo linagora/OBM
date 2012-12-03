@@ -33,6 +33,7 @@ package org.obm.opush;
 
 import javax.mail.Session;
 
+import org.obm.configuration.EmailConfiguration;
 import org.obm.push.java.mail.ImapStoreImpl;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
@@ -51,16 +52,18 @@ public class CountingImapStore extends ImapStoreImpl {
 	public static class Factory implements ImapStore.Factory {
 
 		private ImapConnectionCounter counter;
+		private final EmailConfiguration emailConfiguration;
 
 		@Inject
-		private Factory(ImapConnectionCounter counter) {
+		private Factory(ImapConnectionCounter counter, EmailConfiguration emailConfiguration) {
 			this.counter = counter;
+			this.emailConfiguration = emailConfiguration;
 		}
 		
 		@Override
 		public ImapStore create(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
-				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host, int port) {
-			return new CountingImapStore(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, port, counter);
+				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host) {
+			return new CountingImapStore(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, emailConfiguration.imapPort(), counter);
 		}
 		
 	}

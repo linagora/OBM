@@ -61,7 +61,7 @@ public class LinagoraImapClientProvider {
 	private final MinigStoreClient.Factory minigStoreClientFactory;
 	private final LocatorService locatorService;
 	private final boolean loginWithDomain;
-	private final int imapPort;
+	private final EmailConfiguration emailConfiguration;
 	private final boolean activateTLS;
 	private final IdleClient.Factory idleClientFactory;
 	@VisibleForTesting final Session defaultSession;
@@ -73,8 +73,8 @@ public class LinagoraImapClientProvider {
 		
 		this.minigStoreClientFactory = minigStoreClientFactory;
 		this.locatorService = locatorService;
+		this.emailConfiguration = emailConfiguration;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
-		this.imapPort = emailConfiguration.imapPort();
 		this.activateTLS = emailConfiguration.activateTls();
 		this.idleClientFactory = idleClientFactory;
 		
@@ -118,7 +118,7 @@ public class LinagoraImapClientProvider {
 		
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
-		StoreClient newStoreClient = new StoreClient(imapHost, imapPort, login, udr.getPassword());
+		StoreClient newStoreClient = new StoreClient(imapHost, emailConfiguration.imapPort(), login, udr.getPassword());
 		
 		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(newStoreClient);
 		newMinigStoreClient.login(activateTLS);

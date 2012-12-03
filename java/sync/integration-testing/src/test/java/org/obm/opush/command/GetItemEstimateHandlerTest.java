@@ -46,8 +46,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
@@ -59,6 +57,7 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.state.StateMachine;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.OPClient;
@@ -66,13 +65,12 @@ import org.obm.sync.push.client.OPClient;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowFilterRunner.class) //@Slow
 public class GetItemEstimateHandlerTest {
 
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(GetIemEstimateTestModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -92,12 +90,12 @@ public class GetItemEstimateHandlerTest {
 	@Test
 	public void testGetItemEstimateWithValidCollectionAndSyncKey() throws Exception {
 		SyncKey syncKey = new SyncKey("1");
-		ItemSyncState expectedSyncState = ItemSyncState.builder().syncKey(syncKey).build();
+		ItemSyncState expectedSyncState = ItemSyncState.builder().syncDate(DateUtils.getCurrentDate()).syncKey(syncKey).build();
 		int collectionId = 15105;
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, collectionId);
@@ -110,12 +108,12 @@ public class GetItemEstimateHandlerTest {
 	@Test
 	public void testGetItemEstimateWithUnexistingCollection() throws Exception {
 		SyncKey syncKey = new SyncKey("1");
-		ItemSyncState expectedSyncState = ItemSyncState.builder().syncKey(syncKey).build();
+		ItemSyncState expectedSyncState = ItemSyncState.builder().syncDate(DateUtils.getCurrentDate()).syncKey(syncKey).build();
 		int unexistingCollectionId = 15105;
 		Set<Integer> existingCollections = Collections.<Integer>emptySet();
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, unexistingCollectionId);
@@ -133,7 +131,7 @@ public class GetItemEstimateHandlerTest {
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
 		mockAccessAndStateThenStart(existingCollections, invalidSyncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(invalidSyncKey, collectionId);

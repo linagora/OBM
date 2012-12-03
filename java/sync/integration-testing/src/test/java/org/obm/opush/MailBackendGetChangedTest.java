@@ -55,7 +55,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -70,7 +69,6 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
-import org.obm.push.mail.SmtpServerSetup;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.service.DateService;
@@ -91,14 +89,11 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetup;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendGetChangedTestModule.class)
 public class MailBackendGetChangedTest {
 
-	@Inject	@PortNumber int port;
-	@Inject @SmtpServerSetup ServerSetup smtpServerSetup;
 	@Inject	SingleUserFixture singleUserFixture;
 	@Inject	OpushServer opushServer;
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -118,7 +113,6 @@ public class MailBackendGetChangedTest {
 	private String inboxCollectionPath;
 	private int inboxCollectionId;
 	private String inboxCollectionIdAsString;
-	private OPClient opClient;
 
 	@Before
 	public void init() throws Exception {
@@ -137,7 +131,6 @@ public class MailBackendGetChangedTest {
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
-		opClient = buildWBXMLOpushClient(user, port);
 
 		bindCollectionIdToPath();
 	}
@@ -197,6 +190,7 @@ public class MailBackendGetChangedTest {
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
@@ -260,6 +254,7 @@ public class MailBackendGetChangedTest {
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
@@ -326,6 +321,7 @@ public class MailBackendGetChangedTest {
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
@@ -391,6 +387,7 @@ public class MailBackendGetChangedTest {
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
@@ -430,8 +427,8 @@ public class MailBackendGetChangedTest {
 	}
 
 	private void sendTwoEmailsToImapServer() throws InterruptedException {
-		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", smtpServerSetup);
-		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", greenMail.getSmtp().getServerSetup());
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", greenMail.getSmtp().getServerSetup());
 		greenMail.waitForIncomingEmail(2);
 	}
 
