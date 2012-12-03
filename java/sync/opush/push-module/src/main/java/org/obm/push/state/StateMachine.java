@@ -49,6 +49,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
+import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.utils.DateUtils;
@@ -70,13 +71,15 @@ public class StateMachine {
 	private final CollectionDao collectionDao;
 	private final ItemTrackingDao itemTrackingDao;
 	private final SyncKeyFactory syncKeyFactory;
+	private final DateService dateService;
 
 	@Inject
 	@VisibleForTesting StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			SyncKeyFactory syncKeyFactory) {
+			SyncKeyFactory syncKeyFactory, DateService dateService) {
 		this.collectionDao = collectionDao;
 		this.itemTrackingDao = itemTrackingDao;
 		this.syncKeyFactory = syncKeyFactory;
+		this.dateService = dateService;
 	}
 
 	public ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
@@ -91,7 +94,10 @@ public class StateMachine {
 		Preconditions.checkArgument(syncKey != null && !Strings.isNullOrEmpty(syncKey.getSyncKey()));
 		
 		if (FolderSyncState.isSyncKeyOfInitialFolderSync(syncKey)) {
-			return FolderSyncState.builder().syncKey(syncKey).build();
+			return FolderSyncState.builder()
+					.syncDate(dateService.getEpochPlusOneSecondDate())
+					.syncKey(syncKey)
+					.build();
 		} else {
 			return findFolderSyncState(syncKey);
 		}

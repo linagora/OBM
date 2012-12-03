@@ -84,13 +84,13 @@ import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
 import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -134,6 +134,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final ContinuationService continuationService;
 	private final boolean enablePush;
 	private final SyncKeyFactory syncKeyFactory;
+	private final DateService dateService;
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
@@ -144,7 +145,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			ResponseWindowingService responseWindowingProcessor,
 			ContinuationService continuationService,
 			@Named("enable-push") boolean enablePush,
-			SyncKeyFactory syncKeyFactory) {
+			SyncKeyFactory syncKeyFactory,
+			DateService dateService) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
@@ -158,6 +160,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.continuationService = continuationService;
 		this.enablePush = enablePush;
 		this.syncKeyFactory = syncKeyFactory;
+		this.dateService = dateService;
 	}
 
 	@Override
@@ -287,7 +290,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				Map<String, String> processedClientIds = processModification(udr, collection);
 				modificationStatus.processedClientIds.putAll(processedClientIds);
 			} else {
-				ItemSyncState syncState = ItemSyncState.builder().syncKey(collection.getSyncKey()).build();
+				ItemSyncState syncState = ItemSyncState.builder()
+						.syncDate(dateService.getEpochPlusOneSecondDate())
+						.syncKey(collection.getSyncKey())
+						.build();
 				collection.setItemSyncState(syncState);
 			}
 		}
@@ -435,7 +441,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (syncCollection.getFetchIds().isEmpty()) {
 				syncDate = doUpdates(udr, syncCollection, processedClientIds, newSyncKey, syncCollectionResponse);
 			} else {
-				syncDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+				syncDate = dateService.getEpochPlusOneSecondDate();
 				syncCollectionResponse.setItemChanges(
 						contentsExporter.fetch(udr, syncCollection));
 			}
@@ -457,7 +463,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
 		stMachine.allocateNewSyncKey(udr, 
 				syncCollection.getCollectionId(), 
-				DateUtils.getEpochPlusOneSecondCalendar().getTime(), 
+				dateService.getEpochPlusOneSecondDate(), 
 				changed,
 				deleted,
 				newSyncKey);

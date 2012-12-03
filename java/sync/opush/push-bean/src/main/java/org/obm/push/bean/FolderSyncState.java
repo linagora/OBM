@@ -34,9 +34,6 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.obm.push.utils.DateUtils;
-
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class FolderSyncState extends SyncState implements Serializable {
@@ -52,7 +49,7 @@ public class FolderSyncState extends SyncState implements Serializable {
 		@Override
 		public FolderSyncState build() {
 			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
-			syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			Preconditions.checkArgument(syncDate != null, "syncDate can't be null or empty");
 			return new FolderSyncState(syncDate, syncFiltred, syncKey, id);
 		}
 	}

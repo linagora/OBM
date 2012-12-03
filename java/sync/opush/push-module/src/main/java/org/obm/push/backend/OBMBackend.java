@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
@@ -49,6 +50,7 @@ import org.obm.push.monitor.ContactsMonitoringThread;
 import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
 import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
 import org.obm.push.protocol.provisioning.Policy;
+import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -72,6 +74,7 @@ public class OBMBackend implements IBackend {
 	private final LoginService loginService;
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final MailMonitoringBackend emailBackend;
+	private final DateService dateService;
 	private final boolean enablePush;
 	
 	@Inject
@@ -81,12 +84,14 @@ public class OBMBackend implements IBackend {
 			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, 
 			LoginService loginService,
 			MailMonitoringBackend emailBackend,
+			DateService dateService,
 			@Named("enable-push") boolean enablePush) {
 		
 		this.collectionDao = collectionDao;
 		this.contentsExporter = contentsExporter;
 		this.loginService = loginService;
 		this.emailBackend = emailBackend;
+		this.dateService = dateService;
 		this.enablePush = enablePush;
 		
 		this.registeredListeners = Collections
@@ -181,7 +186,10 @@ public class OBMBackend implements IBackend {
 		for (SyncCollection syncCollection: collectionChangeListener.getMonitoredCollections()) {
 
 			if (!syncCollection.hasSyncState()) {
-				syncCollection.newSyncSate();
+				syncCollection.setItemSyncState(ItemSyncState.builder()
+						.syncDate(dateService.getEpochPlusOneSecondDate())
+						.syncKey(syncCollection.getSyncKey())
+						.build());
 			}
 			
 			int count = getItemEstimateSize(userDataRequest, syncCollection);

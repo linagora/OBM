@@ -117,7 +117,10 @@ public class IntegrationTestUtils {
 			throws DaoException, CollectionNotFoundException {
 		
 		Date lastSync = new Date();
-		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(lastSync)
+				.syncKey(new SyncKey("sync state"))
+				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();

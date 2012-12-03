@@ -87,6 +87,7 @@ import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -146,7 +147,10 @@ public class MailBackendHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int serverId = 1234;
 		String syncEmailId = ":2";
-		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getCurrentDate())
+				.syncKey(new SyncKey("sync state"))
+				.build();
 		DataDelta delta = DataDelta.builder()
 			.changes(new ItemChangesBuilder()
 				.addItemChange(new ItemChangeBuilder()

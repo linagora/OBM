@@ -66,6 +66,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 
@@ -164,10 +165,14 @@ public class EmailSyncTestUtils {
 		}
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncKey.class), anyObject(Date.class)))
 				.andReturn(ItemSyncState.builder()
+						.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 						.syncKey(syncEmailSyncKey)
 						.id((int)(Math.random()*10000))
 						.build()).anyTimes();
-		ItemSyncState state = ItemSyncState.builder().syncKey(syncEmailSyncKey).build();
+		ItemSyncState state = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncEmailSyncKey)
+				.build();
 		expect(collectionDao.findItemStateForKey(syncEmailSyncKey)).andReturn(state).anyTimes();
 	}
 

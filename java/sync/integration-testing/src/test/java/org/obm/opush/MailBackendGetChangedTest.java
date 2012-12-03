@@ -46,6 +46,7 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -75,6 +76,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.OPClient;
@@ -169,7 +171,9 @@ public class MailBackendGetChangedTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
 		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
 				.syncKey(firstAllocatedSyncKey)
 				.id(allocatedStateId)
 				.build();
@@ -178,6 +182,7 @@ public class MailBackendGetChangedTest {
 				.syncKey(secondAllocatedSyncKey)
 				.id(allocatedStateId2)
 				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
 		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, allocatedState);
@@ -222,7 +227,9 @@ public class MailBackendGetChangedTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey, newAllocatedSyncKey);
 		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
 				.syncKey(firstAllocatedSyncKey)
 				.id(allocatedStateId)
 				.build();
@@ -236,6 +243,7 @@ public class MailBackendGetChangedTest {
 				.syncKey(newAllocatedSyncKey)
 				.id(newAllocatedStateId)
 				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
 		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
 		expect(dateService.getCurrentDate()).andReturn(newAllocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
@@ -283,7 +291,9 @@ public class MailBackendGetChangedTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey, newAllocatedSyncKey);
 		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
 				.syncKey(firstAllocatedSyncKey)
 				.id(allocatedStateId)
 				.build();
@@ -297,6 +307,7 @@ public class MailBackendGetChangedTest {
 				.syncKey(newAllocatedSyncKey)
 				.id(newAllocatedStateId)
 				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
 		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
 		expect(dateService.getCurrentDate()).andReturn(newAllocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);

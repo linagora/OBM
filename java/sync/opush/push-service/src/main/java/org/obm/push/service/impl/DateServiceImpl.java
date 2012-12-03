@@ -46,4 +46,8 @@ public class DateServiceImpl implements DateService {
 		return DateUtils.getCurrentDate();
 	}
 	
+	@Override
+	public Date getEpochPlusOneSecondDate() {
+		return DateUtils.getEpochPlusOneSecondCalendar().getTime();
+	}
 }

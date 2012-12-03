@@ -45,6 +45,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
+import org.obm.push.service.impl.DateServiceImpl;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DateUtils;
 
@@ -53,14 +54,14 @@ public class StateMachineTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFolderSyncStateWithNullKey() throws Exception {
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
 		
 		stateMachine.getFolderSyncState(null);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFolderSyncStateWithEmptyKey() throws Exception {
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
 		
 		stateMachine.getFolderSyncState(new SyncKey(""));
 	}
@@ -69,7 +70,7 @@ public class StateMachineTest {
 	public void testGetFolderSyncStateWithInitialKey() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(initialSyncKey);
 		
 		assertThat(folderSyncState.getSyncKey()).isEqualTo(initialSyncKey);
@@ -92,7 +93,7 @@ public class StateMachineTest {
 		expect(collectionDao.findFolderStateForKey(knownSyncKey)).andReturn(knownFolderSyncState).once();
 		replay(collectionDao);
 		
-		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory());
+		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory(), new DateServiceImpl());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(knownSyncKey);
 
 		verify(collectionDao);
@@ -111,7 +112,7 @@ public class StateMachineTest {
 		expect(collectionDao.findFolderStateForKey(unknownSyncKey)).andReturn(null).once();
 		replay(collectionDao);
 		
-		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory());
+		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory(), new DateServiceImpl());
 		stateMachine.getFolderSyncState(unknownSyncKey);
 	}
 }

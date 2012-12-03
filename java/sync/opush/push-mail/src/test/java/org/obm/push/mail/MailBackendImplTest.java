@@ -69,6 +69,7 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.service.DateService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.SnapshotDao;
+import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -150,7 +151,11 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 		
 		assertThat(actual.getDeletions()).isEmpty();
@@ -181,7 +186,11 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
+		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 
 		assertThat(actual.getDeletions()).isEmpty();
@@ -220,7 +229,11 @@ public class MailBackendImplTest {
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		
 		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, new SyncKey("5678"));
+		testee.getChanged(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions, new SyncKey("5678"));
 	}
 	
 	@Test
@@ -295,7 +308,11 @@ public class MailBackendImplTest {
 		expectServerItemChanges(bodyPreferences, emailChanges, modifiedEmail, newEmail, deletedEmail);
 		
 		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder().syncKey(syncKey).build(), collectionId, syncCollectionOptions, newSyncKey);
+		testee.getChanged(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions, newSyncKey);
 		
 		control.verify();
 	}

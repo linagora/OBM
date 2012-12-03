@@ -53,6 +53,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Provider;
@@ -88,7 +89,10 @@ public class MappingServiceImplTest {
 		replay(udr, collectionDao, collectionPathBuilderProvider);
 		
 		MappingServiceImpl mappingServiceImpl= new MappingServiceImpl(collectionDao, null, null,collectionPathBuilderProvider);
-		List<CollectionPath> listCollections = mappingServiceImpl.listCollections(udr, FolderSyncState.builder().syncKey(incomingSyncKey).build());
+		List<CollectionPath> listCollections = mappingServiceImpl.listCollections(udr, FolderSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(incomingSyncKey)
+				.build());
 		
 		assertThat(listCollections).containsOnly(
 				expectedCollectionPathEmail,

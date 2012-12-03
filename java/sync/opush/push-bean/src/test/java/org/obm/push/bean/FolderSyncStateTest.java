@@ -45,16 +45,15 @@ import org.obm.push.utils.DateUtils;
 public class FolderSyncStateTest {
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void testPreconditionOn() {
+	public void testPreconditionOnSyncKey() {
 		FolderSyncState.builder().build();
 	}
 	
-	@Test
-	public void testSyncDateDefaultValue() {
-		FolderSyncState syncState = FolderSyncState.builder()
+	@Test(expected=IllegalArgumentException.class)
+	public void testPreconditionOnSyncDate() {
+		FolderSyncState.builder()
 			.syncKey(new SyncKey("123"))
 			.build();
-		assertThat(syncState.getSyncDate()).isNotNull();
 	}
 	
 	@Test

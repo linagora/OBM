@@ -45,16 +45,15 @@ import org.obm.push.utils.DateUtils;
 public class ItemSyncStateTest {
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void testPreconditionOn() {
+	public void testPreconditionOnSyncKey() {
 		ItemSyncState.builder().build();
 	}
 	
-	@Test
-	public void testSyncDateDefaultValue() {
-		ItemSyncState syncState = ItemSyncState.builder()
+	@Test(expected=IllegalArgumentException.class)
+	public void testPreconditionOnSyncDate() {
+		ItemSyncState.builder()
 			.syncKey(new SyncKey("123"))
 			.build();
-		assertThat(syncState.getSyncDate()).isNotNull();
 	}
 	
 	@Test

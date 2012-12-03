@@ -61,6 +61,7 @@ import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
@@ -81,6 +82,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final HearbeatDao hearbeatDao;
 	private final CollectionPathHelper collectionPathHelper;
 	private final ContinuationService continuationService;
+	private final DateService dateService;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
@@ -89,7 +91,8 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
 			CollectionDao collectionDao, HearbeatDao hearbeatDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ContinuationService continuationService) {
+			ContinuationService continuationService,
+			DateService dateService) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
@@ -99,6 +102,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.hearbeatDao = hearbeatDao;
 		this.collectionPathHelper = collectionPathHelper;
 		this.continuationService = continuationService;
+		this.dateService = dateService;
 	}
 
 	@Override
@@ -174,7 +178,10 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (lastKnownState != null) {
 				collection.setItemSyncState(lastKnownState);
 			} else {
-				collection.newSyncSate();
+				collection.setItemSyncState(ItemSyncState.builder()
+						.syncDate(dateService.getEpochPlusOneSecondDate())
+						.syncKey(collection.getSyncKey())
+						.build());
 			}
 		}
 	}

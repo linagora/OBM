@@ -81,6 +81,7 @@ import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse.ItemChangeMeetingResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.HttpRequestException;
@@ -347,7 +348,10 @@ public class MeetingResponseHandlerTest {
 	private void expectCollectionDaoUnchange(CollectionDao collectionDao) throws DaoException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		
-		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(new SyncKey("sync state"))
+				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		
 		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<SyncCollection>of());

@@ -34,9 +34,6 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.obm.push.utils.DateUtils;
-
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class ItemSyncState extends SyncState implements Serializable {
@@ -52,15 +49,9 @@ public class ItemSyncState extends SyncState implements Serializable {
 		@Override
 		public ItemSyncState build() {
 			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
-			syncDate = Objects.firstNonNull(syncDate, DateUtils.getEpochPlusOneSecondCalendar().getTime());
+			Preconditions.checkArgument(syncDate != null, "syncDate can't be null or empty");
 			return new ItemSyncState(syncDate, syncFiltred, syncKey, id);
 		}
-	}
-	
-	public static ItemSyncState newInitialSyncState() {
-		return ItemSyncState.builder()
-				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
-				.build();
 	}
 	
 	private ItemSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {

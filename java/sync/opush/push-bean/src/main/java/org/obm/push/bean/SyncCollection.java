@@ -176,10 +176,6 @@ public class SyncCollection implements Serializable {
 		return itemSyncState != null;
 	}
 	
-	public void newSyncSate() {
-		this.itemSyncState = ItemSyncState.builder().syncKey(this.getSyncKey()).build();
-	}
-	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(itemSyncState, fetchIds, dataClass, collectionId, collectionPath, 
