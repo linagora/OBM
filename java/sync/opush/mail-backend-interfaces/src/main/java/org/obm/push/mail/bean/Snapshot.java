@@ -40,6 +40,7 @@ import org.obm.push.bean.SyncKey;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 public class Snapshot implements Serializable {
@@ -86,7 +87,7 @@ public class Snapshot implements Serializable {
 		}
 		
 		public Builder emails(Collection<Email> emails) {
-			this.emails = emails;
+			this.emails = ImmutableList.copyOf(emails);
 			return this;
 		}
 		
