@@ -50,7 +50,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -82,13 +81,11 @@ public class FolderSyncHandlerTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(FolderSyncHandlerTestModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 
 	private List<OpushUser> userAsList;
-
 	private OpushUser user;
 
 	@Before
@@ -120,12 +117,9 @@ public class FolderSyncHandlerTest {
 
 		
 		replayMocks(classToInstanceMap);
-		
 		opushServer.start();
-		
-		OPClient opClient = buildWBXMLOpushClient(user, port);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-
 		verifyMocks(classToInstanceMap);
 		
 		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
@@ -152,10 +146,9 @@ public class FolderSyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 
 		replayMocks(classToInstanceMap);
-		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, port);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);
@@ -199,10 +192,9 @@ public class FolderSyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
 		replayMocks(classToInstanceMap);
-		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, port);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);
@@ -238,10 +230,9 @@ public class FolderSyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
 		replayMocks(classToInstanceMap);
-		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, port);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
 		verifyMocks(classToInstanceMap);

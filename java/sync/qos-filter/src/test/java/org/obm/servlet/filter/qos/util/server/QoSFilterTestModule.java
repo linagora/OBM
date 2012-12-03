@@ -36,8 +36,6 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
-import org.obm.FreePortFinder;
-import org.obm.PortNumber;
 import org.obm.servlet.filter.qos.QoSFilter;
 
 import com.google.inject.Provides;
@@ -51,22 +49,31 @@ public class QoSFilterTestModule extends ServletModule {
 	public static final String SUSPENDING_SERVLET_NAME = "suspending";
 	
 	@Provides @Singleton
-	@PortNumber int getPortNumber(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-	
-	@Provides @Singleton
-	protected Server buildServerWithModules(@PortNumber int portNumber) {
-		Server server = new Server(portNumber);
+	protected EmbeddedServer buildServerWithModules() {
+		final Server server = new Server();
 		server.setThreadPool(new QueuedThreadPool(5));
-		SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
-		selectChannelConnector.setPort(portNumber);
-		selectChannelConnector.setReuseAddress(false);
+		final SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
 		server.setConnectors(new Connector[] {selectChannelConnector});
 		Context root = new Context(server, "/", Context.SESSIONS);
 		root.addFilter(GuiceFilter.class, "/*", 0);
 		root.addServlet(DefaultServlet.class, "/");
-		return server;
+		return new EmbeddedServer() {
+			
+			@Override
+			public void stop() throws Exception {
+				server.stop();
+			}
+			
+			@Override
+			public void start() throws Exception {
+				server.start();
+			}
+			
+			@Override
+			public int getPort() {
+				return selectChannelConnector.getLocalPort();
+			}
+		};
 	}
 
 	@Override

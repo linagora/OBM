@@ -42,8 +42,6 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
-import org.obm.FreePortFinder;
-import org.obm.PortNumber;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
 
@@ -76,23 +74,19 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	}
 
 	@Provides @Singleton
-	@PortNumber int getPortNumber(FreePortFinder freePortFinder) {
-		return freePortFinder.findFreePort();
-	}
-
-	@Provides @Singleton
-	protected OpushServer buildOpushServer(@PortNumber int portNumber) {
-		return new OpushServer(portNumber);
+	protected OpushServer buildOpushServer() {
+		return new OpushServer();
 	}
 	
 	public static class OpushServer {
-		private Server server;
+		
+		private final Server server;
+		private final SelectChannelConnector selectChannelConnector;
 
-		public OpushServer(int portNumber) {
+		public OpushServer() {
 			server = new Server();
 			server.setThreadPool(new QueuedThreadPool(2));
-			SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
-			selectChannelConnector.setPort(portNumber);
+			selectChannelConnector = new SelectChannelConnector();
 			server.setConnectors(new Connector[] {selectChannelConnector});
 			Context root = new Context(server, "/", Context.SESSIONS);
 			root.addFilter(GuiceFilter.class, "/*", 0);
@@ -117,6 +111,14 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 		public void stop() throws Exception {
 			server.stop();
+		}
+		
+		public int getPort() {
+			int port = selectChannelConnector.getLocalPort();
+			if (port > 0) {
+				return port;
+			}
+			throw new IllegalStateException("Could not get server's listening port. Start the server first.");
 		}
 	}
 

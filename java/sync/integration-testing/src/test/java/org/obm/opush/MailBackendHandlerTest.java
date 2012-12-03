@@ -54,7 +54,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.locator.store.LocatorService;
@@ -111,7 +110,6 @@ import com.icegreen.greenmail.util.ServerSetup;
 @GuiceModule(MailBackendHandlerTestModule.class)
 public class MailBackendHandlerTest {
 
-	@Inject	@PortNumber int port;
 	@Inject	SingleUserFixture singleUserFixture;
 	@Inject	OpushServer opushServer;
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -174,7 +172,7 @@ public class MailBackendHandlerTest {
 		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(2);
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		opClient.deleteEmail(syncEmailSyncKey, serverId, serverId + syncEmailId);
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);

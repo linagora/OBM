@@ -53,7 +53,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -101,7 +100,6 @@ public class SyncHandlerTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(SyncHandlerTestModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -131,7 +129,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
@@ -165,7 +163,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
@@ -202,7 +200,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
@@ -235,7 +233,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
@@ -270,7 +268,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
@@ -313,7 +311,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, ImmutableList.<Integer> of(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getServerId(), serverId);
@@ -351,7 +349,7 @@ public class SyncHandlerTest {
 		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailUnexistingCollectionId, FilterType.THREE_DAYS_BACK);
 
 		org.obm.sync.push.client.Collection unexistingCollection = syncEmailResponse.getCollection(syncEmailUnexistingCollectionId);

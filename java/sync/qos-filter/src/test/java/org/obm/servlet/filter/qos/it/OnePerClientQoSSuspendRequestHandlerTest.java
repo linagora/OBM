@@ -51,8 +51,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mortbay.jetty.Server;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
@@ -61,6 +59,7 @@ import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
 import org.obm.servlet.filter.qos.util.BlockingServletUtils;
 import org.obm.servlet.filter.qos.util.KeyByRequestProvider;
 import org.obm.servlet.filter.qos.util.server.BlockingServlet;
+import org.obm.servlet.filter.qos.util.server.EmbeddedServer;
 import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
 import com.google.inject.Inject;
@@ -80,10 +79,9 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 	public JUnitGuiceRule guiceModule = new JUnitGuiceRule(Configuration.class);
 	
 	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
-	@Inject @PortNumber int port;
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
-	@Inject Server server;
+	@Inject EmbeddedServer server;
 	@Inject BlockingServlet blockingServlet;
 
 	private AsyncServletRequestUtils async;
@@ -96,7 +94,7 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(12);
-		async = new AsyncServletRequestUtils(threadpool, port, QoSFilterTestModule.BLOCKING_SERVLET_NAME);
+		async = new AsyncServletRequestUtils(threadpool, server.getPort(), QoSFilterTestModule.BLOCKING_SERVLET_NAME);
 		blockingServletUtils = new BlockingServletUtils(blockingServlet);
 		server.start();
 		System.out.println("test started");

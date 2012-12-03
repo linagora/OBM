@@ -50,14 +50,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mortbay.jetty.Server;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
 import org.obm.servlet.filter.qos.util.SuspendingServletUtils;
+import org.obm.servlet.filter.qos.util.server.EmbeddedServer;
 import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 
@@ -78,10 +77,9 @@ public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	public JUnitGuiceRule guiceModule = new JUnitGuiceRule(Configuration.class);
 	
 	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
-	@Inject @PortNumber int port;
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
-	@Inject Server server;
+	@Inject EmbeddedServer server;
 	@Inject SuspendingServlet suspendingServlet;
 
 	private AsyncServletRequestUtils async;
@@ -94,7 +92,7 @@ public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	@Before
 	public void setup() throws Exception {
 		threadpool = Executors.newFixedThreadPool(12);
-		async = new AsyncServletRequestUtils(threadpool, port, QoSFilterTestModule.SUSPENDING_SERVLET_NAME);
+		async = new AsyncServletRequestUtils(threadpool, server.getPort(), QoSFilterTestModule.SUSPENDING_SERVLET_NAME);
 		suspendingServletUtils = new SuspendingServletUtils(suspendingServlet);
 		server.start();
 		System.out.println("test started");

@@ -52,7 +52,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -100,7 +99,6 @@ public class MeetingResponseHandlerTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -255,7 +253,7 @@ public class MeetingResponseHandlerTest {
 	private Document postMeetingAcceptedResponse()
 			throws TransformerException, WBXmlException, IOException, HttpRequestException, SAXException  {
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document document = buildMeetingAcceptedResponse();
 
 		Document serverResponse = opClient.postXml("MeetingResponse", document, "MeetingResponse");

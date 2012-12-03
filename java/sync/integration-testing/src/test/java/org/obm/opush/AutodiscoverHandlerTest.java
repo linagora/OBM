@@ -43,7 +43,6 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.PortNumber;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -71,7 +70,6 @@ public class AutodiscoverHandlerTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
-	@Inject @PortNumber int port;
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
@@ -87,7 +85,7 @@ public class AutodiscoverHandlerTest {
 		prepareMocks(externalUrl);
 		opushServer.start();
 
-		OPClient opClient = IntegrationTestUtils.buildOpushClient(singleUserFixture.jaures, port);
+		OPClient opClient = IntegrationTestUtils.buildOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		String emailAddress = singleUserFixture.jaures.user.getEmail();
 		Document document = opClient.postXml("Autodiscover", buildAutodiscoverCommand(emailAddress), "Autodiscover", null, false);
