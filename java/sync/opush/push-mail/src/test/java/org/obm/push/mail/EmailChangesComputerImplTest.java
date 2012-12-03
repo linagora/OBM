@@ -164,7 +164,7 @@ public class EmailChangesComputerImplTest {
 		Set<Email> before = Sets.newHashSet();
 		Set<Email> actual = Sets.newHashSet();
 		Boolean threeValues = null;
-		int numberOfEmails = 20000 * 3;
+		int numberOfEmails = 10000 * 3;
 		for (int i = 0; i < numberOfEmails; i++) {
 			if (threeValues == null) {
 				Email deleted = Email.builder().uid(i).read(true).date(currentDate).build();
