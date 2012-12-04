@@ -105,5 +105,30 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 			store.remove(snapshotKey);
 		}
 	}
+
+	private class SnapshotWithCollectionIdPredicate implements Predicate<SnapshotKey> {
+
+		private final DeviceId deviceId;
+		private final int collectionId;
+		
+		private SnapshotWithCollectionIdPredicate(DeviceId deviceId, int collectionId) {
+			this.deviceId = deviceId;
+			this.collectionId = collectionId;
+		}
+		
+		@Override
+		public boolean apply(SnapshotKey input) {
+			return Objects.equal(deviceId, input.getDeviceId()) &&
+				Objects.equal(collectionId, input.getCollectionId());
+		}
+	}
 	
+	@Override
+	public void deleteCollectionForDevice(DeviceId deviceId, int collectionId) {
+		List<SnapshotKey> keys = store.getKeys();
+		Iterable<SnapshotKey> toRemove = Iterables.filter(keys, new SnapshotWithCollectionIdPredicate(deviceId, collectionId));
+		for (SnapshotKey snapshotKey : toRemove) {
+			store.remove(snapshotKey);
+		}
+	}
 }

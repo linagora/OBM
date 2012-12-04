@@ -191,6 +191,7 @@ public class SnapshotDaoEhcacheImplTest {
 		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
 		assertThat(keys).containsOnly(expectedSnapshotKey, expectedSnapshotKey2);
 	}
+	
 	@Test
 	public void deleteAll() {
 		DeviceId deviceId = new DeviceId("deviceId");
@@ -310,5 +311,171 @@ public class SnapshotDaoEhcacheImplTest {
 		
 		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
 		assertThat(keys).containsOnly(expectedSnapshotKey);
+	}
+	
+	@Test
+	public void deleteCollectionForDeviceNullDeviceId() {
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
+		Integer collectionId = 1;
+		Integer collectionId2 = 2;
+		Snapshot snapshot = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		Snapshot snapshot2 = Snapshot.builder()
+				.deviceId(deviceId2)
+				.syncKey(syncKey2)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.collectionId(collectionId2)
+				.build();
+		
+		SnapshotKey expectedSnapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		SnapshotKey expectedSnapshotKey2 = SnapshotKey.builder()
+				.deviceId(deviceId2)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		
+		snapshotDaoEhcacheImpl.put(snapshot);
+		snapshotDaoEhcacheImpl.put(snapshot2);
+		snapshotDaoEhcacheImpl.deleteCollectionForDevice(null, collectionId);
+		
+		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
+		assertThat(keys).containsOnly(expectedSnapshotKey, expectedSnapshotKey2);
+	}
+	
+	@Test
+	public void deleteCollectionForDevice() {
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
+		Integer collectionId = 1;
+		Integer collectionId2 = 2;
+		Snapshot snapshot = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		Snapshot snapshot2 = Snapshot.builder()
+				.deviceId(deviceId2)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		
+		SnapshotKey expectedSnapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId2)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		
+		snapshotDaoEhcacheImpl.put(snapshot);
+		snapshotDaoEhcacheImpl.put(snapshot2);
+		snapshotDaoEhcacheImpl.deleteCollectionForDevice(deviceId, collectionId);
+		
+		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
+		assertThat(keys).containsOnly(expectedSnapshotKey);
+	}
+	
+	@Test
+	public void deleteCollectionForDeviceWithMultipleSyncKeys() {
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
+		SyncKey syncKey3 = new SyncKey("synckey3");
+		Integer collectionId = 1;
+		Integer collectionId2 = 2;
+		Snapshot snapshot = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		Snapshot snapshot2 = Snapshot.builder()
+				.deviceId(deviceId2)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		Snapshot snapshot3 = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(syncKey3)
+				.collectionId(collectionId)
+				.build();
+		
+		SnapshotKey expectedSnapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId2)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		
+		snapshotDaoEhcacheImpl.put(snapshot);
+		snapshotDaoEhcacheImpl.put(snapshot2);
+		snapshotDaoEhcacheImpl.put(snapshot3);
+		snapshotDaoEhcacheImpl.deleteCollectionForDevice(deviceId, collectionId);
+		
+		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
+		assertThat(keys).containsOnly(expectedSnapshotKey);
+	}
+
+	@Test
+	public void deleteCollectionForDeviceWithMultipleCollectionId() {
+		DeviceId deviceId = new DeviceId("deviceId");
+		DeviceId deviceId2 = new DeviceId("deviceId2");
+		SyncKey syncKey = new SyncKey("synckey");
+		SyncKey syncKey2 = new SyncKey("synckey2");
+		Integer collectionId = 1;
+		Integer collectionId2 = 2;
+		Integer collectionId3 = 3;
+		Snapshot snapshot = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		Snapshot snapshot2 = Snapshot.builder()
+				.deviceId(deviceId2)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		Snapshot snapshot3 = Snapshot.builder()
+				.deviceId(deviceId)
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(syncKey2)
+				.collectionId(collectionId3)
+				.build();
+		
+		SnapshotKey expectedSnapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId2)
+				.syncKey(syncKey2)
+				.collectionId(collectionId2)
+				.build();
+		SnapshotKey expectedSnapshotKey2 = SnapshotKey.builder()
+				.deviceId(deviceId)
+				.syncKey(syncKey2)
+				.collectionId(collectionId3)
+				.build();
+		
+		snapshotDaoEhcacheImpl.put(snapshot);
+		snapshotDaoEhcacheImpl.put(snapshot2);
+		snapshotDaoEhcacheImpl.put(snapshot3);
+		snapshotDaoEhcacheImpl.deleteCollectionForDevice(deviceId, collectionId);
+		
+		List<SnapshotKey> keys = objectStoreManager.getStore(snapshotDaoEhcacheImpl.getStoreName()).getKeys();
+		assertThat(keys).containsOnly(expectedSnapshotKey, expectedSnapshotKey2);
 	}
 }

@@ -42,4 +42,6 @@ public interface SnapshotDao {
 	void put(Snapshot snapshot);
 	
 	void deleteAll(DeviceId deviceId);
+
+	void deleteCollectionForDevice(DeviceId deviceId, int collectionId);
 }
