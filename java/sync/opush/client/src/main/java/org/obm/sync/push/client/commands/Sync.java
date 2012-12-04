@@ -34,14 +34,15 @@ package org.obm.sync.push.client.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Add;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.SyncResponse;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.SyncResponse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -88,7 +89,7 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 			Collection col = new Collection();
 			col.setSyncKey(DOMUtils.getElementText(e, "SyncKey"));
 			col.setCollectionId(DOMUtils.getElementText(e, "CollectionId"));
-			col.setStatus(Integer.valueOf(DOMUtils.getElementText(e, "Status")));
+			col.setStatus(DOMUtils.getElementText(e, "Status"));
 			NodeList ap = e.getElementsByTagName("Add");
 			for (int j = 0; j < ap.getLength(); j++) {
 				Element appData = (Element) ap.item(j);
@@ -107,7 +108,9 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 			ret.put(col.getCollectionId(), col);
 		}
 
-		return new SyncResponse(ret);
+		Element status = DOMUtils.getUniqueElement(root, "Status");
+		SyncStatus syncStatus = SyncStatus.fromSpecificationValue(DOMUtils.getElementText(status));
+		return new SyncResponse(ret, syncStatus);
 	}
 
 }

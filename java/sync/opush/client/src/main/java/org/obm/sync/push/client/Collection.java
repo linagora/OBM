@@ -33,6 +33,9 @@ package org.obm.sync.push.client;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.obm.push.bean.SyncStatus;
+
 import com.google.common.base.Objects;
 
 /**
@@ -67,8 +70,8 @@ public final class Collection {
 		return status;
 	}
 
-	public void setStatus(Integer status) {
-		this.status = SyncStatus.getSyncStatus(status);
+	public void setStatus(String status) {
+		this.status = SyncStatus.fromSpecificationValue(status);
 	}
 
 	public List<Add> getAdds() {

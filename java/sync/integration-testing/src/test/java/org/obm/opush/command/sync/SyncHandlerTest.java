@@ -68,6 +68,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -88,7 +89,6 @@ import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.FolderType;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
-import org.obm.sync.push.client.SyncStatus;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;

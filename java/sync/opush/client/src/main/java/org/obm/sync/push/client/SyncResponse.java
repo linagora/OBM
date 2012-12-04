@@ -33,14 +33,19 @@ package org.obm.sync.push.client;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.obm.push.bean.SyncStatus;
+
 import com.google.common.base.Objects;
 
 public final class SyncResponse {
 
 	private Map<String, Collection> cl;
+	private SyncStatus syncStatus;
 
-	public SyncResponse(Map<String, Collection> cl) {
+	public SyncResponse(Map<String, Collection> cl, SyncStatus syncStatus) {
 		this.cl = new HashMap<String, Collection>(cl);
+		this.syncStatus = syncStatus;
 	}
 
 	public Map<String, Collection> getCollections() {
@@ -55,16 +60,21 @@ public final class SyncResponse {
 		return cl.get(String.valueOf(key));
 	}
 
+	public SyncStatus getSyncStatus() {
+		return syncStatus;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(cl);
+		return Objects.hashCode(cl, syncStatus);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof SyncResponse) {
 			SyncResponse that = (SyncResponse) object;
-			return Objects.equal(this.cl, that.cl);
+			return Objects.equal(this.cl, that.cl) && 
+				Objects.equal(this.syncStatus, that.syncStatus);
 		}
 		return false;
 	}
