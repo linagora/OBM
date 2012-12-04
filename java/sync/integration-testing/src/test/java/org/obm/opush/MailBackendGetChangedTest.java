@@ -61,10 +61,12 @@ import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.ContinuationService;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
@@ -196,8 +198,8 @@ public class MailBackendGetChangedTest {
 		replayMocks(classToInstanceMap);
 		opushServer.start();
 		sendTwoEmailsToImapServer();
-		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString);
-		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString);
+		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		verifyMocks(classToInstanceMap);
 		
 		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
@@ -259,9 +261,9 @@ public class MailBackendGetChangedTest {
 		replayMocks(classToInstanceMap);
 		opushServer.start();
 		sendTwoEmailsToImapServer();
-		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString);
-		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString);
-		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString);
+		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		verifyMocks(classToInstanceMap);
 		
 		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
@@ -325,10 +327,10 @@ public class MailBackendGetChangedTest {
 		replayMocks(classToInstanceMap);
 		opushServer.start();
 		sendTwoEmailsToImapServer();
-		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString);
-		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString);
+		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		sendTwoEmailsToImapServer();
-		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString);
+		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
 		verifyMocks(classToInstanceMap);
 		
 		assertThat(firstSyncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();

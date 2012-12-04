@@ -7,7 +7,7 @@
 			<DeletesAsMoves>1</DeletesAsMoves>
 			<GetChanges />
 			<Options>
-				<FilterType>2</FilterType> 
+				<FilterType>DEFAULT_FILTER_TYPE</FilterType> 
 			</Options>
 		</Collection>
 	</Collections>

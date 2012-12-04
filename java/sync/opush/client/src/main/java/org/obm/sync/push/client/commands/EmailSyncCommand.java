@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
@@ -41,11 +42,13 @@ public class EmailSyncCommand extends Sync {
 
 	private final SyncKey syncKey;
 	private final String collectionId;
+	private final FilterType filterType;
 
-	public EmailSyncCommand(SyncKey syncKey, String collectionId) {
+	public EmailSyncCommand(SyncKey syncKey, String collectionId, FilterType filterType) {
 		super("EmailSyncRequest.xml");
 		this.syncKey = syncKey;
 		this.collectionId = collectionId;
+		this.filterType = filterType;
 	}
 
 	@Override
@@ -54,5 +57,7 @@ public class EmailSyncCommand extends Sync {
 		sk.setTextContent(syncKey.getSyncKey());
 		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
 		collection.setTextContent(collectionId);
+		Element filterTypeE = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "FilterType");
+		filterTypeE.setTextContent(filterType.asSpecificationValue());
 	}
 }

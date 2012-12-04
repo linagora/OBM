@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
@@ -110,16 +111,16 @@ public abstract class OPClient {
 		return run(new Sync(folders));
 	}
 
-	public SyncResponse syncEmail(SyncKey key, String collectionId) throws Exception {
-		return run(new EmailSyncCommand(key, collectionId));
+	public SyncResponse syncEmail(SyncKey key, String collectionId, FilterType filterType) throws Exception {
+		return run(new EmailSyncCommand(key, collectionId, filterType));
 	}
 
 	public SyncResponse syncEmailWithFetch(SyncKey key, String collectionId, String serverId) throws Exception {
 		return run(new EmailSyncFetchCommand(key, collectionId, serverId));
 	}
 	
-	public SyncResponse syncEmail(SyncKey key, int collectionId) throws Exception {
-		return run(new EmailSyncCommand(key, String.valueOf(collectionId)));
+	public SyncResponse syncEmail(SyncKey key, int collectionId, FilterType filterType) throws Exception {
+		return run(new EmailSyncCommand(key, String.valueOf(collectionId), filterType));
 	}
 	
 	public SyncResponse sync(Document doc) throws Exception {
