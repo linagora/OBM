@@ -47,6 +47,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -64,7 +65,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) 
 					throws DaoException, CollectionNotFoundException, 
-					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getChanged(udr, syncCollection.getSyncState(), 

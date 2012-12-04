@@ -78,6 +78,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -178,6 +179,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						 modificationStatus.processedClientIds, continuation);
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			}
+		} catch (FilterTypeChangedException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, e);
 		} catch (InvalidServerId e) {
 			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);
 		} catch (ProtocolException convExpt) {
@@ -251,7 +254,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Date doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
 			SyncKey newSyncKey, SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -372,6 +375,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
+		} catch (FilterTypeChangedException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, e);
 		} catch (DaoException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
@@ -391,7 +396,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -405,7 +410,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if (syncCollection.getStatus() != SyncStatus.OK) {
@@ -426,7 +431,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException {
 
 		syncCollectionResponse.setCollectionValidity(true);
 		syncCollectionResponse.setSyncStateValidity(true);

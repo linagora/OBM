@@ -51,6 +51,7 @@ import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 
 public interface PIMBackend {
 
@@ -78,7 +79,7 @@ public interface PIMBackend {
 
 	DataDelta getChanged(UserDataRequest udr, SyncState syncState, Integer collectionId,
 			SyncCollectionOptions options, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException;
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException;
 	
 	int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState syncState, 
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 

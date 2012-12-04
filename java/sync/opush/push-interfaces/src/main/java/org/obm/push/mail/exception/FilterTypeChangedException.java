@@ -33,7 +33,7 @@ package org.obm.push.mail.exception;
 
 import org.obm.push.bean.FilterType;
 
-public class FilterTypeChangedException extends RuntimeException {
+public class FilterTypeChangedException extends Exception {
 	
 	public FilterTypeChangedException(FilterType first, FilterType second) {
 		super(buildMessage(first, second));

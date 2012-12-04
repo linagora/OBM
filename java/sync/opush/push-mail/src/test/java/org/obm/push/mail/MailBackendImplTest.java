@@ -226,6 +226,7 @@ public class MailBackendImplTest {
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
 		expectSnapshotDaoHasEntry(syncKey, snapshot);
+		expectSnapshotDaoDelete(collectionId);
 		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		
 		control.replay();
@@ -236,6 +237,11 @@ public class MailBackendImplTest {
 				collectionId, syncCollectionOptions, new SyncKey("5678"));
 	}
 	
+	private void expectSnapshotDaoDelete(int collectionId) {
+		snapshotDao.deleteCollectionForDevice(device.getDevId(), collectionId);
+		expectLastCall();
+	}
+
 	@Test
 	public void testNotInitial() throws Exception {
 		SyncKey syncKey = new SyncKey("1234");
@@ -423,7 +429,7 @@ public class MailBackendImplTest {
 	}
 	
 	@Test
-	public void testSearchEmailsToManagerIsByDateForNullWithoutEmails() {
+	public void testSearchEmailsToManagerIsByDateForNullWithoutEmails() throws FilterTypeChangedException {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
@@ -434,14 +440,14 @@ public class MailBackendImplTest {
 			.andReturn(emailsExpected);
 
 		control.replay();
-		Collection<Email> result = testee.searchEmailsToManage(udr, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
+		Collection<Email> result = testee.searchEmailsToManage(udr, collectionId, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
 		control.verify();
 		
 		assertThat(result).isEmpty();
 	}
 	
 	@Test
-	public void testSearchEmailsToManagerIsByDateForNullWithEmails() {
+	public void testSearchEmailsToManagerIsByDateForNullWithEmails() throws FilterTypeChangedException {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
@@ -457,7 +463,7 @@ public class MailBackendImplTest {
 					.build()));
 
 		control.replay();
-		Collection<Email> result = testee.searchEmailsToManage(udr, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
+		Collection<Email> result = testee.searchEmailsToManage(udr, collectionId, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
 		control.verify();
 		
 		assertThat(result).containsOnly(
@@ -470,7 +476,7 @@ public class MailBackendImplTest {
 	}
 	
 	@Test(expected=FilterTypeChangedException.class)
-	public void testSearchEmailsToManagerThrowExecptionWhenDifferentFolderType() {
+	public void testSearchEmailsToManagerThrowExecptionWhenDifferentFolderType() throws FilterTypeChangedException {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
@@ -489,12 +495,13 @@ public class MailBackendImplTest {
 				.syncKey(new SyncKey("156"))
 				.build();
 
+		expectSnapshotDaoDelete(collectionId);
 		control.replay();
-		testee.searchEmailsToManage(udr, collectionPath, snapshot, options, date("2004-10-14T22:00:00"), 0);
+		testee.searchEmailsToManage(udr, collectionId, collectionPath, snapshot, options, date("2004-10-14T22:00:00"), 0);
 	}
 	
 	@Test
-	public void testSearchEmailsToManagerIsByUIDsWhenPreviousSnapshot() {
+	public void testSearchEmailsToManagerIsByUIDsWhenPreviousSnapshot() throws FilterTypeChangedException {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
 		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
@@ -546,7 +553,7 @@ public class MailBackendImplTest {
 				.build();
 		
 		control.replay();
-		Collection<Email> searchEmailsToManage = testee.searchEmailsToManage(udr, collectionPath, snapshot, syncCollectionOptions, date("2004-10-14T22:00:00"), currentUIDNext);
+		Collection<Email> searchEmailsToManage = testee.searchEmailsToManage(udr, collectionId, collectionPath, snapshot, syncCollectionOptions, date("2004-10-14T22:00:00"), currentUIDNext);
 		
 		control.verify();
 		assertThat(searchEmailsToManage).isEqualTo(expectedEmails);
