@@ -29,19 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.mail;
 
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
 
-public interface SnapshotDao {
+public interface SnapshotService {
 	
-	Snapshot get(DeviceId deviceId, SyncKey syncKey, Integer collectionId);
+	Snapshot getSnapshot(DeviceId deviceId, SyncKey syncKey, Integer collectionId);
 	
-	void put(Snapshot snapshot);
+	void storeSnapshot(Snapshot snapshot);
 	
-	void deleteAll(DeviceId deviceId);
-
-	void delete(DeviceId deviceId, SyncKey syncKey, int collectionId);
+	void deleteSnapshotAndSyncKeys(DeviceId deviceId, int collectionId);
 }

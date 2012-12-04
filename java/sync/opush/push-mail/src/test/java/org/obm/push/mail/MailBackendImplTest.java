@@ -68,7 +68,6 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.service.DateService;
 import org.obm.push.service.impl.MappingService;
-import org.obm.push.store.SnapshotDao;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -85,7 +84,7 @@ public class MailBackendImplTest {
 	private IMocksControl control;
 	private MailboxService mailboxService;
 	private MappingService mappingService;
-	private SnapshotDao snapshotDao;
+	private SnapshotService snapshotService;
 	private EmailChangesComputer emailChangesComputer;
 	private EmailChangesFetcher serverEmailChangesBuilder;
 	private MailBackendImpl testee;
@@ -100,14 +99,14 @@ public class MailBackendImplTest {
 		
 		control = createControl();
 		mailboxService = control.createMock(MailboxService.class);
-		snapshotDao = control.createMock(SnapshotDao.class);
+		snapshotService = control.createMock(SnapshotService.class);
 		mappingService = control.createMock(MappingService.class);
 		emailChangesComputer = control.createMock(EmailChangesComputer.class);
 		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
 		dateService = control.createMock(DateService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, snapshotDao,
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, snapshotService,
 				emailChangesComputer, serverEmailChangesBuilder, mappingService, null, dateService, null, null);
 	}
 	
@@ -238,7 +237,7 @@ public class MailBackendImplTest {
 	}
 	
 	private void expectSnapshotDaoDelete(int collectionId) {
-		snapshotDao.deleteCollectionForDevice(device.getDevId(), collectionId);
+		snapshotService.deleteSnapshotAndSyncKeys(device.getDevId(), collectionId);
 		expectLastCall();
 	}
 
@@ -481,6 +480,7 @@ public class MailBackendImplTest {
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
 
+		SyncKey syncKey = new SyncKey("156");
 		Snapshot snapshot = Snapshot.builder()
 				.addEmail(Email.builder()
 					.uid(5)
@@ -492,7 +492,7 @@ public class MailBackendImplTest {
 				.deviceId(device.getDevId())
 				.filterType(FilterType.ONE_MONTHS_BACK)
 				.uidNext(5000)
-				.syncKey(new SyncKey("156"))
+				.syncKey(syncKey)
 				.build();
 
 		expectSnapshotDaoDelete(collectionId);
@@ -574,7 +574,7 @@ public class MailBackendImplTest {
 	private void expectSnapshotDaoRecordOneSnapshot(SyncKey syncKey, long uidNext,
 			SyncCollectionOptions syncCollectionOptions, Collection<Email> actualEmailsInServer) {
 		
-		snapshotDao.put(Snapshot.builder()
+		snapshotService.storeSnapshot(Snapshot.builder()
 				.emails(actualEmailsInServer)
 				.collectionId(collectionId)
 				.deviceId(device.getDevId())
@@ -592,11 +592,11 @@ public class MailBackendImplTest {
 	}
 
 	private void expectSnapshotDaoHasNoEntry(SyncKey syncKey) {
-		expect(snapshotDao.get(device.getDevId(), syncKey, collectionId)).andReturn(null);
+		expect(snapshotService.getSnapshot(device.getDevId(), syncKey, collectionId)).andReturn(null);
 	}
 
 	private void expectSnapshotDaoHasEntry(SyncKey syncKey, Snapshot snapshot) {
-		expect(snapshotDao.get(device.getDevId(), syncKey, collectionId)).andReturn(snapshot);
+		expect(snapshotService.getSnapshot(device.getDevId(), syncKey, collectionId)).andReturn(snapshot);
 	}
 	
 }

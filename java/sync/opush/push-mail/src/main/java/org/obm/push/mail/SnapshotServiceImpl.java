@@ -29,90 +29,55 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push.mail;
 
 import java.util.List;
-
-import net.sf.ehcache.Element;
 
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
-import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.store.SnapshotDao;
+import org.obm.push.store.SyncKeysDao;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements SnapshotDao {
+public class SnapshotServiceImpl implements SnapshotService {
 
-	@Inject  SnapshotDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
-		super(objectStoreManager);
-	}
-	
-	@Override
-	protected String getStoreName() {
-		return ObjectStoreManager.MAIL_SNAPSHOT_STORE;
-	}
+	private final SnapshotDao snapshotDao;
+	private final SyncKeysDao syncKeysDao;
 
-	@Override
-	public Snapshot get(DeviceId deviceId, SyncKey syncKey, Integer collectionId) {
-		SnapshotKey key = SnapshotKey.builder()
-			.deviceId(deviceId)
-			.syncKey(syncKey)
-			.collectionId(collectionId)
-			.build();
-		Element element = store.get(key);
-		if (element != null) {
-			return (Snapshot) element.getValue();
-		}
-		return null;
+	@Inject
+	@VisibleForTesting SnapshotServiceImpl(SnapshotDao snapshotDao, SyncKeysDao syncKeysDao) {
+		this.snapshotDao = snapshotDao;
+		this.syncKeysDao = syncKeysDao;
 	}
 
 	@Override
-	public void put(Snapshot snapshot) {
-		SnapshotKey key = SnapshotKey.builder()
-				.deviceId(snapshot.getDeviceId())
-				.syncKey(snapshot.getSyncKey())
-				.collectionId(snapshot.getCollectionId())
-				.build();
-		store.put(new Element(key, snapshot));
+	public Snapshot getSnapshot(DeviceId deviceId, SyncKey syncKey, Integer collectionId) {
+		return snapshotDao.get(deviceId, syncKey, collectionId);
 	}
 
-	private class SnapshotHasDeviceIdPredicate implements Predicate<SnapshotKey> {
+	@Override
+	public void storeSnapshot(Snapshot snapshot) {
+		syncKeysDao.put(snapshot.getDeviceId(), snapshot.getCollectionId(), snapshot.getSyncKey());
+		snapshotDao.put(snapshot);
+	}
 
-		private final DeviceId deviceId;
-		
-		private SnapshotHasDeviceIdPredicate(DeviceId deviceId) {
-			this.deviceId = deviceId;
-		}
-		
-		@Override
-		public boolean apply(SnapshotKey input) {
-			return Objects.equal(deviceId, input.getDeviceId()); 
+	@Override
+	public void deleteSnapshotAndSyncKeys(DeviceId deviceId, int collectionId) {
+		List<SyncKey> syncKeys = syncKeysDao.get(deviceId, collectionId);
+		if (syncKeys != null) {
+			delete(deviceId, collectionId, syncKeys);
 		}
 	}
-	
-	@Override
-	public void deleteAll(DeviceId deviceId) {
-		List<SnapshotKey> keys = store.getKeys();
-		Iterable<SnapshotKey> toRemove = Iterables.filter(keys, new SnapshotHasDeviceIdPredicate(deviceId));
-		for (SnapshotKey snapshotKey : toRemove) {
-			store.remove(snapshotKey);
+
+	private void delete(DeviceId deviceId, int collectionId, List<SyncKey> syncKeys) {
+		for (SyncKey syncKey : syncKeys) {
+			snapshotDao.delete(deviceId, syncKey, collectionId);
 		}
-	}
-	
-	@Override
-	public void delete(DeviceId deviceId, SyncKey syncKey, int collectionId) {
-		SnapshotKey snapshotKey = SnapshotKey.builder()
-				.deviceId(deviceId)
-				.syncKey(syncKey)
-				.collectionId(collectionId)
-				.build();
-		store.remove(snapshotKey);
+		syncKeysDao.delete(deviceId, collectionId);
 	}
 }

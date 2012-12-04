@@ -44,6 +44,8 @@ import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailBackendImpl;
 import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailViewToMSEmailConverterImpl;
+import org.obm.push.mail.SnapshotService;
+import org.obm.push.mail.SnapshotServiceImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
@@ -65,6 +67,7 @@ public class OpushMailModule extends AbstractModule {
 	protected void configure() {
 		bind(MailMonitoringBackend.class).to(NoopImapMonitoringImpl.class);
 		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
+		bind(SnapshotService.class).to(SnapshotServiceImpl.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		bind(SmtpProvider.class).to(SmtpProviderImpl.class);

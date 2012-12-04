@@ -103,7 +103,6 @@ import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.EmailDao;
-import org.obm.push.store.SnapshotDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.DateUtils;
@@ -161,7 +160,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final EventService eventService;
 	private final DateService dateService;
 	private final MSEmailFetcher msEmailFetcher;
-	private final SnapshotDao snapshotDao;
+	private final SnapshotService snapshotService;
 	private final EmailChangesComputer emailChangesComputer;
 	private final EmailChangesFetcher emailChangesFetcher;
 
@@ -171,7 +170,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EmailDao emailDao, EmailSync emailSync,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
-			SnapshotDao snapshotDao,
+			SnapshotService snapshotService,
 			EmailChangesComputer emailChangesComputer,
 			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
@@ -188,7 +187,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
 		this.login = login;
-		this.snapshotDao = snapshotDao;
+		this.snapshotService = snapshotService;
 		this.emailChangesComputer = emailChangesComputer;
 		this.emailChangesFetcher = emailChangesFetcher;
 		this.eventService = eventService;
@@ -375,7 +374,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			long currentUIDNext = mailboxService.fetchUIDNext(udr, collectionPath);
 			
-			Snapshot previousStateSnapshot = snapshotDao.get(udr.getDevId(), state.getSyncKey(), collectionId);
+			Snapshot previousStateSnapshot = snapshotService.getSnapshot(udr.getDevId(), state.getSyncKey(), collectionId);
 			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
 			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionId, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
 			takeSnapshot(udr, collectionId, options, newManagedEmails, currentUIDNext, newSyncKey);
@@ -398,7 +397,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails, long currentUIDNext, SyncKey newSyncKey) {
 		
-		snapshotDao.put(Snapshot.builder()
+		snapshotService.storeSnapshot(Snapshot.builder()
 				.emails(managedEmails)
 				.collectionId(collectionId)
 				.deviceId(udr.getDevId())
@@ -436,7 +435,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	private void manageFilterTypeChanged(UserDataRequest udr, Integer collectionId, FilterType previousFilterType, FilterType currentFilterType) throws FilterTypeChangedException {
-		snapshotDao.deleteCollectionForDevice(udr.getDevId(), collectionId);
+		snapshotService.deleteSnapshotAndSyncKeys(udr.getDevId(), collectionId);
 		throw new FilterTypeChangedException(previousFilterType, currentFilterType);
 	}
 
