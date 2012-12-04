@@ -4550,7 +4550,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     } else {
       $begin = $date_edit_occurrence == null ? new Of_Date($event_q->f('event_date'), 'GMT') : new Of_Date($date_edit_occurrence);
       if (isset($calendar['template_id']) && $action == 'new') {
-        $today = $calendar['date_begin'];
+        $today = isset($calendar['date_begin']) ? $calendar['date_begin'] : new Of_Date(date("Y-m-d"), 'GMT');
         $begin->setDay($today->getDay());
         $begin->setMonth($today->getMonth());
         $begin->setYear($today->getYear());
