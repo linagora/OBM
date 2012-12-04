@@ -109,6 +109,7 @@ public class BeansTest {
 					.add(MSEventExtId.class)
 					.add(DeviceId.class)
 					.add(SyncKey.class)
+					.add(SyncKeysKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

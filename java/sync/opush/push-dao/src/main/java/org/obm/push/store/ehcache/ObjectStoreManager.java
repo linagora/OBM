@@ -57,6 +57,7 @@ public class ObjectStoreManager {
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
 	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
 	public static final String MAIL_SNAPSHOT_STORE = "mailSnapshotStore";
+	public static final String SYNC_KEYS_STORE = "syncKeysStore";
 	public static final String PENDING_CONTINUATIONS = "pendingContinuation";
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
@@ -82,6 +83,7 @@ public class ObjectStoreManager {
 		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE).eternal(usePersistentCache));
+		configuration.addCache(defaultCacheConfiguration().name(SYNC_KEYS_STORE).eternal(usePersistentCache));
 		configuration.addCache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS));
 		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 		return configuration;
