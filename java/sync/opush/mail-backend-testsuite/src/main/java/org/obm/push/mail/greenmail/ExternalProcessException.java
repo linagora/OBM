@@ -31,10 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.greenmail;
 
-public class ExternalProcessException extends Exception {
+public class ExternalProcessException extends RuntimeException {
 
 	public ExternalProcessException(String msg, Throwable cause) {
 		super(msg, cause);
+	}
+
+	public ExternalProcessException(String msg) {
+		super(msg);
 	}
 	
 }

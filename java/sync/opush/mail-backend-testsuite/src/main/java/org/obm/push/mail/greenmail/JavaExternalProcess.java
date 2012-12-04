@@ -33,7 +33,6 @@ package org.obm.push.mail.greenmail;
 
 import java.io.File;
 import java.util.Map;
-import java.util.Map.Entry;
 
 
 public class JavaExternalProcess extends ExternalProcess {
@@ -41,24 +40,28 @@ public class JavaExternalProcess extends ExternalProcess {
 	private static final String JAVA_PATH = 
 			System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 	
+	private final Class<?> mainClass;
+	private final Config config;
+	
+	private Long heapMaxSizeInByte;
+	
 	public JavaExternalProcess(Class<?> mainClass, Config config) {
 		super(JAVA_PATH, config.processTimeToLive, config.processStartTimeNeeded);
-		setHeapMaxSize(config);
-		setDebugMode(config);
-		setClasspath();
-		setMainClass(mainClass);
+		this.mainClass = mainClass;
+		this.config = config;
 	}
 	
-	public void setCommandLineArgs(Map<String, String> cliArgs) {
-		for (Entry<String, String> arg : cliArgs.entrySet()) {
-			addTaggedCliArgument(arg.getKey(), arg.getValue());
-		}
+	@Override
+	protected ClosableProcess execute(Map<String, String> cliArgs) throws ExternalProcessException {
+		setClasspath();
+		setDebugMode(config);
+		setHeapMaxSize();
+		setMainClass(mainClass);
+		return super.execute(cliArgs);
 	}
 
-	private void setHeapMaxSize(Config config){
-		if (config.useConfigHeapSize) {
-			addSimpleCliArgument(String.format("-Xmx%dm", bytesToMegaBytes(config.heapMaxSizeInByte)));
-		}
+	public void setHeapMaxSize(long heapMaxSizeInByte){
+		this.heapMaxSizeInByte = heapMaxSizeInByte;
 	}
 	
 	private int bytesToMegaBytes(long bytes) {
@@ -76,22 +79,23 @@ public class JavaExternalProcess extends ExternalProcess {
 		addSimpleCliArgument(mainClass.getName());
 	}
 
+	private void setHeapMaxSize(){
+		if (heapMaxSizeInByte != null) {
+			addSimpleCliArgument(String.format("-Xmx%dm", bytesToMegaBytes(heapMaxSizeInByte)));
+		}
+	}
+
 	private void setClasspath() {
 		addEnvironmentVariable("CLASSPATH", System.getProperty("java.class.path"));
 	}
 	
 	public static class Config {
 		public final boolean debug;
-		public final boolean useConfigHeapSize;
-		public final long heapMaxSizeInByte;
 		public final int processTimeToLive;
 		public final int processStartTimeNeeded;
 		
-		public Config(boolean debug, boolean useConfigHeapSize, long heapMaxSizeInByte, 
-				int processTimeToLive, int processStartTimeNeeded) {
+		public Config(boolean debug, int processTimeToLive, int processStartTimeNeeded) {
 			this.debug = debug;
-			this.useConfigHeapSize = useConfigHeapSize;
-			this.heapMaxSizeInByte = heapMaxSizeInByte;
 			this.processTimeToLive = processTimeToLive;
 			this.processStartTimeNeeded = processStartTimeNeeded;
 		}

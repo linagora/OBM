@@ -31,8 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.greenmail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -41,6 +46,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -51,10 +57,11 @@ public abstract class ExternalProcess {
 	private final CommandLine cli;
 	private final Map<String, String> environment;
 	private final PumpStreamHandler streamHandler;
+	private final ByteArrayOutputStream processOutputStream;
 	
 	private long processTimeout;
 	private long processStartTimeNeeded;
-
+	
 	public ExternalProcess(String executablePath, long processTimeout) {
 		this(executablePath, processTimeout, 0);
 	}
@@ -65,12 +72,14 @@ public abstract class ExternalProcess {
 		
 		this.cli = new CommandLine(executablePath);
 		this.environment = Maps.newHashMap();
-		this.streamHandler = new PumpStreamHandler();
 		this.processTimeout = processTimeout;
 		this.processStartTimeNeeded = processStartTimeNeeded;
+		this.processOutputStream = new ByteArrayOutputStream();
+		this.streamHandler = new PumpStreamHandler(processOutputStream, System.err);
 	}
-	
-	public ClosableProcess execute() throws ExternalProcessException {
+		
+	protected ClosableProcess execute(Map<String, String> cliArgs) throws ExternalProcessException {
+		setCommandLineArgs(cliArgs);
 		final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 		final Executor executor = buildExecutor();
 		executeProcess(resultHandler, executor);
@@ -116,6 +125,11 @@ public abstract class ExternalProcess {
 		}
 	}
 
+	protected Reader readProcessOutput() {
+		ByteArrayInputStream processInputStream = new ByteArrayInputStream(processOutputStream.toByteArray());
+		return new InputStreamReader(processInputStream, Charsets.UTF_8);
+	}
+
 	protected void addEnvironmentVariable(String key, String value) {
 		environment.put(key, value);
 	}
@@ -126,6 +140,20 @@ public abstract class ExternalProcess {
 	
 	protected void addTaggedCliArgument(String name, String value) {
 		cli.addArgument(name.concat(value));
+	}
+	
+	public void setCommandLineArgs(Map<String, String> cliArgs) {
+		for (Entry<String, String> arg : cliArgs.entrySet()) {
+			addTaggedCliArgument(arg.getKey(), arg.getValue());
+		}
+	}
+	
+	protected String readStringProcessOutputArgument(String processOutputLine, String argTag) {
+		return processOutputLine.substring(argTag.length());
+	}
+
+	protected int readIntegerProcessOutputArgument(String processOutputLine, String argTag) {
+		return Integer.valueOf(readStringProcessOutputArgument(processOutputLine, argTag));
 	}
 	
 	public PumpStreamHandler getStreamHandler() {

@@ -35,17 +35,16 @@ import org.obm.configuration.EmailConfiguration;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.icegreen.greenmail.util.GreenMail;
 
 @Singleton
 public class GreenMailEmailConfiguration implements EmailConfiguration {
 
 	private final int imapTimeout;
-	private final GreenMail greenMail;
+	private final GreenMailPortProvider greenMailPortProvider;
 
 	@Inject
-	private GreenMailEmailConfiguration(GreenMail greenMail) {
-		this.greenMail = greenMail;
+	private GreenMailEmailConfiguration(GreenMailPortProvider greenMailPortProvider) {
+		this.greenMailPortProvider = greenMailPortProvider;
 		this.imapTimeout = 3600000; // one hour
 	}
 	
@@ -66,7 +65,7 @@ public class GreenMailEmailConfiguration implements EmailConfiguration {
 
 	@Override
 	public int imapPort() {
-		return greenMail.getImap().getPort();
+		return greenMailPortProvider.imapPort();
 	}
 
 	@Override

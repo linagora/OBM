@@ -33,6 +33,7 @@ package org.obm.push.mail.greenmail;
 
 import java.util.Locale;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -56,8 +57,24 @@ public class GreenMailProviderModule extends AbstractModule {
 	}
 	
 	@Provides @Singleton
-	/* package */ GreenMail provideGreenmail() {
+	@VisibleForTesting GreenMail provideGreenmail() {
 		Locale.setDefault(Locale.US);
 		return new GreenMail(new ServerSetup[] {getSmtpServerSetup(), getImapServerSetup()});
+	}
+	
+	@Provides @Singleton
+	@VisibleForTesting GreenMailPortProvider provideGreenMailPortProvider(final GreenMail greenMail) {
+		return new GreenMailPortProvider() {
+			
+			@Override
+			public int smtpPort() {
+				return greenMail.getSmtp().getPort();
+			}
+			
+			@Override
+			public int imapPort() {
+				return greenMail.getImap().getPort();
+			}
+		};
 	}
 }

@@ -39,7 +39,6 @@ import java.util.Set;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -57,41 +56,44 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
+import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
-@Ignore("OBMFULL-4371, external greenmail has to provide its listening imap and smtp ports")
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class ExternalGreenMailTest {
 
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject LocatorService locatorService;
-	
 	@Inject CollectionPathHelper collectionPathHelper;
+
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
 
-	private int imapPort;
-	private int smtpPort;
+	@Inject GreenMailExternalProcess greenMailExternalProcess;
 	private ClosableProcess greenMailProcess;
 	private ServerSetup smtpServerSetup;
 
 	@Before
 	public void setUp() throws ExternalProcessException, InterruptedException {
-		smtpServerSetup = new ServerSetup(smtpPort, null, ServerSetup.PROTOCOL_SMTP);
 		mailbox = "to@localhost.com";
 		password = "password";
-		greenMailProcess = new GreenMailExternalProcess(mailbox, password, imapPort, smtpPort).execute();
+		greenMailProcess = greenMailExternalProcess.startGreenMail(mailbox, password);
+		smtpServerSetup = greenMailExternalProcess.buildSmtpServerSetup();
+		
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
-		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getImapPort());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getSmtpPort());
 	}
 	
 	@After
@@ -119,8 +121,19 @@ public abstract class ExternalGreenMailTest {
 	}
 
 	private void reinitTestContext() throws ExternalProcessException, InterruptedException {
-		tearDown();
-		setUp();
+        try {
+        	tearDown();
+
+        	GuiceModule moduleAnnotation = getClass().getAnnotation(GuiceModule.class);
+        	Class<? extends Module> module = moduleAnnotation.value();
+			Guice.createInjector(module.newInstance()).injectMembers(this);
+			
+			setUp();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private Set<Email> sendOneEmailAndFetchAll(Date before) throws MailException {

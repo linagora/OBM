@@ -74,7 +74,6 @@ import org.obm.push.mail.mime.MimeAddress;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@Ignore("OBMFULL-4371, external greenmail has to provide its listening imap and smtp ports")
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class MailboxMemoryAPITest {
 	
@@ -89,9 +88,8 @@ public abstract class MailboxMemoryAPITest {
 	private long maxHeapSize;
 	private String inboxPath;
 	
+	@Inject GreenMailExternalProcess greenMailExternalProcess;
 	private ClosableProcess greenMailProcess;
-	private int imapPort;
-	private int smtpPort;
 	
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
@@ -101,13 +99,15 @@ public abstract class MailboxMemoryAPITest {
 		mailbox = "to@localhost.com";
 		password = "password";
 		maxHeapSize = getTwiceThisHeapSize();
-		greenMailProcess = new GreenMailExternalProcess(
-				mailbox, password, imapPort, smtpPort, false, maxHeapSize).execute();
+		greenMailExternalProcess.setHeapMaxSize(maxHeapSize);
+		greenMailProcess = greenMailExternalProcess.startGreenMail(mailbox, password);
+		
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
 						.createUser(mailbox, mailbox, null), password), null, null, null);
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
-		MailTestsUtils.waitForGreenmailAvailability(imapLocation, emailConfiguration.imapPort());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getImapPort());
+		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getSmtpPort());
 		inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 	}
 

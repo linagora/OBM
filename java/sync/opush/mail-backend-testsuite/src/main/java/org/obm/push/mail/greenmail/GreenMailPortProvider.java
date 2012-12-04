@@ -31,28 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.greenmail;
 
-import org.columba.ristretto.smtp.SMTPProtocol;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.exception.SmtpLocatorException;
-import org.obm.push.mail.smtp.SmtpProvider;
+public interface GreenMailPortProvider {
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-@Singleton
-public class GreenMailSmtpProvider implements SmtpProvider {
+	int imapPort();
 	
-	private final GreenMailPortProvider greenMailPortProvider;
-
-	@Inject
-	private GreenMailSmtpProvider(GreenMailPortProvider greenMailPortProvider) {
-		this.greenMailPortProvider = greenMailPortProvider;
-	}
+	int smtpPort();
 	
-	@Override
-	public SMTPProtocol getSmtpClient(UserDataRequest udr)
-			throws SmtpLocatorException {
-		String address = "127.0.0.1";
-		return new SMTPProtocol(address, greenMailPortProvider.smtpPort());
-	}
 }

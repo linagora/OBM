@@ -31,28 +31,50 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.greenmail;
 
-import org.columba.ristretto.smtp.SMTPProtocol;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.exception.SmtpLocatorException;
-import org.obm.push.mail.smtp.SmtpProvider;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-@Singleton
-public class GreenMailSmtpProvider implements SmtpProvider {
-	
-	private final GreenMailPortProvider greenMailPortProvider;
-
-	@Inject
-	private GreenMailSmtpProvider(GreenMailPortProvider greenMailPortProvider) {
-		this.greenMailPortProvider = greenMailPortProvider;
-	}
+public class ExternalGreenMailModule extends AbstractModule {
 	
 	@Override
-	public SMTPProtocol getSmtpClient(UserDataRequest udr)
-			throws SmtpLocatorException {
-		String address = "127.0.0.1";
-		return new SMTPProtocol(address, greenMailPortProvider.smtpPort());
+	protected void configure() {
+		install(new ExternalGreenmailProviderModule());
+		install(new org.obm.push.mail.MailEnvModule());
+		bind(GreenMailPortProvider.class).to(GreenMailPortProviderImpl.class);
+	}
+	
+	public static class GreenMailPortProviderImpl implements GreenMailPortProvider {
+		
+		private final GreenMailExternalProcess greenMailExternalProcess;
+
+		@Inject
+		private GreenMailPortProviderImpl(GreenMailExternalProcess greenMailExternalProcess) {
+			this.greenMailExternalProcess = greenMailExternalProcess;
+		}
+
+		@Override
+		public int imapPort() {
+			return greenMailExternalProcess.getImapPort();
+		}
+
+		@Override
+		public int smtpPort() {
+			return greenMailExternalProcess.getSmtpPort();
+		}
+	}
+
+	public static class ExternalGreenmailProviderModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+		}
+		
+		@Provides @Singleton
+		@VisibleForTesting GreenMailExternalProcess provideGreenMailExternalProcess() {
+			return new GreenMailExternalProcess();
+		}
 	}
 }
