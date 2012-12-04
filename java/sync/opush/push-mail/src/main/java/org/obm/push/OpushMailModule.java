@@ -38,12 +38,12 @@ import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.mail.EmailChangesComputer;
 import org.obm.push.mail.EmailChangesComputerImpl;
+import org.obm.push.mail.EmailChangesFetcher;
+import org.obm.push.mail.EmailChangesFetcherImpl;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailBackendImpl;
 import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailViewToMSEmailConverterImpl;
-import org.obm.push.mail.EmailChangesFetcher;
-import org.obm.push.mail.EmailChangesFetcherImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
@@ -51,7 +51,9 @@ import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.store.EmailDao;
 import org.obm.push.store.SnapshotDao;
+import org.obm.push.store.SyncKeysDao;
 import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
+import org.obm.push.store.ehcache.SyncKeysDaoEhcacheImpl;
 import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
@@ -78,6 +80,7 @@ public class OpushMailModule extends AbstractModule {
 		transformers.addBinding().to(Identity.Factory.class);
 		transformers.addBinding().to(HtmlToText.Factory.class);
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
+		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
 	}
 
 }

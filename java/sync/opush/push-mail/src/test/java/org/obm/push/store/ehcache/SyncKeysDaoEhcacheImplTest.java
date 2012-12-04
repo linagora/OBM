@@ -43,6 +43,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
@@ -54,7 +55,7 @@ import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class SyncKeysDaoEhcacheImplTest extends StoreManagerConfigurationTest {
+public class SyncKeysDaoEhcacheImplTest {
 
 	private ObjectStoreManager objectStoreManager;
 	private SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl;
@@ -65,8 +66,17 @@ public class SyncKeysDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), logger);
 		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+	}
+	
+	private ConfigurationService initConfigurationServiceMock() {
+		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
+		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(false);
+		EasyMock.replay(configurationService);
+		
+		return configurationService;
 	}
 	
 	@After
