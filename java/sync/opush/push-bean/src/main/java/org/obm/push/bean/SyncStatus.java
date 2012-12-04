@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 /**
  * Possible values for the status element in Sync reponses
  */
@@ -53,14 +58,30 @@ public enum SyncStatus {
 	TO_MUCH_FOLDER_TO_MONITOR("15"),
 	NEED_RETRY("16");
 
-	private final String asSpecificationValue;
+	private final String specificationValue;
 
 	private SyncStatus(String asSpecificationValue) {
-		this.asSpecificationValue = asSpecificationValue;
+		this.specificationValue = asSpecificationValue;
 	}
 	
 	public String asSpecificationValue() {
-		return asSpecificationValue;
+		return specificationValue;
 	}
 	
+	public static SyncStatus fromSpecificationValue(String specificationValue) {
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
+		}
+		throw new IllegalArgumentException("No filter type for '" + specificationValue + "'");
+	}
+
+	private static Map<String, SyncStatus> specValueToEnum;
+	
+	static {
+		Builder<String, SyncStatus> builder = ImmutableMap.builder();
+		for (SyncStatus syncStatus : values()) {
+			builder.put(syncStatus.specificationValue, syncStatus);
+		}
+		specValueToEnum = builder.build();
+	}
 }
