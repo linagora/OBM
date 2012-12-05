@@ -54,6 +54,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.mail.greenmail.GreenMailProviderModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -68,7 +69,7 @@ public class JavaxMailTest {
 		
 		@Override
 		protected void configure() {
-			install(new GreenMailModule());
+			install(new GreenMailProviderModule());
 			install(new MailEnvModule());
 		}
 	}

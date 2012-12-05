@@ -29,9 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail;
+package org.obm.push.mail.greenmail;
 
 import java.util.Locale;
+
+import org.obm.push.mail.ImapPort;
+import org.obm.push.mail.ImapServerSetup;
+import org.obm.push.mail.SmtpPort;
+import org.obm.push.mail.SmtpServerSetup;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -39,7 +44,7 @@ import com.google.inject.Singleton;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-public class GreenMailModule extends AbstractModule {
+public class GreenMailProviderModule extends AbstractModule {
 
 	@Override
 	protected void configure() {

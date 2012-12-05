@@ -40,11 +40,11 @@ import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.GreenMailModule;
 import org.obm.push.mail.ImapPort;
 import org.obm.push.mail.SmtpPort;
 import org.obm.push.mail.TestEmailConfiguration;
 import org.obm.push.mail.TestSmtpProvider;
+import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
@@ -57,7 +57,7 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 	
 	@Override
 	protected void configureImpl() {
-		install(new GreenMailModule());
+		install(new GreenMailProviderModule());
 		bind(EventService.class).toInstance(EasyMock.createMock(EventService.class));
 		bind(LocatorService.class).toInstance(new LocatorService() {
 			
