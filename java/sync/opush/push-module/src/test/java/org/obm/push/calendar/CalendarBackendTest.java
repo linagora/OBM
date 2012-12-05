@@ -514,7 +514,7 @@ public class CalendarBackendTest {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
 		
-		int itemEstimateSize = calendarBackend.getItemEstimateSize(userDataRequest, collectionId, lastKnownState, syncCollectionOptions);
+		int itemEstimateSize = calendarBackend.getItemEstimateSize(userDataRequest, lastKnownState, collectionId, syncCollectionOptions);
 		
 		verify(loginService, mappingService, calendarClient, eventService);
 		

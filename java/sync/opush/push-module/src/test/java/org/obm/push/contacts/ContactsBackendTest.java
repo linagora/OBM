@@ -176,7 +176,7 @@ public class ContactsBackendTest {
 		mocks.replay();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
-		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, targetcontactCollectionUid, lastKnownState, null);
+		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, lastKnownState, targetcontactCollectionUid, null);
 
 		mocks.verify();
 		

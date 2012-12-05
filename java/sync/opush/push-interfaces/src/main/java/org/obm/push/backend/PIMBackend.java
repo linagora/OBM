@@ -81,7 +81,7 @@ public interface PIMBackend {
 			SyncCollectionOptions options, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException;
 	
-	int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState syncState, 
+	int getItemEstimateSize(UserDataRequest udr, SyncState syncState, Integer collectionId, 
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
 

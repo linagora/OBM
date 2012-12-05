@@ -311,12 +311,12 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState state, 
-			SyncCollectionOptions syncCollectionOptions) throws ProcessingEmailException, 
+	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
+			SyncCollectionOptions options) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException {
 		
-		MailChanges mailChanges = getSync(udr, state, collectionId, syncCollectionOptions.getFilterType());
-		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges, syncCollectionOptions.getBodyPreferences());
+		MailChanges mailChanges = getSync(udr, state, collectionId, options.getFilterType());
+		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges, options.getBodyPreferences());
 		return dataDelta.getItemEstimateSize();
 	}
 

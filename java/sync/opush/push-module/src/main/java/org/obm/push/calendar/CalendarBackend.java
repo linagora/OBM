@@ -238,7 +238,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, SyncState state, 
+	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException {
 		

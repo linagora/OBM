@@ -71,8 +71,8 @@ public class TaskBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, Integer collectionId, 
-			SyncState state, SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
+	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
+			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
 		return 0;
 	}

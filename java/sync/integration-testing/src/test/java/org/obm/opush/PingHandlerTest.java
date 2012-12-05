@@ -318,8 +318,8 @@ public class PingHandlerTest {
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyInt(),
 				anyObject(SyncState.class),
+				anyInt(),
 				anyObject(SyncCollectionOptions.class)))
 			.andReturn(1).times(2);
 	}
@@ -330,8 +330,8 @@ public class PingHandlerTest {
 		
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyInt(),
 				anyObject(SyncState.class),
+				anyInt(),
 				anyObject(SyncCollectionOptions.class)))
 			.andReturn(0).anyTimes();
 	}

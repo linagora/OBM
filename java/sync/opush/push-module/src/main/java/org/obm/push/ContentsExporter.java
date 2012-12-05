@@ -86,8 +86,8 @@ public class ContentsExporter implements IContentsExporter {
 					UnexpectedObmSyncServerException, ConversionException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
-				syncCollection.getSyncState(), syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 
 	@Override
@@ -96,8 +96,8 @@ public class ContentsExporter implements IContentsExporter {
 			DaoException, UnexpectedObmSyncServerException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
-				state, syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, state, 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class ContentsExporter implements IContentsExporter {
 			UnexpectedObmSyncServerException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
-		return backend.getItemEstimateSize(udr, syncCollection.getCollectionId(), 
-				syncCollection.getSyncState(), syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 }
