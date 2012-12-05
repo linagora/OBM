@@ -69,6 +69,7 @@ import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -525,13 +526,9 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		try {
 			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
-			final Integer srcFolderId = mappingService.getCollectionIdFor(udr.getDevice(), srcFolder);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
-			final Integer devDbId = udr.getDevice().getDatabaseId();
 			Long newUidMail = mailboxService.moveItem(udr, srcFolder, dstFolder, currentMailUid);
-			deleteEmails(devDbId, srcFolderId, Arrays.asList(currentMailUid));
-			addMessageInCache(udr, devDbId, dstFolderId, newUidMail, dstFolder);
-			return dstFolderId + ":" + newUidMail;	
+			return ServerId.buildServerIdString(dstFolderId, newUidMail);	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
