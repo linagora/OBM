@@ -113,7 +113,7 @@ public class StateMachine {
 		return newFolderState;
 	}
 	
-	public void allocateNewSyncKey(UserDataRequest udr, Integer collectionId, Date lastSync, 
+	public void allocateNewSyncState(UserDataRequest udr, Integer collectionId, Date lastSync, 
 		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems, SyncKey newSyncKey) throws DaoException, InvalidServerId {
 
 		ItemSyncState newState = collectionDao.updateState(udr.getDevice(), collectionId, newSyncKey, lastSync);
