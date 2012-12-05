@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
@@ -65,7 +66,7 @@ import org.obm.sync.push.client.OPClient;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) //@Slow
+@RunWith(SlowFilterRunner.class) @Slow
 public class GetItemEstimateHandlerTest {
 
 	@Rule
@@ -119,8 +120,8 @@ public class GetItemEstimateHandlerTest {
 				opClient.getItemEstimateOnMailFolder(syncKey, unexistingCollectionId);
 
 		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
-		Assertions.assertThat(response.getCollectionId()).isNull();
-		Assertions.assertThat(response.getEstimate()).isNull();
+		Assertions.assertThat(response.getCollectionId()).isEqualTo(0);
+		Assertions.assertThat(response.getEstimate()).isEqualTo(0);
 	}
 
 	@Test
@@ -138,7 +139,7 @@ public class GetItemEstimateHandlerTest {
 
 		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
 		Assertions.assertThat(response.getCollectionId()).isEqualTo(collectionId);
-		Assertions.assertThat(response.getEstimate()).isNull();
+		Assertions.assertThat(response.getEstimate()).isEqualTo(0);
 	}
 
 	private void mockAccessAndStateThenStart(Set<Integer> existingCollections, SyncKey syncKey, ItemSyncState syncState)

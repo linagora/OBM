@@ -39,6 +39,8 @@ import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
+
 public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
 
 	private final SyncKey syncKey;
@@ -60,12 +62,20 @@ public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetI
 
 	@Override
 	protected GetItemEstimateSingleFolderResponse parseResponse(Element root) {
-		Integer colId = DOMUtils.getElementInteger(root, "CollectionId");
-		Integer estimate = DOMUtils.getElementInteger(root, "Estimate"); 
+		int colId = 0;
+		int estimate = 0;
+		String unparsedCollectionId = DOMUtils.getElementText(root, "CollectionId");
+		if (!Strings.isNullOrEmpty(unparsedCollectionId)) {
+			colId = Integer.parseInt(unparsedCollectionId);
+		}
+		String unparsedEstimate = DOMUtils.getElementText(root, "Estimate");
+		if (!Strings.isNullOrEmpty(unparsedEstimate)) {
+			estimate = Integer.parseInt(unparsedEstimate);
+		}
 		GetItemEstimateStatus status = findStatus(root);
 		return new GetItemEstimateSingleFolderResponse(colId, estimate, status);
 	}
-
+	
 	private GetItemEstimateStatus findStatus(Element root) {
 		int status = Integer.parseInt(DOMUtils.getElementText(root, "Status"));
 		return GetItemEstimateStatus.fromSpecificationValue(status);
