@@ -114,7 +114,7 @@ public class MailboxBackendTest {
 		transformer = mocks.createMock(Transformer.class);
 		expect(transformersFactory.create(anyObject(FetchInstruction.class))).andReturn(transformer);
 		msEmailFetcher = new MSEmailFetcher(mailboxService, transformersFactory, msEmailConverter);
-		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
+		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null, null,
 				null, null, null, mappingService, null, null, msEmailFetcher, null);
 	}
 

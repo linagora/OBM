@@ -124,7 +124,7 @@ public class MailBackendTest {
 		expect(collectionPathBuilderProvider.get()).andReturn(collectionPathBuilder).anyTimes();
 		mailboxService = createMock(MailboxService.class);
 		mappingService = createMock(MappingService.class);
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null, null,
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null,
 				null,mappingService, null, null, null, collectionPathBuilderProvider);
 	}
 	
@@ -162,7 +162,7 @@ public class MailBackendTest {
 		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(
-				mailboxService, calendarClient, null, null, 
+				mailboxService, calendarClient, null,
 				login, new Mime4jUtils(), mockOpushConfigurationService(), null, null, null, mappingService, null, null, null, collectionPathBuilderProvider);
 
 		replay(mailboxService, calendarClient, userDataRequest, login);
@@ -386,7 +386,7 @@ public class MailBackendTest {
 		expectBuildMailboxesCollectionPaths(changedMailboxes);
 		
 		replayCommonMocks();
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null, null, null,mappingService, null, null, null, collectionPathBuilderProvider);
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null, null,mappingService, null, null, null, collectionPathBuilderProvider);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -409,7 +409,7 @@ public class MailBackendTest {
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("display name", "another display name"));
 		
 		replayCommonMocks();
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null, null,
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null,
 				null,mappingService, null, null, null, collectionPathBuilderProvider);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
 		verifyCommonMocks();
@@ -435,7 +435,7 @@ public class MailBackendTest {
 				.build();
 		
 		replayCommonMocks(); replay(collectionPath);
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null, null,
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null, null,
 				null, mappingService, null, null, null, collectionPathBuilderProvider);
 		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
 		verifyCommonMocks(); verify(collectionPath);

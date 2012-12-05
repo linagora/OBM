@@ -106,7 +106,7 @@ public class MailBackendImplTest {
 		dateService = control.createMock(DateService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null, snapshotService,
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, snapshotService,
 				emailChangesComputer, serverEmailChangesBuilder, mappingService, null, dateService, null, null);
 	}
 	
@@ -558,6 +558,157 @@ public class MailBackendImplTest {
 		control.verify();
 		assertThat(searchEmailsToManage).isEqualTo(expectedEmails);
 	}
+	
+	@Test
+	public void testGetItemEstimateInitialWhenNoChange() throws Exception {
+		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		long uidNext = 45612;
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Set<Email> previousEmailsInServer = ImmutableSet.of();
+		Set<Email> actualEmailsInServer = ImmutableSet.of();
+		EmailChanges emailChanges = EmailChanges.builder().build();
+
+		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
+		expect(dateService.getCurrentDate()).andReturn(fromDate);
+		expectSnapshotDaoHasNoEntry(syncKey);
+		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
+		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions);
+		control.verify();
+		
+		assertThat(itemEstimateSize).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetItemEstimateInitialWhithChanges() throws Exception {
+		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		long uidNext = 45612;
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
+		Email email2 = Email.builder().uid(546).read(true).date(date("2012-12-12T23:59:00")).build();
+		
+		Set<Email> previousEmailsInServer = ImmutableSet.of();
+		Set<Email> actualEmailsInServer = ImmutableSet.of(email1, email2);
+		EmailChanges emailChanges = EmailChanges.builder().additions(actualEmailsInServer).build();
+
+		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
+		expect(dateService.getCurrentDate()).andReturn(fromDate);
+		expectSnapshotDaoHasNoEntry(syncKey);
+		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
+		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions);
+		control.verify();
+		
+		assertThat(itemEstimateSize).isEqualTo(2);
+	}
+
+	@Test
+	public void testGetItemEstimateNoChange() throws Exception {
+		SyncKey syncKey = new SyncKey("1");
+		long uidNext = 10;
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Email email = Email.builder().uid(2).read(false).date(date("2004-12-14T22:00:00")).build();
+		Set<Email> emailsInServer = ImmutableSet.of(email);
+		
+		Snapshot snapshot = Snapshot.builder()
+				.emails(emailsInServer)
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.filterType(FilterType.ALL_ITEMS)
+				.uidNext(2)
+				.syncKey(syncKey)
+				.build();
+		
+		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
+		
+		EmailChanges emailChanges = EmailChanges.builder().build();
+
+		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
+		expect(dateService.getCurrentDate()).andReturn(fromDate);
+		expectSnapshotDaoHasEntry(syncKey, snapshot);
+		expectActualEmailServerStateByUid(emailsInServer, uids, uidNext);
+		expectEmailsDiff(ImmutableList.copyOf(emailsInServer), emailsInServer, emailChanges);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions);
+		control.verify();
+		
+		assertThat(itemEstimateSize).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetItemEstimateWithChanges() throws Exception {
+		SyncKey syncKey = new SyncKey("1");
+		long uidNext = 10;
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+
+		Email deletedEmail = Email.builder().uid(2).read(false).date(date("2004-12-14T22:00:00")).build();
+		Email modifiedEmail = Email.builder().uid(3).read(false).date(date("2004-12-14T22:00:00")).build();
+		Email modifiedEmail2 = Email.builder().uid(3).read(true).date(date("2004-12-14T22:00:00")).build();
+		Email newEmail = Email.builder().uid(4).read(false).date(date("2004-12-14T22:00:00")).build();
+		Set<Email> previousEmailsInServer = ImmutableSet.of(deletedEmail, modifiedEmail);
+		Set<Email> actualEmailsInServer = ImmutableSet.of(modifiedEmail2, newEmail);
+		
+		Snapshot snapshot = Snapshot.builder()
+				.emails(previousEmailsInServer)
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.filterType(FilterType.ALL_ITEMS)
+				.uidNext(2)
+				.syncKey(syncKey)
+				.build();
+		
+		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
+		
+		EmailChanges emailChanges = EmailChanges.builder()
+				.additions(ImmutableSet.<Email>of(newEmail))
+				.changes(ImmutableSet.<Email>of(modifiedEmail2))
+				.deletions(ImmutableSet.<Email>of(deletedEmail))
+				.build();
+
+		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
+		expect(dateService.getCurrentDate()).andReturn(fromDate);
+		expectSnapshotDaoHasEntry(syncKey, snapshot);
+		expectActualEmailServerStateByUid(actualEmailsInServer, uids, uidNext);
+		expectEmailsDiff(ImmutableList.copyOf(previousEmailsInServer), actualEmailsInServer, emailChanges);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build(), 
+				collectionId, syncCollectionOptions);
+		control.verify();
+		
+		assertThat(itemEstimateSize).isEqualTo(3);
+	}
 
 	private void expectBuildItemChangesByFetchingMSEmailsData(List<BodyPreference> bodyPreferences,
 			EmailChanges emailChanges, MSEmailChanges itemChanges)
@@ -567,7 +718,7 @@ public class MailBackendImplTest {
 			.andReturn(itemChanges);
 	}
 
-	private void expectEmailsDiff(Set<Email> previousEmailsInServer, Set<Email> actualEmailsInServer, EmailChanges diff) {
+	private void expectEmailsDiff(Collection<Email> previousEmailsInServer, Collection<Email> actualEmailsInServer, EmailChanges diff) {
 		expect(emailChangesComputer.computeChanges(previousEmailsInServer, actualEmailsInServer)).andReturn(diff);
 	}
 
@@ -588,6 +739,12 @@ public class MailBackendImplTest {
 	private void expectActualEmailServerStateByDate(Set<Email> emailsInServer, Date fromDate, long uidNext) {
 		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
 			.andReturn(emailsInServer);
+		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
+	}
+
+	private void expectActualEmailServerStateByUid(Set<Email> emailsInServer, Collection<Long> uids, long uidNext) {
+		expect(mailboxService.fetchEmails(udr, collectionPath, uids))
+			.andReturn(emailsInServer).once();
 		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
 	}
 

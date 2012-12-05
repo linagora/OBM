@@ -56,6 +56,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
@@ -236,6 +237,9 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (ConversionException e) {
 			logger.error(e.getMessage(), e);
 			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
+		} catch (FilterTypeChangedException e) {
+			logger.error(e.getMessage(), e);
+			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
 		} 
 	}
 
@@ -245,7 +249,8 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
 			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException,
+			FilterTypeChangedException {
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();

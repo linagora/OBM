@@ -83,7 +83,8 @@ public interface PIMBackend {
 	
 	int getItemEstimateSize(UserDataRequest udr, SyncState syncState, Integer collectionId, 
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
-			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException;
+			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
+			FilterTypeChangedException;
 
 	HierarchyCollectionChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException, InvalidSyncKeyException;

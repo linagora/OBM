@@ -57,13 +57,13 @@ public interface IContentsExporter {
 
 	int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException, ConversionException;
+			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
 
 	int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException;
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
 
 	int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException;
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
 }

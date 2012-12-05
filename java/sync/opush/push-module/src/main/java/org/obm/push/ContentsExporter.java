@@ -83,7 +83,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) 
 					throws CollectionNotFoundException, ProcessingEmailException, DaoException,
-					UnexpectedObmSyncServerException, ConversionException {
+					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 
@@ -93,7 +93,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ConversionException {
+			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getItemEstimateSize(udr, state, 
@@ -103,7 +103,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException {
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
 		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 

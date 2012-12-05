@@ -37,9 +37,9 @@ import org.obm.opush.env.AbstractOverrideModule;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
-public class MailBackendGetChangedTestModule  extends AbstractOpushGreenMailEnv {
+public class MailBackendTestModule  extends AbstractOpushGreenMailEnv {
 	
-	public MailBackendGetChangedTestModule() {
+	public MailBackendTestModule() {
 		super();
 	}
 	

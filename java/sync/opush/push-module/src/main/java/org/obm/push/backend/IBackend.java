@@ -40,6 +40,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -69,6 +70,6 @@ public interface IBackend {
 
 	Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException;
+			ConversionException, FilterTypeChangedException;
 	
 }

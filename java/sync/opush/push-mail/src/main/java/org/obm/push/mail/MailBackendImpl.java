@@ -76,7 +76,6 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
-import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSRead;
 import org.obm.push.exception.DaoException;
@@ -156,7 +155,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final ICalendar calendarClient;
 	private final LoginService login;
 	private final EmailDao emailDao;
-	private final EmailSync emailSync;
 	private final EventService eventService;
 	private final DateService dateService;
 	private final MSEmailFetcher msEmailFetcher;
@@ -168,7 +166,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
-			EmailDao emailDao, EmailSync emailSync,
+			EmailDao emailDao,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotService snapshotService,
 			EmailChangesComputer emailChangesComputer,
@@ -182,7 +180,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
 		this.emailDao = emailDao;
-		this.emailSync = emailSync;
 		this.mime4jUtils = mime4jUtils;
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
@@ -294,73 +291,27 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		return collectionPathBuilderProvider.get().pimType(PIMDataType.EMAIL).userDataRequest(udr).backendName(EmailConfiguration.IMAP_TRASH_NAME).build();
 	}
 
-	private MailChanges getSync(UserDataRequest udr, SyncState state, Integer collectionId, FilterType filterType) 
-			throws ProcessingEmailException, CollectionNotFoundException {
-		
-		try {
-			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			SyncState newState = state.newWindowedSyncState(filterType);
-			return emailSync.getSync(udr, mailboxService, newState, collectionPath, collectionId);
-		} catch (DaoException e) {
-			throw new ProcessingEmailException(e);
-		} catch (MailException e) {
-			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
-			throw new ProcessingEmailException(e);
-		}
-	}
-	
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
 			SyncCollectionOptions options) throws ProcessingEmailException, 
-			CollectionNotFoundException, DaoException {
+			CollectionNotFoundException, DaoException, FilterTypeChangedException {
 		
-		MailChanges mailChanges = getSync(udr, state, collectionId, options.getFilterType());
-		DataDelta dataDelta = getDataDelta(udr, collectionId, mailChanges, options.getBodyPreferences());
-		return dataDelta.getItemEstimateSize();
+		Date dataDeltaDate = dateService.getCurrentDate();
+		String collectionPath = mappingService.getCollectionPathFor(collectionId);
+		long currentUIDNext = mailboxService.fetchUIDNext(udr, collectionPath);
+		
+		Snapshot previousStateSnapshot = snapshotService.getSnapshot(udr.getDevId(), state.getSyncKey(), collectionId);
+		Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
+		Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionId, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
+		
+		EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
+		return computeEmailChangesNumber(emailChanges);
 	}
 
-	private DataDelta getDataDelta(UserDataRequest udr, Integer collectionId, MailChanges mailChanges, 
-			List<BodyPreference> bodyPreferences) throws ProcessingEmailException, 
-			CollectionNotFoundException, DaoException {
-		
-		List<ItemChange> itemChanges = fetchMails(udr, collectionId, 
-				mappingService.getCollectionPathFor(collectionId), mailChanges.getNewEmailsUids(), bodyPreferences);
-		List<ItemDeletion> itemsToDelete = mappingService.buildItemsToDeleteFromUids(collectionId, mailChanges.getRemovedEmailsUids());
-		
-		return DataDelta.builder()
-				.changes(itemChanges)
-				.deletions(itemsToDelete)
-				.syncDate(mailChanges.getLastSync())
-				.build();
+	private int computeEmailChangesNumber(EmailChanges emailChanges) {
+		return emailChanges.additions().size() + emailChanges.changes().size() + emailChanges.deletions().size();
 	}
-	
-	private List<ItemChange> fetchMails(UserDataRequest udr, Integer collectionId, String collectionPath, 
-			Collection<Long> emailsUids, List<BodyPreference> bodyPreferences) throws ProcessingEmailException {
-		
-		ImmutableList.Builder<ItemChange> itch = ImmutableList.builder();
-		try {
-			List<org.obm.push.bean.ms.MSEmail> msMails = msEmailFetcher.fetch(udr, collectionId, collectionPath, emailsUids, bodyPreferences);
-			for (org.obm.push.bean.ms.MSEmail mail: msMails) {
-				itch.add(getItemChange(collectionId, mail.getUid(), mail));
-			}
-			return itch.build();
-		} catch (LocatorClientException e) {
-			throw new ProcessingEmailException(e);
-		} catch (EmailViewPartsFetcherException e) {
-			throw new ProcessingEmailException(e);
-		} catch (DaoException e) {
-			throw new ProcessingEmailException(e);
-		}
-	}
-	
-	private ItemChange getItemChange(Integer collectionId, Long uid, IApplicationData data) {
-		ItemChange ic = new ItemChange();
-		ic.setServerId(mappingService.getServerIdFor(collectionId, "" + uid));
-		ic.setData(data);
-		return ic;
-	}
-	
+
 	/**
 	 * @throws FilterTypeChangedException when a snapshot 
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType

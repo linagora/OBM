@@ -45,6 +45,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ListenerRegistration;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
 import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
@@ -178,7 +179,7 @@ public class OBMBackend implements IBackend {
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException {
+			ConversionException, FilterTypeChangedException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final UserDataRequest userDataRequest = collectionChangeListener.getSession();
@@ -203,7 +204,7 @@ public class OBMBackend implements IBackend {
 	
 	private int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) throws DaoException,
 		CollectionNotFoundException, UnexpectedObmSyncServerException, 
-		ProcessingEmailException, ConversionException {
+		ProcessingEmailException, ConversionException, FilterTypeChangedException {
 		
 		return contentsExporter.getItemEstimateSize(udr, syncCollection);
 	}
