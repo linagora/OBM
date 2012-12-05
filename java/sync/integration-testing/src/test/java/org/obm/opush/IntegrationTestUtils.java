@@ -196,6 +196,10 @@ public class IntegrationTestUtils {
 		return buildCollectionPath(opushUser, "email", "INBOX");
 	}
 	
+	public static String buildEmailTrashCollectionPath(OpushUser opushUser) {
+		return buildCollectionPath(opushUser, "email", "Trash");
+	}
+	
 	private static String buildCollectionPath(OpushUser opushUser, String dataType, String relativePath) {
 		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + relativePath;
 	}

@@ -32,6 +32,7 @@
 package org.obm.opush;
 
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -69,10 +70,12 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
@@ -83,6 +86,7 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.SyncResponse;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.store.MailFolder;
@@ -105,6 +109,7 @@ public class MailBackendGetChangedTest {
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
 	private DateService dateService;
+	private EmailDao emailDao;
 
 	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
@@ -113,6 +118,8 @@ public class MailBackendGetChangedTest {
 	private String inboxCollectionPath;
 	private int inboxCollectionId;
 	private String inboxCollectionIdAsString;
+	private int trashCollectionId;
+	private String trashCollectionPath;
 
 	@Before
 	public void init() throws Exception {
@@ -126,11 +133,14 @@ public class MailBackendGetChangedTest {
 		inboxCollectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
 		inboxCollectionId = 1234;
 		inboxCollectionIdAsString = String.valueOf(inboxCollectionId);
+		trashCollectionPath = IntegrationTestUtils.buildEmailTrashCollectionPath(user);
+		trashCollectionId = 1645;
 		
 		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
+		emailDao = classToInstanceMap.get(EmailDao.class);
 
 		bindCollectionIdToPath();
 	}
@@ -340,6 +350,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 	}
 
+
 	@Test
 	public void testGetChangedWithFilterTypeChange() throws Exception {
 		String emailId1 = ":1";
@@ -398,6 +409,69 @@ public class MailBackendGetChangedTest {
 		org.obm.sync.push.client.Collection inboxCollectionResponse = syncResponse.getCollection(inboxCollectionIdAsString);
 		assertThat(inboxCollectionResponse.getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
+	
+	@Test(expected=AssertionError.class)
+	public void testGetChangedDoesnotReturnDeleteAskByClient() throws Exception {
+		String emailId1 = ":1";
+		String emailId2 = ":2";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		SyncKey newAllocatedSyncKey = new SyncKey("1012");
+		int allocatedStateId = 3;
+		int allocatedStateId2 = 4;
+		int newAllocatedStateId = 5;
+		
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), user.userDataRequest, 0);
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey, newAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(allocatedStateId)
+				.build();
+		ItemSyncState currentAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(allocatedStateId2)
+				.build();
+		ItemSyncState newAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T18:17:26"))
+				.syncKey(newAllocatedSyncKey)
+				.id(newAllocatedStateId)
+				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
+		expect(dateService.getCurrentDate()).andReturn(newAllocatedState.getSyncDate());
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState);
+		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState);
+		expectCollectionDaoPerformDeletion();
+		expectUnsynchronizedItemToNeverExceedWindowSize();
+
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall();
+		
+		replayMocks(classToInstanceMap);
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK);
+		SyncResponse syncResponse = opClient.deleteEmail(secondAllocatedSyncKey, inboxCollectionId, inboxCollectionId + emailId1);
+		verifyMocks(classToInstanceMap);
+		
+		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getDeletes()).isEmpty();
+		assertThat(syncResponse.getCollection(inboxCollectionIdAsString).getAdds()).isEmpty();
+
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
+	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize() {
 		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
@@ -408,6 +482,18 @@ public class MailBackendGetChangedTest {
 		expectLastCall().anyTimes();
 		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, inboxCollectionId);
 		expectLastCall().anyTimes();
+	}
+
+	private void expectCollectionDaoPerformDeletion() throws DaoException {
+		expect(collectionDao.getCollectionMapping(user.device, trashCollectionPath)).andReturn(trashCollectionId);
+		expect(emailDao.alreadySyncedEmails(anyInt(), anyInt(), anyObject(Collection.class)))
+			.andReturn(ImmutableSet.<Email>of());
+		emailDao.updateSyncEntriesStatus(anyInt(), anyInt(), anyObject(Set.class));
+		expectLastCall();
+		emailDao.deleteSyncEmails(anyInt(), anyInt(), anyObject(Collection.class));
+		expectLastCall();
+		emailDao.createSyncEntries(anyInt(), anyInt(), anyObject(Set.class), anyObject(Date.class));
+		expectLastCall();
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState, ItemSyncState newItemSyncState)
