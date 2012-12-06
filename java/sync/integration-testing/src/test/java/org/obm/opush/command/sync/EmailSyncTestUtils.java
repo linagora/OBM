@@ -108,7 +108,7 @@ public class EmailSyncTestUtils {
 		mockItemTrackingDao(itemTrackingDao);
 	}
 	
-	private static void mockEmailUnsynchronizedItemDao(UnsynchronizedItemDao unsynchronizedItemDao) {
+	public static void mockEmailUnsynchronizedItemDao(UnsynchronizedItemDao unsynchronizedItemDao) {
 		expect(unsynchronizedItemDao.listItemsToAdd(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
@@ -135,7 +135,7 @@ public class EmailSyncTestUtils {
 		expectLastCall().anyTimes();
 	}
 
-	private static void mockEmailSyncedCollectionDao(SyncedCollectionDao syncedCollectionDao) {
+	public static void mockEmailSyncedCollectionDao(SyncedCollectionDao syncedCollectionDao) {
 		expect(syncedCollectionDao.get(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),

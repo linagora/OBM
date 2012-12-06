@@ -31,6 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
@@ -38,6 +42,8 @@ import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
 import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
+import static org.obm.opush.IntegrationTestUtils.replayMocks;
+import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 
 import java.io.ByteArrayInputStream;
@@ -56,14 +62,18 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.IntegrationTestUtils;
+import org.obm.opush.IntegrationUserAccessUtils;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.SyncKey;
@@ -77,6 +87,9 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
+import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
@@ -320,6 +333,42 @@ public class SyncHandlerTest {
 		assertThat(inboxCollection).isNotNull();
 		assertThat(inboxCollection.getAdds()).isEmpty();
 		assertThat(inboxCollection.getDeletes()).isEmpty();
+	}
+	
+	@Test
+	public void testSyncWithUnknownSyncKeyReturnsInvalidSyncKeyStatus() throws Exception {
+		int collectionId= 1;
+		String collectionIdAsString = String.valueOf(collectionId);
+		
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey secondSyncKey = new SyncKey("456");
+		Date initialUpdateStateDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstItemSyncState = ItemSyncState.builder().syncKey(initialSyncKey).syncDate(initialUpdateStateDate).build();
+		
+		IntegrationUserAccessUtils.mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		EmailSyncTestUtils.mockEmailSyncedCollectionDao(classToInstanceMap.get(SyncedCollectionDao.class));
+		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class),
+				singleUserFixture.jaures.userDataRequest, 0);
+		
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
+		EmailSyncTestUtils.mockEmailUnsynchronizedItemDao(classToInstanceMap.get(UnsynchronizedItemDao.class));
+		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
+		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(null).times(2);
+		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncKey.class), anyObject(Date.class)))
+			.andReturn(firstItemSyncState)
+			.anyTimes();
+		collectionDao.resetCollection(singleUserFixture.jaures.device, collectionId);
+		expectLastCall();
+		
+		replayMocks(classToInstanceMap);
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		opClient.syncEmail(initialSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK);
+		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK);
+		verifyMocks(classToInstanceMap);
+		
+		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
