@@ -371,10 +371,14 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		assertSnapshotHasSameOptionsThanRequest(previousStateSnapshot, actualOptions, collectionId, udr);
 		if (mustSyncByDate(previousStateSnapshot)) {
-			Date searchEmailsFromDate = actualOptions.getFilterType().getFilteredDate(dataDeltaDate);
+			Date searchEmailsFromDate = searchEmailsFromDate(actualOptions.getFilterType(), dataDeltaDate);
 			return mailboxService.fetchEmails(udr, collectionPath, searchEmailsFromDate);
 		}
 		return searchSnapshotAndActualChanges(udr, collectionPath, previousStateSnapshot, currentUIDNext);
+	}
+
+	@VisibleForTesting Date searchEmailsFromDate(FilterType filterType, Date dataDeltaDate) {
+		return Objects.firstNonNull(filterType, FilterType.ALL_ITEMS).getFilteredDate(dataDeltaDate);	
 	}
 
 	private void assertSnapshotHasSameOptionsThanRequest(Snapshot snapshot, SyncCollectionOptions options, Integer collectionId, UserDataRequest udr)

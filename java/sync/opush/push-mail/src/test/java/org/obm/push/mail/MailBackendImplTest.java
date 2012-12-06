@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.easymock.IMocksControl;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -710,6 +712,29 @@ public class MailBackendImplTest {
 		assertThat(itemEstimateSize).isEqualTo(3);
 	}
 
+	@Test
+	public void testSearchEmailsFromDateNoFilterType() {
+		DateTime dateTime = new DateTime(DateUtils.getCurrentDate()).withZone(DateTimeZone.UTC);
+		Date expectedDate = dateTime.minusDays(3).toDate();
+
+		control.replay();
+		Date searchEmailsFromDate = testee.searchEmailsFromDate(FilterType.THREE_DAYS_BACK, dateTime.toDate());
+		
+		control.verify();
+		assertThat(searchEmailsFromDate).isEqualTo(expectedDate);
+	}
+
+	@Test
+	public void testSearchEmailsFromDateWithFilterType() {
+		Date date = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		
+		control.replay();
+		Date searchEmailsFromDate = testee.searchEmailsFromDate(null, null);
+		
+		control.verify();
+		assertThat(searchEmailsFromDate).isEqualTo(date);
+	}
+	
 	private void expectBuildItemChangesByFetchingMSEmailsData(List<BodyPreference> bodyPreferences,
 			EmailChanges emailChanges, MSEmailChanges itemChanges)
 					throws EmailViewPartsFetcherException, DaoException {
