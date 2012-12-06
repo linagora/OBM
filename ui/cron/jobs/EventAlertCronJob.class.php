@@ -165,7 +165,12 @@ class EventAlertCronJob extends CronJob{
     $this->logger->core($query);
     $obm_q->xquery($query);
     while($obm_q->next_record()) {
-      $query = "DELETE FROM EventAlert WHERE eventalert_event_id = ".$obm_q->f('eventalert_event_id')."
+      if ( $obm_q->f('eventalert_event_id') ) {
+        $eventalert_selector = " = ".$obm_q->f('eventalert_event_id');
+      } else {
+        $eventalert_selector = " IS NULL";
+      }
+      $query = "DELETE FROM EventAlert WHERE eventalert_event_id ".$eventalert_selector." 
                 AND eventalert_user_id = ".$obm_q->f('eventalert_user_id');
       $this->logger->core($query);
       $obm2_q->query($query);
