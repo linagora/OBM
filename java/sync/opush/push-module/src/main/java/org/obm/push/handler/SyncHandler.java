@@ -178,8 +178,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 						 modificationStatus.processedClientIds, continuation);
 				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
 			}
-		} catch (FilterTypeChangedException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, e);
 		} catch (InvalidServerId e) {
 			sendError(udr.getDevice(), responder, SyncStatus.PROTOCOL_ERROR, e);
 		} catch (ProtocolException convExpt) {
@@ -261,7 +259,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
 			delta = contentsExporter.getChanged(udr, c, newSyncKey);
-			
 			lastSync = delta.getSyncDate();
 		} else {
 			lastSync = c.getItemSyncState().getSyncDate();
@@ -374,8 +371,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
 					Collections.EMPTY_MAP, continuation);
 			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
-		} catch (FilterTypeChangedException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, e);
 		} catch (DaoException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {
@@ -395,7 +390,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -409,7 +404,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if (syncCollection.getStatus() != SyncStatus.OK) {
@@ -417,7 +412,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} else if (SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncCollection.getSyncKey())) {
 			handleInitialSync(udr, syncCollection, syncCollectionResponse);
 		} else {
-			handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
+			try {
+				handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
+			} catch (FilterTypeChangedException e) {
+				syncCollectionResponse.setSyncStateValidity(false);
+			}
 		}
 		return syncCollectionResponse;
 	}

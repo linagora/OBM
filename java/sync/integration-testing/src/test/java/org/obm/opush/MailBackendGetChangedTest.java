@@ -395,7 +395,8 @@ public class MailBackendGetChangedTest {
 		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.ONE_DAY_BACK);
 		verifyMocks(classToInstanceMap);
 		
-		assertThat(syncResponse.getSyncStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
+		org.obm.sync.push.client.Collection inboxCollectionResponse = syncResponse.getCollection(inboxCollectionIdAsString);
+		assertThat(inboxCollectionResponse.getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize() {
