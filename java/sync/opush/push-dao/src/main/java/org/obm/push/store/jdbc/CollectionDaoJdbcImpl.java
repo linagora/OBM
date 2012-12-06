@@ -134,16 +134,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setInt(2, collectionId);
 			ps.executeUpdate();
 
-			ps = con.prepareStatement("DELETE FROM opush_sync_mail WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, devDbId);
-			ps.setInt(2, collectionId);
-			ps.executeUpdate();
-
-			ps = con.prepareStatement("DELETE FROM opush_sync_deleted_mail WHERE device_id=? AND collection_id=?");
-			ps.setInt(1, devDbId);
-			ps.setInt(2, collectionId);
-			ps.executeUpdate();
-
 			logger.warn("mappings & states cleared for sync of collection {} of device {}",
 					new Object[]{collectionId, device.getDevId()});
 		} catch (SQLException e) {

@@ -34,7 +34,6 @@ package org.obm.opush.env;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.store.EmailDao;
 import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HearbeatDao;
@@ -53,7 +52,6 @@ public final class DaoModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		bindWithMock(CollectionDao.class);
 		bindWithMock(DeviceDao.class);
-		bindWithMock(EmailDao.class);
 		bindWithMock(HearbeatDao.class);
 		bindWithMock(MonitoredCollectionDao.class);
 		bindWithMock(SyncedCollectionDao.class);

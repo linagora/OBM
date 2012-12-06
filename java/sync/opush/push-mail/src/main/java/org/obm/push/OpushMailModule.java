@@ -51,12 +51,10 @@ import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
-import org.obm.push.store.EmailDao;
 import org.obm.push.store.SnapshotDao;
 import org.obm.push.store.SyncKeysDao;
 import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncKeysDaoEhcacheImpl;
-import org.obm.push.store.jdbc.EmailDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -66,7 +64,6 @@ public class OpushMailModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(MailMonitoringBackend.class).to(NoopImapMonitoringImpl.class);
-		bind(EmailDao.class).to(EmailDaoJdbcImpl.class);
 		bind(SnapshotService.class).to(SnapshotServiceImpl.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -76,11 +75,9 @@ import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.EmailDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
@@ -202,7 +199,6 @@ public class MailBackendHandlerTest {
 		mockSyncedCollectionDaoToReturnSyncCollection(serverId);
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
-		mockEmailDao(serverId);
 	}
 	
 	private void mockSyncedCollectionDaoToReturnSyncCollection(int serverId) {
@@ -255,21 +251,6 @@ public class MailBackendHandlerTest {
 		
 		expect(itemTrackingDao.isServerIdSynced(anyObject(ItemSyncState.class), anyObject(ServerId.class)))
 			.andReturn(false).anyTimes();
-	}
-
-	private void mockEmailDao(int serverId) throws Exception {
-		EmailDao emailDao = classToInstanceMap.get(EmailDao.class);
-		emailDao.deleteSyncEmails(anyObject(Integer.class), eq(serverId), anyObject(Collection.class));
-		expectLastCall().anyTimes();
-		
-		expect(emailDao.alreadySyncedEmails(eq(serverId), anyInt(), anyObject(Collection.class)))
-			.andReturn(ImmutableSet.<Email> of()).anyTimes();
-		
-		emailDao.updateSyncEntriesStatus(anyObject(Integer.class), eq(serverId), anyObject(Set.class));
-		expectLastCall().anyTimes();
-		
-		emailDao.createSyncEntries(anyObject(Integer.class), eq(serverId), anyObject(Set.class), anyObject(Date.class));
-		expectLastCall().anyTimes();
 	}
 	
 	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {

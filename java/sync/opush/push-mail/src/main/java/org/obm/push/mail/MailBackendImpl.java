@@ -35,9 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,10 +100,8 @@ import org.obm.push.minig.imap.impl.MessageSetUtils;
 import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
-import org.obm.push.store.EmailDao;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
@@ -155,7 +151,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final ConfigurationService configurationService;
 	private final ICalendar calendarClient;
 	private final LoginService login;
-	private final EmailDao emailDao;
 	private final EventService eventService;
 	private final DateService dateService;
 	private final MSEmailFetcher msEmailFetcher;
@@ -167,7 +162,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
-			EmailDao emailDao,
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotService snapshotService,
 			EmailChangesComputer emailChangesComputer,
@@ -180,7 +174,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
-		this.emailDao = emailDao;
 		this.mime4jUtils = mime4jUtils;
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
@@ -468,14 +461,10 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			if (serverId != null) {
 				final Long uid = getEmailUidFromServerId(serverId);
 				final String collectionName = mappingService.getCollectionPathFor(collectionId);
-				final Integer devDbId = udr.getDevice().getDatabaseId();
 
 				if (trash) {
 					CollectionPath wasteBasketPath = getWasteBasketPath(udr);
-					Integer wasteBasketId = mappingService.getCollectionIdFor(udr.getDevice(), wasteBasketPath.collectionPath());
-					long newUID = mailboxService.moveItem(udr, collectionName, wasteBasketPath.collectionPath(), uid);
-					deleteEmails(devDbId, collectionId, Arrays.asList(newUID));
-					addMessageInCache(udr, devDbId, wasteBasketId, newUID, wasteBasketPath.collectionPath());
+					mailboxService.moveItem(udr, collectionName, wasteBasketPath.collectionPath(), uid);
 				} else {
 					mailboxService.delete(udr, collectionName, uid);
 				}
@@ -826,8 +815,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			}
 			final Integer devDbId = udr.getDevice().getDatabaseId();
 			int collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
-			Collection<Long> uids = mailboxService.purgeFolder(udr, devDbId, collectionPath, collectionId);
-			deleteEmails(devDbId, collectionId, uids);
+			mailboxService.purgeFolder(udr, devDbId, collectionPath, collectionId);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
 			}	
@@ -847,69 +835,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			return itemIdFromServerId.longValue();
 		} else {
 			return null;
-		}
-	}
-
-	private void addMessageInCache(UserDataRequest udr, Integer devId, Integer collectionId, Long mailUids, String collectionPath) throws DaoException, MailException {
-		Collection<Email> emails = mailboxService.fetchEmails(udr, collectionPath, ImmutableList.of(mailUids));
-		try {
-			markEmailsAsSynced(devId, collectionId, emails);
-		} catch (DaoException e) {
-			throw new DaoException("Error while adding messages in db", e);
-		}
-	}
-
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Collection<Email> messages) throws DaoException {
-		markEmailsAsSynced(devId, collectionId, DateUtils.getCurrentDate(), messages);
-	}
-
-	public void markEmailsAsSynced(Integer devId, Integer collectionId, Date lastSync, Collection<Email> emails) throws DaoException {
-		Set<Email> allEmailsToMark = Sets.newHashSet(emails);
-		Set<Email> alreadySyncedEmails = emailDao.alreadySyncedEmails(collectionId, devId, emails);
-		Set<Email> modifiedEmails = findModifiedEmails(allEmailsToMark, alreadySyncedEmails);
-		Set<Email> emailsNeverTrackedBefore = filterOutAlreadySyncedEmails(allEmailsToMark, alreadySyncedEmails);
-		logger.info("mark {} updated mail(s) as synced", modifiedEmails.size());
-		emailDao.updateSyncEntriesStatus(devId, collectionId, modifiedEmails);
-		logger.info("mark {} new mail(s) as synced", emailsNeverTrackedBefore.size());
-		emailDao.createSyncEntries(devId, collectionId, emailsNeverTrackedBefore, lastSync);
-	}
-
-	private Set<Email> findModifiedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
-		Map<Long, Email> indexedEmailsToMark = getEmailsAsUidTreeMap(allEmailsToMark);
-		HashSet<Email> modifiedEmails = Sets.newHashSet();
-		for (Email email: alreadySyncedEmails) {
-			Email modifiedEmail = indexedEmailsToMark.get(email.getUid());
-			if (modifiedEmail != null && !modifiedEmail.equals(email)) {
-				modifiedEmails.add(modifiedEmail);
-			}
-		}
-		return modifiedEmails;
-	}
-
-	private Set<Email> filterOutAlreadySyncedEmails(Set<Email> allEmailsToMark, Set<Email> alreadySyncedEmails) {
-		return org.obm.push.utils.collection.Sets.difference(allEmailsToMark, alreadySyncedEmails, new Comparator<Email>() {
-			@Override
-			public int compare(Email o1, Email o2) {
-				return Long.valueOf(o1.getUid() - o2.getUid()).intValue();
-			}
-		});
-	}
-
-	private Map<Long, Email> getEmailsAsUidTreeMap(Set<Email> emails) {
-		return Maps.uniqueIndex(emails, new Function<Email, Long>() {
-			@Override
-			public Long apply(Email email) {
-				return email.getIndex();
-			}
-		});
-	}
-	
-
-	private void deleteEmails(Integer devId, Integer collectionId, Collection<Long> mailUids) throws DaoException {
-		try {
-			emailDao.deleteSyncEmails(devId, collectionId, mailUids);
-		} catch (DaoException e) {
-			throw new DaoException("Error while deleting messages in db", e);
 		}
 	}
 

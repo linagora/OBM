@@ -33,4 +33,10 @@ CREATE  TABLE `obm`.`DeletedEventLink` (
     ON UPDATE CASCADE
 );
 
+--
+-- Those tables drops are done because emails sync states are now managed out of the SQL database
+--
+DROP TABLE opush_sync_deleted_mail, opush_sync_mail;
+
+
 COMMIT;

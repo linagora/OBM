@@ -108,7 +108,7 @@ public class MailBackendImplTest {
 		dateService = control.createMock(DateService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, snapshotService,
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, snapshotService,
 				emailChangesComputer, serverEmailChangesBuilder, mappingService, null, dateService, null, null);
 	}
 	
