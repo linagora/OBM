@@ -32,25 +32,36 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
-import java.util.Date;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-public class FolderSyncState extends SyncState implements Serializable {
+public class FolderSyncState implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
-	public static class Builder extends SyncStateBuilder<FolderSyncState> {
+	public static class Builder {
+		
+		private SyncKey syncKey;
+		private int id;
 		
 		private Builder() {}
 		
-		@Override
+		public Builder syncKey(SyncKey syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
+		
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+		
 		public FolderSyncState build() {
 			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
-			Preconditions.checkArgument(syncDate != null, "syncDate can't be null or empty");
-			return new FolderSyncState(syncDate, syncFiltred, syncKey, id);
+			return new FolderSyncState(syncKey, id);
 		}
 	}
 	
@@ -62,23 +73,43 @@ public class FolderSyncState extends SyncState implements Serializable {
 		return SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncKey);
 	}
 	
-	private FolderSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
-		super(syncDate, syncFiltred, syncKey, id);
+	private final SyncKey syncKey;
+	private final int id;
+	
+	private FolderSyncState(SyncKey syncKey, int id) {
+		this.syncKey = syncKey;
+		this.id = id;
+	}
+	
+
+	public SyncKey getSyncKey() {
+		return syncKey;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(syncKey, id);
 	}
 	
 	@Override
-	public SyncState newWindowedSyncState(FilterType filterType) {
-		if (filterType != null) {
-			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
-			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
-				return FolderSyncState.builder()
-						.syncDate(filteredDate)
-						.syncFiltred(true)
-						.syncKey(getSyncKey())
-						.id(getId())
-						.build();
-			}
+	public final boolean equals(Object object){
+		if (object instanceof FolderSyncState) {
+			FolderSyncState that = (FolderSyncState) object;
+			return Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.id, that.id);
 		}
-		return this;
-	}	
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("syncKey", syncKey)
+			.add("id", id)
+			.toString();
+	}
 }

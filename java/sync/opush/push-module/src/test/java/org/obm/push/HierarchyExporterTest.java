@@ -39,8 +39,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,7 +65,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.service.impl.MappingService;
-import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -149,9 +146,8 @@ public class HierarchyExporterTest {
 	
 	@Test
 	public void testNothingChanges() throws Exception {
-		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = buildFolderSyncState(currentDate, new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncKey = buildFolderSyncState(currentDate, new SyncKey("1234567890b"));
+		FolderSyncState incomingSyncState = buildFolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncKey = buildFolderSyncState(new SyncKey("1234567890b"));
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
@@ -189,9 +185,8 @@ public class HierarchyExporterTest {
 		String contactParentCollectionId = "5";
 		String mailParentCollectionId = "2";
 		
-		Date currentDate = DateUtils.getCurrentDate();
-		FolderSyncState incomingSyncState = buildFolderSyncState(currentDate, new SyncKey("1234567890a"));
-		FolderSyncState outgoingSyncState = buildFolderSyncState(currentDate, new SyncKey("1234567890b"));
+		FolderSyncState incomingSyncState = buildFolderSyncState(new SyncKey("1234567890a"));
+		FolderSyncState outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		
 		FolderBackend folderExporter = createStrictMock(FolderBackend.class);
 
@@ -305,9 +300,8 @@ public class HierarchyExporterTest {
 			.andReturn(hierarchyItemsChanges).once();
 	}
 
-	private FolderSyncState buildFolderSyncState(Date time, SyncKey syncKey) {
+	private FolderSyncState buildFolderSyncState(SyncKey syncKey) {
 		return FolderSyncState.builder()
-				.syncDate(time)
 				.syncKey(syncKey)
 				.build();
 	}

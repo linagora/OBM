@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -138,18 +139,17 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testDefaultContactChanges() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890a"))
-				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
 				.build();
 		FolderSyncState outgoingSyncState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890b"))
-				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
 				.build();
 		
+		Date lastSyncDate = DateUtils.date("2012-12-15T20:30:45Z");
 		Folder change = Folder.builder().name(contactParentName).uid(contactParentId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
-		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
+		expectBookClientListBooksChanged(lastSyncDate, ImmutableSet.of(change), ImmutableSet.<Folder>of());
 		
 		List<CollectionPath> knownCollections = ImmutableList.of(); 
-		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, knownCollections);
 		expectMappingServiceSearchThenCreateCollection(contactParentName, contactParentId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId));
 		expectMappingServiceLookupCollection(contactParentName, contactParentId);
@@ -178,18 +178,17 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testNoContactsChanges() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890a"))
-				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
 				.build();
 		FolderSyncState outgoingSyncState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890b"))
-				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
 				.build();
 
-		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.<Folder>of());
+		Date lastSyncDate = DateUtils.date("2012-12-15T20:30:45Z");
+		expectBookClientListBooksChanged(lastSyncDate, ImmutableSet.<Folder>of(), ImmutableSet.<Folder>of());
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath(contactParentName, contactParentId)); 
-		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, knownCollections);
 		expectMappingServiceFindCollection(contactParentName, contactParentId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId));
 		
@@ -207,22 +206,21 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testOnlyChanges() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890a"))
-				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
 				.build();
 		FolderSyncState outgoingSyncState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890b"))
-				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
 				.build();
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
 		
+		Date lastSyncDate = DateUtils.date("2012-12-15T20:30:45Z");
 		Folder change = Folder.builder().name(otherCollectionDisplayName).uid(otherCollectionMappingId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
-		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.of(change), ImmutableSet.<Folder>of());
+		expectBookClientListBooksChanged(lastSyncDate, ImmutableSet.of(change), ImmutableSet.<Folder>of());
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath(contactParentName, contactParentId)); 
-		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, knownCollections);
 		expectMappingServiceFindCollection(contactParentName, contactParentId);
 		expectMappingServiceSearchThenCreateCollection(otherCollectionDisplayName, otherCollectionMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(contactParentId, otherCollectionMappingId));
@@ -252,24 +250,23 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testOnlyDeletions() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890a"))
-				.syncDate(DateUtils.date("2012-12-15T20:30:45Z"))
 				.build();
 		FolderSyncState outgoingSyncState = FolderSyncState.builder()
 				.syncKey(new SyncKey("1234567890b"))
-				.syncDate(DateUtils.date("2012-12-16T20:30:45Z"))
 				.build();
 		
 		int otherCollectionMappingId = 203;
 		String otherCollectionDisplayName = "no default address book";
 
+		Date lastSyncDate = DateUtils.date("2012-12-15T20:30:45Z");
 		Folder contactDeletion = Folder.builder().name(contactParentName).uid(contactParentId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		Folder otherCollectionDeletion = Folder.builder().name(otherCollectionDisplayName).uid(otherCollectionMappingId).ownerLoginAtDomain(user.getLoginAtDomain()).build();
-		expectBookClientListBooksChanged(lastKnownState, ImmutableSet.<Folder>of(), ImmutableSet.of(contactDeletion, otherCollectionDeletion));
+		expectBookClientListBooksChanged(lastSyncDate, ImmutableSet.<Folder>of(), ImmutableSet.of(contactDeletion, otherCollectionDeletion));
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
 				new ContactCollectionPath(contactParentName, contactParentId),
 				new ContactCollectionPath(otherCollectionDisplayName, otherCollectionMappingId)); 
-		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, knownCollections);
 		expectMappingServiceLookupCollection(contactParentName, contactParentId);
 		expectMappingServiceLookupCollection(otherCollectionDisplayName, otherCollectionMappingId);
 
@@ -297,11 +294,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testSameAddAndDeleteDiscardDelete() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 		int targetCollectionId = 2;
 			
@@ -311,8 +306,9 @@ public class ContactsBackendHierarchyChangesTest {
 		Set<Folder> removed = ImmutableSet.of(
 				Folder.builder().name("both").uid(targetCollectionId).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("both", targetCollectionId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(targetCollectionId));
 		expectMappingServiceLookupCollection("both", targetCollectionId);
@@ -338,11 +334,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testSameLastKnownAndAdd() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 		int targetCollectionId = 2;
 		
@@ -351,8 +345,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both").uid(targetCollectionId).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceFindCollection("both", targetCollectionId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(targetCollectionId));
 
@@ -370,11 +365,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testTwoSameLastKnownAndAdd() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
@@ -384,8 +377,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both2").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceFindCollection("both", 2);
 		expectMappingServiceFindCollection("both2", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
@@ -405,11 +399,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testOneLastKnownInTwoAdd() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
@@ -418,8 +410,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("add").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("add", 3);
 		expectMappingServiceFindCollection("known", 2);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
@@ -447,11 +440,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testOneAddOneKnownDelete() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(new ContactCollectionPath("known", 2));
@@ -460,8 +451,9 @@ public class ContactsBackendHierarchyChangesTest {
 		Set<Folder> removed = ImmutableSet.of(
 				Folder.builder().name("known").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
 		expectMappingServiceLookupCollection("add", 3);
@@ -490,11 +482,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testOneAddOneUnknownDelete() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
@@ -503,8 +493,9 @@ public class ContactsBackendHierarchyChangesTest {
 		Set<Folder> removed = ImmutableSet.of(
 				Folder.builder().name("unknown").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("add", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
 		expectMappingServiceLookupCollection("add", 3);
@@ -531,11 +522,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testTwoAddWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
@@ -544,8 +533,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("both", 2);
 		expectMappingServiceSearchThenCreateCollection("both", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2, 3));
@@ -581,11 +571,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testTwoAddWithSameNamesAndSameUidsDiscardsOne() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of();
@@ -594,8 +582,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		Set<Folder> removed = ImmutableSet.of();
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceSearchThenCreateCollection("both", 2);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(2));
 		expectMappingServiceLookupCollection("both", 2);
@@ -621,11 +610,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testTwoDeleteWithSameNamesAndDifferentUidsKeepBoth() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
@@ -637,8 +624,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
 				Folder.builder().name("both").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceLookupCollection("both", 2);
 		expectMappingServiceLookupCollection("both", 3);
 		
@@ -659,11 +647,9 @@ public class ContactsBackendHierarchyChangesTest {
 	public void testTwoDeleteWithSameNamesAndSameUidsDiscardsOne() throws Exception {
 		FolderSyncState lastKnownState = FolderSyncState.builder()
 				.syncKey(new SyncKey("key1"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T11:02:03"))
 				.build();
 		FolderSyncState outgoingSyncState=  FolderSyncState.builder()
 				.syncKey(new SyncKey("key2"))
-				.syncDate(org.obm.DateUtils.date("2012-05-04T12:15:05"))
 				.build();
 
 		List<CollectionPath> lastKnown = ImmutableList.<CollectionPath>of(
@@ -675,8 +661,9 @@ public class ContactsBackendHierarchyChangesTest {
 				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build(),
 				Folder.builder().name("both").uid(2).ownerLoginAtDomain(user.getLoginAtDomain()).build());
 		
-		expectBookClientListBooksChanged(lastKnownState, updated, removed);
-		expectMappingServiceListLastKnowCollection(lastKnownState, lastKnown);
+		Date lastSyncDate = org.obm.DateUtils.date("2012-05-04T11:02:03");
+		expectBookClientListBooksChanged(lastSyncDate, updated, removed);
+		expectMappingServiceListLastKnowCollection(lastKnownState, lastSyncDate, lastKnown);
 		expectMappingServiceFindCollection("both", 3);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(3));
 		expectMappingServiceLookupCollection("both", 2);
@@ -718,10 +705,10 @@ public class ContactsBackendHierarchyChangesTest {
 		return collectionPathBuilder;
 	}
 
-	private void expectBookClientListBooksChanged(FolderSyncState lastKnownState,
+	private void expectBookClientListBooksChanged(Date syncDate,
 			Set<Folder> changes, Set<Folder> deletions) throws ServerFault {
-		expect(bookClient.listAddressBooksChanged(accessToken, lastKnownState.getSyncDate()))
-			.andReturn(new FolderChanges(changes, deletions, lastKnownState.getSyncDate())).once();
+		expect(bookClient.listAddressBooksChanged(accessToken, syncDate))
+			.andReturn(new FolderChanges(changes, deletions, syncDate)).once();
 	}
 
 	private void expectCollectionPathBuilderPovider(CollectionPath.Builder collectionPathBuilder) {
@@ -736,11 +723,11 @@ public class ContactsBackendHierarchyChangesTest {
 		expectLastCall();
 	}
 
-	private void expectMappingServiceListLastKnowCollection(FolderSyncState incomingSyncState,
+	private void expectMappingServiceListLastKnowCollection(FolderSyncState incomingSyncState, Date syncDate,
 			List<CollectionPath> collectionPaths) throws DaoException {
 		
 		expect(mappingService.getLastBackendMapping(PIMDataType.CONTACTS, incomingSyncState))
-			.andReturn(incomingSyncState.getSyncDate()).once();
+			.andReturn(syncDate).once();
 		
 		expect(mappingService.listCollections(userDataRequest, incomingSyncState))
 			.andReturn(collectionPaths).once();

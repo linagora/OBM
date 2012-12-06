@@ -77,7 +77,6 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.Add;
@@ -325,7 +324,6 @@ public class SyncHandlerTest {
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
 		return FolderSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(syncEmailSyncKey)
 				.build();
 	}

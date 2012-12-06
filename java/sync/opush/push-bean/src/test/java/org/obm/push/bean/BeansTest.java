@@ -110,6 +110,7 @@ public class BeansTest {
 					.add(DeviceId.class)
 					.add(SyncKey.class)
 					.add(SyncKeysKey.class)
+					.add(FolderSyncState.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

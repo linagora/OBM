@@ -93,7 +93,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 						"(data_type, folder_sync_state_id, last_sync) VALUES (?, ?, ?)");
 			ps.setObject(1, dbcp.getJdbcObject(dataType.getDbFieldName(), dataType.getDbValue()));
 			ps.setInt(2, folderSyncState.getId());
- 			ps.setTimestamp(3, DateUtils.toTimestamp(folderSyncState.getSyncDate()));
+ 			ps.setTimestamp(3, DateUtils.toTimestamp(DateUtils.getCurrentDate()));
 			if (ps.executeUpdate() == 0) {
 				throw new DaoException("No SyncState inserted");
 			} 

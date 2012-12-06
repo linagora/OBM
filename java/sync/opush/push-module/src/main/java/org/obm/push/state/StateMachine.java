@@ -49,10 +49,8 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
-import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,15 +69,13 @@ public class StateMachine {
 	private final CollectionDao collectionDao;
 	private final ItemTrackingDao itemTrackingDao;
 	private final SyncKeyFactory syncKeyFactory;
-	private final DateService dateService;
 
 	@Inject
 	@VisibleForTesting StateMachine(CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			SyncKeyFactory syncKeyFactory, DateService dateService) {
+			SyncKeyFactory syncKeyFactory) {
 		this.collectionDao = collectionDao;
 		this.itemTrackingDao = itemTrackingDao;
 		this.syncKeyFactory = syncKeyFactory;
-		this.dateService = dateService;
 	}
 
 	public ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException {
@@ -95,7 +91,6 @@ public class StateMachine {
 		
 		if (FolderSyncState.isSyncKeyOfInitialFolderSync(syncKey)) {
 			return FolderSyncState.builder()
-					.syncDate(dateService.getEpochPlusOneSecondDate())
 					.syncKey(syncKey)
 					.build();
 		} else {
@@ -113,7 +108,7 @@ public class StateMachine {
 	
 	public FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException {
 		SyncKey newSk = syncKeyFactory.randomSyncKey();
-		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk, DateUtils.getCurrentDate());
+		FolderSyncState newFolderState = collectionDao.allocateNewFolderSyncState(udr.getDevice(), newSk);
 		
 		log(udr, newFolderState);
 		return newFolderState;
@@ -165,4 +160,9 @@ public class StateMachine {
 				new Object[]{newState.getSyncKey(), collectionPath, newState.getSyncDate()});
 	}
 	
+	private void log(UserDataRequest udr, FolderSyncState newState) {
+		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
+		logger.info("Allocate new synckey {} for collectionPath {}", 
+				new Object[]{newState.getSyncKey(), collectionPath});
+	}
 }

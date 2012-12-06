@@ -137,7 +137,7 @@ public class IntegrationTestUtils {
 	}
 
 	public static void expectAllocateFolderState(CollectionDao collectionDao, FolderSyncState folderSyncState) throws DaoException {
-		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(SyncKey.class), anyObject(Date.class)))
+		expect(collectionDao.allocateNewFolderSyncState(anyObject(Device.class), anyObject(SyncKey.class)))
 			.andReturn(folderSyncState);
 	}
 	

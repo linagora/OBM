@@ -37,31 +37,27 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Date;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
-import org.obm.push.service.impl.DateServiceImpl;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.utils.DateUtils;
 
 @RunWith(SlowFilterRunner.class)
 public class StateMachineTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFolderSyncStateWithNullKey() throws Exception {
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		
 		stateMachine.getFolderSyncState(null);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFolderSyncStateWithEmptyKey() throws Exception {
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		
 		stateMachine.getFolderSyncState(new SyncKey(""));
 	}
@@ -70,21 +66,18 @@ public class StateMachineTest {
 	public void testGetFolderSyncStateWithInitialKey() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 
-		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory(), new DateServiceImpl());
+		StateMachine stateMachine = new StateMachine(null , null, new SyncKeyFactory());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(initialSyncKey);
 		
 		assertThat(folderSyncState.getSyncKey()).isEqualTo(initialSyncKey);
-		assertThat(folderSyncState.getSyncDate()).isEqualTo(DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		assertThat(folderSyncState.isInitialFolderSync()).isTrue();
 	}
 
 	@Test
 	public void testGetFolderSyncStateWithKnownKey() throws Exception {
 		SyncKey knownSyncKey = new SyncKey("1234");
-		Date knownSyncDate = org.obm.DateUtils.date("2013-01-01T12:00:15");
 		int knownSyncStateId = 156;
 		FolderSyncState knownFolderSyncState = FolderSyncState.builder()
-				.syncDate(knownSyncDate)
 				.syncKey(knownSyncKey)
 				.id(knownSyncStateId)
 				.build();
@@ -93,14 +86,13 @@ public class StateMachineTest {
 		expect(collectionDao.findFolderStateForKey(knownSyncKey)).andReturn(knownFolderSyncState).once();
 		replay(collectionDao);
 		
-		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory(), new DateServiceImpl());
+		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory());
 		FolderSyncState folderSyncState = stateMachine.getFolderSyncState(knownSyncKey);
 
 		verify(collectionDao);
 
 		assertThat(folderSyncState.getId()).isEqualTo(knownSyncStateId);
 		assertThat(folderSyncState.getSyncKey()).isEqualTo(knownSyncKey);
-		assertThat(folderSyncState.getSyncDate()).isEqualTo(knownSyncDate);
 		assertThat(folderSyncState.isInitialFolderSync()).isFalse();
 	}
 
@@ -112,7 +104,7 @@ public class StateMachineTest {
 		expect(collectionDao.findFolderStateForKey(unknownSyncKey)).andReturn(null).once();
 		replay(collectionDao);
 		
-		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory(), new DateServiceImpl());
+		StateMachine stateMachine = new StateMachine(collectionDao , null, new SyncKeyFactory());
 		stateMachine.getFolderSyncState(unknownSyncKey);
 	}
 }

@@ -81,7 +81,6 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.service.impl.MappingService;
-import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -532,7 +531,6 @@ public class MailBackendTest {
 	
 	private FolderSyncState buildFolderSyncState(SyncKey syncKey) {
 		return FolderSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(syncKey)
 				.build();
 	}

@@ -59,7 +59,7 @@ public interface CollectionDao {
 	 */
 	ItemSyncState updateState(Device device, Integer collectionId, SyncKey syncKey, Date syncDate) throws DaoException;
 
-	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey, Date newSyncDate) throws DaoException;
+	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException;
 	
 	ItemSyncState findItemStateForKey(SyncKey syncKey) throws DaoException ;
 	

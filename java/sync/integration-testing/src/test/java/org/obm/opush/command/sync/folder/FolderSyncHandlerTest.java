@@ -252,7 +252,7 @@ public class FolderSyncHandlerTest {
 	private void expectCollectionDaoAllocateFolderSyncState(CollectionDao collectionDao, SyncKey syncKey, FolderSyncState newSyncState) 
 			throws DaoException {
 	
-		expect(collectionDao.allocateNewFolderSyncState(user.device, syncKey, newSyncState.getSyncDate())).andReturn(newSyncState);
+		expect(collectionDao.allocateNewFolderSyncState(user.device, syncKey)).andReturn(newSyncState);
 	}
 
 	private void expectCollectionDaoFindFolderSyncState(CollectionDao collectionDao,

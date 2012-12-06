@@ -212,7 +212,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	}
 
 	@Override
-	public FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey, Date newSyncDate) throws DaoException {
+	public FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		
@@ -224,7 +224,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.setInt(2, device.getDatabaseId());
 			ps.executeUpdate();
 			FolderSyncState folderSyncState = FolderSyncState.builder()
-					.syncDate(newSyncDate)
 					.syncKey(newSyncKey)
 					.id(dbcp.lastInsertId(con))
 					.build();
