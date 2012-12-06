@@ -35,7 +35,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.bean.Email;
@@ -66,7 +66,7 @@ public class EmailSync implements IEmailSync {
 	}
 
 	@Override
-	public MailChanges getSync(UserDataRequest udr, MailboxService mailboxService, SyncState state, String collectionPath, Integer collectionId) throws DaoException, MailException {
+	public MailChanges getSync(UserDataRequest udr, MailboxService mailboxService, ItemSyncState state, String collectionPath, Integer collectionId) throws DaoException, MailException {
 		Set<Email> emailsFromIMAP = mailboxService.fetchEmails(udr, collectionPath, state.getSyncDate());
 		Set<Email> alreadySyncedEmails = emailDao.listSyncedEmails(udr.getDevice().getDatabaseId(), collectionId, state);
 		Set<Email> newAndUpdatedEmails = Sets.difference(emailsFromIMAP, alreadySyncedEmails);

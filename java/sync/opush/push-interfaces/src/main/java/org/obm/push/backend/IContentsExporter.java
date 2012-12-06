@@ -33,10 +33,10 @@ package org.obm.push.backend;
 
 import java.util.List;
 
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.ConversionException;
@@ -59,7 +59,7 @@ public interface IContentsExporter {
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
 
-	int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
+	int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
 			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
 

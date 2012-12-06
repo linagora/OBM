@@ -40,9 +40,9 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.CollectionPathException;
@@ -147,7 +147,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
 			
 				SyncKey syncKey = syncCollection.getSyncKey();
-				SyncState state = stMachine.getItemSyncState(syncKey);
+				ItemSyncState state = stMachine.getItemSyncState(syncKey);
 				if (state == null) {
 					throw new InvalidSyncKeyException(collectionId, syncKey);
 				}

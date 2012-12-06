@@ -76,7 +76,7 @@ public class SyncCollection implements Serializable {
 		this.status = SyncStatus.OK;
 	}
 	
-	public SyncState getSyncState() {
+	public ItemSyncState getItemSyncState() {
 		return itemSyncState;
 	}
 

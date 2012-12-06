@@ -39,8 +39,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.utils.JDBCUtils;
@@ -57,18 +57,18 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 	}
 	
 	@Override
-	public void markAsSynced(SyncState syncState, Set<ServerId> serverIds) throws DaoException {
-		markItems(syncState, serverIds, true);
+	public void markAsSynced(ItemSyncState itemSyncState, Set<ServerId> serverIds) throws DaoException {
+		markItems(itemSyncState, serverIds, true);
 	}
 
 
 	@Override
-	public void markAsDeleted(SyncState syncState, Set<ServerId> serverIds)
+	public void markAsDeleted(ItemSyncState itemSyncState, Set<ServerId> serverIds)
 			throws DaoException {
-		markItems(syncState, serverIds, false);
+		markItems(itemSyncState, serverIds, false);
 	}
 	
-	private void markItems(SyncState syncState, Set<ServerId> serverIds, boolean addition)
+	private void markItems(ItemSyncState itemSyncState, Set<ServerId> serverIds, boolean addition)
 			throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -80,7 +80,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 					"INSERT INTO opush_synced_item (sync_state_id, item_id, addition) VALUES (?, ?, ?)");
 			for (ServerId serverId: serverIds) {
 				checkServerId(serverId);
-				insert.setInt(1, syncState.getId());
+				insert.setInt(1, itemSyncState.getId());
 				insert.setInt(2, serverId.getItemId());
 				insert.setBoolean(3, addition);
 				insert.addBatch();
@@ -101,7 +101,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 	}
 
 	@Override
-	public Set<ServerId> getSyncedServerIds(final SyncState syncState, Set<ServerId> serverIds) throws DaoException {
+	public Set<ServerId> getSyncedServerIds(final ItemSyncState itemSyncState, Set<ServerId> serverIds) throws DaoException {
 		HashSet<ServerId> filteredSet = new HashSet<ServerId>();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -113,7 +113,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		
 			for (ServerId serverId: serverIds) {
 				checkServerId(serverId);
-				if (isServerIdSynced(select, syncState, serverId)) {
+				if (isServerIdSynced(select, itemSyncState, serverId)) {
 					filteredSet.add(serverId);
 				}
 			}
@@ -142,13 +142,13 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 	}
 	
 	@Override
-	public boolean isServerIdSynced(SyncState syncState, ServerId serverId) throws DaoException {
+	public boolean isServerIdSynced(ItemSyncState itemSyncState, ServerId serverId) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
 			con = dbcp.getConnection();
-			return isServerIdSynced(selectServerId(con), syncState, serverId);
+			return isServerIdSynced(selectServerId(con), itemSyncState, serverId);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -156,10 +156,10 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		}
 	}
 	
-	private boolean isServerIdSynced(PreparedStatement select, SyncState syncState, ServerId serverId) throws SQLException {
+	private boolean isServerIdSynced(PreparedStatement select, ItemSyncState itemSyncState, ServerId serverId) throws SQLException {
 		
 		select.setInt(1, serverId.getItemId());
-		select.setInt(2, syncState.getId());
+		select.setInt(2, itemSyncState.getId());
 		ResultSet resultSet = select.executeQuery();
 		if (resultSet.next()) {
 			return resultSet.getBoolean("addition");

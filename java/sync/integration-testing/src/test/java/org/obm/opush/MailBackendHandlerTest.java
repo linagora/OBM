@@ -69,7 +69,6 @@ import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -248,13 +247,13 @@ public class MailBackendHandlerTest {
 
 	private void mockItemTrackingDao() throws Exception {
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
-		itemTrackingDao.markAsSynced(anyObject(SyncState.class), anyObject(Set.class));
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
-		itemTrackingDao.markAsDeleted(anyObject(SyncState.class), anyObject(Set.class));
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
-		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class)))
+		expect(itemTrackingDao.isServerIdSynced(anyObject(ItemSyncState.class), anyObject(ServerId.class)))
 			.andReturn(false).anyTimes();
 	}
 

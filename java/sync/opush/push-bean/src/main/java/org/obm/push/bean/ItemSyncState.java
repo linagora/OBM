@@ -34,19 +34,43 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-public class ItemSyncState extends SyncState implements Serializable {
+public class ItemSyncState implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
-	public static class Builder extends SyncStateBuilder<ItemSyncState> {
+	public static class Builder {
+		private Date syncDate;
+		private boolean syncFiltred;
+		private SyncKey syncKey;
+		private int id;
 		
 		private Builder() {}
 		
-		@Override
+		public Builder syncDate(Date syncDate) {
+			this.syncDate = syncDate;
+			return this;
+		}
+		
+		public Builder syncFiltred(boolean syncFiltred) {
+			this.syncFiltred = syncFiltred;
+			return this;
+		}
+		
+		public Builder syncKey(SyncKey syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
+		
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+		
 		public ItemSyncState build() {
 			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
 			Preconditions.checkArgument(syncDate != null, "syncDate can't be null or empty");
@@ -54,12 +78,35 @@ public class ItemSyncState extends SyncState implements Serializable {
 		}
 	}
 	
+	private final Date syncDate;
+	private final boolean syncFiltred;
+	private final SyncKey syncKey;
+	private final int id;
+	
 	private ItemSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
-		super(syncDate, syncFiltred, syncKey, id);
+		this.syncDate = syncDate;
+		this.syncFiltred = syncFiltred;
+		this.syncKey = syncKey;
+		this.id = id;
+	}
+
+	public Date getSyncDate() {
+		return syncDate;
+	}
+
+	public boolean isSyncFiltred() {
+		return syncFiltred;
+	}
+
+	public SyncKey getSyncKey() {
+		return syncKey;
+	}
+
+	public int getId() {
+		return id;
 	}
 	
-	@Override
-	public SyncState newWindowedSyncState(FilterType filterType) {
+	public ItemSyncState newWindowedSyncState(FilterType filterType) {
 		if (filterType != null) {
 			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
 			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
@@ -73,4 +120,31 @@ public class ItemSyncState extends SyncState implements Serializable {
 		}
 		return this;
 	}	
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(syncDate, syncFiltred, syncKey, id);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ItemSyncState) {
+			ItemSyncState that = (ItemSyncState) object;
+			return Objects.equal(this.syncDate, that.syncDate)
+				&& Objects.equal(this.syncFiltred, that.syncFiltred)
+				&& Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.id, that.id);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("syncDate", syncDate)
+			.add("syncFiltred", syncFiltred)
+			.add("syncKey", syncKey)
+			.add("id", id)
+			.toString();
+	}
 }

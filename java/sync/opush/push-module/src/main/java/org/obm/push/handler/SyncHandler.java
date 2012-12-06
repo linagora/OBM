@@ -58,7 +58,6 @@ import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -265,7 +264,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			
 			lastSync = delta.getSyncDate();
 		} else {
-			lastSync = c.getSyncState().getSyncDate();
+			lastSync = c.getItemSyncState().getSyncDate();
 			delta = DataDelta.newEmptyDelta(lastSync);
 		}
 
@@ -476,7 +475,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private void identifyNewItems(
-			SyncCollectionResponse syncCollectionResponse, SyncState st)
+			SyncCollectionResponse syncCollectionResponse, ItemSyncState st)
 			throws DaoException, InvalidServerId {
 		
 		for (ItemChange change: syncCollectionResponse.getItemChanges()) {

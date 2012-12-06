@@ -36,10 +36,10 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.ConversionException;
@@ -68,7 +68,7 @@ public class ContentsExporter implements IContentsExporter {
 					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getChanged(udr, syncCollection.getSyncState(), 
+		return backend.getChanged(udr, syncCollection.getItemSyncState(), 
 				syncCollection.getCollectionId(), syncCollection.getOptions(), newSyncKey);
 	}
 
@@ -86,12 +86,12 @@ public class ContentsExporter implements IContentsExporter {
 					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 
+		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 
 				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncState state, SyncCollection syncCollection) 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 		
@@ -106,7 +106,7 @@ public class ContentsExporter implements IContentsExporter {
 			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
-		return backend.getItemEstimateSize(udr, syncCollection.getSyncState(), 
+		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 
 				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 }

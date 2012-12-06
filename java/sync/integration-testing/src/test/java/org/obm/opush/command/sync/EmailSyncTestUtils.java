@@ -53,7 +53,6 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -150,11 +149,11 @@ public class EmailSyncTestUtils {
 	
 
 	private static void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
-		itemTrackingDao.markAsSynced(anyObject(SyncState.class), anyObject(Set.class));
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
-		itemTrackingDao.markAsDeleted(anyObject(SyncState.class), anyObject(Set.class));
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
-		expect(itemTrackingDao.isServerIdSynced(anyObject(SyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
+		expect(itemTrackingDao.isServerIdSynced(anyObject(ItemSyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
 	}
 
 	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, SyncKey syncEmailSyncKey,
@@ -188,7 +187,7 @@ public class EmailSyncTestUtils {
 		
 		expect(contentsExporter.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyObject(SyncState.class),
+				anyObject(ItemSyncState.class),
 				anyObject(SyncCollection.class)))
 			.andReturn(delta.getItemEstimateSize()).anyTimes();
 	}

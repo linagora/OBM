@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.mail.bean.Email;
@@ -225,7 +225,7 @@ public class EmailDaoJdbcImpl extends AbstractJdbcImpl implements EmailDao {
 	}	
 	
 	@Override
-	public Set<Email> listSyncedEmails(Integer devId, Integer collectionId, SyncState syncState) throws DaoException {
+	public Set<Email> listSyncedEmails(Integer devId, Integer collectionId, ItemSyncState syncState) throws DaoException {
 		Set<Email> uids = new HashSet<Email>();
 		Connection con = null;
 		PreparedStatement ps = null;

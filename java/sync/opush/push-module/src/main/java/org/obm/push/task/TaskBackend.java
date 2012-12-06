@@ -38,10 +38,10 @@ import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
@@ -64,14 +64,14 @@ public class TaskBackend implements PIMBackend {
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions options, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException {
 		return DataDelta.newEmptyDelta(new Date());
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
 		return 0;

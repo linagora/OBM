@@ -41,7 +41,6 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
@@ -154,7 +153,7 @@ public class StateMachine {
 		}
 	}
 	
-	private void log(UserDataRequest udr, SyncState newState) {
+	private void log(UserDataRequest udr, ItemSyncState newState) {
 		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
 				new Object[]{newState.getSyncKey(), collectionPath, newState.getSyncDate()});

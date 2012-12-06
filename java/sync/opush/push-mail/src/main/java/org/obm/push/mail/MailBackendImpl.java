@@ -64,13 +64,13 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
@@ -292,7 +292,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions options) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException, FilterTypeChangedException {
 		
@@ -317,7 +317,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, SyncCollectionOptions options, SyncKey newSyncKey)
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, SyncCollectionOptions options, SyncKey newSyncKey)
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
 		try {

@@ -93,7 +93,7 @@ public class BeansTest {
 					.add(SyncCollection.class)
 					.add(SyncCollectionChange.class)
 					.add(SyncCollectionOptions.class)
-					.add(SyncState.class)
+					.add(ItemSyncState.class)
 					.add(MSEventUid.class)
 					.add(User.class)
 					.add(AutodiscoverRequest.class)

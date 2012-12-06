@@ -47,13 +47,13 @@ import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
@@ -238,7 +238,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncState state, Integer collectionId, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException {
 		
@@ -247,7 +247,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncState state, Integer collectionId, 
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException {
 		
@@ -256,7 +256,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		String collectionPath = mappingService.getCollectionPathFor(collectionId);
 		String calendar = parseCalendarName(collectionPath);
 
-		SyncState newState = state.newWindowedSyncState(syncCollectionOptions.getFilterType());
+		ItemSyncState newState = state.newWindowedSyncState(syncCollectionOptions.getFilterType());
 		try {
 			
 			EventChanges changes = null;

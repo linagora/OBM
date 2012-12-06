@@ -77,7 +77,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ConversionException;
@@ -318,7 +317,7 @@ public class PingHandlerTest {
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyObject(SyncState.class),
+				anyObject(ItemSyncState.class),
 				anyInt(),
 				anyObject(SyncCollectionOptions.class)))
 			.andReturn(1).times(2);
@@ -330,7 +329,7 @@ public class PingHandlerTest {
 		
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyObject(SyncState.class),
+				anyObject(ItemSyncState.class),
 				anyInt(),
 				anyObject(SyncCollectionOptions.class)))
 			.andReturn(0).anyTimes();

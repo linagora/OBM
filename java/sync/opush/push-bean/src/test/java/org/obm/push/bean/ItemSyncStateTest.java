@@ -88,7 +88,7 @@ public class ItemSyncStateTest {
 				.syncFiltred(false)
 				.build();
 		
-		SyncState newSyncState = syncState.newWindowedSyncState(null);
+		ItemSyncState newSyncState = syncState.newWindowedSyncState(null);
 		assertThat(newSyncState).isEqualTo(syncState);
 		assertThat(newSyncState.isSyncFiltred()).isFalse();
 	}
@@ -107,7 +107,7 @@ public class ItemSyncStateTest {
 				.syncFiltred(false)
 				.build();
 		
-		SyncState newSyncState = syncState.newWindowedSyncState(FilterType.ONE_DAY_BACK);
+		ItemSyncState newSyncState = syncState.newWindowedSyncState(FilterType.ONE_DAY_BACK);
 		assertThat(newSyncState.getSyncKey()).isEqualTo(syncKey);
 		assertThat(newSyncState.getSyncDate()).isEqualTo(expectedDate);
 		assertThat(newSyncState.getId()).isEqualTo(id);

@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import org.obm.push.bean.SyncState;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailNotFoundException;
 import org.obm.push.mail.bean.Email;
@@ -46,7 +46,7 @@ public interface EmailDao {
 
 	void deleteSyncEmails(Integer devId, Integer collectionId, Date lastSync, Collection<Long> uids) throws DaoException;
 	
-	Set<Email> listSyncedEmails(Integer devId, Integer collectionId, SyncState state) throws DaoException;
+	Set<Email> listSyncedEmails(Integer devId, Integer collectionId, ItemSyncState state) throws DaoException;
 
 	Set<Long> getDeletedMail(Integer devId, Integer collectionId, Date lastSync) throws DaoException;
 
