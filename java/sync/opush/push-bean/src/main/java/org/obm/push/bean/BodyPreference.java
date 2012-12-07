@@ -66,6 +66,9 @@ public final class BodyPreference implements Serializable {
 		}
 		
 		public BodyPreference build() {
+			if (truncationSize != null && truncationSize == 0) {
+				truncationSize = null;
+			}
 			return new BodyPreference(
 					this.truncationSize, this.type, allOrNone);
 		}
