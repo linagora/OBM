@@ -91,7 +91,7 @@ public interface MailboxService {
 
 	boolean getActivateTLS();
 	
-	Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
+	Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
 	Set<Email> fetchEmails(UserDataRequest udr, String collectionPath, Date windows) throws MailException;
 

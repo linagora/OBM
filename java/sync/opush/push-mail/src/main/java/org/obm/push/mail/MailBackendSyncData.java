@@ -51,7 +51,6 @@ import org.obm.push.service.impl.MappingService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -149,9 +148,8 @@ public class MailBackendSyncData {
 		private Collection<Email> searchSnapshotAndActualChanges(UserDataRequest udr, 
 				String collectionPath, Snapshot previousStateSnapshot, long currentUIDNext) {
 			
-			MessageSet messageSet = MessageSetUtils.computeEmailsUID(previousStateSnapshot, currentUIDNext);
-			Iterable<Long> emailsUIDToFetch = messageSet.asDiscreteValues();
-			return mailboxService.fetchEmails(udr, collectionPath, ImmutableList.copyOf(emailsUIDToFetch));
+			MessageSet messages = MessageSetUtils.computeEmailsUID(previousStateSnapshot, currentUIDNext);
+			return mailboxService.fetchEmails(udr, collectionPath, messages);
 		}
 		
 	}

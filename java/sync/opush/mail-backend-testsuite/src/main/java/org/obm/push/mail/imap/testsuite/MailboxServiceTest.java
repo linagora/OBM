@@ -65,7 +65,6 @@ import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.utils.DateUtils;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -311,8 +310,8 @@ public abstract class MailboxServiceTest {
 		String trashCollectionName = testUtils.mailboxPath(trash);
 		
 		long newUid = mailboxService.moveItem(udr, inboxCollectionName, trashCollectionName, 1);
-		assertThat(mailboxService.fetchEmails(udr, inboxCollectionName, ImmutableList.<Long> of(newUid))).isEmpty();
-		Collection<Email> trashEmails = mailboxService.fetchEmails(udr, trashCollectionName, ImmutableList.<Long> of(newUid));
+		assertThat(mailboxService.fetchEmails(udr, inboxCollectionName, MessageSet.singleton(newUid))).isEmpty();
+		Collection<Email> trashEmails = mailboxService.fetchEmails(udr, trashCollectionName, MessageSet.singleton(newUid));
 		assertThat(trashEmails).hasSize(1);
 		assertThat(Iterables.getFirst(trashEmails, null).getUid()).isEqualTo(newUid);
 	}

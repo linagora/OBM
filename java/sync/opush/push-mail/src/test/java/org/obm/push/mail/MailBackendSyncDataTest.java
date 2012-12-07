@@ -56,6 +56,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.service.DateService;
@@ -64,6 +65,7 @@ import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ranges;
 
 @RunWith(SlowFilterRunner.class)
 public class MailBackendSyncDataTest {
@@ -285,7 +287,8 @@ public class MailBackendSyncDataTest {
 		long currentUIDNext = 10;
 		ImmutableList<Email> expectedEmails = ImmutableList.of(modifiedEmail, newEmail);
 		expect(mailboxService.fetchEmails(udr, collectionPath, 
-				ImmutableList.<Long> of(snapedEmailUID, deletedEmailUID, previousUIDNext, newEmailUID, currentUIDNext)))
+				MessageSet.builder().add(snapedEmailUID)
+					.add(deletedEmailUID).add(previousUIDNext).add(newEmailUID).add(currentUIDNext).build()))
 			.andReturn(expectedEmails).once();
 
 		Snapshot snapshot = Snapshot.builder()
@@ -443,14 +446,16 @@ public class MailBackendSyncDataTest {
 				.syncKey(syncKey)
 				.build();
 		
-		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
-		
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
 		expectSnapshotDaoHasEntry(syncKey, snapshot);
-		expectActualEmailServerStateByUid(emailsInServer, uids, uidNext);
+
+		MessageSet messages = MessageSet.builder().add(Ranges.closed(2l, 10l)).build();
+		expect(mailboxService.fetchEmails(udr, collectionPath, messages)).andReturn(emailsInServer).once();
+		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
+	
 		expectEmailsDiff(ImmutableList.copyOf(emailsInServer), emailsInServer, emailChanges);
 		
 		control.replay();
@@ -494,7 +499,6 @@ public class MailBackendSyncDataTest {
 				.syncKey(syncKey)
 				.build();
 		
-		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
 		
 		EmailChanges emailChanges = EmailChanges.builder()
 				.additions(ImmutableSet.<Email>of(newEmail))
@@ -505,7 +509,9 @@ public class MailBackendSyncDataTest {
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expect(dateService.getCurrentDate()).andReturn(fromDate);
 		expectSnapshotDaoHasEntry(syncKey, snapshot);
-		expectActualEmailServerStateByUid(actualEmailsInServer, uids, uidNext);
+		MessageSet messages = MessageSet.builder().add(Ranges.closed(2l, 10l)).build();
+		expect(mailboxService.fetchEmails(udr, collectionPath, messages)).andReturn(actualEmailsInServer).once();
+		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
 		expectEmailsDiff(ImmutableList.copyOf(previousEmailsInServer), actualEmailsInServer, emailChanges);
 		
 		control.replay();
@@ -551,12 +557,6 @@ public class MailBackendSyncDataTest {
 	private void expectActualEmailServerStateByDate(Set<Email> emailsInServer, Date fromDate, long uidNext) {
 		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
 			.andReturn(emailsInServer);
-		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
-	}
-
-	private void expectActualEmailServerStateByUid(Set<Email> emailsInServer, Collection<Long> uids, long uidNext) {
-		expect(mailboxService.fetchEmails(udr, collectionPath, uids))
-			.andReturn(emailsInServer).once();
 		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
 	}
 

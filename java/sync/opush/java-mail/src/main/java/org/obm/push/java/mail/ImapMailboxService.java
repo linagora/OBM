@@ -468,8 +468,8 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, MessageSet.builder().addAll(uids).build());
+	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
+		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, messages);
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
