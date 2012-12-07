@@ -41,6 +41,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class PingProtocol {
 
 	public PingRequest getRequest(Document doc) {
@@ -72,11 +74,21 @@ public class PingProtocol {
 		Element root = document.getDocumentElement();
 		
 		DOMUtils.createElementAndText(root, "Status", pingResponse.getPingStatus().asXmlValue());
+		if (responseHasFolders(pingResponse)) {
+			encodeFolders(pingResponse, root);
+		}
+		return document;
+	}
+
+	@VisibleForTesting boolean responseHasFolders(PingResponse pingResponse) {
+		return pingResponse.getSyncCollections() != null && !pingResponse.getSyncCollections().isEmpty();
+	}
+
+	private void encodeFolders(PingResponse pingResponse, Element root) {
 		Element folders = DOMUtils.createElement(root, "Folders");
 		for (SyncCollection sc : pingResponse.getSyncCollections()) {
 			DOMUtils.createElementAndText(folders, "Folder", sc.getCollectionId().toString());
 		}
-		return document;
 	}
 
 	public Document buildError(String errorStatus) {

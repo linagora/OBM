@@ -35,6 +35,8 @@ import java.util.Set;
 
 import org.obm.push.bean.SyncCollection;
 
+import com.google.common.base.Objects;
+
 public class PingRequest {
 
 	private Long heartbeatInterval;
@@ -56,4 +58,26 @@ public class PingRequest {
 		return syncCollections;
 	}
 
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(heartbeatInterval, syncCollections);
+	}
+	
+	@Override
+	public final boolean equals(Object object) {
+		if (object instanceof PingRequest) {
+			PingRequest that = (PingRequest) object;
+			return Objects.equal(this.heartbeatInterval, that.heartbeatInterval)
+				&& Objects.equal(this.syncCollections, that.syncCollections);
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("heartbeatInterval", heartbeatInterval)
+				.add("syncCollections", syncCollections)
+				.toString();
+	}
 }

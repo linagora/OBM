@@ -40,7 +40,6 @@ import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInb
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
-import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationTestUtils.verifyMocks;
@@ -67,7 +66,6 @@ import org.obm.opush.IntegrationUserAccessUtils;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.ContinuationService;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.Device;
@@ -136,7 +134,6 @@ public class SyncHandlerTest {
 		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -170,7 +167,6 @@ public class SyncHandlerTest {
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -207,7 +203,6 @@ public class SyncHandlerTest {
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -240,7 +235,6 @@ public class SyncHandlerTest {
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -275,7 +269,6 @@ public class SyncHandlerTest {
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();
@@ -317,7 +310,6 @@ public class SyncHandlerTest {
 		
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), userDataRequest, 0);
 		expectContentExporterFetching(classToInstanceMap.get(IContentsExporter.class), userDataRequest, itemChanges);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, ImmutableList.<Integer> of(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
@@ -347,8 +339,6 @@ public class SyncHandlerTest {
 		
 		IntegrationUserAccessUtils.mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		EmailSyncTestUtils.mockEmailSyncedCollectionDao(classToInstanceMap.get(SyncedCollectionDao.class));
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class),
-				singleUserFixture.jaures.userDataRequest, 0);
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);

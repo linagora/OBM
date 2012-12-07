@@ -106,7 +106,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 	
 	private void expectOpushStartupRequirements() {
-		if (PUSH_MODE_ENABLED) {
+		if (ObmSyncModule.PUSH_ENABLED) {
 			expectDaoRequirements();
 		}
 	}

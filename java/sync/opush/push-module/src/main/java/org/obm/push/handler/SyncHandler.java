@@ -368,9 +368,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	@Override
 	public void sendResponse(UserDataRequest udr, Responder responder, boolean sendHierarchyChange, IContinuation continuation) {
 		try {
-			SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
-					Collections.EMPTY_MAP, continuation);
-			sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
+			if (enablePush) {
+				SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
+						Collections.EMPTY_MAP, continuation);
+				sendResponse(responder, syncProtocol.endcodeResponse(syncResponse));
+			} else {
+				//Push is not supported, after the heartbeat interval is over, we ask the phone to retry
+				sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY.asSpecificationValue(), continuation);
+			}
 		} catch (DaoException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, e);
 		} catch (CollectionNotFoundException e) {

@@ -70,8 +70,10 @@ import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class PingHandler extends WbxmlRequestHandler implements IContinuationHandler {
@@ -84,6 +86,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final CollectionPathHelper collectionPathHelper;
 	private final ContinuationService continuationService;
 	private final DateService dateService;
+	private final boolean enablePush;
 
 	@Inject
 	protected PingHandler(IBackend backend, EncoderFactory encoderFactory,
@@ -93,7 +96,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			CollectionDao collectionDao, HearbeatDao hearbeatDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
 			ContinuationService continuationService,
-			DateService dateService) {
+			DateService dateService, @Named("enable-push") boolean enablePush) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
@@ -104,6 +107,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		this.collectionPathHelper = collectionPathHelper;
 		this.continuationService = continuationService;
 		this.dateService = dateService;
+		this.enablePush = enablePush;
 	}
 
 	@Override
@@ -251,6 +255,12 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException,
 			FilterTypeChangedException {
+		
+		if (!enablePush) {
+			// Lie to the phone, try to convince it a new sync is required
+			// Return empty collections since CHANGES_OCCURED is a global scope status, see MS-ASCMD 2.2.2.8
+			return new PingResponse(ImmutableSet.<SyncCollection>of(), PingStatus.CHANGES_OCCURED);
+		}
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();

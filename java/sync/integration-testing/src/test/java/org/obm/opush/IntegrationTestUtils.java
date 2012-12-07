@@ -45,9 +45,7 @@ import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.ContinuationService;
 import org.obm.push.backend.IContentsExporter;
-import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
@@ -148,17 +146,6 @@ public class IntegrationTestUtils {
 
 	public static void expectCreateFolderMappingState(FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao) throws DaoException {
 		folderSyncStateBackendMappingDao.createMapping(anyObject(PIMDataType.class), anyObject(FolderSyncState.class));
-		expectLastCall().anyTimes();
-	}
-
-	public static void expectContinuationTransactionLifecycle(ContinuationService continuationService, UserDataRequest userDataRequest, long secondsTimeout) {
-		continuationService.resume(userDataRequest.getDevice());
-		expectLastCall().anyTimes();
-
-		continuationService.cancel(eq(userDataRequest.getDevice()), anyObject(String.class));
-		expectLastCall().anyTimes();
-		
-		continuationService.suspend(eq(userDataRequest), anyObject(IContinuation.class), eq(secondsTimeout));
 		expectLastCall().anyTimes();
 	}
 

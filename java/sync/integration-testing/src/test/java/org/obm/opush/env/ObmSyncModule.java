@@ -33,8 +33,6 @@ package org.obm.opush.env;
 
 import static org.easymock.EasyMock.expect;
 
-import org.obm.push.ContinuationService;
-import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
@@ -50,13 +48,15 @@ import com.google.inject.name.Names;
 
 public final class ObmSyncModule extends AbstractOverrideModule {
 
+	public static final boolean PUSH_ENABLED = false;
+
 	public ObmSyncModule() {
 		super();
 	}
 
 	@Override
 	protected void configureImpl() {
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(true);
+		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(PUSH_ENABLED);
 		bindWithMock(IAddressBook.class);
 		ICalendar calendar = createAndRegisterMock(ICalendar.class);
 		bind(ICalendar.class)
@@ -77,7 +77,5 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 		expect(contactBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS);
 		TaskBackend taskBackend = getMock(TaskBackend.class);
 		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS);
-		bindWithMock(ContinuationTransactionMap.class);
-		bindWithMock(ContinuationService.class);
 	}
 }

@@ -39,7 +39,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.expectContinuationTransactionLifecycle;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
@@ -59,7 +58,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.ContinuationService;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
@@ -158,7 +156,6 @@ public class MailBackendGetItemEstimateTest {
 	public void testGetItemEstimateWithInvalidSyncKey() throws Exception {
 		SyncKey invalidSyncKey = new SyncKey("456");
 		
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), user.userDataRequest, 0);
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		expect(collectionDao.findItemStateForKey(invalidSyncKey)).andReturn(null);
@@ -184,7 +181,6 @@ public class MailBackendGetItemEstimateTest {
 		SyncKey lastSyncKey = new SyncKey("789");
 		int lastStateId = 3;
 		
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), user.userDataRequest, 0);
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
@@ -229,7 +225,6 @@ public class MailBackendGetItemEstimateTest {
 		SyncKey lastSyncKey = new SyncKey("789");
 		int lastStateId = 3;
 		
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), user.userDataRequest, 0);
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();

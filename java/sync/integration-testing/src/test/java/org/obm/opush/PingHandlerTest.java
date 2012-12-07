@@ -32,17 +32,15 @@
 package org.obm.opush;
 
 
-import static org.easymock.EasyMock.anyInt;
-import static org.easymock.EasyMock.anyLong;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.*;
 import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
 import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.TransformerException;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -135,6 +132,42 @@ public class PingHandlerTest {
 		testHeartbeatInterval(1, 5, 5);
 	}
 
+	@Test
+	public void testNoChange() throws Exception {
+		prepareMockNoChange();
+
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		
+		Stopwatch stopwatch = new Stopwatch().start();
+		Document document = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Ping>" +
+				"<HeartbeatInterval>5</HeartbeatInterval>" +
+					"<Folders>" +
+						"<Folder>" +
+							"<Id>1</Id>" +
+							"<Class>Calendar</Class>" +
+						"</Folder>" +
+						"<Folder>" +
+							"<Id>4</Id>" +
+							"<Class>Contacts</Class>" +
+						"</Folder>" +
+					"</Folders>" +
+				"</Ping>");
+		Document response = opClient.postXml("Ping", document, "Ping", null, false);
+		
+		checkExecutionTime(2, 5, stopwatch);
+		assertThat(DOMUtils.serialize(response))
+			.isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Ping>" +
+					"<Status>2</Status>" +
+				"</Ping>");
+		
+	}
+	
 	@Test
 	@Ignore("OBMFULL-4125")
 	public void test3BlockingClient() throws Exception {
@@ -231,21 +264,21 @@ public class PingHandlerTest {
 			Stopwatch stopwatch) {
 		stopwatch.stop();
 		long elapsedTime = stopwatch.elapsedTime(TimeUnit.SECONDS);
-		Assertions.assertThat(elapsedTime)
+		assertThat(elapsedTime)
 			.isGreaterThanOrEqualTo(expected)
 			.isLessThan(expected + delta);
 	}
 
 	private void checkNoChangeResponse(Document response)
 			throws TransformerException {
-		Assertions.assertThat(DOMUtils.serialize(response))
+		assertThat(DOMUtils.serialize(response))
 			.isEqualTo(
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 					"<Ping><Status>1</Status><Folders/></Ping>");
 	}
 	
 	private void checkHasChangeResponse(Document response) throws TransformerException {
-		Assertions.assertThat(DOMUtils.serialize(response))
+		assertThat(DOMUtils.serialize(response))
 			.isEqualTo(
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><Ping>" +
 					"<Status>2</Status>" +
