@@ -32,6 +32,7 @@
 package org.obm.push.mail.greenmail;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -39,6 +40,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.icegreen.greenmail.util.GreenMail;
@@ -50,15 +53,17 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 	public static final String PASSWORD_ARG_TAG = "-password:";
 	public static final String IMAP_PORT_ARG_TAG = "-imapPort:";
 	public static final String SMTP_PORT_ARG_TAG = "-smtpPort:";
+	private static final String STARTED_TAG = "PROCESS_STARTED_OK";
 
 	public static final int DEFAULT_PROCESS_TTL = 300 * 1000;
-	public static final int DEFAULT_STARTTIME = 300;
+	public static final int MIN_PROCESS_STARTTIME = 50;
+	public static final int MAX_PROCESS_STARTTIME = 3000;
 	
 	private Integer imapPort;
 	private Integer smtpPort;
 	
 	public GreenMailExternalProcess() {
-		super(GreenMailStandalone.class, new Config(false, DEFAULT_PROCESS_TTL, DEFAULT_STARTTIME));
+		super(GreenMailStandalone.class, new Config(false, DEFAULT_PROCESS_TTL, MIN_PROCESS_STARTTIME));
 	}
 	
 	public ClosableProcess startGreenMail(String mailbox, String password) throws ExternalProcessException {
@@ -72,19 +77,35 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 			readGreenmailListeningPorts();
 		} catch (IOException e) {
 			throw new ExternalProcessException("Cannot read Greenmail listening ports", e);
+		} catch (InterruptedException e) {
+			throw new ExternalProcessException("Cannot read Greenmail listening ports", e);
 		}
 	}
 
-	private void readGreenmailListeningPorts() throws IOException {
+	private void readGreenmailListeningPorts() throws IOException, InterruptedException {
 		imapPort = null;
 		smtpPort = null;
-		for (String processOutputLine : CharStreams.readLines(readProcessOutput())) {
+		for (String processOutputLine : readProcessOutputLinesUntilStartedTag()) {
 			assignImapOrSmtpPort(processOutputLine);
 			if (imapPort != null && smtpPort != null) {
 				return;
 			}
 		}
 		throw new ExternalProcessException("Cannot read Greenmail listening ports");
+	}
+
+	private List<String> readProcessOutputLinesUntilStartedTag() throws IOException, InterruptedException {
+		List<String> outputLines = Lists.newArrayList();
+		Stopwatch stopwatch = new Stopwatch().start();
+		do {
+			outputLines.addAll(CharStreams.readLines(readProcessOutput()));
+			if (outputLines.contains(STARTED_TAG)) {
+				return outputLines;
+			}
+			Thread.sleep(5);
+		} while (stopwatch.elapsedMillis() < MAX_PROCESS_STARTTIME);
+		throw new ExternalProcessException(
+				"Process started tag not received in accepted delay of : " + MAX_PROCESS_STARTTIME + " ms");
 	}
 
 	private void assignImapOrSmtpPort(String processOutputLine) {
@@ -129,6 +150,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 			greenMail.start();
 			System.out.println(IMAP_PORT_ARG_TAG + greenMail.greenMail.getImap().getPort());
 			System.out.println(SMTP_PORT_ARG_TAG + greenMail.greenMail.getSmtp().getPort());
+			System.out.println(STARTED_TAG);
 		}
 		
 		private GreenMail greenMail;
