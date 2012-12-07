@@ -139,7 +139,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 	
 	private void fetchBody(Builder emailViewBuilder, FetchInstruction fetchInstruction, 
-			long uid) throws MailException, IOException {
+			long uid) throws MailException, IOException, EmailViewPartsFetcherException {
 		
 		InputStream bodyData = fetchBodyData(fetchInstruction, uid);
 		
@@ -167,7 +167,9 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		return Charsets.UTF_8;
 	}
 
-	private InputStream fetchBodyData(FetchInstruction fetchInstruction, long uid) throws MailException {
+	@VisibleForTesting InputStream fetchBodyData(FetchInstruction fetchInstruction, long uid)
+			throws MailException, EmailViewPartsFetcherException {
+		
 		InputStream bodyData = null;
 		try {
 			if (fetchInstruction.hasMimePartAddressDefined()) {
@@ -180,9 +182,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 				}
 				if (bodyData != null) {
 					return new ByteArrayInputStream(ByteStreams.toByteArray(bodyData));
-				} else {
-					return null;
 				}
+				throw new EmailViewPartsFetcherException(String.format(
+						"Cannot fetch bodyData for collectionPath:%s, uid:%d, address:%s, truncation:%b",
+						collectionPath, uid, address, truncation!=null));
 			} else {
 				return mailboxService.fetchMailStream(udr, collectionPath, uid);
 			}

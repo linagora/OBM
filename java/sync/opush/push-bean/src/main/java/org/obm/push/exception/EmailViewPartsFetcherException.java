@@ -37,4 +37,8 @@ public class EmailViewPartsFetcherException extends Exception {
 	public EmailViewPartsFetcherException(Throwable t) {
 		super(t);
 	}
+
+	public EmailViewPartsFetcherException(String msg) {
+		super(msg);
+	}
 }

@@ -66,6 +66,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
@@ -378,7 +379,7 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailView.getEstimatedDataSize()).isEqualTo(1505);
 	}
 	
-	@Test
+	@Test(expected=EmailViewPartsFetcherException.class)
 	public void testBodyMimePartDataNull() throws Exception {
 		messageFixture.bodyData = null;
 		messageFixture.bodyDataDecoded = null;
