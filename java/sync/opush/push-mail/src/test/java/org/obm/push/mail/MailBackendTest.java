@@ -80,6 +80,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
@@ -467,7 +468,7 @@ public class MailBackendTest {
 		expect(collectionPathBuilder.build())
 			.andReturn(trashCollectionPath).once();
 		
-		mailboxService.delete(udr, trashCollectionPath.collectionPath(), itemId);
+		mailboxService.delete(udr, trashCollectionPath.collectionPath(), MessageSet.singleton(itemId));
 		expectLastCall();
 		
 		replayCommonMocks();

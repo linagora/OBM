@@ -90,6 +90,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
@@ -386,7 +387,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				if (trash && !wasteBasketPath.collectionPath().equals(destinationCollectionPath)) {
 					mailboxService.moveItem(udr, destinationCollectionPath, wasteBasketPath.collectionPath(), uid);
 				} else {
-					mailboxService.delete(udr, destinationCollectionPath, uid);
+					mailboxService.delete(udr, destinationCollectionPath, MessageSet.singleton(uid));
 				}
 			}	
 		} catch (MailException e) {

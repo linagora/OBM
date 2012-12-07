@@ -276,14 +276,14 @@ public class ImapMailboxService implements MailboxService {
 
 	 
 	@Override
-	public void delete(UserDataRequest udr, String collectionPath, long uid) 
+	public void delete(UserDataRequest udr, String collectionPath, MessageSet messages) 
 			throws MailException, ImapMessageNotFoundException {
 
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
-			store.deleteMessage(currentOpushImapFolder(), uid);
+			store.deleteMessage(currentOpushImapFolder(), messages);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (LocatorClientException e) {

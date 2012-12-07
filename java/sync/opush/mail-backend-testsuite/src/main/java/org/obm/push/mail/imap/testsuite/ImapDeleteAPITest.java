@@ -50,6 +50,7 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
@@ -105,7 +106,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), MessageSet.singleton(sentEmail.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -118,7 +119,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(DRAFT);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(DRAFT);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(DRAFT), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(DRAFT), MessageSet.singleton(sentEmail.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(DRAFT);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -131,7 +132,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(SENTBOX);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(SENTBOX);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(SENTBOX), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(SENTBOX), MessageSet.singleton(sentEmail.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(SENTBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -143,7 +144,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(TRASH);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(TRASH);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(TRASH), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(TRASH), MessageSet.singleton(sentEmail.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(TRASH);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -157,7 +158,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToMailbox(otherFolder);
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(otherFolder);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), MessageSet.singleton(sentEmail.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(otherFolder);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(1);
@@ -173,7 +174,7 @@ public abstract class ImapDeleteAPITest {
 		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
 		Email anEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), anEmailFromMailbox.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), MessageSet.singleton(anEmailFromMailbox.getUid()));
 		
 		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
 		Assertions.assertThat(mailboxEmailsBefore).hasSize(3);
@@ -181,13 +182,32 @@ public abstract class ImapDeleteAPITest {
 		Assertions.assertThat(mailboxEmailsAfter).doesNotContain(anEmailFromMailbox);
 	}
 
+	@Test
+	public void testDeleteTwoEmailsAmongManyEmails() throws Exception {
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		
+		Set<Email> mailboxEmailsBefore = testUtils.mailboxEmails(INBOX);
+		Email firstEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 1);
+		Email secondEmailFromMailbox = Iterables.get(mailboxEmailsBefore, 2);
+		
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), 
+				MessageSet.builder().add(firstEmailFromMailbox.getUid()).add(secondEmailFromMailbox.getUid()).build());
+		
+		Set<Email> mailboxEmailsAfter = testUtils.mailboxEmails(INBOX);
+		Assertions.assertThat(mailboxEmailsBefore).hasSize(3);
+		Assertions.assertThat(mailboxEmailsAfter).hasSize(1);
+		Assertions.assertThat(mailboxEmailsAfter).doesNotContain(firstEmailFromMailbox).doesNotContain(secondEmailFromMailbox);
+	}
+	
 	@Ignore("Greenmail replied that the command succeed")
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testDeleteNonExistingEmailTriggersAnException() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		long nonExistingEmailUid = sentEmail.getUid() + 1;
 
-		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), nonExistingEmailUid);
+		mailboxService.delete(udr, testUtils.mailboxPath(INBOX), MessageSet.singleton(nonExistingEmailUid));
 	}
 
 	@Ignore("Greenmail replied that the command succeed")
@@ -197,7 +217,7 @@ public abstract class ImapDeleteAPITest {
 		String otherFolder = "ANYFOLDER";
 		testUtils.createFolders(otherFolder);
 		
-		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), sentEmail.getUid());
+		mailboxService.delete(udr, testUtils.mailboxPath(otherFolder), MessageSet.singleton(sentEmail.getUid()));
 	}
 
 	@Ignore("Greenmail replied that the command succeed")
@@ -206,7 +226,7 @@ public abstract class ImapDeleteAPITest {
 		Email sentEmail = testUtils.sendEmailToInbox();
 		String inboxPath = testUtils.mailboxPath(INBOX);
 		
-		mailboxService.delete(udr, inboxPath, sentEmail.getUid());
-		mailboxService.delete(udr, inboxPath, sentEmail.getUid());
+		mailboxService.delete(udr, inboxPath, MessageSet.singleton(sentEmail.getUid()));
+		mailboxService.delete(udr, inboxPath, MessageSet.singleton(sentEmail.getUid()));
 	}
 }

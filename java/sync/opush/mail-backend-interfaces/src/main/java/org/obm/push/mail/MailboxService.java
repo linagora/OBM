@@ -65,7 +65,7 @@ public interface MailboxService {
 
 	String parseMailBoxName(UserDataRequest udr, String collectionPath) throws MailException;
 
-	void delete(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException;
+	void delete(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException;
 
 	long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
 			throws MailException, DaoException, ImapMessageNotFoundException, UnsupportedBackendFunctionException;

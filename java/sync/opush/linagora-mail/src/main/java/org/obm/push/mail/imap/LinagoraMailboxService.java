@@ -230,7 +230,7 @@ public class LinagoraMailboxService implements MailboxService {
 
 	 
 	@Override
-	public void delete(UserDataRequest udr, String collectionPath, long uid) 
+	public void delete(UserDataRequest udr, String collectionPath, MessageSet messages) 
 			throws MailException, ImapMessageNotFoundException {
 
 		try {
@@ -239,8 +239,8 @@ public class LinagoraMailboxService implements MailboxService {
 			store.select(mailboxName);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			logger.info("delete conv id = ", uid);
-			store.uidStore(MessageSet.singleton(uid), fl, true);
+			logger.info("delete conv id = {}", messages);
+			store.uidStore(messages, fl, true);
 			store.expunge();
 		} catch (LocatorClientException e) {
 			throw new MailException(e);

@@ -44,6 +44,7 @@ import org.obm.push.bean.Resource;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.exception.FolderCreationException;
 import org.obm.push.mail.exception.ImapCommandException;
@@ -75,7 +76,7 @@ public interface ImapStore extends Resource {
 	
 	void appendMessage(OpushImapFolder opushImapFolder, Message message) throws ImapCommandException;
 	
-	void deleteMessage(OpushImapFolder sourceFolder, long messageUid) throws MessagingException, ImapMessageNotFoundException;
+	void deleteMessage(OpushImapFolder sourceFolder, MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 
 	OpushImapFolder select(String folderName) throws ImapCommandException;
 

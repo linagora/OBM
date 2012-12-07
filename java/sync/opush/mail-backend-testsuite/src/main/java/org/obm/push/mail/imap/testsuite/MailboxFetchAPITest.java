@@ -62,6 +62,7 @@ import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MailboxTestUtils;
@@ -152,7 +153,7 @@ public abstract class MailboxFetchAPITest {
 		Email email3 = testUtils.sendEmailToInbox();
 		
 		String mailboxPath = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		mailboxService.delete(udr, mailboxPath, emailWillBeDeleted.getUid());
+		mailboxService.delete(udr, mailboxPath, MessageSet.singleton(emailWillBeDeleted.getUid()));
 		
 		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, mailboxPath, email3.getUid());
 		assertThat(uidEnvelope).isNotNull();

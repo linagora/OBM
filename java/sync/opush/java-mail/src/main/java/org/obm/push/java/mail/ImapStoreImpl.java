@@ -47,6 +47,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.exception.FolderCreationException;
 import org.obm.push.mail.exception.ImapCommandException;
@@ -257,9 +258,11 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public void deleteMessage(OpushImapFolder sourceFolder, long messageUid) throws MessagingException, ImapMessageNotFoundException {
-		Message messageToDelete = sourceFolder.getMessageByUID(messageUid);
-		sourceFolder.deleteMessage(messageToDelete);
+	public void deleteMessage(OpushImapFolder sourceFolder, MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
+		for (long uid: messages) {
+			Message messageToDelete = sourceFolder.getMessageByUID(uid);
+			sourceFolder.deleteMessage(messageToDelete);
+		}
 	}
 
 	@Override
