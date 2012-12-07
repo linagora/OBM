@@ -193,7 +193,7 @@ public abstract class MailboxFetchAPITest {
 		String messageContent = "message content";
 		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
-		mailboxService.setAnsweredFlag(udr, inbox, 1);
+		mailboxService.setAnsweredFlag(udr, inbox, MessageSet.singleton(1l));
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
 		assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());

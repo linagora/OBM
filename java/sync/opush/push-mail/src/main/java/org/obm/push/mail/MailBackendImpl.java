@@ -494,7 +494,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(udr), mail.get(0), message,
 						ImmutableMap.<String, MSAttachementData>of());
 				send(udr, replyEmail, saveInSent);
-				mailboxService.setAnsweredFlag(udr, collectionPath, uid);
+				mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));
 			} else {
 				sendEmail(udr, mailContent, saveInSent);
 			}
@@ -542,7 +542,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), originMail, message, originalMailAttachments);
 				send(udr, forwardEmail, saveInSent);
 				try{
-					mailboxService.setAnsweredFlag(udr, collectionPath, uid);
+					mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));
 				} catch (Throwable e) {
 					logger.info("Can't set Answered Flag to mail["+uid+"]");
 				}

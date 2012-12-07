@@ -339,8 +339,8 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(udr, collectionPath, MessageSet.singleton(uid), Flags.Flag.ANSWERED, true);
+	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException {
+		updateMailFlag(udr, collectionPath, messages, Flags.Flag.ANSWERED, true);
 	}
 
 	@Override

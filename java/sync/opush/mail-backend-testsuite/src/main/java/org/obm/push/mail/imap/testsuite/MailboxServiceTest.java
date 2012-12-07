@@ -218,7 +218,7 @@ public abstract class MailboxServiceTest {
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Email email = Iterables.getOnlyElement(emails);
-		mailboxService.setAnsweredFlag(udr, mailBoxPath, email.getUid());
+		mailboxService.setAnsweredFlag(udr, mailBoxPath, MessageSet.singleton(email.getUid()));
 		
 		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email answeredEmail = Iterables.getOnlyElement(emailsAfterToSetAnsweredFlag);
