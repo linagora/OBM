@@ -34,20 +34,17 @@ package org.obm.push.minig.imap.command;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
-public class UIDSearchCommand extends Command<Collection<Long>> {
+public class UIDSearchCommand extends Command<MessageSet> {
 
 	// Mon, 7 Feb 1994 21:52:25 -0800
 
@@ -80,7 +77,7 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 	@Override
 	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
-		data = Collections.emptyList();
+		data = MessageSet.empty();
 
 		if (isOK) {
 			String uidString = null;
@@ -97,11 +94,11 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 				// 9 => '* SEARCH '.length
 				String uidList = uidString.substring(9);
 				Iterable<String> uids = Splitter.on(' ').omitEmptyStrings().split(uidList);
-				final List<Long> result = Lists.newArrayListWithExpectedSize(Iterables.size(uids));
+				MessageSet.Builder builder = MessageSet.builder();
 				for (String uid : uids) {
-					result.add(Long.valueOf(uid));
+					builder.add(Long.valueOf(uid));
 				}
-				data = result;
+				data = builder.build();
 			}
 		}
 	}

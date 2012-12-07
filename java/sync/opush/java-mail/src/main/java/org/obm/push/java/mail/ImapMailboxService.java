@@ -92,6 +92,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -403,7 +404,7 @@ public class ImapMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
+	public MessageSet purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
 			throws DaoException, MailException {
 		
 		long time = System.currentTimeMillis();
@@ -412,15 +413,15 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
 			logger.info("Mailbox folder[ {} ] will be purged...", mailboxName);
-			Collection<Long> uids = store.uidSearch(currentOpushImapFolder(), SearchQuery.MATCH_ALL);
+			MessageSet messages = store.uidSearch(currentOpushImapFolder(), SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			store.uidStore(uids, fl, true);
+			store.uidStore(messages, fl, true);
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
-					new Object[]{mailboxName, time, uids.size()});
-			return uids;
+					new Object[]{mailboxName, time, Iterables.size(messages)});
+			return messages;
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
 		}
@@ -489,8 +490,8 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
 			SearchQuery query = SearchQuery.builder().after(windows).build();
-			Collection<Long> uids = store.uidSearch(currentOpushImapFolder(), query);
-			Collection<FastFetch> mails = fetchFast(udr, collectionPath, MessageSet.builder().addAll(uids).build());
+			MessageSet messages = store.uidSearch(currentOpushImapFolder(), query);
+			Collection<FastFetch> mails = fetchFast(udr, collectionPath, messages);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (ImapCommandException e) {
 			throw new MailException(e.getMessage(), e);

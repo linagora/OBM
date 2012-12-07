@@ -390,7 +390,7 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
+	public MessageSet purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) 
 			throws DaoException, MailException {
 		
 		long time = System.currentTimeMillis();
@@ -399,15 +399,15 @@ public class LinagoraMailboxService implements MailboxService {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailboxName);
 			logger.info("Mailbox folder[ {} ] will be purged...", collectionPath);
-			Collection<Long> uids = store.uidSearch(SearchQuery.MATCH_ALL);
+			MessageSet messages = store.uidSearch(SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			store.uidStore(MessageSet.builder().addAll(uids).build(), fl, true);
+			store.uidStore(messages, fl, true);
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
-					new Object[]{collectionPath, time, uids.size()});
-			return uids;
+					new Object[]{collectionPath, time, Iterables.size(messages)});
+			return messages;
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
@@ -476,8 +476,8 @@ public class LinagoraMailboxService implements MailboxService {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			store.select( parseMailBoxName(udr, collectionPath) );
 			SearchQuery query = SearchQuery.builder().after(windows).build();
-			Collection<Long> uids = store.uidSearch(query);
-			Collection<FastFetch> mails = fetchFast(udr, collectionPath, MessageSet.builder().addAll(uids).build());
+			MessageSet messages = store.uidSearch(query);
+			Collection<FastFetch> mails = fetchFast(udr, collectionPath, messages);
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {
 			throw new MailException(e);

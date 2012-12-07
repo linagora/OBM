@@ -280,7 +280,7 @@ public class ClientSupport {
 		return run(new UIDFetchMessageCommand(uid));
 	}
 
-	public Collection<Long> uidSearch(SearchQuery sq) {
+	public MessageSet uidSearch(SearchQuery sq) {
 		return run(new UIDSearchCommand(sq));
 	}
 

@@ -32,10 +32,8 @@
 package org.obm.push.java.mail;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
@@ -263,19 +260,19 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 	
 	@Override
-	public Collection<Long> uidSearch(SearchQuery query) throws MessagingException {
+	public MessageSet uidSearch(SearchQuery query) throws MessagingException {
 		final SearchTerm searchTerm = toSearchTerm(query);
-		return (Collection<Long>) folder.doCommand(new ProtocolCommand() {
+		return (MessageSet) folder.doCommand(new ProtocolCommand() {
 			@Override
 			public Object doCommand(IMAPProtocol protocol)
 					throws ProtocolException {
 				try {
 					int[] array = protocol.search(searchTerm);
-					List<Long> result = Lists.newArrayList();
+					MessageSet.Builder builder = MessageSet.builder();
 					for (int i: array) {
-						result.add(protocol.fetchUID(i).uid);
+						builder.add(protocol.fetchUID(i).uid);
 					}
-					return result;
+					return builder.build();
 				} catch (SearchException e) {
 					throw new ProtocolException(e.getMessage(), e);
 				}

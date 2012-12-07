@@ -181,7 +181,7 @@ public class StoreClient {
 		return cs.uidFetchMessage(uid);
 	}
 
-	public Collection<Long> uidSearch(SearchQuery sq) {
+	public MessageSet uidSearch(SearchQuery sq) {
 		return cs.uidSearch(sq);
 	}
 

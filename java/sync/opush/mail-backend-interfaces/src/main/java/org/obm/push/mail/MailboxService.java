@@ -79,7 +79,7 @@ public interface MailboxService {
 
 	InputStream findAttachment(UserDataRequest udr, String collectionPath, Long mailUid, MimeAddress mimePartAddress) throws MailException;
 
-	Collection<Long> purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
+	MessageSet purgeFolder(UserDataRequest udr, Integer devId, String collectionPath, Integer collectionId) throws MailException, DaoException;
 
 	/**
 	 * Store the mail's inputstream in INBOX.

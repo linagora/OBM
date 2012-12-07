@@ -58,6 +58,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
@@ -186,7 +187,7 @@ public class UIDFetchFlagsTest {
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream(), list(flags));
-		Collection<Long> uidSearch = client.uidSearch(SearchQuery.MATCH_ALL_EVEN_DELETED);
+		MessageSet uidSearch = client.uidSearch(SearchQuery.MATCH_ALL_EVEN_DELETED);
 		long newEmailUid = Iterables.getOnlyElement(uidSearch);
 		return newEmailUid;
 	}

@@ -32,7 +32,6 @@
 package org.obm.push.mail.imap;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -88,7 +87,7 @@ public interface OpushImapFolder {
 
 	Map<Long, IMAPMessage> fetchFast(MessageSet messages) throws MessagingException;
 
-	Collection<Long> uidSearch(SearchQuery query) throws MessagingException;
+	MessageSet uidSearch(SearchQuery query) throws MessagingException;
 	
 	Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 

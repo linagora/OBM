@@ -32,7 +32,6 @@
 package org.obm.push.java.mail;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -311,7 +310,7 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override 
-	public Collection<Long> uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException {
+	public MessageSet uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException {
 		try {
 			return opushImapFolder.uidSearch(sq);
 		} catch (MessagingException e) {
@@ -322,7 +321,7 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set) {
+	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
 		// TODO Auto-generated method stub
 		return false;
 	}

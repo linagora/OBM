@@ -32,7 +32,6 @@
 package org.obm.push.mail.imap;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.mail.Flags;
@@ -96,9 +95,9 @@ public interface ImapStore extends Resource {
 	Map<Long, IMAPMessage> fetchBodyStructure(OpushImapFolder opushImapFolder, MessageSet messages) 
 			throws ImapCommandException, ImapMessageNotFoundException;
 	
-	Collection<Long> uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException;
+	MessageSet uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException;
 	
-	boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set);
+	boolean uidStore(MessageSet messages, FlagsList fl, boolean set);
 	
 	void expunge();
 
