@@ -101,9 +101,7 @@ public interface MailboxService {
 	
 	Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
-	MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException;
-	
-	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
+	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
 	Collection<Flag> fetchFlags(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 

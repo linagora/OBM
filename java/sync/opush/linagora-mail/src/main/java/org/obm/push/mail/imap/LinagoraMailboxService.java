@@ -88,7 +88,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -521,16 +520,11 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException {
-		return Iterables.getOnlyElement(fetchBodyStructure(udr, collectionPath, ImmutableSet.<Long>of(uid)));
-	}
-	
-	@Override
-	public Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
+	public Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			store.select(parseMailBoxName(udr, collectionPath));
-			return store.uidFetchBodyStructure(uids);
+			return store.uidFetchBodyStructure(messages);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

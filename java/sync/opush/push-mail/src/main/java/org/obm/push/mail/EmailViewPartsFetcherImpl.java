@@ -48,6 +48,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.conversation.EmailView.Builder;
@@ -66,6 +67,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -131,7 +133,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 	
 	private MimeMessage getMimeMessage(long uid) throws MailException {
-		return mailboxService.fetchBodyStructure(udr, collectionPath, uid);
+		return Iterables.getOnlyElement(mailboxService.fetchBodyStructure(udr, collectionPath, MessageSet.singleton(uid)));
 	}
 
 	private FetchInstruction getFetchInstruction(MimeMessage mimeMessage) {

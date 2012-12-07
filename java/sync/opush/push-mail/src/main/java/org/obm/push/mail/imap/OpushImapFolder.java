@@ -90,7 +90,7 @@ public interface OpushImapFolder {
 
 	Collection<Long> uidSearch(SearchQuery query) throws MessagingException;
 	
-	Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 
 	void noop() throws MessagingException;
 	

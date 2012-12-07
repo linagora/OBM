@@ -70,7 +70,6 @@ import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.IMimePart;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -203,7 +202,7 @@ public abstract class MailboxFetchAPITest {
 	@Test
 	public void testFetchBodyStructureNoUid() throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		Collection<org.obm.push.mail.mime.MimeMessage> result = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of());
+		Collection<org.obm.push.mail.mime.MimeMessage> result = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.empty());
 		assertThat(result).isEmpty();
 	}
 	
@@ -220,7 +219,7 @@ public abstract class MailboxFetchAPITest {
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 
 		assertThat(collections).hasSize(1);
@@ -238,7 +237,7 @@ public abstract class MailboxFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
 		IMimePart multiPartMixed = onlyElement.getMimePart();
@@ -278,7 +277,7 @@ public abstract class MailboxFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
+		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
 		IMimePart multiPartAlternative = onlyElement.getMimePart();
@@ -316,7 +315,7 @@ public abstract class MailboxFetchAPITest {
 				GreenMailUtil.newMimeMessage(messageInputStream), new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
-		mailboxService.fetchBodyStructure(udr, inbox, ImmutableList.<Long>of(1L));
+		mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 	}
 	
 	@Test

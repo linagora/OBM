@@ -40,14 +40,10 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-
-import com.google.common.collect.ImmutableList;
-
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.minig.imap.command.UIDFetchBodyStructureCommand;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
@@ -76,7 +72,7 @@ public class UIDFetchBodyStructureCommandTest {
 		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(mimeMessageBuilder);
 		EasyMock.replay(resultCallback, mimeMessageBuilder);
 		UIDFetchBodyStructureCommand uidFetchBodyStructureCommand = 
-			new UIDFetchBodyStructureCommand(resultCallback, ImmutableList.of(54l));
+			new UIDFetchBodyStructureCommand(resultCallback, MessageSet.singleton(54l));
 		IMAPResponse response = new IMAPResponse("OK", INPUT_LINE1);
 		response.setStreamData(new ByteArrayInputStream(INPUT_BYTESTREAM.getBytes()));
 		uidFetchBodyStructureCommand.responseReceived(

@@ -70,6 +70,7 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -96,8 +97,9 @@ public class MailMessageLoader {
 		MSEmail msEmail = null;
 		try {
 			final UIDEnvelope envelope = mailboxService.fetchEnvelope(udr, collectionPath, messageId);
-			final MimeMessage mimeMessage = mailboxService.fetchBodyStructure(udr, collectionPath, messageId);
-			if (mimeMessage != null) {
+			final Collection<MimeMessage> mimeMessages = mailboxService.fetchBodyStructure(udr, collectionPath, MessageSet.singleton(messageId));
+			if (!mimeMessages.isEmpty()) {
+				MimeMessage mimeMessage = Iterables.getOnlyElement(mimeMessages);
 				final MessageLoader helper = new MessageLoader(udr, mailboxService, htmlMimeSubtypePriority, false, mimeMessage, collectionPath);
 				final MailMessage message = helper.fetch();
 				

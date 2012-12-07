@@ -51,10 +51,9 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 	private ImapMessageSet imapMessageSet;
 	private final BodyStructureParser bodyStructureParser;
 
-	public UIDFetchBodyStructureCommand(BodyStructureParser bodyStructureParser, Collection<Long> uid) {
+	public UIDFetchBodyStructureCommand(BodyStructureParser bodyStructureParser, MessageSet messages) {
 		this.bodyStructureParser = bodyStructureParser;
-		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+		this.imapMessageSet = ImapMessageSet.wrap(messages);
 	}
 
 	@Override

@@ -185,8 +185,8 @@ public class StoreClient {
 		return cs.uidSearch(sq);
 	}
 
-	public Collection<MimeMessage> uidFetchBodyStructure(Collection<Long> uids) {
-		return cs.uidFetchBodyStructure(uids);
+	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
+		return cs.uidFetchBodyStructure(messages);
 	}
 
 	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) {

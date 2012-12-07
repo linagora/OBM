@@ -284,8 +284,8 @@ public class ClientSupport {
 		return run(new UIDSearchCommand(sq));
 	}
 
-	public Collection<MimeMessage> uidFetchBodyStructure(Collection<Long> uid) {
-		return run(new UIDFetchBodyStructureCommand(new BodyStructureParser(), uid));
+	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
+		return run(new UIDFetchBodyStructureCommand(new BodyStructureParser(), messages));
 	}
 
 	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids,

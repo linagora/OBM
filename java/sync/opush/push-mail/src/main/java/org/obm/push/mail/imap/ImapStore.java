@@ -93,7 +93,7 @@ public interface ImapStore extends Resource {
 	
 	Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException, ImapMessageNotFoundException;
 
-	Map<Long, IMAPMessage> fetchBodyStructure(OpushImapFolder opushImapFolder, Collection<Long> uids) 
+	Map<Long, IMAPMessage> fetchBodyStructure(OpushImapFolder opushImapFolder, MessageSet messages) 
 			throws ImapCommandException, ImapMessageNotFoundException;
 	
 	Collection<Long> uidSearch(OpushImapFolder opushImapFolder, SearchQuery sq) throws ImapCommandException;

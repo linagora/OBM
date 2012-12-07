@@ -63,6 +63,7 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
@@ -272,8 +273,8 @@ public class MailboxBackendTest {
 	}
 
 	public void expectFetchBodyStructure(String collectionName, long uid, MimeMessage mimeMessage) {
-		expect(mailboxService.fetchBodyStructure(udr, collectionName, uid))
-			.andReturn(mimeMessage);
+		expect(mailboxService.fetchBodyStructure(udr, collectionName, MessageSet.singleton(uid)))
+			.andReturn(ImmutableList.of(mimeMessage));
 	}
 
 	public void expectFetchMailStream(String collectionName, long uid, InputStream mailStream) {

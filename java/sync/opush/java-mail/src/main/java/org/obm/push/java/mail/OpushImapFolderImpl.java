@@ -323,10 +323,10 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
-	public Map<Long, IMAPMessage> fetchBodyStructure(Collection<Long> uids) throws MessagingException, ImapMessageNotFoundException {
+	public Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
 		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
 		FetchProfile fetchFastProfile = getFetchBodyStructureProfile();
-		for (long uid: uids) {
+		for (long uid: messages) {
 			IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
 			imapMessages.put(uid, imapMessage);
 		}

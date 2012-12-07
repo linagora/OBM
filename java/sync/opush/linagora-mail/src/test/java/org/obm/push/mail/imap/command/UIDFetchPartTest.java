@@ -63,6 +63,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.MimeAddress;
@@ -292,7 +293,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -315,7 +316,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
@@ -337,7 +338,7 @@ public class UIDFetchPartTest {
 		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		
 		Collection<MimeMessage> mimeMessages = 
-				mailboxService.fetchBodyStructure(udr, inbox, Lists.newArrayList(sentEmail.getUid()));
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
 		
 		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.RTF).build();
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);

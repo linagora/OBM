@@ -58,6 +58,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.LinagoraMailboxService;
 import org.obm.push.mail.mime.MimeAddress;
@@ -73,6 +74,7 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
@@ -202,8 +204,8 @@ public class IntegrationTestUtils {
 	}
 
 	public static void expectFetchBodyStructure(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, MimeMessage mimeMessage) {
-		expect(mailboxService.fetchBodyStructure(udr, collectionName, uid))
-			.andReturn(mimeMessage);
+		expect(mailboxService.fetchBodyStructure(udr, collectionName, MessageSet.singleton(uid)))
+			.andReturn(ImmutableList.of(mimeMessage));
 	}
 
 	public static void expectFetchMailStream(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, InputStream mailStream) {

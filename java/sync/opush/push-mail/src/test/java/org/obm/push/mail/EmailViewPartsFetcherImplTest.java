@@ -46,6 +46,7 @@ import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -70,6 +71,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.conversation.EmailViewAttachment;
@@ -671,7 +673,7 @@ public class EmailViewPartsFetcherImplTest {
 	}
 	
 	private void mockMailboxServiceBody(MailboxService mailboxService) throws MailException {
-		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, messageFixture.uid))
+		expect(mailboxService.fetchBodyStructure(udr, messageCollectionName, MessageSet.singleton(messageFixture.uid)))
 			.andReturn(mockAggregateMimeMessage()).once();
 
 		if (messageFixture.estimatedDataSize != 0) {
@@ -695,7 +697,7 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(messageFixture.attachment);
 	}
 
-	private MimeMessage mockAggregateMimeMessage() {
+	private Collection<MimeMessage> mockAggregateMimeMessage() {
 		
 		MimePart mimePart = createMock(MimePart.class);
 		expect(mimePart.getCharset()).andReturn(messageFixture.bodyCharset).anyTimes();
@@ -726,7 +728,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));
 
 		replay(mimeMessage, mimePart);
-		return mimeMessage;
+		return ImmutableList.of(mimeMessage);
 	}
 
 	private EmailViewPartsFetcherImpl newFetcherFromExpectedFixture() throws Exception {
