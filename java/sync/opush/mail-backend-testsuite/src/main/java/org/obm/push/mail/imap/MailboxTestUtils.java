@@ -48,6 +48,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
+import org.obm.push.mail.bean.MessageSet;
 
 import com.google.common.collect.Iterables;
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -95,7 +96,7 @@ public class MailboxTestUtils {
 		
 		Email sentEmail = sendEmailToInbox();
 		String inboxPath = mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		mailboxService.moveItem(udr, inboxPath, mailboxPath(mailbox), sentEmail.getUid());
+		mailboxService.move(udr, inboxPath, mailboxPath(mailbox), MessageSet.singleton(sentEmail.getUid()));
 		return emailInMailbox(mailbox);
 	}
 

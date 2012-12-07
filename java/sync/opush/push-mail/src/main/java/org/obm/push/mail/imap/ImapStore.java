@@ -86,7 +86,7 @@ public interface ImapStore extends Resource {
 
 	boolean hasCapability(ImapCapability imapCapability) throws MessagingException;
 
-	long moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, final Long messageUid)
+	MessageSet moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, final MessageSet messages)
 			throws ImapCommandException, ImapMessageNotFoundException;
 
 	Message fetchEnvelope(OpushImapFolder opushImapFolder, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;

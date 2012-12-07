@@ -209,8 +209,8 @@ public class StoreClient {
 		return cs.uidFetchFast(messages);
 	}
 
-	public Collection<Long> uidCopy(Collection<Long> uids, String destMailbox) {
-		return cs.uidCopy(uids, destMailbox);
+	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
+		return cs.uidCopy(messages, destMailbox);
 	}
 
 	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {

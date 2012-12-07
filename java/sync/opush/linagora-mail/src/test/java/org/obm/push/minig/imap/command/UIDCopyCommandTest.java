@@ -36,6 +36,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
@@ -46,7 +47,7 @@ public class UIDCopyCommandTest {
 	@Test
 	public void testBuildCommand() {
 		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(
-				ImmutableList.of(1l), "Trash");
+				MessageSet.singleton(1l), "Trash");
 		
 		String command = uidCopyCommand.buildCommand().getCommandString();
 		
@@ -59,7 +60,7 @@ public class UIDCopyCommandTest {
 				"* OK [COPY 23 1 2]";
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);
 		
-		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(ImmutableList.of(1l), "Trash");
+		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(MessageSet.singleton(1l), "Trash");
 		uidCopyCommand.responseReceived(ImmutableList.of(imapResponse));
 		
 		assertThat(uidCopyCommand.data).containsOnly(2l);

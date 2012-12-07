@@ -290,7 +290,7 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
+	public MessageSet move(UserDataRequest udr, String srcFolder, String dstFolder, MessageSet messages)
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		try {
@@ -300,10 +300,10 @@ public class ImapMailboxService implements MailboxService {
 			
 			assertMoveItemIsSupported(store);
 			
-			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
-					new Object[] {udr.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
+			logger.debug("Moving email, USER:{} UIDs:{} SRC:{} DST:{}",
+					new Object[] {udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder});
 
-			return store.moveMessageUID(currentOpushImapFolder(), dstMailBox, uid);
+			return store.moveMessageUID(currentOpushImapFolder(), dstMailBox, messages);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {

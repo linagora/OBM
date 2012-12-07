@@ -249,43 +249,38 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public long moveItem(UserDataRequest udr, String srcFolder, String dstFolder, long uid)
+	public MessageSet move(UserDataRequest udr, String srcFolder, String dstFolder, MessageSet messages)
 			throws DaoException, MailException, ImapMessageNotFoundException, UnsupportedBackendFunctionException {
 		
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			assertMoveItemIsSupported(store);
 			
-			logger.debug("Moving email, USER:{} UID:{} SRC:{} DST:{}",
-					new Object[] {udr.getUser().getLoginAtDomain(), uid, srcFolder, dstFolder});
+			logger.debug("Moving email, USER:{} UIDs:{} SRC:{} DST:{}",
+					new Object[] {udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder});
 			
 			String srcMailBox = parseMailBoxName(udr, srcFolder);
 			String dstMailBox = parseMailBoxName(udr, dstFolder);
 
 			store.select(srcMailBox);
-			List<Long> uids = ImmutableList.of(uid);
-			Collection<Long> newUid = copyMessage(store, dstMailBox, uids);
-			deleteMessage(store, uids);
+			MessageSet newUids = copyMessage(store, dstMailBox, messages);
+			deleteMessage(store, messages);
 			
-			return Iterables.getOnlyElement(newUid);
+			return newUids;
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
 	}
 
-	private Collection<Long> copyMessage(StoreClient store, String dstMailBox, List<Long> uids) {
-		Collection<Long> newUids = store.uidCopy(uids, dstMailBox);
-		if (newUids == null || newUids.size() != 1) {
-			throw new ImapMessageNotFoundException("Message with uid " + Iterables.getOnlyElement(uids) + " not found");
-		}
-		return newUids;
+	private MessageSet copyMessage(StoreClient store, String dstMailBox, MessageSet messages) {
+		return store.uidCopy(messages, dstMailBox);
 	}
 
-	private void deleteMessage(StoreClient store, List<Long> uids) {
+	private void deleteMessage(StoreClient store, MessageSet messages) {
 		FlagsList fl = new FlagsList();
 		fl.add(Flag.DELETED);
-		logger.info("delete conv id = ", Iterables.getOnlyElement(uids));
-		store.uidStore(MessageSet.builder().addAll(uids).build(), fl, true);
+		logger.info("delete conv id = {}", messages);
+		store.uidStore(messages, fl, true);
 		store.expunge();
 	}
 	

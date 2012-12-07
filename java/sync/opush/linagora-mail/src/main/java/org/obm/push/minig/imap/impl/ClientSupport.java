@@ -309,8 +309,8 @@ public class ClientSupport {
 		return run(new UIDFetchFastCommand(messages));
 	}
 
-	public Collection<Long> uidCopy(Collection<Long> uids, String destMailbox) {
-		return run(new UIDCopyCommand(uids, destMailbox));
+	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
+		return run(new UIDCopyCommand(messages, destMailbox));
 	}
 
 	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {

@@ -116,6 +116,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -385,7 +386,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 				CollectionPath wasteBasketPath = getWasteBasketPath(udr);
 				if (trash && !wasteBasketPath.collectionPath().equals(destinationCollectionPath)) {
-					mailboxService.moveItem(udr, destinationCollectionPath, wasteBasketPath.collectionPath(), uid);
+					mailboxService.move(udr, destinationCollectionPath, wasteBasketPath.collectionPath(), MessageSet.singleton(uid));
 				} else {
 					mailboxService.delete(udr, destinationCollectionPath, MessageSet.singleton(uid));
 				}
@@ -437,8 +438,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
-			Long newUidMail = mailboxService.moveItem(udr, srcFolder, dstFolder, currentMailUid);
-			return ServerId.buildServerIdString(dstFolderId, newUidMail);	
+			MessageSet messages = mailboxService.move(udr, srcFolder, dstFolder, MessageSet.singleton(currentMailUid));
+			return ServerId.buildServerIdString(dstFolderId, Iterables.getOnlyElement(messages));	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {

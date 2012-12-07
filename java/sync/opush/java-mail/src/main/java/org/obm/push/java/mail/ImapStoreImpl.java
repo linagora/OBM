@@ -229,18 +229,22 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public long moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, final Long messageUid)
+	public MessageSet moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, MessageSet messages)
 			throws ImapCommandException, ImapMessageNotFoundException {
-		
+		Long currentMessageUid = null;
 		try {
-			Message messageToMove = sourceFolder.getMessageByUID(messageUid);
-			
-			long newUid = sourceFolder.copyMessageThenGetNewUID(folderDst, messageUid);
-			sourceFolder.deleteMessage(messageToMove);
-			return newUid;
+			MessageSet.Builder newUids = MessageSet.builder();
+			for (long uid: messages) {
+				currentMessageUid = uid;
+				Message messageToMove = sourceFolder.getMessageByUID(uid);
+				
+				newUids.add(sourceFolder.copyMessageThenGetNewUID(folderDst, uid));
+				sourceFolder.deleteMessage(messageToMove);
+			}
+			return newUids.build();
 		} catch (MessagingException e) {
 			String msg = String.format("IMAP command Move failed. user=%s, folderSource=%s, folderDestination=%s, messageUid=%d",
-					userId, sourceFolder.getFullName(), folderDst, messageUid);
+					userId, sourceFolder.getFullName(), folderDst, currentMessageUid);
 			throw new ImapCommandException(msg, e);
 		}
 	}

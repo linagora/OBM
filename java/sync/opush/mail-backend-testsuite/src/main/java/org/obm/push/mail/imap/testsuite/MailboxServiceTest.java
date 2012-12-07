@@ -309,11 +309,11 @@ public abstract class MailboxServiceTest {
 		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		String trashCollectionName = testUtils.mailboxPath(trash);
 		
-		long newUid = mailboxService.moveItem(udr, inboxCollectionName, trashCollectionName, 1);
-		assertThat(mailboxService.fetchEmails(udr, inboxCollectionName, MessageSet.singleton(newUid))).isEmpty();
-		Collection<Email> trashEmails = mailboxService.fetchEmails(udr, trashCollectionName, MessageSet.singleton(newUid));
+		MessageSet newUid = mailboxService.move(udr, inboxCollectionName, trashCollectionName, MessageSet.singleton(1l));
+		assertThat(mailboxService.fetchEmails(udr, inboxCollectionName, newUid)).isEmpty();
+		Collection<Email> trashEmails = mailboxService.fetchEmails(udr, trashCollectionName, newUid);
 		assertThat(trashEmails).hasSize(1);
-		assertThat(Iterables.getFirst(trashEmails, null).getUid()).isEqualTo(newUid);
+		assertThat(Iterables.getFirst(trashEmails, null).getUid()).isEqualTo(Iterables.getOnlyElement(newUid));
 	}
 	
 	@Ignore("Greenmail replied that the command succeed")
@@ -323,7 +323,7 @@ public abstract class MailboxServiceTest {
 		MailboxFolder trashFolder = folder(trash);
 		mailboxService.createFolder(udr, trashFolder);
 		
-		mailboxService.moveItem(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), testUtils.mailboxPath(trash), 1);
+		mailboxService.move(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), testUtils.mailboxPath(trash), MessageSet.singleton(1));
 	}
 	
 	private void consumeInputStream(InputStream inputStream) throws IOException {
