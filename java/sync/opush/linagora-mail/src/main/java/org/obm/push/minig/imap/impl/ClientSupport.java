@@ -305,8 +305,8 @@ public class ClientSupport {
 		return run(new UIDFetchInternalDateCommand(uids));
 	}
 	
-	public Collection<FastFetch> uidFetchFast(Collection<Long> uids) {
-		return run(new UIDFetchFastCommand(uids));
+	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
+		return run(new UIDFetchFastCommand(messages));
 	}
 
 	public Collection<Long> uidCopy(Collection<Long> uids, String destMailbox) {

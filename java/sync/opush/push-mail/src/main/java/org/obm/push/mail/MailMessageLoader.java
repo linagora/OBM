@@ -54,6 +54,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.conversation.MailBody;
 import org.obm.push.mail.conversation.MailMessage;
@@ -69,7 +70,6 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 
 /**
@@ -120,7 +120,7 @@ public class MailMessageLoader {
 	}
 	
 	private void setMsEmailFlags(final MSEmail msEmail, final UserDataRequest udr, final String collectionPath, final long messageId) {
-		final Collection<FastFetch> fl = mailboxService.fetchFast(udr, collectionPath, ImmutableList.<Long> of(messageId));
+		final Collection<FastFetch> fl = mailboxService.fetchFast(udr, collectionPath, MessageSet.singleton(messageId));
 		if (!fl.isEmpty()) {
 			final FastFetch fl0 = fl.iterator().next();
 			msEmail.setRead(fl0.isRead());

@@ -461,7 +461,7 @@ public class LinagoraMailboxService implements MailboxService {
 
 	@Override
 	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, uids);
+		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, MessageSet.builder().addAll(uids).build());
 		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
 					@Override
 					public Email apply(FastFetch input) {
@@ -483,7 +483,7 @@ public class LinagoraMailboxService implements MailboxService {
 			store.select( parseMailBoxName(udr, collectionPath) );
 			SearchQuery query = SearchQuery.builder().after(windows).build();
 			Collection<Long> uids = store.uidSearch(query);
-			Collection<FastFetch> mails = fetchFast(udr, collectionPath, uids);
+			Collection<FastFetch> mails = fetchFast(udr, collectionPath, MessageSet.builder().addAll(uids).build());
 			return EmailFactory.listEmailFromFastFetch(mails);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -508,11 +508,11 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException {
+	public Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			store.select(parseMailBoxName(udr, collectionPath));
-			return store.uidFetchFast(uids);
+			return store.uidFetchFast(messages);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

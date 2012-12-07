@@ -99,7 +99,7 @@ public interface MailboxService {
 	
 	void createFolder(UserDataRequest udr, MailboxFolder folder) throws MailException;
 	
-	Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, Collection<Long> uids) throws MailException;
+	Collection<FastFetch> fetchFast(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
 	MimeMessage fetchBodyStructure(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 	

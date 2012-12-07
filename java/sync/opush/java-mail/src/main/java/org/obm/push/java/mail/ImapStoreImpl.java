@@ -277,9 +277,9 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, Collection<Long> uids) throws ImapCommandException {
+	public Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException {
 		try {
-			return opushImapFolder.fetchFast(uids);
+			return opushImapFolder.fetchFast(messages);
 		} catch (MessagingException e) {
 			String msg = String.format(
 					"IMAP command fetch fast failed. user=%s, folder=%s", userId, opushImapFolder.getFullName());

@@ -73,6 +73,12 @@ public class MessageSet implements Serializable, Iterable<Long> {
 		}
 		return builder.build();
 	}
+
+	private static final MessageSet EMPTY = builder().build();
+	
+	public static MessageSet empty() {
+		return EMPTY;
+	}
 	
 	public static MessageSet singleton(long uid) {
 		return builder().add(uid).build();
@@ -208,4 +214,5 @@ public class MessageSet implements Serializable, Iterable<Long> {
 			.add("ranges", ranges)
 			.toString();
 	}
+
 }

@@ -44,6 +44,7 @@ import javax.mail.MessagingException;
 
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.mime.MimeAddress;
 
@@ -85,7 +86,7 @@ public interface OpushImapFolder {
 	
 	void open(int mode) throws MessagingException;
 
-	Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException;
+	Map<Long, IMAPMessage> fetchFast(MessageSet messages) throws MessagingException;
 
 	Collection<Long> uidSearch(SearchQuery query) throws MessagingException;
 	

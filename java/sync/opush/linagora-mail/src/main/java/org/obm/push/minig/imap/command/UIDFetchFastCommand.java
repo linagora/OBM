@@ -61,9 +61,8 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 	private ImapMessageSet imapMessageSet;
 	DateFormat df;
 
-	public UIDFetchFastCommand(Collection<Long> uid) {
-		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+	public UIDFetchFastCommand(MessageSet messages) {
+		this.imapMessageSet = ImapMessageSet.wrap(messages);
 		//22-Mar-2010 14:26:18 +0100
 		df = new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH);
 	}

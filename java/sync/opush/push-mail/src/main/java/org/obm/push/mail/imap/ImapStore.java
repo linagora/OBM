@@ -91,7 +91,7 @@ public interface ImapStore extends Resource {
 
 	Message fetchEnvelope(OpushImapFolder opushImapFolder, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;
 	
-	Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, Collection<Long> uids) throws ImapCommandException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException, ImapMessageNotFoundException;
 
 	Map<Long, IMAPMessage> fetchBodyStructure(OpushImapFolder opushImapFolder, Collection<Long> uids) 
 			throws ImapCommandException, ImapMessageNotFoundException;

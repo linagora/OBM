@@ -205,8 +205,8 @@ public class StoreClient {
 		return cs.uidFetchInternalDate(uids);
 	}
 	
-	public Collection<FastFetch> uidFetchFast(Collection<Long> uids) {
-		return cs.uidFetchFast(uids);
+	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
+		return cs.uidFetchFast(messages);
 	}
 
 	public Collection<Long> uidCopy(Collection<Long> uids, String destMailbox) {

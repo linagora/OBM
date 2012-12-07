@@ -57,6 +57,7 @@ import org.obm.push.bean.EmailHeaders;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
@@ -238,10 +239,10 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
-	public Map<Long, IMAPMessage> fetchFast(Collection<Long> uids) throws MessagingException {
+	public Map<Long, IMAPMessage> fetchFast(MessageSet messages) throws MessagingException {
 		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
 		FetchProfile fetchFastProfile = getFetchFastProfile();
-		for (long uid: uids) {
+		for (long uid: messages) {
 			try {
 				IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
 				imapMessages.put(uid, imapMessage);
