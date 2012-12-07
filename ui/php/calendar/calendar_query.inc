@@ -5075,13 +5075,15 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   $query = "SELECT
     event_duration,
     event_timezone,
+    event_location,
     eventexception_parent_id,
     eventexception_child_id,
     eventexception_date
     FROM EventException
     INNER JOIN Event ON eventexception_parent_id = event_id
     WHERE eventexception_parent_id IN ($event_list) 
-    $start $end $child_null";
+    $start $end $child_null
+    ORDER BY eventexception_date";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
   $obm_q->xquery($query);
   return $obm_q;

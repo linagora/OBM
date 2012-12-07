@@ -365,7 +365,11 @@ class CalendarMailer extends OBM_Mailer {
     }
     $list_attendees = implode(', ', $list_attendees).$suffix;
 
-    
+    $eventExceptions = array();
+    if($event->repeat_kind != 'none'){
+      $eventExceptions = $this->getEventsException($event);
+    }
+
     return array(
       'host'               => $GLOBALS['cgp_host'],
       $prefix.'id'         => $event->id,
@@ -383,8 +387,44 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'target'     => $target->label,
       $prefix.'targetState'=> __($target->state),
       $prefix.'attendees'  => $list_attendees,
-      $prefix.'targetComment'  => $target->comment
+      $prefix.'targetComment'  => $target->comment,
+      $prefix.'exceptions' => $eventExceptions
     );
+  }
+
+  private function getEventsException($event){
+    $formatted_exception = array();
+    $exceptions = run_query_get_events_exception(array($event->id));
+
+    while ($exceptions->next_record()) {
+      $exception_date = new Of_Date($exceptions->f('eventexception_date'));
+      $parent_location = $exceptions->f('event_location');
+      $child_id = $exceptions->f('eventexception_child_id');
+
+      if ( $child_id ){
+
+        $child_event = run_query_calendar_detail($child_id);
+        $child_location = $child_event->f('event_location');
+
+        $begin = new Of_Date($child_event->f('event_date'), 'GMT');
+        $end = clone($begin);
+        $end = $end->addSecond($child_event->f('event_duration'));
+        $formatted_date = $begin->getOutputDate().' '.$begin->getOutputTime().' - '.$end->getOutputTime();
+
+        if ( $begin->getOutputDate() != $end->getOutputDate() ) {
+          $formatted_date = $begin->getOutputDateTime().' - '.$end->getOutputDateTime();
+        }
+
+        $formatted_exception['changed'][$child_id] = array("id" => $child_id, "date" => $formatted_date, "location" => "");
+        if ( $child_location != $parent_location ) {
+          $formatted_exception['changed'][$child_id]['location'] = $child_location;
+        }
+      } else {
+        $formatted_exception['removed'][] = $exception_date->getOutputDate();
+      }
+
+    }
+    return $formatted_exception;
   }
   
   private function getReadableRecurrence($event) {

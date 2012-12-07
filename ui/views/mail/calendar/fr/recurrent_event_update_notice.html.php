@@ -31,13 +31,13 @@ applicable to the OBM software.
 
 
 ?>
-<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
+<table style="width:80%; border:1px solid #555; border-collapse:collapse; background:#FAFAFA; font-size:13px; margin:0 auto;">
     <tr>
-        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
+        <th style="text-align:center; background-color: #368599; color:#FFF; font-size:15px;height:25px;" colspan="2">
           Invitation à un évènement récurrent : mise à jour
         </th>
     </tr>
-    <tr>
+    <tr style="height:25px;">
         <td colspan="2">
 Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?> (lieu : <?php echo $old_location; ?>),
 a été modifié : </td>
@@ -70,8 +70,44 @@ a été modifié : </td>
         <td style="text-align:right;padding-right:1em;">Participant(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;"></td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
+    </tr>
+    <?php
+    if ( $exceptions['changed'] != null){
+    ?>
+    <tr>
+        <td style="text-align:right;padding-right:1em;vertical-align:top;font-weight:bold;color:#003300;">Occurrences Modifiées</td><td style="font-weight:bold;">
+    <?php
+        foreach ($exceptions['changed'] as $exception ) {
+            $url = ' <a href="'.$host.'calendar/calendar_index.php?action=detailconsult&calendar_id='.$exception['id'].'">Détails</a><br/>';
+            if( $exception['location'] != ''){
+                echo $exception['date'].' (Nouveau lieu: '.$exception['location'].')'.$url;
+            } else {
+                echo $exception['date'].$url;
+            }
+        }
+    ?>
+        </td>
+    </tr>
+    <?php
+    }
+    if ($exceptions['removed'] != null){
+    ?>
+    <tr>
+        <td style="text-align:right;padding-right:1em;vertical-align:top;font-weight:bold;color:#550000;">Occurrences Annulées</td><td style="font-weight:bold;">
+    <?php
+        foreach ($exceptions['removed'] as $key => $date) {
+            echo $date.'</br>';
+        }
+    ?>
+        </td>
+    </tr>
+    <?php
+    }
+    ?>
+    <tr>
         <td colspan="2">
-          <strong>NB : </strong>Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.
+          <strong>NB : </strong>Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous. 
         </td>
     </tr>
     <tr>

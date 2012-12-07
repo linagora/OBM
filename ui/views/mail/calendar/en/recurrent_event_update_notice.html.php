@@ -31,9 +31,9 @@ applicable to the OBM software.
 
 
 ?>
-<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
+<table style="width:80%; border:1px solid #555; border-collapse:collapse; background:#FAFAFA; font-size:13px; margin:0 auto;">
     <tr>
-        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
+        <th style="text-align:center; background-color: #368599; color:#FFF; font-size:15px;height:25px;" colspan="2">
           Recurrent appointment updated
         </th>
     </tr>
@@ -69,6 +69,39 @@ was updated : </td>
     <tr>
         <td style="text-align:right;padding-right:1em;">Participants</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
     </tr>
+    <?php
+    if ( $exceptions['changed'] != null){
+    ?>
+    <tr>
+        <td style="text-align:right;padding-right:1em;vertical-align:top;font-weight:bold;color:#005500;">Changed Occurrences</td><td style="font-weight:bold;">
+    <?php
+        foreach ($exceptions['changed'] as $exception ) {
+            $url = ' <a href="'.$host.'calendar/calendar_index.php?action=detailconsult&calendar_id='.$exception['id'].'">Détails</a><br/>';
+            if( $exception['location'] != ''){
+                echo $exception['date'].' (New location: '.$exception['location'].')'.$url;
+            } else {
+                echo $exception['date'].$url;
+            }
+        }
+    ?>
+        </td>
+    </tr>
+    <?php
+    }
+    if ($exceptions['removed'] != null){
+    ?>
+    <tr>
+        <td style="text-align:right;padding-right:1em;vertical-align:top;font-weight:bold;color:#550000;">Cancelled Occurrences</td><td style="font-weight:bold;">
+    <?php
+        foreach ($exceptions['removed'] as $key => $date) {
+            echo $date.'</br>';
+        }
+    ?>
+        </td>
+    </tr>
+    <?php
+    }
+    ?>
     <tr>
         <td colspan="2">
           <strong>NB : </strong>If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
