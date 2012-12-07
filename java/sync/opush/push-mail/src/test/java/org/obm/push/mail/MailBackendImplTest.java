@@ -734,6 +734,23 @@ public class MailBackendImplTest {
 		control.verify();
 		assertThat(searchEmailsFromDate).isEqualTo(date);
 	}
+
+	@Test
+	public void testFetchEmailCallsServiceWithExpectedParameters() {
+		List<Long> emailsToFetchUids = ImmutableList.of(15l);
+		
+		org.obm.push.bean.MSEmail msEmail = control.createMock(org.obm.push.bean.MSEmail.class);
+		MailMessageLoader mailLoader = control.createMock(MailMessageLoader.class);
+		expect(mailLoader.fetch(collectionPath, collectionId, 15l, udr))
+			.andReturn(msEmail);
+		
+		control.replay();
+		List<org.obm.push.bean.MSEmail> fetchMails = 
+				testee.fetchMails(mailLoader, udr, collectionId, collectionPath, emailsToFetchUids);
+		control.verify();
+		
+		assertThat(fetchMails).containsOnly(msEmail);
+	}
 	
 	private void expectBuildItemChangesByFetchingMSEmailsData(List<BodyPreference> bodyPreferences,
 			EmailChanges emailChanges, MSEmailChanges itemChanges)

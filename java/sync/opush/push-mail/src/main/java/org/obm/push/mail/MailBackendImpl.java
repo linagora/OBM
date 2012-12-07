@@ -645,21 +645,27 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} 
 	}
-
+	
 	private List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
 			String collectionPath, Collection<Long> uids) throws MailException {
 		
-		final List<MSEmail> mails = new LinkedList<MSEmail>();
-		String collectionName = mailboxService.parseMailBoxName(udr, collectionPath);
+		MailMessageLoader mailLoader = new MailMessageLoader(mailboxService, eventService);
+		return fetchMails(mailLoader, udr, collectionId, collectionPath, uids);
+	}
 
-		final MailMessageLoader mailLoader = new MailMessageLoader(mailboxService, eventService);
-		for (final Long uid: uids) {
-			final MSEmail email = mailLoader.fetch(collectionName, collectionId, uid, udr);
-			if (email != null) {
-				mails.add(email);
+	@VisibleForTesting List<MSEmail> fetchMails(MailMessageLoader mailMessageLoader,
+			UserDataRequest udr, Integer collectionId, 
+			String collectionPath, Collection<Long> uids) throws MailException {
+		
+		List<MSEmail> fetchedEmails = new LinkedList<MSEmail>();
+		
+		for (Long uid: uids) {
+			MSEmail fetchedEmail = mailMessageLoader.fetch(collectionPath, collectionId, uid, udr);
+			if (fetchedEmail != null) {
+				fetchedEmails.add(fetchedEmail);
 			}
 		}
-		return mails;
+		return fetchedEmails;
 	}
 	
 	private void loadAttachments(Map<String, MSAttachementData> attachments, 
