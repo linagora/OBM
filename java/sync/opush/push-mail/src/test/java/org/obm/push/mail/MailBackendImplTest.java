@@ -43,8 +43,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.easymock.IMocksControl;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,10 +63,9 @@ import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
-import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.push.service.DateService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 
@@ -87,10 +84,10 @@ public class MailBackendImplTest {
 	private MailboxService mailboxService;
 	private MappingService mappingService;
 	private SnapshotService snapshotService;
-	private EmailChangesComputer emailChangesComputer;
 	private EmailChangesFetcher serverEmailChangesBuilder;
+	private MailBackendSyncDataFactory mailBackendSyncDataFactory;
+
 	private MailBackendImpl testee;
-	private DateService dateService;
 
 	@Before
 	public void setup() throws Exception {
@@ -103,13 +100,12 @@ public class MailBackendImplTest {
 		mailboxService = control.createMock(MailboxService.class);
 		snapshotService = control.createMock(SnapshotService.class);
 		mappingService = control.createMock(MappingService.class);
-		emailChangesComputer = control.createMock(EmailChangesComputer.class);
 		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
-		dateService = control.createMock(DateService.class);
+		mailBackendSyncDataFactory = control.createMock(MailBackendSyncDataFactory.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, snapshotService,
-				emailChangesComputer, serverEmailChangesBuilder, mappingService, null, dateService, null, null);
+				serverEmailChangesBuilder, mappingService, null, null, null, mailBackendSyncDataFactory);
 	}
 	
 	@Test
@@ -144,25 +140,25 @@ public class MailBackendImplTest {
 			.build();
 		
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasNoEntry(syncKey);
-		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		expectSnapshotDaoRecordOneSnapshot(newSyncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
-		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
+		
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build();
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer,
+				actualEmailsInServer, emailChanges, fromDate, syncState);
+
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
-				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions, newSyncKey);
+		DataDelta actual = testee.getChanged(udr, syncState, collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 		
 		assertThat(actual.getDeletions()).isEmpty();
 		assertThat(actual.getChanges()).containsOnly(itemChange1, itemChange2);
 	}
-	
+
 	@Test
 	public void testInitialWhenNoChange() throws Exception {
 		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
@@ -177,72 +173,24 @@ public class MailBackendImplTest {
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
 		MSEmailChanges itemChanges = MSEmailChanges.builder().build();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasNoEntry(syncKey);
-		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
 		expectSnapshotDaoRecordOneSnapshot(newSyncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
-		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, ItemSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
-				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions, newSyncKey);
+		DataDelta actual = testee.getChanged(udr, syncState, collectionId, syncCollectionOptions, newSyncKey);
 		control.verify();
 
 		assertThat(actual.getDeletions()).isEmpty();
 		assertThat(actual.getChanges()).isEmpty();
 	}
 	
-	@Test(expected=FilterTypeChangedException.class)
-	public void testSyncByDateWhenFilterTypeChanged() throws Exception {
-		SyncKey syncKey = new SyncKey("1234");
-		long uidNext = 45612;
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
-		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
-
-		Email email = Email.builder()
-				.uid(5)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build();
-		Set<Email> previousEmailsInServer = ImmutableSet.of(email);
-		Set<Email> actualEmailsInServer = ImmutableSet.of(email);
-		
-		Snapshot snapshot = Snapshot.builder()
-				.emails(previousEmailsInServer)
-				.collectionId(collectionId)
-				.deviceId(device.getDevId())
-				.filterType(FilterType.THREE_DAYS_BACK)
-				.uidNext(5000)
-				.syncKey(syncKey)
-				.build();
-
-		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasEntry(syncKey, snapshot);
-		expectSnapshotDaoDelete(collectionId);
-		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
-		
-		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
-				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions, new SyncKey("5678"));
-	}
-	
-	private void expectSnapshotDaoDelete(int collectionId) {
-		snapshotService.deleteSnapshotAndSyncKeys(device.getDevId(), collectionId);
-		expectLastCall();
-	}
-
 	@Test
 	public void testNotInitial() throws Exception {
 		SyncKey syncKey = new SyncKey("1234");
@@ -283,25 +231,20 @@ public class MailBackendImplTest {
 		
 		long previousUIDNext = 8;
 		long currentUIDNext = 10;
-		expect(mailboxService.fetchUIDNext(udr, collectionPath))
-			.andReturn(currentUIDNext).once();
-		ImmutableList<Email> fetchedEmails = ImmutableList.of(modifiedEmail, newEmail);
-		expect(mailboxService.fetchEmails(udr, collectionPath, 
-				ImmutableList.<Long> of(snapedEmailUID, deletedEmailUID, previousUIDNext, newEmailUID, currentUIDNext)))
-			.andReturn(fetchedEmails).once();
-		
-		ImmutableList<Email> previousEmailsInServer = ImmutableList.of(snapedEmail, deletedEmail);
+
+		Set<Email> fetchedEmails = ImmutableSet.of(modifiedEmail, newEmail);
+		Set<Email> previousEmailsInServer = ImmutableSet.of(snapedEmail, deletedEmail);
 		
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasEntry(syncKey, Snapshot.builder()
-				.emails(previousEmailsInServer)
-				.collectionId(collectionId)
-				.deviceId(device.getDevId())
-				.filterType(syncCollectionOptions.getFilterType())
-				.uidNext(previousUIDNext)
-				.syncKey(syncKey)
-				.build());
+
+		Snapshot existingSnapshot = Snapshot.builder()
+			.emails(previousEmailsInServer)
+			.collectionId(collectionId)
+			.deviceId(device.getDevId())
+			.filterType(syncCollectionOptions.getFilterType())
+			.uidNext(previousUIDNext)
+			.syncKey(syncKey)
+			.build();
 		expectSnapshotDaoRecordOneSnapshot(newSyncKey, currentUIDNext, syncCollectionOptions, fetchedEmails);
 		
 		EmailChanges emailChanges = EmailChanges.builder()
@@ -309,17 +252,17 @@ public class MailBackendImplTest {
 				.additions(ImmutableSet.<Email> of(newEmail))
 				.deletions(ImmutableSet.<Email> of(deletedEmail))
 				.build();
-		expect(emailChangesComputer.computeChanges(previousEmailsInServer, fetchedEmails))
-			.andReturn(emailChanges).once();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build();
+
+		expectMailBackendSyncData(currentUIDNext, syncCollectionOptions, existingSnapshot, previousEmailsInServer, fetchedEmails, emailChanges, fromDate, syncState);
 
 		expectServerItemChanges(bodyPreferences, emailChanges, modifiedEmail, newEmail, deletedEmail);
 		
 		control.replay();
-		testee.getChanged(udr, ItemSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
-				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions, newSyncKey);
+		testee.getChanged(udr, syncState, collectionId, syncCollectionOptions, newSyncKey);
 		
 		control.verify();
 	}
@@ -356,212 +299,6 @@ public class MailBackendImplTest {
 	}
 	
 	@Test
-	public void testGetManagedEmailsIsEmptyForNull() {
-		control.replay();
-		assertThat(testee.getManagedEmails(null)).isEmpty();
-		control.verify();
-	}
-	
-	@Test
-	public void testGetManagedEmailsAreTookFromSnapshot() {
-		Snapshot snapshot = Snapshot.builder()
-			.addEmail(Email.builder()
-				.uid(5)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build())
-			.addEmail(Email.builder()
-				.uid(15)
-				.date(date("2014-12-14T22:00:00"))
-				.read(true)
-				.answered(true)
-				.build())
-			.collectionId(collectionId)
-			.deviceId(device.getDevId())
-			.filterType(FilterType.ALL_ITEMS)
-			.uidNext(5000)
-			.syncKey(new SyncKey("156"))
-			.build();
-
-		control.replay();
-		assertThat(testee.getManagedEmails(snapshot)).containsOnly(
-			Email.builder()
-				.uid(5)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build(),
-			Email.builder()
-				.uid(15)
-				.date(date("2014-12-14T22:00:00"))
-				.read(true)
-				.answered(true)
-				.build());
-		control.verify();
-	}
-	
-	@Test
-	public void testMustSyncByDateIsTrueWhenNoSnapshot() {
-		control.replay();
-		assertThat(testee.mustSyncByDate(null)).isTrue();
-		control.verify();
-	}
-	
-	@Test
-	public void testMustSyncByDateIsFalseWhenPreviousSnapshot() {
-		Snapshot snapshot = Snapshot.builder()
-				.addEmail(Email.builder()
-					.uid(5)
-					.date(date("2004-12-14T22:00:00"))
-					.read(false)
-					.answered(false)
-					.build())
-				.collectionId(collectionId)
-				.deviceId(device.getDevId())
-				.filterType(FilterType.ALL_ITEMS)
-				.uidNext(5000)
-				.syncKey(new SyncKey("156"))
-				.build();
-
-		control.replay();
-		assertThat(testee.mustSyncByDate(snapshot)).isFalse();
-		control.verify();
-	}
-	
-	@Test
-	public void testSearchEmailsToManagerIsByDateForNullWithoutEmails() throws FilterTypeChangedException {
-		SyncCollectionOptions options = new SyncCollectionOptions();
-		options.setFilterType(FilterType.ALL_ITEMS);
-		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		Date fromDate = options.getFilterType().getFilteredDateTodayAtMidnight();
-		
-		Set<Email> emailsExpected = ImmutableSet.of();
-		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
-			.andReturn(emailsExpected);
-
-		control.replay();
-		Collection<Email> result = testee.searchEmailsToManage(udr, collectionId, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
-		control.verify();
-		
-		assertThat(result).isEmpty();
-	}
-	
-	@Test
-	public void testSearchEmailsToManagerIsByDateForNullWithEmails() throws FilterTypeChangedException {
-		SyncCollectionOptions options = new SyncCollectionOptions();
-		options.setFilterType(FilterType.ALL_ITEMS);
-		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		Date fromDate = options.getFilterType().getFilteredDateTodayAtMidnight();
-		
-		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
-			.andReturn(ImmutableSet.of(
-					Email.builder()
-					.uid(5)
-					.date(date("2004-12-14T22:00:00"))
-					.read(false)
-					.answered(false)
-					.build()));
-
-		control.replay();
-		Collection<Email> result = testee.searchEmailsToManage(udr, collectionId, collectionPath, null, options, date("2004-10-14T22:00:00"), 0);
-		control.verify();
-		
-		assertThat(result).containsOnly(
-			Email.builder()
-				.uid(5)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build());
-	}
-	
-	@Test(expected=FilterTypeChangedException.class)
-	public void testSearchEmailsToManagerThrowExecptionWhenDifferentFolderType() throws FilterTypeChangedException {
-		SyncCollectionOptions options = new SyncCollectionOptions();
-		options.setFilterType(FilterType.ALL_ITEMS);
-		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-
-		SyncKey syncKey = new SyncKey("156");
-		Snapshot snapshot = Snapshot.builder()
-				.addEmail(Email.builder()
-					.uid(5)
-					.date(date("2004-12-14T22:00:00"))
-					.read(false)
-					.answered(false)
-					.build())
-				.collectionId(collectionId)
-				.deviceId(device.getDevId())
-				.filterType(FilterType.ONE_MONTHS_BACK)
-				.uidNext(5000)
-				.syncKey(syncKey)
-				.build();
-
-		expectSnapshotDaoDelete(collectionId);
-		control.replay();
-		testee.searchEmailsToManage(udr, collectionId, collectionPath, snapshot, options, date("2004-10-14T22:00:00"), 0);
-	}
-	
-	@Test
-	public void testSearchEmailsToManagerIsByUIDsWhenPreviousSnapshot() throws FilterTypeChangedException {
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
-		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
-
-		long snapedEmailUID = 5;
-		long deletedEmailUID = 6;
-		Email snapedEmail = Email.builder()
-				.uid(snapedEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build();
-		Email modifiedEmail = Email.builder()
-				.uid(snapedEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(true)
-				.answered(false)
-				.build();
-		Email deletedEmail = Email.builder()
-				.uid(deletedEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(true)
-				.answered(false)
-				.build();
-		
-		long newEmailUID = 9;
-		Email newEmail = Email.builder()
-				.uid(newEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build();
-		
-		long previousUIDNext = 8;
-		long currentUIDNext = 10;
-		ImmutableList<Email> expectedEmails = ImmutableList.of(modifiedEmail, newEmail);
-		expect(mailboxService.fetchEmails(udr, collectionPath, 
-				ImmutableList.<Long> of(snapedEmailUID, deletedEmailUID, previousUIDNext, newEmailUID, currentUIDNext)))
-			.andReturn(expectedEmails).once();
-
-		Snapshot snapshot = Snapshot.builder()
-				.addEmail(snapedEmail)
-				.addEmail(deletedEmail)
-				.collectionId(collectionId)
-				.deviceId(device.getDevId())
-				.filterType(FilterType.ALL_ITEMS)
-				.uidNext(previousUIDNext)
-				.syncKey(new SyncKey("156"))
-				.build();
-		
-		control.replay();
-		Collection<Email> searchEmailsToManage = testee.searchEmailsToManage(udr, collectionId, collectionPath, snapshot, syncCollectionOptions, date("2004-10-14T22:00:00"), currentUIDNext);
-		
-		control.verify();
-		assertThat(searchEmailsToManage).isEqualTo(expectedEmails);
-	}
-	
-	@Test
 	public void testGetItemEstimateInitialWhenNoChange() throws Exception {
 		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		long uidNext = 45612;
@@ -574,17 +311,14 @@ public class MailBackendImplTest {
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasNoEntry(syncKey);
-		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
-		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
-		
-		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+		ItemSyncState syncState = ItemSyncState.builder()
 				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions);
+				.build();
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(0);
@@ -606,17 +340,14 @@ public class MailBackendImplTest {
 		EmailChanges emailChanges = EmailChanges.builder().additions(actualEmailsInServer).build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasNoEntry(syncKey);
-		expectActualEmailServerStateByDate(actualEmailsInServer, fromDate, uidNext);
-		expectEmailsDiff(previousEmailsInServer, actualEmailsInServer, emailChanges);
-		
-		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+		ItemSyncState syncState = ItemSyncState.builder()
 				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions);
+				.build();
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(2);
@@ -642,15 +373,14 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 		
-		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
-		
 		EmailChanges emailChanges = EmailChanges.builder().build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasEntry(syncKey, snapshot);
-		expectActualEmailServerStateByUid(emailsInServer, uids, uidNext);
-		expectEmailsDiff(ImmutableList.copyOf(emailsInServer), emailsInServer, emailChanges);
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(syncKey)
+				.build();
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, snapshot, emailsInServer, emailsInServer, emailChanges, fromDate, syncState);
 		
 		control.replay();
 		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
@@ -687,8 +417,6 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 		
-		ImmutableList<Long> uids = ImmutableList.<Long> of(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
-		
 		EmailChanges emailChanges = EmailChanges.builder()
 				.additions(ImmutableSet.<Email>of(newEmail))
 				.changes(ImmutableSet.<Email>of(modifiedEmail2))
@@ -696,43 +424,17 @@ public class MailBackendImplTest {
 				.build();
 
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-		expect(dateService.getCurrentDate()).andReturn(fromDate);
-		expectSnapshotDaoHasEntry(syncKey, snapshot);
-		expectActualEmailServerStateByUid(actualEmailsInServer, uids, uidNext);
-		expectEmailsDiff(ImmutableList.copyOf(previousEmailsInServer), actualEmailsInServer, emailChanges);
-		
-		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, ItemSyncState.builder()
+		ItemSyncState syncState = ItemSyncState.builder()
 				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(syncKey)
-				.build(), 
-				collectionId, syncCollectionOptions);
+				.build();
+		expectMailBackendSyncData(uidNext, syncCollectionOptions, snapshot, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
+		
+		control.replay();
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(3);
-	}
-
-	@Test
-	public void testSearchEmailsFromDateNoFilterType() {
-		DateTime dateTime = new DateTime(DateUtils.getCurrentDate()).withZone(DateTimeZone.UTC);
-		Date expectedDate = dateTime.minusDays(3).toDate();
-
-		control.replay();
-		Date searchEmailsFromDate = testee.searchEmailsFromDate(FilterType.THREE_DAYS_BACK, dateTime.toDate());
-		
-		control.verify();
-		assertThat(searchEmailsFromDate).isEqualTo(expectedDate);
-	}
-
-	@Test
-	public void testSearchEmailsFromDateWithFilterType() {
-		Date date = DateUtils.getEpochPlusOneSecondCalendar().getTime();
-		
-		control.replay();
-		Date searchEmailsFromDate = testee.searchEmailsFromDate(null, null);
-		
-		control.verify();
-		assertThat(searchEmailsFromDate).isEqualTo(date);
 	}
 
 	@Test
@@ -760,10 +462,17 @@ public class MailBackendImplTest {
 			.andReturn(itemChanges);
 	}
 
-	private void expectEmailsDiff(Collection<Email> previousEmailsInServer, Collection<Email> actualEmailsInServer, EmailChanges diff) {
-		expect(emailChangesComputer.computeChanges(previousEmailsInServer, actualEmailsInServer)).andReturn(diff);
+	private void expectMailBackendSyncData(long uidNext,
+			SyncCollectionOptions syncCollectionOptions,
+			Snapshot snapshot,
+			Set<Email> previousEmailsInServer, Set<Email> actualEmailsInServer,
+			EmailChanges emailChanges, Date fromDate, ItemSyncState syncState)
+			throws Exception {
+		MailBackendSyncData syncData = new MailBackendSyncData(fromDate, collectionPath, uidNext, snapshot, previousEmailsInServer, actualEmailsInServer, emailChanges);
+		expect(mailBackendSyncDataFactory.create(udr, syncState, collectionId, syncCollectionOptions))
+			.andReturn(syncData).once();
 	}
-
+	
 	private void expectSnapshotDaoRecordOneSnapshot(SyncKey syncKey, long uidNext,
 			SyncCollectionOptions syncCollectionOptions, Collection<Email> actualEmailsInServer) {
 		
@@ -777,25 +486,4 @@ public class MailBackendImplTest {
 				.build());
 		expectLastCall();
 	}
-
-	private void expectActualEmailServerStateByDate(Set<Email> emailsInServer, Date fromDate, long uidNext) {
-		expect(mailboxService.fetchEmails(udr, collectionPath, fromDate))
-			.andReturn(emailsInServer);
-		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
-	}
-
-	private void expectActualEmailServerStateByUid(Set<Email> emailsInServer, Collection<Long> uids, long uidNext) {
-		expect(mailboxService.fetchEmails(udr, collectionPath, uids))
-			.andReturn(emailsInServer).once();
-		expect(mailboxService.fetchUIDNext(udr, collectionPath)).andReturn(uidNext);
-	}
-
-	private void expectSnapshotDaoHasNoEntry(SyncKey syncKey) {
-		expect(snapshotService.getSnapshot(device.getDevId(), syncKey, collectionId)).andReturn(null);
-	}
-
-	private void expectSnapshotDaoHasEntry(SyncKey syncKey, Snapshot snapshot) {
-		expect(snapshotService.getSnapshot(device.getDevId(), syncKey, collectionId)).andReturn(snapshot);
-	}
-	
 }

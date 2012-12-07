@@ -36,7 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -58,7 +57,6 @@ import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -90,14 +88,11 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
-import org.obm.push.minig.imap.impl.MessageSetUtils;
-import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.tnefconverter.TNEFConverterException;
@@ -120,7 +115,6 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -152,11 +146,10 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final ICalendar calendarClient;
 	private final LoginService login;
 	private final EventService eventService;
-	private final DateService dateService;
 	private final MSEmailFetcher msEmailFetcher;
 	private final SnapshotService snapshotService;
-	private final EmailChangesComputer emailChangesComputer;
 	private final EmailChangesFetcher emailChangesFetcher;
+	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
 
 
 	@Inject
@@ -164,13 +157,12 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotService snapshotService,
-			EmailChangesComputer emailChangesComputer,
 			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
 			EventService eventService,
-			DateService dateService,
 			MSEmailFetcher msEmailFetcher,
-			Provider<CollectionPath.Builder> collectionPathBuilderProvider)  {
+			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
+			MailBackendSyncDataFactory mailBackendSyncDataFactory)  {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
@@ -179,11 +171,10 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.calendarClient = calendarClient;
 		this.login = login;
 		this.snapshotService = snapshotService;
-		this.emailChangesComputer = emailChangesComputer;
 		this.emailChangesFetcher = emailChangesFetcher;
 		this.eventService = eventService;
-		this.dateService = dateService;
 		this.msEmailFetcher = msEmailFetcher;
+		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
 	}
 
 	@Override
@@ -290,16 +281,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			SyncCollectionOptions options) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException, FilterTypeChangedException {
 		
-		Date dataDeltaDate = dateService.getCurrentDate();
-		String collectionPath = mappingService.getCollectionPathFor(collectionId);
-		long currentUIDNext = mailboxService.fetchUIDNext(udr, collectionPath);
-		
-		Snapshot previousStateSnapshot = snapshotService.getSnapshot(udr.getDevId(), state.getSyncKey(), collectionId);
-		Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
-		Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionId, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
-		
-		EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
-		return computeEmailChangesNumber(emailChanges);
+		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state, collectionId, options);
+		return computeEmailChangesNumber(syncData.getEmailChanges());
 	}
 
 	private int computeEmailChangesNumber(EmailChanges emailChanges) {
@@ -315,23 +298,16 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
 		try {
-			Date dataDeltaDate = dateService.getCurrentDate();
-			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			long currentUIDNext = mailboxService.fetchUIDNext(udr, collectionPath);
-			
-			Snapshot previousStateSnapshot = snapshotService.getSnapshot(udr.getDevId(), state.getSyncKey(), collectionId);
-			Collection<Email> managedEmails = getManagedEmails(previousStateSnapshot);
-			Collection<Email> newManagedEmails = searchEmailsToManage(udr, collectionId, collectionPath, previousStateSnapshot, options, dataDeltaDate, currentUIDNext);
-			takeSnapshot(udr, collectionId, options, newManagedEmails, currentUIDNext, newSyncKey);
-			
-			EmailChanges emailChanges = emailChangesComputer.computeChanges(managedEmails, newManagedEmails);
+			MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state, collectionId, options);
+			takeSnapshot(udr, collectionId, options, syncData, newSyncKey);
+
 			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
-					collectionPath, options.getBodyPreferences(), emailChanges);
+					syncData.getCollectionPath(), options.getBodyPreferences(), syncData.getEmailChanges());
 			
 			return DataDelta.builder()
 					.changes(serverItemChanges.getItemChanges())
 					.deletions(serverItemChanges.getItemDeletions())
-					.syncDate(dataDeltaDate)
+					.syncDate(syncData.getDataDeltaDate())
 					.build();
 			
 		} catch (EmailViewPartsFetcherException e) {
@@ -340,74 +316,18 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions, Collection<Email> managedEmails, long currentUIDNext, SyncKey newSyncKey) {
+			SyncCollectionOptions syncCollectionOptions, MailBackendSyncData syncData, SyncKey newSyncKey) {
 		
 		snapshotService.storeSnapshot(Snapshot.builder()
-				.emails(managedEmails)
+				.emails(syncData.getNewManagedEmails())
 				.collectionId(collectionId)
 				.deviceId(udr.getDevId())
 				.filterType(syncCollectionOptions.getFilterType())
 				.syncKey(newSyncKey)
-				.uidNext(currentUIDNext)
+				.uidNext(syncData.getCurrentUIDNext())
 				.build());
 	}
 
-	@VisibleForTesting Collection<Email> getManagedEmails(Snapshot previousStateSnapshot) {
-		if (previousStateSnapshot != null) {
-			return previousStateSnapshot.getEmails();
-		}
-		return ImmutableSet.of(); 
-	}
-
-	@VisibleForTesting Collection<Email> searchEmailsToManage(UserDataRequest udr, Integer collectionId, String collectionPath,
-			Snapshot previousStateSnapshot, SyncCollectionOptions actualOptions,
-			Date dataDeltaDate, long currentUIDNext) throws FilterTypeChangedException {
-		
-		assertSnapshotHasSameOptionsThanRequest(previousStateSnapshot, actualOptions, collectionId, udr);
-		if (mustSyncByDate(previousStateSnapshot)) {
-			Date searchEmailsFromDate = searchEmailsFromDate(actualOptions.getFilterType(), dataDeltaDate);
-			return mailboxService.fetchEmails(udr, collectionPath, searchEmailsFromDate);
-		}
-		return searchSnapshotAndActualChanges(udr, collectionPath, previousStateSnapshot, currentUIDNext);
-	}
-
-	@VisibleForTesting Date searchEmailsFromDate(FilterType filterType, Date dataDeltaDate) {
-		return Objects.firstNonNull(filterType, FilterType.ALL_ITEMS).getFilteredDate(dataDeltaDate);	
-	}
-
-	private void assertSnapshotHasSameOptionsThanRequest(Snapshot snapshot, SyncCollectionOptions options, Integer collectionId, UserDataRequest udr)
-			throws FilterTypeChangedException {
-		
-		if (!snapshotIsAbsent(snapshot) && filterTypeHasChanged(snapshot, options)) {
-			manageFilterTypeChanged(udr, collectionId, snapshot.getFilterType(), options.getFilterType());
-		}
-	}
-
-	private void manageFilterTypeChanged(UserDataRequest udr, Integer collectionId, FilterType previousFilterType, FilterType currentFilterType) throws FilterTypeChangedException {
-		snapshotService.deleteSnapshotAndSyncKeys(udr.getDevId(), collectionId);
-		throw new FilterTypeChangedException(previousFilterType, currentFilterType);
-	}
-
-	@VisibleForTesting boolean mustSyncByDate(Snapshot previousStateSnapshot) {
-		return snapshotIsAbsent(previousStateSnapshot);
-	}
-
-	private boolean snapshotIsAbsent(Snapshot previousStateSnapshot) {
-		return previousStateSnapshot == null;
-	}
-
-	private boolean filterTypeHasChanged(Snapshot snapshot, SyncCollectionOptions options) {
-		return snapshot.getFilterType() != options.getFilterType();
-	}
-
-	private Collection<Email> searchSnapshotAndActualChanges(UserDataRequest udr, 
-			String collectionPath, Snapshot previousStateSnapshot, long currentUIDNext) {
-		
-		MessageSet messageSet = MessageSetUtils.computeEmailsUID(previousStateSnapshot, currentUIDNext);
-		Iterable<Long> emailsUIDToFetch = messageSet.asDiscreteValues();
-		return mailboxService.fetchEmails(udr, collectionPath, ImmutableList.copyOf(emailsUIDToFetch));
-	}
-	
 	private Map<Integer, Collection<Long>> getEmailUidByCollectionId(List<String> fetchIds) {
 		Map<Integer, Collection<Long>> ret = Maps.newHashMap();
 		for (String serverId : fetchIds) {
