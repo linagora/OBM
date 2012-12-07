@@ -53,6 +53,7 @@ import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.ListResult;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
@@ -312,8 +313,8 @@ public class ClientSupport {
 		return run(new UIDCopyCommand(uids, destMailbox));
 	}
 
-	public boolean uidStore(Collection<Long> uids, FlagsList fl, boolean set) {
-		return run(new UIDStoreCommand(uids, fl, set));
+	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
+		return run(new UIDStoreCommand(messages, fl, set));
 	}
 
 	public InputStream uidFetchPart(long uid, String address) {

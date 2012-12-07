@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.command.UIDStoreCommand;
 
 import com.google.common.collect.ImmutableList;
@@ -48,7 +49,7 @@ public class UIDStoreCommandTest {
 	public void testBuildCommandAddFlag() {
 		boolean setFlags = true;
 		FlagsList flags = new FlagsList(ImmutableList.of(Flag.ANSWERED));
-		UIDStoreCommand command = new UIDStoreCommand(ImmutableList.of(354546l), flags, setFlags);
+		UIDStoreCommand command = new UIDStoreCommand(MessageSet.singleton(354546l), flags, setFlags);
 
 		Assertions.assertThat(command.buildCommand().getCommandString()).isEqualTo(
 				"UID STORE 354546 +FLAGS.SILENT (\\Answered)");
@@ -58,7 +59,7 @@ public class UIDStoreCommandTest {
 	public void testBuildCommandRemoveFlag() {
 		boolean setFlags = false;
 		FlagsList flags = new FlagsList(ImmutableList.of(Flag.ANSWERED));
-		UIDStoreCommand command = new UIDStoreCommand(ImmutableList.of(354546l), flags, setFlags);
+		UIDStoreCommand command = new UIDStoreCommand(MessageSet.singleton(354546l), flags, setFlags);
 
 		Assertions.assertThat(command.buildCommand().getCommandString()).isEqualTo(
 				"UID STORE 354546 -FLAGS.SILENT (\\Answered)");
@@ -68,7 +69,7 @@ public class UIDStoreCommandTest {
 	public void testBuildCommandManyID() {
 		boolean setFlags = true;
 		FlagsList flags = new FlagsList(ImmutableList.of(Flag.ANSWERED));
-		UIDStoreCommand command = new UIDStoreCommand(ImmutableList.of(1l, 3l , 354546l), flags, setFlags);
+		UIDStoreCommand command = new UIDStoreCommand(MessageSet.builder().add(1l).add(3l).add(354546l).build(), flags, setFlags);
 
 		Assertions.assertThat(command.buildCommand().getCommandString()).isEqualTo(
 				"UID STORE 1,3,354546 +FLAGS.SILENT (\\Answered)");
@@ -79,7 +80,7 @@ public class UIDStoreCommandTest {
 		boolean setFlags = true;
 		FlagsList flags = new FlagsList(ImmutableList.of(
 				Flag.ANSWERED, Flag.SEEN, Flag.FLAGGED, Flag.DELETED));
-		UIDStoreCommand command = new UIDStoreCommand(ImmutableList.of(354546l), flags, setFlags);
+		UIDStoreCommand command = new UIDStoreCommand(MessageSet.singleton(354546l), flags, setFlags);
 
 		Assertions.assertThat(command.buildCommand().getCommandString()).startsWith(
 				"UID STORE 354546 +FLAGS.SILENT (")

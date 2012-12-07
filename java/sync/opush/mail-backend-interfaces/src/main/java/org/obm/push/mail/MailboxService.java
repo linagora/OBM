@@ -51,6 +51,7 @@ import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
@@ -60,7 +61,7 @@ public interface MailboxService {
 	
 	MailboxFolders listSubscribedFolders(UserDataRequest udr) throws MailException;
 	
-	void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) throws MailException, ImapMessageNotFoundException;
+	void updateReadFlag(UserDataRequest udr, String collectionPath, MessageSet messages, boolean read) throws MailException, ImapMessageNotFoundException;
 
 	String parseMailBoxName(UserDataRequest udr, String collectionPath) throws MailException;
 

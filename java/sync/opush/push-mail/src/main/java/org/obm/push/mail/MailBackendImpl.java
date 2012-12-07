@@ -415,8 +415,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
 			if (serverId != null) {
-				Long mailUid = getEmailUidFromServerId(serverId);
-				mailboxService.updateReadFlag(udr, collectionPath, mailUid, msRead.isRead());
+				MessageSet messages = MessageSet.singleton(getEmailUidFromServerId(serverId));
+				mailboxService.updateReadFlag(udr, collectionPath, messages, msRead.isRead());
 			}
 			return serverId;
 		} catch (MailException e) {

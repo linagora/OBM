@@ -32,7 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.mail.bean.FlagsList;
@@ -46,9 +45,8 @@ public class UIDStoreCommand extends Command<Boolean> {
 	private FlagsList fl;
 	private boolean set;
 
-	public UIDStoreCommand(Collection<Long> uids, FlagsList fl, boolean set) {
-		MessageSet messageSet = MessageSet.builder().addAll(uids).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+	public UIDStoreCommand(MessageSet messages, FlagsList fl, boolean set) {
+		this.imapMessageSet = ImapMessageSet.wrap(messages);
 		this.fl = fl;
 		this.set = set;
 	}

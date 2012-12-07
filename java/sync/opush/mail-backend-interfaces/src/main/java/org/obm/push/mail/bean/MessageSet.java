@@ -35,6 +35,7 @@ package org.obm.push.mail.bean;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -47,7 +48,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 import com.google.common.collect.Sets;
 
-public class MessageSet implements Serializable {
+public class MessageSet implements Serializable, Iterable<Long> {
 
 	public static Builder builder() {
 		return new Builder();
@@ -71,6 +72,10 @@ public class MessageSet implements Serializable {
 			}
 		}
 		return builder.build();
+	}
+	
+	public static MessageSet singleton(long uid) {
+		return builder().add(uid).build();
 	}
 
 	public static class Builder implements org.obm.push.bean.Builder<MessageSet>, Serializable {
@@ -172,6 +177,11 @@ public class MessageSet implements Serializable {
 				return input.asSet(DiscreteDomains.longs());
 			}
 		}));
+	}
+
+	@Override
+	public Iterator<Long> iterator() {
+		return asDiscreteValues().iterator();
 	}
 	
 	public int rangeNumber() {

@@ -70,6 +70,7 @@ import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.IMimePart;
@@ -183,13 +184,13 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) 
+	public void updateReadFlag(UserDataRequest udr, String collectionPath, MessageSet messages, boolean read) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		updateMailFlag(udr, collectionPath, uid, Flag.SEEN, read);
+		updateMailFlag(udr, collectionPath, messages, Flag.SEEN, read);
 	}
 
-	private void updateMailFlag(UserDataRequest udr, String collectionPath, long uid, Flag flag, 
+	private void updateMailFlag(UserDataRequest udr, String collectionPath, MessageSet messages, Flag flag, 
 			boolean status) throws MailException {
 		
 		try {
@@ -198,9 +199,9 @@ public class LinagoraMailboxService implements MailboxService {
 			store.select(mailboxName);
 			FlagsList fl = new FlagsList();
 			fl.add(flag);
-			store.uidStore(ImmutableList.of(uid), fl, status);
+			store.uidStore(messages, fl, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-					new Object[] { uid, mailboxName, flag.asCommandValue(), status });
+					new Object[] { messages, mailboxName, flag.asCommandValue(), status });
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
@@ -239,7 +240,7 @@ public class LinagoraMailboxService implements MailboxService {
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
 			logger.info("delete conv id = ", uid);
-			store.uidStore(ImmutableList.of(uid), fl, true);
+			store.uidStore(MessageSet.singleton(uid), fl, true);
 			store.expunge();
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
@@ -285,7 +286,7 @@ public class LinagoraMailboxService implements MailboxService {
 		FlagsList fl = new FlagsList();
 		fl.add(Flag.DELETED);
 		logger.info("delete conv id = ", Iterables.getOnlyElement(uids));
-		store.uidStore(uids, fl, true);
+		store.uidStore(MessageSet.builder().addAll(uids).build(), fl, true);
 		store.expunge();
 	}
 	
@@ -316,7 +317,7 @@ public class LinagoraMailboxService implements MailboxService {
 
 	@Override
 	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(udr, collectionPath, uid, Flag.ANSWERED, true);
+		updateMailFlag(udr, collectionPath, MessageSet.singleton(uid), Flag.ANSWERED, true);
 	}
 
 	@Override
@@ -407,7 +408,7 @@ public class LinagoraMailboxService implements MailboxService {
 			Collection<Long> uids = store.uidSearch(SearchQuery.MATCH_ALL);
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
-			store.uidStore(uids, fl, true);
+			store.uidStore(MessageSet.builder().addAll(uids).build(), fl, true);
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",

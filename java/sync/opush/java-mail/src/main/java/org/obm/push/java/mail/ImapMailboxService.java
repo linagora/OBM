@@ -71,6 +71,7 @@ import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.exception.ImapCommandException;
@@ -194,22 +195,24 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void updateReadFlag(UserDataRequest udr, String collectionPath, long uid, boolean read) 
+	public void updateReadFlag(UserDataRequest udr, String collectionPath, MessageSet messages, boolean read) 
 			throws MailException, ImapMessageNotFoundException {
 		
-		updateMailFlag(udr, collectionPath, uid, Flags.Flag.SEEN, read);
+		updateMailFlag(udr, collectionPath, messages, Flags.Flag.SEEN, read);
 	}
 
-	private void updateMailFlag(UserDataRequest udr, String collectionPath, long uid, Flags.Flag flag, 
+	private void updateMailFlag(UserDataRequest udr, String collectionPath, MessageSet messages, Flags.Flag flag, 
 			boolean status) throws MailException, ImapMessageNotFoundException {
 		
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
-			IMAPMessage message = getMessage(uid);
-			message.setFlag(flag, status);
-			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-					new Object[] { uid, collectionPath, imapMailBoxUtils.flagToString(flag), status });
+			for (long uid: messages) {
+				IMAPMessage message = getMessage(uid);
+				message.setFlag(flag, status);
+				logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
+						new Object[] { uid, collectionPath, imapMailBoxUtils.flagToString(flag), status });
+			}
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (LocatorClientException e) {
@@ -339,7 +342,7 @@ public class ImapMailboxService implements MailboxService {
 
 	@Override
 	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, long uid) throws MailException, ImapMessageNotFoundException {
-		updateMailFlag(udr, collectionPath, uid, Flags.Flag.ANSWERED, true);
+		updateMailFlag(udr, collectionPath, MessageSet.singleton(uid), Flags.Flag.ANSWERED, true);
 	}
 
 	@Override

@@ -61,6 +61,7 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.utils.DateUtils;
@@ -152,7 +153,7 @@ public abstract class MailboxServiceTest {
 		
 		Email email = Iterables.getOnlyElement(mailboxService.fetchEmails(udr, mailBoxPath, date));
 		
-		mailboxService.updateReadFlag(udr, mailBoxPath, email.getUid(), true);
+		mailboxService.updateReadFlag(udr, mailBoxPath, MessageSet.singleton(email.getUid()), true);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
@@ -162,7 +163,7 @@ public abstract class MailboxServiceTest {
 	@Test(expected=ImapMessageNotFoundException.class)
 	public void testUpdateMailFlagWithBadUID() throws Exception {
 		long mailUIDNotExist = 1l;
-		mailboxService.updateReadFlag(udr, mailboxPath(IMAP_INBOX_NAME), mailUIDNotExist, true);
+		mailboxService.updateReadFlag(udr, mailboxPath(IMAP_INBOX_NAME), MessageSet.singleton(mailUIDNotExist), true);
 	}
 	
 	@Test
@@ -176,7 +177,7 @@ public abstract class MailboxServiceTest {
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
 		Email emailNotRead = Iterables.getOnlyElement(emails);
-		mailboxService.updateReadFlag(udr, mailBoxPath, emailNotRead.getUid(), true);
+		mailboxService.updateReadFlag(udr, mailBoxPath, MessageSet.singleton(emailNotRead.getUid()), true);
 		
 		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email emailHasRead = Iterables.getOnlyElement(emailsAfterToReadMail);
