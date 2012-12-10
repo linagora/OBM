@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
 import java.math.BigDecimal;
@@ -53,6 +54,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
@@ -78,11 +80,9 @@ public class SyncDecoderTest {
 		syncCollectionOptions.setMimeSupport(1);
 		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
 				.bodyType(MSEmailBodyType.PlainText)
-				.truncationSize(0)
 				.build(),
 				BodyPreference.builder()
 				.bodyType(MSEmailBodyType.HTML)
-				.truncationSize(0)
 				.build(),
 				BodyPreference.builder()
 				.bodyType(MSEmailBodyType.MIME)
@@ -123,11 +123,9 @@ public class SyncDecoderTest {
 		firstBuilder.append("<FilterType>2</FilterType>");
 		firstBuilder.append("<BodyPreference>");
 		firstBuilder.append("<Type>1</Type>");
-		firstBuilder.append("<TruncationSize>0</TruncationSize>");
 		firstBuilder.append("</BodyPreference>");
 		firstBuilder.append("<BodyPreference>");
 		firstBuilder.append("<Type>2</Type>");
-		firstBuilder.append("<TruncationSize>0</TruncationSize>");
 		firstBuilder.append("</BodyPreference>");
 		firstBuilder.append("<Conflict>1</Conflict>");
 		firstBuilder.append("<MIMESupport>1</MIMESupport>");
@@ -161,6 +159,137 @@ public class SyncDecoderTest {
 		syncDecoder.decodeSync(secondDoc, getFakeUserDataRequest());
 		
 		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
+	}
+	
+	@Test
+	public void testZeroTruncationSizeMustNotBeInterpreted() throws Exception {
+		String inboxCollectionPath = "INBOX";
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.THREE_DAYS_BACK);
+		syncCollectionOptions.setMimeSupport(1);
+		syncCollectionOptions.setConflict(1);
+		syncCollectionOptions.setMimeSupport(1);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
+				.bodyType(MSEmailBodyType.PlainText)
+				.build()
+				));
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setCollectionId(5);
+		syncCollection.setCollectionPath(inboxCollectionPath);
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setOptions(syncCollectionOptions);
+		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		
+		SyncedCollectionDao syncedCollectionDao = createStrictMock(SyncedCollectionDao.class);
+		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
+			.andReturn(null).once();
+		syncedCollectionDao.put(getFakeUserDataRequest().getCredentials(), 
+				getFakeDevice(), syncCollection);
+		expectLastCall().once();
+		
+		CollectionDao collectionDao = createMock(CollectionDao.class);
+		expect(collectionDao.getCollectionPath(5)).andReturn(inboxCollectionPath).once();
+		
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(inboxCollectionPath))
+			.andReturn(PIMDataType.EMAIL).once();
+		
+		StringBuilder firstBuilder = new StringBuilder();
+		firstBuilder.append("<Sync>");
+		firstBuilder.append("<Collections>");
+		firstBuilder.append("<Collection>");
+		firstBuilder.append("<SyncKey>0</SyncKey>");
+		firstBuilder.append("<CollectionId>5</CollectionId>");
+		firstBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
+		firstBuilder.append("<Options>");
+		firstBuilder.append("<FilterType>2</FilterType>");
+		firstBuilder.append("<BodyPreference>");
+		firstBuilder.append("<Type>1</Type>");
+		firstBuilder.append("<TruncationSize>0</TruncationSize>");
+		firstBuilder.append("</BodyPreference>");
+		firstBuilder.append("<Conflict>1</Conflict>");
+		firstBuilder.append("<MIMESupport>1</MIMESupport>");
+		firstBuilder.append("</Options>");
+		firstBuilder.append("</Collection>");
+		firstBuilder.append("</Collections>");
+		firstBuilder.append("</Sync>");
+		Document firstDoc = getXml(firstBuilder.toString());
+		
+		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
+		
+		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		Sync sync = syncDecoder.decodeSync(firstDoc, getFakeUserDataRequest());
+		
+		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
+		SyncCollectionOptions options = sync.getCollection(5).getOptions();
+		BodyPreference bodyPreference = options.getBodyPreferences().get(0);
+		assertThat(bodyPreference.getTruncationSize()).isNull();
+	}
+	
+	@Test
+	public void testTruncationSizeMustBeInterpreted() throws Exception {
+		String inboxCollectionPath = "INBOX";
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
+		syncCollectionOptions.setFilterType(FilterType.THREE_DAYS_BACK);
+		syncCollectionOptions.setMimeSupport(1);
+		syncCollectionOptions.setConflict(1);
+		syncCollectionOptions.setMimeSupport(1);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
+				.bodyType(MSEmailBodyType.PlainText)
+				.truncationSize(1000)
+				.build()
+				));
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setCollectionId(5);
+		syncCollection.setCollectionPath(inboxCollectionPath);
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setOptions(syncCollectionOptions);
+		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		
+		SyncedCollectionDao syncedCollectionDao = createStrictMock(SyncedCollectionDao.class);
+		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
+			.andReturn(null).once();
+		syncedCollectionDao.put(getFakeUserDataRequest().getCredentials(), 
+				getFakeDevice(), syncCollection);
+		expectLastCall().once();
+		
+		CollectionDao collectionDao = createMock(CollectionDao.class);
+		expect(collectionDao.getCollectionPath(5)).andReturn(inboxCollectionPath).once();
+		
+		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		expect(collectionPathHelper.recognizePIMDataType(inboxCollectionPath))
+			.andReturn(PIMDataType.EMAIL).once();
+		
+		StringBuilder firstBuilder = new StringBuilder();
+		firstBuilder.append("<Sync>");
+		firstBuilder.append("<Collections>");
+		firstBuilder.append("<Collection>");
+		firstBuilder.append("<SyncKey>0</SyncKey>");
+		firstBuilder.append("<CollectionId>5</CollectionId>");
+		firstBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
+		firstBuilder.append("<Options>");
+		firstBuilder.append("<FilterType>2</FilterType>");
+		firstBuilder.append("<BodyPreference>");
+		firstBuilder.append("<Type>1</Type>");
+		firstBuilder.append("<TruncationSize>1000</TruncationSize>");
+		firstBuilder.append("</BodyPreference>");
+		firstBuilder.append("<Conflict>1</Conflict>");
+		firstBuilder.append("<MIMESupport>1</MIMESupport>");
+		firstBuilder.append("</Options>");
+		firstBuilder.append("</Collection>");
+		firstBuilder.append("</Collections>");
+		firstBuilder.append("</Sync>");
+		Document firstDoc = getXml(firstBuilder.toString());
+		
+		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
+		
+		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		Sync sync = syncDecoder.decodeSync(firstDoc, getFakeUserDataRequest());
+		
+		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
+		SyncCollectionOptions options = sync.getCollection(5).getOptions();
+		BodyPreference bodyPreference = options.getBodyPreferences().get(0);
+		assertThat(bodyPreference.getTruncationSize()).isEqualTo(1000);
 	}
 
 	private UserDataRequest getFakeUserDataRequest() {
