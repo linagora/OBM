@@ -29,82 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.sync.push.client.commands;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.AccountInfos;
+import org.obm.sync.push.client.OPClient;
+import org.w3c.dom.Element;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+public class EmailSyncNoOptionsCommand extends Sync {
 
-public class Sync {
-	
-	private final Map<Integer, SyncCollection> collections;
-	private Integer wait;
-	
-	public Sync() {
-		super();
-		this.collections = new HashMap<Integer, SyncCollection>();
-	}
-	
-	public Integer getWaitInSecond() {
-		Integer ret = 0;
-		if(wait != null){
-			ret = wait * 60;
-		}
-		return ret;
-	}
-	
-	public void setWait(Integer wait) {
-		this.wait = wait;
-	}
-	
-	public Set<SyncCollection> getCollections() {
-		return ImmutableSet.copyOf(collections.values());
-	}
+	private final SyncKey syncKey;
+	private final String collectionId;
 
-	public Set<SyncCollection> getCollectionsValidToProcess() {
-		return Sets.filter(getCollections(), new Predicate<SyncCollection>() {
-
-			@Override
-			public boolean apply(SyncCollection input) {
-				return input.isValidToProcess();
-			}
-		});
-	}
-	
-	public SyncCollection getCollection(Integer collectionId) {
-		return collections.get(collectionId);
-	}
-	
-	public void addCollection(SyncCollection collec) {
-		collections.put(collec.getCollectionId(), collec);
+	public EmailSyncNoOptionsCommand(SyncKey syncKey, String collectionId) {
+		super("EmailSyncRequest.xml");
+		this.syncKey = syncKey;
+		this.collectionId = collectionId;
 	}
 
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(collections, wait);
+	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
+		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "SyncKey");
+		sk.setTextContent(syncKey.getSyncKey());
+		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
+		collection.setTextContent(collectionId);
+		
+		Element collectionElement = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "Collection");
+		collectionElement.removeChild(DOMUtils.getUniqueElement(collectionElement, "Options"));
 	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof Sync) {
-			Sync that = (Sync) object;
-			return Objects.equal(this.collections, that.collections)
-				&& Objects.equal(this.wait, that.wait);
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("collections", collections)
-			.add("wait", wait)
-			.toString();
-	}
-	
 }

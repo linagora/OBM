@@ -31,80 +31,44 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public class Sync {
-	
-	private final Map<Integer, SyncCollection> collections;
-	private Integer wait;
-	
-	public Sync() {
-		super();
-		this.collections = new HashMap<Integer, SyncCollection>();
-	}
-	
-	public Integer getWaitInSecond() {
-		Integer ret = 0;
-		if(wait != null){
-			ret = wait * 60;
-		}
-		return ret;
-	}
-	
-	public void setWait(Integer wait) {
-		this.wait = wait;
-	}
-	
-	public Set<SyncCollection> getCollections() {
-		return ImmutableSet.copyOf(collections.values());
+@RunWith(SlowFilterRunner.class)
+public class SyncCollectionTest {
+
+	@Test
+	public void testIsValidToProcessWithNullStatus() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setStatus(null);
+		
+		assertThat(syncCollection.isValidToProcess()).isTrue();
 	}
 
-	public Set<SyncCollection> getCollectionsValidToProcess() {
-		return Sets.filter(getCollections(), new Predicate<SyncCollection>() {
-
-			@Override
-			public boolean apply(SyncCollection input) {
-				return input.isValidToProcess();
-			}
-		});
-	}
-	
-	public SyncCollection getCollection(Integer collectionId) {
-		return collections.get(collectionId);
-	}
-	
-	public void addCollection(SyncCollection collec) {
-		collections.put(collec.getCollectionId(), collec);
+	@Test
+	public void testIsValidToProcessWithNullOK() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setStatus(SyncStatus.OK);
+		
+		assertThat(syncCollection.isValidToProcess()).isTrue();
 	}
 
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(collections, wait);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof Sync) {
-			Sync that = (Sync) object;
-			return Objects.equal(this.collections, that.collections)
-				&& Objects.equal(this.wait, that.wait);
-		}
-		return false;
+	@Test
+	public void testIsValidToProcessWithNullObjectNotFound() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
+		
+		assertThat(syncCollection.isValidToProcess()).isFalse();
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("collections", collections)
-			.add("wait", wait)
-			.toString();
+	@Test
+	public void testIsValidToProcessWithNullPartialRequest() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setStatus(SyncStatus.PARTIAL_REQUEST);
+		
+		assertThat(syncCollection.isValidToProcess()).isFalse();
 	}
-	
 }

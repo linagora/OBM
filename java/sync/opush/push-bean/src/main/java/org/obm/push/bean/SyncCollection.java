@@ -175,6 +175,10 @@ public class SyncCollection implements Serializable {
 	public boolean hasSyncState() {
 		return itemSyncState != null;
 	}
+
+	public boolean isValidToProcess() {
+		return status == null || status == SyncStatus.OK;
+	}
 	
 	@Override
 	public final int hashCode(){

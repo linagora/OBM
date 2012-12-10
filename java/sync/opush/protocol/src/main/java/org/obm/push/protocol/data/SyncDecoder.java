@@ -159,6 +159,7 @@ public class SyncDecoder {
 			collection.setOptions(options);
 			syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
 		} else {
+			collection.setStatus(SyncStatus.PARTIAL_REQUEST);
 			if (lastSyncCollection != null) {
 				collection.setOptions(lastSyncCollection.getOptions());
 			}

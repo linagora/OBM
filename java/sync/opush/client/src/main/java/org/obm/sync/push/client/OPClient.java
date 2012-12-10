@@ -48,6 +48,7 @@ import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.EmailSyncFetchCommand;
+import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.Options;
@@ -107,7 +108,7 @@ public abstract class OPClient {
 		return run(new FolderSync(key));
 	}
 
-	public SyncResponse initialSync(Folder[] folders) throws Exception {
+	public SyncResponse initialSync(Folder... folders) throws Exception {
 		return run(new Sync(folders));
 	}
 
@@ -117,6 +118,10 @@ public abstract class OPClient {
 
 	public SyncResponse syncEmailWithFetch(SyncKey key, String collectionId, String serverId) throws Exception {
 		return run(new EmailSyncFetchCommand(key, collectionId, serverId));
+	}
+
+	public SyncResponse syncWithoutOptions(SyncKey key, String collectionId) throws Exception {
+		return run(new EmailSyncNoOptionsCommand(key, collectionId));
 	}
 	
 	public SyncResponse syncEmail(SyncKey key, int collectionId, FilterType filterType) throws Exception {

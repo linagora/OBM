@@ -47,6 +47,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -86,7 +87,6 @@ public class SyncProtocolTest {
 
 		collectionResponse.setNewSyncKey(new SyncKey("123456789"));
 		collectionResponse.setCollectionValidity(true);
-		collectionResponse.setSyncStateValidity(true);
 		
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
@@ -99,7 +99,6 @@ public class SyncProtocolTest {
 		SyncCollectionResponse collectionResponse = newSyncCollectionResponse(collectionId);
 
 		collectionResponse.setCollectionValidity(false);
-		collectionResponse.setSyncStateValidity(true);
 
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
@@ -111,9 +110,9 @@ public class SyncProtocolTest {
 		int collectionId = 515;
 		SyncCollectionResponse collectionResponse = newSyncCollectionResponse(collectionId);
 
-		collectionResponse.setSyncStateValidity(false);
 		collectionResponse.setCollectionValidity(true);
-
+		collectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
+		
 		String endcodedResponse = encodeResponse(collectionResponse);
 		
 		Assertions.assertThat(endcodedResponse).isEqualTo(newSyncKeyErrorResponse(collectionId));

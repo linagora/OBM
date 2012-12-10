@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
@@ -74,6 +75,9 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -362,6 +366,68 @@ public class SyncHandlerTest {
 		verifyMocks(classToInstanceMap);
 		
 		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
+	}
+
+	@Test
+	public void testSyncWithoutOptionsAndNoOptionsInCacheReturnsStatus13() throws Exception {
+		OpushUser user = singleUserFixture.jaures;
+		int collectionId = 1;
+		String collectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey secondSyncKey = new SyncKey("13424");
+
+		SyncCollectionOptions toStoreOptions = new SyncCollectionOptions();
+		toStoreOptions.setFilterType(FilterType.THREE_DAYS_BACK);
+		toStoreOptions.setConflict(1);
+		SyncCollection toStoreCollection = new SyncCollection();
+		toStoreCollection.setCollectionId(collectionId);
+		toStoreCollection.setCollectionPath(collectionPath);
+		toStoreCollection.setDataType(PIMDataType.EMAIL);
+		toStoreCollection.setOptions(toStoreOptions);
+		toStoreCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		
+		ItemSyncState itemSyncState = ItemSyncState.builder()
+				.id(4)
+				.syncKey(secondSyncKey)
+				.syncDate(date("2012-10-10T16:22:53"))
+				.build();
+
+		IntegrationUserAccessUtils.mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(secondSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).anyTimes();
+		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
+		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(itemSyncState);
+		expect(collectionDao.updateState(anyObject(Device.class), anyInt(),
+				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(itemSyncState);
+		collectionDao.resetCollection(user.device, collectionId);
+		expectLastCall();
+		
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		expect(syncedCollectionDao.get(user.credentials, user.device, collectionId)).andReturn(null);
+		syncedCollectionDao.put(user.credentials, user.device, toStoreCollection);
+		expect(syncedCollectionDao.get(user.credentials, user.device, collectionId)).andReturn(null);
+		expectLastCall();
+		
+		replayMocks(classToInstanceMap);
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
+		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
+		
+		opClient.syncEmail(initialSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
+		SyncResponse syncWithoutOptions = opClient.syncWithoutOptions(secondSyncKey, inbox.getServerId());
+
+		verifyMocks(classToInstanceMap);
+		assertThat(syncWithoutOptions).isNotNull();
+		Collection inboxCollection = syncWithoutOptions.getCollection(inbox.getServerId());
+		assertThat(inboxCollection).isNotNull();
+		assertThat(inboxCollection.getStatus()).isEqualTo(SyncStatus.PARTIAL_REQUEST);
 	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {

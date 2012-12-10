@@ -52,8 +52,6 @@ import com.google.inject.util.Modules;
 
 public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 
-	private static final boolean PUSH_MODE_ENABLED = false;
-	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ClassToInstanceAgregateView<Object> mockMap;
 	

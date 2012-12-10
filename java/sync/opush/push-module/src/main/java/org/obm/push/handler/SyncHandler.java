@@ -420,7 +420,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			try {
 				handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
 			} catch (FilterTypeChangedException e) {
-				syncCollectionResponse.setSyncStateValidity(false);
+				syncCollectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
 			}
 		}
 		return syncCollectionResponse;
@@ -437,12 +437,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException {
 
 		syncCollectionResponse.setCollectionValidity(true);
-		syncCollectionResponse.setSyncStateValidity(true);
 		
 		ItemSyncState st = stMachine.getItemSyncState(syncCollection.getSyncKey());
 		if (st == null) {
-			syncCollectionResponse.setSyncStateValidity(false);
-		} else {
+			syncCollectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
+		} else if (syncCollection.isValidToProcess()) {
 			syncCollection.setItemSyncState(st);
 			Date syncDate = null;
 			SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
@@ -464,7 +463,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			throws DaoException, InvalidServerId {
 		
 		backend.resetCollection(udr, syncCollection.getCollectionId());
-		syncCollectionResponse.setSyncStateValidity(true);
 		syncCollectionResponse.setCollectionValidity(true);
 		List<ItemChange> changed = ImmutableList.of();
 		List<ItemDeletion> deleted = ImmutableList.of();
