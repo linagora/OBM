@@ -194,7 +194,7 @@ public class UIDFetchFlagsTest {
 	
 	private Collection<Flag> uidFetchFlags(long uid) throws MailException {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return mailboxService.fetchFlags(udr, inbox, uid);
+		return mailboxService.fetchFlags(udr, inbox, MessageSet.singleton(uid)).get(uid);
 	}
 	
 	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {

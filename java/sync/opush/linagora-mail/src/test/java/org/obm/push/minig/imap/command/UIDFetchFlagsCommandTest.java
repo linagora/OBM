@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
-import org.obm.push.minig.imap.command.UIDFetchFlagsCommand;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.Lists;
@@ -57,7 +57,7 @@ public class UIDFetchFlagsCommandTest {
 
 	@Test
 	public void validResponses() {
-		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
+		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(MessageSet.singleton(12l));
 		uidFetchFlagsCommand.handleResponses(responses("* 98 FETCH (FLAGS (\\Seen) UID 12)"));
 		Map<Long, FlagsList> receivedData = uidFetchFlagsCommand.getReceivedData();
 		assertThat(receivedData).hasSize(1).contains(entry(12l, new FlagsList(Arrays.asList(Flag.SEEN))) );
@@ -65,7 +65,7 @@ public class UIDFetchFlagsCommandTest {
 	
 	@Test
 	public void severalUntaggedResponses() {
-		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
+		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(MessageSet.singleton(12l));
 		uidFetchFlagsCommand.handleResponses(
 				responses(
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 
@@ -76,7 +76,7 @@ public class UIDFetchFlagsCommandTest {
 	
 	@Test
 	public void severalIdenticalUntaggedResponses() {
-		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
+		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(MessageSet.singleton(12l));
 		uidFetchFlagsCommand.handleResponses(
 				responses(
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 

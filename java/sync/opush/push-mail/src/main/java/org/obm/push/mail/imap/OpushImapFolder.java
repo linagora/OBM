@@ -63,7 +63,7 @@ public interface OpushImapFolder {
 
 	Message fetchEnvelope(long anyMessageUID) throws MessagingException, ImapMessageNotFoundException;
 
-	FlagsList uidFetchFlags(long messageUid) throws MessagingException, ImapMessageNotFoundException;
+	Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 	
 	IMAPMessage getMessageByUID(long uid) throws MessagingException, ImapMessageNotFoundException;
 

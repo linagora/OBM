@@ -52,8 +52,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.Base64InputStream;
-import org.easymock.IMocksControl;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +71,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.conversation.EmailView;
@@ -89,7 +90,8 @@ import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
@@ -645,7 +647,7 @@ public class EmailViewPartsFetcherImplTest {
 	}
 
 	private void mockMailboxServiceFlags(MailboxService mailboxService) throws MailException {
-		Builder<Flag> flagsListBuilder = ImmutableList.builder();
+		ImmutableSet.Builder<Flag> flagsListBuilder = ImmutableSet.builder();
 		if (messageFixture.answered) {
 			flagsListBuilder.add(Flag.ANSWERED);
 		}
@@ -655,8 +657,8 @@ public class EmailViewPartsFetcherImplTest {
 		if (messageFixture.starred) {
 			flagsListBuilder.add(Flag.FLAGGED);
 		}
-		expect(mailboxService.fetchFlags(udr, messageCollectionName, messageFixture.uid))
-				.andReturn(flagsListBuilder.build()).once();
+		expect(mailboxService.fetchFlags(udr, messageCollectionName, MessageSet.singleton(messageFixture.uid)))
+				.andReturn(ImmutableMap.of(messageFixture.uid, new FlagsList(flagsListBuilder.build()))).once();
 	}
 
 	private void mockMailboxServiceEnvelope(MailboxService mailboxService) throws MailException {

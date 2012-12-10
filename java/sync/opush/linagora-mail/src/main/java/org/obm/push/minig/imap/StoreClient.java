@@ -197,8 +197,8 @@ public class StoreClient {
 		return cs.uidFetchEnvelope(uids);
 	}
 
-	public Map<Long, FlagsList> uidFetchFlags(Collection<Long> uids) {
-		return cs.uidFetchFlags(uids);
+	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
+		return cs.uidFetchFlags(messages);
 	}
 	
 	public InternalDate[] uidFetchInternalDate(Collection<Long> uids) {

@@ -297,8 +297,8 @@ public class ClientSupport {
 		return run(new UIDFetchEnvelopeCommand(uids));
 	}
 
-	public Map<Long, FlagsList> uidFetchFlags(Collection<Long> uids) {
-		return run(new UIDFetchFlagsCommand(uids));
+	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
+		return run(new UIDFetchFlagsCommand(messages));
 	}
 
 	public InternalDate[] uidFetchInternalDate(Collection<Long> uids) {

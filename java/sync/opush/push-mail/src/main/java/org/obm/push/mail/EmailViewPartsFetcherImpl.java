@@ -37,8 +37,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
@@ -123,7 +123,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 
 	private void fetchFlags(Builder emailViewBuilder, long uid) throws MailException {
-		Collection<Flag> emailFlags = mailboxService.fetchFlags(udr, collectionPath, uid);
+		Set<Flag> emailFlags = mailboxService.fetchFlags(udr, collectionPath, MessageSet.singleton(uid)).get(uid);
 		emailViewBuilder.flags(emailFlags);
 	}
 

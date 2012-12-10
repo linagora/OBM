@@ -68,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
@@ -194,10 +195,14 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
-	public FlagsList uidFetchFlags(long messageUid) throws MessagingException, ImapMessageNotFoundException {
-		IMAPMessage messageToFetch = getMessageByUID(messageUid);
-		folder.fetch(new Message[]{messageToFetch}, getFetchFlagsProfile());
-		return flagsList(messageToFetch.getFlags());
+	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
+		ImmutableMap.Builder<Long, FlagsList> response = ImmutableMap.builder();
+		for (long uid: messages) {
+			IMAPMessage messageToFetch = getMessageByUID(uid);
+			folder.fetch(new Message[]{messageToFetch}, getFetchFlagsProfile());
+			response.put(uid, flagsList(messageToFetch.getFlags()));
+		}
+		return response.build();
 	}
 
 	private FlagsList flagsList(Flags flagsToConvert) {

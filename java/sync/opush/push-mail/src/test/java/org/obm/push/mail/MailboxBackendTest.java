@@ -41,7 +41,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 
 import org.easymock.Capture;
@@ -63,6 +62,7 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.MimeAddress;
@@ -76,6 +76,7 @@ import org.obm.push.utils.UserEmailParserUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
@@ -177,7 +178,7 @@ public class MailboxBackendTest {
 	}
 	
 	private void mockMailboxServiceFetchFullMail(InputStream mailStream, long itemId, String collectionPath) {
-		expectFetchFlags(collectionPath, itemId, ImmutableList.of(Flag.SEEN));
+		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
 		expectFetchEnvelope(collectionPath, itemId, buildUIDEnvelope(itemId));
 		expectFetchBodyStructure(collectionPath, itemId, buildMimeMessage(itemId));
 		expectFetchMailStream(collectionPath, itemId, mailStream);
@@ -222,7 +223,7 @@ public class MailboxBackendTest {
 	}
 
 	private void mockMailboxServiceFetchFullMailWithMimePartAddress(InputStream mailStream, int itemId, String collectionPath) {
-		expectFetchFlags(collectionPath, itemId, ImmutableList.of(Flag.SEEN));
+		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
 		expectFetchEnvelope(collectionPath, itemId, buildUIDEnvelope(itemId));
 		expectFetchBodyStructure(collectionPath, itemId, buildMimeMessage(itemId));
 		expectFetchMimePartStream(collectionPath, itemId, mailStream, new MimeAddress("1"));
@@ -262,9 +263,8 @@ public class MailboxBackendTest {
 		return new ByteArrayInputStream(ByteStreams.toByteArray(ClassLoader.getSystemResourceAsStream("eml/" + name)));
 	}
 
-	public void expectFetchFlags(String collectionName, long uid, Collection<Flag> value) {
-		expect(mailboxService.fetchFlags(udr, collectionName, uid))
-			.andReturn(value);
+	public void expectFetchFlags(String collectionName, long uid, FlagsList value) {
+		expect(mailboxService.fetchFlags(udr, collectionName, MessageSet.singleton(uid))).andReturn(ImmutableMap.of(uid, value));
 	}
 
 	public void expectFetchEnvelope(String collectionName, long uid, UIDEnvelope envelope) {

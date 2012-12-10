@@ -132,11 +132,11 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Collection<Flag> fetchFlags(UserDataRequest udr, String collectionPath, long uid) throws MailException {
+	public Map<Long, FlagsList> fetchFlags(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
-			return currentOpushImapFolder().uidFetchFlags(uid);
+			return currentOpushImapFolder().uidFetchFlags(messages);
 		} catch (MessagingException e) {
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {

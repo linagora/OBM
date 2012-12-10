@@ -32,7 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +51,8 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	private ImapMessageSet imapMessageSet;
 
-	public UIDFetchFlagsCommand(Collection<Long> uid) {
-		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+	public UIDFetchFlagsCommand(MessageSet messages) {
+		this.imapMessageSet = ImapMessageSet.wrap(messages);
 	}
 
 	@Override

@@ -57,7 +57,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.LinagoraMailboxService;
@@ -75,6 +75,7 @@ import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
@@ -193,9 +194,8 @@ public class IntegrationTestUtils {
 		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + relativePath;
 	}
 
-	public static void expectFetchFlags(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, Collection<Flag> value) {
-		expect(mailboxService.fetchFlags(udr, collectionName, uid))
-			.andReturn(value);
+	public static void expectFetchFlags(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, long uid, FlagsList value) {
+		expect(mailboxService.fetchFlags(udr, collectionName, MessageSet.singleton(uid))).andReturn(ImmutableMap.of(uid, value));
 	}
 
 	public static void expectFetchEnvelope(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, UIDEnvelope envelope) {
