@@ -128,7 +128,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 
 	private void fetchEnvelope(Builder emailViewBuilder, long uid)throws MailException {
-		UIDEnvelope envelope = mailboxService.fetchEnvelope(udr, collectionPath, uid);
+		UIDEnvelope envelope = Iterables.getOnlyElement(mailboxService.fetchEnvelope(udr, collectionPath, MessageSet.singleton(uid)));
 		emailViewBuilder.envelope(envelope.getEnvelope());
 	}
 	

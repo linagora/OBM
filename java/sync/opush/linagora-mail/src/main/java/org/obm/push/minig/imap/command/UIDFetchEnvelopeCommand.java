@@ -66,9 +66,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
 	private ImapMessageSet imapMessageSet;
 
-	public UIDFetchEnvelopeCommand(Collection<Long> uid) {
-		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+	public UIDFetchEnvelopeCommand(MessageSet messages) {
+		this.imapMessageSet = ImapMessageSet.wrap(messages);
 	}
 
 	@Override

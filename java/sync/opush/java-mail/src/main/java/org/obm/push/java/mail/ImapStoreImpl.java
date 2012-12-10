@@ -269,9 +269,9 @@ public class ImapStoreImpl implements ImapStore {
 	}
 
 	@Override
-	public Message fetchEnvelope(OpushImapFolder opushImapFolder, long messageUid) throws ImapCommandException, ImapMessageNotFoundException {
+	public Map<Long, IMAPMessage> fetchEnvelope(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException, ImapMessageNotFoundException {
 		try {
-			return opushImapFolder.fetchEnvelope(messageUid);
+			return opushImapFolder.fetchEnvelope(messages);
 		} catch (MessagingException e) {
 			String msg = String.format(
 					"IMAP command fetch envelope failed. user=%s, folder=%s", userId, opushImapFolder.getFullName());

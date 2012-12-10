@@ -33,7 +33,6 @@ package org.obm.push.java.mail;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,6 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
@@ -173,10 +173,14 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	}
 
 	@Override
-	public IMAPMessage fetch(long messageUid, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException {
-		IMAPMessage message = getMessageByUID(messageUid);
-		folder.fetch(new Message[]{message}, fetchProfile);
-		return message;
+	public Map<Long, IMAPMessage> fetch(MessageSet messages, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException {
+		ImmutableMap.Builder<Long, IMAPMessage> result = ImmutableMap.builder();
+		for (long uid: messages) {
+			IMAPMessage message = getMessageByUID(uid);
+			folder.fetch(new Message[]{message}, fetchProfile);
+			result.put(uid, message);
+		}
+		return result.build();
 	}
 	
 	public Message fetchHeaders(long messageUid, EmailHeaders headersToFetch) throws MessagingException, ImapMessageNotFoundException {
@@ -184,14 +188,14 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		for (EmailHeader header: headersToFetch) {
 			fetchProfile.add(header.getHeader());
 		}
-		return fetch(messageUid, fetchProfile);
+		return Iterables.getOnlyElement(fetch(MessageSet.singleton(messageUid), fetchProfile).values());
 	}
 
 	@Override
-	public Message fetchEnvelope(long messageUid) throws MessagingException, ImapMessageNotFoundException {
+	public Map<Long, IMAPMessage> fetchEnvelope(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
 		FetchProfile fetchProfile = new FetchProfile();
 		fetchProfile.add(FetchProfile.Item.ENVELOPE);
-		return fetch(messageUid, fetchProfile);
+		return fetch(messages, fetchProfile);
 	}
 
 	@Override
@@ -242,18 +246,13 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 
 	@Override
 	public Map<Long, IMAPMessage> fetchFast(MessageSet messages) throws MessagingException {
-		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
 		FetchProfile fetchFastProfile = getFetchFastProfile();
-		for (long uid: messages) {
-			try {
-				IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
-				imapMessages.put(uid, imapMessage);
-			}
-			catch (ImapMessageNotFoundException e) {
-				logger.debug("Message {} not found", uid);
-			}
+		try {
+			return fetch(messages, fetchFastProfile);
+		} catch (ImapMessageNotFoundException e) {
+			logger.debug("Message {} not found", messages);
 		}
-		return imapMessages;
+		return ImmutableMap.<Long, IMAPMessage>of();
 	}
 
 	private FetchProfile getFetchFastProfile() {
@@ -326,13 +325,8 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 
 	@Override
 	public Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
-		Map<Long, IMAPMessage> imapMessages = new HashMap<Long, IMAPMessage>();
 		FetchProfile fetchFastProfile = getFetchBodyStructureProfile();
-		for (long uid: messages) {
-			IMAPMessage imapMessage = fetch(uid, fetchFastProfile);
-			imapMessages.put(uid, imapMessage);
-		}
-		return imapMessages;
+		return fetch(messages, fetchFastProfile);
 	}
 
 	private FetchProfile getFetchBodyStructureProfile() {

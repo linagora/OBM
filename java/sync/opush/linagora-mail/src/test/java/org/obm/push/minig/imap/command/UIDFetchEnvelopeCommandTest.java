@@ -33,8 +33,6 @@ package org.obm.push.minig.imap.command;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +41,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
-import org.obm.push.minig.imap.command.UIDFetchEnvelopeCommand;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.IMAPResponseParser;
 import org.obm.push.minig.imap.impl.MinaIMAPMessage;
@@ -67,7 +65,7 @@ public class UIDFetchEnvelopeCommandTest {
 		minaMsg.addLine(continuation.getBytes());
 		IMAPResponseParser imapResponseParser = new IMAPResponseParser();
 		IMAPResponse response = imapResponseParser.parse(minaMsg);
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(Arrays.asList(20l));
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.singleton(20l));
 		command.handleResponses(ImmutableList.of(response, new IMAPResponse("OK", "")));
 		Assert.assertNotNull(command.getReceivedData());
 	}
@@ -80,7 +78,7 @@ public class UIDFetchEnvelopeCommandTest {
 				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
 				" ((\"toName toName\" NIL \"toName\" \"thilaire.lng.org\"))" +
 				" NIL NIL NIL \"<5051CEAD.8020706@thilaire.lng.org>\")";
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(ImmutableList.<Long>of());
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.empty());
 
 		Envelope envelope = command.parseEnvelope(envelopeData.getBytes());
 		
@@ -106,7 +104,7 @@ public class UIDFetchEnvelopeCommandTest {
 		
 		String fullPayload = "* 2 FETCH (UID 28 ENVELOPE " + expectedEnvelopePayload + ")";
 		
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(ImmutableList.<Long>of());
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.empty());
 
 		String parsedEnvelope = command.getEnvelopePayload(fullPayload);
 		assertThat(parsedEnvelope).isEqualTo(expectedEnvelopePayload);
@@ -121,7 +119,7 @@ public class UIDFetchEnvelopeCommandTest {
 				"((\"Robert Dupont\" NIL \"rdupont\" \"linagora.com\")) " +
 				"((NIL NIL \"boss\" \"linagora.com\")) NIL NIL \"<4D5547D2.9050008@linagora.com>\" \"<4D556074.8050406@linagora.com>\"))";
 		
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(ImmutableList.of(590923l));
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.singleton(590923l));
 		String parsedEnvelope = command.getEnvelopePayload(fullPayload);
 		Envelope envelope = command.parseEnvelope(parsedEnvelope.getBytes());
 		

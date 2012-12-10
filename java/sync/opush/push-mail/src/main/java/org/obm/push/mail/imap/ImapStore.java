@@ -88,7 +88,7 @@ public interface ImapStore extends Resource {
 	MessageSet moveMessageUID(final OpushImapFolder sourceFolder, final String folderDst, final MessageSet messages)
 			throws ImapCommandException, ImapMessageNotFoundException;
 
-	Message fetchEnvelope(OpushImapFolder opushImapFolder, long messageUid) throws ImapCommandException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchEnvelope(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException, ImapMessageNotFoundException;
 	
 	Map<Long, IMAPMessage> fetchFast(OpushImapFolder opushImapFolder, MessageSet messages) throws ImapCommandException, ImapMessageNotFoundException;
 

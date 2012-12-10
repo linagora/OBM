@@ -199,8 +199,8 @@ public class IntegrationTestUtils {
 	}
 
 	public static void expectFetchEnvelope(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, UIDEnvelope envelope) {
-		expect(mailboxService.fetchEnvelope(udr, collectionName, uid))
-			.andReturn(envelope);
+		expect(mailboxService.fetchEnvelope(udr, collectionName, MessageSet.singleton(uid)))
+			.andReturn(ImmutableList.of(envelope));
 	}
 
 	public static void expectFetchBodyStructure(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, int uid, MimeMessage mimeMessage) {

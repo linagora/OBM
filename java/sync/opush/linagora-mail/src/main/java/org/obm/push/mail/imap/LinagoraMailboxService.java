@@ -34,7 +34,6 @@ package org.obm.push.mail.imap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -480,13 +479,12 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException {
+	public Collection<UIDEnvelope> fetchEnvelope(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			store.select(mailboxName);
-			Collection<UIDEnvelope> uidFetchEnvelopes = store.uidFetchEnvelope(Arrays.asList(uid));
-			return Iterables.getOnlyElement(uidFetchEnvelopes);
+			return store.uidFetchEnvelope(messages);
 		} catch (NoSuchElementException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

@@ -268,8 +268,8 @@ public class MailboxBackendTest {
 	}
 
 	public void expectFetchEnvelope(String collectionName, long uid, UIDEnvelope envelope) {
-		expect(mailboxService.fetchEnvelope(udr, collectionName, uid))
-			.andReturn(envelope);
+		expect(mailboxService.fetchEnvelope(udr, collectionName, MessageSet.singleton(uid)))
+			.andReturn(ImmutableList.of(envelope));
 	}
 
 	public void expectFetchBodyStructure(String collectionName, long uid, MimeMessage mimeMessage) {

@@ -193,8 +193,8 @@ public class StoreClient {
 		return cs.uidFetchHeaders(uids, headers);
 	}
 
-	public Collection<UIDEnvelope> uidFetchEnvelope(Collection<Long> uids) {
-		return cs.uidFetchEnvelope(uids);
+	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
+		return cs.uidFetchEnvelope(messages);
 	}
 
 	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {

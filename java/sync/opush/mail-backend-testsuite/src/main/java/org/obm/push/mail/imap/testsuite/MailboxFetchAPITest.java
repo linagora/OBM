@@ -131,10 +131,9 @@ public abstract class MailboxFetchAPITest {
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
 		mailboxService.storeInInbox(udr, inputStream, true);
 		
-		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 1l);
+		Collection<UIDEnvelope> uidEnvelopes = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(1l));
 
-		assertThat(uidEnvelope).isNotNull();
-		assertThat(uidEnvelope).isEqualTo(new UIDEnvelope(1l, envelope));
+		assertThat(uidEnvelopes).isNotNull().containsExactly(new UIDEnvelope(1l, envelope));
 	}
 	
 	@Test(expected=MailException.class)
@@ -142,7 +141,7 @@ public abstract class MailboxFetchAPITest {
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
 		mailboxService.storeInInbox(udr, inputStream, true);
 		
-		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), 2l);
+		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(2l));
 	}
 	
 	@Test
@@ -154,9 +153,9 @@ public abstract class MailboxFetchAPITest {
 		String mailboxPath = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		mailboxService.delete(udr, mailboxPath, MessageSet.singleton(emailWillBeDeleted.getUid()));
 		
-		UIDEnvelope uidEnvelope = mailboxService.fetchEnvelope(udr, mailboxPath, email3.getUid());
-		assertThat(uidEnvelope).isNotNull();
-		assertThat(uidEnvelope.getUid()).isEqualTo(email3.getUid());
+		Collection<UIDEnvelope> uidEnvelopes = mailboxService.fetchEnvelope(udr, mailboxPath, MessageSet.singleton(email3.getUid()));
+		assertThat(uidEnvelopes).isNotNull().hasSize(1);
+		assertThat(Iterables.getOnlyElement(uidEnvelopes).getUid()).isEqualTo(email3.getUid());
 	}
 	
 	@Test

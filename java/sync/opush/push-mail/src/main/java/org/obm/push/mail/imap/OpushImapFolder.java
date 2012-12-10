@@ -59,9 +59,9 @@ public interface OpushImapFolder {
 
 	InputStream uidFetchPart(long uid, MimeAddress address, Integer truncation) throws MessagingException, ImapMessageNotFoundException;
 
-	IMAPMessage fetch(long anyMessageUID, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetch(MessageSet messages, FetchProfile fetchProfile) throws MessagingException, ImapMessageNotFoundException;
 
-	Message fetchEnvelope(long anyMessageUID) throws MessagingException, ImapMessageNotFoundException;
+	Map<Long, IMAPMessage> fetchEnvelope(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 
 	Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 	

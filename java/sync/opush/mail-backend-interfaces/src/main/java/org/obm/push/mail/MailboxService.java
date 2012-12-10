@@ -112,7 +112,7 @@ public interface MailboxService {
 	InputStream fetchMimePartStream(UserDataRequest udr, String collectionPath, long uid, MimeAddress partAddress) 
 			throws MailException;
 	
-	UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException;
+	Collection<UIDEnvelope> fetchEnvelope(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
 	IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException;
 

@@ -96,7 +96,7 @@ public class MailMessageLoader {
 		
 		MSEmail msEmail = null;
 		try {
-			final UIDEnvelope envelope = mailboxService.fetchEnvelope(udr, collectionPath, messageId);
+			final UIDEnvelope envelope = Iterables.getOnlyElement(mailboxService.fetchEnvelope(udr, collectionPath, MessageSet.singleton(messageId)));
 			final Collection<MimeMessage> mimeMessages = mailboxService.fetchBodyStructure(udr, collectionPath, MessageSet.singleton(messageId));
 			if (!mimeMessages.isEmpty()) {
 				MimeMessage mimeMessage = Iterables.getOnlyElement(mimeMessages);

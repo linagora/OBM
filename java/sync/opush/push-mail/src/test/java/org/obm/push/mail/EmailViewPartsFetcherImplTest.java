@@ -670,8 +670,8 @@ public class EmailViewPartsFetcherImplTest {
 			.date(messageFixture.date)
 			.build();
 		
-		expect(mailboxService.fetchEnvelope(udr, messageCollectionName, messageFixture.uid))
-			.andReturn(new UIDEnvelope(messageFixture.uid, envelope)).once();
+		expect(mailboxService.fetchEnvelope(udr, messageCollectionName, MessageSet.singleton(messageFixture.uid)))
+			.andReturn(ImmutableList.of(new UIDEnvelope(messageFixture.uid, envelope))).once();
 	}
 	
 	private void mockMailboxServiceBody(MailboxService mailboxService) throws MailException {

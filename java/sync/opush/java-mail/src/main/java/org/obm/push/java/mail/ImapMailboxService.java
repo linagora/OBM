@@ -64,7 +64,6 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
@@ -94,6 +93,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
@@ -499,13 +499,13 @@ public class ImapMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public UIDEnvelope fetchEnvelope(UserDataRequest udr, String collectionPath, long uid) throws MailException {
-		IMAPMessage message = null;
+	public Collection<UIDEnvelope> fetchEnvelope(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
+		Map<Long, IMAPMessage> imapMessages = null;
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
-			message = (IMAPMessage) store.fetchEnvelope(currentOpushImapFolder(), uid);
+			imapMessages = store.fetchEnvelope(currentOpushImapFolder(), messages);
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
@@ -514,8 +514,12 @@ public class ImapMailboxService implements MailboxService {
 			throw new MailException(e);
 		}
 		
-		Envelope envelope = imapMailBoxUtils.buildEnvelopeFromMessage(message);
-		return new UIDEnvelope(uid, envelope);
+		return Maps.transformEntries(imapMessages, new Maps.EntryTransformer<Long, IMAPMessage, UIDEnvelope>() {
+			@Override
+			public UIDEnvelope transformEntry(Long uid, IMAPMessage message) {
+				return new UIDEnvelope(uid, imapMailBoxUtils.buildEnvelopeFromMessage(message));
+			}
+		}).values();
 	}
 	
 	@Override

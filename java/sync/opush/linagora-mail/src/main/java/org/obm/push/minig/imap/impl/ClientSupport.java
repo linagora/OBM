@@ -293,8 +293,8 @@ public class ClientSupport {
 		return run(new UIDFetchHeadersCommand(uids, headers));
 	}
 
-	public Collection<UIDEnvelope> uidFetchEnvelope(Collection<Long> uids) {
-		return run(new UIDFetchEnvelopeCommand(uids));
+	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
+		return run(new UIDFetchEnvelopeCommand(messages));
 	}
 
 	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
