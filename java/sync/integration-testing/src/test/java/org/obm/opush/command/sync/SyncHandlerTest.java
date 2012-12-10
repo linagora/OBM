@@ -83,6 +83,7 @@ import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -331,6 +332,7 @@ public class SyncHandlerTest {
 	public void testSyncWithUnknownSyncKeyReturnsInvalidSyncKeyStatus() throws Exception {
 		int collectionId= 1;
 		String collectionIdAsString = String.valueOf(collectionId);
+		String collectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(singleUserFixture.jaures); 
 		
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey secondSyncKey = new SyncKey("456");
@@ -341,10 +343,11 @@ public class SyncHandlerTest {
 		EmailSyncTestUtils.mockEmailSyncedCollectionDao(classToInstanceMap.get(SyncedCollectionDao.class));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		IntegrationTestUtils.expectUserCollectionsNeverChange(collectionDao, fakeTestUsers);
+		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).once();
+		expect(collectionDao.getCollectionPath(collectionId)).andThrow(new CollectionNotFoundException());
+		
 		EmailSyncTestUtils.mockEmailUnsynchronizedItemDao(classToInstanceMap.get(UnsynchronizedItemDao.class));
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
-		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(null).times(2);
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncKey.class), anyObject(Date.class)))
 			.andReturn(firstItemSyncState)
 			.anyTimes();
@@ -358,7 +361,7 @@ public class SyncHandlerTest {
 		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK);
 		verifyMocks(classToInstanceMap);
 		
-		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
+		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
@@ -381,7 +384,6 @@ public class SyncHandlerTest {
 		java.util.Collection<Integer> existingCollections = Collections.emptySet();
 		int syncEmailUnexistingCollectionId = 15105;
 		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
-		expectContinuationTransactionLifecycle(classToInstanceMap.get(ContinuationService.class), singleUserFixture.jaures.userDataRequest, 0);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		opushServer.start();

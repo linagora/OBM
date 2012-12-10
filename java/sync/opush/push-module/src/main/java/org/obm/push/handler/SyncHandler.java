@@ -279,7 +279,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
-		for (SyncCollection collection : sync.getCollections()) {
+		for (SyncCollection collection : sync.getCollectionsValidToProcess()) {
 
 			// get our sync state for this collection
 			ItemSyncState collectionState = stMachine.getItemSyncState(collection.getSyncKey());

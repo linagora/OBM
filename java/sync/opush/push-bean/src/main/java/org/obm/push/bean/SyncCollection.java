@@ -152,7 +152,7 @@ public class SyncCollection implements Serializable {
 		return status;
 	}
 	
-	public void setError(SyncStatus status){
+	public void setStatus(SyncStatus status){
 		this.status = status;
 	}
 

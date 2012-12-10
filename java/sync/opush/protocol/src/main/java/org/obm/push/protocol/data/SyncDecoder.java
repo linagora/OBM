@@ -130,47 +130,60 @@ public class SyncDecoder {
 		if (collectionId == null) {
 			throw new ProtocolException("CollectionId can't be null");
 		}
-		SyncCollection lastSyncCollection = 
-				syncedCollectionStoreService.get(udr.getCredentials(), udr.getDevice(), collectionId);
-		if (isPartial && lastSyncCollection == null) {
-			throw new PartialException();
-		}
 		
-		try {
-			collection.setCollectionId(collectionId);
-			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
-			collection.setDataType(dataType);
-			collection.setDataClass(DOMUtils.getElementText(col, "Class"));
-			collection.setSyncKey(new SyncKey(DOMUtils.getElementText(col, "SyncKey")));
+		collection.setCollectionId(collectionId);
+		collection.setDataClass(DOMUtils.getElementText(col, "Class"));
+		collection.setSyncKey(new SyncKey(DOMUtils.getElementText(col, "SyncKey")));
 
-			Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
-			if (windowSizeElement != null) {
-				collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
-			}
-			
-			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
-			if (options != null) {
-				collection.setOptions(options);
-				syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
-			} else {
-				if (lastSyncCollection != null) {
-					collection.setOptions(lastSyncCollection.getOptions());
-				}
-			}
-			
-			appendCommand(col, collection);
-		} catch (CollectionNotFoundException e) {
-			collection.setError(SyncStatus.OBJECT_NOT_FOUND);
+		Element windowSizeElement = DOMUtils.getUniqueElement(col, "WindowSize");
+		if (windowSizeElement != null) {
+			collection.setWindowSize(Integer.parseInt(windowSizeElement.getTextContent()));
 		}
 		
-		appendCommand(col, collection);
+		SyncCollection lastSyncCollection = findLastSyncedCollectionOptions(udr, isPartial, collectionId);
+		SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
 		
+		recognizeCollection(collection, collectionId);
+		storeLastSyncedCollectionOptions(udr, collection, lastSyncCollection, options);
+		appendCommand(col, collection);
 		// TODO sync supported
 		// TODO sync <getchanges/>
 
 		return collection;
+	}
+
+	private void storeLastSyncedCollectionOptions(UserDataRequest udr,
+			SyncCollection collection, SyncCollection lastSyncCollection,
+			SyncCollectionOptions options) {
+		if (options != null) {
+			collection.setOptions(options);
+			syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
+		} else {
+			if (lastSyncCollection != null) {
+				collection.setOptions(lastSyncCollection.getOptions());
+			}
+		}
+	}
+
+	private SyncCollection findLastSyncedCollectionOptions(
+			UserDataRequest udr, boolean isPartial, Integer collectionId) {
+		
+		SyncCollection lastSyncCollection = syncedCollectionStoreService.get(udr.getCredentials(), udr.getDevice(), collectionId);
+		if (isPartial && lastSyncCollection == null) {
+			throw new PartialException();
+		}
+		return lastSyncCollection;
+	}
+
+	private void recognizeCollection(SyncCollection collection, Integer collectionId) throws DaoException {
+		try {
+			String collectionPath = collectionDao.getCollectionPath(collectionId);
+			collection.setCollectionPath(collectionPath);
+			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
+			collection.setDataType(dataType);
+		} catch (CollectionNotFoundException e) {
+			collection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
+		}
 	}
 
 	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection,

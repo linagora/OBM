@@ -31,80 +31,44 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public class Sync {
-	
-	private final Map<Integer, SyncCollection> collections;
-	private Integer wait;
-	
-	public Sync() {
-		super();
-		this.collections = new HashMap<Integer, SyncCollection>();
-	}
-	
-	public Integer getWaitInSecond() {
-		Integer ret = 0;
-		if(wait != null){
-			ret = wait * 60;
-		}
-		return ret;
-	}
-	
-	public void setWait(Integer wait) {
-		this.wait = wait;
-	}
-	
-	public Set<SyncCollection> getCollections() {
-		return ImmutableSet.copyOf(collections.values());
-	}
+@RunWith(SlowFilterRunner.class)
+public class SyncTest {
 
-	public Set<SyncCollection> getCollectionsValidToProcess() {
-		return Sets.filter(getCollections(), new Predicate<SyncCollection>() {
-
-			@Override
-			public boolean apply(SyncCollection input) {
-				return input.getStatus() == null || input.getStatus() == SyncStatus.OK;
-			}
-		});
+	@Test
+	public void testValidCollectionsWhenEmpty() {
+		Sync sync = new Sync();
+		
+		assertThat(sync.getCollections()).isEmpty();
+		assertThat(sync.getCollectionsValidToProcess()).isEmpty();
 	}
 	
-	public SyncCollection getCollection(Integer collectionId) {
-		return collections.get(collectionId);
-	}
-	
-	public void addCollection(SyncCollection collec) {
-		collections.put(collec.getCollectionId(), collec);
-	}
+	@Test
+	public void testValidCollections() {
+		SyncCollection validCollection = new SyncCollection(5, "path 1");
+		validCollection.setStatus(null);
+		SyncCollection validCollection2 = new SyncCollection(15, "path 2");
+		validCollection2.setStatus(SyncStatus.OK);
+		SyncCollection invalidCollection = new SyncCollection(20, "path 3");
+		invalidCollection.setStatus(SyncStatus.CONFLICT);
+		SyncCollection invalidCollection2 = new SyncCollection(25, "path 4");
+		invalidCollection2.setStatus(SyncStatus.OBJECT_NOT_FOUND);
 
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(collections, wait);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof Sync) {
-			Sync that = (Sync) object;
-			return Objects.equal(this.collections, that.collections)
-				&& Objects.equal(this.wait, that.wait);
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("collections", collections)
-			.add("wait", wait)
-			.toString();
+		Sync sync = new Sync();
+		sync.addCollection(validCollection);
+		sync.addCollection(validCollection2);
+		sync.addCollection(invalidCollection);
+		sync.addCollection(invalidCollection2);
+		
+		assertThat(sync.getCollections()).containsOnly(
+				validCollection, validCollection2, invalidCollection, invalidCollection2);
+		assertThat(sync.getCollectionsValidToProcess()).containsOnly(
+				validCollection, validCollection2);
 	}
 	
 }
