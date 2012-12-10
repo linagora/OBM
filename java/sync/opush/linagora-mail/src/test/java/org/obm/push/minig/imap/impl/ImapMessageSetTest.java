@@ -56,7 +56,7 @@ public class ImapMessageSetTest {
 
 	@Test
 	public void testParseAsCollection1() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("1:3,8:10,12");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("1:3,8:10,12");
 		Collection<Long> actual = imapMessageSet.asLongCollection();
 		assertThat(actual).containsExactly(1l, 2l, 3l, 8l, 9l, 10l, 12l);
 	}
@@ -70,7 +70,7 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testParseAsCollection2() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("2:4,8:10,12:13");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("2:4,8:10,12:13");
 		Collection<Long> actual = imapMessageSet.asLongCollection();
 		assertThat(actual).containsExactly(2l, 3l, 4l, 8l, 9l, 10l, 12l, 13l);
 	}
@@ -84,7 +84,7 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testParseAsCollection3() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("1:2");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("1:2");
 		Collection<Long> actual = imapMessageSet.asLongCollection();
 		assertThat(actual).containsExactly(1l, 2l);
 	}
@@ -98,7 +98,7 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testParseAsCollection4() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("1");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("1");
 		Collection<Long> actual = imapMessageSet.asLongCollection();
 		assertThat(actual).containsExactly(1l);
 	}
@@ -110,12 +110,6 @@ public class ImapMessageSetTest {
 		return ImapMessageSet.wrap(set);
 	}
 	
-	private ImapMessageSet buildImapMessageSet(String setAsString) {
-		MessageSet set = MessageSet.parseMessageSet(setAsString);
-		ImapMessageSet imapMessageSet = ImapMessageSet.wrap(set);
-		return imapMessageSet;
-	}
-	
 	@Test
 	public void testSizeZero() {
 		ImapMessageSet imapMessageSet = ImapMessageSet.wrap(MessageSet.builder().build());
@@ -124,7 +118,7 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testSize() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("2:4,8:10,12:13");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("2:4,8:10,12:13");
 		assertThat(imapMessageSet.size()).isEqualTo(8);
 	}
 	
@@ -136,7 +130,7 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testIsNotEmpty() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("2:4,8:10,12:13");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("2:4,8:10,12:13");
 		assertThat(imapMessageSet.isEmpty()).isFalse();
 	}
 	
@@ -148,13 +142,43 @@ public class ImapMessageSetTest {
 	
 	@Test
 	public void testNotContains() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("2:4,8:10,12:13");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("2:4,8:10,12:13");
 		assertThat(imapMessageSet.contains(0)).isFalse();
 	}
 	
 	@Test
 	public void testContains() {
-		ImapMessageSet imapMessageSet = buildImapMessageSet("2:4,8:10,12:13");
+		ImapMessageSet imapMessageSet = ImapMessageSet.parseMessageSet("2:4,8:10,12:13");
 		assertThat(imapMessageSet.contains(3)).isTrue();
 	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testParseMessageSetNull() {
+		ImapMessageSet.parseMessageSet(null);
+	}
+	
+	@Test(expected=NumberFormatException.class)
+	public void testParseMessageSetNumber() {
+		ImapMessageSet.parseMessageSet("");
+	}
+	
+	@Test
+	public void testParseMessageSet() {
+		ImapMessageSet messageSet = ImapMessageSet.parseMessageSet("1");
+		assertThat(messageSet.asLongCollection()).containsOnly(1l);
+	}
+	
+	@Test
+	public void testParseMessageSetRange() {
+		ImapMessageSet messageSet = ImapMessageSet.parseMessageSet("1:3");
+		assertThat(messageSet.asLongCollection()).containsOnly(1l, 2l, 3l);
+	}
+	
+	@Test
+	public void testParseMessageSetMultipleRanges() {
+		ImapMessageSet messageSet = ImapMessageSet.parseMessageSet("1:3,8:10");
+		assertThat(messageSet.asLongCollection()).containsOnly(1l, 2l, 3l, 8l, 9l, 10l);
+	}
+	
+
 }

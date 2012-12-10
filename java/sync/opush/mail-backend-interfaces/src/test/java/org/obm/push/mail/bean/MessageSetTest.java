@@ -139,34 +139,6 @@ public class MessageSetTest {
 		assertThat(secondSet.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l);
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void testParseMessageSetNull() {
-		MessageSet.parseMessageSet(null);
-	}
-	
-	@Test(expected=NumberFormatException.class)
-	public void testParseMessageSetNumber() {
-		MessageSet.parseMessageSet("");
-	}
-	
-	@Test
-	public void testParseMessageSet() {
-		MessageSet messageSet = MessageSet.parseMessageSet("1");
-		assertThat(messageSet.asDiscreteValues()).containsOnly(1l);
-	}
-	
-	@Test
-	public void testParseMessageSetRange() {
-		MessageSet messageSet = MessageSet.parseMessageSet("1:3");
-		assertThat(messageSet.asDiscreteValues()).containsOnly(1l, 2l, 3l);
-	}
-	
-	@Test
-	public void testParseMessageSetMultipleRanges() {
-		MessageSet messageSet = MessageSet.parseMessageSet("1:3,8:10");
-		assertThat(messageSet.asDiscreteValues()).containsOnly(1l, 2l, 3l, 8l, 9l, 10l);
-	}
-	
 	@Test
 	public void messageSetBuilderExtendTo() {
 		MessageSet firstSet = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(7l, 8l))

@@ -83,7 +83,7 @@ public class UIDCopyCommand extends Command<MessageSet> {
 		int space = payload.lastIndexOf(" ", idx);
 		String set = payload.substring(space + 1, idx);
 		logger.debug("set to parse: " + set);
-		return MessageSet.parseMessageSet(set);
+		return ImapMessageSet.parseMessageSet(set).getMessageSet();
 	}
 
 }

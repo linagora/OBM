@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.mail.bean.MessageSet;
+import org.obm.push.mail.bean.MessageSet.Builder;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ContiguousSet;
@@ -44,11 +45,28 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import com.google.common.collect.Ranges;
 
 public class ImapMessageSet {
 	
 	private final MessageSet set;
 
+	public static ImapMessageSet parseMessageSet(String set) {
+		String[] parts = set.split(",");
+		Builder builder = MessageSet.builder();
+		for (String s : parts) {
+			if (!s.contains(":")) {
+				builder.add(Long.valueOf(s));
+			} else {
+				String[] p = s.split(":");
+				long start = Long.valueOf(p[0]);
+				long end = Long.valueOf(p[1]);
+				builder.add(Ranges.closed(start, end));
+			}
+		}
+		return wrap(builder.build());
+	}
+	
 	public static ImapMessageSet wrap(MessageSet set) {
 		return new ImapMessageSet(set);
 	}

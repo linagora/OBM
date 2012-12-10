@@ -58,22 +58,6 @@ public class MessageSet implements Serializable, Iterable<Long> {
 		return new Builder(set);
 	}
 
-	public static MessageSet parseMessageSet(String set) {
-		String[] parts = set.split(",");
-		Builder builder = MessageSet.builder();
-		for (String s : parts) {
-			if (!s.contains(":")) {
-				builder.add(Long.valueOf(s));
-			} else {
-				String[] p = s.split(":");
-				long start = Long.valueOf(p[0]);
-				long end = Long.valueOf(p[1]);
-				builder.add(Ranges.closed(start, end));
-			}
-		}
-		return builder.build();
-	}
-
 	private static final MessageSet EMPTY = builder().build();
 	
 	public static MessageSet empty() {
