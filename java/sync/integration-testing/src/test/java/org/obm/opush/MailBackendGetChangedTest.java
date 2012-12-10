@@ -44,7 +44,6 @@ import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -151,7 +150,7 @@ public class MailBackendGetChangedTest {
 		expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
 			.andReturn(trashCollection).anyTimes();
 		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Collection.class));
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(SyncCollection.class));
 		expectLastCall().anyTimes();
 	}
 

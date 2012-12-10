@@ -63,6 +63,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -79,7 +80,7 @@ public class SyncDecoder {
 	private final CollectionPathHelper collectionPathHelper;
 
 	@Inject
-	private SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
+	@VisibleForTesting SyncDecoder(SyncedCollectionDao syncedCollectionStoreService,
 			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper,
 			Base64ASTimeZoneDecoder base64AsTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
 		this.collectionDao = collectionDao;
@@ -109,7 +110,6 @@ public class SyncDecoder {
 			SyncCollection collec = getCollection(userDataRequest, col, isPartial);
 			ret.addCollection(collec);
 		}
-		syncedCollectionStoreService.put(userDataRequest.getCredentials(), userDataRequest.getDevice(), ret.getCollections());
 		return ret;
 	}
 
@@ -151,7 +151,14 @@ public class SyncDecoder {
 			}
 			
 			SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
-			collection.setOptions(options);
+			if (options != null) {
+				collection.setOptions(options);
+				syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
+			} else {
+				if (lastSyncCollection != null) {
+					collection.setOptions(lastSyncCollection.getOptions());
+				}
+			}
 			
 			appendCommand(col, collection);
 		} catch (CollectionNotFoundException e) {
@@ -168,16 +175,17 @@ public class SyncDecoder {
 
 	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection,
 			Element collectionElement) {
-		SyncCollectionOptions options = null;
-		if(lastSyncCollection != null){
-			options = lastSyncCollection.getOptions();
-		}
-		if(options == null){
-			options = new SyncCollectionOptions();
-		}
 		
 		Element optionsElement = DOMUtils.getUniqueElement(collectionElement, "Options");
 		if (optionsElement != null) {
+			SyncCollectionOptions options = null;
+			if(lastSyncCollection != null){
+				options = lastSyncCollection.getOptions();
+			}
+			if(options == null){
+				options = new SyncCollectionOptions();
+			}
+			
 			String filterTypeElement = DOMUtils.getElementText(optionsElement, "FilterType");
 			if (filterTypeElement != null) {
 				options.setFilterType(FilterType.fromSpecificationValue(filterTypeElement));
@@ -213,8 +221,10 @@ public class SyncDecoder {
 			}
 
 			options.setBodyPreferences(getBodyPreference(optionsElement));
+			return options;
 		}
-		return options;
+		
+		return null;
 	}
 
 	private List<BodyPreference> getBodyPreference(Element optionsElement) {

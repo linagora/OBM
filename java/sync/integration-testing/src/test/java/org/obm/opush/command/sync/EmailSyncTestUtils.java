@@ -143,7 +143,7 @@ public class EmailSyncTestUtils {
 		syncedCollectionDao.put(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
-				anyObject(Set.class));
+				anyObject(SyncCollection.class));
 		expectLastCall().once().anyTimes();
 	}
 	

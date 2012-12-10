@@ -43,4 +43,5 @@ public interface SyncedCollectionDao {
 	
 	void put(Credentials credentials, Device device, Collection<SyncCollection> collections);
 
+	void put(Credentials credentials, Device device, SyncCollection collection);
 }

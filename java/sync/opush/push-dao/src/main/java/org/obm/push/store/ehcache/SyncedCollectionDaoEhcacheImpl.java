@@ -66,7 +66,8 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 		}
 	}
 
-	private void put(Credentials credentials, Device device, SyncCollection collection) {
+	@Override
+	public void put(Credentials credentials, Device device, SyncCollection collection) {
 		Key key = buildKey(credentials, device, collection.getCollectionId());
 		store.put( new Element(key, collection) );
 	}
