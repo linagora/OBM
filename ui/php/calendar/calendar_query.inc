@@ -2352,11 +2352,6 @@ function run_query_calendar_quick_event_update($calendar) {
 	// reload once again to have the correct sequence number
 	$newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
 	
-	// OBMFULL-3499
-	// This is done here so that participation status is up-to-date BEFORE the email is sent
-	// This allows the attached ICS to contain the correct PARTSTAT for the attendees
-	run_query_quick_attendee_update($calendar, $calendar['calendar_id']);
-	
   // Send mail session var
   $GLOBALS['send_notification_mail'] = $calendar['send_mail'];
   // Notify Observers
