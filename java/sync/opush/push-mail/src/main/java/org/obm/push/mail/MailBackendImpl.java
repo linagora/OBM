@@ -380,13 +380,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			}
 			if (serverId != null) {
 				final Long uid = getEmailUidFromServerId(serverId);
-				final String collectionName = mappingService.getCollectionPathFor(collectionId);
+				final String destinationCollectionPath = mappingService.getCollectionPathFor(collectionId);
 
-				if (trash) {
-					CollectionPath wasteBasketPath = getWasteBasketPath(udr);
-					mailboxService.moveItem(udr, collectionName, wasteBasketPath.collectionPath(), uid);
+				CollectionPath wasteBasketPath = getWasteBasketPath(udr);
+				if (trash && !wasteBasketPath.collectionPath().equals(destinationCollectionPath)) {
+					mailboxService.moveItem(udr, destinationCollectionPath, wasteBasketPath.collectionPath(), uid);
 				} else {
-					mailboxService.delete(udr, collectionName, uid);
+					mailboxService.delete(udr, destinationCollectionPath, uid);
 				}
 			}	
 		} catch (MailException e) {

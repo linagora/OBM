@@ -450,6 +450,32 @@ public class MailBackendTest {
 				.build());
 	}
 
+	@Test
+	public void testDeleteItemInTrash() throws Exception {
+		int collectionId = 1;
+		int itemId = 2;
+		String serverId = collectionId + ":" + itemId;
+		
+		MailCollectionPath trashCollectionPath = new MailCollectionPath(EmailConfiguration.IMAP_TRASH_NAME);
+		expect(mappingService.getItemIdFromServerId(serverId))
+			.andReturn(itemId).once();
+		expect(mappingService.getCollectionPathFor(collectionId))
+			.andReturn(trashCollectionPath.collectionPath()).once();
+		
+		expect(collectionPathBuilder.backendName(EmailConfiguration.IMAP_TRASH_NAME))
+			.andReturn(collectionPathBuilder).once();
+		expect(collectionPathBuilder.build())
+			.andReturn(trashCollectionPath).once();
+		
+		mailboxService.delete(udr, trashCollectionPath.collectionPath(), itemId);
+		expectLastCall();
+		
+		replayCommonMocks();
+		 
+		testee.delete(udr, collectionId, serverId, true);
+		verifyCommonMocks();
+	}
+
 	private void expectMappingServiceSearchThenCreateCollection(Map<String, Integer> mailboxesIds)
 			throws DaoException, CollectionNotFoundException {
 		
