@@ -47,6 +47,8 @@ public class QoSFilterTestModule extends ServletModule {
 	
 	public static final String BLOCKING_SERVLET_NAME = "blocking";
 	public static final String SUSPENDING_SERVLET_NAME = "suspending";
+	private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 10;
+	private static final int WAIT_TO_BE_STARTED_MAX_ITERATION = 10;
 	
 	@Provides @Singleton
 	protected EmbeddedServer buildServerWithModules() {
@@ -68,14 +70,33 @@ public class QoSFilterTestModule extends ServletModule {
 			public void start() throws Exception {
 				server.start();
 			}
-			
+
 			@Override
 			public int getPort() {
+				if (server.isRunning()) {
+					return waitServerStartsThenGetPorts();
+				}
+				throw new IllegalStateException("Could not get server's listening port. Start the server first.");
+			}
+
+			private int waitServerStartsThenGetPorts() {
+				try {
+					for (int tryCount = 0; tryCount < WAIT_TO_BE_STARTED_MAX_ITERATION; tryCount++) {
+						if (server.isStarted()) {
+							return getLocalPort();
+						}
+						Thread.sleep(WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE);
+					}
+				} catch (InterruptedException e) { }
+				throw new IllegalStateException("Could not get server's listening port, server too long to start.");
+			}
+
+			private int getLocalPort() {
 				int port = selectChannelConnector.getLocalPort();
 				if (port > 0) {
 					return port;
 				}
-				throw new IllegalStateException("Could not get server's listening port. Assert to start the server first.");
+				throw new IllegalStateException("Could not get server's listening port.");
 			}
 		};
 	}

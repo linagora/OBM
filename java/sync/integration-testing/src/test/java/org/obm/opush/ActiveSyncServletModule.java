@@ -80,6 +80,9 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	
 	public static class OpushServer {
 		
+		private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 10;
+		private static final int WAIT_TO_BE_STARTED_MAX_ITERATION = 10;
+		
 		private final Server server;
 		private final SelectChannelConnector selectChannelConnector;
 
@@ -91,7 +94,11 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			Context root = new Context(server, "/", Context.SESSIONS);
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/");
-			root.addEventListener(new ServletContextListener() {
+			root.addEventListener(buildTransactionManagerListener());
+		}
+
+		private ServletContextListener buildTransactionManagerListener() {
+			return new ServletContextListener() {
 				
 				@Override
 				public void contextInitialized(ServletContextEvent sce) {
@@ -102,7 +109,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			    	CacheManager.getInstance().shutdown();
 			    	TransactionManagerServices.getTransactionManager().shutdown();
 				}
-			});
+			};
 		}
 
 		public void start() throws Exception {
@@ -114,11 +121,30 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 		}
 		
 		public int getPort() {
+			if (server.isRunning()) {
+				return waitServerStartsThenGetPorts();
+			}
+			throw new IllegalStateException("Could not get server's listening port. Start the server first.");
+		}
+
+		private int waitServerStartsThenGetPorts() {
+			try {
+				for (int tryCount = 0; tryCount < WAIT_TO_BE_STARTED_MAX_ITERATION; tryCount++) {
+					if (server.isStarted()) {
+						return getLocalPort();
+					}
+					Thread.sleep(WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE);
+				}
+			} catch (InterruptedException e) { }
+			throw new IllegalStateException("Could not get server's listening port, server too long to start.");
+		}
+
+		private int getLocalPort() {
 			int port = selectChannelConnector.getLocalPort();
 			if (port > 0) {
 				return port;
 			}
-			throw new IllegalStateException("Could not get server's listening port. Start the server first.");
+			throw new IllegalStateException("Could not get server's listening port.");
 		}
 	}
 
