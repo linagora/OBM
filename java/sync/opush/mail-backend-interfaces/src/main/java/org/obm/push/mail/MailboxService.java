@@ -114,7 +114,7 @@ public interface MailboxService {
 	
 	Collection<UIDEnvelope> fetchEnvelope(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
-	IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException;
+	Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet uid, IMimePart mimePart) throws IOException;
 
 	void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException;
 

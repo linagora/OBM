@@ -91,6 +91,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -644,7 +645,16 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException {
+	public Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet messages, IMimePart mimePart) throws IOException {
+		ImmutableMap.Builder<Long, IMAPHeaders> headers = ImmutableMap.builder();
+		for (long uid: messages) {
+			headers.put(uid, fetchPartHeaders(udr, collectionPath, uid, mimePart));
+		}
+		return headers.build();
+	}
+
+	private IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart)
+			throws IOException {
 		MimeAddress address = mimePart.getAddress();
 		String part = null;
 		if (address == null) {

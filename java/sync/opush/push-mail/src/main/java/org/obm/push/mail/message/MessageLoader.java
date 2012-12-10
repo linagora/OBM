@@ -43,6 +43,7 @@ import java.util.List;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.conversation.MailBody;
 import org.obm.push.mail.conversation.MailMessage;
 import org.obm.push.mail.imap.StoreException;
@@ -106,9 +107,10 @@ public class MessageLoader {
 			throws IOException {
 		
 		MailMessage mm = extractMailMessage(mimePart);
-		IMAPHeaders h = mailboxService.fetchPartHeaders(udr, collectionPath, message.getUid(), mimePart);
+		long messageUid = message.getUid();
+		IMAPHeaders h = mailboxService.fetchPartHeaders(udr, collectionPath, MessageSet.singleton(messageUid), mimePart).get(messageUid);
 		copyHeaders(h, mm);
-		mm.setUid(message.getUid());
+		mm.setUid(messageUid);
 
 		return mm;
 	}
