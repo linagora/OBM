@@ -38,6 +38,7 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
 import org.obm.sync.push.client.Add;
+import org.obm.sync.push.client.Change;
 import org.obm.sync.push.client.Collection;
 import org.obm.sync.push.client.Delete;
 import org.obm.sync.push.client.Folder;
@@ -97,6 +98,14 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 				Add add = new Add();
 				add.setServerId(serverId);
 				col.addAdd(add);
+			}
+			NodeList changes = e.getElementsByTagName("Change");
+			for (int j = 0; j < changes.getLength(); j++) {
+				Element appData = (Element) changes.item(j);
+				String serverId = DOMUtils.getElementText(appData, "ServerId");
+				Change change = new Change();
+				change.setServerId(serverId);
+				col.addChange(change);
 			}
 			NodeList deleteNodes = e.getElementsByTagName("Delete");
 			for (int j = 0; j < deleteNodes.getLength(); j++) {
