@@ -95,6 +95,7 @@ import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -249,18 +250,21 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuationService.suspend(udr, continuation, sync.getWaitInSecond());
 	}
 
-	private Date doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
-			SyncKey newSyncKey, SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
+	private ItemSyncState doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
+			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
+		SyncKey treatmentSyncKey = null;
 		
 		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
 		if (unSynchronizedItemNb == 0) {
-			delta = contentsExporter.getChanged(udr, c, newSyncKey);
+			treatmentSyncKey = syncKeyFactory.randomSyncKey();
+			delta = contentsExporter.getChanged(udr, c, treatmentSyncKey);
 			lastSync = delta.getSyncDate();
 		} else {
+			treatmentSyncKey = c.getSyncKey();
 			lastSync = c.getItemSyncState().getSyncDate();
 			delta = DataDelta.newEmptyDelta(lastSync);
 		}
@@ -271,7 +275,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		List<ItemDeletion> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, processedClientIds);
 		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
-		return lastSync;
+		return ItemSyncState.builder()
+				.syncKey(treatmentSyncKey)
+				.syncDate(lastSync)
+				.build();
 	}
 
 	private ModificationStatus processCollections(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
@@ -444,18 +451,30 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} else if (syncCollection.isValidToProcess()) {
 			syncCollection.setItemSyncState(st);
 			Date syncDate = null;
-			SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
+			SyncKey treatmentSyncKey = null;
 			if (syncCollection.getFetchIds().isEmpty()) {
-				syncDate = doUpdates(udr, syncCollection, processedClientIds, newSyncKey, syncCollectionResponse);
+				ItemSyncState itemSyncState = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
+				syncDate = itemSyncState.getSyncDate();
+				treatmentSyncKey = itemSyncState.getSyncKey();
 			} else {
+				treatmentSyncKey = syncKeyFactory.randomSyncKey();
 				syncDate = dateService.getEpochPlusOneSecondDate();
 				syncCollectionResponse.setItemChanges(
 						contentsExporter.fetch(udr, syncCollection));
 			}
+			
 			identifyNewItems(syncCollectionResponse, st);
+			allocateSyncStateIfNew(udr, syncCollection, syncCollectionResponse, syncDate, treatmentSyncKey);
+			syncCollectionResponse.setNewSyncKey(treatmentSyncKey);
+		}
+	}
+
+	private void allocateSyncStateIfNew(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse, Date syncDate, SyncKey treatmentSyncKey) 
+				throws DaoException, InvalidServerId {
+
+		if (!Objects.equal(syncCollection.getSyncKey(), treatmentSyncKey)) {
 			stMachine.allocateNewSyncState(udr, syncCollection.getCollectionId(), syncDate, 
-					syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion(), newSyncKey);
-			syncCollectionResponse.setNewSyncKey(newSyncKey);
+					syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion(), treatmentSyncKey);
 		}
 	}
 
