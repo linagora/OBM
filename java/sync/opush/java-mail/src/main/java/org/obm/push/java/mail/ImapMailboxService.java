@@ -473,6 +473,7 @@ public class ImapMailboxService implements MailboxService {
 						return Email.builder()
 								.uid(input.getUid())
 								.read(input.isRead())
+								.deleted(input.isDeleted())
 								.date(input.getInternalDate())
 								.build();
 					}

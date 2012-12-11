@@ -142,6 +142,10 @@ public class FastFetch {
 		return flags != null && flags.contains(Flag.FLAGGED);
 	}
 
+	public boolean isDeleted() {
+		return flags != null && flags.contains(Flag.DELETED);
+	}
+	
 	public Integer getSize() {
 		return size;
 	}
