@@ -78,7 +78,7 @@ public class UIDSearchCommand extends Command<Collection<Long>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		data = Collections.emptyList();
 

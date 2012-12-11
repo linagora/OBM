@@ -56,7 +56,7 @@ public class ListCommandTest {
 	
 	@Test
 	public void folderNameList() {
-		listCommand.responseReceived(responses(
+		listCommand.handleResponses(responses(
 				"* LIST (\\Noinferiors) \"/\" INBOX",
 				"* LIST (\\HasNoChildren) \"/\" Drafts",
 				"* LIST (\\HasNoChildren) \"/\" SPAM",
@@ -76,7 +76,7 @@ public class ListCommandTest {
 	
 	@Test
 	public void folderNameTrimQuotes() {
-		listCommand.responseReceived(responses(
+		listCommand.handleResponses(responses(
 				"* LIST (\\Noinferiors) \"/\" \"INBOX\"",
 				"* LIST (\\HasNoChildren) \"/\" \"Drafts\"",
 				"* LIST (\\HasNoChildren) \"/\" \"SPAM\"",

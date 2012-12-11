@@ -65,15 +65,8 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		if (imaplogger.isInfoEnabled()) {
-			for (IMAPResponse r: rs) {
-				imaplogger.info(r.getPayload());
-			}
-		}
-		
-		if (isOK) {
+	public void handleResponses(List<IMAPResponse> rs) {
+		if (isOk(rs)) {
 			List<MimeMessage> mts = new LinkedList<MimeMessage>();
 			Iterator<IMAPResponse> it = rs.iterator();
 			int len = rs.size() - 1;
@@ -87,7 +80,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 				}
 				
 				if (bs.length() < 2) {
-					logger.warn("strange bs response: " + s);
+					logger.warn("strange bs response: {}", s);
 					continue;
 				}
 
@@ -100,15 +93,15 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 					messageBuilder.uid(uid).size(size);
 					mts.add(messageBuilder.build());
 				} catch (RuntimeException re) {
-					logger.error("error parsing:\n" + new String(s));
-					logger.error("payload was:\n" + s);
+					logger.error("error parsing:\n{}", new String(s));
+					logger.error("payload was:\n{}", s);
 					throw re;
 				}
 			}
 			data = mts;
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("bodystructure failed : " + ok.getPayload());
+			logger.warn("bodystructure failed : {}", ok.getPayload());
 			data = Collections.emptyList();
 		}
 	}

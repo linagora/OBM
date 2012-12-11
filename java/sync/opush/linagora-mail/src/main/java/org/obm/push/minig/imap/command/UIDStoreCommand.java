@@ -54,7 +54,7 @@ public class UIDStoreCommand extends Command<Boolean> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		data = isOK;
 	}

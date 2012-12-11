@@ -44,8 +44,10 @@ public interface ICommand<T> {
 	void execute(IoSession s, TagProducer tp, Semaphore lock,
 			List<IMAPResponse> lastResponses);
 
-	void responseReceived(List<IMAPResponse> rs);
+	void handleResponses(List<IMAPResponse> rs);
 
 	T getReceivedData();
+
+	void responseReceived(List<IMAPResponse> lastResponses);
 
 }

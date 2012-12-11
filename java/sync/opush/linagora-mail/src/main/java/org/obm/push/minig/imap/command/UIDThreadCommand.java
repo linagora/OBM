@@ -49,7 +49,7 @@ public class UIDThreadCommand extends Command<List<MailThread>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		data = new LinkedList<MailThread>();
 		if (isOK) {
@@ -65,7 +65,7 @@ public class UIDThreadCommand extends Command<List<MailThread>> {
 
 			if (threads != null) {
 				parseParenList(data, threads.substring("* THREAD ".length()));
-				logger.debug("extracted " + data.size() + " threads");
+				logger.debug("extracted {} threads", data.size());
 			}
 		}
 	}

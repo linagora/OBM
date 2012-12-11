@@ -54,7 +54,7 @@ public class UIDCopyCommandTest {
 	}
 	
 	@Test
-	public void testResponseReceived() {
+	public void testHandleResponses() {
 		String response = 
 				"* OK [COPY 23 1 2]";
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);

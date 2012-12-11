@@ -46,12 +46,11 @@ public class QuotaRootCommand extends SimpleCommand<QuotaInfo> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		data = new QuotaInfo();
 		if (isOk(rs)) {
 			Pattern p = Pattern.compile("\\* QUOTA .* \\(STORAGE ");
 			for (IMAPResponse imapr : rs) {
-				logger.debug("Payload " + imapr.getPayload());
 				Matcher m = p.matcher(imapr.getPayload());
 				if (m.find()) {
 					String rep = m.replaceAll("").replaceAll("\\)", "");

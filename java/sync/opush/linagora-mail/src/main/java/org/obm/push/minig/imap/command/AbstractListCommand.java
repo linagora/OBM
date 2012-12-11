@@ -51,7 +51,7 @@ public class AbstractListCommand extends SimpleCommand<ListResult> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		ListResult lr = new ListResult(rs.size() - 1);
 		for (int i = 0; i < rs.size() - 1; i++) {
 			String p = rs.get(i).getPayload();

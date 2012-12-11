@@ -58,7 +58,7 @@ public class UIDFetchFlagsCommandTest {
 	@Test
 	public void validResponses() {
 		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
-		uidFetchFlagsCommand.responseReceived(responses("* 98 FETCH (FLAGS (\\Seen) UID 12)"));
+		uidFetchFlagsCommand.handleResponses(responses("* 98 FETCH (FLAGS (\\Seen) UID 12)"));
 		Map<Long, FlagsList> receivedData = uidFetchFlagsCommand.getReceivedData();
 		assertThat(receivedData).hasSize(1).contains(entry(12l, new FlagsList(Arrays.asList(Flag.SEEN))) );
 	}
@@ -66,7 +66,7 @@ public class UIDFetchFlagsCommandTest {
 	@Test
 	public void severalUntaggedResponses() {
 		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
-		uidFetchFlagsCommand.responseReceived(
+		uidFetchFlagsCommand.handleResponses(
 				responses(
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 
 						"* 98 FETCH (FLAGS (\\Seen) UID 13)"));
@@ -77,7 +77,7 @@ public class UIDFetchFlagsCommandTest {
 	@Test
 	public void severalIdenticalUntaggedResponses() {
 		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(Arrays.asList(12l));
-		uidFetchFlagsCommand.responseReceived(
+		uidFetchFlagsCommand.handleResponses(
 				responses(
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)"));

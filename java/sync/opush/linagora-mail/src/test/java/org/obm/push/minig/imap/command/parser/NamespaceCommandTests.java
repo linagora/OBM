@@ -52,7 +52,7 @@ public class NamespaceCommandTests {
 	@Test
 	public void testParsingRFC2342Ex5Dot1() {
 		IMAPResponse response = createImapResponseFromPayload("* NAMESPACE ((\"\" \"/\")) NIL NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());
@@ -63,7 +63,7 @@ public class NamespaceCommandTests {
 	@Test
 	public void testParsingRFC2342Ex5Dot2() {
 		IMAPResponse response = createImapResponseFromPayload("* NAMESPACE NIL NIL ((\"\" \".\"))");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(0, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());
@@ -74,7 +74,7 @@ public class NamespaceCommandTests {
 	@Test
 	public void testParsingRFC2342Ex5Dot3() {
 		IMAPResponse response = createImapResponseFromPayload("* NAMESPACE ((\"\" \"/\")) NIL ((\"Public Folders/\" \"/\"))");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());
@@ -89,7 +89,7 @@ public class NamespaceCommandTests {
 				"* NAMESPACE ((\"\" \"/\")) ((\"~\" \"/\")) " +
 				"((\"#shared/\" \"/\") (\"#public/\" \"/\") " +
 				"(\"#ftp/\" \"/\")(\"#news.\" \".\"))");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(1, namespaceInfo.getOtherUsers().size());
@@ -103,7 +103,7 @@ public class NamespaceCommandTests {
 	@Test
 	public void testParsingRFC2342Ex5Dot5() {
 		IMAPResponse response = createImapResponseFromPayload("* NAMESPACE ((\"INBOX.\" \".\")) NIL  NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());
@@ -115,7 +115,7 @@ public class NamespaceCommandTests {
 	public void testParsingRFC2342Ex5Dot6() {
 		IMAPResponse response = createImapResponseFromPayload(
 				"* NAMESPACE ((\"\" \"/\")(\"#mh/\" \"/\" \"X-PARAM\" (\"FLAG1\" \"FLAG2\"))) NIL NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(2, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());
@@ -128,7 +128,7 @@ public class NamespaceCommandTests {
 	public void testParsingRFC2342Ex5Dot7() {
 		IMAPResponse response = createImapResponseFromPayload(
 				"* NAMESPACE ((\"\" \"/\")) ((\"Other Users/\" \"/\")) NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(1, namespaceInfo.getOtherUsers().size());
@@ -141,7 +141,7 @@ public class NamespaceCommandTests {
 	public void testParsingRFC2342Ex5Dot8() {
 		IMAPResponse response = createImapResponseFromPayload(
 				"* NAMESPACE ((\"\" \"/\")) ((\"#Users/\" \"/\")) NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(1, namespaceInfo.getOtherUsers().size());
@@ -154,7 +154,7 @@ public class NamespaceCommandTests {
 	public void testParsingRFC2342Ex5Dot9() {
 		IMAPResponse response = createImapResponseFromPayload(
 				"* NAMESPACE ((\"\" \"/\")) ((\"~\" \"/\")) NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(1, namespaceInfo.getPersonal().size());
 		Assert.assertEquals(1, namespaceInfo.getOtherUsers().size());
@@ -166,7 +166,7 @@ public class NamespaceCommandTests {
 	@Test
 	public void testParsingRFC2342UTF7() {
 		IMAPResponse response = createImapResponseFromPayload("* NAMESPACE ((\"Bo&AO4-tes partag&AOk-es/\" \"/\")) NIL NIL");
-		command.responseReceived(Arrays.asList(response));
+		command.handleResponses(Arrays.asList(response));
 		NameSpaceInfo namespaceInfo = command.getReceivedData();
 		Assert.assertEquals(0, namespaceInfo.getMailShares().size());
 		Assert.assertEquals(0, namespaceInfo.getOtherUsers().size());

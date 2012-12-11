@@ -50,7 +50,7 @@ public class NamespaceCommand extends SimpleCommand<NameSpaceInfo> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		if (isOk(rs)) {
 			IMAPResponse nsr = lookForResponse(rs);
 			NamespaceParser parserInstance = parser.newInstance();

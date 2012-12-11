@@ -67,7 +67,7 @@ public class UIDFetchBodyStructureCommandTest {
 
 	
 	@Test @Slow
-	public void testResponseReceived() {
+	public void testHandleResponses() {
 		BodyStructureParser resultCallback = EasyMock.createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
 		MimeMessage.Builder mimeMessageBuilder = EasyMock.createNiceMock(MimeMessage.Builder.class);

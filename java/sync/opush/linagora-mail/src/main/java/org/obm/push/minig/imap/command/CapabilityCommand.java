@@ -46,7 +46,7 @@ public class CapabilityCommand extends SimpleCommand<Set<String>> {
 
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		data = new HashSet<String>();
 		String[] parts = rs.get(0).getPayload().split(" ");
 		for (int i = 2; i < parts.length; i++) {

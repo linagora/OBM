@@ -42,6 +42,7 @@ import org.obm.push.minig.imap.impl.TagProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 public abstract class Command<T> implements ICommand<T> {
@@ -62,7 +63,7 @@ public abstract class Command<T> implements ICommand<T> {
 		sb.append(' ');
 		sb.append(cmd);
 		String sent = sb.toString();
-		imaplogger.info("{}", sent);
+		imaplogger.info("C: {}", sent);
 		session.write(sent);
 		if (args.hasLiteralData()) {
 			lock(lock);
@@ -71,6 +72,15 @@ public abstract class Command<T> implements ICommand<T> {
 
 	}
 
+	@Override
+	public final void responseReceived(List<IMAPResponse> lastResponses) {
+		if (imaplogger.isInfoEnabled()) {
+			imaplogger.info("Command status {}", isOk(lastResponses) ? "SUCCESS" : "FAILURE");
+			imaplogger.info("S: {}", Joiner.on('\n').join(lastResponses));
+		}
+		handleResponses(lastResponses);
+	}
+	
 	private void lock(Semaphore lock) {
 		try {
 			lock.acquire();
@@ -96,9 +106,7 @@ public abstract class Command<T> implements ICommand<T> {
 	}
 
 	protected boolean isOk(List<IMAPResponse> rs) {
-		boolean isOK = Iterables.getLast(rs).isOk();
-		imaplogger.info("{}", isOK);
-		return isOK;
+		return Iterables.getLast(rs).isOk();
 	}
 
 	protected static String fromUtf7(String mailbox) {

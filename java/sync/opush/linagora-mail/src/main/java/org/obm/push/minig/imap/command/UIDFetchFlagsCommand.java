@@ -74,7 +74,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
 		if (imapMessageSet.isEmpty()) {
@@ -100,8 +100,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 				if (fidx > 0 && endFlags >= fidx) {
 					flags = payload.substring(fidx, endFlags);
 				} else {
-					logger.error("Failed to get flags in fetch response: "
-							+ payload);
+					logger.error("Failed to get flags in fetch response: {}", payload);
 				}
 
 				long uid = getUid(payload);
@@ -114,7 +113,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 			data = result;
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: " + ok.getPayload());
+			logger.warn("error on fetch: {}", ok.getPayload());
 			data = ImmutableMap.<Long, FlagsList>of();
 		}
 	}

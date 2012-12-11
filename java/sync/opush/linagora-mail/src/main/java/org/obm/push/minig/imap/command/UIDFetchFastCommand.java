@@ -85,7 +85,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
 		if (imapMessageSet.isEmpty()) {
@@ -101,7 +101,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH (")) {
-					logger.debug("not a fetch: "+payload);
+					logger.debug("not a fetch: {}", payload);
 					continue;
 				}
 				
@@ -117,7 +117,7 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 			}
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: " + ok.getPayload());
+			logger.warn("error on fetch: {}", ok.getPayload());
 		}
 		
 		data = buildSet.build();

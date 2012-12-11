@@ -59,7 +59,7 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
 		IMAPResponse stream = rs.get(0);
@@ -77,15 +77,10 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 			data = new ByteArrayInputStream(dest);
 		} else {
 			if (isOK) {
-				logger
-						.warn("fetch is ok with no stream in response. Printing received responses :");
-				for (IMAPResponse ir : rs) {
-					logger.warn("    <= " + ir.getPayload());
-				}
+				logger.warn("fetch is ok with no stream in response. Printing received responses :");
 				data = new ByteArrayInputStream("".getBytes());
 			} else {
-				logger.error("UIDFetchMessage failed for uid " + uid + ": "
-						+ Iterables.getLast(rs).getPayload());
+				logger.error("UIDFetchMessage failed for uid {} : {}", uid, Iterables.getLast(rs).getPayload());
 			}
 			throw new ImapMessageNotFoundException("UIDFetchMessage failed for uid " + uid);
 		}

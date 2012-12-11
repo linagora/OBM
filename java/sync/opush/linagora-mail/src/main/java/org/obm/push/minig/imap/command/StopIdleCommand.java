@@ -53,7 +53,7 @@ public class StopIdleCommand extends Command<Boolean> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {}
+	public void handleResponses(List<IMAPResponse> rs) {}
 
 	@Override
 	protected CommandArgument buildCommand() {

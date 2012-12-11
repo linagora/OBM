@@ -64,19 +64,18 @@ public class UIDCopyCommand extends Command<Collection<Long>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 
 		IMAPResponse ok = rs.get(rs.size() - 1);
 		if (isOK && ok.getPayload().contains("[")) {
-			logger.debug("ok: " + ok.getPayload());
+			logger.debug("ok: {}", ok.getPayload());
 			data = parseMessageSet(ok.getPayload());
 		} else {
 			if (isOK) {
-				logger.warn("cyrus did not send [COPYUID ...] token: "
-						+ ok.getPayload());
+				logger.warn("cyrus did not send [COPYUID ...] token: {}", ok.getPayload());
 			} else {
-				logger.error("error on uid copy: " + ok.getPayload());
+				logger.error("error on uid copy: {}", ok.getPayload());
 			}
 			data = Collections.emptyList();
 		}

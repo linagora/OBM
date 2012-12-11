@@ -75,7 +75,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
 		if (imapMessageSet.isEmpty()) {
@@ -101,8 +101,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 				if (fidx > 0 && endDate >= fidx) {
 					internalDate = payload.substring(fidx, endDate);
 				} else {
-					logger.error("Failed to get flags in fetch response: "
-							+ payload);
+					logger.error("Failed to get flags in fetch response: {}", payload);
 				}
 
 				int uidIdx = payload.indexOf("UID ") + "UID ".length();
@@ -118,7 +117,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 			}
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: " + ok.getPayload());
+			logger.warn("error on fetch: {}", ok.getPayload());
 			data = new InternalDate[0];
 		}
 	}
@@ -127,7 +126,7 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 		try {
 			return df .parse(date);
 		} catch (ParseException e) {
-			logger.error("Can't parse "+date);
+			logger.error("Can't parse date {}", date);
 		}
 		return new Date();
 	}

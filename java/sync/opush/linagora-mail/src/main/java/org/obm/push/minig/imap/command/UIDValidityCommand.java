@@ -53,7 +53,7 @@ public class UIDValidityCommand extends Command<Long> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		data = null;
 		if (isOK) {

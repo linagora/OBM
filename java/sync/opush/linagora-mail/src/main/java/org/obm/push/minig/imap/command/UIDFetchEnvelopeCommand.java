@@ -87,7 +87,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 
 		if (imapMessageSet.isEmpty()) {
@@ -102,7 +102,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH")) {
-					logger.warn("not a fetch: " + payload);
+					logger.warn("not a fetch: {}", payload);
 					continue;
 				}
 				String fullPayload = AtomHelper.getFullResponse(payload, r.getStreamData());
@@ -114,8 +114,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 					logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
 					tmp.add( new UIDEnvelope(uid, envelope) );
 				} catch (Throwable t) {
-					logger.error("fail parsing envelope for message UID " + uid, t);
-					logger.error("Envelope payload in error was : " + envel);
+					logger.error("fail parsing envelope for message UID {}", uid, t);
+					logger.error("Envelope payload in error was : {}", envel);
 					data = Collections.emptyList();
 					return;
 				}
@@ -124,7 +124,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 			data = tmp;
 		} else {
 			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: " + ok.getPayload());
+			logger.warn("error on fetch: {}", ok.getPayload());
 			data = Collections.emptyList();
 		}
 	}

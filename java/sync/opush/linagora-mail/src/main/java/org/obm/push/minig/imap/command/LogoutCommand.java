@@ -45,7 +45,7 @@ public class LogoutCommand extends SimpleCommand<Object>{
 
 	
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 	}
 	
 }

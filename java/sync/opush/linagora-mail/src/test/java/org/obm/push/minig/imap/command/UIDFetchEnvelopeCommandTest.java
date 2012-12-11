@@ -68,7 +68,7 @@ public class UIDFetchEnvelopeCommandTest {
 		IMAPResponseParser imapResponseParser = new IMAPResponseParser();
 		IMAPResponse response = imapResponseParser.parse(minaMsg);
 		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(Arrays.asList(20l));
-		command.responseReceived(ImmutableList.of(response, new IMAPResponse("OK", "")));
+		command.handleResponses(ImmutableList.of(response, new IMAPResponse("OK", "")));
 		Assert.assertNotNull(command.getReceivedData());
 	}
 	

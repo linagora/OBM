@@ -82,7 +82,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		boolean isOK = isOk(rs);
 		
 		if (imapMessageSet.isEmpty()) {
@@ -97,7 +97,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 				IMAPResponse r = it.next();
 				String payload = r.getPayload();
 				if (!payload.contains(" FETCH")) {
-					logger.warn("not a fetch: "+payload);
+					logger.warn("not a fetch: {}", payload);
 					continue;
 				}
 				int uidIdx = payload.indexOf("(UID ") + "(UID ".length();
@@ -107,8 +107,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 				try {
 					uid = Long.parseLong(uidStr);
 				} catch (NumberFormatException nfe) {
-					logger.error("cannot parse uid for string '" + uid
-							+ "' (payload: " + payload + ")");
+					logger.error("cannot parse uid for string '{}' (payload: {})", uid, payload);
 					continue;
 				}
 
@@ -126,7 +125,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 					}
 				} else {
 					// cyrus search command can return uid's that no longer exist in the mailbox
-					logger.warn("cyrus did not return any header for uid " + uid);
+					logger.warn("cyrus did not return any header for uid {}", uid);
 				}
 
 				IMAPHeaders imapHeaders = new IMAPHeaders();

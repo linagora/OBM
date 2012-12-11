@@ -41,37 +41,37 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 public class UIDValidityCommandTest {
 	
 	@Test
-	public void testResponseReceivedNOK() {
-		UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
-		
-		uidValidityCommand.responseReceived(Arrays.asList(new IMAPResponse("NO", "")));
-		
-		Long uidValidity = uidValidityCommand.getReceivedData();
-		assertThat(uidValidity).isNull();
-	}
+		public void testHandleResponsesNOK() {
+			UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
+			
+			uidValidityCommand.handleResponses(Arrays.asList(new IMAPResponse("NO", "")));
+			
+			Long uidValidity = uidValidityCommand.getReceivedData();
+			assertThat(uidValidity).isNull();
+		}
 	
 	@Test
-	public void testResponseReceived() {
-		UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
-		IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231 UIDVALIDITY 44292)");
-		
-		long expectedUIDValidity = 44292;
-		uidValidityCommand.responseReceived(Arrays.asList(response, new IMAPResponse("OK", "")));
-		
-		Long uidValidity = uidValidityCommand.getReceivedData();
-		assertThat(uidValidity).isEqualTo(expectedUIDValidity);
-	}
+		public void testHandleResponses() {
+			UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
+			IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231 UIDVALIDITY 44292)");
+			
+			long expectedUIDValidity = 44292;
+			uidValidityCommand.handleResponses(Arrays.asList(response, new IMAPResponse("OK", "")));
+			
+			Long uidValidity = uidValidityCommand.getReceivedData();
+			assertThat(uidValidity).isEqualTo(expectedUIDValidity);
+		}
 	
 	@Test
-	public void testResponseReceivedMultiLines() {
-		UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
-		IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231");
-		IMAPResponse response2 = new IMAPResponse("OK", "UIDVALIDITY 44292)");
-		
-		long expectedUIDValidity = 44292;
-		uidValidityCommand.responseReceived(Arrays.asList(response, response2, new IMAPResponse("OK", "")));
-		
-		Long uidValidity = uidValidityCommand.getReceivedData();
-		assertThat(uidValidity).isEqualTo(expectedUIDValidity);
-	}
+		public void testHandleResponsesMultiLines() {
+			UIDValidityCommand uidValidityCommand = new UIDValidityCommand("Inbox");
+			IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231");
+			IMAPResponse response2 = new IMAPResponse("OK", "UIDVALIDITY 44292)");
+			
+			long expectedUIDValidity = 44292;
+			uidValidityCommand.handleResponses(Arrays.asList(response, response2, new IMAPResponse("OK", "")));
+			
+			Long uidValidity = uidValidityCommand.getReceivedData();
+			assertThat(uidValidity).isEqualTo(expectedUIDValidity);
+		}
 }

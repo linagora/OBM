@@ -43,15 +43,9 @@ public class NoopCommand extends SimpleCommand<Boolean> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		IMAPResponse ok = rs.get(rs.size() - 1);
 		data = ok.isOk();
-		if (!data) {
-			logger.warn("noop failed, printing server responses");
-			for (IMAPResponse r : rs) {
-				logger.warn("noop response: " + r.getPayload());
-			}
-		}
 	}
 
 }

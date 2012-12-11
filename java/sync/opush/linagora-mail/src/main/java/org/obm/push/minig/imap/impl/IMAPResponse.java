@@ -106,4 +106,14 @@ public class IMAPResponse {
 	public void setStreamData(InputStream streamData) {
 		this.streamData = streamData;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		if (tag != null) {
+			builder.append("[").append(tag).append("] ");
+		}
+		builder.append(payload);
+		return builder.toString();
+	}
 }

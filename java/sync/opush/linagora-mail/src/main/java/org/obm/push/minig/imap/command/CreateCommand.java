@@ -43,7 +43,7 @@ public class CreateCommand extends SimpleCommand<Boolean> {
 	}
 
 	@Override
-	public void responseReceived(List<IMAPResponse> rs) {
+	public void handleResponses(List<IMAPResponse> rs) {
 		data = isOk(rs);
 	}
 
