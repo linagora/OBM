@@ -901,7 +901,7 @@ class OBM_EventMailObserver implements  OBM_IObserver {
    */
   private function sendOldContactMail($old, $new, $recipients) {
     if (!empty($recipients)) {
-    	if ($new->repeat_kind == 'none') {
+    	if ($old->repeat_kind == 'none') {
       	  $this->mailer->sendContactCancel($old, $recipients);
     	} else {
     	  $this->mailer->sendRecurrentContactCancel($old, $recipients);
