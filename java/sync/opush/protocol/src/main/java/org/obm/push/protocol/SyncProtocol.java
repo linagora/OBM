@@ -238,7 +238,11 @@ public class SyncProtocol {
 		if (itemChange.isNew()) {
 			return "Add";
 		} else {
-			return "Change";
+			if (itemChange.isDeleted()) {
+				return "Delete";
+			} else {
+				return "Change";
+			}
 		}
 	}
 

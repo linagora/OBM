@@ -283,7 +283,7 @@ public class ContactsBackendTest {
 		
 		mocks.verify();
 		
-		ItemChange itemChange = new ItemChange(serverIdAsString, false);
+		ItemChange itemChange = new ItemChange(serverIdAsString, false, false);
 		itemChange.setData(new ContactConverter().convert(contact));
 		
 		assertThat(itemChanges).hasSize(1);

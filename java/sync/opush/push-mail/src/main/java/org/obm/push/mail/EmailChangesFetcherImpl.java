@@ -38,10 +38,10 @@ import java.util.Set;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -126,6 +126,7 @@ public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 								.serverId(ServerId.buildServerIdString(collectionId, email.getUid()))
 								.withApplicationData(uidToMSEmailMap.get(email.getUid()))
 								.withNewFlag(withNewTag)
+								.withDeletedFlag(email.isDeleted())
 								.build();
 					}}
 				
