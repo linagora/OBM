@@ -29,24 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data;
+package org.obm.push.bean.ms;
+
+import java.io.Serializable;
 
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.ms.MSRead;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.bean.PIMDataType;
 
-import com.google.inject.Inject;
+import com.google.common.base.Objects;
 
-public class EmailDecoder extends Decoder implements IDataDecoder {
+public class MSEmailMetadata implements IApplicationData, Serializable {
 
-	@Inject
-	public EmailDecoder(Base64ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
-		super(asTimeZoneDecoder, asTimeZoneConverter);
+	@Override
+	public PIMDataType getType() {
+		return PIMDataType.EMAIL;
+	}
+
+	private final boolean read;
+
+	public MSEmailMetadata(boolean read) {
+		this.read = read;
+	}
+	
+	public boolean isRead() {
+		return read;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(read);
 	}
 	
 	@Override
-	public IApplicationData decode(Element syncData) {
-		return new MSRead(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
+	public final boolean equals(Object object){
+		if (object instanceof MSEmailMetadata) {
+			MSEmailMetadata that = (MSEmailMetadata) object;
+			return Objects.equal(this.read, that.read);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("read", read)
+			.toString();
 	}
 }

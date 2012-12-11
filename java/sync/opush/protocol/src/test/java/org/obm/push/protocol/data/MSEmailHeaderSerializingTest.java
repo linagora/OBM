@@ -46,7 +46,6 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

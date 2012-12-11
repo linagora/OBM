@@ -50,7 +50,6 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest.MsMeetingRequestBuild
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.IntEncoder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

@@ -31,66 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.io.IOException;
-
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailMetadata;
+import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 
-@Singleton
-public class EncoderFactory {
-
-	private final Provider<CalendarEncoder> calendarProvider;
-	private final Provider<ContactEncoder> contactProvider;
-	private final Provider<TaskEncoder> taskEncoder;
-	private final Provider<MSEmailEncoder> emailEncoder;
-	private final Provider<MSEmailMetadataEncoder> emailMetadataEncoder;
+public class MSEmailMetadataDecoder extends Decoder implements IDataDecoder {
 
 	@Inject
-	private EncoderFactory(Provider<CalendarEncoder> calendarProvider,
-			Provider<ContactEncoder> contactProvider,
-			Provider<TaskEncoder> taskEncoder,
-			Provider<MSEmailEncoder> emailEncoder,
-			Provider<MSEmailMetadataEncoder> emailMetadataEncoder) {
-		super();
-		this.calendarProvider = calendarProvider;
-		this.contactProvider = contactProvider;
-		this.taskEncoder = taskEncoder;
-		this.emailEncoder = emailEncoder;
-		this.emailMetadataEncoder = emailMetadataEncoder;
+	public MSEmailMetadataDecoder(Base64ASTimeZoneDecoder asTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+		super(asTimeZoneDecoder, asTimeZoneConverter);
 	}
 	
-	public void encode(UserDataRequest udr, Element parent, 
-			IApplicationData data, boolean isResponse) throws IOException {
-		
-		if (data != null) {
-			switch (data.getType()) {
-			case CALENDAR:
-				calendarProvider.get().encode(udr, parent, data, isResponse);
-				break;
-			case CONTACTS:
-				contactProvider.get().encode(udr, parent, data);
-				break;
-			case TASKS:
-				taskEncoder.get().encode(udr, parent, data);
-				break;
-			case EMAIL:
-				if (data instanceof MSEmail) {
-					emailEncoder.get().encode(parent, data);
-				} else if (data instanceof MSEmailMetadata) {
-					emailMetadataEncoder.get().encode(parent, data);
-				}
-				break;
-			default:
-				throw new IllegalArgumentException();
-			}
-		}
+	@Override
+	public IApplicationData decode(Element syncData) {
+		return new MSEmailMetadata(parseDOMInt2Boolean(DOMUtils.getUniqueElement(syncData, "Read")));
 	}
-
 }

@@ -38,7 +38,6 @@ import java.util.List;
 
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.ms.MSEmail;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 

@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.protocol.data.ms;
+package org.obm.push.protocol.data;
 
 import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -48,6 +48,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.protocol.data.MSEmailEncoder;
 import org.obm.push.protocol.data.TimeZoneConverter;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.utils.DOMUtils;

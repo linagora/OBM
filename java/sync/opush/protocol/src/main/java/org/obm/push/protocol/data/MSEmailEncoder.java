@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.data.ms;
+package org.obm.push.protocol.data;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -44,12 +44,6 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.protocol.bean.ASTimeZone;
-import org.obm.push.protocol.data.ASAirs;
-import org.obm.push.protocol.data.ASEmail;
-import org.obm.push.protocol.data.MSEmailHeaderSerializer;
-import org.obm.push.protocol.data.MSMeetingRequestSerializer;
-import org.obm.push.protocol.data.TimeZoneConverter;
-import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.SerializableInputStream;

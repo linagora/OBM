@@ -40,7 +40,6 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
-import org.obm.push.protocol.data.ms.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.IntEncoder.Capacity;

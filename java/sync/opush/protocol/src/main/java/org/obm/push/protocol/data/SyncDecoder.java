@@ -89,7 +89,7 @@ public class SyncDecoder {
 		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
 				.put(PIMDataType.CONTACTS, new ContactDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
 				.put(PIMDataType.CALENDAR, new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.EMAIL, new EmailDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
+				.put(PIMDataType.EMAIL, new MSEmailMetadataDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
 				.put(PIMDataType.TASKS, new TaskDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
 				.build();
 	}

@@ -74,7 +74,7 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
-import org.obm.push.bean.ms.MSRead;
+import org.obm.push.bean.ms.MSEmailMetadata;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
@@ -410,7 +410,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	public String createOrUpdate(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, ItemNotFoundException {
 		
-		MSRead msRead = (MSRead) data;
+		MSEmailMetadata msRead = (MSEmailMetadata) data;
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
 			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});

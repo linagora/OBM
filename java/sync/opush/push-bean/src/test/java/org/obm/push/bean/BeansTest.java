@@ -44,7 +44,7 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
-import org.obm.push.bean.ms.MSRead;
+import org.obm.push.bean.ms.MSEmailMetadata;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
@@ -105,7 +105,7 @@ public class BeansTest {
 					.add(MSMeetingRequestRecurrence.class)
 					.add(MSMeetingRequestCategory.class)
 					.add(MSEmailHeader.class)
-					.add(MSRead.class)
+					.add(MSEmailMetadata.class)
 					.add(MSEventExtId.class)
 					.add(DeviceId.class)
 					.add(SyncKey.class)
