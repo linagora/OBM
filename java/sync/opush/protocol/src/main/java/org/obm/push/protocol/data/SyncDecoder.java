@@ -141,29 +141,15 @@ public class SyncDecoder {
 		}
 		
 		SyncCollection lastSyncCollection = findLastSyncedCollectionOptions(udr, isPartial, collectionId);
-		SyncCollectionOptions options = getUpdatedOptions(lastSyncCollection, col);
+		collection.setOptions(getUpdatedOptions(lastSyncCollection, col));
 		
 		recognizeCollection(collection, collectionId);
-		storeLastSyncedCollectionOptions(udr, collection, lastSyncCollection, options);
+		syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
 		appendCommand(col, collection);
 		// TODO sync supported
 		// TODO sync <getchanges/>
 
 		return collection;
-	}
-
-	private void storeLastSyncedCollectionOptions(UserDataRequest udr,
-			SyncCollection collection, SyncCollection lastSyncCollection,
-			SyncCollectionOptions options) {
-		if (options != null) {
-			collection.setOptions(options);
-			syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
-		} else {
-			collection.setStatus(SyncStatus.PARTIAL_REQUEST);
-			if (lastSyncCollection != null) {
-				collection.setOptions(lastSyncCollection.getOptions());
-			}
-		}
 	}
 
 	private SyncCollection findLastSyncedCollectionOptions(
@@ -187,58 +173,62 @@ public class SyncDecoder {
 		}
 	}
 
-	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection,
-			Element collectionElement) {
-		
-		Element optionsElement = DOMUtils.getUniqueElement(collectionElement, "Options");
-		if (optionsElement != null) {
-			SyncCollectionOptions options = null;
-			if(lastSyncCollection != null){
-				options = lastSyncCollection.getOptions();
-			}
-			if(options == null){
-				options = new SyncCollectionOptions();
-			}
-			
-			String filterTypeElement = DOMUtils.getElementText(optionsElement, "FilterType");
-			if (filterTypeElement != null) {
-				options.setFilterType(FilterType.fromSpecificationValue(filterTypeElement));
-			}
-			
-			String mimeSupport = DOMUtils.getElementText(optionsElement, "MIMESupport");
-			if (mimeSupport != null) {
-				options.setMimeSupport(Integer.parseInt(mimeSupport));
-			}
-			
-			String mimeTruncation = DOMUtils.getElementText(optionsElement,	"MIMETruncation");
-			if (mimeTruncation != null) {
-				options.setMimeTruncation(Integer.parseInt(mimeTruncation));
-			}
-			
-			String conflict = DOMUtils.getElementText(optionsElement, "Conflict");
-			if (conflict != null) {
-				options.setConflict(Integer.parseInt(conflict));
-			}
-
-			String truncation = DOMUtils.getElementText(optionsElement, "Truncation");
-			if (truncation != null) {
-				options.setTruncation(Integer.parseInt(truncation));
-			}
-			
-			String deletesAsMoves = DOMUtils.getElementText(optionsElement,	"DeletesAsMoves");
-			if(deletesAsMoves != null){
-				if ("0".equals(deletesAsMoves)) {
-					options.setDeletesAsMoves(false);
-				} else {
-					options.setDeletesAsMoves(true);
-				}
-			}
-
-			options.setBodyPreferences(getBodyPreference(optionsElement));
-			return options;
+	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection, Element collectionElement) {
+		SyncCollectionOptions lastUsedOptions = null;
+		if (lastSyncCollection != null) {
+			lastUsedOptions = lastSyncCollection.getOptions();
 		}
 		
-		return null;
+		Element optionsElement = DOMUtils.getUniqueElement(collectionElement, "Options");
+		if (optionsElement == null && lastUsedOptions == null) {
+			return new SyncCollectionOptions();
+		} else if (optionsElement == null && lastUsedOptions != null) {
+			return lastUsedOptions;
+		} else {
+			return getOptions(optionsElement);
+		}
+	}
+
+	private SyncCollectionOptions getOptions(Element optionsElement) {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		
+		String filterTypeElement = DOMUtils.getElementText(optionsElement, "FilterType");
+		if (filterTypeElement != null) {
+			options.setFilterType(FilterType.fromSpecificationValue(filterTypeElement));
+		}
+		
+		String mimeSupport = DOMUtils.getElementText(optionsElement, "MIMESupport");
+		if (mimeSupport != null) {
+			options.setMimeSupport(Integer.parseInt(mimeSupport));
+		}
+		
+		String mimeTruncation = DOMUtils.getElementText(optionsElement,	"MIMETruncation");
+		if (mimeTruncation != null) {
+			options.setMimeTruncation(Integer.parseInt(mimeTruncation));
+		}
+		
+		String conflict = DOMUtils.getElementText(optionsElement, "Conflict");
+		if (conflict != null) {
+			options.setConflict(Integer.parseInt(conflict));
+		}
+
+		String truncation = DOMUtils.getElementText(optionsElement, "Truncation");
+		if (truncation != null) {
+			options.setTruncation(Integer.parseInt(truncation));
+		}
+		
+		String deletesAsMoves = DOMUtils.getElementText(optionsElement,	"DeletesAsMoves");
+		if(deletesAsMoves != null){
+			if ("0".equals(deletesAsMoves)) {
+				options.setDeletesAsMoves(false);
+			} else {
+				options.setDeletesAsMoves(true);
+			}
+		}
+
+		options.setBodyPreferences(getBodyPreference(optionsElement));
+		
+		return options;
 	}
 
 	private List<BodyPreference> getBodyPreference(Element optionsElement) {

@@ -31,18 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.TestUtils.getXml;
 
 import java.math.BigDecimal;
 import java.util.Properties;
 
+import org.easymock.IMocksControl;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -70,236 +69,308 @@ import com.google.common.collect.ImmutableList;
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
 	
+	private Device device;
+	private UserDataRequest udr;
+	private String collectionPath;
+	private int collectionId;
+	
+	private IMocksControl mocks;
+	private SyncedCollectionDao syncedCollectionDao;
+	private CollectionDao collectionDao;
+	private CollectionPathHelper collectionPathHelper;
+
+	@Before
+	public void setUp() throws Exception {
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
+		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
+		udr = new UserDataRequest(new Credentials(user, "test"), "Sync", device, new BigDecimal("12.5"));
+		collectionPath = "INBOX";
+		collectionId = 5;
+
+		mocks = createControl();
+		syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
+		collectionDao = mocks.createMock(CollectionDao.class);
+		collectionPathHelper = mocks.createMock(CollectionPathHelper.class);
+		
+		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).anyTimes();
+		expect(collectionPathHelper.recognizePIMDataType(collectionPath)).andReturn(PIMDataType.EMAIL).anyTimes();
+	}
+	
 	@Test
-	public void testFirstSyncCollectionOptionsMustBeStored() throws Exception {
-		String inboxCollectionPath = "INBOX";
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
-		syncCollectionOptions.setFilterType(FilterType.THREE_DAYS_BACK);
-		syncCollectionOptions.setMimeSupport(1);
-		syncCollectionOptions.setConflict(1);
-		syncCollectionOptions.setMimeSupport(1);
-		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
+	public void testRequestOptionsAreStored() throws Exception {
+		Document request = buildRequestWithOptions("0", 
+				"<Options>" +
+					"<FilterType>2</FilterType>" +
+					"<Conflict>1</Conflict>" +
+					"<MIMESupport>1</MIMESupport>" +
+					"<MIMETruncation>100</MIMETruncation>" +
+					"<BodyPreference>" +
+						"<Type>1</Type>" +
+					"</BodyPreference>" +
+					"<BodyPreference>" +
+						"<Type>2</Type>" +
+					"</BodyPreference>" +
+					"<BodyPreference>" +
+						"<Type>4</Type>" +
+						"<TruncationSize>5120</TruncationSize>" +
+					"</BodyPreference>" +
+				"</Options>");
+		
+		SyncCollectionOptions requestOptionsToStore = new SyncCollectionOptions();
+		requestOptionsToStore.setFilterType(FilterType.THREE_DAYS_BACK);
+		requestOptionsToStore.setConflict(1);
+		requestOptionsToStore.setMimeSupport(1);
+		requestOptionsToStore.setMimeTruncation(100);
+		requestOptionsToStore.setBodyPreferences(ImmutableList.<BodyPreference> of(
+			BodyPreference.builder()
 				.bodyType(MSEmailBodyType.PlainText)
 				.build(),
-				BodyPreference.builder()
+			BodyPreference.builder()
 				.bodyType(MSEmailBodyType.HTML)
 				.build(),
-				BodyPreference.builder()
+			BodyPreference.builder()
 				.bodyType(MSEmailBodyType.MIME)
 				.truncationSize(5120)
 				.build()
-				));
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(5);
-		syncCollection.setCollectionPath(inboxCollectionPath);
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setOptions(syncCollectionOptions);
-		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+			));
+		SyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
 		
-		SyncedCollectionDao syncedCollectionDao = createStrictMock(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
-			.andReturn(null).once();
-		syncedCollectionDao.put(getFakeUserDataRequest().getCredentials(), 
-				getFakeDevice(), syncCollection);
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, requestSyncCollectionToStore);
 		expectLastCall().once();
-		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
-			.andReturn(syncCollection).once();
 		
-		CollectionDao collectionDao = createMock(CollectionDao.class);
-		expect(collectionDao.getCollectionPath(5)).andReturn(inboxCollectionPath).times(2);
-		
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
-		expect(collectionPathHelper.recognizePIMDataType(inboxCollectionPath))
-			.andReturn(PIMDataType.EMAIL).times(2);
-		
-		StringBuilder firstBuilder = new StringBuilder();
-		firstBuilder.append("<Sync>");
-		firstBuilder.append("<Collections>");
-		firstBuilder.append("<Collection>");
-		firstBuilder.append("<SyncKey>0</SyncKey>");
-		firstBuilder.append("<CollectionId>5</CollectionId>");
-		firstBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
-		firstBuilder.append("<Options>");
-		firstBuilder.append("<FilterType>2</FilterType>");
-		firstBuilder.append("<BodyPreference>");
-		firstBuilder.append("<Type>1</Type>");
-		firstBuilder.append("</BodyPreference>");
-		firstBuilder.append("<BodyPreference>");
-		firstBuilder.append("<Type>2</Type>");
-		firstBuilder.append("</BodyPreference>");
-		firstBuilder.append("<Conflict>1</Conflict>");
-		firstBuilder.append("<MIMESupport>1</MIMESupport>");
-		firstBuilder.append("<BodyPreference>");
-		firstBuilder.append("<Type>4</Type>");
-		firstBuilder.append("<TruncationSize>5120</TruncationSize>");
-		firstBuilder.append("</BodyPreference>");
-		firstBuilder.append("</Options>");
-		firstBuilder.append("</Collection>");
-		firstBuilder.append("</Collections>");
-		firstBuilder.append("</Sync>");
-		Document firstDoc = getXml(firstBuilder.toString());
-		
-		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
-		
+		mocks.replay();
 		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
-		syncDecoder.decodeSync(firstDoc, getFakeUserDataRequest());
+		Sync decodedRequest = syncDecoder.decodeSync(request, udr);
+		mocks.verify();
 		
-		StringBuilder secondBuilder = new StringBuilder();
-		secondBuilder.append("<Sync>");
-		secondBuilder.append("<Collections>");
-		secondBuilder.append("<Collection>");
-		secondBuilder.append("<SyncKey>0</SyncKey>");
-		secondBuilder.append("<CollectionId>5</CollectionId>");
-		secondBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
-		secondBuilder.append("</Collection>");
-		secondBuilder.append("</Collections>");
-		secondBuilder.append("</Sync>");
-		Document secondDoc = getXml(secondBuilder.toString());
+		assertThat(decodedRequest.getCollections()).containsOnly(requestSyncCollectionToStore);
+	}
+	
+	@Test
+	public void testRequestWithOnlyFilterTypeOptionsStoreOthersWithDefaultValue() throws Exception {
+		Document request = buildRequestWithOptions("0", 
+				"<Options>" +
+					"<FilterType>2</FilterType>" +
+				"</Options>");
 		
-		syncDecoder.decodeSync(secondDoc, getFakeUserDataRequest());
+		SyncCollectionOptions requestOptionsToStore = new SyncCollectionOptions();
+		requestOptionsToStore.setFilterType(FilterType.THREE_DAYS_BACK);
+
+		SyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
 		
-		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, requestSyncCollectionToStore);
+		expectLastCall().once();
+		
+		mocks.replay();
+		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		Sync decodedRequest = syncDecoder.decodeSync(request, udr);
+		mocks.verify();
+		
+		assertThat(decodedRequest.getCollections()).containsOnly(requestSyncCollectionToStore);
+	}
+	
+	@Test
+	public void testNoRequestOptionsTakeTheDefaultOneIfNoPrevious() throws Exception {
+		SyncCollectionOptions toStoreOptions = new SyncCollectionOptions();
+		toStoreOptions.setBodyPreferences(ImmutableList.<BodyPreference>of());
+		toStoreOptions.setConflict(1);
+		toStoreOptions.setDeletesAsMoves(true);
+		toStoreOptions.setFilterType(FilterType.THREE_DAYS_BACK);
+		toStoreOptions.setMimeSupport(null);
+		toStoreOptions.setMimeTruncation(null);
+		toStoreOptions.setTruncation(SyncCollectionOptions.SYNC_TRUNCATION_ALL);
+		SyncCollection toStoreSyncCollection = buildRequestCollectionWithOptions(toStoreOptions, "156");
+
+		Document requestWithoutOptions = buildRequestWithoutOptions("156");
+		
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, toStoreSyncCollection);
+		expectLastCall().once();
+		
+		mocks.replay();
+		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		Sync decodedRequest = syncDecoder.decodeSync(requestWithoutOptions, udr);
+		mocks.verify();
+		
+		assertThat(decodedRequest.getCollections()).containsOnly(toStoreSyncCollection);
+	}
+	
+	@Test
+	public void testNoRequestOptionsTakeThePreviousOne() throws Exception {
+		Document firstRequest = buildRequestWithOptions("0", 
+				"<Options>" +
+					"<FilterType>2</FilterType>" +
+					"<Conflict>1</Conflict>" +
+					"<MIMESupport>1</MIMESupport>" +
+					"<MIMETruncation>100</MIMETruncation>" +
+					"<BodyPreference>" +
+						"<Type>1</Type>" +
+					"</BodyPreference>" +
+					"<BodyPreference>" +
+						"<Type>2</Type>" +
+					"</BodyPreference>" +
+					"<BodyPreference>" +
+						"<Type>4</Type>" +
+						"<TruncationSize>5120</TruncationSize>" +
+					"</BodyPreference>" +
+				"</Options>");
+		Document secondRequest = buildRequestWithoutOptions("156");
+		
+		SyncCollectionOptions firstRequestOptionsToStore = new SyncCollectionOptions();
+		firstRequestOptionsToStore.setFilterType(FilterType.THREE_DAYS_BACK);
+		firstRequestOptionsToStore.setConflict(1);
+		firstRequestOptionsToStore.setMimeSupport(1);
+		firstRequestOptionsToStore.setMimeTruncation(100);
+		firstRequestOptionsToStore.setBodyPreferences(ImmutableList.<BodyPreference> of(
+			BodyPreference.builder()
+				.bodyType(MSEmailBodyType.PlainText)
+				.build(),
+			BodyPreference.builder()
+				.bodyType(MSEmailBodyType.HTML)
+				.build(),
+			BodyPreference.builder()
+				.bodyType(MSEmailBodyType.MIME)
+				.truncationSize(5120)
+				.build()
+			));
+		SyncCollection firstSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "0");
+		SyncCollection secondSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "156");
+		
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, firstSyncCollectionToStore);
+		expectLastCall().once();
+		
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(firstSyncCollectionToStore).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, secondSyncCollectionToStore);
+		expectLastCall().once();
+		
+		mocks.replay();
+		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		Sync firstDecodedRequest = syncDecoder.decodeSync(firstRequest, udr);
+		Sync secondDecodedRequest = syncDecoder.decodeSync(secondRequest, udr);
+		mocks.verify();
+		
+		assertThat(firstDecodedRequest.getCollections()).containsOnly(firstSyncCollectionToStore);
+		assertThat(secondDecodedRequest.getCollections()).containsOnly(secondSyncCollectionToStore);
 	}
 	
 	@Test
 	public void testZeroTruncationSizeMustNotBeInterpreted() throws Exception {
-		String inboxCollectionPath = "INBOX";
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.THREE_DAYS_BACK);
 		syncCollectionOptions.setMimeSupport(1);
 		syncCollectionOptions.setConflict(1);
-		syncCollectionOptions.setMimeSupport(1);
-		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
+		syncCollectionOptions.setMimeTruncation(100);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(
+			BodyPreference.builder()
 				.bodyType(MSEmailBodyType.PlainText)
 				.build()
-				));
+			));
 		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(5);
-		syncCollection.setCollectionPath(inboxCollectionPath);
+		syncCollection.setCollectionId(collectionId);
+		syncCollection.setCollectionPath(collectionPath);
 		syncCollection.setDataType(PIMDataType.EMAIL);
 		syncCollection.setOptions(syncCollectionOptions);
 		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 		
-		SyncedCollectionDao syncedCollectionDao = createStrictMock(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
-			.andReturn(null).once();
-		syncedCollectionDao.put(getFakeUserDataRequest().getCredentials(), 
-				getFakeDevice(), syncCollection);
+		Document firstDoc = buildRequestWithOptions("0",
+				"<Options>" +
+					"<FilterType>2</FilterType>" +
+					"<Conflict>1</Conflict>" +
+					"<MIMESupport>1</MIMESupport>" +
+					"<MIMETruncation>100</MIMETruncation>" +
+					"<BodyPreference>" +
+						"<Type>1</Type>" +
+						"<TruncationSize>0</TruncationSize>" +
+					"</BodyPreference>" +
+				"</Options>");
+
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, syncCollection);
 		expectLastCall().once();
 		
-		CollectionDao collectionDao = createMock(CollectionDao.class);
-		expect(collectionDao.getCollectionPath(5)).andReturn(inboxCollectionPath).once();
-		
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
-		expect(collectionPathHelper.recognizePIMDataType(inboxCollectionPath))
-			.andReturn(PIMDataType.EMAIL).once();
-		
-		StringBuilder firstBuilder = new StringBuilder();
-		firstBuilder.append("<Sync>");
-		firstBuilder.append("<Collections>");
-		firstBuilder.append("<Collection>");
-		firstBuilder.append("<SyncKey>0</SyncKey>");
-		firstBuilder.append("<CollectionId>5</CollectionId>");
-		firstBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
-		firstBuilder.append("<Options>");
-		firstBuilder.append("<FilterType>2</FilterType>");
-		firstBuilder.append("<BodyPreference>");
-		firstBuilder.append("<Type>1</Type>");
-		firstBuilder.append("<TruncationSize>0</TruncationSize>");
-		firstBuilder.append("</BodyPreference>");
-		firstBuilder.append("<Conflict>1</Conflict>");
-		firstBuilder.append("<MIMESupport>1</MIMESupport>");
-		firstBuilder.append("</Options>");
-		firstBuilder.append("</Collection>");
-		firstBuilder.append("</Collections>");
-		firstBuilder.append("</Sync>");
-		Document firstDoc = getXml(firstBuilder.toString());
-		
-		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
-		
+		mocks.replay();
 		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
-		Sync sync = syncDecoder.decodeSync(firstDoc, getFakeUserDataRequest());
+		Sync sync = syncDecoder.decodeSync(firstDoc, udr);
+		mocks.verify();
 		
-		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
-		SyncCollectionOptions options = sync.getCollection(5).getOptions();
+		SyncCollectionOptions options = sync.getCollection(collectionId).getOptions();
 		BodyPreference bodyPreference = options.getBodyPreferences().get(0);
 		assertThat(bodyPreference.getTruncationSize()).isNull();
 	}
 	
 	@Test
 	public void testTruncationSizeMustBeInterpreted() throws Exception {
-		String inboxCollectionPath = "INBOX";
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
 		syncCollectionOptions.setFilterType(FilterType.THREE_DAYS_BACK);
 		syncCollectionOptions.setMimeSupport(1);
 		syncCollectionOptions.setConflict(1);
-		syncCollectionOptions.setMimeSupport(1);
-		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(BodyPreference.builder()
+		syncCollectionOptions.setMimeTruncation(100);
+		syncCollectionOptions.setBodyPreferences(ImmutableList.<BodyPreference> of(
+			BodyPreference.builder()
 				.bodyType(MSEmailBodyType.PlainText)
 				.truncationSize(1000)
 				.build()
-				));
+			));
 		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(5);
-		syncCollection.setCollectionPath(inboxCollectionPath);
+		syncCollection.setCollectionId(collectionId);
+		syncCollection.setCollectionPath(collectionPath);
 		syncCollection.setDataType(PIMDataType.EMAIL);
 		syncCollection.setOptions(syncCollectionOptions);
 		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 		
-		SyncedCollectionDao syncedCollectionDao = createStrictMock(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(getFakeUserDataRequest().getCredentials(), getFakeDevice(), 5))
-			.andReturn(null).once();
-		syncedCollectionDao.put(getFakeUserDataRequest().getCredentials(), 
-				getFakeDevice(), syncCollection);
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, syncCollection);
 		expectLastCall().once();
 		
-		CollectionDao collectionDao = createMock(CollectionDao.class);
-		expect(collectionDao.getCollectionPath(5)).andReturn(inboxCollectionPath).once();
-		
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
-		expect(collectionPathHelper.recognizePIMDataType(inboxCollectionPath))
-			.andReturn(PIMDataType.EMAIL).once();
-		
-		StringBuilder firstBuilder = new StringBuilder();
-		firstBuilder.append("<Sync>");
-		firstBuilder.append("<Collections>");
-		firstBuilder.append("<Collection>");
-		firstBuilder.append("<SyncKey>0</SyncKey>");
-		firstBuilder.append("<CollectionId>5</CollectionId>");
-		firstBuilder.append("<DeletesAsMoves>0</DeletesAsMoves>");
-		firstBuilder.append("<Options>");
-		firstBuilder.append("<FilterType>2</FilterType>");
-		firstBuilder.append("<BodyPreference>");
-		firstBuilder.append("<Type>1</Type>");
-		firstBuilder.append("<TruncationSize>1000</TruncationSize>");
-		firstBuilder.append("</BodyPreference>");
-		firstBuilder.append("<Conflict>1</Conflict>");
-		firstBuilder.append("<MIMESupport>1</MIMESupport>");
-		firstBuilder.append("</Options>");
-		firstBuilder.append("</Collection>");
-		firstBuilder.append("</Collections>");
-		firstBuilder.append("</Sync>");
-		Document firstDoc = getXml(firstBuilder.toString());
-		
-		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
-		
+		Document firstRequest = buildRequestWithOptions("0",
+				"<Options>" +
+					"<FilterType>2</FilterType>" +
+					"<Conflict>1</Conflict>" +
+					"<MIMESupport>1</MIMESupport>" +
+					"<MIMETruncation>100</MIMETruncation>" +
+					"<BodyPreference>" +
+						"<Type>1</Type>" +
+						"<TruncationSize>1000</TruncationSize>" +
+					"</BodyPreference>" +
+				"</Options>");
+
+		mocks.replay();
 		SyncDecoder syncDecoder = new SyncDecoder(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
-		Sync sync = syncDecoder.decodeSync(firstDoc, getFakeUserDataRequest());
+		Sync sync = syncDecoder.decodeSync(firstRequest, udr);
+		mocks.verify();
 		
-		verify(syncedCollectionDao, collectionDao, collectionPathHelper);
-		SyncCollectionOptions options = sync.getCollection(5).getOptions();
+		SyncCollectionOptions options = sync.getCollection(collectionId).getOptions();
 		BodyPreference bodyPreference = options.getBodyPreferences().get(0);
 		assertThat(bodyPreference.getTruncationSize()).isEqualTo(1000);
 	}
-
-	private UserDataRequest getFakeUserDataRequest() {
-		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		UserDataRequest udr = new UserDataRequest(
-				new Credentials(user, "test"), "Sync", getFakeDevice(), new BigDecimal("12.5"));
-		return udr;
+	
+	private SyncCollection buildRequestCollectionWithOptions(SyncCollectionOptions options, String syncKey) {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setCollectionId(collectionId);
+		syncCollection.setCollectionPath(collectionPath);
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setOptions(options);
+		syncCollection.setSyncKey(new SyncKey(syncKey));
+		return syncCollection;
 	}
 
-	private Device getFakeDevice() {
-		return new Device(1, "devType", new DeviceId("devId"), new Properties());
+	private Document buildRequestWithoutOptions(String syncKey) throws Exception {
+		return buildRequestWithOptions(syncKey, "");
+	}
+
+	private Document buildRequestWithOptions(String syncKey, String options) throws Exception {
+		return getXml(
+			"<Sync>" +
+				"<Collections>" +
+					"<Collection>" +
+						"<SyncKey>" + syncKey +"</SyncKey>" +
+						"<CollectionId>" + collectionId + "</CollectionId>" +
+						options +
+					"</Collection>" +
+				"</Collections>" +
+			"</Sync>");
 	}
 }

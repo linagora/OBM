@@ -369,7 +369,7 @@ public class SyncHandlerTest {
 	}
 
 	@Test
-	public void testSyncWithoutOptionsAndNoOptionsInCacheReturnsStatus13() throws Exception {
+	public void testSyncWithoutOptionsAndNoOptionsInCacheTakeThePreviousOne() throws Exception {
 		OpushUser user = singleUserFixture.jaures;
 		int collectionId = 1;
 		String collectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
@@ -379,14 +379,21 @@ public class SyncHandlerTest {
 		SyncCollectionOptions toStoreOptions = new SyncCollectionOptions();
 		toStoreOptions.setFilterType(FilterType.THREE_DAYS_BACK);
 		toStoreOptions.setConflict(1);
-		SyncCollection toStoreCollection = new SyncCollection();
-		toStoreCollection.setCollectionId(collectionId);
-		toStoreCollection.setCollectionPath(collectionPath);
-		toStoreCollection.setDataType(PIMDataType.EMAIL);
-		toStoreCollection.setOptions(toStoreOptions);
-		toStoreCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-		
-		ItemSyncState itemSyncState = ItemSyncState.builder()
+		SyncCollection firstToStoreCollection = new SyncCollection();
+		firstToStoreCollection.setCollectionId(collectionId);
+		firstToStoreCollection.setCollectionPath(collectionPath);
+		firstToStoreCollection.setDataType(PIMDataType.EMAIL);
+		firstToStoreCollection.setOptions(toStoreOptions);
+		firstToStoreCollection.setWindowSize(25);
+		firstToStoreCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+
+		SyncCollection secondToStoreCollection = new SyncCollection();
+		secondToStoreCollection.setCollectionId(collectionId);
+		secondToStoreCollection.setCollectionPath(collectionPath);
+		secondToStoreCollection.setDataType(PIMDataType.EMAIL);
+		secondToStoreCollection.setOptions(toStoreOptions);
+		secondToStoreCollection.setSyncKey(secondSyncKey);
+		ItemSyncState secondRequestSyncState = ItemSyncState.builder()
 				.id(4)
 				.syncKey(secondSyncKey)
 				.syncDate(date("2012-10-10T16:22:53"))
@@ -396,38 +403,60 @@ public class SyncHandlerTest {
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(secondSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		expectUnsynchronizedItemToNeverExceedWindowSize(unsynchronizedItemDao, user, collectionId);
+		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
+		expect(contentsExporter.getChanged(
+				anyObject(UserDataRequest.class), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
+			.andReturn(DataDelta.newEmptyDelta(secondRequestSyncState.getSyncDate()));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).anyTimes();
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
-		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(itemSyncState);
+		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(secondRequestSyncState).times(2);
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(),
-				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(itemSyncState);
+				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).times(2);
 		collectionDao.resetCollection(user.device, collectionId);
 		expectLastCall();
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		expect(syncedCollectionDao.get(user.credentials, user.device, collectionId)).andReturn(null);
-		syncedCollectionDao.put(user.credentials, user.device, toStoreCollection);
+		syncedCollectionDao.put(user.credentials, user.device, firstToStoreCollection);
+		expectLastCall();
 		expect(syncedCollectionDao.get(user.credentials, user.device, collectionId)).andReturn(null);
+		syncedCollectionDao.put(user.credentials, user.device, secondToStoreCollection);
 		expectLastCall();
 		
 		replayMocks(classToInstanceMap);
 		opushServer.start();
-
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		Folder inbox = folderSyncResponse.getFolders().get(FolderType.DEFAULT_INBOX_FOLDER);
 		
-		opClient.syncEmail(initialSyncKey, inbox.getServerId(), FilterType.THREE_DAYS_BACK);
+		opClient.syncEmail(initialSyncKey, inbox.getServerId(), toStoreOptions.getFilterType());
 		SyncResponse syncWithoutOptions = opClient.syncWithoutOptions(secondSyncKey, inbox.getServerId());
-
 		verifyMocks(classToInstanceMap);
+		
 		assertThat(syncWithoutOptions).isNotNull();
 		Collection inboxCollection = syncWithoutOptions.getCollection(inbox.getServerId());
 		assertThat(inboxCollection).isNotNull();
-		assertThat(inboxCollection.getStatus()).isEqualTo(SyncStatus.PARTIAL_REQUEST);
+		assertThat(inboxCollection.getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(inboxCollection.getAdds()).isEmpty();
+		assertThat(inboxCollection.getDeletes()).isEmpty();
+	}
+
+	private void expectUnsynchronizedItemToNeverExceedWindowSize(
+			UnsynchronizedItemDao unsynchronizedItemDao, OpushUser user, int collectionId) {
+		
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, collectionId))
+				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, collectionId))
+				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, collectionId);
+		expectLastCall().anyTimes();
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, collectionId);
+		expectLastCall().anyTimes();
 	}
 	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
