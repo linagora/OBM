@@ -112,8 +112,8 @@ public abstract class OPClient {
 		return run(new Sync(folders));
 	}
 
-	public SyncResponse syncEmail(SyncKey key, String collectionId, FilterType filterType) throws Exception {
-		return run(new EmailSyncCommand(key, collectionId, filterType));
+	public SyncResponse syncEmail(SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommand(key, collectionId, filterType, windowSize));
 	}
 
 	public SyncResponse syncEmailWithFetch(SyncKey key, String collectionId, String serverId) throws Exception {
@@ -124,8 +124,8 @@ public abstract class OPClient {
 		return run(new EmailSyncNoOptionsCommand(key, collectionId));
 	}
 	
-	public SyncResponse syncEmail(SyncKey key, int collectionId, FilterType filterType) throws Exception {
-		return run(new EmailSyncCommand(key, String.valueOf(collectionId), filterType));
+	public SyncResponse syncEmail(SyncKey key, int collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommand(key, String.valueOf(collectionId), filterType, windowSize));
 	}
 	
 	public SyncResponse sync(Document doc) throws Exception {

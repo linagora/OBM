@@ -43,12 +43,14 @@ public class EmailSyncCommand extends Sync {
 	private final SyncKey syncKey;
 	private final String collectionId;
 	private final FilterType filterType;
+	private final int windowSize;
 
-	public EmailSyncCommand(SyncKey syncKey, String collectionId, FilterType filterType) {
+	public EmailSyncCommand(SyncKey syncKey, String collectionId, FilterType filterType, int windowSize) {
 		super("EmailSyncRequest.xml");
 		this.syncKey = syncKey;
 		this.collectionId = collectionId;
 		this.filterType = filterType;
+		this.windowSize = windowSize;
 	}
 
 	@Override
@@ -59,5 +61,7 @@ public class EmailSyncCommand extends Sync {
 		collection.setTextContent(collectionId);
 		Element filterTypeE = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "FilterType");
 		filterTypeE.setTextContent(filterType.asSpecificationValue());
+		Element windowSizeE = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "WindowSize");
+		windowSizeE.setTextContent(String.valueOf(windowSize));
 	}
 }
