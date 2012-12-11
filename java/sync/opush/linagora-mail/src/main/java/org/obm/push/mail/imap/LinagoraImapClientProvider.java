@@ -31,11 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.util.Properties;
-import java.util.Set;
-
-import javax.mail.Session;
-
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -47,12 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 public class LinagoraImapClientProvider {
 
-	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
 	private static final String STORE_CLIENT_RESOURCE = "store-client";
 
 	private static final Logger logger = LoggerFactory.getLogger(LinagoraImapClientProvider.class);
@@ -64,7 +57,6 @@ public class LinagoraImapClientProvider {
 	private final EmailConfiguration emailConfiguration;
 	private final boolean activateTLS;
 	private final IdleClient.Factory idleClientFactory;
-	@VisibleForTesting final Session defaultSession;
 
 	@Inject
 	@VisibleForTesting LinagoraImapClientProvider(MinigStoreClient.Factory minigStoreClientFactory,
@@ -77,31 +69,7 @@ public class LinagoraImapClientProvider {
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 		this.idleClientFactory = idleClientFactory;
-		
-		Properties imapProperties = buildProperties(emailConfiguration);
-		this.defaultSession = Session.getInstance(imapProperties);
 	}
-
-	private Properties buildProperties(EmailConfiguration emailConfiguration) {
-		boolean activateTls = emailConfiguration.activateTls();
-		int imapTimeout = emailConfiguration.imapTimeout();
-		int imapFetchBlockSize = emailConfiguration.getImapFetchBlockSize();
-		logger.debug("Java Mail settings : STARTTLS=" + activateTls);
-		logger.debug("Java Mail settings : TIMEOUT=" + imapTimeout);
-		logger.debug("Java Mail settings : BLOCKSIZE=" + imapFetchBlockSize);
-
-		Properties properties = new Properties();
-		properties.put("mail.debug", "false");
-		properties.put("mail.imap.starttls.enable", activateTls);
-
-		for (String availableProtocol : AVAILABLE_PROTOCOLS) {
-			properties.put("mail." + availableProtocol +".timeout", imapTimeout);
-			properties.put("mail." + availableProtocol +".fetchsize", imapFetchBlockSize);
-		}
-		
-		return properties;
-	}
-
 	
 	private String locateImap(UserDataRequest udr) throws LocatorClientException {
 		String imapLocation = locatorService.
