@@ -35,11 +35,18 @@ import org.obm.push.bean.FilterType;
 
 public class FilterTypeChangedException extends Exception {
 	
-	public FilterTypeChangedException(FilterType first, FilterType second) {
+	private final int collectionId;
+
+	public FilterTypeChangedException(int collectionId, FilterType first, FilterType second) {
 		super(buildMessage(first, second));
+		this.collectionId = collectionId;
 	}
 	
 	private static String buildMessage(FilterType first, FilterType second) {
 		return String.format("FilterType changed, first:%s second:%s", first, second);
+	}
+
+	public int getCollectionId() {
+		return collectionId;
 	}
 }

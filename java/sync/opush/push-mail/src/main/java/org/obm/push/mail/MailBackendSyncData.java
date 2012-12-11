@@ -131,7 +131,7 @@ public class MailBackendSyncData {
 
 		private void manageFilterTypeChanged(UserDataRequest udr, Integer collectionId, FilterType previousFilterType, FilterType currentFilterType) throws FilterTypeChangedException {
 			snapshotService.deleteSnapshotAndSyncKeys(udr.getDevId(), collectionId);
-			throw new FilterTypeChangedException(previousFilterType, currentFilterType);
+			throw new FilterTypeChangedException(collectionId, previousFilterType, currentFilterType);
 		}
 
 		@VisibleForTesting boolean mustSyncByDate(Snapshot previousStateSnapshot) {

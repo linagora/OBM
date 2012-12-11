@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
@@ -44,18 +45,28 @@ import com.google.common.base.Strings;
 public class GetItemEstimateEmailFolderCommand extends TemplateBasedCommand<GetItemEstimateSingleFolderResponse> {
 
 	private final SyncKey syncKey;
+	private final FilterType filterType;
 	private final int collectionId;
 
-	public GetItemEstimateEmailFolderCommand(SyncKey key, int collectionId) {
+	public GetItemEstimateEmailFolderCommand(SyncKey key, FilterType filterType, int collectionId) {
 		super(NS.GetItemEstimate, "GetItemEstimate", "GetItemEstimateRequestEmail.xml");
 		this.syncKey = key;
+		this.filterType = filterType;
 		this.collectionId = collectionId;
 	}
 
+	public GetItemEstimateEmailFolderCommand(SyncKey key, int collectionId) {
+		this(key, null, collectionId);
+	}
+	
 	@Override
 	protected void customizeTemplate(AccountInfos ai, OPClient opc) {
 		Element sk = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:SyncKey");
 		sk.setTextContent(syncKey.getSyncKey());
+		if (filterType != null) {
+			Element ft = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "AirSync:FilterType");
+			ft.setTextContent(filterType.asSpecificationValue());
+		}
 		Element collection = DOMUtils.getUniqueElement(tpl.getDocumentElement(), "CollectionId");
 		collection.setTextContent(String.valueOf(collectionId));
 	}

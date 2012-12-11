@@ -40,6 +40,7 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
@@ -48,6 +49,8 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class GetItemEstimateProtocol {
 
@@ -86,7 +89,7 @@ public class GetItemEstimateProtocol {
 		final Document document = createDocument();
 		for (Estimate estimate: response.getEstimates()) {
 			final Element responseElement = createResponseNode(document);
-			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.OK.getSpecificationValue());
+			createStatusElement(estimate.getCollection().getStatus(), responseElement);
 			final Element collectionElement = DOMUtils.createElement(responseElement, "Collection");
 			createCollectionIdElement(estimate.getCollection(), collectionElement);
 			createEstimateElement(estimate.getEstimate(), collectionElement);
@@ -104,6 +107,17 @@ public class GetItemEstimateProtocol {
 		return responseElement;
 	}
 
+	@VisibleForTesting void createStatusElement(SyncStatus syncStatus, final Element responseElement) {
+		if (syncStatus == SyncStatus.OK) {
+			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.OK.getSpecificationValue());
+		}
+		if (syncStatus == SyncStatus.INVALID_SYNC_KEY) {
+			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.INVALID_SYNC_KEY.getSpecificationValue());
+		}
+		if (syncStatus == SyncStatus.NEED_RETRY) {
+			DOMUtils.createElementAndText(responseElement, "Status", GetItemEstimateStatus.NEED_SYNC.getSpecificationValue());
+		}
+	}
 	
 	private void createCollectionIdElement(SyncCollection syncCollection, Element collectionElement) {
 		DOMUtils.createElementAndText(collectionElement, "CollectionId",

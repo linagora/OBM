@@ -148,6 +148,10 @@ public abstract class OPClient {
 		return run(new GetItemEstimateEmailFolderCommand(key, collectionId));
 	}
 	
+	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(SyncKey key, FilterType filterType, int collectionId) throws Exception {
+		return run(new GetItemEstimateEmailFolderCommand(key, filterType, collectionId));
+	}
+	
 	public Document postXml(String namespace, Document doc, String cmd)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException {
 		return postXml(namespace, doc, cmd, null, false);

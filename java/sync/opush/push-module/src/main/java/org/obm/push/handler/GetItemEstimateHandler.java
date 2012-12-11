@@ -43,6 +43,7 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.CollectionPathException;
@@ -67,6 +68,7 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -118,8 +120,6 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		} catch (ConversionException e) {
 			logger.error(e.getMessage(), e);
-		} catch (FilterTypeChangedException e) {
-			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 	private GetItemEstimateResponse doTheJob(UserDataRequest udr, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException,
-		CollectionNotFoundException, ConversionException, FilterTypeChangedException {
+		CollectionNotFoundException, ConversionException {
 		
 		final ArrayList<Estimate> estimates = new ArrayList<GetItemEstimateResponse.Estimate>();
 		
@@ -145,24 +145,34 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			try {
 				syncCollection.setCollectionPath(collectionPath);
 				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
-			
-				SyncKey syncKey = syncCollection.getSyncKey();
-				ItemSyncState state = stMachine.getItemSyncState(syncKey);
-				if (state == null) {
-					throw new InvalidSyncKeyException(collectionId, syncKey);
-				}
-				
-				int unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);
-				int count = contentsExporter.getItemEstimateSize(udr, state, syncCollection);
-			
-				estimates.add( new Estimate(syncCollection, count + unSynchronizedItemNb) );
-
+				estimates.add( computeEstimate(udr, syncCollection) );
 			} catch (CollectionPathException e) {
 				throw new CollectionNotFoundException("Collection path {" + collectionPath + "} not found.");
 			}			
 		}
 		
 		return new GetItemEstimateResponse(estimates);
+	}
+	
+	@VisibleForTesting Estimate computeEstimate(UserDataRequest udr, SyncCollection syncCollection) throws DaoException, InvalidSyncKeyException,
+		CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
+		
+		SyncKey syncKey = syncCollection.getSyncKey();
+		ItemSyncState state = stMachine.getItemSyncState(syncKey);
+		if (state == null) {
+			throw new InvalidSyncKeyException(syncCollection.getCollectionId(), syncKey);
+		}
+		
+		int unSynchronizedItemNb, count;
+		try {
+			unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);
+			count = contentsExporter.getItemEstimateSize(udr, state, syncCollection);
+		} catch (FilterTypeChangedException e) {
+			syncCollection.setStatus(SyncStatus.INVALID_SYNC_KEY);
+			return new Estimate(syncCollection);
+		}
+	
+		return new Estimate(syncCollection, count + unSynchronizedItemNb);
 	}
 
 	private int listItemToAddSize(UserDataRequest udr, SyncCollection syncCollection) {

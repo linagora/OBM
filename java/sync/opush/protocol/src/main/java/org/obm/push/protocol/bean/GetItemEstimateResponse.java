@@ -47,6 +47,10 @@ public class GetItemEstimateResponse {
 			this.estimate = estimate;
 		}
 		
+		public Estimate(SyncCollection collection) {
+			this(collection, 0);
+		}
+		
 		public SyncCollection getCollection() {
 			return collection;
 		}

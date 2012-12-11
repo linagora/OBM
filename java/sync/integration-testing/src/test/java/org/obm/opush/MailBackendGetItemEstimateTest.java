@@ -218,6 +218,50 @@ public class MailBackendGetItemEstimateTest {
 	}
 
 	@Test
+	public void testGetItemEstimateNoChangeWithFilterTypeChanged() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey lastSyncKey = new SyncKey("789");
+		int lastStateId = 3;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState lastSyncState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(lastSyncKey)
+				.id(lastStateId)
+				.build();
+		
+		expectInitialSyncWithTwoMails(initialSyncKey, firstAllocatedSyncKey, lastSyncKey);
+
+		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
+		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
+		expectUnsynchronizedItemToNeverExceedWindowSize();
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		replayMocks(classToInstanceMap);
+
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+
+		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, FilterType.ONE_MONTHS_BACK, inboxCollectionId);
+
+		verifyMocks(classToInstanceMap);
+		
+		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
+
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+	}
+
+	@Test
 	public void testGetItemEstimateWithChanges() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey firstAllocatedSyncKey = new SyncKey("456");
