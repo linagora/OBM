@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +60,55 @@ public class WBXMLToolsTest {
 	@Before
 	public void setUp() {
 		wbxmlTools = new WBXMLTools();
+	}
+	
+	@Test
+	public void testWbxmlDecodeEncodeRoundtrip() throws IOException, SAXException, FactoryConfigurationError, WBXmlException{
+		
+		String expectedResult = 
+				"<?xml version=\"1.0\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<Class>Email</Class>" +
+							"<SyncKey>" +
+								"c488f7b0-0602-4910-82ab-45a6a117e66c" +
+							"</SyncKey>" +
+							"<CollectionId>1169</CollectionId>" +
+							"<DeletesAsMoves/>" +
+							"<GetChanges/>" +
+							"<WindowSize>5</WindowSize>" +
+							"<Options>" +
+								"<FilterType>5</FilterType>" +
+							"</Options>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>";
+		
+		String xmlActiveSync = 
+				"<?xml version=\"1.0\"?>" +
+				"<Sync>   " +
+					"<Collections>" +
+						"<Collection>  \r\n" +
+							"<Class>Email</Class>" +
+							"<SyncKey>" +
+								"c488f7b0-0602-4910-82ab-45a6a117e66c" +
+							"</SyncKey>" +
+							"<CollectionId>1169</CollectionId>" +
+							"<DeletesAsMoves/>" +
+							"<GetChanges/>" +
+							"<WindowSize>5</WindowSize>" +
+							"<Options>" +
+								"<FilterType>5</FilterType> " +
+							"</Options>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>";
+		ByteArrayInputStream is = new ByteArrayInputStream(xmlActiveSync.getBytes("UTF-8"));		
+		Document doc = DOMUtils.parse(is);
+		byte[] byteDoc = wbxmlTools.toWbxml("AirSync", doc);
+		Document actual = wbxmlTools.toXml(byteDoc);
+		XMLAssert.assertXMLEqual(DOMUtils.parse(expectedResult), actual);
 	}
 	
 	@Test

@@ -31,6 +31,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.google.common.base.CharMatcher;
+
 class EncoderHandler extends DefaultHandler {
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -41,10 +43,12 @@ class EncoderHandler extends DefaultHandler {
 	private StringBuilder currentCharacter;
 
 	private Stack<String> stackedStarts;
-
+	private Stack<Boolean> currentNodeHasSubnodes;
+	
 	public EncoderHandler(WbxmlEncoder we, ByteArrayOutputStream buf,
 			String defaultNamespace) throws IOException {
 		this.stackedStarts = new Stack<String>();
+		this.currentNodeHasSubnodes = new Stack<Boolean>();
 		this.defaultNamespace = defaultNamespace;
 		this.we = we;
 		this.buf = buf;
@@ -55,13 +59,15 @@ class EncoderHandler extends DefaultHandler {
 		currentXmlns = defaultNamespace;
 	}
 
+	@Override
 	public void startElement(String uri, String localName, String qName,
 			Attributes attr) throws SAXException {
 
+		subnodeStartElement();
 		if (!stackedStarts.isEmpty()) {
 			flushNormal();
 		}
-		flushCharacter();
+		dropIgnorableWhitespace();
 		try {
 			String newNs = null;
 			if (!qName.contains(":")) {
@@ -81,6 +87,27 @@ class EncoderHandler extends DefaultHandler {
 		} catch (IOException e) {
 			throw new SAXException(e);
 		}
+	}
+
+	private void subnodeStartElement() {
+		if (!currentNodeHasSubnodes.isEmpty()) {
+			currentNodeHasSubnodes.pop();
+			currentNodeHasSubnodes.add(true);
+		}
+		currentNodeHasSubnodes.add(false);
+	}
+
+	private void dropIgnorableWhitespace() throws SAXException {
+		if (currentCharacter != null) {
+			if (!containsIgnorableWhitespaces(currentCharacter.toString())) {
+				throw new SAXException("unexpected characters between to opening tags");
+			}
+			currentCharacter = null;
+		}
+	}
+
+	private boolean containsIgnorableWhitespaces(String input) {
+		return CharMatcher.WHITESPACE.matchesAllOf(input);
 	}
 
 	private void queueStart(String qName) {
@@ -113,6 +140,8 @@ class EncoderHandler extends DefaultHandler {
 		we.setStringTable(table);
 		we.switchPage(TagsTables.NAMESPACES_IDS.get(newNs));
 	}
+	
+	@Override
 	public void characters(char[] chars, int start, int len)
 			throws SAXException {
 		if (!stackedStarts.isEmpty()) {
@@ -120,20 +149,12 @@ class EncoderHandler extends DefaultHandler {
 		}
 		String s = new String(chars, start, len);
 		appendCharacter(s);
-//		s = s.trim();
-//		if (s.length() == 0) {
-//			return;
-//		}
-//		try {
-//			buf.write(Wbxml.STR_I);
-//			we.writeStrI(buf, new String(chars, start, len));
-//		} catch (IOException e) {
-//			throw new SAXException(e);
-//		}
 	}
 
+	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
+		subnodeEndElement();
 		if (!stackedStarts.isEmpty()) {
 			flushEmptyElem();
 		} else {
@@ -142,12 +163,16 @@ class EncoderHandler extends DefaultHandler {
 		}
 	}
 	
+	private void subnodeEndElement() throws SAXException {
+		boolean currentElementHasChildren = currentNodeHasSubnodes.pop();
+		if (currentElementHasChildren) {
+			dropIgnorableWhitespace();
+		}
+	}
+
 	private void appendCharacter(String characters){
 		
 		if(this.currentCharacter == null){
-			if (characters.trim().length() == 0) {
-				return;
-			}
 			this.currentCharacter = new StringBuilder();
 		}
 		currentCharacter.append(characters);
