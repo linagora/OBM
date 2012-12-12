@@ -185,7 +185,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		User jaures = jauresUser();
 		MSEvent msEvent = converter.convert(event, new MSEventUid("mseventuid"), jaures);
 		assertThat(msEvent.getAllDayEvent()).isEqualTo(true);
-		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-14T21:39:45Z"));
+		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-14T00:00:00"));
 	}
 	
 	@Test

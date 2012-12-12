@@ -38,6 +38,7 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.DateMidnight;
 import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -92,9 +93,9 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 		mse.setSubject(e.getTitle());
 		mse.setDescription(e.getDescription());
 		mse.setLocation(e.getLocation());
-		mse.setStartTime(e.getStartDate());
-	
-		Date endtTime = endTime(e.getStartDate().getTime(), e.getDuration());
+		setStartTimeVersusAllDayProperty(e, mse);
+
+		Date endtTime = endTime(mse.getStartTime().getTime(), e.getDuration());
 		mse.setEndTime(endtTime);
 		
 		mse.setAllDayEvent(e.isAllday());
@@ -105,6 +106,15 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 
 		mse.setCategories(category(e));
 		mse.setMeetingStatus(CalendarMeetingStatus.IS_A_MEETING);
+	}
+
+	private void setStartTimeVersusAllDayProperty(Event event, MSEventCommon mse) {
+		if(event.isAllday()) {
+			DateMidnight startMidnight = new DateMidnight(event.getStartDate().getTime());
+			mse.setStartTime(startMidnight.toDate());
+		} else {
+			mse.setStartTime(event.getStartDate());
+		}
 	}
 
 	private Date endTime(long startTime, int duration) {
