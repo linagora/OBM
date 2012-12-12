@@ -42,7 +42,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -112,7 +111,7 @@ public abstract class MailboxServiceTest {
 		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailboxPath(IMAP_INBOX_NAME), before);
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
+		assertThat(emails).isNotNull().hasSize(1);
 	}
 	
 	@Test(expected=MailException.class)
@@ -120,7 +119,7 @@ public abstract class MailboxServiceTest {
 		MailboxFolder newFolder = folder("inBox");
 		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(after).isNotNull().containsOnly(
+		assertThat(after).isNotNull().containsOnly(
 				inbox());
 	}
 	
@@ -129,7 +128,7 @@ public abstract class MailboxServiceTest {
 		MailboxFolder newFolder = folder("to&to");
 		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(after).isNotNull().containsOnly(
+		assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}
 	
@@ -138,7 +137,7 @@ public abstract class MailboxServiceTest {
 		MailboxFolder newFolder = folder("éàêôï");
 		mailboxService.createFolder(udr, newFolder);
 		MailboxFolders after = mailboxService.listAllFolders(udr);
-		Assertions.assertThat(after).isNotNull().containsOnly(
+		assertThat(after).isNotNull().containsOnly(
 				inbox(), newFolder);
 	}
 	
@@ -156,7 +155,27 @@ public abstract class MailboxServiceTest {
 		mailboxService.updateReadFlag(udr, mailBoxPath, MessageSet.singleton(email.getUid()), true);
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		
-		Assertions.assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
+		assertThat(Iterables.getOnlyElement(emails).isRead()).isTrue();
+	}
+	
+	@Test
+	public void testUpdateSeveralMailsFlag() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = mailboxPath(mailBox);
+		Date date = DateUtils.getMidnightCalendar().getTime();
+
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		greenMail.waitForIncomingEmail(2);
+		
+		mailboxService.fetchEmails(udr, mailBoxPath, date);
+		
+		mailboxService.updateReadFlag(udr, mailBoxPath, MessageSet.builder().add(1l).add(2l).build(), true);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
+		
+		assertThat(emails).hasSize(2);
+		assertThat(Iterables.get(emails, 0).isRead()).isTrue();
+		assertThat(Iterables.get(emails, 1).isRead()).isTrue();
 	}
 	
 	@Ignore("Greenmail replied that the command succeed")
@@ -182,11 +201,11 @@ public abstract class MailboxServiceTest {
 		Set<Email> emailsAfterToReadMail = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email emailHasRead = Iterables.getOnlyElement(emailsAfterToReadMail);
 		
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
-		Assertions.assertThat(emailsAfterToReadMail).isNotNull().hasSize(1);
+		assertThat(emails).isNotNull().hasSize(1);
+		assertThat(emailsAfterToReadMail).isNotNull().hasSize(1);
 		
-		Assertions.assertThat(emailNotRead.isRead()).isFalse();
-		Assertions.assertThat(emailHasRead.isRead()).isTrue();
+		assertThat(emailNotRead.isRead()).isFalse();
+		assertThat(emailHasRead.isRead()).isTrue();
 	}
 	
 	@Test
@@ -205,11 +224,11 @@ public abstract class MailboxServiceTest {
 		Set<Email> emailsAfterToSetAnsweredFlag = mailboxService.fetchEmails(udr, mailBoxPath, date);
 		Email answeredEmail = Iterables.getOnlyElement(emailsAfterToSetAnsweredFlag);
 		
-		Assertions.assertThat(emails).isNotNull().hasSize(1);
-		Assertions.assertThat(emailsAfterToSetAnsweredFlag).isNotNull().hasSize(1);
+		assertThat(emails).isNotNull().hasSize(1);
+		assertThat(emailsAfterToSetAnsweredFlag).isNotNull().hasSize(1);
 		
-		Assertions.assertThat(email.isAnswered()).isFalse();
-		Assertions.assertThat(answeredEmail.isAnswered()).isTrue();
+		assertThat(email.isAnswered()).isFalse();
+		assertThat(answeredEmail.isAnswered()).isTrue();
 	}
 
 	@Test
@@ -220,7 +239,7 @@ public abstract class MailboxServiceTest {
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+		assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 
 	@Test
@@ -234,7 +253,7 @@ public abstract class MailboxServiceTest {
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent\r\n\r\n");
 
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+		assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 
 	@Test(expected=MailException.class)
@@ -260,7 +279,7 @@ public abstract class MailboxServiceTest {
 		}
 
 		mailboxService.storeInSent(udr, emailData);
-		Assertions.assertThat(isResetable).isFalse();
+		assertThat(isResetable).isFalse();
 	}
 
 	@Test
@@ -276,7 +295,7 @@ public abstract class MailboxServiceTest {
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent\r\n\r\n");
 
-		Assertions.assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
+		assertThat(fetchMailStream).hasContentEqualTo(expectedEmailData);
 	}
 	
 	@Test
