@@ -789,70 +789,78 @@ public class Ical4jHelperTest {
 		ical4jHelper.appendAllDay(event, startDate, endDate);
 		assertTrue(event.isAllday());
 	}
-	
+
+	@Test
+	public void testAppendAllDayWithStartDateObject() {
+		final Event event = new Event();
+		VEvent vevent = new VEvent();
+		final DtStart startDate = new DtStart();
+		startDate.setDate(new net.fortuna.ical4j.model.Date());
+		vevent.getProperties().add(startDate);
+
+		ical4jHelper.appendAllDay(event, vevent);
+		assertTrue(event.isAllday());
+	}
+
 	@Test
 	public void testAppendAllDayWithDurationOfOneDay() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-15T21:39:45Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertTrue(event.isAllday());
 	}
-	
+
+	private Event createEventByDuration(Duration duration) {
+		final Event event = new Event();
+		VEvent vevent = new VEvent();
+		vevent.getProperties().add(duration);
+		ical4jHelper.appendAllDay(event, vevent);
+		return event;
+	}
+
 	@Test
 	public void testAppendAllDayWithDurationOfThreeDay() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-17T21:39:45Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertTrue(event.isAllday());
 	}
 	
 	@Test
 	public void testAppendAllDayWithDurationOfOneWeek() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-21T21:39:45Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertFalse(event.isAllday());
 	}
 
 	@Test
 	public void testAppendAllDayWithDurationOfOneHour() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-14T22:39:45Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertFalse(event.isAllday());
 	}
 	
 	@Test
 	public void testAppendAllDayWithDurationOfQuiteOneDay() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:40:00Z"),
 				DateUtils.date("2004-12-15T21:30:00Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertFalse(event.isAllday());
 	}
 
 	@Test
 	public void testAppendAllDayWithDurationOfOneMinute() {
-		final Event event = new Event();
 		final Duration allDayDuration = new Duration(
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-14T21:40:45Z"));
-		
-		ical4jHelper.appendAllDay(event, allDayDuration);
+		final Event event = createEventByDuration(allDayDuration);
 		assertFalse(event.isAllday());
 	}
 	
@@ -932,22 +940,6 @@ public class Ical4jHelperTest {
 		DtStart dtstart = ical4jHelper.getDtStart(event.getStartDate());
 
 		assertEquals(dtstart.getDate().getTime(), event.getStartDate().getTime());
-	}
-
-	@Test
-	public void testGetDurationAllDay() {
-		Event event = new Event();
-		Calendar cal = getCalendarPrecisionOfSecond();
-		event.setStartDate(cal.getTime());
-		event.setAllday(true);
-		
-		Duration duration = ical4jHelper.getDuration(event.getStartDate(), event.getEndDate());
-		
-		assertEquals(duration.getDuration().getWeeks(), 0);
-		assertEquals(duration.getDuration().getDays(), 1);
-		assertEquals(duration.getDuration().getHours(), 0);
-		assertEquals(duration.getDuration().getMinutes(), 0);
-		assertEquals(duration.getDuration().getSeconds(), 0);
 	}
 
 	@Test
@@ -1105,7 +1097,54 @@ public class Ical4jHelperTest {
 		Assert.assertThat(ics, StringContains.containsString(icsAttendee));
 		Assert.assertEquals(1, countStringOccurrences(ics, "ATTENDEE;"));	
 	}
-	
+
+	@Test
+	public void testDateOfBuildIcsInvitationWithAllDayEvent() {
+		final Event event = buildEvent();
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		event.setAllday(true);
+		AccessToken token = new AccessToken(0, "OBM");
+
+		String invitationIcs = ical4jHelper.buildIcsInvitationRequest(ical4jUser, event, token);
+		String cancelIcs = ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, token);
+		String replyIcs = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
+
+		String expectedStartDate = "DTSTART;VALUE=DATE:19700116";
+		String expectedEndDate = "DTEND;VALUE=DATE:19700117";
+		String notExpectedDuration = "DURATION";
+
+		assertThat(invitationIcs).contains(expectedEndDate).contains(expectedStartDate)
+			.doesNotContain(notExpectedDuration);
+		assertThat(cancelIcs).contains(expectedEndDate).contains(expectedStartDate)
+			.doesNotContain(notExpectedDuration);
+		assertThat(replyIcs).contains(expectedEndDate).contains(expectedStartDate)
+			.doesNotContain(notExpectedDuration);
+	}
+
+	@Test
+	public void testDateOfBuildIcsInvitationOneHourEvent() {
+		final Event event = buildEvent();
+		final Attendee attendeeReply = event.getAttendees().get(2);
+		final Ical4jUser ical4jUser = buildObmUser(attendeeReply);
+		AccessToken token = new AccessToken(0, "OBM");
+
+		String invitationIcs = ical4jHelper.buildIcsInvitationRequest(ical4jUser, event, token);
+		String cancelIcs = ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, token);
+		String replyIcs = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
+
+		String expectedStartDate = "DTSTART:19700116T104834Z";
+		String expectedDuration = "DURATION:PT1H";
+		String notExpectedDEndDate = "DTEND";
+
+		assertThat(invitationIcs).contains(expectedDuration).contains(expectedStartDate)
+			.doesNotContain(notExpectedDEndDate);
+		assertThat(cancelIcs).contains(expectedDuration).contains(expectedStartDate)
+			.doesNotContain(notExpectedDEndDate);
+		assertThat(replyIcs).contains(expectedDuration).contains(expectedStartDate)
+			.doesNotContain(notExpectedDEndDate);
+	}
+
 	private Event buildEvent() {
 		final Event event = new Event();
 		
