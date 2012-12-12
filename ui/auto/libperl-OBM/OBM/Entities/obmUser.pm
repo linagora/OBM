@@ -183,19 +183,13 @@ sub _init {
     }
 
     # User Address
-    if( $userDesc->{'userobm_address1'} ) {
-        $userDesc->{'userobm_full_address'} = $userDesc->{'userobm_address1'};
+    my @fullAddress;
+    foreach my $field(('userobm_address1', 'userobm_address2',
+            'userobm_address3')) {
+        push @fullAddress, $userDesc->{$field} if
+            ($userDesc->{$field});
     }
-
-    if( $userDesc->{'userobm_address2'} ) {
-        $userDesc->{'userobm_full_address'} .= '\r\n' if $userDesc->{'userobm_full_address'};
-        $userDesc->{'userobm_full_address'} .= $userDesc->{'userobm_address2'};
-    }
-
-    if( $userDesc->{'userobm_address3'} ) {
-        $userDesc->{'userobm_full_address'} .= '\r\n' if $userDesc->{'userobm_full_address'};
-        $userDesc->{'userobm_full_address'} .= $userDesc->{'userobm_address3'};
-    }
+    $userDesc->{userobm_full_address} = join('$', @fullAddress);
 
     # User registered address
     my @registeredAddress;
