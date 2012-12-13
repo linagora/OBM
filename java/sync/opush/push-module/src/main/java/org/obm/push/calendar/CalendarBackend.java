@@ -84,6 +84,7 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.CalendarType;
+import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
@@ -266,6 +267,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				changes = calendarClient.getSync(token, calendar, newState.getSyncDate());
 			}
 			
+			new ConsistencyEventChangesLogger().log(logger, changes);
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 		
