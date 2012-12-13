@@ -32,12 +32,10 @@
 package org.obm.push.calendar;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -46,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,9 +96,11 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
+import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -122,8 +123,10 @@ public class CalendarBackendTest {
 	private EventService eventService;
 	private LoginService loginService;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
+	private ConsistencyEventChangesLogger consistencyLogger;
 	
 	private CalendarBackend calendarBackend;
+	private IMocksControl mockControl;
 	
 	@Before
 	public void setUp() {
@@ -135,20 +138,24 @@ public class CalendarBackendTest {
 		this.outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
 
+		mockControl = createControl();
+		this.mappingService = mockControl.createMock(MappingService.class);
+		this.calendarClient = mockControl.createMock(CalendarClient.class);
+		this.eventConverter = mockControl.createMock(EventConverter.class);
+		this.eventService = mockControl.createMock(EventService.class);
+		this.loginService = mockControl.createMock(LoginService.class);
+		this.collectionPathBuilderProvider = mockControl.createMock(Provider.class);
+		this.consistencyLogger = mockControl.createMock(ConsistencyEventChangesLogger.class);
 		
-		this.mappingService = createMock(MappingService.class);
-		this.calendarClient = createMock(CalendarClient.class);
-		this.eventConverter = createMock(EventConverter.class);
-		this.eventService = createMock(EventService.class);
-		this.loginService = createMock(LoginService.class);
-		this.collectionPathBuilderProvider = createMock(Provider.class);
+		consistencyLogger.log(anyObject(Logger.class), anyObject(EventChanges.class));
+		expectLastCall().anyTimes();
 		
 		this.calendarBackend = new CalendarBackend(mappingService, 
 				calendarClient, 
 				eventConverter, 
 				eventService, 
 				loginService, 
-				collectionPathBuilderProvider);
+				collectionPathBuilderProvider, consistencyLogger);
 	}
 	
 	@Test
@@ -168,13 +175,13 @@ public class CalendarBackendTest {
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(collectionMappingId));
 		expectMappingServiceLookupCollection(defaultCalendarName, collectionMappingId);
 		
-		Builder collectionPathBuilder = expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
+		expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
 
-		replay(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mockControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mockControl.verify();
 		
 		CollectionChange expectedItemChange = CollectionChange.builder()
 				.collectionId(String.valueOf(collectionMappingId))
@@ -200,13 +207,13 @@ public class CalendarBackendTest {
 		expectMappingServiceFindCollection(defaultCalendarName, collectionMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(collectionMappingId));
 		
-		Builder collectionPathBuilder = expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
+		expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
 
-		replay(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mockControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(mappingService, collectionPathBuilder, collectionPathBuilderProvider);
+		mockControl.verify();
 		
 		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
 		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
@@ -233,8 +240,8 @@ public class CalendarBackendTest {
 				newCalendarInfo("1", calendar1DisplayName),
 				newCalendarInfo("2", calendar2DisplayName));
 		
-		Builder collectionPathBuilder1 = expectBuildCollectionPath(calendar1DisplayName, calendar1CollectionPath);
-		Builder collectionPathBuilder2 = expectBuildCollectionPath(calendar2DisplayName, calendar2CollectionPath);
+		expectBuildCollectionPath(calendar1DisplayName, calendar1CollectionPath);
+		expectBuildCollectionPath(calendar2DisplayName, calendar2CollectionPath);
 		
 		List<CollectionPath> knownCollections = ImmutableList.of(); 
 		expectMappingServiceListLastKnowCollection(lastKnownState, knownCollections);
@@ -244,13 +251,11 @@ public class CalendarBackendTest {
 		expectMappingServiceLookupCollection(calendar1CollectionPath, calendar1MappingId);
 		expectMappingServiceLookupCollection(calendar2CollectionPath, calendar2MappingId);
 		
-		replay(loginService, mappingService, collectionPathBuilder1, collectionPathBuilder2,
-				collectionPathBuilderProvider, calendarClient);
+		mockControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, mappingService, collectionPathBuilder1, collectionPathBuilder2,
-				collectionPathBuilderProvider, calendarClient);
+		mockControl.verify();
 
 		CollectionChange expectedItemChange1 = CollectionChange.builder()
 				.collectionId(String.valueOf(calendar1MappingId))
@@ -291,7 +296,7 @@ public class CalendarBackendTest {
 		expectLoginBehavior();
 		expectObmSyncCalendarChanges(newCalendarInfo("1", calendar1DisplayName));
 		
-		Builder collectionPathBuilder1 = expectBuildCollectionPath(calendar1DisplayName, calendar1CollectionPath);
+		expectBuildCollectionPath(calendar1DisplayName, calendar1CollectionPath);
 
 		List<CollectionPath> knownCollections = ImmutableList.<CollectionPath>of(
 				new CollectionPathTest(calendar2CollectionPath, PIMDataType.CALENDAR, calendar2DisplayName));
@@ -301,11 +306,11 @@ public class CalendarBackendTest {
 		expectMappingServiceLookupCollection(calendar1CollectionPath, calendar1MappingId);
 		expectMappingServiceLookupCollection(calendar2CollectionPath, calendar2MappingId);
 		
-		replay(loginService, mappingService, collectionPathBuilder1, collectionPathBuilderProvider, calendarClient);
+		mockControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
 		
-		verify(loginService, mappingService, collectionPathBuilder1, collectionPathBuilderProvider, calendarClient);
+		mockControl.verify();
 
 		CollectionChange expectedItemChange1 = CollectionChange.builder()
 				.collectionId(String.valueOf(calendar1MappingId))
@@ -331,16 +336,16 @@ public class CalendarBackendTest {
 		String calendarDisplayName = calendarBackendName + " calendar";
 		String calendarCollectionPath = rootCalendarPath + calendarBackendName;
 
-		Builder collectionPathBuilder = expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
+		expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
 
 		expectMappingServiceListLastKnowCollection(lastKnownState, ImmutableList.<CollectionPath>of());
 		expectMappingServiceSearchThenCreateCollection(calendarCollectionPath, calendarMappingId);
 		expectMappingServiceSnapshot(outgoingSyncState, ImmutableSet.of(calendarMappingId));
 		expectMappingServiceLookupCollection(calendarCollectionPath, calendarMappingId);
 		
-		replay(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
+		mockControl.replay();
 		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
-		verify(loginService, mappingService, collectionPathBuilder, collectionPathBuilderProvider, calendarClient);
+		mockControl.verify();
 
 		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(CollectionChange.builder()
 				.displayName(calendarDisplayName)
@@ -371,8 +376,8 @@ public class CalendarBackendTest {
 				newCalendarInfo("1", calendarBackendName),
 				newCalendarInfo("2", calendar2BackendName));
 
-		Builder collectionPathBuilder = expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
-		Builder collectionPath2Builder = expectBuildCollectionPath(calendar2BackendName, calendar2CollectionPath);
+		expectBuildCollectionPath(calendarBackendName, calendarCollectionPath);
+		expectBuildCollectionPath(calendar2BackendName, calendar2CollectionPath);
 
 		expectMappingServiceListLastKnowCollection(lastKnownState, ImmutableList.<CollectionPath>of());
 		expectMappingServiceSearchThenCreateCollection(calendarCollectionPath, calendarMappingId);
@@ -381,12 +386,11 @@ public class CalendarBackendTest {
 		expectMappingServiceLookupCollection(calendarCollectionPath, calendarMappingId);
 		expectMappingServiceLookupCollection(calendar2CollectionPath, calendar2MappingId);
 		
-		replay(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
-				collectionPathBuilderProvider, calendarClient);
-		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
-		verify(loginService, mappingService, collectionPathBuilder, collectionPath2Builder,
-				collectionPathBuilderProvider, calendarClient);
+		mockControl.replay();
 
+		HierarchyCollectionChanges hierarchyItemsChanges = calendarBackend.getHierarchyChanges(userDataRequest, lastKnownState, outgoingSyncState);
+		
+		mockControl.verify();
 		assertThat(hierarchyItemsChanges.getCollectionChanges()).containsOnly(
 				CollectionChange.builder()
 					.displayName(calendarDisplayName)
@@ -413,7 +417,7 @@ public class CalendarBackendTest {
 	}
 
 	private CollectionPath.Builder expectCollectionPathBuilder(CollectionPath collectionPath, String displayName) {
-		CollectionPath.Builder collectionPathBuilder = createMock(CollectionPath.Builder.class);
+		CollectionPath.Builder collectionPathBuilder = mockControl.createMock(CollectionPath.Builder.class);
 		expect(collectionPathBuilder.userDataRequest(userDataRequest))
 			.andReturn(collectionPathBuilder).once();
 		
@@ -508,7 +512,7 @@ public class CalendarBackendTest {
 
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
 		
-		replay(loginService, mappingService, calendarClient, eventService);
+		mockControl.replay();
 		
 		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
@@ -517,7 +521,7 @@ public class CalendarBackendTest {
 		
 		int itemEstimateSize = calendarBackend.getItemEstimateSize(userDataRequest, lastKnownState, collectionId, syncCollectionOptions);
 		
-		verify(loginService, mappingService, calendarClient, eventService);
+		mockControl.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(4);
 	}
@@ -552,7 +556,7 @@ public class CalendarBackendTest {
 
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
 		
-		replay(loginService, mappingService, calendarClient, eventService);
+		mockControl.replay();
 		
 		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
@@ -561,7 +565,7 @@ public class CalendarBackendTest {
 		
 		DataDelta dataDelta = calendarBackend.getChanged(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
 		
-		verify(loginService, mappingService, calendarClient, eventService);
+		mockControl.verify();
 		
 		assertThat(dataDelta.getSyncDate()).isEqualTo(currentDate);
 		assertThat(dataDelta.getDeletions()).hasSize(2);
@@ -570,9 +574,9 @@ public class CalendarBackendTest {
 
 	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate, MappingService mappingService, int collectionId) {
 		EventChanges eventChanges = new EventChanges();
-		List<DeletedEvent> deletedEvents = new ArrayList<DeletedEvent>();
-		deletedEvents.add(createDeletedEvent(new EventObmId(11), new EventExtId("11")));
-		deletedEvents.add(createDeletedEvent(new EventObmId(12), new EventExtId("12")));
+		Set<DeletedEvent> deletedEvents = ImmutableSet.of(
+				createDeletedEvent(new EventObmId(11), new EventExtId("11")),
+				createDeletedEvent(new EventObmId(12), new EventExtId("12")));
 		eventChanges.setDeletedEvents(deletedEvents);
 		
 		eventChanges.setParticipationUpdated(ImmutableList.<ParticipationChanges> of());
@@ -627,11 +631,11 @@ public class CalendarBackendTest {
 
 		expectEventConvertion(event, true);
 		
-		replay(loginService, mappingService, calendarClient, eventConverter);
+		mockControl.replay();
 		
 		String serverIdFor = calendarBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, data);
 		
-		verify(loginService, mappingService, calendarClient, eventConverter);
+		mockControl.verify();
 		
 		assertThat(serverIdFor).isEqualTo(serverId);
 	}
@@ -660,11 +664,11 @@ public class CalendarBackendTest {
 		
 		expectGetAndRemoveEventFromId(itemId);
 		
-		replay(loginService, mappingService, calendarClient);
+		mockControl.replay();
 		
 		calendarBackend.delete(userDataRequest, collectionId, serverId, true);
 		
-		verify(mappingService, loginService, calendarClient);
+		mockControl.verify();
 	}
 
 	private void expectGetAndRemoveEventFromId(int itemId)
@@ -713,15 +717,13 @@ public class CalendarBackendTest {
 		expect(mappingService.getServerIdFor(1, "1"))
 			.andReturn(serverId);
 		
-		Builder collectionPathBuilder = expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
+		expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
 		
-		replay(loginService, eventService, calendarClient, eventConverter, mappingService,
-				collectionPathBuilderProvider, collectionPathBuilder);
+		mockControl.replay();
 
 		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
 		
-		verify(loginService, eventService, calendarClient, eventConverter, mappingService, 
-				collectionPathBuilderProvider, collectionPathBuilder);
+		mockControl.verify();
 		assertThat(serverIdResponse).isEqualTo(serverId);
 	}
 	
@@ -761,13 +763,13 @@ public class CalendarBackendTest {
 		expectConvertEventToMSEvent(serverId1, event1);
 		expectConvertEventToMSEvent(serverId2, event2);
 		
-		replay(loginService, mappingService, calendarClient, eventService);
+		mockControl.replay();
 		
 		List<String> itemIds = ImmutableList.<String> of(serverId1, serverId2);
 
 		List<ItemChange> itemChanges = calendarBackend.fetch(userDataRequest, itemIds, null);
 		
-		verify(loginService, mappingService, calendarClient, eventService);
+		mockControl.verify();
 		
 		assertThat(itemChanges).hasSize(2);
 	}
@@ -836,15 +838,15 @@ public class CalendarBackendTest {
 		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
 		
 		
-		replay(calendarClient, mappingService);
+		mockControl.replay();
 		
 		DataDelta dataDelta = calendarBackend.buildDataDelta(userDataRequest, collectionId, token, eventChanges);
 		
-		verify(calendarClient, mappingService);
+		mockControl.verify();
 		assertThat(dataDelta.getDeletions()).hasSize(1).containsOnly(
 				ItemDeletion.builder()
-					.serverId("1:132453")
-					.build());
+				.serverId("1:132453")
+				.build());
 	}
 
 	private FolderSyncState buildFolderSyncState(SyncKey syncKey) {

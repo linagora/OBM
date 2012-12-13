@@ -64,10 +64,12 @@ import com.google.common.collect.ImmutableList;
 public class ConsistencyEventChangesLoggerTest {
 
 	private Logger logger;
+	private ConsistencyEventChangesLogger consistencyEventChangesLogger;
 
 	@Before
 	public void setUp() {
 		logger = createStrictMock(Logger.class);
+		consistencyEventChangesLogger = new ConsistencyEventChangesLogger();
 	}
 	
 	@Test
@@ -80,8 +82,8 @@ public class ConsistencyEventChangesLoggerTest {
 			.build();
 
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 		
 		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
@@ -112,8 +114,8 @@ public class ConsistencyEventChangesLoggerTest {
 			.build();
 
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 		
 		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
@@ -133,8 +135,8 @@ public class ConsistencyEventChangesLoggerTest {
 			.build();
 
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 		
 		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
@@ -171,8 +173,8 @@ public class ConsistencyEventChangesLoggerTest {
 		logger.error(anyObject(String.class));
 		expectLastCall().times(2);
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 		
 		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
@@ -211,8 +213,8 @@ public class ConsistencyEventChangesLoggerTest {
 		logger.error(anyObject(String.class));
 		expectLastCall().times(2);
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 
 		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
@@ -234,16 +236,12 @@ public class ConsistencyEventChangesLoggerTest {
 			.deletes(ImmutableList.<DeletedEvent>of(event1, event2, event3, event4, event2Again))
 			.build();
 
-		logger.error(anyObject(String.class));
-		expectLastCall().times(2);
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 
-		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
-		assertThat(duplicateChanges.getDuplicatesEntries().get(new EventObmId(2)))
-			.containsOnly(event2, event2Again);
+		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
 	}
 
 	@Test
@@ -263,8 +261,8 @@ public class ConsistencyEventChangesLoggerTest {
 		logger.error(anyObject(String.class));
 		expectLastCall().times(2);
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 
 		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
@@ -294,8 +292,8 @@ public class ConsistencyEventChangesLoggerTest {
 			.build();
 
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 
 		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
@@ -329,8 +327,8 @@ public class ConsistencyEventChangesLoggerTest {
 		logger.error(anyObject(String.class));
 		expectLastCall().times(2);
 		replay(logger);
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
-		new ConsistencyEventChangesLogger().log(logger, duplicateChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
+		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 
 		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(2);
@@ -346,12 +344,8 @@ public class ConsistencyEventChangesLoggerTest {
 		Document dump = DOMUtils.parse(dumpStream);
 		EventChanges eventChanges = new CalendarItemsParser().parseChanges(dump);
 		
-		NotConsistentEventChanges duplicateChanges = new ConsistencyEventChangesLogger().build(eventChanges);
+		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
 
-		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
-		assertThat(duplicateChanges.getDuplicatesEntries().get(new EventObmId(1342411))).containsOnly(
-				new DeletedEvent(new EventObmId(1342411), new EventExtId("ad603237-22bc-41f1-8878-3cc51375d8c2")),
-				new DeletedEvent(new EventObmId(1342411), new EventExtId("ad603237-22bc-41f1-8878-3cc51375d8c2")),
-				new DeletedEvent(new EventObmId(1342411), new EventExtId("ad603237-22bc-41f1-8878-3cc51375d8c2")));
+		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
 	}
 }

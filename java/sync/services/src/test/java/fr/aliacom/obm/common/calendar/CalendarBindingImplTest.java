@@ -86,6 +86,7 @@ import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -1748,7 +1749,7 @@ public class CalendarBindingImplTest {
 
 		EventChanges eventChangesFromDao = new EventChanges();
 		eventChangesFromDao.setLastSync(syncDateFromDao);
-		eventChangesFromDao.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		eventChangesFromDao.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 		eventChangesFromDao.setParticipationUpdated(new ArrayList<ParticipationChanges>());
 		eventChangesFromDao.setUpdated(Lists.newArrayList(publicUpdatedEvent1, publicUpdatedEvent2,
 				privateUpdatedEvent1));
@@ -1760,7 +1761,7 @@ public class CalendarBindingImplTest {
 
 		EventChanges anonymizedEventChanges = new EventChanges();
 		anonymizedEventChanges.setLastSync(syncDateFromDao);
-		anonymizedEventChanges.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		anonymizedEventChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 		anonymizedEventChanges.setParticipationUpdated(new ArrayList<ParticipationChanges>());
 		anonymizedEventChanges.setUpdated(Lists.newArrayList(publicUpdatedEvent1,
 				publicUpdatedEvent2, privateUpdatedAndAnonymizedEvent1));

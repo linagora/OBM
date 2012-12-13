@@ -1126,7 +1126,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		Iterable<DeletedEvent> deletedEvents = Iterables.concat(findDeletedEvents(calendarUser, lastSync, typeFilter,declined), findDeletedEventsLinks(calendarUser, lastSync));
 
-		ret.setDeletedEvents(Lists.newArrayList(deletedEvents));
+		ret.setDeletedEvents(Sets.newHashSet(deletedEvents));
 		
 		return ret;
 	}

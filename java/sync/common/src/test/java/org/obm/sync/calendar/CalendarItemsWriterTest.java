@@ -56,6 +56,7 @@ import org.obm.sync.items.ParticipationChanges;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 
@@ -88,7 +89,7 @@ private CalendarItemsWriter writer;
 
 		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("123"));
 		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("456"));
-		eventChanges.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		eventChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithRemovedElements.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.base.Category;
@@ -48,6 +49,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 public class CalendarItemsParser extends AbstractItemsParser {
 
@@ -66,8 +68,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
 		NodeList rmed = removed.getElementsByTagName("event");
-		List<DeletedEvent> removedIds = new ArrayList<DeletedEvent>(rmed
-				.getLength() + 1);
+		Set<DeletedEvent> removedIds = Sets.newHashSetWithExpectedSize(rmed.getLength() + 1);
 		for (int i = 0; i < rmed.getLength(); i++) {
 			Element e = (Element) rmed.item(i);
 			removedIds.add(new DeletedEvent(

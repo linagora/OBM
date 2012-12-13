@@ -45,6 +45,7 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.RecurrenceId;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class EventChangesTest {
@@ -97,14 +98,14 @@ public class EventChangesTest {
 
 		EventChanges changes = new EventChanges();
 		changes.setLastSync(lastSync);
-		changes.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1,
 				participationChanges2));
 		changes.setUpdated(Lists.newArrayList(publicEvent, privateEvent));
 
 		EventChanges expectedChanges = new EventChanges();
 		expectedChanges.setLastSync(lastSync);
-		expectedChanges.setDeletedEvents(Lists.newArrayList(deletedEvent1, deletedEvent2));
+		expectedChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1,
 				participationChanges2));
 		expectedChanges.setUpdated(Lists.newArrayList(publicEvent, privateAnonymizedEvent));

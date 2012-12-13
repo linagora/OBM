@@ -49,7 +49,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ConsistencyEventChangesLogger {
 
 	public static class NotConsistentEventChanges {
@@ -80,6 +83,11 @@ public class ConsistencyEventChangesLogger {
 			}
 			return representation.toString();
 		}
+	}
+	
+	@Inject
+	@VisibleForTesting ConsistencyEventChangesLogger() {
+		super();
 	}
 	
 	public void log(Logger logger, EventChanges changes) {

@@ -108,6 +108,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final EventConverter eventConverter;
 	private final EventService eventService;
 	private final ICalendar calendarClient;
+	private final ConsistencyEventChangesLogger consistencyLogger;
 
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
@@ -115,11 +116,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			EventConverter eventConverter, 
 			EventService eventService,
 			LoginService login,
-			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
+			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger) {
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
+		this.consistencyLogger = consistencyLogger;
 	}
 	
 	@Override
@@ -267,7 +269,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				changes = calendarClient.getSync(token, calendar, newState.getSyncDate());
 			}
 			
-			new ConsistencyEventChangesLogger().log(logger, changes);
+			consistencyLogger.log(logger, changes);
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 		
@@ -312,7 +314,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return items;
 	}
 	
-	private List<ItemDeletion> removeEventFilter(List<DeletedEvent> eventsRemoved, Integer collectionId) {
+	private List<ItemDeletion> removeEventFilter(Iterable<DeletedEvent> eventsRemoved, Integer collectionId) {
 		
 		List<ItemDeletion> deletions = Lists.newArrayList();
 		for (final DeletedEvent eventRemove : eventsRemoved) {

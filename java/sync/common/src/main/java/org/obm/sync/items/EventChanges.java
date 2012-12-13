@@ -33,6 +33,7 @@ package org.obm.sync.items;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.sync.calendar.Anonymizable;
 import org.obm.sync.calendar.DeletedEvent;
@@ -42,6 +43,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class EventChanges implements Anonymizable<EventChanges> {
@@ -93,7 +95,7 @@ public class EventChanges implements Anonymizable<EventChanges> {
 		
 	}
 	
-	private List<DeletedEvent> deletedEvents;
+	private Set<DeletedEvent> deletedEvents;
 	private List<Event> updatedEvents;
 	private List<ParticipationChanges> participationUpdated;
 	private Date lastSync;
@@ -104,18 +106,18 @@ public class EventChanges implements Anonymizable<EventChanges> {
 	
 	private EventChanges(Iterable<DeletedEvent> deletes, Iterable<Event> updates,
 						Iterable<ParticipationChanges> participationChanges, Date lastSync) {
-		this.deletedEvents = Lists.newArrayList(deletes);
+		this.deletedEvents = ImmutableSet.copyOf(deletes);
 		this.updatedEvents = Lists.newArrayList(updates);
 		this.participationUpdated = Lists.newArrayList(participationChanges);
 		this.lastSync = lastSync;
 	}
 
-	public List<DeletedEvent> getDeletedEvents() {
+	public Set<DeletedEvent> getDeletedEvents() {
 		return deletedEvents;
 	}
 
-	public void setDeletedEvents(List<DeletedEvent> deleted) {
-		this.deletedEvents = deleted;
+	public void setDeletedEvents(Set<DeletedEvent> deleted) {
+		this.deletedEvents = ImmutableSet.copyOf(deleted);
 	}
 
 	public List<Event> getUpdated() {
