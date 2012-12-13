@@ -80,7 +80,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	
 	public static class OpushServer {
 		
-		private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 10;
+		private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 300;
 		private static final int WAIT_TO_BE_STARTED_MAX_ITERATION = 10;
 		
 		private final Server server;
@@ -131,7 +131,10 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			try {
 				for (int tryCount = 0; tryCount < WAIT_TO_BE_STARTED_MAX_ITERATION; tryCount++) {
 					if (server.isStarted()) {
-						return getLocalPort();
+						try {
+							return getLocalPort();
+						} catch (IllegalStateException e) {
+						}
 					}
 					Thread.sleep(WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE);
 				}
