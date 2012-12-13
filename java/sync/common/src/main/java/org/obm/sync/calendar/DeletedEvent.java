@@ -31,10 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import com.google.common.base.Objects;
+
 public final class DeletedEvent {
 	
-	private EventObmId id;
-	private EventExtId extId;
+	private final EventObmId id;
+	private final EventExtId extId;
 	
 	public DeletedEvent(EventObmId id, EventExtId extId) {
 		this.id = id;
@@ -49,4 +51,27 @@ public final class DeletedEvent {
 		return extId;
 	}
 
+
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(id, extId);
+	}
+	
+	@Override
+	public final boolean equals(Object object) {
+		if (object instanceof DeletedEvent) {
+			DeletedEvent that = (DeletedEvent) object;
+			return Objects.equal(this.extId, that.extId)
+				&& Objects.equal(this.id, that.id);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("extId", extId)
+			.add("id", id)
+			.toString();
+	}
 }

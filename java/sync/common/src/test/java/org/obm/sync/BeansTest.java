@@ -40,6 +40,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.Login;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Contact;
+import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -67,6 +68,7 @@ public class BeansTest {
 		equalsVerifierUtilsTest.test(
 				ObmDomain.class,
 				Event.class,
+				DeletedEvent.class,
 				EventRecurrence.class,
 				EventChanges.class,
 				Contact.class,
