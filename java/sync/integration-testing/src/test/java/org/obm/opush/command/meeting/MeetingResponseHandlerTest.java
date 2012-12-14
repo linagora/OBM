@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.io.IOException;
@@ -46,6 +45,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -103,6 +103,7 @@ public class MeetingResponseHandlerTest {
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject MeetingProtocol protocol;
+	@Inject IMocksControl mocksControl;
 
 	private int meetingCollectionId;
 	private int meetingItemId;
@@ -284,7 +285,7 @@ public class MeetingResponseHandlerTest {
 		expectMailbackendDeleteInvitationTriggersException(classToInstanceMap.get(MailBackend.class), triggeredException);
 		expectHandleMeetingResponseProcessCorrectly(classToInstanceMap.get(CalendarBackend.class));
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 	}
 
 	private void prepareMockForMeetingResponseHandlingError(Exception triggeredException) throws Exception {
@@ -293,7 +294,7 @@ public class MeetingResponseHandlerTest {
 		expectMailbackendDeleteInvitationProcessCorrectly(classToInstanceMap.get(MailBackend.class));
 		expectHandleMeetingResponseTriggersException(classToInstanceMap.get(CalendarBackend.class), triggeredException);
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 	}
 	
 	private void prepareMockForCommonNeeds() throws Exception {

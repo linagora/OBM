@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Collection;
@@ -83,7 +82,6 @@ public class EmailSyncTestUtils {
 		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockEmailSync(syncEmailSyncKey, syncEmailCollectionsIds, delta, fakeTestUsers, classToInstanceMap);
-		replayMocks(classToInstanceMap);
 	}
 	
 	private static void mockEmailSync(SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta,

@@ -38,13 +38,12 @@ import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInb
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
-import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,7 +83,8 @@ public class FolderSyncHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
-
+	@Inject IMocksControl mocksControl;
+	
 	private List<OpushUser> userAsList;
 	private OpushUser user;
 
@@ -116,11 +116,13 @@ public class FolderSyncHandlerTest {
 //		mockCollectionDao(collectionDao, initialSyncKey, serverId);
 
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
+		
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
-		verifyMocks(classToInstanceMap);
+		
+		mocksControl.verify();
 		
 		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
 		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
@@ -145,13 +147,14 @@ public class FolderSyncHandlerTest {
 		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
+		
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 
 		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
 		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
@@ -191,13 +194,14 @@ public class FolderSyncHandlerTest {
 		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
+		
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 
 		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
 		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());
@@ -229,13 +233,13 @@ public class FolderSyncHandlerTest {
 		expectCollectionDaoFindFolderSyncState(classToInstanceMap.get(CollectionDao.class), newSyncKey, newSyncState);
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(newSyncKey);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 
 		assertThat(folderSyncResponse.getReturnedSyncKey()).isEqualTo(newGeneratedSyncKey);
 		assertThat(folderSyncResponse.getStatusAsString()).isEqualTo(FolderSyncStatus.OK.asXmlValue());

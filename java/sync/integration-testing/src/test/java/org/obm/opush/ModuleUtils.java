@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import org.easymock.IMocksControl;
 import org.obm.opush.env.AbstractOverrideModule;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.service.DateService;
@@ -38,8 +39,8 @@ import org.obm.push.state.SyncKeyFactory;
 
 public class ModuleUtils {
 
-	public static AbstractOverrideModule buildContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = new AbstractOverrideModule() {
+	public static AbstractOverrideModule buildContentsExporterBackendModule(IMocksControl mocksControl) {
+		AbstractOverrideModule contentsExporterBackend = new AbstractOverrideModule(mocksControl) {
 
 			@Override
 			protected void configureImpl() {
@@ -49,8 +50,8 @@ public class ModuleUtils {
 		return contentsExporterBackend;
 	}
 
-	public static AbstractOverrideModule buildSyncKeyFactoryModule() {
-		return new AbstractOverrideModule() {
+	public static AbstractOverrideModule buildSyncKeyFactoryModule(IMocksControl mocksControl) {
+		return new AbstractOverrideModule(mocksControl) {
 
 			@Override
 			protected void configureImpl() {
@@ -59,8 +60,8 @@ public class ModuleUtils {
 		};
 	}
 
-	public static AbstractOverrideModule buildDateServiceModule() {
-		return new AbstractOverrideModule() {
+	public static AbstractOverrideModule buildDateServiceModule(IMocksControl mocksControl) {
+		return new AbstractOverrideModule(mocksControl) {
 
 			@Override
 			protected void configureImpl() {

@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +45,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -110,6 +110,7 @@ public class MailBackendHandlerTest {
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
+	@Inject IMocksControl mocksControl;
 	
 	private ServerSetup smtpServerSetup;
 	private String mailbox;
@@ -157,7 +158,7 @@ public class MailBackendHandlerTest {
 		bindCollectionIdToPath(serverId);
 		bindChangedToDelta(delta);
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", smtpServerSetup);

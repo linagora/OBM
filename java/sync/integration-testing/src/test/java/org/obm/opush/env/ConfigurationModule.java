@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 
 import java.util.Locale;
 
+import org.easymock.IMocksControl;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
@@ -47,8 +48,8 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 
 	private final Configuration configuration;
 
-	public ConfigurationModule(Configuration configuration) {
-		super();
+	public ConfigurationModule(Configuration configuration, IMocksControl mocksControl) {
+		super(mocksControl);
 		this.configuration = configuration;
 	}
 	

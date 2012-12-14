@@ -55,11 +55,11 @@ public class FolderSyncHandlerTestModule  extends AbstractOpushEnv {
 	}
 
 	private Module bindContentsExporterBackendModule() {
-		return bindModule(ModuleUtils.buildContentsExporterBackendModule());
+		return bindModule(ModuleUtils.buildContentsExporterBackendModule(getMocksControl()));
 	}
 
 	private Module bindSyncKeyFactoryModule() {
-		return bindModule(ModuleUtils.buildSyncKeyFactoryModule());
+		return bindModule(ModuleUtils.buildSyncKeyFactoryModule(getMocksControl()));
 	}
 	
 	private Module bindModule(AbstractOverrideModule module) {

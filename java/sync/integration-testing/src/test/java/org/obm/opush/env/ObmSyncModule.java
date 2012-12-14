@@ -33,6 +33,7 @@ package org.obm.opush.env;
 
 import static org.easymock.EasyMock.expect;
 
+import org.easymock.IMocksControl;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
@@ -50,8 +51,8 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 
 	public static final boolean PUSH_ENABLED = false;
 
-	public ObmSyncModule() {
-		super();
+	public ObmSyncModule(IMocksControl mocksControl) {
+		super(mocksControl);
 	}
 
 	@Override

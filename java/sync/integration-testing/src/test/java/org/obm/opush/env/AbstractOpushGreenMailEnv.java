@@ -51,6 +51,6 @@ public abstract class AbstractOpushGreenMailEnv extends AbstractOpushEnv {
 	}
 	
 	protected GreenMailEnvModule greenMail() {
-		return new GreenMailEnvModule();
+		return new GreenMailEnvModule(getMocksControl());
 	}
 }

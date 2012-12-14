@@ -38,6 +38,7 @@ import java.util.Locale;
 import javax.xml.transform.TransformerException;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Rule;
@@ -73,6 +74,7 @@ public class AutodiscoverHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject IMocksControl mocksControl;
 
 	@After
 	public void shutdown() throws Exception {
@@ -83,6 +85,7 @@ public class AutodiscoverHandlerTest {
 	public void testAutodiscoverCommand() throws Exception {
 		String externalUrl = "https://external-url/Microsoft-Server-ActiveSync";
 		prepareMocks(externalUrl);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = IntegrationTestUtils.buildOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -119,7 +122,6 @@ public class AutodiscoverHandlerTest {
 		mockLoginService();
 		mockCollectionDaoNoChange();
 		mockConfigurationService(externalUrl);
-		IntegrationTestUtils.replayMocks(classToInstanceMap);
 	}
 
 	private void mockDeviceDao() throws DaoException {

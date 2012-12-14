@@ -43,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.easymock.EasyMock;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.ChangedCollections;
@@ -77,7 +76,6 @@ import org.obm.sync.push.client.XMLOPClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 public class IntegrationTestUtils {
 
@@ -152,14 +150,6 @@ public class IntegrationTestUtils {
 		expectLastCall().anyTimes();
 	}
 
-	public static void replayMocks(Iterable<Object> toReplay) {
-		EasyMock.replay(Iterables.toArray(toReplay, Object.class));
-	}
-
-	public static void verifyMocks(Iterable<Object> toVerify) {
-		EasyMock.verify(Iterables.toArray(toVerify, Object.class));
-	}
-	
 	public static OPClient buildOpushClient(OpushUser user, int port) {
 		return new XMLOPClient(user.user.getLoginAtDomain(), 
 				user.password, 

@@ -37,7 +37,6 @@ import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
 import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -55,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.TransformerException;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -104,6 +104,7 @@ public class PingHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject IMocksControl mocksControl;
 
 	private List<OpushUser> fakeTestUsers;
 	private int pingOnCollectionId;
@@ -234,7 +235,7 @@ public class PingHandlerTest {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForNoChangePing();
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 	}
 
 	private void prepareMockHasChanges(int noChangeIterationCount) throws DaoException, CollectionNotFoundException, 
@@ -242,7 +243,7 @@ public class PingHandlerTest {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForCalendarHasChangePing(noChangeIterationCount);
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 	}
 	
 	public void testHeartbeatInterval(int heartbeatInterval, int delta, int expected) throws Exception {

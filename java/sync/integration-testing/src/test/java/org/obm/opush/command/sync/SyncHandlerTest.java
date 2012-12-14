@@ -42,8 +42,6 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
-import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
 
 import java.io.ByteArrayInputStream;
@@ -53,6 +51,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -118,7 +117,8 @@ public class SyncHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
-
+	@Inject IMocksControl mocksControl;
+	
 	private List<OpushUser> fakeTestUsers;
 
 	@Before
@@ -141,6 +141,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -174,6 +175,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -210,6 +212,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -242,6 +245,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -276,6 +280,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -318,6 +323,7 @@ public class SyncHandlerTest {
 		expectContentExporterFetching(classToInstanceMap.get(IContentsExporter.class), userDataRequest, itemChanges);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, ImmutableList.<Integer> of(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
@@ -358,12 +364,12 @@ public class SyncHandlerTest {
 		collectionDao.resetCollection(singleUserFixture.jaures.device, collectionId);
 		expectLastCall();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		opClient.syncEmail(initialSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(secondSyncKey, collectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(syncResponse.getCollection(collectionIdAsString).getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
@@ -427,7 +433,7 @@ public class SyncHandlerTest {
 		syncedCollectionDao.put(user.credentials, user.device, secondToStoreCollection);
 		expectLastCall();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		
@@ -436,7 +442,7 @@ public class SyncHandlerTest {
 		
 		opClient.syncEmail(initialSyncKey, inbox.getServerId(), toStoreOptions.getFilterType(), 25);
 		SyncResponse syncWithoutOptions = opClient.syncWithoutOptions(secondSyncKey, inbox.getServerId());
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(syncWithoutOptions).isNotNull();
 		Collection inboxCollection = syncWithoutOptions.getCollection(inbox.getServerId());
@@ -481,6 +487,7 @@ public class SyncHandlerTest {
 		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());

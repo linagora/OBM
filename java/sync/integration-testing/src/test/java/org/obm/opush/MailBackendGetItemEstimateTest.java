@@ -39,8 +39,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
-import static org.obm.opush.IntegrationTestUtils.verifyMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
@@ -48,6 +46,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -97,6 +96,7 @@ public class MailBackendGetItemEstimateTest {
 	@Inject GreenMail greenMail;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
+	@Inject IMocksControl mocksControl;
 	
 	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
@@ -160,14 +160,14 @@ public class MailBackendGetItemEstimateTest {
 		expect(collectionDao.findItemStateForKey(invalidSyncKey)).andReturn(null);
 		expectUnsynchronizedItemToNeverExceedWindowSize();
 
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 		
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(invalidSyncKey, inboxCollectionId);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
@@ -197,7 +197,7 @@ public class MailBackendGetItemEstimateTest {
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
@@ -207,7 +207,7 @@ public class MailBackendGetItemEstimateTest {
 
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, inboxCollectionId);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(itemEstimateResponse.getEstimate()).isEqualTo(0);
 
@@ -241,7 +241,7 @@ public class MailBackendGetItemEstimateTest {
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
@@ -251,7 +251,7 @@ public class MailBackendGetItemEstimateTest {
 
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, FilterType.ONE_MONTHS_BACK, inboxCollectionId);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
 
@@ -285,7 +285,7 @@ public class MailBackendGetItemEstimateTest {
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
@@ -296,7 +296,7 @@ public class MailBackendGetItemEstimateTest {
 		sendTwoEmailsToImapServer();
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, inboxCollectionId);
 
-		verifyMocks(classToInstanceMap);
+		mocksControl.verify();
 		
 		assertThat(itemEstimateResponse.getEstimate()).isEqualTo(2);
 

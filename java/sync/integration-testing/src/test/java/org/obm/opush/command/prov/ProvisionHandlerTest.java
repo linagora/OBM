@@ -35,12 +35,12 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
-import static org.obm.opush.IntegrationTestUtils.replayMocks;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -79,6 +79,7 @@ public class ProvisionHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject IMocksControl mocksControl;
 
 	private List<OpushUser> fakeTestUsers;
 
@@ -168,6 +169,6 @@ public class ProvisionHandlerTest {
 		deviceDao.removePolicyKey(user.user, user.device);
 		expectLastCall().once();
 		
-		replayMocks(classToInstanceMap);
+		mocksControl.replay();
 	}
 }

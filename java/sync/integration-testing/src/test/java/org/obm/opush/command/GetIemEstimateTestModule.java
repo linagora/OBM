@@ -56,7 +56,7 @@ public class GetIemEstimateTestModule  extends AbstractOpushEnv {
 	}
 
 	private Module bindStateMachineModule() {
-		AbstractOverrideModule mailBackend = new AbstractOverrideModule() {
+		AbstractOverrideModule mailBackend = new AbstractOverrideModule(getMocksControl()) {
 
 			@Override
 			protected void configureImpl() {
@@ -68,7 +68,7 @@ public class GetIemEstimateTestModule  extends AbstractOpushEnv {
 	}
 	
 	private Module bindContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule();
+		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule(getMocksControl());
 		getMockMap().addMap(contentsExporterBackend.getMockMap());
 		return contentsExporterBackend;
 	}

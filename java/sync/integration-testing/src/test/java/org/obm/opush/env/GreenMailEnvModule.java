@@ -32,6 +32,7 @@
 package org.obm.opush.env;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -49,6 +50,10 @@ import org.obm.push.service.EventService;
 
 public class GreenMailEnvModule extends AbstractOverrideModule {
 
+	public GreenMailEnvModule(IMocksControl mocksControl) {
+		super(mocksControl);
+	}
+	
 	@Override
 	protected void configureImpl() {
 		install(new GreenMailProviderModule());

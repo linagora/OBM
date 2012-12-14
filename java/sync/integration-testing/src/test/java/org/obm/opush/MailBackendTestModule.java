@@ -54,13 +54,13 @@ public class MailBackendTestModule  extends AbstractOpushGreenMailEnv {
 	}
 
 	private Module bindDateService() {
-		AbstractOverrideModule dateServiceModule = ModuleUtils.buildDateServiceModule();
+		AbstractOverrideModule dateServiceModule = ModuleUtils.buildDateServiceModule(getMocksControl());
 		getMockMap().addMap(dateServiceModule.getMockMap());
 		return dateServiceModule;
 	}
 
 	private Module bindSyncKeyFactory() {
-		AbstractOverrideModule syncKeyFactoryModule = ModuleUtils.buildSyncKeyFactoryModule();
+		AbstractOverrideModule syncKeyFactoryModule = ModuleUtils.buildSyncKeyFactoryModule(getMocksControl());
 		getMockMap().addMap(syncKeyFactoryModule.getMockMap());
 		return syncKeyFactoryModule;
 	}

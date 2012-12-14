@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import org.easymock.IMocksControl;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
@@ -44,8 +45,8 @@ import org.obm.push.store.UnsynchronizedItemDao;
 
 public final class DaoModule extends AbstractOverrideModule {
 
-	public DaoModule() {
-		super();
+	public DaoModule(IMocksControl mocksControl) {
+		super(mocksControl);
 	}
 
 	@Override

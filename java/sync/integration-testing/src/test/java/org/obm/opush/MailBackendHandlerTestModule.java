@@ -53,7 +53,7 @@ public class MailBackendHandlerTestModule  extends AbstractOpushGreenMailEnv {
 	}
 
 	private Module bindContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule();
+		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule(getMocksControl());
 		getMockMap().addMap(contentsExporterBackend.getMockMap());
 		return contentsExporterBackend;
 	}

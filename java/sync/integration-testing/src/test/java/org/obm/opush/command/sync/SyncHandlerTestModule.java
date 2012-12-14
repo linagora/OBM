@@ -54,7 +54,7 @@ public class SyncHandlerTestModule  extends AbstractOpushEnv {
 	}
 
 	private Module bindContentsExporterBackendModule() {
-		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule();
+		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule(getMocksControl());
 		getMockMap().addMap(contentsExporterBackend.getMockMap());
 		return contentsExporterBackend;
 	}

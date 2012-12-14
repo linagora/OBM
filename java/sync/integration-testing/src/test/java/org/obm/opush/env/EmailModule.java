@@ -33,6 +33,7 @@ package org.obm.opush.env;
 
 import static org.easymock.EasyMock.expect;
 
+import org.easymock.IMocksControl;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
@@ -41,8 +42,8 @@ import org.obm.push.mail.smtp.SmtpSender;
 
 public final class EmailModule extends AbstractOverrideModule {
 
-	public EmailModule() {
-		super();
+	public EmailModule(IMocksControl mocksControl) {
+		super(mocksControl);
 	}
 
 	@Override

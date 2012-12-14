@@ -32,10 +32,12 @@
 package org.obm.opush.env;
 
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.createControl;
 
 import java.util.Collections;
 import java.util.Date;
 
+import org.easymock.IMocksControl;
 import org.obm.DateUtils;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
@@ -54,14 +56,21 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ClassToInstanceAgregateView<Object> mockMap;
+	private final IMocksControl mocksControl;
 	
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
+		mocksControl = createControl();
 	}
 
 	@Provides
 	public ClassToInstanceAgregateView<Object> makeInstanceMapInjectable() {
 		return mockMap;
+	}
+	
+	@Provides
+	public IMocksControl getMocksControl() {
+		return mocksControl;
 	}
 	
 	@Override
@@ -79,19 +88,19 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	protected ObmSyncModule obmSync() {
-		return new ObmSyncModule();
+		return new ObmSyncModule(mocksControl);
 	}
 
 	protected EmailModule email() {
-		return new EmailModule();
+		return new EmailModule(mocksControl);
 	}
 
 	protected DaoModule dao() {
-		return new DaoModule();
+		return new DaoModule(mocksControl);
 	}
 
 	protected ConfigurationModule configuration() {
-		return new ConfigurationModule(new Configuration());
+		return new ConfigurationModule(new Configuration(), mocksControl);
 	}
 	
 	public ClassToInstanceAgregateView<Object> getMockMap() {

@@ -31,8 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
+
+import org.easymock.IMocksControl;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
@@ -41,9 +42,11 @@ import com.google.inject.AbstractModule;
 public abstract class AbstractOverrideModule extends AbstractModule {
 
 	private ClassToInstanceMap<Object> mockMap;
+	private final IMocksControl mocksControl;
 
-	public AbstractOverrideModule() {
-		mockMap = MutableClassToInstanceMap.create();
+	public AbstractOverrideModule(IMocksControl mocksControl) {
+		this.mocksControl = mocksControl;
+		this.mockMap = MutableClassToInstanceMap.create();
 	}
 	
 	protected <T extends Object> void bindWithMock(Class<T> clazz) {
@@ -52,7 +55,7 @@ public abstract class AbstractOverrideModule extends AbstractModule {
 	}
 
 	protected <T> T createAndRegisterMock(Class<T> clazz) {
-		T mock = createMock(clazz);
+		T mock = mocksControl.createMock(clazz);
 		mockMap.put(clazz, mock);
 		return mock;
 	}

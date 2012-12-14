@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -75,6 +76,7 @@ public class GetItemEstimateHandlerTest {
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
+	@Inject IMocksControl mocksControl;
 
 	private List<OpushUser> fakeTestUsers;
 
@@ -148,7 +150,7 @@ public class GetItemEstimateHandlerTest {
 
 		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
 		EmailSyncTestUtils.mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
-		
+		mocksControl.replay();
 		opushServer.start();
 	}
 }
