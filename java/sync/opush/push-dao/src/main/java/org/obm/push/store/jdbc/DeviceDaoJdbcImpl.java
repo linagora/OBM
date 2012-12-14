@@ -162,16 +162,14 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device ON device_id=id "
-					+ "WHERE identifier=? AND userobm_login=? AND domain_name=?");
+					+ "WHERE identifier=? AND userobm_login=? AND domain_name=? "
+					+ "AND policy IS NOT NULL");
 			ps.setString(1, deviceId.getDeviceId());
 			ps.setString(2, user.getLogin());
 			ps.setString(3, user.getDomain());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				long policyKey = rs.getLong("policy");
-				if (!rs.wasNull()) {
-					return policyKey;
-				}
+				return rs.getLong("policy");
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
