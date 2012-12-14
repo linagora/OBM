@@ -40,6 +40,8 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.store.SnapshotDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
@@ -50,6 +52,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements SnapshotDao {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	@Inject  SnapshotDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
@@ -67,6 +71,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 			.collectionId(collectionId)
 			.build();
 		Element element = store.get(key);
+		logger.debug("Get snapshot with key {} : {}", key, element);
 		if (element != null) {
 			return (Snapshot) element.getValue();
 		}
@@ -80,6 +85,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 				.syncKey(snapshot.getSyncKey())
 				.collectionId(snapshot.getCollectionId())
 				.build();
+		logger.debug("put snapshot with key {} : {}", key, snapshot);
 		store.put(new Element(key, snapshot));
 	}
 
@@ -102,6 +108,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 		List<SnapshotKey> keys = store.getKeys();
 		Iterable<SnapshotKey> toRemove = Iterables.filter(keys, new SnapshotHasDeviceIdPredicate(deviceId));
 		for (SnapshotKey snapshotKey : toRemove) {
+			logger.debug("delete snapshot with key {}", snapshotKey);
 			store.remove(snapshotKey);
 		}
 	}
@@ -113,6 +120,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 				.syncKey(syncKey)
 				.collectionId(collectionId)
 				.build();
+		logger.debug("delete snapshot with key {}", snapshotKey);
 		store.remove(snapshotKey);
 	}
 }
