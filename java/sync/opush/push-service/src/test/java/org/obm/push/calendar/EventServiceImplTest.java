@@ -31,11 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.easymock.EasyMock.*;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -57,11 +61,26 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.client.login.LoginService;
+import org.obm.sync.date.DateProvider;
 
 import com.google.common.io.ByteStreams;
 
 
 public class EventServiceImplTest {
+	private Ical4jHelper ical4jHelper;
+	private DateProvider dateProvider;
+	private Date now;
+
+	@Before
+	public void setUp() {
+		now = new Date();
+		dateProvider = createMock(DateProvider.class);
+		ical4jHelper = new Ical4jHelper(dateProvider);
+		
+		expect(dateProvider.getDate()).andReturn(now).anyTimes();		
+		replay(dateProvider);
+	}
+	
 	@Test
 	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, AuthFault, DaoException {
 		
@@ -83,7 +102,7 @@ public class EventServiceImplTest {
 		EventConverterImpl eventConverter = new EventConverterImpl(new MSEventToObmEventConverterImpl(), new ObmEventToMSEventConverterImpl());
 		
 		InputStream icsStream = ClassLoader.getSystemResourceAsStream("icalendar/OBMFULL-3526.ics");
-		EventService eventService = new EventServiceImpl(calendarDao, eventConverter, new Ical4jHelper(), factory, loginService);
+		EventService eventService = new EventServiceImpl(calendarDao, eventConverter, ical4jHelper, factory, loginService);
 		eventService.parseEventFromICalendar(udr, new String(ByteStreams.toByteArray(icsStream)));
 		
 		EasyMock.verify(loginService);

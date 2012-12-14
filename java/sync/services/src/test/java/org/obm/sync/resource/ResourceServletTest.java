@@ -29,6 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.resource;
 
+import static org.easymock.EasyMock.*;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -39,13 +41,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.ICalendar;
 
 import com.google.inject.Injector;
@@ -65,74 +67,82 @@ public class ResourceServletTest {
 	private Collection<Event> collectionEvents;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
-
+	private DateProvider dateProvider;
+	private Date now;
+	
 	@Before
 	public void setUp() {
+		now = new Date();
+		dateProvider = createMock(DateProvider.class);
+		helper = new Ical4jHelper(dateProvider);
 		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
 				ToolBox.getDefaultObmDomain());
-		helper = new Ical4jHelper();
 		resourceServlet = new ResourceServlet();
 
-		servletConfig = EasyMock.createMock(ServletConfig.class);
-		servletContext = EasyMock.createMock(ServletContext.class);
-		injector = EasyMock.createMock(Injector.class);
-		calendarBinding = EasyMock.createMock(ICalendar.class);
-		request = EasyMock.createMock(HttpServletRequest.class);
-		response = EasyMock.createMock(HttpServletResponse.class);
+		servletConfig = createMock(ServletConfig.class);
+		servletContext = createMock(ServletContext.class);
+		injector = createMock(Injector.class);
+		calendarBinding = createMock(ICalendar.class);
+		request = createMock(HttpServletRequest.class);
+		response = createMock(HttpServletResponse.class);
 
-		EasyMock.expect(servletConfig.getServletContext()).andReturn(servletContext);
-		EasyMock.expect(servletContext.getAttribute(EasyMock.isA(String.class)))
+		expect(dateProvider.getDate()).andReturn(now).anyTimes();
+		
+		expect(servletConfig.getServletContext()).andReturn(servletContext);
+		expect(servletContext.getAttribute(isA(String.class)))
 				.andReturn(injector);
-		EasyMock.expect(injector.getInstance(EasyMock.eq(ICalendar.class))).andReturn(
+		expect(injector.getInstance(eq(ICalendar.class))).andReturn(
 				calendarBinding);
-		EasyMock.expect(injector.getInstance(Ical4jHelper.class)).andReturn(helper);
+		expect(injector.getInstance(Ical4jHelper.class)).andReturn(helper);
+		
+		replay(dateProvider);
 	}
 
 	@Test
 	public void testGetResourceICS() throws Exception {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
-		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
+		expect(
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
 				.andReturn(collectionEvents);
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding };
-		EasyMock.replay(mocks);
+		replay(mocks);
 		resourceServlet.init(servletConfig);
 
 		String ics = resourceServlet.getResourceICS("resource@domain");
 		Assertions.assertThat(helper.parseICS(ics, iCalUser)).isNotNull().hasSize(collectionSize);
-		EasyMock.verify(mocks);
+		verify(mocks);
 	}
 
 	@Test
 	public void testDoGetEmailValid() throws Exception {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
-		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
+		expect(
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
 				.andReturn(collectionEvents);
 
 		String uid = "/resource@domain";
 		StringWriter stringWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(stringWriter);
 
-		EasyMock.expect(request.getPathInfo()).andReturn(uid);
+		expect(request.getPathInfo()).andReturn(uid);
 
 		response.setContentType("text/calendar;charset=UTF-8");
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_OK));
-		EasyMock.expectLastCall();
+		response.setStatus(eq(HttpServletResponse.SC_OK));
+		expectLastCall();
 
-		EasyMock.expect(response.getWriter()).andReturn(writer);
+		expect(response.getWriter()).andReturn(writer);
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
 				response };
 
-		EasyMock.replay(mocks);
+		replay(mocks);
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 
-		EasyMock.verify(mocks);
+		verify(mocks);
 		String ics = stringWriter.toString();
 		Assertions.assertThat(helper.parseICS(ics, iCalUser)).isNotNull().hasSize(collectionSize);
 	}
@@ -140,40 +150,40 @@ public class ResourceServletTest {
 	@Test
 	public void testDoGetNoEmail() throws Exception {
 		String uid = "";
-		EasyMock.expect(request.getPathInfo()).andReturn(uid);
+		expect(request.getPathInfo()).andReturn(uid);
 
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_NOT_FOUND));
-		EasyMock.expectLastCall();
+		response.setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
+		expectLastCall();
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
 				response };
-		EasyMock.replay(mocks);
+		replay(mocks);
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
-		EasyMock.verify(mocks);
+		verify(mocks);
 	}
 
 	@Test
 	public void testDoGetNoResourceWithEmail() throws Exception {
 		String uid = "/resource@domain";
-		EasyMock.expect(request.getPathInfo()).andReturn(uid);
-		EasyMock.expect(
-				calendarBinding.getResourceEvents(EasyMock.eq("resource@domain"), EasyMock.anyObject(Date.class)))
+		expect(request.getPathInfo()).andReturn(uid);
+		expect(
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
 				.andThrow(new ResourceNotFoundException("Resource with id doesn't exist"));
 
 		response.setContentType("text/calendar;charset=UTF-8");
-		response.setStatus(EasyMock.eq(HttpServletResponse.SC_NOT_FOUND));
+		response.setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
 		response.flushBuffer();
-		EasyMock.expectLastCall();
+		expectLastCall();
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
 				response };
-		EasyMock.replay(mocks);
+		replay(mocks);
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
-		EasyMock.verify(mocks);
+		verify(mocks);
 	}
 
 }

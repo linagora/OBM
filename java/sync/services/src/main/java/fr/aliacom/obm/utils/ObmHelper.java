@@ -41,7 +41,9 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.date.DateProvider;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,7 +51,7 @@ import com.google.inject.Singleton;
  * Helper functions datasource management
  */
 @Singleton
-public class ObmHelper {
+public class ObmHelper implements DateProvider {
 
 	private DatabaseFlavour type = DatabaseFlavour.PGSQL;
 	public static final String VCOMPONENT = "vcomponent";
@@ -188,5 +190,21 @@ public class ObmHelper {
 
 	public DatabaseConnectionProvider getDBCP() {
 		return dbcp;
+	}
+
+	@Override
+	public Date getDate() {
+		Connection con = null;
+		
+		try {
+			con = getConnection();
+			
+			return selectNow(con);
+		}
+		catch (Exception e) {
+			throw Throwables.propagate(e);
+		} finally {
+			cleanup(con, null, null);
+		}
 	}
 }

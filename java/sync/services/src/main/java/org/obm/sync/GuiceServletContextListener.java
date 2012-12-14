@@ -53,6 +53,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.locator.store.LocatorService;
 import org.obm.locator.store.LocatorCache;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.sync.services.ICalendar;
@@ -84,6 +85,7 @@ import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.HelperServiceImpl;
+import fr.aliacom.obm.utils.ObmHelper;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -144,6 +146,7 @@ public class GuiceServletContextListener implements ServletContextListener {
                 
         		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
         		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+        		bind(DateProvider.class).to(ObmHelper.class);
             }
         }, new MessageQueueModule(), new TransactionalModule(), new SolrJmsModule());
     }

@@ -31,16 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.easymock.EasyMock.*;
+
+import java.util.Date;
+
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obm.icalendar.Ical4jHelper;
 import org.obm.push.exception.ConversionException;
+import org.obm.sync.date.DateProvider;
 
 
 public class ConvertObmEventByICSLoopTest extends ConvertObmEventToMsEventIntegrityTest {
 	
+	private Ical4jHelper ical4jHelper;
+	private DateProvider dateProvider;
+	private Date now;
+
+	@Before
+	public void setUp() {
+		now = new Date();
+		dateProvider = createMock(DateProvider.class);
+		ical4jHelper = new Ical4jHelper(dateProvider);
+		
+		expect(dateProvider.getDate()).andReturn(now).anyTimes();		
+		replay(dateProvider);
+		
+		super.setUp();
+	}
+	
 	@Override
 	protected ObmEventToMSEventConverter newObmEventToMSEventConverter() {
-		return new ObmEventToMSEventByICSLoopConverter();
+		return new ObmEventToMSEventByICSLoopConverter(ical4jHelper);
 	}
 
 	@Ignore("OBMFULL-4295")

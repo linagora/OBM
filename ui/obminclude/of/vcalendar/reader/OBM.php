@@ -213,7 +213,12 @@ class Vcalendar_Reader_OBM {
     // here we cast bc PHP ceil when ms is > 500 and lightning floor watever the miliseconds value
     // so we remove miliseconds
     // OBMFULL-3595
-    $last_modified = $this->parseDate((integer)$data['timeupdate']);
+    $timeupdate = (integer) $data['timeupdate'];
+    if ($timeupdate == 0) {
+      $timeupdate = time();
+    }
+    
+    $last_modified = $this->parseDate($timeupdate);
     $last_modified->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('last-modified', $last_modified);
     $vevent->set('dtstamp', $last_modified);

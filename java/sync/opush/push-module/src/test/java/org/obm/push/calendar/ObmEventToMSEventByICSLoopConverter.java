@@ -55,9 +55,9 @@ public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventCon
 	private Ical4jHelper ical4j;
 	private ObmEventToMSEventConverter obmEventToMSEventConverter;
 	
-	public ObmEventToMSEventByICSLoopConverter() {
-		ical4j = new Ical4jHelper();
+	public ObmEventToMSEventByICSLoopConverter(Ical4jHelper ical4j) {
 		obmEventToMSEventConverter = new ObmEventToMSEventConverterImpl();
+		this.ical4j = ical4j;
 	}
 	
 	@Override

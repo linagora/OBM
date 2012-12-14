@@ -31,14 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
@@ -79,6 +72,7 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.slf4j.Logger;
 
@@ -103,14 +97,18 @@ public class EventChangeMailerTest {
 	private AccessToken accessToken;
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
-
+	private DateProvider dateProvider;
+	private Date now;
 	private Logger logger;
-
+	
 	@Before
 	public void setup() {
+		now = new Date();
+		dateProvider = createMock(DateProvider.class);
+		ical4jHelper = new Ical4jHelper(dateProvider);
+		
 		accessToken = new AccessToken(1, "unitTest");
 		obmUser = ServicesToolBox.getDefaultObmUser();
-		ical4jHelper = new Ical4jHelper();
 		ITemplateLoader templateLoader = new ITemplateLoader() {
 			@Override
 			public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
@@ -122,11 +120,15 @@ public class EventChangeMailerTest {
 				return cfg.getTemplate(templateName, locale);
 			}
 		};
+		
 		ObmSyncConfigurationService constantService = createMock(ObmSyncConfigurationService.class);
+		
+		expect(dateProvider.getDate()).andReturn(now).anyTimes();		
+		
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 		expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
 		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
-		replay(constantService);
+		replay(constantService, dateProvider);
 		
 		mailService = createMock(MailService.class);
 		logger = createNiceMock(Logger.class);

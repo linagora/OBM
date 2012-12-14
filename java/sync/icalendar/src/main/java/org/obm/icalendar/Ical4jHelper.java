@@ -133,6 +133,7 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,6 +150,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -173,6 +175,14 @@ public class Ical4jHelper {
 			.put(RecurrenceKind.daily, Recur.DAILY).put(RecurrenceKind.weekly, Recur.WEEKLY)
 			.put(RecurrenceKind.monthlybydate, Recur.MONTHLY).put(RecurrenceKind.monthlybyday, Recur.MONTHLY)
 			.put(RecurrenceKind.yearly, Recur.YEARLY).put(RecurrenceKind.yearlybyday, Recur.YEARLY).build();
+	
+	private final DateProvider dateProvider;
+	
+	@Inject
+	@VisibleForTesting
+	public Ical4jHelper(DateProvider obmHelper) {
+		this.dateProvider = obmHelper;
+	}
 
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
 		Calendar calendar = initCalendar();
@@ -700,7 +710,11 @@ public class Ical4jHelper {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
-		appendDtstamp(event, vEvent);
+		if (Method.REPLY.equals(method)) {
+			appendDtstamp(dateProvider.getDate(), vEvent);
+		} else {
+			appendDtstamp(event, vEvent);
+		}
 		appendUidToICS(prop, event, parentExtID);
 		appendCreated(prop, event);
 		appendLastModified(prop, event);
@@ -747,7 +761,12 @@ public class Ical4jHelper {
 		if (eventTimeUpdate == null && eventTimeCreate == null) {
 			return;
 		}
-		vEvent.getDateStamp().setDateTime(new DateTime(Objects.firstNonNull(eventTimeUpdate, eventTimeCreate).getTime()));
+		
+		appendDtstamp(Objects.firstNonNull(eventTimeUpdate, eventTimeCreate), vEvent);
+	}
+	
+	private void appendDtstamp(Date time, VEvent vEvent) {
+		vEvent.getDateStamp().setDateTime(new DateTime(time));
 	}
 
 	private boolean canAddVAlarmToICS(Method method) {

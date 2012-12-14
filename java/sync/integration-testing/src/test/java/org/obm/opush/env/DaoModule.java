@@ -42,6 +42,7 @@ import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.sync.date.DateProvider;
 
 public final class DaoModule extends AbstractOverrideModule {
 
@@ -61,5 +62,6 @@ public final class DaoModule extends AbstractOverrideModule {
 		bindWithMock(ItemTrackingDao.class);
 		bindWithMock(FolderSyncStateBackendMappingDao.class);
 		bindWithMock(FolderSnapshotDao.class);
+		bindWithMock(DateProvider.class);
 	}
 }
