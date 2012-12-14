@@ -305,10 +305,10 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 
-	private void sendNeedProvisionningResponse(HttpServletResponse response) throws IOException {
+	private void sendNeedProvisionningResponse(HttpServletResponse response) {
 		sendASHeaders(response);
 		response.setHeader("Content-type", "text/html");
-		response.sendError(449);
+		response.setStatus(449);
 	}
 
 	private IRequestHandler getHandler(UserDataRequest p) {
