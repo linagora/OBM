@@ -49,6 +49,8 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Iterables;
+
 @RunWith(SlowFilterRunner.class)
 public class CalendarItemsParserTest {
 	
@@ -388,7 +390,7 @@ public class CalendarItemsParserTest {
 
 		assertThat(ev.getRecurrence().getEventExceptions()).hasSize(1);
 
-		Event evEx = ev.getRecurrence().getEventExceptions().get(0);
+		Event evEx = Iterables.getOnlyElement(ev.getRecurrence().getEventExceptions());
 		assertThat(evEx.getObmId()).isNull();
 		assertThat(evEx.getExtId()).isEqualTo(new EventExtId("a7db3cd5-adf3-42f4-95f3-d0a7a9c01aa3"));
 		assertThat(evEx.isAllday()).isFalse();

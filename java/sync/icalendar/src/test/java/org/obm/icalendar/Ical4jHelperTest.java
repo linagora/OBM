@@ -109,6 +109,7 @@ import org.obm.sync.exception.IllegalRecurrenceKindException;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -698,7 +699,7 @@ public class Ical4jHelperTest {
 
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setExceptions(Lists.newArrayList(deletedExceptionOne, deletedExceptionTwo));
-		recurrence.setEventExceptions(Lists.newArrayList(regularException));
+		recurrence.setEventExceptions(Sets.newHashSet(regularException));
 		
 		Event event = new Event();
 		event.setRecurrence(recurrence);

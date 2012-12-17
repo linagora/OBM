@@ -45,7 +45,9 @@ import org.junit.runner.RunWith;
 
 import org.obm.DateUtils;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import org.obm.filter.SlowFilterRunner;
 
@@ -59,7 +61,7 @@ public class EventRecurrenceTest {
 		Event e1 = createEventException(1, 2);
 		Event e2 = createEventException(2, 3);
 		
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		rec1.setEventExceptions(Sets.newHashSet(e1, e2));
 		
 		Event exception = rec1.getEventExceptionWithRecurrenceId(new Date());
 		Assert.assertNull(exception);
@@ -70,9 +72,8 @@ public class EventRecurrenceTest {
 		EventRecurrence rec1 = getOneDailyEventRecurence();
 		
 		Event e1 = createEventException(1, 2);
-		Event e2 = createEventException(2, 3);
 		
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		rec1.setEventExceptions(Sets.newHashSet(e1));
 		
 		Event exception = rec1.getEventExceptionWithRecurrenceId(e1.getRecurrenceId());
 		Assert.assertNotNull(exception);
@@ -137,7 +138,7 @@ public class EventRecurrenceTest {
 		
 		Attendee firstAttendee = e1.getAttendees().get(0);
 		firstAttendee.setParticipation(Participation.declined());	
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		rec1.setEventExceptions(Sets.newHashSet(e1, e2));
 		
 		String attendeeWithDeclinedEventEmail = "email0@email.com";
 		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
@@ -155,7 +156,7 @@ public class EventRecurrenceTest {
 
 		Attendee firstAttendee = e1.getAttendees().get(0);
 		firstAttendee.setParticipation(Participation.declined());
-		rec1.setEventExceptions(Lists.newArrayList(e1, e2));
+		rec1.setEventExceptions(Sets.newHashSet(e1, e2));
 
 		EventRecurrence rec2 = getOneDailyEventRecurence();
 
@@ -174,7 +175,7 @@ public class EventRecurrenceTest {
 		exception.setRecurrenceId(DateUtils.date("2004-12-14T22:00:00Z"));
 		exception.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
-		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setEventExceptions(Sets.newHashSet(exception));
 		recurrence.setExceptions(Collections.<Date>emptyList());
 		
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
@@ -186,7 +187,7 @@ public class EventRecurrenceTest {
 		Date deletedException = DateUtils.date("2004-12-14T22:00:00Z");
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Lists.newArrayList(deletedException));
-		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 		
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
 		Assertions.assertThat(exceptionFound).isTrue();
@@ -196,7 +197,7 @@ public class EventRecurrenceTest {
 	public void testHasAnyExceptionAtDateNotFound() {
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Collections.<Date>emptyList());
-		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 		
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
 		Assertions.assertThat(exceptionFound).isFalse();
@@ -208,7 +209,7 @@ public class EventRecurrenceTest {
 		
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
-		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 		
 		boolean exceptionFound = recurrence.hasException();
 		Assertions.assertThat(exceptionFound).isTrue();
@@ -221,7 +222,7 @@ public class EventRecurrenceTest {
 		eventException.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Collections.<Date>emptyList());
-		recurrence.setEventExceptions(Lists.newArrayList(eventException));
+		recurrence.setEventExceptions(Sets.newHashSet(eventException));
 		
 		boolean exceptionFound = recurrence.hasEventException();
 		Assertions.assertThat(exceptionFound).isTrue();
@@ -235,7 +236,7 @@ public class EventRecurrenceTest {
 		
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Collections.<Date>emptyList());
-		recurrence.setEventExceptions(Lists.newArrayList(eventException));
+		recurrence.setEventExceptions(Sets.newHashSet(eventException));
 		
 		boolean exceptionFound = recurrence.hasException();
 		Assertions.assertThat(exceptionFound).isFalse();
@@ -247,7 +248,7 @@ public class EventRecurrenceTest {
 		
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
-		recurrence.setEventExceptions(Collections.<Event>emptyList());
+		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 		
 		boolean exceptionFound = recurrence.hasEventException();
 		Assertions.assertThat(exceptionFound).isFalse();
@@ -268,7 +269,7 @@ public class EventRecurrenceTest {
 		publicEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
 
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
-		recurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+		recurrence.setEventExceptions(Sets.newHashSet(publicEventException1,
 				publicEventException2));
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
@@ -318,12 +319,12 @@ public class EventRecurrenceTest {
 		privateAnonymizedEventException2.setStartDate(DateUtils.date("2004-12-14T21:00:00Z"));
 
 		EventRecurrence recurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
-		recurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+		recurrence.setEventExceptions(Sets.newHashSet(publicEventException1,
 				publicEventException2, privateEventException1, privateEventException2));
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
 		EventRecurrence anonymizedRecurrence = getOneEventRecurrenceByKind(RecurrenceKind.daily);
-		anonymizedRecurrence.setEventExceptions(Lists.newArrayList(publicEventException1,
+		anonymizedRecurrence.setEventExceptions(Sets.newHashSet(publicEventException1,
 				publicEventException2, privateAnonymizedEventException1,
 				privateAnonymizedEventException2));
 		anonymizedRecurrence.setExceptions(Lists.newArrayList(exceptionDeleted));

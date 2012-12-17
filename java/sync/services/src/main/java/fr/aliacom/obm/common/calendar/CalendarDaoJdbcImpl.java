@@ -97,6 +97,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -224,7 +225,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 
 	@Inject
-	private CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
+	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
 			ObmHelper obmHelper, Ical4jHelper ical4jHelper) {
 		this.userDao = userDao;
 		this.solrHelperFactory = solrHelperFactory;
@@ -347,7 +348,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
-			List<Event> eventException, Connection con, EventObmId id, Boolean useObmUser)
+			Set<Event> eventException, Connection con, EventObmId id, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault {
 		List<Event> newEvExcepts = new LinkedList<Event>();
 		Event created = null;
@@ -1162,7 +1163,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return result;
 	}
 
-	private void touchParentOfDeclinedRecurrentEvents(
+	@VisibleForTesting void touchParentOfDeclinedRecurrentEvents(
 			Set<Event> parentOfDeclinedRecurrentEvent,
 			List<Event> changedEvents, Date touchDateForFakeExDates) {
 		for (Event parentEvent : parentOfDeclinedRecurrentEvent) {

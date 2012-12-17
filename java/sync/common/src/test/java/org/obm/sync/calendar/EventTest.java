@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -50,7 +50,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Participation.State;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.ToolBox;
 
@@ -235,7 +235,7 @@ public class EventTest {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		
-		List<Event> eventExceptions = new LinkedList<Event>();
+		HashSet<Event> eventExceptions = Sets.newHashSet();
 		Event exception = event.clone();
 		exception.setTimeCreate(dateStart);
 		exception.setTimeUpdate(calendarUpdate.getTime());
@@ -414,7 +414,7 @@ public class EventTest {
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
 		
-		Event firstException = updateRecurrence.getEventExceptions().get(0);
+		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setStartDate(new DateTime(firstException.getStartDate()).plusHours(4).toDate());
 		
 		assertThat(after.hasImportantChanges(before)).isTrue();
@@ -439,7 +439,7 @@ public class EventTest {
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
 		
-		Event firstException = updateRecurrence.getEventExceptions().get(0);
+		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setDescription("my very different description");
 		
 		assertThat(after.hasImportantChanges(before)).isFalse();
@@ -465,7 +465,7 @@ public class EventTest {
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
 		
-		Event firstException = updateRecurrence.getEventExceptions().get(0);
+		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setStartDate(new DateTime(firstException.getStartDate()).plusHours(4).toDate());
 		
 		assertThat(after.hasImportantChangesExceptedEventException(before)).isFalse();
@@ -1329,7 +1329,7 @@ public class EventTest {
 		Event exception = createNonRecurrentEventWithMostFields();
 		exception.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
 
-		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setEventExceptions(Sets.newHashSet(exception));
 
 		publicEvent.setRecurrence(recurrence);
 
@@ -1348,7 +1348,7 @@ public class EventTest {
 		exception.setPrivacy(EventPrivacy.PRIVATE);
 		exception.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
 
-		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setEventExceptions(Sets.newHashSet(exception));
 		privateEvent.setRecurrence(recurrence);
 
 		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
@@ -1359,7 +1359,7 @@ public class EventTest {
 		Event anonymizedException = createPrivateAnonymizedEvent();
 		anonymizedException.setRecurrenceId(new DateTime(2012, Calendar.MAY, 24, 14, 0).toDate());
 
-		anonymizedRecurrence.setEventExceptions(Lists.newArrayList(anonymizedException));
+		anonymizedRecurrence.setEventExceptions(Sets.newHashSet(anonymizedException));
 
 		privateAnonymizedEvent.setRecurrence(anonymizedRecurrence);
 

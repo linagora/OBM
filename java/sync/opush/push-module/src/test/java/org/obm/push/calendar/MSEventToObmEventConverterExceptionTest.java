@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -462,7 +463,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
-		List<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
+		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		assertThat(exceptions).hasSize(1);
 		assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
 		assertThat(eventExceptions).isEmpty();
@@ -485,10 +486,10 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
-		List<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
+		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		assertThat(exceptions).isEmpty();
 		assertThat(eventExceptions).hasSize(1);
-		assertThat(eventExceptions.get(0).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
+		assertThat(Iterables.getOnlyElement(eventExceptions).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
 	}
 
 	@Test
@@ -1228,11 +1229,11 @@ public class MSEventToObmEventConverterExceptionTest {
 		MSEvent msEvent = makeMSEventWithException(msEventException, msEventExceptionDeleted);
 
 		Event converted = convertToOBMEvent(msEvent);
-		List<Event> convertedExceptions = converted.getRecurrence().getEventExceptions();
+		Set<Event> convertedExceptions = converted.getRecurrence().getEventExceptions();
 		List<Date> convertedExceptionsDeleted = converted.getRecurrence().getExceptions();
 
 		assertThat(convertedExceptions).hasSize(1);
-		assertThat(convertedExceptions.get(0).getRecurrenceId())
+		assertThat(Iterables.getOnlyElement(convertedExceptions).getRecurrenceId())
 			.isEqualTo(msEventException.getExceptionStartTime());
 		assertThat(convertedExceptionsDeleted).hasSize(1);
 		assertThat(convertedExceptionsDeleted).containsOnly(date("2004-10-12T12:15:10Z"));

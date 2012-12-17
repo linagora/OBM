@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -488,7 +489,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private void ensureNewAttendeesWithDelegationAreAccepted(Event before, Event event) {
 		ensureNewAttendeesWithDelegationAreAcceptedOnEvent(before, event);
 		
-		List<Event> eventExceptions = event.getEventsExceptions();
+		Set<Event> eventExceptions = event.getEventsExceptions();
 		TreeMap<Event, Event> beforeExceptions = buildTreeMap(before.getEventsExceptions());
 		
 		for (Event eventException : eventExceptions) {
@@ -529,7 +530,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@VisibleForTesting void inheritsParticipationOnExceptions(Event before, Event event) {
-		List<Event> beforeExceptions = before.getEventsExceptions();
+		Set<Event> beforeExceptions = before.getEventsExceptions();
 		TreeMap<Event, Event> eventExceptions = buildTreeMap(event.getEventsExceptions());
 		
 		for (Event beforeException : beforeExceptions) {
@@ -539,7 +540,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	@VisibleForTesting TreeMap<Event, Event> buildTreeMap(List<Event> events) {
+	@VisibleForTesting TreeMap<Event, Event> buildTreeMap(Set<Event> events) {
 		if (events == null) {
 			return new TreeMap<Event, Event>();
 		}
@@ -748,7 +749,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@VisibleForTesting
 	protected void assignDelegationRightsOnAttendees(AccessToken token, Event event) {
 		applyDelegationRightsOnAttendeesToEvent(token, event);
-		List<Event> eventsExceptions = event.getEventsExceptions();
+		Set<Event> eventsExceptions = event.getEventsExceptions();
 		for (Event eventException : eventsExceptions) {
 			applyDelegationRightsOnAttendeesToEvent(token, eventException);
 		}

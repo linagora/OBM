@@ -14,6 +14,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class DeclinedAttendeeFilterTest {
 
@@ -117,11 +118,11 @@ public class DeclinedAttendeeFilterTest {
 		evExWithPhilby.setRecurrenceId(currentDate);
 
 		evWithSomePhilby.getRecurrence().setEventExceptions(
-				Lists.newArrayList(evExWithoutPhilby, evExWithPhilby));
+				Sets.newHashSet(evExWithoutPhilby, evExWithPhilby));
 
 		Event cloneOfEvWithSomePhilby = evWithSomePhilby.clone();
 		cloneOfEvWithSomePhilby.getRecurrence().setEventExceptions(
-				Lists.newArrayList(evExWithPhilby));
+				Sets.newHashSet(evExWithPhilby));
 		cloneOfEvWithSomePhilby.getRecurrence().setExceptions(
 				Lists.newArrayList(evExWithoutPhilby.getRecurrenceId()));
 
@@ -171,7 +172,7 @@ public class DeclinedAttendeeFilterTest {
 		evExWithPhilby.setRecurrenceId(currentDate);
 
 		evWithSomePhilby.getRecurrence().setEventExceptions(
-				Lists.newArrayList(evExWithoutPhilby, evExWithPhilby));
+				Sets.newHashSet(evExWithoutPhilby, evExWithPhilby));
 
 		Map<EventObmId, Event> expectedEvents = new ImmutableMap.Builder<EventObmId, Event>()
 				.put(evWithPhilbyId, evWithPhilby).put(evExWithPhilbyId, evExWithPhilby).build();

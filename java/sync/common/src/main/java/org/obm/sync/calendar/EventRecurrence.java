@@ -32,18 +32,20 @@
 package org.obm.sync.calendar;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.push.utils.collection.Sets;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializable {
@@ -54,11 +56,11 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 	private int frequence;
 	private RecurrenceKind kind;
 	private List<Date> exceptions;
-	private List<Event> eventExceptions;
+	private Set<Event> eventExceptions;
 
 	public EventRecurrence(RecurrenceKind kind) {
 		this.exceptions = new LinkedList<Date>();
-		this.eventExceptions = new LinkedList<Event>();
+		this.eventExceptions = com.google.common.collect.Sets.newHashSet();
 		this.kind = kind;
 		this.days = new RecurrenceDays();
 	}
@@ -111,11 +113,11 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		exceptions.add(d);
 	}
 
-	public List<Event> getEventExceptions() {
+	public Set<Event> getEventExceptions() {
 		return eventExceptions;
 	}
 
-	public void setEventExceptions(List<Event> eventsExceptions) {
+	public void setEventExceptions(Set<Event> eventsExceptions) {
 		Preconditions.checkNotNull(eventsExceptions);
 		this.eventExceptions = eventsExceptions;
 	}
@@ -129,7 +131,7 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		EventRecurrence eventRecurrence = new EventRecurrence();
 		eventRecurrence.setDays(this.days);
 		eventRecurrence.setEnd(this.end);
-		List<Event> eventExceptions = new ArrayList<Event>();
+		Set<Event> eventExceptions = com.google.common.collect.Sets.newHashSet();
 		for (Event event: this.eventExceptions) {
 			eventExceptions.add(event.clone());
 		}
@@ -176,7 +178,7 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 	}
 
 	public void replaceUnattendedEventExceptionByException(String attendeeEmail) {
-		List<Event> eventExceptionsCopy = Lists.newArrayList(eventExceptions);
+		HashSet<Event> eventExceptionsCopy = com.google.common.collect.Sets.newHashSet(eventExceptions);
 		for (Event eexp : eventExceptions) {
 			Attendee attendee = eexp.findAttendeeFromEmail(attendeeEmail);
 			boolean willAttend = attendee != null
@@ -277,13 +279,14 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		anonymizedRecurrence.exceptions = this.exceptions;
 		anonymizedRecurrence.frequence = frequence;
 		anonymizedRecurrence.kind = kind;
-		anonymizedRecurrence.eventExceptions = Lists.transform(this.eventExceptions,
+		anonymizedRecurrence.eventExceptions = com.google.common.collect.Sets.newHashSet(
+				Lists.transform(ImmutableList.copyOf(this.eventExceptions),
 				new Function<Event, Event>() {
 					@Override
 					public Event apply(Event event) {
 						return event.anonymizePrivateItems();
 					}
-				});
+				}));
 		return anonymizedRecurrence;
 	}
 }

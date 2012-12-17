@@ -1,8 +1,8 @@
 package fr.aliacom.obm.common.calendar.loader.filter;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -10,8 +10,8 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class DeclinedAttendeeFilter implements EventFilter {
 	private Attendee declinedAttendee;
@@ -46,7 +46,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 		}
 	}
 
-	private List<Event> filterRecurrentEvent(Event event) {
+	private Set<Event> filterRecurrentEvent(Event event) {
 		event.getRecurrence().replaceUnattendedEventExceptionByException(
 				this.declinedAttendee.getEmail());
 
@@ -56,7 +56,7 @@ public class DeclinedAttendeeFilter implements EventFilter {
 		if (isParentEventDeclined) {
 			return event.getEventsExceptions();
 		} else {
-			return Lists.newArrayList(event);
+			return Sets.newHashSet(event);
 		}
 	}
 

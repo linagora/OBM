@@ -34,6 +34,7 @@ package fr.aliacom.obm.common.calendar;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
@@ -48,6 +49,8 @@ import org.obm.sync.calendar.Event;
 import fr.aliacom.obm.ToolBox;
 
 import org.obm.filter.SlowFilterRunner;
+
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class EventChangeHandlerTest {
@@ -120,7 +123,7 @@ public class EventChangeHandlerTest {
 
 		Event currentParentEvent = previousEvent.clone();
 
-		Event modifiedEventException = currentParentEvent.getEventsExceptions().get(0);
+		Event modifiedEventException = Iterables.getOnlyElement(currentParentEvent.getEventsExceptions());
 		modifiedEventException.setLocation("a new Location");
 
 		jmsService.writeIcsInvitationRequest(token, modifiedEventException);
@@ -136,7 +139,7 @@ public class EventChangeHandlerTest {
 
 		Event currentEvent = previousEvent.clone();
 
-		Event modifiedEventException = currentEvent.getEventsExceptions().get(0);
+		Event modifiedEventException = Iterables.getOnlyElement(currentEvent.getEventsExceptions());
 		modifiedEventException.setLocation("a new Location");
 
 		currentEvent.setLocation("a new location");
@@ -155,7 +158,9 @@ public class EventChangeHandlerTest {
 		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
 
 		Event currentParentEvent = previousEvent.clone();
-		Event deletedEventException = currentParentEvent.getEventsExceptions().remove(0);
+		Set<Event> eventsExceptions = currentParentEvent.getEventsExceptions();
+		Event deletedEventException = Iterables.getOnlyElement(eventsExceptions);
+		eventsExceptions.remove(deletedEventException);
 
 		jmsService.writeIcsInvitationCancel(token, deletedEventException);
 		eventNotificationService.notifyDeletedEvent(deletedEventException, token);
@@ -168,7 +173,9 @@ public class EventChangeHandlerTest {
 		previousEvent.addEventException(previousEvent.getOccurrence(previousEvent.getStartDate()));
 
 		Event currentEvent = previousEvent.clone();
-		Event deletedEventException = currentEvent.getEventsExceptions().remove(0);
+		Set<Event> eventsExceptions = currentEvent.getEventsExceptions();
+		Event deletedEventException = Iterables.getOnlyElement(eventsExceptions);
+		eventsExceptions.remove(deletedEventException);
 
 		currentEvent.setLocation("a new location");
 

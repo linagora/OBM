@@ -34,7 +34,7 @@ package org.obm.push.calendar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.fest.assertions.api.Assertions;
@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -60,10 +60,9 @@ import org.obm.sync.calendar.EventMeetingStatus;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterTest {
@@ -1065,7 +1064,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
-		List<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
+		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		Assertions.assertThat(exceptions).hasSize(1);
 		Assertions.assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
 		Assertions.assertThat(eventExceptions).isEmpty();
@@ -1093,10 +1092,10 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
-		List<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
+		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		Assertions.assertThat(exceptions).isEmpty();
 		Assertions.assertThat(eventExceptions).hasSize(1);
-		Assertions.assertThat(eventExceptions.get(0).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
+		Assertions.assertThat(Iterables.getOnlyElement(eventExceptions).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
 	}
 
 	private MSRecurrence simpleRecurrence(RecurrenceType type) {

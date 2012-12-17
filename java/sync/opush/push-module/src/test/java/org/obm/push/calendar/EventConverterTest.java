@@ -74,6 +74,7 @@ import org.obm.sync.calendar.Participation;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
@@ -152,7 +153,7 @@ public class EventConverterTest {
 		IApplicationData  data = getApplicationData("samecase/update-one-exception-of-same-event.xml");
 
 		Event event = eventConverter.convert(buildUserDataRequest("jribiera@obm.lng.org").getUser(), oldEvent, (MSEvent) data, true);
-		Event excptEvtUpd = event.getRecurrence().getEventExceptions().get(0);
+		Event excptEvtUpd = Iterables.getOnlyElement(event.getRecurrence().getEventExceptions());
 
 		
 		Assertions.assertThat(event.getExtId())

@@ -522,8 +522,8 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	}
 
 	public List<Event> getAddedEventExceptions(Event before) {
-		List<Event> afterOccurrences = recurrence.getEventExceptions();
-		List<Event> beforeOccurrences = before.getEventsExceptions();
+		Set<Event> afterOccurrences = recurrence.getEventExceptions();
+		Set<Event> beforeOccurrences = before.getEventsExceptions();
 		Set<Event> addedEventExceptions = Sets.difference(afterOccurrences, beforeOccurrences, new Comparator<Event>() {
 
 			@Override
@@ -555,7 +555,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	}
 
 	private Map<Date, Event> indexEventExceptionsByRecurrenceId(
-			List<Event> afterOccurrences) {
+			Iterable<Event> afterOccurrences) {
 		Map<Date, Event> afterOccurrencesByReccurrenceId = Maps.uniqueIndex(afterOccurrences, new Function<Event, Date>() {
 
 			@Override
@@ -638,7 +638,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		return getRecurrence().isRecurrent();
 	}
 
-	public List<Event> getEventsExceptions() {
+	public Set<Event> getEventsExceptions() {
 		return recurrence.getEventExceptions();
 	}
 
@@ -648,7 +648,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	
 	public void updateParticipation() {
 		changeAttendeesParticipation();
-		List<Event> eventsExceptions = getEventsExceptions();
+		Set<Event> eventsExceptions = getEventsExceptions();
 		for (Event event: eventsExceptions) {
 			event.changeAttendeesParticipation();
 		}

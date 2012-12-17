@@ -89,6 +89,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
@@ -326,7 +327,7 @@ public class CalendarBindingImplTest {
 		expect(event.isInternalEvent()).andReturn(false).atLeastOnce();
 		expect(event.getTitle()).andReturn("title").atLeastOnce();
 		expect(event.getAttendees()).andReturn(ImmutableList.of(ToolBox.getFakeAttendee(defaultUser.getEmail()))).atLeastOnce();
-		expect(event.getEventsExceptions()).andReturn(ImmutableList.<Event>of());
+		expect(event.getEventsExceptions()).andReturn(ImmutableSet.<Event>of());
 		
 		event.findAttendeeFromEmail(defaultUser.getEmail());
 		EasyMock.expectLastCall().andReturn(null).atLeastOnce();
@@ -806,7 +807,7 @@ public class CalendarBindingImplTest {
 		exception.setRecurrenceId(recurrenceId);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setEventExceptions(Sets.newHashSet(exception));
 		event.setRecurrence(recurrence);
 
 		Event dummyException = new Event();
@@ -912,7 +913,7 @@ public class CalendarBindingImplTest {
 		exception.setRecurrenceId(recurrenceId);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setEventExceptions(Lists.newArrayList(exception));
+		recurrence.setEventExceptions(Sets.newHashSet(exception));
 		event.setRecurrence(recurrence);
 
 		Event dummyException = new Event();
@@ -1002,7 +1003,7 @@ public class CalendarBindingImplTest {
 		
 		Event event = beforeEvent.clone();
 		event.setSequence(1);
-		event.getRecurrence().getEventExceptions().get(0).setLocation("aLocation");
+		Iterables.getOnlyElement(event.getRecurrence().getEventExceptions()).setLocation("aLocation");
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = createMock(HelperService.class);
@@ -1037,7 +1038,7 @@ public class CalendarBindingImplTest {
 
 		Assert.assertEquals(Participation.accepted(), newEvent.getAttendees().get(0)
 				.getParticipation());		
-		Assert.assertEquals(Participation.needsAction(), newEvent.getRecurrence().getEventExceptions().get(0).getAttendees().get(1)
+		Assert.assertEquals(Participation.needsAction(), Iterables.getOnlyElement(newEvent.getRecurrence().getEventExceptions()).getAttendees().get(1)
 				.getParticipation());
 	}
 	
@@ -2142,7 +2143,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testBuildTreeMapEmptyList() {
-		ImmutableList<Event> events = ImmutableList.<Event> of();
+		ImmutableSet<Event> events = ImmutableSet.<Event> of();
 		
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null);
@@ -2169,7 +2170,7 @@ public class CalendarBindingImplTest {
 		Event thirdException = createEventException(attendees, eventDate.plusDays(3).toDate());
 		
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
-		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(ImmutableList.of(firstException, secondException, thirdException));
+		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(ImmutableSet.of(firstException, secondException, thirdException));
 		
 		assertThat(treeMap.keySet()).containsExactly(firstException, secondException, thirdException);
 	}
