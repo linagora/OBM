@@ -1753,10 +1753,8 @@ function quick_check_calendar_conflict($calendar, $entities) {
     $calendar['date_end'] = $end->addTimestamp($q->f('event_duration'));
   }
 
-  if ($q->f("event_allday")) {
-    $begin->setHour(0)->setMinute(0)->setSecond(0);
-    $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  }
+  $begin->setHour(0)->setMinute(0)->setSecond(0); 
+  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   // Event entities
   if (!empty($entities['user']['ids'])) {
