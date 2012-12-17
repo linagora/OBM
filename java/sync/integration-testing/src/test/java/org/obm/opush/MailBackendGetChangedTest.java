@@ -750,19 +750,19 @@ public class MailBackendGetChangedTest {
 		sendNEmailsToImapServer(numberOfEmails);
 		
 		SyncResponse initialSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
-		assertThat(initialSyncResponse.getCollection(inboxCollectionIdAsString).getSyncKey()).isEqualTo(firstAllocatedSyncKey.getSyncKey());
+		assertThat(initialSyncResponse.getCollection(inboxCollectionIdAsString).getSyncKey()).isEqualTo(firstAllocatedSyncKey);
 		
 		SyncResponse firstPartSyncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
 		Collection firstCollection = firstPartSyncResponse.getCollection(inboxCollectionIdAsString);
 		assertThat(firstCollection.getAdds()).hasSize(windowSize);
-		assertThat(firstCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey.getSyncKey());
+		assertThat(firstCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey);
 		
 		SyncResponse lastPartSyncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
 		mocksControl.verify();
 		
 		Collection lastCollection = lastPartSyncResponse.getCollection(inboxCollectionIdAsString);
 		assertThat(lastCollection.getAdds()).hasSize(numberOfEmails - windowSize);
-		assertThat(lastCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey.getSyncKey());
+		assertThat(lastCollection.getSyncKey()).isEqualTo(secondAllocatedSyncKey);
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, numberOfEmails);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();

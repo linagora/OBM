@@ -34,6 +34,7 @@ package org.obm.sync.push.client.commands;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.AccountInfos;
@@ -88,7 +89,7 @@ public class Sync extends TemplateBasedCommand<SyncResponse> {
 		for (int i = 0; i < nl.getLength(); i++) {
 			Element e = (Element) nl.item(i);
 			Collection col = new Collection();
-			col.setSyncKey(DOMUtils.getElementText(e, "SyncKey"));
+			col.setSyncKey(new SyncKey(DOMUtils.getElementText(e, "SyncKey")));
 			col.setCollectionId(DOMUtils.getElementText(e, "CollectionId"));
 			col.setStatus(DOMUtils.getElementText(e, "Status"));
 			NodeList ap = e.getElementsByTagName("Add");

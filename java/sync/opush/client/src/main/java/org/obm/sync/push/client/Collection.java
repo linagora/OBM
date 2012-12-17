@@ -34,6 +34,7 @@ package org.obm.sync.push.client;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 
 import com.google.common.base.Objects;
@@ -44,7 +45,7 @@ import com.google.common.base.Objects;
  */
 public final class Collection {
 
-	private String syncKey;
+	private SyncKey syncKey;
 	private String collectionId;
 	private SyncStatus status;
 	private List<Add> adds = new LinkedList<Add>();
@@ -52,11 +53,11 @@ public final class Collection {
 	private List<Delete> deletes = new LinkedList<Delete>();
 	
 
-	public String getSyncKey() {
+	public SyncKey getSyncKey() {
 		return syncKey;
 	}
 
-	public void setSyncKey(String syncKey) {
+	public void setSyncKey(SyncKey syncKey) {
 		this.syncKey = syncKey;
 	}
 

@@ -95,7 +95,7 @@ public class OPClientTests extends AbstractPushTest {
 		return resp;
 	}
 
-	public String getSyncKey(String collectionId, Map<String, Collection> cols) {
+	public SyncKey getSyncKey(String collectionId, Map<String, Collection> cols) {
 		Collection col = cols.get(collectionId);
 		assertNotNull("Collection[" + collectionId + "] not found", col);
 		assertNotNull(col.getSyncKey());
@@ -114,7 +114,7 @@ public class OPClientTests extends AbstractPushTest {
 				FolderType type = FolderType.valueOf(syncKey.getTextContent());
 				if (folder.getType().equals(type)) {
 					syncKey.setTextContent(getSyncKey(folder.getServerId(),
-							syncResp.getCollections()));
+							syncResp.getCollections()).getSyncKey());
 				}
 			} catch (Throwable t) {
 			}
