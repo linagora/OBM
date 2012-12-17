@@ -67,6 +67,13 @@ public class SnapshotServiceImpl implements SnapshotService {
 	}
 
 	@Override
+	public void actualizeSnapshot(DeviceId deviceId, SyncKey syncKey, Integer collectionId, SyncKey newSyncKey) {
+		Snapshot snapshot = getSnapshot(deviceId, syncKey, collectionId);
+		storeSnapshot(Snapshot.builder()
+				.actualizeSnapshot(snapshot, newSyncKey));
+	}
+	
+	@Override
 	public void deleteSnapshotAndSyncKeys(DeviceId deviceId, int collectionId) {
 		List<SyncKey> syncKeys = syncKeysDao.get(deviceId, collectionId);
 		if (syncKeys != null) {

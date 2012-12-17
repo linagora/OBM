@@ -458,9 +458,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				treatmentSyncKey = itemSyncState.getSyncKey();
 			} else {
 				treatmentSyncKey = syncKeyFactory.randomSyncKey();
-				syncDate = dateService.getEpochPlusOneSecondDate();
+				syncDate = st.getSyncDate();
 				syncCollectionResponse.setItemChanges(
-						contentsExporter.fetch(udr, syncCollection));
+						contentsExporter.fetch(udr, syncCollection, treatmentSyncKey));
 			}
 			
 			identifyNewItems(syncCollectionResponse, st);

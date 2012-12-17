@@ -73,7 +73,8 @@ public interface PIMBackend {
 	
 	PIMDataType getPIMDataType();
 
-	List<ItemChange> fetch(UserDataRequest udr, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions) 
+	List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions,
+				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
 			throws ProcessingEmailException, CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException;
 

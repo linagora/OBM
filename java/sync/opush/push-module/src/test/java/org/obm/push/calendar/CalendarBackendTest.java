@@ -747,8 +747,8 @@ public class CalendarBackendTest {
 	
 	@Test
 	public void testFetch() throws Exception {
-		String serverId1 = "1";
-		String serverId2 = "2";
+		String serverId1 = "1:1";
+		String serverId2 = "1:2";
 		Integer itemId1 = 1;
 		Integer itemId2 = 2;
 		
@@ -767,7 +767,7 @@ public class CalendarBackendTest {
 		
 		List<String> itemIds = ImmutableList.<String> of(serverId1, serverId2);
 
-		List<ItemChange> itemChanges = calendarBackend.fetch(userDataRequest, itemIds, null);
+		List<ItemChange> itemChanges = calendarBackend.fetch(userDataRequest, 1, itemIds, null, null, null);
 		
 		mockControl.verify();
 		

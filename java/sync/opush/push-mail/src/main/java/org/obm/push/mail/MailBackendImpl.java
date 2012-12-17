@@ -767,13 +767,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds, SyncCollectionOptions collectionOptions) 
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> itemIds, SyncCollectionOptions collectionOptions, 
+				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
 			throws ProcessingEmailException {
 		
 		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
-			Integer collectionId = entry.getKey();
 			Collection<Long> uids = entry.getValue();
 			try {
 				ret.addAll(fetchItems(udr, collectionId, uids, collectionOptions.getBodyPreferences()));
@@ -781,6 +781,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				logger.error("fetchItems : collection {} not found !", collectionId);
 			}
 		}
+		snapshotService.actualizeSnapshot(udr.getDevId(), previousItemSyncState.getSyncKey(), collectionId, newSyncKey);
 		return ret;
 	}
 }

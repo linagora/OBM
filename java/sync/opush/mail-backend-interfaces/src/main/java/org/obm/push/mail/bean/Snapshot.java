@@ -96,6 +96,17 @@ public class Snapshot implements Serializable {
 			return this;
 		}
 		
+		public Snapshot actualizeSnapshot(Snapshot snapshot, SyncKey newSynckKey) {
+			return Snapshot.builder()
+				.deviceId(snapshot.getDeviceId())
+				.filterType(snapshot.getFilterType())
+				.syncKey(newSynckKey)
+				.collectionId(snapshot.getCollectionId())
+				.uidNext(snapshot.getUidNext())
+				.emails(snapshot.getEmails())
+				.build();
+		}
+		
 		public Snapshot build() {
 			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			Preconditions.checkArgument(filterType != null, "filterType can't be null or empty");

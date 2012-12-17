@@ -230,8 +230,8 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			
 			BodyPreference bodyPreference = BodyPreference.builder().bodyType(type).build();
 
-			List<ItemChange> itemChanges = contentsExporter.fetch(udr, 
-					new SyncCollection(dataType, ImmutableList.of(serverId), ImmutableList.of(bodyPreference)));
+			List<ItemChange> itemChanges = contentsExporter.fetch(udr,
+					new SyncCollection(dataType, ImmutableList.of(serverId), ImmutableList.of(bodyPreference)), null);
 			
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);

@@ -256,8 +256,8 @@ public class ContactsBackendTest {
 	public void testFetch() throws Exception {
 		int otherContactCollectionUid = 1;
 		int targetcontactCollectionUid = 2;
-		int serverId = 215;
-		String serverIdAsString = String.valueOf(serverId);
+		int itemId = 215;
+		String serverId = targetcontactCollectionUid + ":" + itemId;
 		
 		List<AddressBook> books = ImmutableList.of(
 				newAddressBookObject("folder", otherContactCollectionUid, false),
@@ -268,22 +268,21 @@ public class ContactsBackendTest {
 		expectBuildCollectionPath("folder", otherContactCollectionUid);
 		expectBuildCollectionPath("folder_1", targetcontactCollectionUid);
 		
-		Contact contact = newContactObject(serverId);
-		expect(bookClient.getContactFromId(token, targetcontactCollectionUid, serverId)).andReturn(contact);
+		Contact contact = newContactObject(itemId);
+		expect(bookClient.getContactFromId(token, targetcontactCollectionUid, itemId)).andReturn(contact);
 
 		expectMappingServiceCollectionIdBehavior(books);
-		expect(mappingService.getItemIdFromServerId(serverIdAsString)).andReturn(serverId);
-		expect(mappingService.getCollectionIdFromServerId(serverIdAsString)).andReturn(targetcontactCollectionUid);
-		expect(mappingService.getServerIdFor(targetcontactCollectionUid, serverIdAsString)).andReturn(serverIdAsString);
+		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
+		expect(mappingService.getServerIdFor(targetcontactCollectionUid, String.valueOf(itemId))).andReturn(serverId);
 	
 		mocks.replay();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
-		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, ImmutableList.of(serverIdAsString), null);
+		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, targetcontactCollectionUid, ImmutableList.of(serverId), null, null, null);
 		
 		mocks.verify();
 		
-		ItemChange itemChange = new ItemChange(serverIdAsString, false, false);
+		ItemChange itemChange = new ItemChange(serverId, false, false);
 		itemChange.setData(new ContactConverter().convert(contact));
 		
 		assertThat(itemChanges).hasSize(1);

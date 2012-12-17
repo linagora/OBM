@@ -36,12 +36,15 @@ import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.easymock.Capture;
 import org.easymock.IAnswer;
@@ -53,8 +56,12 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -87,6 +94,7 @@ public class MailboxBackendTest {
 	private String mailbox;
 	private String password;
 	private UserDataRequest udr;
+	private Device device;
 	
 	private IMocksControl mocks;
 	private MailBackendImpl mailBackendImpl;
@@ -97,14 +105,17 @@ public class MailboxBackendTest {
 	private MailViewToMSEmailConverter msEmailConverter;
 	private Transformer transformer;
 	private EventService eventService;
+	private SnapshotService snapshotService;
 
 	@Before
 	public void setUp() {
 		mailbox = "to@localhost.com";
 		password = "password";
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties());
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null, null);
+						.createUser(mailbox, mailbox, null), password), null, 
+						device, null);
 		mocks = createControl();
 		mailboxService = mocks.createMock(MailboxService.class);
 		mappingService = mocks.createMock(MappingService.class);
@@ -116,8 +127,9 @@ public class MailboxBackendTest {
 		transformer = mocks.createMock(Transformer.class);
 		expect(transformersFactory.create(anyObject(FetchInstruction.class))).andReturn(transformer);
 		msEmailFetcher = new MSEmailFetcher(mailboxService, transformersFactory, msEmailConverter);
+		snapshotService = mocks.createMock(SnapshotService.class);
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
-				null, null, mappingService, null, msEmailFetcher, null, null);
+				snapshotService, null, mappingService, null, msEmailFetcher, null, null);
 	}
 
 	@Test
@@ -139,8 +151,19 @@ public class MailboxBackendTest {
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath);
 		expect(mappingService.getServerIdFor(collectionId, String.valueOf(itemId))).andReturn(serverId);
 		
+		SyncKey previousSyncKey = new SyncKey("123");
+		ItemSyncState previousItemSyncState = ItemSyncState.builder()
+				.id(1)
+				.syncKey(previousSyncKey)
+				.syncDate(date("2012-01-01T11:22:33"))
+				.build();
+
+		SyncKey newSyncKey = new SyncKey("456");
+		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
+		expectLastCall();
+		
 		mocks.replay();		
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of(serverId), syncCollectionOptions);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
@@ -168,8 +191,19 @@ public class MailboxBackendTest {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(
 				ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
 		
+		SyncKey previousSyncKey = new SyncKey("123");
+		ItemSyncState previousItemSyncState = ItemSyncState.builder()
+				.id(1)
+				.syncKey(previousSyncKey)
+				.syncDate(date("2012-01-01T11:22:33"))
+				.build();
+
+		SyncKey newSyncKey = new SyncKey("456");
+		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
+		expectLastCall();
+		
 		mocks.replay();
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of(serverId), syncCollectionOptions);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
@@ -211,8 +245,19 @@ public class MailboxBackendTest {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(
 				ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.PlainText).build()));
 		
+		SyncKey previousSyncKey = new SyncKey("123");
+		ItemSyncState previousItemSyncState = ItemSyncState.builder()
+				.id(1)
+				.syncKey(previousSyncKey)
+				.syncDate(date("2012-01-01T11:22:33"))
+				.build();
+
+		SyncKey newSyncKey = new SyncKey("456");
+		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
+		expectLastCall();
+		
 		mocks.replay();
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, ImmutableList.of(serverId), syncCollectionOptions);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();

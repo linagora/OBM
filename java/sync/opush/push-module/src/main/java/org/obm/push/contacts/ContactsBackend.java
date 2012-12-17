@@ -441,15 +441,15 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, List<String> itemIds, SyncCollectionOptions options)
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions,
+				ItemSyncState previousItemSyncState, SyncKey newSyncKey)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		for (String serverId: itemIds) {
+		for (String serverId: fetchServerIds) {
 			try {
 
 				Integer contactId = mappingService.getItemIdFromServerId(serverId);
-				Integer collectionId = mappingService.getCollectionIdFromServerId(serverId);
 				Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
 				
 				Contact contact = getContactFromId(udr, addressBookId, contactId);
