@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -47,6 +50,7 @@ import org.obm.push.utils.DOMUtils;
 
 import bitronix.tm.TransactionManagerServices;
 
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Module;
@@ -80,11 +84,12 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	
 	public static class OpushServer {
 		
-		private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 300;
-		private static final int WAIT_TO_BE_STARTED_MAX_ITERATION = 10;
-		
+		private static final int WAIT_TO_BE_STARTED_MAX_TIME = 10;
+		private static final int WAIT_TO_BE_STARTED_LATCH_COUNT = 1;
+
 		private final Server server;
 		private final SelectChannelConnector selectChannelConnector;
+		private final CountDownLatch serverStartedLatch = new CountDownLatch(WAIT_TO_BE_STARTED_LATCH_COUNT);
 
 		public OpushServer() {
 			server = new Server();
@@ -102,6 +107,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 				
 				@Override
 				public void contextInitialized(ServletContextEvent sce) {
+					serverStartedLatch.countDown();
 				}
 				
 				@Override
@@ -129,17 +135,13 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 		private int waitServerStartsThenGetPorts() {
 			try {
-				for (int tryCount = 0; tryCount < WAIT_TO_BE_STARTED_MAX_ITERATION; tryCount++) {
-					if (server.isStarted()) {
-						try {
-							return getLocalPort();
-						} catch (IllegalStateException e) {
-						}
-					}
-					Thread.sleep(WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE);
+				if (serverStartedLatch.await(WAIT_TO_BE_STARTED_MAX_TIME, TimeUnit.SECONDS)) {
+					return getLocalPort();
 				}
-			} catch (InterruptedException e) { }
-			throw new IllegalStateException("Could not get server's listening port, server too long to start.");
+			} catch (InterruptedException e) {
+				Throwables.propagate(e);
+			}
+			throw new IllegalStateException("Could not get server's listening port. Illegal concurrent state.");
 		}
 
 		private int getLocalPort() {

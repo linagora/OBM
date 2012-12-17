@@ -29,6 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.util.server;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import net.sf.ehcache.CacheManager;
+
 import org.eclipse.jetty.continuation.ContinuationFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -38,6 +46,7 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
 import org.obm.servlet.filter.qos.QoSFilter;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
@@ -47,8 +56,11 @@ public class QoSFilterTestModule extends ServletModule {
 	
 	public static final String BLOCKING_SERVLET_NAME = "blocking";
 	public static final String SUSPENDING_SERVLET_NAME = "suspending";
-	private static final int WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE = 10;
-	private static final int WAIT_TO_BE_STARTED_MAX_ITERATION = 10;
+
+	private static final int WAIT_TO_BE_STARTED_MAX_TIME = 10;
+	private static final int WAIT_TO_BE_STARTED_LATCH_COUNT = 1;
+	
+	private final CountDownLatch serverStartedLatch = new CountDownLatch(WAIT_TO_BE_STARTED_LATCH_COUNT);
 	
 	@Provides @Singleton
 	protected EmbeddedServer buildServerWithModules() {
@@ -59,6 +71,7 @@ public class QoSFilterTestModule extends ServletModule {
 		Context root = new Context(server, "/", Context.SESSIONS);
 		root.addFilter(GuiceFilter.class, "/*", 0);
 		root.addServlet(DefaultServlet.class, "/");
+		root.addEventListener(buildTransactionManagerListener());
 		return new EmbeddedServer() {
 			
 			@Override
@@ -81,14 +94,13 @@ public class QoSFilterTestModule extends ServletModule {
 
 			private int waitServerStartsThenGetPorts() {
 				try {
-					for (int tryCount = 0; tryCount < WAIT_TO_BE_STARTED_MAX_ITERATION; tryCount++) {
-						if (server.isStarted()) {
-							return getLocalPort();
-						}
-						Thread.sleep(WAIT_TO_BE_STARTED_ITERATION_TIMELAPSE);
+					if (serverStartedLatch.await(WAIT_TO_BE_STARTED_MAX_TIME, TimeUnit.SECONDS)) {
+						return getLocalPort();
 					}
-				} catch (InterruptedException e) { }
-				throw new IllegalStateException("Could not get server's listening port, server too long to start.");
+				} catch (InterruptedException e) {
+					Throwables.propagate(e);
+				}
+				throw new IllegalStateException("Could not get server's listening port. Illegal concurrent state.");
 			}
 
 			private int getLocalPort() {
@@ -97,6 +109,21 @@ public class QoSFilterTestModule extends ServletModule {
 					return port;
 				}
 				throw new IllegalStateException("Could not get server's listening port.");
+			}
+		};
+	}
+
+	private ServletContextListener buildTransactionManagerListener() {
+		return new ServletContextListener() {
+			
+			@Override
+			public void contextInitialized(ServletContextEvent sce) {
+				serverStartedLatch.countDown();
+			}
+			
+			@Override
+			public void contextDestroyed(ServletContextEvent sce) {
+				CacheManager.getInstance().shutdown();
 			}
 		};
 	}
