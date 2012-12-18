@@ -219,7 +219,9 @@ public class MessageLoader {
 	
 	private MailBody getMailBody(IMimePart chosenPart) throws IOException {
 		MailBody mb = new MailBody();
-		InputStream bodyText = mailboxService.fetchMimePartStream(udr, collectionPath, message.getUid(), chosenPart.getAddress());
+		InputStream bodyText = 
+				chosenPart.decodeMimeStream(
+						mailboxService.fetchMimePartStream(udr, collectionPath, message.getUid(), chosenPart.getAddress()));
 		Charset charsetName = computeSupportedCharset(chosenPart.getCharset());
 		String partText = CharStreams.toString(new InputStreamReader(bodyText, charsetName));
 		mb.addConverted(chosenPart.getFullMimeType(), partText);
