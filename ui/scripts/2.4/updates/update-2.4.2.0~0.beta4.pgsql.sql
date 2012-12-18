@@ -14,7 +14,7 @@ WHERE NOT EXISTS (SELECT 1 FROM UserObmPref WHERE userobmpref_option='set_allday
 
 CREATE TABLE deletedeventlink
 (
-  deletedeventlink_id serial NOT NULL,
+  deletedeventlink_id integer NOT NULL,
   deletedeventlink_userobm_id integer NOT NULL,
   deletedeventlink_event_id integer NOT NULL,
   deletedeventlink_event_ext_id character varying(300) NOT NULL,
@@ -56,7 +56,7 @@ CREATE SEQUENCE deletedeventlink_deletedeventlink_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
-  START 13
+  START 1
   CACHE 1;
 ALTER TABLE deletedeventlink_deletedeventlink_id_seq
   OWNER TO obm;
