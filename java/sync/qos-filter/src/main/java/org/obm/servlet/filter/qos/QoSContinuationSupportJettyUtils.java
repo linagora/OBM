@@ -29,35 +29,24 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.servlet.filter.qos.it;
+package org.obm.servlet.filter.qos;
 
-import static org.easymock.EasyMock.createStrictControl;
+import javax.servlet.ServletRequest;
 
-import org.easymock.IMocksControl;
-import org.obm.servlet.filter.qos.QoSContinuationSupport;
-import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
-import org.obm.servlet.filter.qos.QoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
-import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
+import org.eclipse.jetty.continuation.Continuation;
+import org.eclipse.jetty.continuation.ContinuationSupport;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+public class QoSContinuationSupportJettyUtils implements QoSContinuationSupport {
 
-public abstract class NPerClientQosSuspendConfiguration extends AbstractModule {
-	
-	protected abstract int getN();
+	@Override
+	public Continuation getContinuationFor(ServletRequest request) {
+		return ContinuationSupport.getContinuation(request);
+	}
 	
 	@Override
-	protected void configure() {
-		IMocksControl control = createStrictControl();
-		bind(IMocksControl.class).toInstance(control);
-		bind(new TypeLiteral<BusinessKeyProvider<String>>(){}).toInstance(control.createMock(BusinessKeyProvider.class));
-		bind(QoSRequestHandler.class).to(new TypeLiteral<NPerClientQoSRequestSuspendHandler<String>>(){});
-		bind(Integer.class).annotatedWith(Names.named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM)).toInstance(getN());
-		bind(QoSContinuationSupport.class).to(QoSContinuationSupportJettyUtils.class);
-		install(new QoSFilterTestModule());
+	public void suspend(ServletRequest request) {
+		Continuation continuation = getContinuationFor(request);
+		continuation.suspend();
 	}
+	
 }

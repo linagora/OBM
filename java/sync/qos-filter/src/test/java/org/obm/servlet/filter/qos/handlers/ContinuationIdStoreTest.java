@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
+import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 
 @RunWith(SlowFilterRunner.class)
@@ -64,7 +65,7 @@ public class ContinuationIdStoreTest {
 	public void setup() {
 		control = createControl();
 		hashmap = control.createMock(ConcurrentHashMap.class);
-		continuationSupport = control.createMock(QoSContinuationSupport.class);
+		continuationSupport = control.createMock(QoSContinuationSupportJettyUtils.class);
 		atomicLong = new AtomicLong(44l);
 		store = new ContinuationIdStore(atomicLong, hashmap, continuationSupport);
 	}

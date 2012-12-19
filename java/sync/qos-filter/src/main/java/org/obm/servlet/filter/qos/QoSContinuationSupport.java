@@ -34,17 +34,11 @@ package org.obm.servlet.filter.qos;
 import javax.servlet.ServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
-import org.eclipse.jetty.continuation.ContinuationSupport;
 
-public class QoSContinuationSupport {
+public interface QoSContinuationSupport {
 
-	public Continuation getContinuationFor(ServletRequest request) {
-		return ContinuationSupport.getContinuation(request);
-	}
-	
-	public void suspend(ServletRequest request) {
-		Continuation continuation = getContinuationFor(request);
-		continuation.suspend();
-	}
-	
+	Continuation getContinuationFor(ServletRequest request);
+
+	void suspend(ServletRequest request);
+
 }

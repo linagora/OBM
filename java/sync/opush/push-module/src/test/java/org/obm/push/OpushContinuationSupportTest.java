@@ -29,35 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.servlet.filter.qos.it;
+package org.obm.push;
 
-import static org.easymock.EasyMock.createStrictControl;
+import static org.easymock.EasyMock.*;
+
+import javax.servlet.ServletRequest;
 
 import org.easymock.IMocksControl;
-import org.obm.servlet.filter.qos.QoSContinuationSupport;
+import org.junit.Before;
+import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
-import org.obm.servlet.filter.qos.QoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
-import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 
-public abstract class NPerClientQosSuspendConfiguration extends AbstractModule {
-	
-	protected abstract int getN();
-	
-	@Override
-	protected void configure() {
-		IMocksControl control = createStrictControl();
-		bind(IMocksControl.class).toInstance(control);
-		bind(new TypeLiteral<BusinessKeyProvider<String>>(){}).toInstance(control.createMock(BusinessKeyProvider.class));
-		bind(QoSRequestHandler.class).to(new TypeLiteral<NPerClientQoSRequestSuspendHandler<String>>(){});
-		bind(Integer.class).annotatedWith(Names.named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM)).toInstance(getN());
-		bind(QoSContinuationSupport.class).to(QoSContinuationSupportJettyUtils.class);
-		install(new QoSFilterTestModule());
+public class OpushContinuationSupportTest {
+
+	private LoggerService loggerService;
+	private QoSContinuationSupportJettyUtils delegate;
+	private OpushContinuationSupport testee;
+	private IMocksControl mockControl;
+
+	@Before
+	public void setup() {
+		mockControl = createControl();
+		loggerService = mockControl.createMock(LoggerService.class);
+		delegate = mockControl.createMock(QoSContinuationSupportJettyUtils.class);
+		testee = new OpushContinuationSupport(delegate, loggerService);
 	}
+	
+	@Test
+	public void suspendCloseCurrentSession() {
+		ServletRequest request = mockControl.createMock(ServletRequest.class);
+		loggerService.closeSession();
+		expectLastCall().once();
+		delegate.suspend(request);
+		expectLastCall().once();
+		mockControl.replay();
+		testee.suspend(request);
+		mockControl.verify();
+	}
+	
 }

@@ -65,7 +65,7 @@ public class QoSFilterTest {
 	@Before
 	public void setUp() {
 		control = createStrictControl();
-		suspender = control.createMock(QoSContinuationSupport.class);
+		suspender = control.createMock(QoSContinuationSupportJettyUtils.class);
 		request = control.createMock(HttpServletRequest.class);
 		response = control.createMock(HttpServletResponse.class);
 		chain = control.createMock(FilterChain.class);

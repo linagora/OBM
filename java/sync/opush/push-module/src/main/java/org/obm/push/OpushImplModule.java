@@ -84,6 +84,7 @@ import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
 import org.obm.push.task.TaskBackend;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilterModule;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
@@ -143,6 +144,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(ContinuationTransactionMap.class).to(ContinuationTransactionMapImpl.class);
 		bind(ContinuationService.class).to(ContinuationServiceImpl.class);
 		bind(DateService.class).to(DateServiceImpl.class);
+		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
