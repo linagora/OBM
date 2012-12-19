@@ -41,37 +41,37 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 public class UIDNextCommandTest {
 	
 	@Test
-		public void testHandleResponsesNOK() {
-			UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
-			
-			uidNextCommand.handleResponses(Arrays.asList(new IMAPResponse("NO", "")));
-			
-			Long uidNext = uidNextCommand.getReceivedData();
-			assertThat(uidNext).isNull();
-		}
+	public void testHandleResponsesNOK() {
+		UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
+		
+		uidNextCommand.handleResponses(Arrays.asList(new IMAPResponse("NO", "")));
+		
+		Long uidNext = uidNextCommand.getReceivedData();
+		assertThat(uidNext).isNull();
+	}
 	
 	@Test
-		public void testHandleResponses() {
-			UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
-			IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231 UIDNEXT 44292)");
-			
-			long expectedUIDNext = 44292;
-			uidNextCommand.handleResponses(Arrays.asList(response, new IMAPResponse("OK", "")));
-			
-			Long uidNext = uidNextCommand.getReceivedData();
-			assertThat(uidNext).isEqualTo(expectedUIDNext);
-		}
+	public void testHandleResponses() {
+		UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
+		IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231 UIDNEXT 44292)");
+		
+		long expectedUIDNext = 44292;
+		uidNextCommand.handleResponses(Arrays.asList(response, new IMAPResponse("OK", "")));
+		
+		Long uidNext = uidNextCommand.getReceivedData();
+		assertThat(uidNext).isEqualTo(expectedUIDNext);
+	}
 	
 	@Test
-		public void testHandleResponsesMultiLines() {
-			UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
-			IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231");
-			IMAPResponse response2 = new IMAPResponse("OK", "UIDNEXT 44292)");
-			
-			long expectedUIDNext = 44292;
-			uidNextCommand.handleResponses(Arrays.asList(response, response2, new IMAPResponse("OK", "")));
-			
-			Long uidNext = uidNextCommand.getReceivedData();
-			assertThat(uidNext).isEqualTo(expectedUIDNext);
-		}
+	public void testHandleResponsesMultiLines() {
+		UIDNextCommand uidNextCommand = new UIDNextCommand("Inbox");
+		IMAPResponse response = new IMAPResponse("OK", "* STATUS Inbox (MESSAGES 231");
+		IMAPResponse response2 = new IMAPResponse("OK", "UIDNEXT 44292)");
+		
+		long expectedUIDNext = 44292;
+		uidNextCommand.handleResponses(Arrays.asList(response, response2, new IMAPResponse("OK", "")));
+		
+		Long uidNext = uidNextCommand.getReceivedData();
+		assertThat(uidNext).isEqualTo(expectedUIDNext);
+	}
 }

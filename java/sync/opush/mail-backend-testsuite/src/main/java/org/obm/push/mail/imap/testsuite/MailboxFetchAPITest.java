@@ -337,6 +337,24 @@ public abstract class MailboxFetchAPITest {
 	}
 	
 	@Test
+	public void testFetchUIDNextMailboxInUTF7() {
+		testUtils.createFolders("JIRA INBOX");
+		String mailbox = testUtils.mailboxPath("JIRA INBOX");
+		
+		long uIDNext = mailboxService.fetchUIDNext(udr, mailbox);
+		assertThat(uIDNext).isEqualTo(1);
+	}
+	
+	@Test
+	public void testFetchUIDNextMailboxInUTF7WithAccent() {
+		testUtils.createFolders("déplacements");
+		String mailbox = testUtils.mailboxPath("déplacements");
+		
+		long uIDNext = mailboxService.fetchUIDNext(udr, mailbox);
+		assertThat(uIDNext).isEqualTo(1);
+	}
+	
+	@Test
 	public void testFetchUIDValidity() {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		

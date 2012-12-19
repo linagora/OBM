@@ -80,7 +80,7 @@ public class UIDNextCommand extends Command<Long> {
 	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = STATUS_COMMAND + " " 
-				+ mailbox 
+				+ toUtf7(mailbox) 
 				+  " (" + UIDNEXT_ITEM + ")";
 		return new CommandArgument(cmd, null);
 	}
