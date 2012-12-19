@@ -38,8 +38,9 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class SubscribeCommand extends SimpleCommand<Boolean> {
 
+	private final static String IMAP_COMMAND = "SUBSCRIBE";
 	public SubscribeCommand(String mailbox) {
-		super("SUBSCRIBE "+toUtf7(mailbox));
+		super(IMAP_COMMAND + " " + toUtf7(mailbox));
 	}
 
 	@Override
@@ -47,4 +48,18 @@ public class SubscribeCommand extends SimpleCommand<Boolean> {
 		data = isOk(rs);
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

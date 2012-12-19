@@ -37,8 +37,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
@@ -46,8 +44,13 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
-public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
+public class UIDFetchInternalDateCommand extends Command<Collection<InternalDate>> {
+
+	private final static String IMAP_COMMAND = "UID FETCH";
+	private final static String IMAP_SUB_COMMAND = "UID INTERNALDATE";
 	private ImapMessageSet imapMessageSet;
 	DateFormat df;
 
@@ -63,9 +66,12 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 
 		StringBuilder sb = new StringBuilder();
 		if (!imapMessageSet.isEmpty()) {
-			sb.append("UID FETCH ");
+			sb.append(IMAP_COMMAND);
+			sb.append(" ");
 			sb.append(imapMessageSet.asString());
-			sb.append(" (UID INTERNALDATE)");
+			sb.append(" (");
+			sb.append(IMAP_SUB_COMMAND);
+			sb.append(")");
 		} else {
 			sb.append("NOOP");
 		}
@@ -75,51 +81,50 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
+	public String getImapCommand() {
+		return IMAP_COMMAND + " " +IMAP_SUB_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String payload = response.getPayload();
+		int fidx = payload.indexOf("INTERNALDATE \"") + "INTERNALDATE \"".length();
+		if (fidx == -1 + "INTERNALDATE \"".length()) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
 		if (imapMessageSet.isEmpty()) {
-			data = new InternalDate[0];
+			data = ImmutableList.of();
 			return;
 		}
 		
-		if (isOK) {
-			data = new InternalDate[rs.size() - 1];
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; i < rs.size() - 1; i++) {
-				IMAPResponse r = it.next();
-				String payload = r.getPayload();
-
-				int fidx = payload.indexOf("INTERNALDATE \"") + "INTERNALDATE \"".length();
-				
-				if (fidx == -1 + "INTERNALDATE \"".length()) {
-					continue;
-				}
-				
-				int endDate = payload.indexOf("\"", fidx);
-				String internalDate = "";
-				if (fidx > 0 && endDate >= fidx) {
-					internalDate = payload.substring(fidx, endDate);
-				} else {
-					logger.error("Failed to get flags in fetch response: {}", payload);
-				}
-
-				int uidIdx = payload.indexOf("UID ") + "UID ".length();
-				int endUid = uidIdx;
-				while (Character.isDigit(payload.charAt(endUid))) {
-					endUid++;
-				}
-				long uid = Long.parseLong(payload.substring(uidIdx, endUid));
-
-				// logger.info("payload: " + r.getPayload()+" uid: "+uid);
-
-				data[i] = new InternalDate(uid,parseDate(internalDate));
-			}
+		String payload = response.getPayload();
+		int fidx = payload.indexOf("INTERNALDATE \"") + "INTERNALDATE \"".length();
+		int endDate = payload.indexOf("\"", fidx);
+		String internalDate = "";
+		if (fidx > 0 && endDate >= fidx) {
+			internalDate = payload.substring(fidx, endDate);
 		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: {}", ok.getPayload());
-			data = new InternalDate[0];
+			logger.error("Failed to get flags in fetch response: {}", payload);
 		}
+
+		int uidIdx = payload.indexOf("UID ") + "UID ".length();
+		int endUid = uidIdx;
+		while (Character.isDigit(payload.charAt(endUid))) {
+			endUid++;
+		}
+		long uid = Long.parseLong(payload.substring(uidIdx, endUid));
+
+		// logger.info("payload: " + r.getPayload()+" uid: "+uid);
+
+		if (data == null || data.isEmpty()) {
+			data = Lists.newArrayList();
+		}
+		data.add(new InternalDate(uid,parseDate(internalDate)));
 	}
 
 	private Date parseDate(String date) {
@@ -130,5 +135,9 @@ public class UIDFetchInternalDateCommand extends Command<InternalDate[]> {
 		}
 		return new Date();
 	}
-
+	
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableList.of();
+	}
 }

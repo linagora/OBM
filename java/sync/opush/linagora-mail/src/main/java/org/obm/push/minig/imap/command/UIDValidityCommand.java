@@ -32,9 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.mime.impl.AtomHelper;
@@ -43,7 +40,7 @@ import com.google.common.base.Strings;
 
 public class UIDValidityCommand extends Command<Long> {
 
-	private final static String UIDVALIDITY_ITEM = "UIDVALIDITY";
+	private final static String IMAP_COMMAND = "UIDVALIDITY";
 	private final static String STATUS_COMMAND = "STATUS";
 	
 	private String mailbox;
@@ -53,37 +50,42 @@ public class UIDValidityCommand extends Command<Long> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		data = null;
-		if (isOK) {
-			Iterator<IMAPResponse> it = rs.iterator();
-			int len = rs.size() - 1;
-			for (int i = 0; i < len; i++) {
-				IMAPResponse ir = it.next();
-				String s = AtomHelper.getFullResponse(ir.getPayload(), ir.getStreamData());
-					
-				String uidValidityHasString = getUIDValidityHasString(s);
-				if (Strings.isNullOrEmpty(uidValidityHasString)) {
-					continue;
-				}
-				
-				data = Long.valueOf(uidValidityHasString);
-				break;
-			}
-		}
-	}
-
-	private String getUIDValidityHasString(String fullPayload) {
-		return IMAPParsingTools.getStringHasNumberForField(fullPayload, UIDVALIDITY_ITEM + " ");
-	}
-
-	@Override
 	protected CommandArgument buildCommand() {
 		String cmd = STATUS_COMMAND + " " 
-				+ mailbox 
-				+  " (" + UIDVALIDITY_ITEM + ")";
+				+ toUtf7(mailbox) 
+				+  " (" + IMAP_COMMAND + ")";
 		return new CommandArgument(cmd, null);
 	}
 
+	@Override
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		
+		if (!s.contains(IMAP_COMMAND)) {
+			return false;
+		}
+		
+		String uidValidityHasString = getUIDValidityHasString(s);
+		if (Strings.isNullOrEmpty(uidValidityHasString)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		String uidValidityHasString = getUIDValidityHasString(s);
+		
+		data = Long.valueOf(uidValidityHasString);
+	}
+
+	private String getUIDValidityHasString(String fullPayload) {
+		return IMAPParsingTools.getStringHasNumberForField(fullPayload, IMAP_COMMAND + " ");
+	}
 }

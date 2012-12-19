@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class RenameCommand extends SimpleCommand<Boolean> {
@@ -43,8 +41,17 @@ public class RenameCommand extends SimpleCommand<Boolean> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		data = isOk(rs);
+	public boolean isMatching(IMAPResponse response) {
+		return true;
 	}
 
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

@@ -44,10 +44,17 @@ public interface ICommand<T> {
 	void execute(IoSession s, TagProducer tp, Semaphore lock,
 			List<IMAPResponse> lastResponses);
 
+	String getImapCommand();
+	
+	boolean isMatching(IMAPResponse response);
+
 	void handleResponses(List<IMAPResponse> rs);
 
+	void handleResponse(IMAPResponse response);
+
 	T getReceivedData();
-
+	
 	void responseReceived(List<IMAPResponse> lastResponses);
-
+	
+	void setDataInitialValue();
 }

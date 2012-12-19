@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
@@ -41,6 +39,7 @@ import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 public class UIDStoreCommand extends Command<Boolean> {
 
+	private final static String IMAP_COMMAND = "UID STORE";
 	private ImapMessageSet imapMessageSet;
 	private FlagsList fl;
 	private boolean set;
@@ -52,16 +51,29 @@ public class UIDStoreCommand extends Command<Boolean> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		data = isOK;
-	}
-
-	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID STORE " + imapMessageSet.asString() + " "
+		String cmd = IMAP_COMMAND + " " + imapMessageSet.asString() + " "
 				+ (set ? "+" : "-") + "FLAGS.SILENT " + fl.asCommandValue();
 		return new CommandArgument(cmd, null);
 	}
 
+	@Override
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

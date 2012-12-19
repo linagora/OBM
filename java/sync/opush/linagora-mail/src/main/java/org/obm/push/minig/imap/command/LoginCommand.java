@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class LoginCommand extends SimpleCommand<Boolean> {
@@ -41,12 +39,7 @@ public class LoginCommand extends SimpleCommand<Boolean> {
 	public LoginCommand(String login, String password) {
 		super("LOGIN \"" + escapeString(login) + "\" \"" + escapeString(password)+"\"");
 	}
-
-	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		data = isOk(rs);
-	}
-
+	
 	private static String escapeString(String s) {
 		StringBuilder ret = new StringBuilder(48);
 		char[] toEsc = s.toCharArray();
@@ -58,6 +51,19 @@ public class LoginCommand extends SimpleCommand<Boolean> {
 		}
 		return ret.toString();
 	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
 	
-	
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

@@ -61,7 +61,19 @@ public class UIDCopyCommandTest {
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);
 		
 		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(MessageSet.singleton(1l), "Trash");
-		uidCopyCommand.responseReceived(ImmutableList.of(imapResponse));
+		uidCopyCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
+		
+		assertThat(uidCopyCommand.data).containsOnly(2l);
+	}
+	
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		IMAPResponse response = new IMAPResponse("OK", "* 16931 FETCH (FLAGS (Junk) UID 735417)");
+		IMAPResponse response2 = new IMAPResponse("OK", "* OK [COPY 23 1 2]");
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+		
+		UIDCopyCommand uidCopyCommand = new UIDCopyCommand(MessageSet.singleton(1l), "Trash");
+		uidCopyCommand.responseReceived(ImmutableList.of(response, response2, response3));
 		
 		assertThat(uidCopyCommand.data).containsOnly(2l);
 	}

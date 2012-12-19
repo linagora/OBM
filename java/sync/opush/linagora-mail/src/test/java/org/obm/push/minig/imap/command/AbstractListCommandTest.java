@@ -36,7 +36,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.minig.imap.command.AbstractListCommand;
+import org.obm.push.mail.bean.ListInfo;
+import org.obm.push.mail.bean.ListResult;
+import org.obm.push.minig.imap.impl.IMAPResponse;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
 public class AbstractListCommandTest {
@@ -84,5 +88,23 @@ public class AbstractListCommandTest {
 		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INB&OX");
+	}
+	
+	@Test
+	public void testHandleResponses() {
+		IMAPResponse response = new IMAPResponse("OK", "* LSUB () \".\" #news.comp.mail.mime");
+		IMAPResponse response2 = new IMAPResponse("OK", "* LSUB () \".\" #news.comp.mail.misc");
+		IMAPResponse response3 = new IMAPResponse("OK", "* LSUB (\\Noselect) \".\" #news.comp.mail.others");
+		IMAPResponse response4 = new IMAPResponse("OK", "A002 OK LSUB completed");
+		
+		ListInfo expectedListInfo = new ListInfo("#news.comp.mail.mime", true, true);
+		ListInfo expectedListInfo2 = new ListInfo("#news.comp.mail.misc", true, true);
+		ListInfo expectedListInfo3 = new ListInfo("#news.comp.mail.others", false, true);
+		
+		AbstractListCommand abstractListCommand = new AbstractListCommand(true);
+		abstractListCommand.handleResponses(ImmutableList.of(response, response2, response3, response4));
+		ListResult listResult = abstractListCommand.getReceivedData();
+		assertThat(listResult).hasSize(3);
+		assertThat(listResult).containsOnly(expectedListInfo, expectedListInfo2, expectedListInfo3);
 	}
 }

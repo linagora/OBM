@@ -31,12 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.command;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.InputStream;
 import java.util.Date;
 
-import org.fest.assertions.api.Assertions;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,7 +53,6 @@ import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.IMAPException;
@@ -106,7 +106,7 @@ public class UIDFetchMessageTest {
 
 		InputStream fetchPart = uidFetchMessage(sentEmail.getUid());
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("plainText.eml"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("plainText.eml"));
 	}
 	
 	@Test
@@ -115,7 +115,7 @@ public class UIDFetchMessageTest {
 
 		InputStream fetchPart = uidFetchMessage(sentEmail.getUid());
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative.eml"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative.eml"));
 	}
 	
 	@Test
@@ -124,7 +124,7 @@ public class UIDFetchMessageTest {
 
 		InputStream fetchPart = uidFetchMessage(sentEmail.getUid());
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded.eml"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded.eml"));
 	}
 	
 	@Test
@@ -133,7 +133,7 @@ public class UIDFetchMessageTest {
 
 		InputStream fetchPart = uidFetchMessage(sentEmail.getUid());
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed.eml"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed.eml"));
 	}
 	
 	@Test
@@ -142,18 +142,19 @@ public class UIDFetchMessageTest {
 
 		InputStream fetchPart = uidFetchMessage(sentEmail.getUid());
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated.eml"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated.eml"));
 	}
 
-	@Test(expected=ImapMessageNotFoundException.class)
+	@Test
 	public void testUidFetchPartWrongUid() throws Exception {
 		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("plainText.eml"));
 		long wrongUid = sentEmail.getUid() + 1;
 		
-		uidFetchMessage(wrongUid);
+		InputStream uidFetchMessage = uidFetchMessage(wrongUid);
+		assertThat(IOUtils.toByteArray(uidFetchMessage)).isEmpty();
 	}
 	
-	@Test(expected=ImapMessageNotFoundException.class)
+	@Test
 	public void testUidFetchPartWrongSelectedMailbox() throws Exception {
 		String mailbox = "wrongmailbox";
 		testUtils.createFolders(mailbox);
@@ -161,7 +162,8 @@ public class UIDFetchMessageTest {
 
 		StoreClient client = loggedClient();
 		client.select(mailbox);
-		client.uidFetchMessage(sentEmail.getUid());
+		InputStream uidFetchMessage = client.uidFetchMessage(sentEmail.getUid());
+		assertThat(IOUtils.toByteArray(uidFetchMessage)).isEmpty();
 	}
 
 	private InputStream uidFetchMessage(long uid) throws LocatorClientException, IMAPException {

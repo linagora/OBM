@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.IMAPResponse;
@@ -49,26 +47,36 @@ public class AbstractListCommand extends SimpleCommand<ListResult> {
 		super((subscribedOnly ? "LSUB " : "LIST ") + "\"\" \"*\"");
 		this.subscribedOnly = subscribedOnly;
 	}
-
+	
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		ListResult lr = new ListResult(rs.size() - 1);
-		for (int i = 0; i < rs.size() - 1; i++) {
-			String p = rs.get(i).getPayload();
-			if (!p.contains( subscribedOnly? "LSUB " : " LIST ")) {
-				continue;
-			}
-			int oParen = p.indexOf('(', 5);
-			int cPren = p.indexOf(')', oParen);
-			String flags = p.substring(oParen + 1, cPren);
-			if (i == 0) {
-				char imapSep = p.charAt(cPren + 3);
-				lr.setImapSeparator(imapSep);
-			}
-			String mbox = parseMailboxName(p, cPren);
-			lr.add(new ListInfo(mbox, !flags.contains("\\Noselect"), !flags.contains("\\Noinferiors")));
+	public boolean isMatching(IMAPResponse response) {
+		String p = response.getPayload();
+		if (!p.contains( subscribedOnly? "* LSUB " : "* LIST ")) {
+			return false;
 		}
-		data = lr;
+		return true;
+	}
+	
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		String p = response.getPayload();
+		int oParen = p.indexOf('(', 5);
+		int cPren = p.indexOf(')', oParen);
+		String flags = p.substring(oParen + 1, cPren);
+		
+		String mbox = parseMailboxName(p, cPren);
+		ListInfo listInfo = new ListInfo(mbox, !flags.contains("\\Noselect"), !flags.contains("\\Noinferiors"));
+			
+		if (null == data || data.isEmpty()) {
+			ListResult lr = new ListResult(1);
+			char imapSep = p.charAt(cPren + 3);
+			lr.setImapSeparator(imapSep);
+			
+			lr.add(listInfo);
+			data = lr;
+		} else {
+			data.add(listInfo);
+		}
 	}
 
 	@VisibleForTesting String parseMailboxName(String responseLine, int flagsEndingIndex) {
@@ -85,4 +93,8 @@ public class AbstractListCommand extends SimpleCommand<ListResult> {
 		}
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = new ListResult(0);
+	}
 }

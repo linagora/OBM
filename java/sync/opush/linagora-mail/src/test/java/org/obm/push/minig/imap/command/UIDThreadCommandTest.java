@@ -29,56 +29,29 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-import java.util.concurrent.Semaphore;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.apache.mina.common.IoSession;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.TagProducer;
 
-public class StopIdleCommand extends Command<Boolean> {
+import com.google.common.collect.ImmutableList;
 
-	private final static String IMAP_COMMAND = "DONE";
+@RunWith(SlowFilterRunner.class)
+public class UIDThreadCommandTest {
 	
-	@Override
-	public void execute(IoSession session, TagProducer tp, Semaphore lock,
-			List<IMAPResponse> lastResponses) {
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		IMAPResponse response = new IMAPResponse("OK", "* OK [COPY 23 1 2]");
+		IMAPResponse response2 = new IMAPResponse("OK", "* THREAD (12)");
+		IMAPResponse response3 = new IMAPResponse("OK", "");
 		
-		CommandArgument args = buildCommand();
-		String commandString = args.getCommandString();
-		logger.info(commandString);
-		session.write(commandString);
-		lock.release();
-	}
-
-	@Override
-	public void handleResponses(List<IMAPResponse> rs) {}
-
-	@Override
-	protected CommandArgument buildCommand() {
-		return new CommandArgument(IMAP_COMMAND, null);
-	}
-
-	@Override
-	public String getImapCommand() {
-		return IMAP_COMMAND;
-	}
-
-	@Override
-	public boolean isMatching(IMAPResponse response) {
-		return true;
-	}
-
-	@Override
-	public void handleResponse(IMAPResponse response) {
-		data = response.isOk();
-	}
-
-	@Override
-	public void setDataInitialValue() {
-		data = false;
+		UIDThreadCommand command = new UIDThreadCommand();
+		command.handleResponses(ImmutableList.of(response, response2, response3));
+		
+		assertThat(command.getReceivedData()).hasSize(1);
 	}
 }

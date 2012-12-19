@@ -132,4 +132,22 @@ public class UIDFetchEnvelopeCommandTest {
 		assertThat(envelope.getReplyTo()).isEmpty();
 		assertThat(envelope.getSubject()).isEqualTo("Re: Tu ne m'oublies pas ;-)");
 	}
+	
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		IMAPResponse response = new IMAPResponse("OK", "* 16931 FETCH (FLAGS (Junk) UID 735417)");
+		IMAPResponse response2 = new IMAPResponse("OK", "* 16864 FETCH (UID 735319 ENVELOPE (\"Mon, 17 Dec 2012 10:54:27 +0100\" \"Re: Courrier =?UTF-8?Q?recommand=C3=A9=20-=20Statut=20-=20PV?=\" " +
+				"((NIL NIL \"usera\" \"linagora.com\")) ((NIL NIL \"usera\" \"linagora.com\")) " +
+				"((NIL NIL \"usera\" \"linagora.com\")) ((\"=?UTF-8?Q?Jean-S=C3=A9bastien_Din=C3=A9ty?=\" NIL \"dinety\" \"other.fr\")) " +
+				"((\"User B\" NIL \"userb\" \"linagora.com\")(NIL NIL \"userc\" \"other.fr\")(NIL NIL \"userd\" \"other.fr\")" +
+					"(\"User E\" NIL \"usere\" \"linagora.com\")(\"Administration\" NIL \"administration\" \"linagora.com\")" +
+					"(\"=?UTF-8?Q?userf=C3=A7ois_userf?=\" NIL \"userf.domain\" \"other.fr\")) " +
+				"NIL \"<50CEDB75.80401@other.fr>\" \"<91b86812066230173c396bbf195bbbfd@linagora.com>\"))");
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+		
+		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.singleton(735417));
+		command.handleResponses(ImmutableList.of(response, response2, response3));
+		
+		assertThat(command.getReceivedData()).hasSize(1);
+	}
 }

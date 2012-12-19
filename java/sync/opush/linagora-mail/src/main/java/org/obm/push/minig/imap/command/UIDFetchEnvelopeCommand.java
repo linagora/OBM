@@ -35,9 +35,7 @@ package org.obm.push.minig.imap.command;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -57,6 +55,7 @@ import org.obm.push.minig.imap.mime.impl.ParenListParser.TokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author tom
@@ -64,6 +63,7 @@ import com.google.common.base.Charsets;
  */
 public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
 	private ImapMessageSet imapMessageSet;
 
 	public UIDFetchEnvelopeCommand(MessageSet messages) {
@@ -74,7 +74,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
 		if (!imapMessageSet.isEmpty()) {
-			sb.append("UID FETCH ");
+			sb.append(IMAP_COMMAND);
+			sb.append(" ");
 			sb.append(imapMessageSet.asString());
 			sb.append(" (UID ENVELOPE)");
 		} else {
@@ -86,45 +87,52 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String payload = response.getPayload();
+		if (!payload.contains(" FETCH ")) {
+			logger.warn("not a fetch: {}", payload);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
 		if (imapMessageSet.isEmpty()) {
-			data = Collections.emptyList();
 			return;
 		}
 		
-		if (isOK) {
-			List<UIDEnvelope> tmp = new ArrayList<UIDEnvelope>(imapMessageSet.size());
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < imapMessageSet.size();) {
-				IMAPResponse r = it.next();
-				String payload = r.getPayload();
-				if (!payload.contains(" FETCH")) {
-					logger.warn("not a fetch: {}", payload);
-					continue;
-				}
-				String fullPayload = AtomHelper.getFullResponse(payload, r.getStreamData());
-				long uid = getUid(fullPayload);
-				String envel = getEnvelopePayload(fullPayload);
-
-				try {
-					Envelope envelope = parseEnvelope(envel.getBytes(Charsets.US_ASCII));
-					logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
-					tmp.add( new UIDEnvelope(uid, envelope) );
-				} catch (Throwable t) {
-					logger.error("fail parsing envelope for message UID {}", uid, t);
-					logger.error("Envelope payload in error was : {}", envel);
-					data = Collections.emptyList();
-					return;
-				}
-				i++;
+		try {
+			String payload = response.getPayload();
+			String fullPayload = AtomHelper.getFullResponse(payload, response.getStreamData());
+			long uid = getUid(fullPayload);
+			String envel = getEnvelopePayload(fullPayload);
+			if (envel == null) {
+				return;
 			}
-			data = tmp;
-		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: {}", ok.getPayload());
-			data = Collections.emptyList();
+	
+			List<UIDEnvelope> envelopes = new ArrayList<UIDEnvelope>(imapMessageSet.size());
+			try {
+				Envelope envelope = parseEnvelope(envel.getBytes(Charsets.US_ASCII));
+				logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
+				envelopes.add( new UIDEnvelope(uid, envelope) );
+			} catch (Throwable t) {
+				logger.error("fail parsing envelope for message UID {}", uid, t);
+				logger.error("Envelope payload in error was : {}", envel);
+				return;
+			}
+			
+			if (data == null || data.isEmpty()) {
+				data = envelopes;
+			} else {
+				data.addAll(envelopes);
+			}
+		} catch (EndingResponseException e) {
 		}
 	}
 
@@ -133,10 +141,20 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 			String longAsString = IMAPParsingTools.getStringHasNumberForField(fullPayload, "UID ");
 			return Long.valueOf(longAsString);
 		} catch(NumberFormatException e) {
-			throw new MailException("Cannot find UID in response : " + fullPayload);
+			if (noEnvelopeResponseAlreadyFound()) {
+				throw new MailException("Cannot find UID in response : " + fullPayload);
+			}
+			throw new EndingResponseException();
 		}
 	}
 	
+	private boolean noEnvelopeResponseAlreadyFound() {
+		if (data.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+
 	@VisibleForTesting String getEnvelopePayload(String fullPayload) {
 		String envelopeStartToken = "ENVELOPE ";
 		int bsIdx = fullPayload.indexOf(envelopeStartToken);
@@ -263,4 +281,8 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		return ret;
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableList.of();
+	}
 }

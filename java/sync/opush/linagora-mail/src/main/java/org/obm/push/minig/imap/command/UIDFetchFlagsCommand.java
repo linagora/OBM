@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.obm.push.mail.MailException;
@@ -49,6 +47,8 @@ import com.google.common.collect.Maps;
 
 public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
+	private final static String IMAP_SUB_COMMAND = "UID FLAGS";
 	private ImapMessageSet imapMessageSet;
 
 	public UIDFetchFlagsCommand(MessageSet messages) {
@@ -60,9 +60,12 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 		StringBuilder sb = new StringBuilder();
 		if (!imapMessageSet.isEmpty()) {
-			sb.append("UID FETCH ");
+			sb.append(IMAP_COMMAND);
+			sb.append(" ");
 			sb.append(imapMessageSet.asString());
-			sb.append(" (UID FLAGS)");
+			sb.append(" (");
+			sb.append(IMAP_SUB_COMMAND);
+			sb.append(")");
 		} else {
 			sb.append("NOOP");
 		}
@@ -72,47 +75,49 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
-		if (imapMessageSet.isEmpty()) {
-			data = ImmutableMap.<Long, FlagsList>of();
-			return;
+	public String getImapCommand() {
+		return IMAP_COMMAND + " " + IMAP_SUB_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String payload = response.getPayload();
+		if (payload == null) {
+			return false;
 		}
 		
-		if (isOK) {
-			Map<Long, FlagsList> result = Maps.newTreeMap();
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; i < rs.size() - 1; i++) {
-				IMAPResponse r = it.next();
-				String payload = r.getPayload();
+		int fidx = payload.indexOf("FLAGS (") + "FLAGS (".length();
+		if (fidx == -1 + "FLAGS (".length()) {
+			return false;
+		}
+		return true;
+	}
 
-				int fidx = payload.indexOf("FLAGS (") + "FLAGS (".length();
-				
-				if (fidx == -1 + "FLAGS (".length()) {
-					continue;
-				}
-				
-				int endFlags = payload.indexOf(")", fidx);
-				String flags = "";
-				if (fidx > 0 && endFlags >= fidx) {
-					flags = payload.substring(fidx, endFlags);
-				} else {
-					logger.error("Failed to get flags in fetch response: {}", payload);
-				}
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		Map<Long, FlagsList> result = Maps.newTreeMap();
+		String payload = response.getPayload();
+		int fidx = payload.indexOf("FLAGS (") + "FLAGS (".length();
+		
+		int endFlags = payload.indexOf(")", fidx);
+		String flags = "";
+		if (fidx > 0 && endFlags >= fidx) {
+			flags = payload.substring(fidx, endFlags);
+		} else {
+			logger.error("Failed to get flags in fetch response: {}", payload);
+		}
 
-				long uid = getUid(payload);
-				if (imapMessageSet.contains(uid)) {
-					FlagsList flagsList = new FlagsList();
-					parseFlags(flags, flagsList);
-					result.put(uid, flagsList);
-				}
-			}
+		long uid = getUid(payload);
+		if (imapMessageSet.contains(uid)) {
+			FlagsList flagsList = new FlagsList();
+			parseFlags(flags, flagsList);
+			result.put(uid, flagsList);
+		}
+		
+		if (data == null || data.isEmpty()) {
 			data = result;
 		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: {}", ok.getPayload());
-			data = ImmutableMap.<Long, FlagsList>of();
+			data.putAll(result);
 		}
 	}
 
@@ -144,4 +149,8 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 		}
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableMap.of();
+	}
 }

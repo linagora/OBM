@@ -301,7 +301,7 @@ public class ClientSupport {
 		return run(new UIDFetchFlagsCommand(messages));
 	}
 
-	public InternalDate[] uidFetchInternalDate(Collection<Long> uids) {
+	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
 		return run(new UIDFetchInternalDateCommand(uids));
 	}
 	

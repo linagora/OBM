@@ -40,14 +40,17 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-
+@RunWith(SlowFilterRunner.class)
 public class UIDFetchFlagsCommandTest {
 
 	@Before
@@ -93,5 +96,16 @@ public class UIDFetchFlagsCommandTest {
 		responses.add(new IMAPResponse("OK", null));
 		return responses;
 	}
-
+	
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		IMAPResponse response = new IMAPResponse("OK", "* OK [COPY 23 1 2]");
+		IMAPResponse response2 = new IMAPResponse("OK", "* 98 FETCH (FLAGS (\\Seen) UID 12)");
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+		
+		UIDFetchFlagsCommand command = new UIDFetchFlagsCommand(MessageSet.singleton(12l));
+		command.handleResponses(ImmutableList.of(response, response2, response3));
+		
+		assertThat(command.getReceivedData()).hasSize(1);
+	}
 }

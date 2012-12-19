@@ -201,7 +201,7 @@ public class StoreClient {
 		return cs.uidFetchFlags(messages);
 	}
 	
-	public InternalDate[] uidFetchInternalDate(Collection<Long> uids) {
+	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
 		return cs.uidFetchInternalDate(uids);
 	}
 	

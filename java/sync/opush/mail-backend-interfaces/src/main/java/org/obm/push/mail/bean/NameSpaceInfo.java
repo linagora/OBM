@@ -34,6 +34,7 @@ package org.obm.push.mail.bean;
 import java.util.List;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
 public class NameSpaceInfo {
 	
@@ -47,11 +48,23 @@ public class NameSpaceInfo {
 	public void setPersonal(List<String> personal) {
 		this.personal = personal;
 	}
+	public void addPersonal(List<String> personal) {
+		if (this.personal == null) {
+			this.personal = Lists.newArrayList();
+		}
+		this.personal.addAll(personal);
+	}
 	public List<String> getOtherUsers() {
 		return otherUsers;
 	}
 	public void setOtherUsers(List<String> otherUsers) {
 		this.otherUsers = otherUsers;
+	}
+	public void addOtherUsers(List<String> otherUsers) {
+		if (this.otherUsers == null) {
+			this.otherUsers = Lists.newArrayList();
+		}
+		this.otherUsers.addAll(otherUsers);
 	}
 	public List<String> getMailShares() {
 		return mailShares;
@@ -59,7 +72,19 @@ public class NameSpaceInfo {
 	public void setMailShares(List<String> mailShares) {
 		this.mailShares = mailShares;
 	}
+	public void addMailShares(List<String> mailShares) {
+		if (this.mailShares == null) {
+			this.mailShares = Lists.newArrayList();
+		}
+		this.mailShares.addAll(mailShares);
+	}
 
+	public void addAll(NameSpaceInfo nameSpaceInfo) {
+		addPersonal(nameSpaceInfo.getPersonal());
+		addOtherUsers(nameSpaceInfo.getOtherUsers());
+		addMailShares(nameSpaceInfo.getMailShares());
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).

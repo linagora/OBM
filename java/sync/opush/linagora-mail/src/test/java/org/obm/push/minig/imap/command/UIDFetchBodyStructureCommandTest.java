@@ -31,13 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.command;
 
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 import org.easymock.Capture;
 import org.easymock.CaptureType;
-import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -46,6 +54,8 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
 public class UIDFetchBodyStructureCommandTest {
@@ -64,21 +74,44 @@ public class UIDFetchBodyStructureCommandTest {
 	
 	@Test @Slow
 	public void testHandleResponses() {
-		BodyStructureParser resultCallback = EasyMock.createMock(BodyStructureParser.class);
+		BodyStructureParser resultCallback = createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
-		MimeMessage.Builder mimeMessageBuilder = EasyMock.createNiceMock(MimeMessage.Builder.class);
-		EasyMock.expect(mimeMessageBuilder.uid(EasyMock.anyLong())).andReturn(mimeMessageBuilder);
-		EasyMock.expect(mimeMessageBuilder.size(EasyMock.anyInt())).andReturn(mimeMessageBuilder);
-		EasyMock.expect(resultCallback.parseBodyStructure(EasyMock.capture(result))).andReturn(mimeMessageBuilder);
-		EasyMock.replay(resultCallback, mimeMessageBuilder);
+		MimeMessage.Builder mimeMessageBuilder = createNiceMock(MimeMessage.Builder.class);
+		expect(mimeMessageBuilder.uid(anyLong())).andReturn(mimeMessageBuilder);
+		expect(mimeMessageBuilder.size(anyInt())).andReturn(mimeMessageBuilder);
+		expect(resultCallback.parseBodyStructure(capture(result))).andReturn(mimeMessageBuilder);
+		replay(resultCallback, mimeMessageBuilder);
 		UIDFetchBodyStructureCommand uidFetchBodyStructureCommand = 
 			new UIDFetchBodyStructureCommand(resultCallback, MessageSet.singleton(54l));
 		IMAPResponse response = new IMAPResponse("OK", INPUT_LINE1);
 		response.setStreamData(new ByteArrayInputStream(INPUT_BYTESTREAM.getBytes()));
 		uidFetchBodyStructureCommand.responseReceived(
 				Arrays.asList(response, new IMAPResponse("OK", "")));
-		EasyMock.verify(resultCallback, mimeMessageBuilder);
-		Assert.assertEquals(OUTPUT, result.getValue());
+		verify(resultCallback, mimeMessageBuilder);
+		assertThat(result.getValue()).isEqualTo(OUTPUT);
 	}
-
+	
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		BodyStructureParser resultCallback = createMock(BodyStructureParser.class);
+		Capture<String> result = new Capture<String>(CaptureType.FIRST);
+		MimeMessage.Builder mimeMessageBuilder = createNiceMock(MimeMessage.Builder.class);
+		expect(mimeMessageBuilder.uid(anyLong())).andReturn(mimeMessageBuilder);
+		expect(mimeMessageBuilder.size(anyInt())).andReturn(mimeMessageBuilder);
+		expect(resultCallback.parseBodyStructure(capture(result))).andReturn(mimeMessageBuilder);
+		replay(resultCallback, mimeMessageBuilder);
+		
+		UIDFetchBodyStructureCommand uidFetchBodyStructureCommand = 
+				new UIDFetchBodyStructureCommand(resultCallback, MessageSet.singleton(54l));
+		IMAPResponse response = new IMAPResponse("OK", "* 16931 FETCH (FLAGS (Junk) UID 735417)");
+		IMAPResponse response2 = new IMAPResponse("OK", INPUT_LINE1);
+		response2.setStreamData(new ByteArrayInputStream(INPUT_BYTESTREAM.getBytes()));
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+		
+		uidFetchBodyStructureCommand.responseReceived(ImmutableList.of(response, response2, response3));
+		
+		verify(resultCallback, mimeMessageBuilder);
+		assertThat(result.getValue()).isEqualTo(OUTPUT);
+		assertThat(uidFetchBodyStructureCommand.getReceivedData()).hasSize(1);
+	}
 }

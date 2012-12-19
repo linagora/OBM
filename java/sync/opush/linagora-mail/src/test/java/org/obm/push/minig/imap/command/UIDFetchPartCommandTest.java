@@ -29,84 +29,54 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.minig.imap.command;
 
-import java.util.LinkedList;
-import java.util.List;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.MailThread;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteStreams;
 
-public class UIDThreadCommand extends Command<List<MailThread>> {
-
-	private final static String IMAP_COMMAND = "UID THREAD REFERENCES UTF-8 NOT DELETED";
+@RunWith(SlowFilterRunner.class)
+public class UIDFetchPartCommandTest {
 	
-	@Override
-	protected CommandArgument buildCommand() {
-		CommandArgument args = new CommandArgument(IMAP_COMMAND, null);
-		return args;
-	}
-
-	@Override
-	public String getImapCommand() {
-		return IMAP_COMMAND;
-	}
-
-	@Override
-	public boolean isMatching(IMAPResponse response) {
-		if (!response.getPayload().startsWith("* THREAD ")) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public void handleResponse(IMAPResponse response) {
-		parseParenList(response.getPayload().substring("* THREAD ".length()));
-		logger.debug("extracted {} threads", data.size());
-	}
-
-	private void parseParenList(String substring) {
-		int parentCnt = 0;
-		MailThread m = new MailThread();
-		StringBuilder sb = new StringBuilder();
-		for (char c : substring.toCharArray()) {
-			if (c == '(') {
-				if (parentCnt == 0) {
-					m = new MailThread();
-				}
-				parentCnt++;
-			} else if (c == ')') {
-				parentCnt--;
-				if (sb.length() > 0) {
-					sb = addUid(m, sb);
-				}
-				if (m.size() > 0 && parentCnt == 0) {
-					if (data == null || data.isEmpty()) {
-						data = new LinkedList<MailThread>();
-					}
-					data.add(m);
-				}
-			} else if (Character.isDigit(c)) {
-				sb.append(c);
-			} else if (sb.length() > 0) {
-				sb = addUid(m, sb);
-			}
-		}
-	}
-
-	private StringBuilder addUid(MailThread m, StringBuilder sb) {
-		long l = Long.parseLong(sb.toString());
-		m.add(l);
-		sb = new StringBuilder();
-		return sb;
-	}
-
-	@Override
-	public void setDataInitialValue() {
-		data = ImmutableList.of();
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() throws IOException {
+		IMAPResponse response = new IMAPResponse("OK", "* OK [COPY 23 1 2]");
+		IMAPResponse response2 = new IMAPResponse("OK", "* 1 FETCH (UID 738 BODY[HEADER] {688}");
+		String streamData =
+			"Return-Path: <userb@antoine.org>" +
+			"Received: from debian.antoine.org (localhost [127.0.0.1])" +
+			"	 by debian (Cyrus v2.4.16-Debian-2.4.16-2~obm60+1) with LMTPA;" +
+			"	 Fri, 14 Dec 2012 10:56:18 +0100" +
+			"X-Sieve: CMU Sieve 2.4" +
+			"Received: from [127.0.1.1] (localhost [127.0.0.1])" +
+			"	by debian.antoine.org (Postfix) with ESMTP id 282F83C5B3" +
+			"	for <usera@antoine.org>; Fri, 14 Dec 2012 10:56:18 +0100 (CET)" +
+			"MIME-Version: 1.0" +
+			"From: userb@antoine.org" +
+			"Subject: Test" +
+			"Date: Fri, 14 Dec 2012 10:46:28 +0100" +
+			"To: \"usera@antoine.org\" <usera@antoine.org>" +
+			"Content-Type: multipart/alternative;" +
+			"	boundary=\"_7BCFA324-AD66-0AD4-44B3-CB2D2FF20425_\"" +
+			"Message-Id: <20121214095618.282F83C5B3@debian.antoine.org>" +
+			"";
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(new String(streamData + ")").getBytes());
+		response2.setStreamData(inputStream);
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+		
+		UIDFetchPartCommand command = new UIDFetchPartCommand(12, "HEADER");
+		command.handleResponses(ImmutableList.of(response, response2, response3));
+		
+		assertThat(ByteStreams.toByteArray(command.getReceivedData()))
+			.isEqualTo(streamData.getBytes());
 	}
 }

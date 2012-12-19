@@ -35,16 +35,18 @@ package org.obm.push.minig.imap.command;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.utils.FileUtils;
 
-import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Bytes;
 
 public class UIDFetchMessageCommand extends Command<InputStream> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
+	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK[]";
 	private long uid;
 
 	public UIDFetchMessageCommand(long uid) {
@@ -53,37 +55,51 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + uid + " (UID BODY.PEEK[])";
+		String cmd = IMAP_COMMAND + " " + uid + " (" + IMAP_SUB_COMMAND + ")";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
-		IMAPResponse stream = rs.get(0);
-		if (isOK && stream.getStreamData() != null) {
-			InputStream in = stream.getStreamData();
-			
+	public String getImapCommand() {
+		return IMAP_COMMAND + " " + IMAP_SUB_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		if (!response.getPayload().contains("BODY[]")) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		InputStream in = response.getStreamData();
+		if (in != null) {
 			// -1 pattern of the day to remove "\0" at end of stream
 			byte[] dest = new byte[0];
 			try {
 				byte[] byteData = FileUtils.streamBytes(in, true);
 				dest = new byte[byteData.length - 1];
 				System.arraycopy(byteData, 0, dest, 0, dest.length);
+				
+				if (data == null) {
+					data = new ByteArrayInputStream(dest);
+				} else {
+					byte[] byteArray = ByteStreams.toByteArray(data);
+					data = new ByteArrayInputStream(Bytes.concat(byteArray, dest));
+				}
 			} catch (IOException e) {
 			}
-			data = new ByteArrayInputStream(dest);
 		} else {
-			if (isOK) {
-				logger.warn("fetch is ok with no stream in response. Printing received responses :");
-				data = new ByteArrayInputStream("".getBytes());
-			} else {
-				logger.error("UIDFetchMessage failed for uid {} : {}", uid, Iterables.getLast(rs).getPayload());
-			}
+			logger.warn("fetch is ok with no stream in response. Printing received responses :");
 			throw new ImapMessageNotFoundException("UIDFetchMessage failed for uid " + uid);
 		}
 	}
-
+	
+	@Override
+	public void setDataInitialValue() {
+		data = new ByteArrayInputStream("".getBytes());
+	}
 }

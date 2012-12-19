@@ -32,14 +32,13 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 public class UIDCopyCommand extends Command<MessageSet> {
 
+	private final static String IMAP_COMMAND = "UID COPY";
 	private ImapMessageSet imapMessageSet;
 	private String destMailbox;
 
@@ -51,7 +50,8 @@ public class UIDCopyCommand extends Command<MessageSet> {
 	@Override
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("UID COPY ");
+		sb.append(IMAP_COMMAND);
+		sb.append(" ");
 		sb.append(imapMessageSet.asString());
 		sb.append(' ');
 		sb.append(toUtf7(destMailbox));
@@ -61,23 +61,28 @@ public class UIDCopyCommand extends Command<MessageSet> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		if (isOK && ok.getPayload().contains("[")) {
-			logger.debug("ok: {}", ok.getPayload());
-			data = parseMessageSet(ok.getPayload());
-		} else {
-			if (isOK) {
-				logger.warn("cyrus did not send [COPYUID ...] token: {}", ok.getPayload());
-			} else {
-				logger.error("error on uid copy: {}", ok.getPayload());
-			}
-			data = MessageSet.empty();
-		}
+	public String getImapCommand() {
+		return IMAP_COMMAND;
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return response.getPayload().contains("[COPY");
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		MessageSet messageSet = parseMessageSet(response.getPayload());
+		if (data == null) {
+			data = messageSet;
+		} else {
+			data = MessageSet.builder()
+					.add(messageSet)
+					.add(data)
+					.build();
+		}
+	}
+	
 	private MessageSet parseMessageSet(String payload) {
 		int idx = payload.lastIndexOf("]");
 		int space = payload.lastIndexOf(" ", idx);
@@ -86,4 +91,8 @@ public class UIDCopyCommand extends Command<MessageSet> {
 		return ImapMessageSet.parseMessageSet(set).getMessageSet();
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = MessageSet.empty();
+	}
 }

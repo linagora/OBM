@@ -32,53 +32,9 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-import java.util.concurrent.Semaphore;
+public class EndingResponseException extends RuntimeException {
 
-import org.apache.mina.common.IoSession;
-import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.TagProducer;
-
-public class StopIdleCommand extends Command<Boolean> {
-
-	private final static String IMAP_COMMAND = "DONE";
-	
-	@Override
-	public void execute(IoSession session, TagProducer tp, Semaphore lock,
-			List<IMAPResponse> lastResponses) {
-		
-		CommandArgument args = buildCommand();
-		String commandString = args.getCommandString();
-		logger.info(commandString);
-		session.write(commandString);
-		lock.release();
-	}
-
-	@Override
-	public void handleResponses(List<IMAPResponse> rs) {}
-
-	@Override
-	protected CommandArgument buildCommand() {
-		return new CommandArgument(IMAP_COMMAND, null);
-	}
-
-	@Override
-	public String getImapCommand() {
-		return IMAP_COMMAND;
-	}
-
-	@Override
-	public boolean isMatching(IMAPResponse response) {
-		return true;
-	}
-
-	@Override
-	public void handleResponse(IMAPResponse response) {
-		data = response.isOk();
-	}
-
-	@Override
-	public void setDataInitialValue() {
-		data = false;
+	public EndingResponseException() {
+		super();
 	}
 }

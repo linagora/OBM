@@ -33,10 +33,11 @@
 package org.obm.push.minig.imap.command;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
+
+import com.google.common.collect.Sets;
 
 public class CapabilityCommand extends SimpleCommand<Set<String>> {
 
@@ -44,14 +45,28 @@ public class CapabilityCommand extends SimpleCommand<Set<String>> {
 		super("CAPABILITY");
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		data = new HashSet<String>();
-		String[] parts = rs.get(0).getPayload().split(" ");
+	public void handleResponse(IMAPResponse response) {
+		Set<String> partsSet = Sets.newHashSet();
+		String[] parts = response.getPayload().split(" ");
 		for (int i = 2; i < parts.length; i++) {
-			data.add(parts[i]);
+			partsSet.add(parts[i]);
+		}
+		
+		if (data == null) {
+			data = partsSet;
+		} else {
+			data.addAll(partsSet);
 		}
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = new HashSet<String>();
+	}
 }

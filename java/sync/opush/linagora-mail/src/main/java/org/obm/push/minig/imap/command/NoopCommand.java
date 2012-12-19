@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class NoopCommand extends SimpleCommand<Boolean> {
@@ -43,9 +41,17 @@ public class NoopCommand extends SimpleCommand<Boolean> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		IMAPResponse ok = rs.get(rs.size() - 1);
-		data = ok.isOk();
+	public boolean isMatching(IMAPResponse response) {
+		return true;
 	}
 
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

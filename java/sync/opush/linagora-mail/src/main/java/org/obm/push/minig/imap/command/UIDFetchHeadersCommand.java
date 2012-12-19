@@ -38,8 +38,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.minig.imap.command.parser.HeadersParser;
@@ -48,8 +46,12 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
+import com.google.common.collect.ImmutableList;
+
 public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
+	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK[HEADER.FIELDS";
 	private ImapMessageSet imapMessageSet;
 	private String[] headers;
 
@@ -63,9 +65,12 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 	protected CommandArgument buildCommand() {
 		StringBuilder sb = new StringBuilder();
 		if (!imapMessageSet.isEmpty()) {
-			sb.append("UID FETCH ");
+			sb.append(IMAP_COMMAND);
+			sb.append(" ");
 			sb.append(imapMessageSet.asString());
-			sb.append(" (UID BODY.PEEK[HEADER.FIELDS (");
+			sb.append(" (");
+			sb.append(IMAP_SUB_COMMAND);
+			sb.append(" (");
 			for (int i = 0; i < headers.length; i++) {
 				if (i > 0) {
 					sb.append(" ");
@@ -82,62 +87,62 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
-		if (imapMessageSet.isEmpty()) {
-			data = Collections.emptyList();
-			return;
-		}
-		
-		if (isOK) {
-			data = new ArrayList<IMAPHeaders>(imapMessageSet.size());
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < imapMessageSet.size(); ) {
-				IMAPResponse r = it.next();
-				String payload = r.getPayload();
-				if (!payload.contains(" FETCH")) {
-					logger.warn("not a fetch: {}", payload);
-					continue;
-				}
-				int uidIdx = payload.indexOf("(UID ") + "(UID ".length();
-				int endUid = payload.indexOf(' ', uidIdx);
-				String uidStr = payload.substring(uidIdx, endUid);
-				long uid = 0;
-				try {
-					uid = Long.parseLong(uidStr);
-				} catch (NumberFormatException nfe) {
-					logger.error("cannot parse uid for string '{}' (payload: {})", uid, payload);
-					continue;
-				}
-
-				Map<String, String> rawHeaders = Collections.emptyMap();
-
-				InputStream in = r.getStreamData();
-				if (in != null) {
-					try {
-						InputStreamReader reader = new InputStreamReader(in);
-						rawHeaders = new HeadersParser().parseRawHeaders(reader);
-					} catch (IOException e) {
-						logger.error("Error reading headers stream", e);
-					} catch (Throwable t) {
-						logger.error("error parsing headers stream", t);
-					}
-				} else {
-					// cyrus search command can return uid's that no longer exist in the mailbox
-					logger.warn("cyrus did not return any header for uid {}", uid);
-				}
-
-				IMAPHeaders imapHeaders = new IMAPHeaders();
-				imapHeaders.setRawHeaders(rawHeaders);
-				data.add(imapHeaders);
-				i++;
-			}
-		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: " + ok.getPayload());
-			data = Collections.emptyList();
-		}
+	public String getImapCommand() {
+		return IMAP_COMMAND + " " +IMAP_SUB_COMMAND;
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String payload = response.getPayload();
+		if (!payload.contains("[HEADER.FIELDS")) {
+			logger.warn("not a fetch: {}", payload);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		String payload = response.getPayload();
+		int uidIdx = payload.indexOf("(UID ") + "(UID ".length();
+		int endUid = payload.indexOf(' ', uidIdx);
+		String uidStr = payload.substring(uidIdx, endUid);
+		long uid = 0;
+		try {
+			uid = Long.parseLong(uidStr);
+		} catch (NumberFormatException nfe) {
+			logger.error("cannot parse uid for string '{}' (payload: {})", uid, payload);
+			return;
+		}
+
+		Map<String, String> rawHeaders = Collections.emptyMap();
+
+		InputStream in = response.getStreamData();
+		if (in != null) {
+			try {
+				InputStreamReader reader = new InputStreamReader(in);
+				rawHeaders = new HeadersParser().parseRawHeaders(reader);
+			} catch (IOException e) {
+				logger.error("Error reading headers stream", e);
+			} catch (Throwable t) {
+				logger.error("error parsing headers stream", t);
+			}
+		} else {
+			// cyrus search command can return uid's that no longer exist in the mailbox
+			logger.warn("cyrus did not return any header for uid {}", uid);
+		}
+
+		IMAPHeaders imapHeaders = new IMAPHeaders();
+		imapHeaders.setRawHeaders(rawHeaders);
+		
+		if (data == null || data.isEmpty()) {
+			data = new ArrayList<IMAPHeaders>(imapMessageSet.size());
+		}
+		data.add(imapHeaders);
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableList.of();
+	}
 }

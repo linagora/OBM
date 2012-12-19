@@ -32,7 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,27 +40,35 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class QuotaRootCommand extends SimpleCommand<QuotaInfo> {
 
+	private final static Pattern pattern = Pattern.compile("\\* QUOTA .* \\(STORAGE ");
+	
 	public QuotaRootCommand(String mailbox) {
 		super("GETQUOTAROOT " + toUtf7(mailbox));
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
+	public boolean isMatching(IMAPResponse response) {
+		Matcher m = pattern.matcher(response.getPayload());
+		if (m.find()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
 		data = new QuotaInfo();
-		if (isOk(rs)) {
-			Pattern p = Pattern.compile("\\* QUOTA .* \\(STORAGE ");
-			for (IMAPResponse imapr : rs) {
-				Matcher m = p.matcher(imapr.getPayload());
-				if (m.find()) {
-					String rep = m.replaceAll("").replaceAll("\\)", "");
-					String[] tab = rep.split(" ");
-					if (tab.length == 2) {
-						data = new QuotaInfo(Integer.parseInt(tab[0]), Integer
-								.parseInt(tab[1]));
-					}
-				}
-			}
+		Matcher m = pattern.matcher(response.getPayload());
+		String rep = m.replaceAll("").replaceAll("\\)", "");
+		String[] tab = rep.split(" ");
+		if (tab.length == 2) {
+			data = new QuotaInfo(Integer.parseInt(tab[0]), Integer
+					.parseInt(tab[1]));
 		}
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = new QuotaInfo();
+	}
 }

@@ -35,7 +35,6 @@ package org.obm.push.minig.imap.command;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.minig.imap.CommandIOException;
@@ -44,6 +43,7 @@ import org.obm.push.utils.FileUtils;
 
 public class AppendCommand extends Command<Boolean> {
 
+	private final static String IMAP_COMMAND = "APPEND";
 	private InputStream in;
 	private String mailbox;
 	private FlagsList flags;
@@ -55,9 +55,15 @@ public class AppendCommand extends Command<Boolean> {
 	}
 
 	@Override
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
+	
+	@Override
 	protected CommandArgument buildCommand() {
 		StringBuilder cmd = new StringBuilder(50);
-		cmd.append("APPEND ");
+		cmd.append(IMAP_COMMAND);
+		cmd.append(" ");
 		cmd.append(toUtf7(mailbox));
 		cmd.append(" ");
 		if (!flags.isEmpty()) {
@@ -82,9 +88,17 @@ public class AppendCommand extends Command<Boolean> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		IMAPResponse r = rs.get(rs.size() - 1);
-		data = r.isOk();
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+	
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

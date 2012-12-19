@@ -29,56 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-import java.util.concurrent.Semaphore;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.apache.mina.common.IoSession;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.impl.TagProducer;
 
-public class StopIdleCommand extends Command<Boolean> {
+import com.google.common.collect.ImmutableList;
 
-	private final static String IMAP_COMMAND = "DONE";
+@RunWith(SlowFilterRunner.class)
+public class UIDFetchFastCommandTest {
 	
-	@Override
-	public void execute(IoSession session, TagProducer tp, Semaphore lock,
-			List<IMAPResponse> lastResponses) {
+	@Test
+	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
+		IMAPResponse response = new IMAPResponse("OK", "* 16931 FETCH (FLAGS (Junk) UID 735417)");
+		IMAPResponse response2 = new IMAPResponse("OK", "* 1 FETCH (FLAGS (\\Seen) UID 738 INTERNALDATE \"14-Dec-2012 10:56:18 +0100\" RFC822.SIZE 1321)");
+		IMAPResponse response3 = new IMAPResponse("OK", "");
+
+		UIDFetchFastCommand command = new UIDFetchFastCommand(MessageSet.singleton(738));
+		command.handleResponses(ImmutableList.of(response, response2, response3));
 		
-		CommandArgument args = buildCommand();
-		String commandString = args.getCommandString();
-		logger.info(commandString);
-		session.write(commandString);
-		lock.release();
-	}
-
-	@Override
-	public void handleResponses(List<IMAPResponse> rs) {}
-
-	@Override
-	protected CommandArgument buildCommand() {
-		return new CommandArgument(IMAP_COMMAND, null);
-	}
-
-	@Override
-	public String getImapCommand() {
-		return IMAP_COMMAND;
-	}
-
-	@Override
-	public boolean isMatching(IMAPResponse response) {
-		return true;
-	}
-
-	@Override
-	public void handleResponse(IMAPResponse response) {
-		data = response.isOk();
-	}
-
-	@Override
-	public void setDataInitialValue() {
-		data = false;
+		assertThat(command.getReceivedData()).hasSize(1);
 	}
 }

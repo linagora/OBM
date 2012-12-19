@@ -47,4 +47,18 @@ public class SelectCommand extends SimpleCommand<Boolean> {
 		data = isOk(rs);
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

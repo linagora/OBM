@@ -32,8 +32,6 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 
@@ -43,9 +41,17 @@ public class ExpungeCommand extends SimpleCommand<Object>{
 		super("EXPUNGE");
 	}
 
-	
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
+	public boolean isMatching(IMAPResponse response) {
+		return true;
 	}
-	
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

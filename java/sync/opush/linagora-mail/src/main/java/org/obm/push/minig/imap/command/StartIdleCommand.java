@@ -38,13 +38,33 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 
 public class StartIdleCommand extends Command<Boolean> {
 
+	private final static String IMAP_COMMAND = "IDLE";
+	
 	@Override
 	public void handleResponses(List<IMAPResponse> rs) {}
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "IDLE";
-		return new CommandArgument(cmd, null);
+		return new CommandArgument(IMAP_COMMAND, null);
+	}
+	
+	@Override
+	public String getImapCommand() {
+		return IMAP_COMMAND;
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		data = response.isOk();
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }

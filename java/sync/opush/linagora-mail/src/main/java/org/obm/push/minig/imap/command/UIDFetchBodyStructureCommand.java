@@ -33,8 +33,6 @@
 package org.obm.push.minig.imap.command;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,10 +44,15 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
+import com.google.common.collect.ImmutableList;
+
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
 	private ImapMessageSet imapMessageSet;
 	private final BodyStructureParser bodyStructureParser;
+	private String fullresponse;
+	private String bodyStructure;
 
 	public UIDFetchBodyStructureCommand(BodyStructureParser bodyStructureParser, MessageSet messages) {
 		this.bodyStructureParser = bodyStructureParser;
@@ -58,50 +61,54 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + imapMessageSet.asString() + " (UID RFC822.SIZE BODYSTRUCTURE)";
+		String cmd = IMAP_COMMAND + " " + imapMessageSet.asString() + " (UID RFC822.SIZE BODYSTRUCTURE)";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		if (isOk(rs)) {
-			List<MimeMessage> mts = new LinkedList<MimeMessage>();
-			Iterator<IMAPResponse> it = rs.iterator();
-			int len = rs.size() - 1;
-			for (int i = 0; i < len; i++) {
-				IMAPResponse ir = it.next();
-				String s = AtomHelper.getFullResponse(ir.getPayload(), ir.getStreamData());
-				
-				String bs = getBodyStructurePayload(s);
-				if (bs == null) {
-					continue;
-				}
-				
-				if (bs.length() < 2) {
-					logger.warn("strange bs response: {}", s);
-					continue;
-				}
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
 
-				long uid = getUid(s);
-				int size = getSize(s);
-				
-				try {
-					//remove closing brace
-					MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bs);
-					messageBuilder.uid(uid).size(size);
-					mts.add(messageBuilder.build());
-				} catch (RuntimeException re) {
-					logger.error("error parsing:\n{}", new String(s));
-					logger.error("payload was:\n{}", s);
-					throw re;
-				}
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		fullresponse = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		
+		bodyStructure = getBodyStructurePayload(fullresponse);
+		if (bodyStructure == null) {
+			return false;
+		}
+		
+		if (bodyStructure.length() < 2) {
+			logger.warn("strange bs response: {}", fullresponse);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		List<MimeMessage> mts = new LinkedList<MimeMessage>();
+		
+		long uid = getUid(fullresponse);
+		int size = getSize(fullresponse);
+		
+		try {
+			//remove closing brace
+			MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bodyStructure);
+			messageBuilder.uid(uid).size(size);
+			mts.add(messageBuilder.build());
+			
+			if (data == null || data.isEmpty()) {
+				data = mts;
+			} else {
+				data.addAll(mts);
 			}
-			data = mts;
-		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("bodystructure failed : {}", ok.getPayload());
-			data = Collections.emptyList();
+		} catch (RuntimeException re) {
+			logger.error("error parsing:\n{}", new String(fullresponse));
+			logger.error("payload was:\n{}", fullresponse);
+			throw re;
 		}
 	}
 
@@ -128,5 +135,9 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 		String content = fullPayload.substring(contentStart);
 		return IMAPParsingTools.substringFromOpeningToClosingBracket(content);
 	}
-	
+
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableList.of();
+	}
 }

@@ -34,8 +34,6 @@ package org.obm.push.minig.imap.command;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 import org.obm.push.mail.bean.MessageSet;
@@ -48,6 +46,7 @@ public class UIDSearchCommand extends Command<MessageSet> {
 
 	// Mon, 7 Feb 1994 21:52:25 -0800
 
+	private final static String IMAP_COMMAND = "UID SEARCH";
 	private SearchQuery sq;
 
 	public UIDSearchCommand(SearchQuery sq) {
@@ -56,7 +55,7 @@ public class UIDSearchCommand extends Command<MessageSet> {
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID SEARCH";
+		String cmd = IMAP_COMMAND;
 		if (!sq.isMatchDeleted()) {
 			cmd += " NOT DELETED";
 		}
@@ -74,33 +73,41 @@ public class UIDSearchCommand extends Command<MessageSet> {
 		return args;
 	}
 
+
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		data = MessageSet.empty();
-
-		if (isOK) {
-			String uidString = null;
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int j = 0; j < rs.size() - 1; j++) {
-				String resp = it.next().getPayload();
-				if (resp.startsWith("* SEARCH ")) {
-					uidString = resp;
-					break;
-				}
-			}
-
-			if (uidString != null) {
-				// 9 => '* SEARCH '.length
-				String uidList = uidString.substring(9);
-				Iterable<String> uids = Splitter.on(' ').omitEmptyStrings().split(uidList);
-				MessageSet.Builder builder = MessageSet.builder();
-				for (String uid : uids) {
-					builder.add(Long.valueOf(uid));
-				}
-				data = builder.build();
-			}
-		}
+	public String getImapCommand() {
+		return IMAP_COMMAND;
 	}
 
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		if (!response.getPayload().startsWith("* SEARCH ")) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		String uidString = response.getPayload();
+		
+		// 9 => '* SEARCH '.length
+		String uidList = uidString.substring(9);
+		Iterable<String> uids = Splitter.on(' ').omitEmptyStrings().split(uidList);
+		MessageSet.Builder builder = MessageSet.builder();
+		for (String uid : uids) {
+			builder.add(Long.valueOf(uid));
+		}
+		
+		if (data == null) {
+			data = builder.build();
+		} else {
+			data = builder.add(data).build();
+		}
+	}
+	
+	@Override
+	public void setDataInitialValue() {
+		data = MessageSet.empty();
+	}
 }

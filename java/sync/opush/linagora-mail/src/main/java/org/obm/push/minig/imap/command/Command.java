@@ -81,6 +81,28 @@ public abstract class Command<T> implements ICommand<T> {
 		handleResponses(lastResponses);
 	}
 	
+	@Override
+	public void handleResponses(List<IMAPResponse> rs) {
+		boolean isOK = isOk(rs);
+		
+		setDataInitialValue();
+		if (isOK) {
+			for (IMAPResponse response : rs) {
+				if (isMatching(response)) {
+					handleResponse(response);
+				}
+			}
+		} else {
+			IMAPResponse ok = rs.get(rs.size() - 1);
+			logger.warn("error on {}: {}", getImapCommand(), ok.getPayload());
+		}
+	}
+
+	@Override
+	public void setDataInitialValue() {
+		data = null;
+	}
+	
 	private void lock(Semaphore lock) {
 		try {
 			lock.acquire();

@@ -36,14 +36,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Bytes;
 
 public class UIDFetchPartCommand extends Command<InputStream> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
+	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK";
 	private long uid;
 	private String section;
 	private final Long truncation;
@@ -60,11 +62,11 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = "UID FETCH " + uid + " (UID BODY.PEEK[" + section + "]" + truncation() + ")";
+		String cmd = IMAP_COMMAND + " " + uid + " (" + IMAP_SUB_COMMAND + "[" + section + "]" + truncation() + ")";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
 	}
-
+	
 	private String truncation() {
 		if (truncation != null) {
 			return "<0."+truncation+">";
@@ -74,30 +76,43 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
-		IMAPResponse stream = rs.get(0);
-		if (isOK && stream.getStreamData() != null) {
+	public String getImapCommand() {
+		return IMAP_COMMAND + " " + IMAP_SUB_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		if (response.getStreamData() != null) {
 			try {
-				byte[] rawData = ByteStreams.toByteArray(stream.getStreamData());
+				byte[] rawData = ByteStreams.toByteArray(response.getStreamData());
 				if (rawData[rawData.length - 1] == ')') {
 					rawData = Arrays.copyOf(rawData, rawData.length - 1);
 				}
 				
-				data = new ByteArrayInputStream(rawData);
+				if (data == null) {
+					data = new ByteArrayInputStream(rawData);
+				} else {
+					byte[] byteArray = ByteStreams.toByteArray(data);
+					data = new ByteArrayInputStream(Bytes.concat(byteArray, rawData));
+				}
 			}
 			catch (IOException e) {
 				logger.error("Error reading response stream", e);
 			}
 		} else {
-			if (isOK) {
+			if (data == null) {
 				data = new ByteArrayInputStream("[empty]".getBytes());
-			} else {
-				IMAPResponse ok = rs.get(rs.size() - 1);
-				logger.warn("Fetch of part {} in uid {} failed", new Object[] {section, uid, ok.getPayload()});
 			}
 		}
 	}
-
+	
+	@Override
+	public void setDataInitialValue() {
+		data = new ByteArrayInputStream("".getBytes());
+	}
 }

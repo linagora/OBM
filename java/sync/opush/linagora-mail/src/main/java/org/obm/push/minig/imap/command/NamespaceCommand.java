@@ -32,14 +32,11 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.util.List;
-
 import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.minig.imap.command.parser.NamespaceParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.RecoveringParseRunner;
-import org.parboiled.support.ParsingResult;
 
 public class NamespaceCommand extends SimpleCommand<NameSpaceInfo> {
 
@@ -50,23 +47,24 @@ public class NamespaceCommand extends SimpleCommand<NameSpaceInfo> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		if (isOk(rs)) {
-			IMAPResponse nsr = lookForResponse(rs);
-			NamespaceParser parserInstance = parser.newInstance();
-			RecoveringParseRunner<NameSpaceInfo> runner = new RecoveringParseRunner<NameSpaceInfo>(parserInstance.rule());
-			ParsingResult<NameSpaceInfo> result = runner.run(nsr.getPayload());
-			data = result.resultValue;
+	public boolean isMatching(IMAPResponse response) {
+		if (response.getPayload().startsWith(NamespaceParser.expectedResponseStart)) {
+			return true;
 		}
+		return false;
 	}
 
-	private IMAPResponse lookForResponse(List<IMAPResponse> rs) {
-		for (IMAPResponse ir : rs) {
-			if (ir.getPayload().startsWith(NamespaceParser.expectedResponseStart)) {
-				return ir;
-			}
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		NamespaceParser parserInstance = parser.newInstance();
+		RecoveringParseRunner<NameSpaceInfo> runner = new RecoveringParseRunner<NameSpaceInfo>(parserInstance.rule());
+		NameSpaceInfo nameSpaceInfo = runner.run(response.getPayload()).resultValue;
+		
+		if (data == null) {
+			data = nameSpaceInfo;
+		} else {
+			data.addAll(nameSpaceInfo);
 		}
-		return null;
 	}
 
 }

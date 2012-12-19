@@ -38,7 +38,6 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.minig.imap.command.UIDStoreCommand;
 
 import com.google.common.collect.ImmutableList;
 

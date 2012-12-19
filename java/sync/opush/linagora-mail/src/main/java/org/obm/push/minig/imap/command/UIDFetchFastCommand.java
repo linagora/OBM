@@ -38,8 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -50,7 +48,7 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Sets;
 
 /**
  * FAST
@@ -58,6 +56,7 @@ import com.google.common.collect.ImmutableSet.Builder;
  */
 public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 
+	private final static String IMAP_COMMAND = "UID FETCH";
 	private ImapMessageSet imapMessageSet;
 	DateFormat df;
 
@@ -72,7 +71,8 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 
 		StringBuilder sb = new StringBuilder();
 		if (!imapMessageSet.isEmpty()) {
-			sb.append("UID FETCH ");
+			sb.append(IMAP_COMMAND);
+			sb.append(" ");
 			sb.append(imapMessageSet.asString());
 			sb.append(" (FLAGS INTERNALDATE RFC822.SIZE)");
 		} else {
@@ -84,42 +84,41 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 	}
 
 	@Override
-	public void handleResponses(List<IMAPResponse> rs) {
-		boolean isOK = isOk(rs);
-		
-		if (imapMessageSet.isEmpty()) {
-			data = ImmutableSet.of();
-			return;
+	public String getImapCommand() {
+		return IMAP_COMMAND;
+	}
+
+	@Override
+	public boolean isMatching(IMAPResponse response) {
+		String payload = response.getPayload();
+		if (!payload.contains(" FETCH (") || !payload.contains("FLAGS") 
+				|| !payload.contains("INTERNALDATE") || !payload.contains("SIZE")) {
+			logger.debug("not a fetch: {}", payload);
+			return false;
 		}
+		return true;
+	}
+
+	@Override
+	public void handleResponse(IMAPResponse response) {
+		FastFetch.Builder builder = FastFetch.builder();
+		String payload = response.getPayload();
 		
-		Builder<FastFetch> buildSet = ImmutableSet.builder();
-		if (isOK) {
-			Iterator<IMAPResponse> it = rs.iterator();
-			for (int i = 0; it.hasNext() && i < imapMessageSet.size(); ) {
-				org.obm.push.mail.bean.FastFetch.Builder builder = FastFetch.builder();
-				IMAPResponse r = it.next();
-				String payload = r.getPayload();
-				if (!payload.contains(" FETCH (")) {
-					logger.debug("not a fetch: {}", payload);
-					continue;
-				}
-				
-				builder.uid(getUid(payload));
-				Date internalDate = getInternalDate(payload);
-				if (internalDate == null) {
-					logger.error("Failed to get internaldate in fetch response: {}", payload);
-				}
-				builder.internalDate(internalDate);
-				builder.flags(getFlags(payload));
-				builder.size(getSize(payload));
-				buildSet.add(builder.build());
-			}
+		builder.uid(getUid(payload));
+		Date internalDate = getInternalDate(payload);
+		if (internalDate == null) {
+			logger.error("Failed to get internaldate in fetch response: {}", payload);
+		}
+		builder.internalDate(internalDate);
+		builder.flags(getFlags(payload));
+		builder.size(getSize(payload));
+		
+		if (data == null || data.isEmpty()) {
+			data = Sets.newLinkedHashSet();
+			data.add(builder.build());
 		} else {
-			IMAPResponse ok = rs.get(rs.size() - 1);
-			logger.warn("error on fetch: {}", ok.getPayload());
+			data.add(builder.build());
 		}
-		
-		data = buildSet.build();
 	}
 
 	private int getSize(String payload) {
@@ -201,4 +200,8 @@ public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 		return flagsList;
 	}
 	
+	@Override
+	public void setDataInitialValue() {
+		data = ImmutableSet.of();
+	}
 }

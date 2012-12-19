@@ -32,6 +32,7 @@
 
 package org.obm.push.minig.imap.command;
 
+
 public abstract class SimpleCommand<T> extends Command<T> {
 
 	private String command;
@@ -44,4 +45,8 @@ public abstract class SimpleCommand<T> extends Command<T> {
 		return new CommandArgument(command, null);
 	}
 
+	@Override
+	public String getImapCommand() {
+		return command;
+	}
 }
