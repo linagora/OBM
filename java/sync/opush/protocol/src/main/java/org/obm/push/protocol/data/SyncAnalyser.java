@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.util.Map;
-
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
@@ -57,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -71,23 +68,17 @@ public class SyncAnalyser {
 	
 	private final CollectionDao collectionDao;
 	private final SyncedCollectionDao syncedCollectionStoreService;
-	private final Map<PIMDataType, IDataDecoder> decoders;
-
 	private final CollectionPathHelper collectionPathHelper;
+	private final DecoderFactory decoderFactory;
 
 	@Inject
 	protected SyncAnalyser(SyncedCollectionDao syncedCollectionStoreService,
 			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper,
-			Base64ASTimeZoneDecoder base64AsTimeZoneDecoder, ASTimeZoneConverter asTimeZoneConverter) {
+			DecoderFactory decoderFactory) {
 		this.collectionDao = collectionDao;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;
 		this.collectionPathHelper = collectionPathHelper;
-		this.decoders = ImmutableMap.<PIMDataType, IDataDecoder>builder()
-				.put(PIMDataType.CONTACTS, new ContactDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.CALENDAR, new CalendarDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.EMAIL, new MSEmailMetadataDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
-				.put(PIMDataType.TASKS, new TaskDecoder(base64AsTimeZoneDecoder, asTimeZoneConverter))
-				.build();
+		this.decoderFactory = decoderFactory;
 	}
 
 	public Sync analyseSync(UserDataRequest userDataRequest, SyncRequest syncRequest) 
@@ -188,25 +179,15 @@ public class SyncAnalyser {
 		String clientId = command.getClientId();
 		Element syncData = command.getApplicationData();
 		
-		IDataDecoder dd = getDecoder(collection.getDataType());
-		IApplicationData data = null;
-		if (dd != null) {
-			if (syncData != null) {
-				data = dd.decode(syncData);
-			}
-		} else {
-			logger.error("no decoder for " + collection.getDataType());
-			if (modType.equals("Fetch")) {
-				logger.info("adding id to fetch " + serverId);
-				collection.getFetchIds().add(serverId);
-			}
+		IApplicationData data = decode(syncData, collection.getDataType());
+		if (data == null) {
+			logger.error("Decoding failed for " + collection.getDataType());
 		}
-		return new SyncCollectionChange(serverId, clientId, modType, data,
-				collection.getDataType());
+		return new SyncCollectionChange(serverId, clientId, modType, data, collection.getDataType());
 	}
 
-	protected IDataDecoder getDecoder(PIMDataType dataClass) {
-		return decoders.get(dataClass);
+	protected IApplicationData decode(Element data, PIMDataType dataType) {
+		return decoderFactory.decode(data, dataType);
 	}
 
 }

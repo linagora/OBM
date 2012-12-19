@@ -78,8 +78,9 @@ import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
-import org.obm.push.protocol.data.ASTimeZoneConverter;
-import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;
+import org.obm.push.protocol.data.ContactDecoder;
+import org.obm.push.protocol.data.DecoderFactory;
+import org.obm.push.protocol.data.MSEmailMetadataDecoder;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.protocol.data.SyncEncoder;
@@ -91,6 +92,7 @@ import org.w3c.dom.Document;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncProtocolTest {
@@ -1355,7 +1357,7 @@ public class SyncProtocolTest {
 			CollectionPathHelper collectionPathHelper) {
 		SyncDecoder syncDecoder = new SyncDecoderTest();
 		SyncEncoder syncEncoder = new SyncEncoderTest();
-		SyncAnalyser syncAnalyser = new SyncAnalyserTest(syncedCollectionDao, collectionDao, collectionPathHelper, null, null);
+		SyncAnalyser syncAnalyser = new SyncAnalyserTest(syncedCollectionDao, collectionDao, collectionPathHelper);
 		return new SyncProtocol(syncDecoder, syncAnalyser, syncEncoder, null, udr);
 	}
 
@@ -1471,13 +1473,24 @@ public class SyncProtocolTest {
 		protected SyncAnalyserTest(
 				SyncedCollectionDao syncedCollectionStoreService,
 				CollectionDao collectionDao,
-				CollectionPathHelper collectionPathHelper,
-				Base64ASTimeZoneDecoder base64AsTimeZoneDecoder,
-				ASTimeZoneConverter asTimeZoneConverter) {
+				CollectionPathHelper collectionPathHelper) {
 			super(syncedCollectionStoreService, collectionDao, collectionPathHelper,
-					base64AsTimeZoneDecoder, asTimeZoneConverter);
-		}
-		
+					new DecoderFactory(
+							null, new Provider<ContactDecoder>() {
+								@Override
+								public ContactDecoder get() {
+									return new ContactDecoder(null, null);
+								}
+							},
+							null, new Provider<MSEmailMetadataDecoder>() {
+								@Override
+								public MSEmailMetadataDecoder get() {
+									return new MSEmailMetadataDecoder(null, null);
+								}
+							}) {}
+				);
+			}
+
 	}
 	
 }
