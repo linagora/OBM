@@ -88,6 +88,8 @@ ln -s /etc/solr/conf/contact /var/solr/contact/conf
 
 
 %changelog
+* Wed Dec 19 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-solr-2.4.2.0-0.beta6
+- New upstream release.
 * Tue Dec 18 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-solr-2.4.2.0-0.beta5
 - New upstream release.
 * Mon Dec 17 2012 Thomas Sarboni <tsarboni@linagora.com> - obm-solr-2.4.2.0-0.beta4
