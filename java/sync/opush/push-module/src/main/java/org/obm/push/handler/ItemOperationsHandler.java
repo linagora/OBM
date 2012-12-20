@@ -228,21 +228,21 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
 			
-			BodyPreference bodyPreference = BodyPreference.builder().bodyType(type).build();
+			List<BodyPreference> bodyPreferences = bodyPreferencesFromBodyType(type);
 
-			List<ItemChange> itemChanges = contentsExporter.fetch(udr,
-					new SyncCollection(dataType, ImmutableList.of(serverId), ImmutableList.of(bodyPreference)), null);
+			SyncCollection syncCollection = new SyncCollection(dataType, ImmutableList.of(serverId), bodyPreferences);
+			syncCollection.setCollectionId(collectionId);
+			syncCollection.setCollectionPath(collectionPath);
+			syncCollection.setDataClass(dataType.asXmlValue());
+			syncCollection.setOptions(new SyncCollectionOptions(bodyPreferences));
+			
+			List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection);
 			
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 			} else {
 				fetchResult.setItemChange(itemChanges.get(0));
-				SyncCollection c = new SyncCollection();
-				c.setCollectionId(collectionId);
-				SyncCollectionOptions options = new SyncCollectionOptions();
-				options.setBodyPreferences(ImmutableList.of(bodyPreference));
-				c.setOptions(options);
-				fetchResult.setSyncCollection(c);
+				fetchResult.setSyncCollection(syncCollection);
 				fetchResult.setStatus(ItemOperationsStatus.SUCCESS);
 			}
 		} catch (CollectionNotFoundException e) {
@@ -259,6 +259,13 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			fetchResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
 		}
 		return fetchResult;
+	}
+
+	private List<BodyPreference> bodyPreferencesFromBodyType(MSEmailBodyType type) {
+		if (type != null) {
+			return ImmutableList.of(BodyPreference.builder().bodyType(type).build());
+		}
+		return ImmutableList.of();
 	}
 	
 	private EmptyFolderContentsResult emptyFolderOperation(

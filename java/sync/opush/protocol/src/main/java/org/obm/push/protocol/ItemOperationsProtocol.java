@@ -155,10 +155,10 @@ public class ItemOperationsProtocol {
 	}
 	
 	private void encodeEmptyFolderOperation(EmptyFolderContentsResult result, Element root) {
-		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asSpecificationValue());
 		Element response = DOMUtils.createElement(root, "Response");
 		Element empty = DOMUtils.createElement(response, "EmptyFolderContents");
-		DOMUtils.createElementAndText(empty, "Status", result.getItemOperationsStatus().asXmlValue());
+		DOMUtils.createElementAndText(empty, "Status", result.getItemOperationsStatus().asSpecificationValue());
 		DOMUtils.createElementAndText(empty, "AirSync:CollectionId", String.valueOf(result.getCollectionId()));
 	}
 
@@ -177,10 +177,10 @@ public class ItemOperationsProtocol {
 			throws IOException {
 		
 		DOMUtils.createElementAndText(root, "Status",
-				ItemOperationsStatus.SUCCESS.asXmlValue());
+				ItemOperationsStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(root, "Response");
 		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
-		DOMUtils.createElementAndText(fetchResp, "Status", fetchItemResult.getStatus().asXmlValue());
+		DOMUtils.createElementAndText(fetchResp, "Status", fetchItemResult.getStatus().asSpecificationValue());
 		DOMUtils.createElementAndText(fetchResp, "AirSync:ServerId", fetchItemResult.getServerId());
 
 		if (ItemOperationsStatus.SUCCESS == fetchItemResult.getStatus() &&
@@ -192,10 +192,10 @@ public class ItemOperationsProtocol {
 	}
 	
 	private void encodeFetchAttachmentResult(Element root, FetchAttachmentResult fetchAttachmentResult, boolean multipart) {
-		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", ItemOperationsStatus.SUCCESS.asSpecificationValue());
 		Element resp = DOMUtils.createElement(root, "Response");
 		Element fetchResp = DOMUtils.createElement(resp, "Fetch");
-		DOMUtils.createElementAndText(fetchResp, "Status", fetchAttachmentResult.getStatus().asXmlValue());
+		DOMUtils.createElementAndText(fetchResp, "Status", fetchAttachmentResult.getStatus().asSpecificationValue());
 		
 		if (fetchAttachmentResult.getReference() != null) {
 			DOMUtils.createElementAndText(fetchResp, "AirSyncBase:FileReference", fetchAttachmentResult.getReference());
@@ -214,7 +214,7 @@ public class ItemOperationsProtocol {
 	public Document encodeErrorRespponse(ItemOperationsStatus status) {
 		Document document = DOMUtils.createDoc(null, "ItemOperations");
 		Element root = document.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", status.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", status.asSpecificationValue());
 		return document;
 	}
 	

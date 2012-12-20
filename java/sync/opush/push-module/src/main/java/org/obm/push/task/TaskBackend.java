@@ -55,6 +55,14 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 public class TaskBackend implements PIMBackend {
 
 	@Override
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, 
+				SyncCollectionOptions syncCollectionOptions)
+			throws ProcessingEmailException, CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
+		
+		return fetch(udr, collectionId, fetchServerIds, syncCollectionOptions);
+	}
+	
+	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, 
 				int collectionId, 
 				List<String> fetchServerIds, 

@@ -29,55 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.client.tests;
+package org.obm.sync.push.client;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderHierarchy;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.ItemOperationFetchResponse;
-import org.obm.sync.push.client.ItemOperationResponse;
-import org.obm.sync.push.client.ProvisionResponse;
-import org.obm.sync.push.client.SyncResponse;
+import com.google.common.base.Objects;
 
-import com.google.common.collect.ImmutableList;
+public final class ItemOperationResponse {
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+	private final Iterable<ItemOperationFetchResponse> fetchResponses;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public ItemOperationResponse(Iterable<ItemOperationFetchResponse> fetchResponses) {
+		this.fetchResponses = fetchResponses;
+	}
+
+	public Iterable<ItemOperationFetchResponse> getFetchResponses() {
+		return fetchResponses;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(fetchResponses);
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-				.add(AccountInfos.class)
-				.add(Add.class)
-				.add(Collection.class)
-				.add(Folder.class)
-				.add(FolderHierarchy.class)
-				.add(FolderSyncResponse.class)
-				.add(GetItemEstimateSingleFolderResponse.class)
-				.add(SyncResponse.class)
-				.add(Delete.class)
-				.add(ProvisionResponse.class)
-				.add(ItemOperationResponse.class)
-				.add(ItemOperationFetchResponse.class)
-				.build();
-		equalsVerifierUtilsTest.test(list);
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof ItemOperationResponse) {
+			ItemOperationResponse that = (ItemOperationResponse) object;
+			return Objects.equal(fetchResponses, that.fetchResponses);
+		}
+		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("fetchResponses", fetchResponses)
+				.toString();
+	}
+	
 }

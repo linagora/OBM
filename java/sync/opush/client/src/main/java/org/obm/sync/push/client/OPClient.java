@@ -43,6 +43,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
@@ -51,6 +52,7 @@ import org.obm.sync.push.client.commands.EmailSyncFetchCommand;
 import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
+import org.obm.sync.push.client.commands.ItemOperationFetchCommand;
 import org.obm.sync.push.client.commands.Options;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
@@ -150,6 +152,14 @@ public abstract class OPClient {
 	
 	public GetItemEstimateSingleFolderResponse getItemEstimateOnMailFolder(SyncKey key, FilterType filterType, int collectionId) throws Exception {
 		return run(new GetItemEstimateEmailFolderCommand(key, filterType, collectionId));
+	}
+
+	public ItemOperationResponse itemOperationFetch(int collectionId, String...serverId) throws Exception {
+		return run(new ItemOperationFetchCommand(collectionId, serverId));
+	}
+
+	public ItemOperationResponse itemOperationFetch(int collectionId, MSEmailBodyType bodyType, String...serverId) throws Exception {
+		return run(new ItemOperationFetchCommand(collectionId, bodyType, serverId));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)

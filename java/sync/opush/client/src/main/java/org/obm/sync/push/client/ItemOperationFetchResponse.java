@@ -29,55 +29,60 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.client.tests;
+package org.obm.sync.push.client;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.push.client.AccountInfos;
-import org.obm.sync.push.client.Add;
-import org.obm.sync.push.client.Collection;
-import org.obm.sync.push.client.Delete;
-import org.obm.sync.push.client.Folder;
-import org.obm.sync.push.client.FolderHierarchy;
-import org.obm.sync.push.client.FolderSyncResponse;
-import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.ItemOperationFetchResponse;
-import org.obm.sync.push.client.ItemOperationResponse;
-import org.obm.sync.push.client.ProvisionResponse;
-import org.obm.sync.push.client.SyncResponse;
+import org.obm.push.bean.ItemOperationsStatus;
+import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Objects;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public final class ItemOperationFetchResponse {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	private final ItemOperationsStatus status;
+	private final String serverId;
+	private final Element data;
+
+	public ItemOperationFetchResponse(ItemOperationsStatus status, String serverId, Element data) {
+		this.status = status;
+		this.serverId = serverId;
+		this.data = data;
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-				.add(AccountInfos.class)
-				.add(Add.class)
-				.add(Collection.class)
-				.add(Folder.class)
-				.add(FolderHierarchy.class)
-				.add(FolderSyncResponse.class)
-				.add(GetItemEstimateSingleFolderResponse.class)
-				.add(SyncResponse.class)
-				.add(Delete.class)
-				.add(ProvisionResponse.class)
-				.add(ItemOperationResponse.class)
-				.add(ItemOperationFetchResponse.class)
-				.build();
-		equalsVerifierUtilsTest.test(list);
+	public ItemOperationsStatus getStatus() {
+		return status;
 	}
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public Element getData() {
+		return data;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(status, serverId, data);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof ItemOperationFetchResponse) {
+			ItemOperationFetchResponse that = (ItemOperationFetchResponse) object;
+			return Objects.equal(status, that.status)
+				&& Objects.equal(serverId, that.serverId)
+				&& Objects.equal(data, that.data);
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("status", status)
+				.add("serverId", serverId)
+				.add("data", data)
+				.toString();
+	}
+	
 }

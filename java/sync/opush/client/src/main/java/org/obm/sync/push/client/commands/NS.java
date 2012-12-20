@@ -33,6 +33,6 @@ package org.obm.sync.push.client.commands;
 
 public enum NS {
 
-	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover;
+	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations;
 	
 }

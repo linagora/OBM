@@ -587,6 +587,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				ItemSyncState previousItemSyncState, SyncKey newSyncKey)
 			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
 	
+		return fetch(udr, collectionId, fetchServerIds, syncCollectionOptions);
+	}
+	
+	@Override
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions)
+			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
+	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(udr);
 		for (String serverId : fetchServerIds) {

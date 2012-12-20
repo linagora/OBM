@@ -767,21 +767,29 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> itemIds, SyncCollectionOptions collectionOptions, 
-				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> itemIds, SyncCollectionOptions collectionOptions) 
 			throws ProcessingEmailException {
 		
-		LinkedList<ItemChange> ret = new LinkedList<ItemChange>();
+		LinkedList<ItemChange> fetchs = new LinkedList<ItemChange>();
 		Map<Integer, Collection<Long>> emailUids = getEmailUidByCollectionId(itemIds);
 		for (Entry<Integer, Collection<Long>> entry : emailUids.entrySet()) {
 			Collection<Long> uids = entry.getValue();
 			try {
-				ret.addAll(fetchItems(udr, collectionId, uids, collectionOptions.getBodyPreferences()));
+				fetchs.addAll(fetchItems(udr, collectionId, uids, collectionOptions.getBodyPreferences()));
 			} catch (CollectionNotFoundException e) {
 				logger.error("fetchItems : collection {} not found !", collectionId);
 			}
 		}
+		return fetchs;
+	}
+
+	@Override
+	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> itemIds, SyncCollectionOptions collectionOptions, 
+				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
+			throws ProcessingEmailException {
+
+		List<ItemChange> fetchs = fetch(udr, collectionId, itemIds, collectionOptions);
 		snapshotService.actualizeSnapshot(udr.getDevId(), previousItemSyncState.getSyncKey(), collectionId, newSyncKey);
-		return ret;
+		return fetchs;
 	}
 }

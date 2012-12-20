@@ -52,6 +52,9 @@ public interface IContentsExporter {
 			throws DaoException, CollectionNotFoundException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException;
 
+	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, 
+		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
+	
 	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 
