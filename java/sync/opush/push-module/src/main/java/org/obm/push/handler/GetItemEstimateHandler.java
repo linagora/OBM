@@ -50,6 +50,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
@@ -111,6 +112,9 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		} catch (CollectionNotFoundException e) {
 			sendErrorResponse(responder, 
 					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, e.getCollectionId()), e);
+		} catch (HierarchyChangedException e) {
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.INVALID_COLLECTION, null), e);
 		} catch (DaoException e) {
 			logger.error(e.getMessage(), e);
 		} catch (UnexpectedObmSyncServerException e) {
@@ -133,7 +137,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 	private GetItemEstimateResponse doTheJob(UserDataRequest udr, GetItemEstimateRequest request) throws InvalidSyncKeyException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException,
-		CollectionNotFoundException, ConversionException {
+		CollectionNotFoundException, ConversionException, HierarchyChangedException {
 		
 
 		GetItemEstimateResponse.Builder getItemEstimateResponseBuilder = GetItemEstimateResponse.builder();
@@ -154,7 +158,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 	}
 	
 	@VisibleForTesting Estimate computeEstimate(UserDataRequest udr, SyncCollection syncCollection) throws DaoException, InvalidSyncKeyException,
-		CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
+		CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
 		SyncKey syncKey = syncCollection.getSyncKey();
 		ItemSyncState state = stMachine.getItemSyncState(syncKey);

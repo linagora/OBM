@@ -47,6 +47,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -57,18 +58,18 @@ public interface PIMBackend {
 
 	String createOrUpdate(UserDataRequest udr, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
-		throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException;
+			throws CollectionNotFoundException, ProcessingEmailException, 
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException, HierarchyChangedException;
 	
 	String move(UserDataRequest udr, String srcFolder, String dstFolder, String messageId)
 		throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException;
 	
 	void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash) 
-		throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException,
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException,
 			ProcessingEmailException, UnsupportedBackendFunctionException;
 	
 	void emptyFolderContent(UserDataRequest udr, String collectionPath, boolean deleteSubFolder)
-		throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException;
+			throws NotAllowedException, CollectionNotFoundException, ProcessingEmailException;
 	
 	PIMDataType getPIMDataType();
 	
@@ -82,15 +83,14 @@ public interface PIMBackend {
 			DaoException, UnexpectedObmSyncServerException, ConversionException;
 
 	DataDelta getChanged(UserDataRequest udr, ItemSyncState itemSyncState, Integer collectionId,
-			SyncCollectionOptions options, SyncKey newSyncKey)
-		throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException;
+			SyncCollectionOptions options, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 	
 	int getItemEstimateSize(UserDataRequest udr, ItemSyncState syncState, Integer collectionId, 
-			SyncCollectionOptions collectionOptions)
-		throws CollectionNotFoundException, ProcessingEmailException, DaoException,
-			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
+			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
+			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
+			FilterTypeChangedException, HierarchyChangedException;
 
 	HierarchyCollectionChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
-		throws DaoException, InvalidSyncKeyException;
+			throws DaoException, InvalidSyncKeyException;
 }

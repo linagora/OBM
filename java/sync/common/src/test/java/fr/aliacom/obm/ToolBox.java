@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.calendar.Attendee;
@@ -56,18 +57,37 @@ public class ToolBox {
 
 	public static AccessToken mockAccessToken() {
 		ObmUser user = getDefaultObmUser();
+		
 		return mockAccessToken(user.getLogin(), user.getDomain());
 	}
-
+	
+	public static AccessToken mockAccessToken(IMocksControl mocksControl) {
+		ObmUser user = getDefaultObmUser();
+		
+		return mockAccessToken(user.getLogin(), user.getDomain(), mocksControl);
+	}
+	
 	public static AccessToken mockAccessToken(String login, ObmDomain domain) {
 		AccessToken accessToken = EasyMock.createMock(AccessToken.class);
-		EasyMock.expect(accessToken.getDomain()).andReturn(domain).atLeastOnce();
+		
+		return mockAccessTokenMethods(accessToken, login, domain);
+	}
+
+	public static AccessToken mockAccessToken(String login, ObmDomain domain, IMocksControl mocksControl) {
+		AccessToken accessToken = mocksControl.createMock(AccessToken.class);
+		
+		return mockAccessTokenMethods(accessToken, login, domain);
+	}
+	
+	private static AccessToken mockAccessTokenMethods(AccessToken accessToken, String login, ObmDomain domain) {
+		EasyMock.expect(accessToken.getDomain()).andReturn(domain).anyTimes();
 		EasyMock.expect(accessToken.getUserLogin()).andReturn(login).anyTimes();
 		EasyMock.expect(accessToken.getUserEmail()).andReturn(login + '@' + domain.getName()).anyTimes();
 		EasyMock.expect(accessToken.getOrigin()).andReturn("unittest").anyTimes();
 		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
 		EasyMock.expect(accessToken.getSessionId()).andReturn("sessionId").anyTimes();
 		EasyMock.expect(accessToken.getVersion()).andReturn(new MavenVersion("0", "0", "0")).anyTimes();
+		
 		return accessToken;
 	}
 

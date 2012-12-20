@@ -32,9 +32,9 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                </dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
 			<artifactId>commons-httpclient</artifactId>
@@ -57,12 +57,22 @@
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
 		</dependency>
 	</dependencies>
 

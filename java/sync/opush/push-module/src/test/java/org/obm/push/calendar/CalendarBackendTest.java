@@ -31,11 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -641,7 +637,7 @@ public class CalendarBackendTest {
 	}
 
 	private void expectGetAndModifyEvent(String serverId, Event event) 
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
 		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), new EventObmId(serverId)))
 			.andReturn(event).once();
@@ -728,7 +724,7 @@ public class CalendarBackendTest {
 	}
 	
 	private void expectGetAndModifyEvent(EventExtId eventExtId, Event event) 
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
 		expect(calendarClient.getEventFromExtId(token, userDataRequest.getUser().getLoginAtDomain(), eventExtId))
 			.andReturn(event).once();
@@ -780,7 +776,7 @@ public class CalendarBackendTest {
 	}
 
 	private Event expectGetEventFromId(Integer itemId) 
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
 		EventObmId eventObmId = new EventObmId(itemId);
 		Event event = new Event();

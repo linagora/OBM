@@ -61,6 +61,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -131,7 +132,7 @@ public class EmailSyncTestUtils {
 			SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta, 
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, AuthFault,
-			ConversionException, FilterTypeChangedException {
+			ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockEmailSync(syncEmailSyncKey, syncEmailCollectionsIds, delta, fakeTestUsers, classToInstanceMap);
@@ -140,7 +141,7 @@ public class EmailSyncTestUtils {
 	private static void mockEmailSync(SyncKey syncEmailSyncKey, Collection<Integer> syncEmailCollectionsIds, DataDelta delta,
 			List<OpushUser> fakeTestUsers, ClassToInstanceAgregateView<Object> classToInstanceMap)
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
-			ConversionException, FilterTypeChangedException {
+			ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		mockEmailSyncedCollectionDao(syncedCollectionDao);
@@ -228,7 +229,8 @@ public class EmailSyncTestUtils {
 	}
 
 	private static void mockContentsExporter(IContentsExporter contentsExporter, DataDelta delta) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
+			throws CollectionNotFoundException, ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
+			FilterTypeChangedException, HierarchyChangedException {
 
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 

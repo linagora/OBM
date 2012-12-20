@@ -46,6 +46,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.PushNotificationImpl;
 import org.obm.push.mail.exception.FilterTypeChangedException;
@@ -125,6 +126,8 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 						} catch (ConversionException e) {
 							logger.error(e.getMessage(), e);
 						} catch (FilterTypeChangedException e) {
+							logger.error(e.getMessage(), e);
+						} catch (HierarchyChangedException e) {
 							logger.error(e.getMessage(), e);
 						}
 					}

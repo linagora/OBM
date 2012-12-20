@@ -43,6 +43,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.exception.FilterTypeChangedException;
@@ -179,7 +180,7 @@ public class OBMBackend implements IBackend {
 	@Override
 	public Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException, FilterTypeChangedException {
+			ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		final Set<SyncCollection> syncCollectionsChanged = new HashSet<SyncCollection>();
 		final UserDataRequest userDataRequest = collectionChangeListener.getSession();
@@ -204,7 +205,7 @@ public class OBMBackend implements IBackend {
 	
 	private int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) throws DaoException,
 		CollectionNotFoundException, UnexpectedObmSyncServerException, 
-		ProcessingEmailException, ConversionException, FilterTypeChangedException {
+		ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		return contentsExporter.getItemEstimateSize(udr, syncCollection);
 	}

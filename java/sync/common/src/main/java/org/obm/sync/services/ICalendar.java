@@ -116,20 +116,20 @@ public interface ICalendar {
 	 * FIXME: remove this service
 	 */
 	Event removeEventByExtId(AccessToken token, String calendar, EventExtId extId,
-			int sequence, boolean notification) throws ServerFault;
+			int sequence, boolean notification) throws ServerFault, NotAllowedException;
 
 	/**
 	 * FIXME: needs work
 	 */
 	Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees, boolean notification) throws ServerFault;
+			boolean updateAttendees, boolean notification) throws ServerFault, NotAllowedException;
 
 	/**
 	 * FIXME: needs work
 	 * @throws EventAlreadyExistException 
 	 */
 	EventObmId createEvent(AccessToken token, String calendar, Event event,
-			boolean notification) throws ServerFault, EventAlreadyExistException;
+			boolean notification) throws ServerFault, EventAlreadyExistException, NotAllowedException;
 
 	/**
 	 * return every changes made to calendar since lastSync date for events into
@@ -137,7 +137,7 @@ public interface ICalendar {
 	 * changes. Logged user needs read rights on calendar.
 	 */
 	EventChanges getSyncInRange(AccessToken token, String calendar,
-			Date lastSync, SyncRange syncRange) throws ServerFault;
+			Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException;
 
 	/**
 	 * return every changes made to calendar since lastSync date. This service
@@ -145,7 +145,7 @@ public interface ICalendar {
 	 * rights on calendar.
 	 */
 	EventChanges getSync(AccessToken token, String calendar, Date lastSync)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * return every changes made to calendar since lastSync date. This service
@@ -154,14 +154,14 @@ public interface ICalendar {
 	 * rights on calendar.
 	 */
 	EventChanges getSyncWithSortedChanges(AccessToken token, String calendar,
-			Date lastSync) throws ServerFault;
+			Date lastSync) throws ServerFault, NotAllowedException;
 
 	/**
 	 * return every event in calendar the will happen after start date Logged
 	 * user needs read rights on calendar
 	 */
 	EventChanges getSyncEventDate(AccessToken token, String calendar, Date start)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * Find an event from its id.
@@ -170,7 +170,7 @@ public interface ICalendar {
 	 *         is present in its calendar, null if event is not found or user
 	 *         has not enough rights to read this event
 	 */
-	Event getEventFromId(AccessToken token, String calendar, EventObmId id) throws ServerFault, EventNotFoundException;
+	Event getEventFromId(AccessToken token, String calendar, EventObmId id) throws ServerFault, EventNotFoundException, NotAllowedException;
 
 	/**
 	 * Return id of events who have : - start date, subject and duration if not
@@ -179,7 +179,7 @@ public interface ICalendar {
 	 * execute this service.
 	 */
 	KeyList getEventTwinKeys(AccessToken token, String calendar, Event event)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * get current user email based
@@ -191,7 +191,7 @@ public interface ICalendar {
 	 * selected calendar to execute this service.
 	 */
 	KeyList getRefusedKeys(AccessToken token, String calendar, Date since)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * List known categories.
@@ -204,21 +204,21 @@ public interface ICalendar {
 	 * @throws EventNotFoundException 
 	 */
 	EventObmId getEventObmIdFromExtId(AccessToken token, String calendar,
-			EventExtId extId) throws ServerFault, EventNotFoundException;
+			EventExtId extId) throws ServerFault, EventNotFoundException, NotAllowedException;
 
 	/**
 	 * retrieve an event by its extId into specified calendar User needs read
 	 * access on selected calendar to execute this service.
 	 * @throws EventNotFoundException 
 	 */
-	Event getEventFromExtId(AccessToken token, String calendar, EventExtId extId) throws ServerFault, EventNotFoundException;
+	Event getEventFromExtId(AccessToken token, String calendar, EventExtId extId) throws ServerFault, EventNotFoundException, NotAllowedException;
 
 	/**
 	 * retrieve all events between start and end date. User needs read access on
 	 * selected calendar to execute this service.
 	 */
 	List<Event> getListEventsFromIntervalDate(AccessToken token,
-			String calendar, Date start, Date end) throws ServerFault;
+			String calendar, Date start, Date end) throws ServerFault, NotAllowedException;
 
 	/**
 	 * retrieve all events of type evenType from calendar. User needs read
@@ -233,7 +233,7 @@ public interface ICalendar {
 	 */
 	List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
 			AccessToken token, String calendar, Date start, Date end)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * Convert an event into an ICS
@@ -288,20 +288,20 @@ public interface ICalendar {
 	 * Retrieve last update (event creation or update) for a given calendar.
 	 * Logged user must have read access on the calendar.
 	 */
-	Date getLastUpdate(AccessToken token, String calendar) throws ServerFault;
+	Date getLastUpdate(AccessToken token, String calendar) throws ServerFault, NotAllowedException;
 
 	/**
 	 * Check that logged user has access to a given calendar
 	 */
 	boolean isWritableCalendar(AccessToken token, String calendar)
-			throws ServerFault;
+			throws ServerFault, NotAllowedException;
 
 	/**
 	 * change user of given calendar participation state
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
 			EventExtId extId, Participation participation, int sequence,
-			boolean notification) throws ServerFault;
+			boolean notification) throws ServerFault, NotAllowedException;
 
 	/**
 	 * This method is used to change the participation state of a specific occurrence
@@ -310,7 +310,7 @@ public interface ICalendar {
 	 */
 	boolean changeParticipationState(AccessToken token, String calendar,
 			EventExtId extId, RecurrenceId recurrenceId, Participation participation, int sequence,
-			boolean notification) throws ServerFault, EventNotFoundException, ParseException;
+			boolean notification) throws ServerFault, EventNotFoundException, ParseException, NotAllowedException;
 	
 	/**
 	 * Import ics file in calendar's user Adding a new attendee (owner) if
@@ -319,13 +319,13 @@ public interface ICalendar {
 	 * Return ImportICalendarException if import fails
 	 */
 	int importICalendar(AccessToken token, String calendar, String ics)
-			throws ImportICalendarException, ServerFault;
+			throws ImportICalendarException, ServerFault, NotAllowedException;
 
 	/**
 	 * remove all calendar's events older than 6 month
 	 * 
 	 */
-	void purge(AccessToken token, String calendar) throws ServerFault;
+	void purge(AccessToken token, String calendar) throws ServerFault, NotAllowedException;
 
 	/**
 	 * Returns the events using the resource in a range of three months before

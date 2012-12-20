@@ -66,6 +66,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -243,7 +244,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
-			DaoException, UnexpectedObmSyncServerException, ConversionException {
+			DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
 		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
@@ -252,7 +253,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
 			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws DaoException,
-			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException {
+			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
 		AccessToken token = login(udr);
 		
@@ -280,6 +281,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				new Object[]{calendar, collectionPath, newState.getSyncDate(), delta.statistics()});
 			
 			return delta;
+		} catch (org.obm.sync.NotAllowedException e) {
+			throw new HierarchyChangedException(e);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {
@@ -361,7 +364,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public String createOrUpdate(UserDataRequest udr, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException {
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
 		AccessToken token = login(udr);
 		
@@ -388,11 +391,17 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			} else {
 				eventId = createCalendarEntity(udr, calendarClient, token, collectionPath, event, data);
 			}
-				
+		} catch (org.obm.sync.NotAllowedException e) {
+			throw new HierarchyChangedException(e);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} catch (EventAlreadyExistException e) {
-			eventId = getEventIdFromExtId(token, collectionPath, calendarClient, event);
+			try {
+				eventId = getEventIdFromExtId(token, collectionPath, calendarClient, event);
+			}
+			catch (org.obm.sync.NotAllowedException nae) {
+				throw new HierarchyChangedException(nae);
+			}
 		} catch (EventNotFoundException e) {
 			throw new ItemNotFoundException(e);
 		} finally {
@@ -402,7 +411,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return getServerIdFor(collectionId, eventId);
 	}
 
-	private void updateCalendarEntity(ICalendar cc, AccessToken token, String collectionPath, Event old, Event event) throws ServerFault {
+	private void updateCalendarEntity(ICalendar cc, AccessToken token, String collectionPath, Event old, Event event) throws ServerFault, org.obm.sync.NotAllowedException {
 		if (event.getExtId() == null || event.getExtId().getExtId() == null) {
 			event.setExtId(old.getExtId());
 		}
@@ -419,7 +428,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private EventObmId createCalendarEntity(UserDataRequest udr, ICalendar cc,
 			AccessToken token, String collectionPath, Event event, IApplicationData data)
-			throws ServerFault, EventAlreadyExistException, DaoException {
+			throws ServerFault, EventAlreadyExistException, DaoException, org.obm.sync.NotAllowedException {
 		switch (event.getType()) {
 		case VEVENT:
 			return createEvent(udr, cc, token, collectionPath, event, (MSEvent) data);
@@ -432,13 +441,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private EventObmId createTodo(ICalendar cc,
 			AccessToken token, String collectionPath, Event event)
-			throws ServerFault, EventAlreadyExistException {
+			throws ServerFault, EventAlreadyExistException, org.obm.sync.NotAllowedException {
 		return cc.createEvent(token, parseCalendarName(collectionPath), event, true);
 	}
 
 	private EventObmId createEvent(UserDataRequest udr, ICalendar cc,
 			AccessToken token, String collectionPath, Event event, MSEvent msEvent)
-			throws ServerFault, EventAlreadyExistException, DaoException {
+			throws ServerFault, EventAlreadyExistException, DaoException, org.obm.sync.NotAllowedException {
 		EventExtId eventExtId = generateExtId();
 		event.setExtId(eventExtId);
 		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEvent.getUid(), udr.getDevice());
@@ -462,7 +471,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private EventObmId getEventIdFromExtId(AccessToken token, String collectionPath, ICalendar cc, Event event)
-			throws UnexpectedObmSyncServerException {
+			throws UnexpectedObmSyncServerException, org.obm.sync.NotAllowedException {
 		
 		try {
 			return cc.getEventObmIdFromExtId(token, parseCalendarName(collectionPath), event.getExtId());
@@ -502,7 +511,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	public String handleMeetingResponse(UserDataRequest udr, MSEmail invitation, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
-			ItemNotFoundException, ConversionException {
+			ItemNotFoundException, ConversionException, HierarchyChangedException {
 		
 		MSEvent event = invitation.getInvitation();
 		AccessToken at = login(udr);
@@ -511,6 +520,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Event obmEvent = createOrModifyInvitationEvent(udr, event, at);
 			event.setObmSequence(obmEvent.getSequence());
 			return updateUserStatus(udr, event, obmEvent, status, calendarClient, at);
+		} catch (org.obm.sync.NotAllowedException e) {
+			throw new HierarchyChangedException(e);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
@@ -521,7 +532,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event createOrModifyInvitationEvent(UserDataRequest udr, MSEvent event, AccessToken at) 
-			throws UnexpectedObmSyncServerException, EventNotFoundException, ConversionException, DaoException {
+			throws UnexpectedObmSyncServerException, EventNotFoundException, ConversionException, DaoException, org.obm.sync.NotAllowedException {
 		
 		try {
 			
@@ -558,7 +569,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Event getEventFromExtId(UserDataRequest udr, EventExtId eventExtId, AccessToken at) 
-			throws ServerFault {
+			throws ServerFault, org.obm.sync.NotAllowedException {
 		try {
 			return calendarClient.getEventFromExtId(at, udr.getUser().getLoginAtDomain(), eventExtId);
 		} catch (EventNotFoundException e) {
@@ -568,7 +579,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private String updateUserStatus(UserDataRequest udr, MSEvent msEvent, Event event, AttendeeStatus status, ICalendar calCli,
-			AccessToken at) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException {
+			AccessToken at) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, org.obm.sync.NotAllowedException {
 		
 		logger.info("update user status[ {} in calendar ]", status);
 		Participation participationStatus = eventConverter.getParticipation(null, status);
@@ -585,14 +596,14 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions,
 				ItemSyncState previousItemSyncState, SyncKey newSyncKey)
-			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
+			throws DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 	
 		return fetch(udr, collectionId, fetchServerIds, syncCollectionOptions);
 	}
 	
 	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions)
-			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
+			throws DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 	
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(udr);
@@ -603,6 +614,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 					ItemChange ic = createItemChangeToAddFromEvent(udr, event, serverId);
 					ret.add(ic);
 				}
+			} catch (org.obm.sync.NotAllowedException e) {
+				throw new HierarchyChangedException(e);
 			} catch (EventNotFoundException e) {
 				logger.error("event from serverId {} not found.", serverId);
 			} catch (ServerFault e1) {
@@ -613,7 +626,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return ret;
 	}
 	
-	private Event getEventFromServerId(AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException {
+	private Event getEventFromServerId(AccessToken token, String calendar, String serverId) throws ServerFault, EventNotFoundException, org.obm.sync.NotAllowedException {
 		Integer itemId = mappingService.getItemIdFromServerId(serverId);
 		if (itemId == null) {
 			return null;

@@ -265,13 +265,13 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String getLastUpdate(
 			AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault {
+			throws ServerFault, NotAllowedException {
 		Date d = binding.getLastUpdate(at, getCalendar(at, request));
 		return responder.sendLong(d.getTime());
 	}
 
 	private String getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+			AccessToken at, Request request, XmlResponder responder) throws ServerFault, NotAllowedException {
 		String calendar = getCalendar(at, request);
 		Date start = DateHelper.asDate(request.getParameter("start"));
 		Date end = null;
@@ -331,7 +331,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getListEventsFromIntervalDate(
 			AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault {
+			throws ServerFault, NotAllowedException {
 		List<Event> e = binding.getListEventsFromIntervalDate(at, 
 				getCalendar(at, request),
 				DateHelper.asDate(request.getParameter("start")),
@@ -341,7 +341,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventObmIdFromExtId(AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		
 		EventObmId id = binding.getEventObmIdFromExtId(at, getCalendar(at, request), getExtId(request, "extId"));
 		if (id != null) {
@@ -351,7 +351,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String getEventFromExtId(AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		Event e = binding.getEventFromExtId(at, getCalendar(at, request), getExtId(request, "extId"));
 		return responder.sendEvent(e);
 	}
@@ -367,7 +367,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getRefusedKeys(AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault {
+		throws ServerFault, NotAllowedException {
 		KeyList ret = binding.getRefusedKeys(at, 
 				getCalendar(at, request),
 				DateHelper.asDate(request.getParameter("since")));
@@ -375,7 +375,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventTwinKeys(AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException {
 		KeyList kl = binding.getEventTwinKeys(at, getCalendar(at, request), getEvent(request));
 		return responder.sendKeyList(kl);
 	}
@@ -391,14 +391,14 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String getEventFromId(AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault, EventNotFoundException {
+			throws ServerFault, EventNotFoundException, NotAllowedException {
 		Event e = binding.getEventFromId(at, getCalendar(at, request), getObmId(request, "id"));
 		return responder.sendEvent(e);
 	}
 
 	private String createEvent(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException, NotAllowedException {
 		EventObmId ev = binding.createEvent(at,	getCalendar(at, request), getEvent(request), getNotificationOption(request));
 		return responder.sendInt(ev.getObmId());
 	}
@@ -427,7 +427,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String modifyEvent(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException {
 		Event ev = binding.modifyEvent(at, getCalendar(at, request),
 				getEvent(request), Boolean.valueOf(request.getParameter("updateAttendees")),
 				getNotificationOption(request)
@@ -450,7 +450,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String removeEventByExtId(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault {
+		throws ServerFault, NotAllowedException {
 		Event ev = binding.removeEventByExtId(at, getCalendar(at, request),
 				getExtId(request, "extId"),
 				i(request, "sequence", 0),
@@ -464,7 +464,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getSyncEventDate(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault {
+		throws ServerFault, NotAllowedException {
 		EventChanges ret = binding.getSyncEventDate(at, 
 				getCalendar(at, request),
 				DateHelper.asDate(request.getParameter("lastSync")));
@@ -473,7 +473,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getSyncWithSortedChanges(
 			AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault {
+			throws ServerFault, NotAllowedException {
 			EventChanges ret = binding.getSyncWithSortedChanges(at, 
 					getCalendar(at, request),
 					DateHelper.asDate(request.getParameter("lastSync")));
@@ -482,7 +482,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String getSync(
 			AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault {
+			throws ServerFault, NotAllowedException {
 			EventChanges ret = binding.getSync(at, 
 					getCalendar(at, request),
 					DateHelper.asDate(request.getParameter("lastSync")));
@@ -491,7 +491,7 @@ public class EventHandler extends SecureSyncHandler {
 	
 	private String getSyncInRange(
 			AccessToken at, Request request, XmlResponder responder)
-	throws ServerFault {
+	throws ServerFault, NotAllowedException {
 		final Date after = DateHelper.asDate(request.getParameter("syncRangeAfter"));
 		final Date before = DateHelper.asDate(request.getParameter("syncRangeBefore"));
 		SyncRange syncRange = null;
@@ -514,7 +514,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String changeParticipationState(AccessToken at,
-			Request request, XmlResponder responder) throws ServerFault, ParseException, EventNotFoundException {
+			Request request, XmlResponder responder) throws ServerFault, ParseException, EventNotFoundException, NotAllowedException {
 		
 		boolean recursive = getRecursive(request);
 		boolean success = false;
@@ -536,7 +536,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String importICalendar(final AccessToken token, final Request request,
-			XmlResponder responder) throws ImportICalendarException, ServerFault {
+			XmlResponder responder) throws ImportICalendarException, ServerFault, NotAllowedException {
 		final String calendar = request.getParameter("calendar");
 		final String ics = request.getParameter("ics");
 		
@@ -544,7 +544,7 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendInt(countEvent);
 	}
 	
-	private String purge(final AccessToken at, final Request request, final XmlResponder responder) throws ServerFault {
+	private String purge(final AccessToken at, final Request request, final XmlResponder responder) throws ServerFault, NotAllowedException {
 		binding.purge(at, getCalendar(at, request));
 		return responder.sendBoolean(true);
 	}

@@ -52,15 +52,24 @@ import java.util.TreeMap;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.DateUtils;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -81,19 +90,22 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
-import org.obm.sync.services.ImportICalendarException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.FindException;
+import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
@@ -101,6 +113,50 @@ import fr.aliacom.obm.utils.HelperService;
 @RunWith(SlowFilterRunner.class)
 public class CalendarBindingImplTest {
 
+	private static class Env extends AbstractModule {
+		private IMocksControl mocksControl = createControl();
+		
+		@Override
+		protected void configure() {
+			bind(IMocksControl.class).toInstance(mocksControl);
+			
+			bindWithMock(CalendarDao.class);
+			bindWithMock(EventNotificationService.class);
+			bindWithMock(MessageQueueService.class);
+			bindWithMock(DomainService.class);
+			bindWithMock(UserService.class);
+			bindWithMock(HelperService.class);
+			bindWithMock(DatabaseConnectionProvider.class);
+			bindWithMock(DateProvider.class);
+			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+		}
+		
+		private <T> void bindWithMock(Class<T> cls) {
+			bind(cls).toInstance(mocksControl.createMock(cls));
+		}
+	}
+	
+	@Rule
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
+
+	@Inject
+	private IMocksControl mocksControl;
+	@Inject
+	private CalendarBindingImpl binding;
+	@Inject
+	private HelperService helperService;
+	@Inject
+	private UserService userService;
+	@Inject
+	private CalendarDao calendarDao;
+	
+	private AccessToken token;
+	
+	@Before
+	public void setUp() {
+		token = ToolBox.mockAccessToken(mocksControl);
+	}
+	
 	private HelperService mockRightsHelper(String calendar, AccessToken accessToken) {
 		HelperService rightsHelper = createMock(HelperService.class);
 		expect(rightsHelper.canWriteOnCalendar(eq(accessToken), eq(calendar))).andReturn(true).anyTimes();
@@ -311,7 +367,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test(expected=ServerFault.class)
-	public void testCalendarOwnerNotAnAttendee() throws ServerFault, FindException, EventAlreadyExistException {
+	public void testCalendarOwnerNotAnAttendee() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -355,8 +411,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testImportEventInThePast() throws ImportICalendarException, ServerFault, IOException, ParserException, 
-		FindException, SQLException {
+	public void testImportEventInThePast() throws Exception {
 		
 		Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
@@ -401,7 +456,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testPurge() throws FindException, ServerFault, SQLException, NumberFormatException, EventNotFoundException {
+	public void testPurge() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -528,8 +583,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testImportEventInTheFuture() throws ImportICalendarException, ServerFault, IOException, 
-		ParserException, FindException, SQLException {
+	public void testImportEventInTheFuture() throws Exception {
 		
 		Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
@@ -575,7 +629,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testModifyNullEvent() throws ServerFault {
+	public void testModifyNullEvent() throws Exception {
 
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
@@ -591,7 +645,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testModifyNotExistingEvent() throws FindException, EventNotFoundException, ServerFault {
+	public void testModifyNotExistingEvent() throws Exception {
 
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
@@ -613,8 +667,8 @@ public class CalendarBindingImplTest {
 		assertThat(modifiedEvent).isNull();
 	}
 
-	@Test
-	public void testToModifyEventWithoutWriteRightOnCalendar() throws FindException, EventNotFoundException, ServerFault {
+	@Test(expected=NotAllowedException.class)
+	public void testToModifyEventWithoutWriteRightOnCalendar() throws Exception {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = defaultObmUser.getEmail();
 		Event event = new Event();
@@ -637,12 +691,11 @@ public class CalendarBindingImplTest {
 
 		EasyMock.replay(accessToken, userService, calendarDao, rightsHelper);
 
-		Event modifiedEvent = calendarService.modifyEvent(accessToken, calendar, event, false, false);
-		assertThat(modifiedEvent).isEqualTo(event);
+		calendarService.modifyEvent(accessToken, calendar, event, false, false);
 	}
 
 	@Test
-	public void testAttendeeHasRightToWriteOnCalendar() throws FindException, ServerFault, SQLException, EventNotFoundException {
+	public void testAttendeeHasRightToWriteOnCalendar() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -699,7 +752,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testAttendeeHasNoRightToWriteOnCalendar() throws FindException, ServerFault, SQLException, EventNotFoundException {
+	public void testAttendeeHasNoRightToWriteOnCalendar() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 
 		String calendar = "cal1";
@@ -757,8 +810,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testAttendeeOfExceptionHasRightToWriteOnCalendar() throws FindException,
-			ServerFault, SQLException, EventNotFoundException {
+	public void testAttendeeOfExceptionHasRightToWriteOnCalendar() throws Exception {
 		
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
@@ -863,8 +915,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testAttendeeOfExceptionHasNoRightToWriteOnCalendar() throws FindException, ServerFault, SQLException, 
-	EventNotFoundException {
+	public void testAttendeeOfExceptionHasNoRightToWriteOnCalendar() throws Exception {
 		
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
@@ -969,7 +1020,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testCreateAnEventExceptionAndUpdateItsStatusButNotTheParent() throws FindException, SQLException, EventNotFoundException, ServerFault {
+	public void testCreateAnEventExceptionAndUpdateItsStatusButNotTheParent() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -1042,7 +1093,7 @@ public class CalendarBindingImplTest {
 				.getParticipation());
 	}
 	
-	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws ServerFault, FindException, SQLException, EventNotFoundException {
+	public void testDontSendEmailsAndDontUpdateStatusForUnimportantChanges() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -1228,7 +1279,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testCreateExternalEventCalendarOwnerWithDeclinedPartState() throws FindException, ServerFault, EventAlreadyExistException, SQLException {
+	public void testCreateExternalEventCalendarOwnerWithDeclinedPartState() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
 		String calendar = "cal1";
@@ -1280,7 +1331,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testRecurrenceIdAtTheProperFormatInGetSyncResponse() throws FindException, ServerFault{
+	public void testRecurrenceIdAtTheProperFormatInGetSyncResponse() throws Exception {
 		String calendar = "cal1";
 		String userName = "user";
 		Date lastSync = new Date(1327690144000L);
@@ -1293,7 +1344,7 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testGetSyncWithRecurrentEventAlwaysInUpdatedTag() throws FindException, ServerFault {
+	public void testGetSyncWithRecurrentEventAlwaysInUpdatedTag() throws Exception {
 		String calendar = "cal1";
 		String userName = "user";
 		Date lastSync = new Date(1327680144000L);
@@ -1312,8 +1363,7 @@ public class CalendarBindingImplTest {
 	}
 
 	private EventChanges mockGetSyncWithSortedChanges(String calendar, String userName,
-			Date lastSync, EventChanges daoChanges) throws FindException,
-			ServerFault {
+			Date lastSync, EventChanges daoChanges) throws Exception {
 		
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 
@@ -1374,7 +1424,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test(expected=ServerFault.class)
-	public void testCreateNullEvent() throws ServerFault, EventAlreadyExistException {
+	public void testCreateNullEvent() throws Exception {
 
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
@@ -1391,7 +1441,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test(expected=ServerFault.class)
-	public void testCreateEventWithObmId() throws ServerFault, EventAlreadyExistException {
+	public void testCreateEventWithObmId() throws Exception {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
 
@@ -1408,7 +1458,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test(expected=EventAlreadyExistException.class)
-	public void testCreateDuplicateEvent() throws ServerFault, EventAlreadyExistException, FindException {
+	public void testCreateDuplicateEvent() throws Exception {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 		String calendar = "cal1";
@@ -1428,8 +1478,8 @@ public class CalendarBindingImplTest {
 		calendarService.createEvent(accessToken, calendar, event, false);
 	}
 
-	@Test(expected=ServerFault.class)
-	public void testCreateUnauthorizedEventOnCalendar() throws ServerFault, EventAlreadyExistException, FindException {
+	@Test(expected=NotAllowedException.class)
+	public void testCreateUnauthorizedEventOnCalendar() throws Exception {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 		String calendar = "cal1";
@@ -1614,8 +1664,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testNegativeExceptionChange() throws ServerFault, SQLException, FindException,
-			EventNotFoundException {
+	public void testNegativeExceptionChange() throws Exception {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
 
@@ -1676,7 +1725,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testRemoveEventByExtIdIsDeclined() throws FindException, ServerFault, SQLException {
+	public void testRemoveEventByExtIdIsDeclined() throws Exception {
 		String calendar = "user@test";
 		ObmUser user = ToolBox.getDefaultObmUser();
 		AccessToken token = ToolBox.mockAccessToken();
@@ -1722,8 +1771,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testReadOnlyCalendarWithPrivateEventsIsAnonymized() throws ServerFault,
-			FindException {
+	public void testReadOnlyCalendarWithPrivateEventsIsAnonymized() throws Exception {
 		String calendar = "bill.colby@cia.gov";
 		ObmUser user = ToolBox.getDefaultObmUser();
 		AccessToken token = ToolBox.mockAccessToken();
@@ -1791,8 +1839,8 @@ public class CalendarBindingImplTest {
 		assertThat(actualChanges).isEqualTo(anonymizedEventChanges);
 	}
 	
-	@Test
-	public void testEventCanBeModifiedWhenCannotWriteOnCalendar() {
+	@Test(expected=NotAllowedException.class)
+	public void testAssertEventCanBeModifiedWhenCannotWriteOnCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
@@ -1805,13 +1853,11 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		boolean eventCanBeModified = calendarService.eventCanBeModified(token, calendar, eventToModify);
-		
-		assertThat(eventCanBeModified).isFalse();
+		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
 	}
 	
-	@Test
-	public void testEventCanBeModifiedWhenEventDoesNotBelongToCalendar() {
+	@Test(expected=NotAllowedException.class)
+	public void testAssertEventCanBeModifiedWhenEventDoesNotBelongToCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
@@ -1825,13 +1871,11 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		boolean eventCanBeModified = calendarService.eventCanBeModified(token, calendar, eventToModify);
-		
-		assertThat(eventCanBeModified).isFalse();
+		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
 	}
 	
 	@Test
-	public void testEventCanBeModifiedWhenRequirementsAreOK() {
+	public void testAssertEventCanBeModifiedWhenRequirementsAreOK() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
@@ -1845,13 +1889,11 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		boolean eventCanBeModified = calendarService.eventCanBeModified(token, calendar, eventToModify);
-		
-		assertThat(eventCanBeModified).isTrue();
+		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
 	}
 	
 	@Test
-	public void testEventCanBeModifiedWhenEventBelongsToEditorInAnotherCalendar() {
+	public void testAssertEventCanBeModifiedWhenEventBelongsToEditorInAnotherCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
@@ -1867,9 +1909,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		boolean eventCanBeModified = calendarService.eventCanBeModified(token, calendar, eventToModify);
-		
-		assertThat(eventCanBeModified).isTrue();
+		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
 	}
 	
 	@Test
@@ -2296,6 +2336,84 @@ public class CalendarBindingImplTest {
 		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 		assertThat(organizerForExc.getParticipation()).isEqualTo(Participation.needsAction());
 		assertThat(att1ForExc.getParticipation()).isEqualTo(Participation.needsAction());
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testRemoveEventByIdNoWriteRights() throws Exception {
+		EventObmId eventId = new EventObmId(1);
+		
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.removeEventById(token, "calendar", eventId, 0, false);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testRemoveEventByExtIdNoWriteRights() throws Exception {
+		EventExtId eventExtId = EventExtId.newExtId();
+		
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.removeEventByExtId(token, "calendar", eventExtId, 0, false);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testChangeParticipationStateNoWriteRights() throws Exception {
+		EventExtId eventExtId = EventExtId.newExtId();
+		
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.changeParticipationState(token, "calendar", eventExtId, Participation.accepted(), 0, false);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testChangeParticipationStateRecurrentNoWriteRights() throws Exception {
+		EventExtId eventExtId = EventExtId.newExtId();
+		RecurrenceId recurrenceId = new RecurrenceId("RecurrenceId");
+		
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.changeParticipationState(token, "calendar", eventExtId, recurrenceId, Participation.accepted(), 0, false);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testGetSyncNoReadRights() throws Exception {
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.getSync(token, "calendar", null);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testGetSyncInRangeNoReadRights() throws Exception {
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.getSyncInRange(token, "calendar", null, new SyncRange(null, DateUtils.date("2012-01-01T00:00:00")));
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testGetSyncWithSortedChangedNoReadRights() throws Exception {
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.getSyncWithSortedChanges(token, "calendar", null);
+	}
+	
+	@Test(expected=NotAllowedException.class)
+	public void testGetSyncEventDateNoReadRights() throws Exception {
+		expectNoRightsForCalendar("calendar");
+		mocksControl.replay();
+		
+		binding.getSyncEventDate(token, "calendar", null);
+	}
+	
+	private void expectNoRightsForCalendar(String calendar) {
+		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();
+		expect(helperService.canReadCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();
 	}
 
 	private Event createEvent(List<Attendee> expectedAttendees) {

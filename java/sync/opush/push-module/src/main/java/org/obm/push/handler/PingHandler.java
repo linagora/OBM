@@ -53,6 +53,7 @@ import org.obm.push.exception.FolderSyncRequiredException;
 import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
@@ -244,7 +245,10 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (FilterTypeChangedException e) {
 			logger.error(e.getMessage(), e);
 			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
-		} 
+		} catch (HierarchyChangedException e) {
+			logger.error(e.getMessage(), e);
+			sendError(udr.getDevice(), responder, PingStatus.FOLDER_SYNC_REQUIRED);
+		}
 	}
 
 	private void sendResponse(Responder responder, Document document) {
@@ -254,7 +258,7 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 	private PingResponse buildResponse(boolean sendHierarchyChange, IContinuation continuation) 
 			throws FolderSyncRequiredException, DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException,
-			FilterTypeChangedException {
+			FilterTypeChangedException, HierarchyChangedException {
 		
 		if (!enablePush) {
 			// Lie to the phone, try to convince it a new sync is required

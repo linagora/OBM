@@ -80,21 +80,15 @@ public class SyncClientException {
 		}
 	}
 	
-	public void checkEventAlreadyExistException(Document doc) throws ServerFault, EventAlreadyExistException {
+	public void checkCreateEventException(Document doc) throws ServerFault, EventAlreadyExistException, NotAllowedException {
 		if (documentIsError(doc)) {
 			throwEventAlreadyExistException(doc);
+			throwNotAllowedException(doc);
 			checkServerFaultException(doc);
 		}
 	}
 	
-	public void checkEventNotFoundException(Document doc) throws ServerFault, EventNotFoundException {
-		if (documentIsError(doc)) {
-			throwEventNotFoundException(doc);
-			checkServerFaultException(doc);
-		}
-	}
-	
-	public void checkRemoveEventException(Document doc) throws ServerFault, EventNotFoundException, NotAllowedException {
+	public void checkEventNotFoundException(Document doc) throws ServerFault, EventNotFoundException, NotAllowedException {
 		if (documentIsError(doc)) {
 			throwEventNotFoundException(doc);
 			throwNotAllowedException(doc);
@@ -105,6 +99,13 @@ public class SyncClientException {
 	public void checkLoginExpection(Document doc) throws AuthFault {
 		if (documentIsError(doc)) {
 			throw new AuthFault(getErrorMessage(doc));
+		}
+	}
+	
+	public void checkNotAllowedException(Document doc) throws ServerFault, NotAllowedException {
+		if (documentIsError(doc)) {
+			throwNotAllowedException(doc);
+			checkServerFaultException(doc);
 		}
 	}
 	

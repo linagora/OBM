@@ -43,6 +43,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 
@@ -50,7 +51,7 @@ public interface IContentsExporter {
 
 	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey)
 			throws DaoException, CollectionNotFoundException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException;
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
 	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
@@ -60,13 +61,13 @@ public interface IContentsExporter {
 
 	int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection)
 			throws CollectionNotFoundException, ProcessingEmailException,
-			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
+			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
 	int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
 	int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException;
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 }

@@ -47,6 +47,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -177,6 +178,9 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			} catch (CollectionNotFoundException e) {
 				logger.error(e.getMessage(), e);
 				status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
+			} catch (HierarchyChangedException e) {
+				logger.error(e.getMessage(), e);
+				status = MeetingResponseStatus.SERVER_ERROR;
 			}		
 		} else {
 			status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
@@ -190,7 +194,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	}
 
 	private String handle(UserDataRequest udr, MSEmail email, AttendeeStatus userResponse) 
-			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException {
+			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException, HierarchyChangedException {
 		
 		return calendarBackend.handleMeetingResponse(udr, email, userResponse);
 	}

@@ -68,6 +68,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
@@ -211,6 +212,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ServerErrorException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
+		} catch (HierarchyChangedException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.HIERARCHY_CHANGED, continuation, e);
 		}
 	}
 
@@ -254,7 +257,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private ItemSyncState doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
 			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		DataDelta delta = null;
 		Date lastSync = null;
@@ -284,7 +287,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	private ModificationStatus processCollections(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
-		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
+		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
 		ModificationStatus modificationStatus = new ModificationStatus();
 
@@ -312,7 +315,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	 * Handles modifications requested by mobile device
 	 */
 	private Map<String, String> processModification(UserDataRequest udr, SyncCollection collection) throws CollectionNotFoundException, 
-		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException {
+		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		for (SyncCollectionChange change: collection.getChanges()) {
@@ -335,7 +338,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ItemNotFoundException, ConversionException {
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
 		contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
 				change.getData());
@@ -343,7 +346,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void addServerItem(UserDataRequest udr, SyncCollection collection, 
 			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
 		String obmId = contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(),
 				change.getClientId(), change.getData());
@@ -400,12 +403,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (ServerErrorException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
+		} catch (HierarchyChangedException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.HIERARCHY_CHANGED, continuation, e);
 		}
 	}
 
 	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
 			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, HierarchyChangedException {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
@@ -419,7 +424,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			Map<String, String> processedClientIds, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, HierarchyChangedException {
 
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
 		if (syncCollection.getStatus() != SyncStatus.OK) {
@@ -444,7 +449,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		syncCollectionResponse.setCollectionValidity(true);
 		

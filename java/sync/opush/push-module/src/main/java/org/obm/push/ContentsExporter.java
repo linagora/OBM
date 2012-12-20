@@ -46,6 +46,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 
@@ -65,7 +66,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) 
 					throws DaoException, CollectionNotFoundException, 
-					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException {
+					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getChanged(udr, syncCollection.getItemSyncState(), 
@@ -91,7 +92,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) 
 					throws CollectionNotFoundException, ProcessingEmailException, DaoException,
-					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
+					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 
@@ -101,7 +102,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
+			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
 		return backend.getItemEstimateSize(udr, state, 
@@ -111,7 +112,7 @@ public class ContentsExporter implements IContentsExporter {
 	@Override
 	public int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException {
+			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
 		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 

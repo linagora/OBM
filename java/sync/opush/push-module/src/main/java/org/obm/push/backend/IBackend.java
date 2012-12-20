@@ -33,12 +33,13 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.provisioning.Policy;
@@ -70,6 +71,6 @@ public interface IBackend {
 
 	Set<SyncCollection> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException, FilterTypeChangedException;
+			ConversionException, FilterTypeChangedException, HierarchyChangedException;
 	
 }
