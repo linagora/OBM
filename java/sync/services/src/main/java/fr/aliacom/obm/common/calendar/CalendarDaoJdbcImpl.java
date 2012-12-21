@@ -100,12 +100,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -1525,6 +1527,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String domainName = null;
 
 		Map<EventObmId, Event> evenExcepttById = new HashMap<EventObmId, Event>();
+		Multimap<Event, Event> eventChildren = ArrayListMultimap.create();
 		List<Event> changedEvent = new LinkedList<Event>();
 		Calendar cal = getGMTCalendar();
 		try {
@@ -1542,7 +1545,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				EventObmId eventId = new EventObmId(rs.getInt("parent_id"));
 				Event event = eventById.get(eventId);
 				if (event != null) {
-					event.getRecurrence().addEventException(eventExcept);
+					eventChildren.put(event, eventExcept);
 					changedEvent.add(eventExcept);
 					evenExcepttById.put(eventExcept.getObmId(),
 							eventExcept);
@@ -1551,6 +1554,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			IntegerIndexedSQLCollectionHelper changedIds = new IntegerIndexedSQLCollectionHelper(changedEvent);
 			loadAttendees(con, evenExcepttById, domainName);
 			loadAlerts(con, token, evenExcepttById, changedIds);
+			
+			for (Entry<Event, Event> entry: eventChildren.entries()) {
+				entry.getKey().addEventException(entry.getValue());
+			}
+			
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
 		}
