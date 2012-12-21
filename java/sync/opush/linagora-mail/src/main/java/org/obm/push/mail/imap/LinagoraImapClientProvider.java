@@ -86,7 +86,7 @@ public class LinagoraImapClientProvider {
 		
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
-		StoreClient newStoreClient = new StoreClient(imapHost, emailConfiguration.imapPort(), login, udr.getPassword());
+		StoreClient newStoreClient = new StoreClient(imapHost, emailConfiguration, login, udr.getPassword());
 		
 		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(newStoreClient);
 		newMinigStoreClient.login(activateTLS);

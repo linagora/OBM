@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.MailboxNameUTF7Converter;
 import org.obm.push.minig.imap.impl.TagProducer;
@@ -53,8 +54,7 @@ public abstract class Command<T> implements ICommand<T> {
 	protected T data;
 	
 	@Override
-	public void execute(IoSession session, TagProducer tp, Semaphore lock, 
-			List<IMAPResponse> lastResponses) {
+	public WriteFuture execute(IoSession session, TagProducer tp, Semaphore lock) {
 		
 		CommandArgument args = buildCommand();
 		String cmd = args.getCommandString();
@@ -64,11 +64,15 @@ public abstract class Command<T> implements ICommand<T> {
 		sb.append(cmd);
 		String sent = sb.toString();
 		imaplogger.info("C: {}", sent);
-		session.write(sent);
+		WriteFuture writeFuture = session.write(sent);
 		if (args.hasLiteralData()) {
-			lock(lock);
-			session.write(args.getLiteralData());
+			writeFuture.join();
+			if (writeFuture.isWritten()) {
+				lock(lock);
+				writeFuture = session.write(args.getLiteralData());
+			}
 		}
+		return writeFuture;
 
 	}
 

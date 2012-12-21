@@ -70,7 +70,7 @@ public class JavaxMailTest {
 		@Override
 		protected void configure() {
 			install(new GreenMailProviderModule());
-			install(new MailEnvModule());
+			install(new MailEnvModule(3600000));
 		}
 	}
 	

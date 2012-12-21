@@ -32,6 +32,6 @@
 
 package org.obm.push.minig.imap;
 
-public abstract class SieveTestCase extends IMAPTestCase {
+public abstract class SieveTestCase {
 
 }

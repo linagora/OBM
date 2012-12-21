@@ -48,6 +48,8 @@ import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.service.EventService;
 
+import com.google.inject.name.Names;
+
 public class GreenMailEnvModule extends AbstractOverrideModule {
 
 	public GreenMailEnvModule(IMocksControl mocksControl) {
@@ -68,6 +70,7 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 		});
 		
 		bind(EmailConfiguration.class).to(GreenMailEmailConfiguration.class);
+		bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(360000);
 		bind(SmtpProvider.class).to(GreenMailSmtpProvider.class);
 
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);

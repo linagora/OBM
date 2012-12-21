@@ -36,13 +36,13 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.TagProducer;
 
 public interface ICommand<T> {
 
-	void execute(IoSession s, TagProducer tp, Semaphore lock,
-			List<IMAPResponse> lastResponses);
+	WriteFuture execute(IoSession s, TagProducer tp, Semaphore lock);
 
 	String getImapCommand();
 	

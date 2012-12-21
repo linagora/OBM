@@ -32,18 +32,22 @@
 
 package org.obm.push.minig.imap;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.nio.ByteBuffer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Ignore;
-import org.obm.push.minig.imap.SieveClient;
 
 @Ignore("It's necessary to do again all tests")
 public class SieveLoginTests extends SieveTestCase {
 
+	private SieveClient sc = null;
+	
 	public void testConstructor() {
-		SieveClient sc = new SieveClient(confValue("imap"), 2000,
-				confValue("login"), confValue("password"));
+		SieveClient sc = null;
 		assertNotNull(sc);
 	}
 
@@ -57,9 +61,6 @@ public class SieveLoginTests extends SieveTestCase {
 	}
 
 	public void testLoginLogout() {
-		SieveClient sc = new SieveClient(confValue("imap"), 2000,
-				confValue("login"), confValue("password"));
-		assertNotNull(sc);
 
 		try {
 			boolean ret = sc.login();
@@ -71,9 +72,6 @@ public class SieveLoginTests extends SieveTestCase {
 	}
 
 	public void testUnauthenticate() {
-		SieveClient sc = new SieveClient(confValue("imap"), 2000,
-				confValue("login"), confValue("password"));
-		assertNotNull(sc);
 
 		try {
 			boolean ret = sc.login();
@@ -87,9 +85,6 @@ public class SieveLoginTests extends SieveTestCase {
 
 	public void testLoginLogoutPerf() {
 		final int IT_COUNT = 10000;
-		SieveClient sc = new SieveClient(confValue("imap"), 2000,
-				confValue("login"), confValue("password"));
-		assertNotNull(sc);
 
 		for (int i = 0; i < 1000; i++) {
 			sc.login();

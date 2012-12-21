@@ -45,9 +45,16 @@ import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 
 public class MailEnvModule extends AbstractModule {
 
+	private final int imapTimeout;
+
+	public MailEnvModule(int imapTimeoutInMilliseconds) {
+		this.imapTimeout = imapTimeoutInMilliseconds;
+	}
+	
 	@Override
 	protected void configure() {
 		bind(EventService.class).toInstance(EasyMock.createMock(EventService.class));
@@ -62,6 +69,7 @@ public class MailEnvModule extends AbstractModule {
 		});
 
 		bind(EmailConfiguration.class).to(GreenMailEmailConfiguration.class);
+		bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(imapTimeout);
 		bind(SmtpProvider.class).to(GreenMailSmtpProvider.class);
 
 		bind(MailViewToMSEmailConverter.class).to(MailViewToMSEmailConverterImpl.class);

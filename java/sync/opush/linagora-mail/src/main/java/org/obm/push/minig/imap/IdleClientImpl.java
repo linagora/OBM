@@ -78,7 +78,7 @@ public class IdleClientImpl implements IdleClient {
 		this.port = port;
 		icb = new IdleClientCallback();
 		ClientHandler handler = new ClientHandler(icb);
-		cs = new ClientSupport(handler);
+		cs = new ClientSupport(handler, null);
 		icb.setClient(cs);
 	}
 

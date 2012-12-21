@@ -157,7 +157,7 @@ public class ImapClientProviderImplTest {
 			.andReturn(true).once();
 		expect(emailConfiguration.activateTls())
 			.andReturn(false).once();
-		expect(emailConfiguration.imapTimeout())
+		expect(emailConfiguration.imapTimeoutInMilliseconds())
 			.andReturn(5000).once();
 		expect(emailConfiguration.getImapFetchBlockSize())
 			.andReturn(10240).once();

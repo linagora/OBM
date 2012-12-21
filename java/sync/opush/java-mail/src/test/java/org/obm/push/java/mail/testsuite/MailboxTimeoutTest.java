@@ -29,51 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
-package org.obm.push.minig.imap;
+package org.obm.push.java.mail.testsuite;
 
 import org.junit.Ignore;
-import org.obm.push.mail.imap.IMAPException;
-import org.obm.push.minig.imap.IdleClientImpl;
+import org.junit.Test;
+import org.obm.push.java.mail.TimeoutMailEnvModule;
+import org.obm.push.mail.imap.GuiceModule;
 
-@Ignore("It's necessary to do again all tests")
-public class IdleClientLoginTests extends IMAPTestCase {
+@GuiceModule(TimeoutMailEnvModule.class)
+public class MailboxTimeoutTest extends
+		org.obm.push.mail.imap.testsuite.MailboxTimeoutTest {
 
-	public void testConstructor() {
-		create();
+	@Override
+	@Test
+	@Ignore("Timeout is not handled correctly by javamail")
+	public void fetchTooSlow() throws InterruptedException {
+		super.fetchTooSlow();
 	}
-
-	private IdleClientImpl create() {
-		return new IdleClientImpl(confValue("imap"), 143, confValue("login"),
-				confValue("password"));
-	}
-
-	public void testLoginLogout() {
-		IdleClientImpl sc = create();
-		try {
-			sc.login(true);
-			sc.select("INBOX");
-			sc.stopIdle();
-		} catch (Throwable e) {
-			fail(e.getMessage());
-		} finally {
-			try {
-				sc.logout();
-			} catch (Throwable e) {
-				fail(e.getMessage());
-			}
-		}
-	}
-
-	public void testLoginLogoutSpeed() throws IMAPException {
-		IdleClientImpl sc = create();
-		int COUNT = 1000;
-		for (int i = 0; i < COUNT; i++) {
-			sc.login(true);
-			sc.select("INBOX");
-			sc.stopIdle();
-			sc.logout();
-		}
-	}
-
+	
 }

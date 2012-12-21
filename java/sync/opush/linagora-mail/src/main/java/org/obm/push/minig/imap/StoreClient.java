@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -78,15 +79,15 @@ public class StoreClient {
 	private ClientSupport cs;
 	private SocketConnector connector;
 
-	public StoreClient(String hostname, int port, String login, String password) {
+	public StoreClient(String hostname, EmailConfiguration emailConfiguration, String login, String password) {
 		this.hostname = hostname;
-		this.port = port;
+		this.port = emailConfiguration.imapPort();
 		this.login = login;
 		this.password = password;
 
 		IResponseCallback cb = new StoreClientCallback();
 		handler = new ClientHandler(cb);
-		cs = new ClientSupport(handler);
+		cs = new ClientSupport(handler, emailConfiguration.imapTimeoutInMilliseconds());
 		cb.setClient(cs);
 		connector = new SocketConnector();
 	}

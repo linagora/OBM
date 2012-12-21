@@ -32,12 +32,14 @@
 
 package org.obm.push.minig.imap;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 
 import org.junit.Ignore;
-import org.obm.push.minig.imap.SieveClient;
 import org.obm.push.minig.imap.sieve.SieveScript;
 
 @Ignore("It's necessary to do again all tests")
@@ -45,11 +47,8 @@ public class SieveClientTests extends SieveTestCase {
 
 	private SieveClient sc;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		sc = new SieveClient(confValue("imap"), 2000, confValue("login"),
-				confValue("password"));
+	protected void setUp() {
+		sc = null;
 		sc.login();
 	}
 
@@ -104,11 +103,9 @@ public class SieveClientTests extends SieveTestCase {
 		assertTrue(scripts.isEmpty());
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	protected void tearDown() {
 		sc.logout();
 		sc = null;
-		super.tearDown();
 	}
 
 }

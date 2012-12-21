@@ -91,7 +91,7 @@ public class ImapClientProviderImpl {
 
 	private Properties buildProperties(EmailConfiguration emailConfiguration) {
 		boolean activateTls = emailConfiguration.activateTls();
-		int imapTimeout = emailConfiguration.imapTimeout();
+		int imapTimeout = emailConfiguration.imapTimeoutInMilliseconds();
 		int imapFetchBlockSize = emailConfiguration.getImapFetchBlockSize();
 		logger.debug("Java Mail settings : STARTTLS=" + activateTls);
 		logger.debug("Java Mail settings : TIMEOUT=" + imapTimeout);

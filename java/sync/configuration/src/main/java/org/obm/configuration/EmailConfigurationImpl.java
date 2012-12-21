@@ -88,7 +88,7 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	}
 
 	@Override
-	public int imapTimeout() {
+	public int imapTimeoutInMilliseconds() {
 		return getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
 	}
 

@@ -29,56 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.push.minig.imap.testsuite;
 
-package org.obm.push.minig.imap;
+import org.obm.push.mail.imap.GuiceModule;
+import org.obm.push.minig.imap.TimeoutMailEnvModule;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+@GuiceModule(TimeoutMailEnvModule.class)
+public class MailboxTimeoutTest extends
+		org.obm.push.mail.imap.testsuite.MailboxTimeoutTest {
 
-import org.junit.Ignore;
-import org.obm.push.mail.imap.IMAPException;
-import org.obm.push.minig.imap.StoreClient;
-
-@Ignore("It's necessary to do again all tests")
-public abstract class LoggedTestCase extends IMAPTestCase {
-
-	protected StoreClient sc;
-
-	public void setUp() {
-		String port = confValue("port");
-		if (port == null) {
-			port = "143";
-		}
-		sc = new StoreClient(confValue("imap"), Integer.parseInt(port), confValue("login"),
-				confValue("password"));
-		try {
-			sc.login(true);
-		} catch (IMAPException e) {
-			fail("login failed for "+confValue("login")+" / "+confValue("password"));
-		}
-	}
-
-	public void tearDown() {
-		sc.logout();
-	}
-
-	public InputStream getRfc822Message() {
-		String m = "From: Thomas Cataldo <thomas@zz.com>\r\n"
-				+ "Subject: test message "
-				+ System.currentTimeMillis()
-				+ "\r\n"
-				+ "MIME-Version: 1.0\r\n"
-				+ "Content-Type: text/plain; CHARSET=UTF-8\r\n\r\n"
-				+ "Hi, this is message about my 300euros from the casino.\r\n\r\n";
-		return new ByteArrayInputStream(m.getBytes());
-	}
-
-	public InputStream getUtf8Rfc822Message() {
-		String m = "From: Thomas Cataldo <thomas@zz.com>\r\n"
-				+ "Subject: test message " + System.currentTimeMillis()
-				+ "\r\n" + "MIME-Version: 1.0\r\n"
-				+ "Content-Type: text/plain; CHARSET=UTF-8\r\n\r\n"
-				+ "Hi, this is message about my 300€ from the casino.\r\n\r\n";
-		return new ByteArrayInputStream(m.getBytes());
-	}
 }

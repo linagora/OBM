@@ -41,13 +41,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLException;
 
 import org.apache.mina.common.ConnectFuture;
+import org.apache.mina.common.IoFuture;
 import org.apache.mina.common.IoHandler;
 import org.apache.mina.common.IoSession;
+import org.apache.mina.common.WriteFuture;
 import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -102,23 +106,33 @@ public class ClientSupport {
 	private final static Logger logger = LoggerFactory.getLogger(ClientSupport.class);
 	
 	private final IoHandler handler;
+	private final Integer imapTimeoutInMilliseconds;
 	private IoSession session;
 	private Semaphore lock;
 	private List<IMAPResponse> lastResponses;
 	private TagProducer tagsProducer;
 	private MinigTLSFilter sslFilter;
 
-	public ClientSupport(IoHandler handler) {
+	/**
+	 * @param imapTimeoutInMilliseconds null means no timeout
+	 */
+	public ClientSupport(IoHandler handler, Integer imapTimeoutInMilliseconds) {
 		this.lock = new Semaphore(1);
 		this.handler = handler;
 		this.tagsProducer = new TagProducer();
+		this.imapTimeoutInMilliseconds = imapTimeoutInMilliseconds;
 		this.lastResponses = Collections
 				.synchronizedList(new LinkedList<IMAPResponse>());
 	}
 
 	private void lock() {
 		try {
-			lock.acquire();
+			if (imapTimeoutInMilliseconds != null) {
+				boolean success = lock.tryAcquire(imapTimeoutInMilliseconds, TimeUnit.MILLISECONDS);
+				assertTimeout(success);
+			} else {
+				lock.acquire();
+			}
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException("InterruptedException !!");
@@ -136,7 +150,7 @@ public class ClientSupport {
 
 		lock(); // waits for "* OK IMAP4rev1 server...
 		ConnectFuture cf = connector.connect(address, handler);
-		cf.join();
+		join(cf);
 		if (!cf.isConnected()) {
 			lock.release();
 			// This method call will throws the original exception  
@@ -157,6 +171,21 @@ public class ClientSupport {
 		logger.debug("Sending " + login + " login informations.");
 		if (!run(new LoginCommand(login, password))) {
 			throw new IMAPException("Cannot log into imap server");
+		}
+	}
+
+	private void join(IoFuture future) {
+		if (imapTimeoutInMilliseconds != null) {
+			boolean joinSuccess = future.join(imapTimeoutInMilliseconds);
+			assertTimeout(joinSuccess);
+		} else {
+			future.join();
+		}
+	}
+
+	private void assertTimeout(boolean joinSuccess) {
+		if (!joinSuccess) {
+			throw new ImapTimeoutException();
 		}
 	}
 
@@ -184,7 +213,7 @@ public class ClientSupport {
 					logger.error("imap connection is already stop");
 				}
 			}
-			session.close().join();
+			join(session.close());
 			session = null;
 		}
 	}
@@ -197,9 +226,12 @@ public class ClientSupport {
 		// where we might wait for cyrus welcome text.
 		lock();
 		try {
-			cmd.execute(session, tagsProducer, lock, lastResponses);
-			lock(); // this one should wait until this.setResponses is called
-			cmd.responseReceived(lastResponses);
+			WriteFuture writeFuture = cmd.execute(session, tagsProducer, lock);
+			join(writeFuture);
+			if (writeFuture.isWritten()) {
+				lock(); // this one should wait until this.setResponses is called
+				cmd.responseReceived(lastResponses);
+			}
 		} finally {
 			lock.release();
 		}

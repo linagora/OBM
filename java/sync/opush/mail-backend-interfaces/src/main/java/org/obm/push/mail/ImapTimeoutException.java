@@ -29,39 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.push.mail;
 
-package org.obm.push.minig.imap;
+public class ImapTimeoutException extends RuntimeException {
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.junit.Ignore;
-
-import junit.framework.TestCase;
-
-@Ignore("It's necessary to do again all tests")
-public abstract class IMAPTestCase extends TestCase {
-
-	protected String confValue(String key) {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(
-				"data/test.properties.sample");
-		Properties props = new Properties();
-		if (is != null) {
-			try {
-				props.load(is);
-				return props.getProperty(key);
-			} catch (IOException e) {
-				return null;
-			} finally {
-				try {
-					is.close();
-				} catch (IOException e) {
-				}
-			}
-		} else {
-			return null;
-		}
-	}
-	
 }
