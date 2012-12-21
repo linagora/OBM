@@ -403,6 +403,17 @@ public class ICalendarEventTest {
 	}
 	
 	@Test
+	public void firstAlarmInSecondsNoTriggers() {
+		VEvent vEvent = new VEvent(
+				properties(
+						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
+				alarms(
+						new VAlarm()));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.firstAlarmInSeconds()).isNull();
+	}
+	
+	@Test
 	public void firstAlarmInSecondsDateTimeAtBeginning() {
 		VEvent vEvent = new VEvent(
 				properties(

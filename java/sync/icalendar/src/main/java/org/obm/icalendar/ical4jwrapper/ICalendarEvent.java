@@ -129,7 +129,7 @@ public class ICalendarEvent {
 	
 	public Long firstAlarmInSeconds() {
 		VAlarm vAlarm = firstVAlarm(vEvent);
-		if (vAlarm != null) {
+		if (vAlarm != null && vAlarm.getTrigger() != null) {
 			Trigger trigger = vAlarm.getTrigger();
 			if (trigger.getDuration() != null) {
 				return alarmFromRelatedDateTime(trigger);
