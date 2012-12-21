@@ -79,6 +79,7 @@ import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -132,9 +133,9 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 		responder.sendWBXMLResponse(NAMESPACE, protocol.encodeErrorRespponse(status));
 	}
 	
-	private void sendResponse(Responder responder, Document document, ItemOperationsResponse response) {
+	@VisibleForTesting void sendResponse(Responder responder, Document document, ItemOperationsResponse response) {
 		
-		if (response.isMultipart()) {
+		if (response.isMultipart() && response.hasFileReference()) {
 			responder.sendMSSyncMultipartResponse(NAMESPACE, document, 
 					Arrays.asList(response.getAttachmentData()), response.isGzip());
 		} else {

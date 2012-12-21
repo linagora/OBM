@@ -217,5 +217,12 @@ public class ItemOperationsResponse {
 		}
 		return null;
 	}
+
+	public boolean hasFileReference() {
+		if (mailboxFetchResult != null) {
+			return mailboxFetchResult.getFileReferenceFetch() != null;
+		}
+		return false;
+	}
 	
 }
