@@ -160,6 +160,10 @@ public class MessageSet implements Serializable, Iterable<Long> {
 		return ranges;
 	}
 	
+	public boolean isEmpty() {
+		return ranges.isEmpty();
+	}
+	
 	public Iterable<Long> asDiscreteValues() {
 		return Iterables.concat(Iterables.transform(ranges, new Function<Range<Long>, Set<Long>>() {
 			@Override

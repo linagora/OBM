@@ -45,4 +45,8 @@ public class ItemNotFoundException extends ActiveSyncException {
 		super(message, cause);
 	}
 
+	public ItemNotFoundException(String msg) {
+		super(msg);
+	}
+
 }

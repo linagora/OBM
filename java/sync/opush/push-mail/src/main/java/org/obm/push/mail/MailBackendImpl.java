@@ -439,7 +439,10 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
 			MessageSet messages = mailboxService.move(udr, srcFolder, dstFolder, MessageSet.singleton(currentMailUid));
-			return ServerId.buildServerIdString(dstFolderId, Iterables.getOnlyElement(messages));	
+			if (!messages.isEmpty()) {
+				return ServerId.buildServerIdString(dstFolderId, Iterables.getOnlyElement(messages));	
+			}
+			throw new ItemNotFoundException("The item to move may not exists anymore");
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {

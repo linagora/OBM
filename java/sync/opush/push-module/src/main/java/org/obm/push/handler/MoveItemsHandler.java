@@ -47,6 +47,7 @@ import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
@@ -155,6 +156,9 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 				} catch (UnsupportedBackendFunctionException e) {
 					moveItemsItem.setStatusForItem(MoveItemsStatus.SERVER_ERROR);
 					logger.error(e.getMessage(), e);
+				} catch (ItemNotFoundException e) {
+					moveItemsItem.setStatusForItem(MoveItemsStatus.INVALID_SOURCE_COLLECTION_ID);
+					logger.warn(e.getMessage(), e);
 				}
 			}
 			moveItemsItems.add(moveItemsItem);

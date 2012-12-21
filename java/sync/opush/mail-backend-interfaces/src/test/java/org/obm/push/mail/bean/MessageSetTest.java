@@ -36,13 +36,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.bean.MessageSet;
 
 import com.google.common.collect.Ranges;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowFilterRunner.class)
 public class MessageSetTest {
 
 	@Test
@@ -146,5 +144,29 @@ public class MessageSetTest {
 				.build();
 		assertThat(firstSet.rangeNumber()).isEqualTo(2);
 		assertThat(firstSet.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 7l, 8l, 9l, 10l);
+	}
+	
+	@Test
+	public void messageSetIsEmptyBuiltWithNothing() {
+		MessageSet set = MessageSet.builder().build();
+		assertThat(set.isEmpty()).isTrue();
+	}
+	
+	@Test
+	public void messageSetIsEmptyBuiltWithEmpty() {
+		MessageSet set = MessageSet.empty();
+		assertThat(set.isEmpty()).isTrue();
+	}
+	
+	@Test
+	public void messageSetIsEmptyBuiltWithSingleton() {
+		MessageSet set = MessageSet.singleton(1l);
+		assertThat(set.isEmpty()).isFalse();
+	}
+	
+	@Test
+	public void messageSetIsEmptyBuiltWithAdd() {
+		MessageSet set = MessageSet.builder().add(1l).build();
+		assertThat(set.isEmpty()).isFalse();
 	}
 }
