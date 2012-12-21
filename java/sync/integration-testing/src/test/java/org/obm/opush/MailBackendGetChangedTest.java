@@ -55,7 +55,6 @@ import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -94,7 +93,6 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@Ignore("Sync decoding in progress until end of OBMFULL-4040")
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetChangedTest {
@@ -624,7 +622,7 @@ public class MailBackendGetChangedTest {
 
 		SyncCollectionResponse inboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
 		assertThat(inboxResponse.getItemChanges()).containsOnly(
-				new ItemChangeBuilder().serverId(inboxCollectionId + emailId).withNewFlag(true).build());
+				new ItemChangeBuilder().serverId(inboxCollectionId + ":" + emailId).withNewFlag(false).build());
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();

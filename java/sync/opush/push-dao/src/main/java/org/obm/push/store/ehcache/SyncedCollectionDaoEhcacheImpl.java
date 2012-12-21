@@ -32,7 +32,6 @@
 package org.obm.push.store.ehcache;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 import net.sf.ehcache.Element;
 
@@ -56,14 +55,6 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 	@Override
 	protected String getStoreName() {
 		return ObjectStoreManager.SYNCED_COLLECTION_STORE;
-	}
-
-	@Override
-	public void put(Credentials credentials, Device device,
-			Collection<SyncCollection> collections) {
-		for(SyncCollection collection : collections){
-			put(credentials, device, collection);
-		}
 	}
 
 	@Override

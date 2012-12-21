@@ -94,9 +94,7 @@ public class SyncAnalyser {
 			builder.addCollection(getCollection(userDataRequest, syncRequestCollection,
 					defaultRequestWindowSize, false));
 		}
-		Sync sync = builder.build();
-		syncedCollectionStoreService.put(userDataRequest.getCredentials(), userDataRequest.getDevice(), sync.getCollections());
-		return sync;
+		return builder.build();
 	}
 
 	private void assertNotPartialRequest(SyncRequest syncRequest) {
@@ -125,17 +123,8 @@ public class SyncAnalyser {
 		
 		SyncCollection collection = new SyncCollection();
 		int collectionId = requestCollection.getId();
-		SyncCollection lastSyncCollection = 
-				syncedCollectionStoreService.get(udr.getCredentials(), udr.getDevice(), collectionId);
-		if (isPartial && lastSyncCollection == null) {
-			throw new PartialException();
-		}
 		try {
 			collection.setCollectionId(collectionId);
-			String collectionPath = collectionDao.getCollectionPath(collectionId);
-			collection.setCollectionPath(collectionPath);
-			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
-			collection.setDataType(dataType);
 			collection.setDataClass(requestCollection.getDataClass());
 			collection.setSyncKey(requestCollection.getSyncKey());
 
@@ -144,14 +133,12 @@ public class SyncAnalyser {
 			} else {
 				collection.setWindowSize(requestDefaultWindowSize);
 			}
+
+			SyncCollection lastSyncCollection = findLastSyncedCollectionOptions(udr, isPartial, collectionId);
+			collection.setOptions(getUpdatedOptions(lastSyncCollection, requestCollection));
 			
-			if (requestCollection.hasOptions()) {
-				SyncCollectionOptions requestOptions = requestCollection.getOptions();
-				collection.setOptions(SyncCollectionOptions.cloneOnlyByExistingFields(requestOptions));
-			} else {
-				collection.setOptions(new SyncCollectionOptions());
-			}
-			
+			recognizeCollection(collection, collectionId);
+			syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
 			appendCommand(collection, requestCollection);
 		} catch (CollectionNotFoundException e) {
 			collection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
@@ -160,6 +147,40 @@ public class SyncAnalyser {
 		// TODO sync <getchanges/>
 
 		return collection;
+	}
+
+	private SyncCollection findLastSyncedCollectionOptions(UserDataRequest udr, boolean isPartial, int collectionId) {
+		SyncCollection lastSyncCollection = 
+				syncedCollectionStoreService.get(udr.getCredentials(), udr.getDevice(), collectionId);
+		if (isPartial && lastSyncCollection == null) {
+			throw new PartialException();
+		}
+		return lastSyncCollection;
+	}
+
+	private void recognizeCollection(SyncCollection collection, int collectionId) {
+		try {
+ 			String collectionPath = collectionDao.getCollectionPath(collectionId);
+ 			collection.setCollectionPath(collectionPath);
+ 			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
+ 			collection.setDataType(dataType);
+		} catch (CollectionNotFoundException e) {
+			collection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
+ 		}
+	}
+
+	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection, SyncRequestCollection requestCollection) {
+		SyncCollectionOptions lastUsedOptions = null;
+		if (lastSyncCollection != null) {
+			lastUsedOptions = lastSyncCollection.getOptions();
+		}
+		
+		if (!requestCollection.hasOptions() && lastUsedOptions != null) {
+			return lastUsedOptions;
+		} else if (requestCollection.hasOptions()) {
+			return SyncCollectionOptions.cloneOnlyByExistingFields(requestCollection.getOptions());
+		}
+		return new SyncCollectionOptions();
 	}
 
 	private void appendCommand(SyncCollection collection, SyncRequestCollection requestCollection) {

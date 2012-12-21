@@ -98,7 +98,7 @@ public class SyncCollectionOptionsTest {
 		
 		SyncCollectionOptions cloned = SyncCollectionOptions.cloneOnlyByExistingFields(cloningFromOptions);
 		
-		Assertions.assertThat(cloned.getFilterType()).isEqualTo(FilterType.ALL_ITEMS);
+		Assertions.assertThat(cloned.getFilterType()).isEqualTo(FilterType.THREE_DAYS_BACK);
 	}
 
 	@Test

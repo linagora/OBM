@@ -679,8 +679,7 @@ public class SyncProtocolTest {
 				"123", "13579", "Add", expectedMSContact, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS, 
-				ImmutableList.of(expectedSyncCollectionChange));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -745,8 +744,7 @@ public class SyncProtocolTest {
 				"456", "02468", "Add", expectedMSContact2, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS,
-				ImmutableList.of(expectedSyncCollectionChange, expectedSyncCollectionChange2));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -796,8 +794,7 @@ public class SyncProtocolTest {
 				"123", "13579", "Change", expectedMSContact, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS,
-				ImmutableList.of(expectedSyncCollectionChange));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -862,8 +859,7 @@ public class SyncProtocolTest {
 				"456", "02468", "Change", expectedMSContact2, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS,
-				ImmutableList.of(expectedSyncCollectionChange, expectedSyncCollectionChange2));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -902,8 +898,7 @@ public class SyncProtocolTest {
 				"123", null, "Fetch", null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL,
-				ImmutableList.of(expectedSyncCollectionChange), ImmutableList.of("123"));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -948,9 +943,7 @@ public class SyncProtocolTest {
 				"456", null, "Fetch", null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL,
-				ImmutableList.of(expectedSyncCollectionChange, expectedSyncCollectionChange2),
-				ImmutableList.of("123", "456"));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -991,8 +984,7 @@ public class SyncProtocolTest {
 				"123", null, "Delete", null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL,
-				ImmutableList.of(expectedSyncCollectionChange));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1036,8 +1028,7 @@ public class SyncProtocolTest {
 				"456", null, "Delete", null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL,
-				ImmutableList.of(expectedSyncCollectionChange, expectedSyncCollectionChange2));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1141,13 +1132,7 @@ public class SyncProtocolTest {
 				"79", null, "Delete", null, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
-				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS,
-				ImmutableList.of(
-						expectedSyncCollectionAdd, expectedSyncCollectionAdd2,
-						expectedSyncCollectionChange, expectedSyncCollectionChange2,
-						expectedSyncCollectionFetch,  expectedSyncCollectionFetch2,
-						expectedSyncCollectionDelete, expectedSyncCollectionDelete2),
-				ImmutableList.of("56", "57"));
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
 		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1616,7 +1601,7 @@ public class SyncProtocolTest {
 			List<BodyPreference> bodyPreferences) {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setBodyPreferences(bodyPreferences);
-		options.setFilterType(FilterType.ALL_ITEMS);
+		options.setFilterType(FilterType.THREE_DAYS_BACK);
 		
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, options);
 	}
@@ -1632,33 +1617,19 @@ public class SyncProtocolTest {
 	}
 
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, Integer windowSize) {
-		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, windowSize, PIMDataType.EMAIL,
-				Collections.<SyncCollectionChange>emptySet(), Collections.<String>emptyList());
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, windowSize, PIMDataType.EMAIL);
 	}
 
-	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, PIMDataType pimDataType,
-			Iterable<SyncCollectionChange> syncCollectionChanges) {
-		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, DEFAULT_WINDOW_SIZE, pimDataType,
-				syncCollectionChanges, Collections.<String>emptyList());
-	}
-
-	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, PIMDataType pimDataType,
-			Iterable<SyncCollectionChange> syncCollectionChanges, List<String> fetchIds) {
-		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, DEFAULT_WINDOW_SIZE, pimDataType,
-				syncCollectionChanges, fetchIds);
+	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(int collectionId, String syncKey, PIMDataType pimDataType) {
+		return mockReadThenWriteSyncedCollectionCache(collectionId, syncKey, DEFAULT_WINDOW_SIZE, pimDataType);
 	}
 
 	private SyncedCollectionDao mockReadThenWriteSyncedCollectionCache(
-			int collectionId, String syncKey, Integer windowSize, PIMDataType pimDataType,
-			Iterable<SyncCollectionChange> syncCollectionChanges, List<String> fetchIds) {
+			int collectionId, String syncKey, Integer windowSize, PIMDataType pimDataType) {
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(pimDataType, collectionId));
 		syncCollection.setDataType(pimDataType);
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		syncCollection.setWindowSize(windowSize);
-		syncCollection.setFetchIds(fetchIds);
-		for (SyncCollectionChange change : syncCollectionChanges) {
-			syncCollection.addChange(change);
-		}
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);
 	}
 
@@ -1666,7 +1637,7 @@ public class SyncProtocolTest {
 			int collectionId, SyncCollection syncCollection) {
 		SyncedCollectionDao syncedCollectionDao = createMock(SyncedCollectionDao.class);
 		expect(syncedCollectionDao.get(credentials, device, collectionId)).andReturn(null);
-		syncedCollectionDao.put(credentials, device, Sets.newHashSet(syncCollection));
+		syncedCollectionDao.put(credentials, device, syncCollection);
 		expectLastCall();
 		return syncedCollectionDao;
 	}

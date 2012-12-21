@@ -111,7 +111,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@Ignore("Sync decoding in progress until end of OBMFULL-4040")
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncHandlerTest {
 
@@ -324,7 +323,8 @@ public class SyncHandlerTest {
 		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
 		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getCollectionId(), serverId);
 
-		checkMailFolderHasNoChange(syncEmailResponse, inbox.getCollectionId());
+		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
+				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123").withNewFlag(false).build());
 	}
 	
 	@Test
@@ -379,6 +379,7 @@ public class SyncHandlerTest {
 		firstToStoreCollection.setCollectionId(collectionId);
 		firstToStoreCollection.setCollectionPath(collectionPath);
 		firstToStoreCollection.setDataType(PIMDataType.EMAIL);
+		firstToStoreCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		firstToStoreCollection.setOptions(toStoreOptions);
 		firstToStoreCollection.setWindowSize(25);
 		firstToStoreCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
@@ -387,6 +388,7 @@ public class SyncHandlerTest {
 		secondToStoreCollection.setCollectionId(collectionId);
 		secondToStoreCollection.setCollectionPath(collectionPath);
 		secondToStoreCollection.setDataType(PIMDataType.EMAIL);
+		secondToStoreCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		secondToStoreCollection.setOptions(toStoreOptions);
 		secondToStoreCollection.setSyncKey(secondSyncKey);
 		ItemSyncState secondRequestSyncState = ItemSyncState.builder()

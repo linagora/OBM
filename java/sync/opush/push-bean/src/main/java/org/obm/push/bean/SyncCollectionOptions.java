@@ -56,7 +56,7 @@ public class SyncCollectionOptions implements Serializable {
 		this.conflict = 1;
 		this.truncation = SYNC_TRUNCATION_ALL;
 		this.deletesAsMoves = true;
-		this.filterType = FilterType.ALL_ITEMS;
+		this.filterType = FilterType.THREE_DAYS_BACK;
 	}
 	
 	public SyncCollectionOptions() {

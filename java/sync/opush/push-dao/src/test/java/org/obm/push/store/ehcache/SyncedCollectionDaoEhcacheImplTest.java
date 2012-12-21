@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Collection;
-import java.util.List;
-
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
@@ -56,8 +53,6 @@ import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
-
-import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
@@ -93,7 +88,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void put() {
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildCollection(1));
 		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(syncCollection);
 		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
@@ -101,41 +96,22 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void putUpdatedCollection() {
-		Collection<SyncCollection> cols = buildListCollection(1);
-		cols.iterator().next().setCollectionPath("PATH1");
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), cols);
-		cols.iterator().next().setCollectionPath("PATH1CHANGE");
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), cols);
+		SyncCollection col = buildCollection(1);
+		col.setCollectionPath("PATH1");
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
+		col.setCollectionPath("PATH1CHANGE");
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
 		
 		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
 		Assert.assertNotNull(syncCollection);
 		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
 		Assert.assertEquals("PATH1CHANGE", syncCollection.getCollectionPath());
 	}
-	
-	@Test
-	public void putList() {
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1,2,3));
-		SyncCollection syncCollection1 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		SyncCollection syncCollection2 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 2);
-		SyncCollection syncCollection3 = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 3);
-		
-		Assert.assertNotNull(syncCollection1);
-		Assert.assertEquals(new Integer(1), syncCollection1.getCollectionId());
-		Assert.assertNotNull(syncCollection2);
-		Assert.assertEquals(new Integer(2), syncCollection2.getCollectionId());
-		Assert.assertNotNull(syncCollection3);
-		Assert.assertEquals(new Integer(3), syncCollection3.getCollectionId());
-	}
 
-	private Collection<SyncCollection> buildListCollection(Integer... ids) {
-		List<SyncCollection> cols = Lists.newLinkedList();
-		for(Integer id : ids){
-			SyncCollection col = new SyncCollection();
-			col.setCollectionId(id);
-			cols.add(col);
-		}
-		return cols;
+	private SyncCollection buildCollection(Integer id) {
+		SyncCollection col = new SyncCollection();
+		col.setCollectionId(id);
+		return col;
 	}
 	
 	private Device getFakeDeviceId(){
