@@ -29,47 +29,56 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.sync.push.client;
 
-import java.util.Map;
+import org.obm.push.bean.MoveItemsStatus;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.base.Objects;
 
-public enum MoveItemsStatus {
-	
-	INVALID_SOURCE_COLLECTION_ID("1"), //1 Invalid source collection ID.
-	INVALID_DESTINATION_COLLECTION_ID("2"), //2 Invalid destination collection ID.
-	SUCCESS("3"), // 3 Success
-	SAME_SOURCE_AND_DESTINATION_COLLECTION_ID("4"), //4 Source and destination collection IDs are the same.
-	SERVER_ERROR("5"), // 5 A failure occurred during the MoveItem operation.
-	ITEM_ALREADY_EXISTS_AT_DESTINATION("6"), //6 An item with that name already exists at the destination.
-	SOURCE_OR_DESTINATION_LOCKED("7");//7 Source or destination item was locked.
+public final class MoveItemsResponse {
 
-	private final String specificationValue;
-	
-	private MoveItemsStatus(String specificationValue) {
-		this.specificationValue = specificationValue;
-	}
-	
-	public String asSpecificationValue() {
-		return specificationValue;
-	}
-	
-	public static MoveItemsStatus fromSpecificationValue(String specificationValue) {
-		if (specValueToEnum.containsKey(specificationValue)) {
-			return specValueToEnum.get(specificationValue);
-		}
-		throw new IllegalArgumentException("No MoveItemsStatus for '" + specificationValue + "'");
-	}
-	
-	private static Map<String, MoveItemsStatus> specValueToEnum;
+	public static class MoveResult {
 		
-	static {
-		Builder<String, MoveItemsStatus> builder = ImmutableMap.builder();
-		for (MoveItemsStatus status : values()) {
-			builder.put(status.specificationValue, status);
+		public final String srcMsgId;
+		public final String dstMsgId;
+		public final MoveItemsStatus status;
+		
+		public MoveResult(String srcMsgId, String dstMsgId, MoveItemsStatus status) {
+			this.srcMsgId = srcMsgId;
+			this.dstMsgId = dstMsgId;
+			this.status = status;
 		}
-		specValueToEnum = builder.build();
 	}
+	
+	private final Iterable<MoveResult> moveResults;
+
+	public MoveItemsResponse(Iterable<MoveResult> moveResults) {
+		this.moveResults = moveResults;
+	}
+
+	public Iterable<MoveResult> getMoveResults() {
+		return moveResults;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(moveResults);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof MoveItemsResponse) {
+			MoveItemsResponse that = (MoveItemsResponse) object;
+			return Objects.equal(moveResults, that.moveResults);
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("moveResults", moveResults)
+				.toString();
+	}
+	
 }

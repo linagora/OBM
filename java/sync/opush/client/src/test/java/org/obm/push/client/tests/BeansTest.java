@@ -46,6 +46,7 @@ import org.obm.sync.push.client.FolderSyncResponse;
 import org.obm.sync.push.client.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.ItemOperationFetchResponse;
 import org.obm.sync.push.client.ItemOperationResponse;
+import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.ProvisionResponse;
 import org.obm.sync.push.client.SyncResponse;
 
@@ -77,6 +78,7 @@ public class BeansTest {
 				.add(ProvisionResponse.class)
 				.add(ItemOperationResponse.class)
 				.add(ItemOperationFetchResponse.class)
+				.add(MoveItemsResponse.class)
 				.build();
 		equalsVerifierUtilsTest.test(list);
 	}

@@ -81,17 +81,17 @@ public class MoveItemsProtocol {
 			
 			switch (moveItemsItem.getItemStatus()) {
 			case SUCCESS:
-				DOMUtils.createElementAndText(response, "Status", MoveItemsStatus.SUCCESS.asXmlValue());
+				DOMUtils.createElementAndText(response, "Status", MoveItemsStatus.SUCCESS.asSpecificationValue());
 				DOMUtils.createElementAndText(response, "SrcMsgId",	moveItemsItem.getSourceMessageId());
 				DOMUtils.createElementAndText(response, "DstMsgId",	moveItemsItem.getNewDstId());
 				break;
 			case SERVER_ERROR:
 				DOMUtils.createElementAndText(response, "SrcMsgId", moveItemsItem.getSourceMessageId());
-				DOMUtils.createElementAndText(response, "Status", MoveItemsStatus.SERVER_ERROR.asXmlValue());
+				DOMUtils.createElementAndText(response, "Status", MoveItemsStatus.SERVER_ERROR.asSpecificationValue());
 				break;
 			default:
 				DOMUtils.createElementAndText(response, "SrcMsgId", moveItemsItem.getSourceMessageId());
-				DOMUtils.createElementAndText(response, "Status", moveItemsItem.getItemStatus().asXmlValue());
+				DOMUtils.createElementAndText(response, "Status", moveItemsItem.getItemStatus().asSpecificationValue());
 				break;
 			}			
 		}
@@ -101,7 +101,7 @@ public class MoveItemsProtocol {
 	public Document encodeErrorResponse(MoveItemsStatus moveItemsStatus) {
 		Document document = DOMUtils.createDoc(null, "Move");
 		Element root = document.getDocumentElement();
-		DOMUtils.createElementAndText(root, "Status", moveItemsStatus.asXmlValue());
+		DOMUtils.createElementAndText(root, "Status", moveItemsStatus.asSpecificationValue());
 		return document;
 	}
 	

@@ -53,6 +53,8 @@ import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.ItemOperationFetchCommand;
+import org.obm.sync.push.client.commands.MoveItemsCommand;
+import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 import org.obm.sync.push.client.commands.Options;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
@@ -160,6 +162,10 @@ public abstract class OPClient {
 
 	public ItemOperationResponse itemOperationFetch(int collectionId, MSEmailBodyType bodyType, String...serverId) throws Exception {
 		return run(new ItemOperationFetchCommand(collectionId, bodyType, serverId));
+	}
+
+	public MoveItemsResponse moveItems(Move...moves) throws Exception {
+		return run(new MoveItemsCommand(moves));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)
