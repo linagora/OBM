@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -64,12 +65,18 @@ public class ResponseWindowingService {
 		void store(List<T> itemsToStore);
 	}
 	
+	private static interface ChangesMergePolicy<T extends ASItem> {
+		List<T> merge(Collection<T> lhs, List<T> rhs);
+	}
+	
 	private static class WindowLogic<T extends ASItem> {
 		private Logger logger = LoggerFactory.getLogger(getClass());
 		private final Store<T> store;
+		private final ChangesMergePolicy<T> changesMergePolicy;
 		
-		WindowLogic(Store<T> store) {
+		WindowLogic(Store<T> store, ChangesMergePolicy<T> changesMergePolicy) {
 			this.store = store;
+			this.changesMergePolicy = changesMergePolicy;
 		}
 		
 		List<T> window(SyncCollection c, List<T> newChanges, Map<String, String> processedClientIds) {
@@ -83,12 +90,8 @@ public class ResponseWindowingService {
 			}
 		}
 		
-		List<T> listChanges(List<T> newChanges) {
-			
-			return Lists.newArrayList(
-					Iterables.concat(
-							popUnsynchronizedChanges(),
-							newChanges));
+		protected List<T> listChanges(List<T> newChanges) {
+			return changesMergePolicy.merge(popUnsynchronizedChanges(), newChanges);
 		}
 
 		Collection<T> popUnsynchronizedChanges() {
@@ -191,6 +194,11 @@ public class ResponseWindowingService {
 				return items;
 			}
 			
+		}, new ChangesMergePolicy<ItemChange>() {
+			@Override
+			public List<ItemChange> merge(Collection<ItemChange> lhs, List<ItemChange> rhs) {
+				return Lists.newArrayList(Iterables.concat(lhs, rhs));
+			}
 		}).window(c, delta.getChanges(), processedClientIds);
 	}
 
@@ -213,6 +221,12 @@ public class ResponseWindowingService {
 				return items;
 			}
 			
+		}, new ChangesMergePolicy<ItemDeletion>() {
+			@Override
+			public List<ItemDeletion> merge(Collection<ItemDeletion> lhs, List<ItemDeletion> rhs) {
+				return Lists.newArrayList(
+						ImmutableSet.copyOf(Iterables.concat(lhs, rhs)));
+			}
 		}).window(c, delta.getDeletions(), processedClientIds);
 	}
 

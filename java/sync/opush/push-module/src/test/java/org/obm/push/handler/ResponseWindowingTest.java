@@ -51,6 +51,7 @@ import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -238,6 +239,60 @@ public class ResponseWindowingTest {
 		verify(unsynchronizedItemDao);
 				
 		assertThat(actual).isEqualTo(deltas.getDeletions());
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void windowChangesWithDuplicates() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(deltas(2).getChanges());
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		replay(unsynchronizedItemDao);
+		
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		
+		DataDelta deltas = deltas(2);
+		try {
+			responseWindowingProcessor.windowChanges(syncCollection(2), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+		} catch (IllegalStateException e) {
+			verify(unsynchronizedItemDao);
+			throw e;
+		}
+	}
+	
+	@Test
+	public void windowDeletionsWithDuplicates() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		ItemDeletion duplicateEntry = ItemDeletion.builder().serverId("12:23").build();
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1))
+			.andReturn(
+					ImmutableSet.of(
+							ItemDeletion.builder().serverId("12:22").build(), 
+							duplicateEntry));
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
+		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, 1, 
+				ImmutableList.of(ItemDeletion.builder().serverId("12:24").build()));
+		replay(unsynchronizedItemDao);
+		
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		
+		DataDelta deltas = DataDelta.builder().deletions(
+				ImmutableList.of(
+						duplicateEntry,
+						ItemDeletion.builder().serverId("12:24").build()))
+				.syncDate(DateUtils.date("2012-01-01"))
+				.build();
+		List<ItemDeletion> actual = 
+				responseWindowingProcessor.windowDeletions(syncCollection(2), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+		
+		verify(unsynchronizedItemDao);
+				
+		assertThat(actual).containsExactly(
+				ItemDeletion.builder().serverId("12:22").build(),
+				duplicateEntry);
 	}
 	
 	private Map<String, String> changesToMap(DataDelta deltasWithOffset) {
