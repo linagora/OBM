@@ -35,12 +35,12 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.OpushUser;
@@ -109,7 +109,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 				
-		Assertions.assertThat(actual).isEqualTo(deltas.getChanges());
+		assertThat(actual).isEqualTo(deltas.getChanges());
 	}
 
 	@Test
@@ -138,9 +138,9 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 		
-		Assertions.assertThat(firstCall).isEqualTo(deltas(2).getChanges());
-		Assertions.assertThat(secondCall).isEqualTo(deltasWithOffset(2, 2).getChanges());
-		Assertions.assertThat(thirdCall).isEqualTo(deltasWithOffset(1, 4).getChanges());
+		assertThat(firstCall).isEqualTo(deltas(2).getChanges());
+		assertThat(secondCall).isEqualTo(deltasWithOffset(2, 2).getChanges());
+		assertThat(thirdCall).isEqualTo(deltasWithOffset(1, 4).getChanges());
 	}
 
 	@Test
@@ -158,7 +158,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 		
-		Assertions.assertThat(actual).isEqualTo(deltas(3).getChanges());
+		assertThat(actual).isEqualTo(deltas(3).getChanges());
 	}
 
 	@Test
@@ -176,7 +176,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 		
-		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
+		assertThat(actual).isEqualTo(deltas(5).getChanges());
 	}
 
 	@Test
@@ -197,7 +197,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 		
-		Assertions.assertThat(actual).isEqualTo(deltasWithOffset(2, 3).getChanges());
+		assertThat(actual).isEqualTo(deltasWithOffset(2, 3).getChanges());
 	}
 
 	@Test
@@ -217,7 +217,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 		
-		Assertions.assertThat(actual).isEqualTo(deltas(5).getChanges());
+		assertThat(actual).isEqualTo(deltas(5).getChanges());
 	}
 	
 	@Test
@@ -237,7 +237,7 @@ public class ResponseWindowingTest {
 		
 		verify(unsynchronizedItemDao);
 				
-		Assertions.assertThat(actual).isEqualTo(deltas.getDeletions());
+		assertThat(actual).isEqualTo(deltas.getDeletions());
 	}
 	
 	private Map<String, String> changesToMap(DataDelta deltasWithOffset) {
