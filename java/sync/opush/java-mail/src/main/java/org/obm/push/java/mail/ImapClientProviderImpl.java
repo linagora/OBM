@@ -123,12 +123,10 @@ public class ImapClientProviderImpl {
 			if (imapStore != null) {
 				return imapStore;
 			} else {
-				ImapStore newStore = null;
-					newStore = buildImapStore(udr);
-					
-					newStore.login();
-					udr.putResource(IMAP_STORE_RESOURCE, newStore);
-					return newStore;
+				ImapStore newStore = buildImapStore(udr);
+				newStore.login();
+				udr.putResource(IMAP_STORE_RESOURCE, newStore);
+				return newStore;
 			}
 		} catch (NoImapClientAvailableException e) {
 			throw new IMAPException(e);
