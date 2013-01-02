@@ -214,6 +214,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (HierarchyChangedException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.HIERARCHY_CHANGED, continuation, e);
+		} catch (ItemNotFoundException e) {
+			//This case is specific to email sync race-condition
+			sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY, continuation, e);
 		}
 	}
 

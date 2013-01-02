@@ -110,6 +110,7 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -203,6 +204,46 @@ public class SyncHandlerTest {
 				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":" + 0).withNewFlag(true).build());
 	}
 
+	@Test
+	public void testSyncTwoMailButOneDisappearing() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("13424");
+		int syncEmailCollectionId = 432;
+
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, ImmutableList.of(syncEmailCollectionId));
+		mockCollectionDaoForEmailSync(collectionDao, syncEmailSyncKey, ImmutableList.of(syncEmailCollectionId));
+		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		mockEmailSyncedCollectionDao(syncedCollectionDao);
+		
+		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
+
+		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
+		expect(contentsExporter.getChanged(
+				anyObject(UserDataRequest.class), 
+				anyObject(SyncCollection.class),
+				anyObject(SyncKey.class)))
+				.andThrow(new ItemNotFoundException());
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, inbox.getCollectionId(), FilterType.THREE_DAYS_BACK, 100);
+		
+		assertThat(syncEmailResponse).isNotNull();
+		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.NEED_RETRY);
+	}
+	
 	@Test
 	public void testSyncTwoInboxMails() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
