@@ -2298,7 +2298,8 @@ function update_calendar_action() {
   if($id) {
     $event_info = get_calendar_event_info($id);
     $owner = $event_info['owner'];
-    if ($owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
+    $organizerUserObmId = get_event_organizer_userObm_id($id);
+    if ( !$organizerUserObmId || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);
 

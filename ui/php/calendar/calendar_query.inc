@@ -5049,6 +5049,20 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
   return $obm_q;
 }
 
+/**
+* Get the ID of the userObm user that is organizer of this event
+* if the organizer is not a userObm it returns FALSE
+*/
+function get_event_organizer_userObm_id($event_id) {
+  $res=run_query_get_events_attendee(array($event_id), false, false);
+  while($res->next_record()) {
+    if($res->f('eventlink_is_organizer')
+    AND $res->f('eventlink_entity') == "user" ){
+      return $res->f('eventlink_entity_id');
+    }
+  }
+  return false;
+}
 
 /**
  * Get all exceptions for an array of events
