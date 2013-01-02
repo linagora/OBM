@@ -31,66 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.request;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static org.fest.assertions.api.Assertions.*;
+import static org.easymock.EasyMock.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.obm.push.bean.DeviceId;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
+@RunWith(SlowFilterRunner.class)
+public class Base64QueryStringTest {
 
-public class SimpleQueryString extends AbstractActiveSyncRequest {
+	@Test
+	public void testBase64Query() {
+		HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+		expect(httpRequest.getQueryString()).andReturn("eQkMBBCCQ5n2qr7U1ExezUo9UusJBDkAAAACV1A=");
+		
+		replay(httpRequest);
+		ActiveSyncRequest asRequest = new Base64QueryString(httpRequest, null);
+		verify(httpRequest);
 
-	public SimpleQueryString(HttpServletRequest request) {
-		super(request);
-	}
+		assertThat(asRequest.getMsPolicyKey()).isEqualTo("956301312");
+		assertThat(asRequest.getMSASProtocolVersion()).isEqualTo("12.1");
+		assertThat(asRequest.getCommand()).isEqualTo("FolderSync");
 
-	@Override
-	public String getParameter(String key) {
-		return request.getParameter(key);
-	}
-
-	@Override
-	public InputStream getInputStream() throws IOException {
-		return request.getInputStream();
-	}
-
-	@Override
-	public String getHeader(String name) {
-		return request.getHeader(name);
-	}
-
-	@Override
-	public HttpServletRequest getHttpServletRequest() {
-		return request;
-	}
-
-	@Override
-	public DeviceId getDeviceId() {
-		return new DeviceId(p("DeviceId"));
-	}
-
-	@Override
-	public String getDeviceType() {
-		String deviceType = p("DeviceType");
-		if (deviceType.startsWith("IMEI")) {
-			return p("User-Agent");
-		}
-		return deviceType;
-	}
-	
-	@Override
-	public String getCommand() {
-		return p("Cmd");
-	}
-	
-	@Override
-	public String getMsPolicyKey() {
-		return request.getHeader("X-Ms-PolicyKey");
-	}
-	
-	@Override
-	public String getMSASProtocolVersion() {
-		return request.getHeader("MS-ASProtocolVersion");
+		assertThat(asRequest.getParameter("Cmd")).isEqualTo("FolderSync");
+		assertThat(asRequest.getParameter("DeviceId")).isEqualTo("gkOZ9qq+1NRMXs1KPVLrCQ==");
+		assertThat(asRequest.getParameter("DeviceType")).isEqualTo("WP");
+		assertThat(asRequest.getParameter("AttachmentName")).isNull();
+		assertThat(asRequest.getParameter("CollectionId")).isNull();
+		assertThat(asRequest.getParameter("CollectionName")).isNull();
+		assertThat(asRequest.getParameter("AttachmentName")).isNull();
+		assertThat(asRequest.getParameter("ItemId")).isNull();
+		assertThat(asRequest.getParameter("LongId")).isNull();
+		assertThat(asRequest.getParameter("ParentId")).isNull();
+		assertThat(asRequest.getParameter("Occurrence")).isNull();
+		assertThat(asRequest.getParameter("SaveInSent")).isNull();
+		assertThat(asRequest.getParameter("AcceptMultiPart")).isNull();
 	}
 }

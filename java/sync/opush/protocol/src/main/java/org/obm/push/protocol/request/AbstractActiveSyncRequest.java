@@ -54,14 +54,4 @@ public abstract class AbstractActiveSyncRequest implements ActiveSyncRequest {
 	public String getUserAgent() {
 		return request.getHeader("User-Agent");
 	}
-
-	@Override
-	public String getMsPolicyKey() {
-		return request.getHeader("X-Ms-PolicyKey");
-	}
-	
-	@Override
-	public String getMSASProtocolVersion() {
-		return request.getHeader("MS-ASProtocolVersion");
-	}
 }

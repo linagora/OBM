@@ -31,66 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.request;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.obm.push.bean.DeviceId;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
+@RunWith(SlowFilterRunner.class)
+public class SimpleQueryStringTest {
 
-public class SimpleQueryString extends AbstractActiveSyncRequest {
-
-	public SimpleQueryString(HttpServletRequest request) {
-		super(request);
-	}
-
-	@Override
-	public String getParameter(String key) {
-		return request.getParameter(key);
-	}
-
-	@Override
-	public InputStream getInputStream() throws IOException {
-		return request.getInputStream();
-	}
-
-	@Override
-	public String getHeader(String name) {
-		return request.getHeader(name);
-	}
-
-	@Override
-	public HttpServletRequest getHttpServletRequest() {
-		return request;
-	}
-
-	@Override
-	public DeviceId getDeviceId() {
-		return new DeviceId(p("DeviceId"));
-	}
-
-	@Override
-	public String getDeviceType() {
-		String deviceType = p("DeviceType");
-		if (deviceType.startsWith("IMEI")) {
-			return p("User-Agent");
-		}
-		return deviceType;
-	}
-	
-	@Override
-	public String getCommand() {
-		return p("Cmd");
-	}
-	
-	@Override
-	public String getMsPolicyKey() {
-		return request.getHeader("X-Ms-PolicyKey");
-	}
-	
-	@Override
-	public String getMSASProtocolVersion() {
-		return request.getHeader("MS-ASProtocolVersion");
+	@Test
+	public void testSimpleQuery() {
+		HttpServletRequest httpRequest = createMock(HttpServletRequest.class);
+		expect(httpRequest.getHeader("X-Ms-PolicyKey")).andReturn("956301312");
+		expect(httpRequest.getHeader("MS-ASProtocolVersion")).andReturn("12.1");
+		expect(httpRequest.getParameter("Cmd")).andReturn("Autodiscover");
+		expect(httpRequest.getParameter("DeviceId")).andReturn("gkOZ9qq+1NRMXs1KPVLrCQ==");
+		expect(httpRequest.getParameter("DeviceType")).andReturn("WP");
+		
+		replay(httpRequest);
+		ActiveSyncRequest asRequest = new SimpleQueryString(httpRequest);
+		assertThat(asRequest.getMsPolicyKey()).isEqualTo("956301312");
+		assertThat(asRequest.getMSASProtocolVersion()).isEqualTo("12.1");
+		assertThat(asRequest.getCommand()).isEqualTo("Autodiscover");
+		assertThat(asRequest.getParameter("DeviceId")).isEqualTo("gkOZ9qq+1NRMXs1KPVLrCQ==");
+		assertThat(asRequest.getParameter("DeviceType")).isEqualTo("WP");
+		verify(httpRequest);
 	}
 }

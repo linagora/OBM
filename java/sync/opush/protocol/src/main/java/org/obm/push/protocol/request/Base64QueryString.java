@@ -40,7 +40,7 @@ import org.obm.push.bean.DeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Base64QueryString extends AbstractActiveSyncRequest implements ActiveSyncRequest {
+public class Base64QueryString extends AbstractActiveSyncRequest {
 
 	/**
 	 * <code>
@@ -74,13 +74,14 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	private static final Logger logger = LoggerFactory
 			.getLogger(Base64QueryString.class);
 	
-	private InputStream stream;
+	private final InputStream stream;
 	
 	private byte[] data;
 	private String protocolVersion;
 	private String deviceType;
 	private DeviceId deviceId;
 	private int cmdCode;
+	private int policyKey;
 	
 	private String attachmentName;
 	private String collectionId;
@@ -93,10 +94,10 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	private String acceptMultiPart;
 	
 
-	public Base64QueryString(HttpServletRequest r, InputStream stream) {
-		super(r);
+	public Base64QueryString(HttpServletRequest request, InputStream stream) {
+		super(request);
 		this.stream = stream;
-		this.data = Base64.decodeBase64(r.getQueryString());
+		this.data = Base64.decodeBase64(request.getQueryString());
 		int i = 0;
 		protocolVersion = "" + (data[i++] / 10.0); // i==0
 		cmdCode = data[i++]; // 1
@@ -112,7 +113,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 			deviceId = new DeviceId(new String(Base64.encodeBase64(devId)));
 		}
 
-		int policyKey = 0;
+		policyKey = 0;
 		if (data[i++] == 4) { // got a policy key
 			policyKey = policyKey + (data[i++] << 24) + (data[i++] << 16)
 					+ (data[i++] << 8) + (data[i++]);
@@ -272,8 +273,17 @@ public class Base64QueryString extends AbstractActiveSyncRequest implements Acti
 	}
 
 	@Override
+	public String getMsPolicyKey() {
+		return String.valueOf(policyKey);
+	}
+
+	@Override
+	public String getMSASProtocolVersion() {
+		return protocolVersion;
+	}
+
+	@Override
 	public String getCommand() {
 		return Base64CommandCodes.getCmd(cmdCode);
 	}
-	
 }
