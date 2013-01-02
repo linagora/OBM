@@ -2094,7 +2094,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $opacity = strtolower($occurrence->event->opacity);
   $eventColor = get_color_data($event->color);
   $updatable = false;
-  if ( $entity_id == $event->owner && ( $owner == $obm['uid'] || in_array($owner,$writable_entity['ids']) ) ) {
+  if ( $event->isOrganizerAnObmUser() && $entity_id == $event->owner && ( $owner == $obm['uid'] || in_array($owner,$writable_entity['ids']) ) ) {
     $updatable =  true;
     $event_data["updatable"] = true;
   }

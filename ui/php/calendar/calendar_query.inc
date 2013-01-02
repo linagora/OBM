@@ -6213,6 +6213,7 @@ Class Event {
     $this->repeat = $repeat;
     $this->all_day = $all_day;
     $this->attendee = array();
+    $this->attendee_data = array();
     $this->owner = $owner;
     $this->owner_name = $owner_name;
     $this->color = $color;
@@ -6290,10 +6291,28 @@ Class Event {
    */
   function addAttendee($entity,$entity_id,$entity_label, $entity_state) {
     $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_".strtolower(str_replace('-', '_', $entity_state))].')';
+    $this->attendee_data[] = array(
+      "entity"=>$entity,
+      "entity_id"=>$entity_id,
+      "entity_label"=>$entity_label,
+      "entity_state"=>$entity_state
+    );
   }
 
   function setOrganizerName($organizerName){
     $this->organizer_name = $organizerName;
+  }
+
+  public function isOrganizerAnObmUser() {
+    if ( !$this->organizer_name ) {
+      return FALSE;
+    }
+    foreach ( $this->attendee_data as $attendee) {
+      if ( $attendee["entity"] == "user" && $attendee["entity_label"] == $this->organizer_name ) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
