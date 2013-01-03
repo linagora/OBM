@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.sync.ServerCapability;
 import org.obm.sync.calendar.CalendarInfo;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -56,6 +57,7 @@ public class AccessToken {
 	private Map<String, String> serviceProps;
 	private Collection<CalendarInfo> calendarRights;
 	private UserSettings userSettings;
+	private Map<ServerCapability, String> serverCapabilities;
 
 	private MavenVersion version;
 	private int conversationUid;
@@ -65,6 +67,7 @@ public class AccessToken {
 		this.origin = origin;
 		this.isoCodeToNameCache = new HashMap<String, String>();
 		this.serviceProps = new HashMap<String, String>();
+		this.serverCapabilities = new HashMap<ServerCapability, String>();
 	}
 	
 	public ObmDomain getDomain() {
@@ -189,5 +192,13 @@ public class AccessToken {
 
 	public void setUserSettings(UserSettings userSettings) {
 		this.userSettings = userSettings;
+	}
+
+	public Map<ServerCapability, String> getServerCapabilities() {
+		return serverCapabilities;
+	}
+
+	public void setServerCapabilities(Map<ServerCapability, String> serverCapabilities) {
+		this.serverCapabilities = serverCapabilities;
 	}
 }

@@ -29,13 +29,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.w3c.dom.Document;
 
@@ -56,8 +59,9 @@ public class XmlResponderTest {
 	}
 
 	@Test
-	public void testToXMLNoUserSettings() throws Exception {
+	public void testToXMLNoUserSettingsNoCapabilities() throws Exception {
 		expect(at.getUserSettings()).andReturn(null).once();
+		expect(at.getServerCapabilities()).andReturn(null).once();
 		replay(at);
 
 		Document doc = responder.toXML(at);
@@ -67,9 +71,12 @@ public class XmlResponderTest {
 	}
 
 	@Test
-	public void testToXMLFiveUserSettings() throws Exception {
+	public void testToXMLFiveUserSettingsOneCapability() throws Exception {
 		ImmutableMap<String, String> settings = ImmutableMap.of("setting1", "value1", "setting2", "value2", "setting3", "value3", "setting4", "value4", "setting5", "value5");
+		ImmutableMap<ServerCapability, String> caps = ImmutableMap.of(ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
+		
 		expect(at.getUserSettings()).andReturn(new UserSettings(settings)).once();
+		expect(at.getServerCapabilities()).andReturn(caps).once();
 		replay(at);
 
 		Document doc = responder.toXML(at);

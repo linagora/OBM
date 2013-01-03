@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.base.Category;
@@ -127,11 +128,11 @@ public class XmlResponder {
 	}
 
 	public Document toXML(AccessToken at) throws FactoryConfigurationError {
-		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain(), at.getUserSettings());
+		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain(), at.getUserSettings(), at.getServerCapabilities());
 	}
 
 	public Document prepareAccessTokenXML(String sessionId, String userEmail,
-			MavenVersion version, ObmDomain tokenDomain, UserSettings userSettings)
+			MavenVersion version, ObmDomain tokenDomain, UserSettings userSettings, Map<ServerCapability, String> serverCapabilities)
 			throws FactoryConfigurationError {
 		Document doc = DOMUtils.createDoc(
 				"http://www.obm.org/xsd/sync/token.xsd", "token");
@@ -147,6 +148,13 @@ public class XmlResponder {
 		Element domain = DOMUtils.createElementAndText(root, "domain", tokenDomain.getName());
 		domain.setAttribute("uuid", tokenDomain.getUuid());
 
+		appendUserSettings(root, userSettings);
+		appendServerCapabilities(root, serverCapabilities);
+
+		return doc;
+	}
+	
+	private void appendUserSettings(Element root, UserSettings userSettings) {
 		Element settingsElement = DOMUtils.createElement(root, "settings");
 
 		if (userSettings != null) {
@@ -160,8 +168,18 @@ public class XmlResponder {
 				}
 			}
 		}
+	}
+	
+	private void appendServerCapabilities(Element root, Map<ServerCapability, String> serverCapabilities) {
+		Element settingsElement = DOMUtils.createElement(root, "server-capabilities");
 
-		return doc;
+		if (serverCapabilities != null) {
+			for (Entry<ServerCapability, String> capability : serverCapabilities.entrySet()) {
+				Element capabilityElement = DOMUtils.createElementAndText(settingsElement, "server-capability", capability.getValue());
+
+				capabilityElement.setAttribute("name", capability.getKey().name());
+			}
+		}
 	}
 
 	public String emitResponse(Document doc) {

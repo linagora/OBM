@@ -11,4 +11,7 @@
 		<setting name="setting4">value4</setting>
 		<setting name="setting5">value5</setting>
 	</settings>
+	<server-capabilities>
+		<server-capability name="CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION">true</server-capability>
+	</server-capabilities>
 </token>
