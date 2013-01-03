@@ -152,6 +152,8 @@ public class CalendarEncoder extends Encoder {
 
 		encodeBody(device, p, ev.getDescription());
 
+		encodeCategories(p, ev.getCategories());
+		
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev, sdf, timeZone);
 			encodeExceptions(device, ev, p, ev.getExceptions(), sdf);
@@ -185,6 +187,16 @@ public class CalendarEncoder extends Encoder {
 
 		// DOMUtils.createElement(p, "Calendar:Compressed_RTF");
 
+	}
+
+	private void encodeCategories(Element p, List<String> categories) {
+		if (categories != null && !categories.isEmpty()) {
+			Element ce = DOMUtils.createElement(p, ASCalendar.CATEGORIES.asASValue());
+			
+			for (String category : categories) {
+				s(ce, ASCalendar.CATEGORY.asASValue(), category);
+			}
+		}
 	}
 
 	private String encodedTimeZoneAsString(TimeZone timeZone, Locale locale) {
@@ -236,7 +248,7 @@ public class CalendarEncoder extends Encoder {
 					s(e, ASCalendar.BUSY_STATUS.asASValue(), ex.getBusyStatus().asIntString());
 					s(e, ASCalendar.ALL_DAY_EVENT.asASValue(), (ex.getAllDayEvent() ? "1" : "0"));
 					s(e, ASCalendar.REMINDER_MINS_BEFORE.asASValue(), ex.getReminder());
-					DOMUtils.createElement(e, ASCalendar.CATEGORIES.asASValue());
+					encodeCategories(e, ex.getCategories());
 				}
 				s(e, ASCalendar.SUBJECT.asASValue(), ex.getSubject());
 

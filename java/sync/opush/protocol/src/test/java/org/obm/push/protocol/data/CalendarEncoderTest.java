@@ -44,7 +44,6 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +65,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.IntEncoder;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class)
@@ -81,6 +81,7 @@ public class CalendarEncoderTest {
 		timeZoneEncoder = new TimeZoneEncoderImpl(new IntEncoder(), new WCHAREncoder(), new SystemTimeEncoder());
 		timeZoneConverter = new TimeZoneConverterImpl();
 		encoder = new CalendarEncoder(timeZoneEncoder, timeZoneConverter);
+		TimeZone.setDefault(null);
 		defaultTimeZone = TimeZone.getTimeZone("GMT");
 		// Locale should be inherited in future from UserSettings
 		// standardName & dayLightName are locale dependent  
@@ -130,7 +131,7 @@ public class CalendarEncoderTest {
 		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
 		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
 		expected.append("</ApplicationData>");
-		Assertions.assertThat(actual).isEqualTo(expected.toString());
+		assertThat(actual).isEqualTo(expected.toString());
 	}
 
 	@Test
@@ -252,8 +253,8 @@ public class CalendarEncoderTest {
 		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>");
-		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:StartTime>20120615T113512Z</Calendar:StartTime>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:StartTime>20120615T133512Z</Calendar:StartTime>");
 		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
 		expected.append("<AirSyncBase:Body>");
 		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
@@ -294,8 +295,8 @@ public class CalendarEncoderTest {
 		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		expected.append("<ApplicationData xmlns=\"test\">");
 		expected.append("<Calendar:TimeZone>xP///0MAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAEMAZQBuAHQAcgBhAGwAIABFAHUAcgBvAHAAZQBhAG4AIABTAHUAbQBtAGUAcgAgAFQAaQBtAGUAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==</Calendar:TimeZone>");
-		expected.append("<Calendar:DTStamp>19700101T000000Z</Calendar:DTStamp>");
-		expected.append("<Calendar:StartTime>20120614T220000Z</Calendar:StartTime>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:StartTime>20120615T000000Z</Calendar:StartTime>");
 		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
 		expected.append("<AirSyncBase:Body>");
 		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
@@ -327,5 +328,193 @@ public class CalendarEncoderTest {
 
 	private Device getFakeDevice() {
 		return new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
+	}
+	
+	@Test
+	public void testEncodeOneCategories() throws Exception {
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		msEvent.setCategories(ImmutableList.of("Cat"));
+		
+		String actual = encodeMSEventAsString(msEvent);
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		expected.append("<ApplicationData xmlns=\"test\">");
+		expected.append("<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Categories>");
+		expected.append("<Calendar:Category>Cat</Calendar:Category>");
+		expected.append("</Calendar:Categories>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
+		expected.append("</ApplicationData>");
+		assertThat(actual).isEqualTo(expected.toString());
+	}
+	
+	@Test
+	public void testEncodeCategories() throws Exception {
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		msEvent.setCategories(ImmutableList.of("Cat1", "Cat2"));
+		
+		String actual = encodeMSEventAsString(msEvent);
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		expected.append("<ApplicationData xmlns=\"test\">");
+		expected.append("<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Categories>");
+		expected.append("<Calendar:Category>Cat1</Calendar:Category>");
+		expected.append("<Calendar:Category>Cat2</Calendar:Category>");
+		expected.append("</Calendar:Categories>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
+		expected.append("</ApplicationData>");
+		assertThat(actual).isEqualTo(expected.toString());
+	}
+	
+	@Test
+	public void testEncodeOneCategoriesInException() throws Exception {
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		MSEventException msEventException = getFakeMSEventException(defaultTimeZone);
+		msEventException.setCategories(ImmutableList.of("Cat"));
+		Calendar calendar = DateUtils.getEpochCalendar(defaultTimeZone);
+		calendar.set(Calendar.YEAR, 2012);
+		calendar.set(Calendar.MONTH, 5);
+		calendar.set(Calendar.DAY_OF_MONTH, 15);
+		calendar.set(Calendar.HOUR, 11);
+		calendar.set(Calendar.MINUTE, 35);
+		calendar.set(Calendar.SECOND, 12);
+		msEvent.setStartTime(calendar.getTime());
+		msEvent.setExceptions(ImmutableList.of(msEventException));
+		msEvent.setRecurrence(getMSRecurrence(msEvent.getStartTime()));
+		
+		String actual = encodeMSEventAsString(msEvent);
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		expected.append("<ApplicationData xmlns=\"test\">");
+		expected.append("<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:StartTime>20120615T133512Z</Calendar:StartTime>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Recurrence>");
+		expected.append("<Calendar:RecurrenceType>2</Calendar:RecurrenceType>");
+		expected.append("<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>");
+		expected.append("<Calendar:RecurrenceDayOfMonth>15</Calendar:RecurrenceDayOfMonth>");
+		expected.append("</Calendar:Recurrence>");
+		expected.append("<Calendar:Exceptions>");
+		expected.append("<Calendar:Exception>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:Categories>");
+		expected.append("<Calendar:Category>Cat</Calendar:Category>");
+		expected.append("</Calendar:Categories>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("</Calendar:Exception>");
+		expected.append("</Calendar:Exceptions>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
+		expected.append("</ApplicationData>");
+		assertThat(actual).isEqualTo(expected.toString());
+	}
+	
+	@Test
+	public void testEncodeCategoriesInException() throws Exception {
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		MSEventException msEventException = getFakeMSEventException(defaultTimeZone);
+		msEventException.setCategories(ImmutableList.of("Cat1", "Cat2"));
+		Calendar calendar = DateUtils.getEpochCalendar(defaultTimeZone);
+		calendar.set(Calendar.YEAR, 2012);
+		calendar.set(Calendar.MONTH, 5);
+		calendar.set(Calendar.DAY_OF_MONTH, 15);
+		calendar.set(Calendar.HOUR, 11);
+		calendar.set(Calendar.MINUTE, 35);
+		calendar.set(Calendar.SECOND, 12);
+		msEvent.setStartTime(calendar.getTime());
+		msEvent.setExceptions(ImmutableList.of(msEventException));
+		msEvent.setRecurrence(getMSRecurrence(msEvent.getStartTime()));
+		
+		String actual = encodeMSEventAsString(msEvent);
+		
+		StringBuilder expected = new StringBuilder();
+		expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		expected.append("<ApplicationData xmlns=\"test\">");
+		expected.append("<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("<Calendar:StartTime>20120615T133512Z</Calendar:StartTime>");
+		expected.append("<Calendar:UID>FAC000123D</Calendar:UID>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Recurrence>");
+		expected.append("<Calendar:RecurrenceType>2</Calendar:RecurrenceType>");
+		expected.append("<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>");
+		expected.append("<Calendar:RecurrenceDayOfMonth>15</Calendar:RecurrenceDayOfMonth>");
+		expected.append("</Calendar:Recurrence>");
+		expected.append("<Calendar:Exceptions>");
+		expected.append("<Calendar:Exception>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:Body>");
+		expected.append("<AirSyncBase:Type>1</AirSyncBase:Type>");
+		expected.append("<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>");
+		expected.append("</AirSyncBase:Body>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:Categories>");
+		expected.append("<Calendar:Category>Cat1</Calendar:Category>");
+		expected.append("<Calendar:Category>Cat2</Calendar:Category>");
+		expected.append("</Calendar:Categories>");
+		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
+		expected.append("</Calendar:Exception>");
+		expected.append("</Calendar:Exceptions>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
+		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
+		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
+		expected.append("</ApplicationData>");
+		assertThat(actual).isEqualTo(expected.toString());
+	}
+	
+	private MSEventException getFakeMSEventException(TimeZone timeZone) {
+		MSEventException msEventException = new MSEventException();
+		msEventException.setSensitivity(CalendarSensitivity.NORMAL);
+		msEventException.setBusyStatus(CalendarBusyStatus.FREE);
+		msEventException.setAllDayEvent(false);
+		Calendar calendar = DateUtils.getEpochCalendar(timeZone);
+		msEventException.setDtStamp(calendar.getTime());
+		return msEventException;
 	}
 }
