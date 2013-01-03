@@ -4529,6 +4529,41 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $organizer_id = $uid;
   }
 
+
+  $displayedPeople = array();
+  if ($current_view->users_count() > 0) {
+    $displayed_users = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users()));
+    foreach($displayed_users['entity'] as $id => $entity) {
+      $name = phpStringToJsString($entity['label']);
+      $displayedPeople[$id] = $name;
+    }
+  }
+  if ($current_view->contacts_count() > 0) {
+    $displayed_contacts = get_contact_from_ids($current_view->get_contacts(), false);
+    foreach($displayed_contacts['entity'] as $id => $entity) {
+      $name = phpStringToJsString($entity['label']);
+      $displayedPeople[$id] = $name;
+    }
+  }
+
+  $possible_organizers = array();
+  if(is_array($displayedPeople)){
+    foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
+      if(OBM_Acl::canWrite($uid, 'calendar',$displayed_person_id)) {
+        $possible_organizers[$displayed_person_id] = $displayed_person_name;
+      }
+    }
+    if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
+  }
+  else {
+      if (!OBM_Acl::canWrite($uid, 'calendar',$organizer_id)) {
+          error_log("The current user of id $uid doesn't have write rights on the $calendar of user $organizer_id");
+          # Redirect to calendar index
+          header("Location: $GLOBALS[path]/calendar/calendar_index.php");
+          exit;
+      }
+  }
+
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') || ($action == 'new' && $event_q != '') || ($action == 'edit_template')) {
     $is_exception = $date_edit_occurrence != null || $calendar['is_exception'] || $event_q->f('event_is_exception');
     $title = htmlspecialchars($event_q->f('event_title'));
@@ -4808,13 +4843,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($current_view->users_count() + $current_view->contacts_count() > 0) {
     
     $u = array();
-    $displayedPeople = array();
     if ($current_view->users_count() > 0) {
       $displayed_users = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users()));
       foreach($displayed_users['entity'] as $id => $entity) {
         $name = phpStringToJsString($entity['label']);
         array_push($u, "'$id' : '$name'");
-        $displayedPeople[$id] = $name;
       }
     }
     $users_js = "{".implode(",", $u)."}";
@@ -4825,7 +4858,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       foreach($displayed_contacts['entity'] as $id => $entity) {
         $name = phpStringToJsString($entity['label']);
         array_push($c, "'$id' : '$name'");
-        $displayedPeople[$id] = $name;
       }
     }
     $contact_js = "{".implode(",", $c)."}";
@@ -4872,24 +4904,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </a>";
   foreach ($possible_owners as $o) {
     if(empty($organizer_name) && $o['id']==$organizer_id) $organizer_name = $o[label];
-  }
-   
-  $possible_organizers = array();
-  if(is_array($displayedPeople)){
-    foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
-      if(OBM_Acl::canWrite($uid, 'calendar',$displayed_person_id)) {
-        $possible_organizers[$displayed_person_id] = $displayed_person_name;
-      }
-    }
-    if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
-  }
-  else {
-      if (!OBM_Acl::canWrite($uid, 'calendar',$organizer_id)) {
-          error_log("The current user of id $uid doesn't have write rights on the $calendar of user $organizer_id");
-          # Redirect to calendar index
-          header("Location: $GLOBALS[path]/calendar/calendar_index.php");
-          exit;
-      }
   }
 
   $block_organizer = "
