@@ -38,7 +38,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.StoreClient;
-import org.obm.push.minig.imap.StoreClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,6 @@ public class LinagoraImapClientProvider {
 	private final MinigStoreClient.Factory minigStoreClientFactory;
 	private final LocatorService locatorService;
 	private final boolean loginWithDomain;
-	private final EmailConfiguration emailConfiguration;
 	private final boolean activateTLS;
 	private final IdleClient.Factory idleClientFactory;
 
@@ -66,7 +64,6 @@ public class LinagoraImapClientProvider {
 		
 		this.minigStoreClientFactory = minigStoreClientFactory;
 		this.locatorService = locatorService;
-		this.emailConfiguration = emailConfiguration;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.activateTLS = emailConfiguration.activateTls();
 		this.idleClientFactory = idleClientFactory;
@@ -87,9 +84,8 @@ public class LinagoraImapClientProvider {
 		
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
-		StoreClient newStoreClient = new StoreClientImpl(imapHost, emailConfiguration, login, udr.getPassword());
-		
-		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(newStoreClient);
+
+		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(imapHost, login, udr.getPassword());
 		newMinigStoreClient.login(activateTLS);
 		udr.putResource(STORE_CLIENT_RESOURCE, newMinigStoreClient);
 		

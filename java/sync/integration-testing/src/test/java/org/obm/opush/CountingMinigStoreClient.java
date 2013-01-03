@@ -46,15 +46,18 @@ public class CountingMinigStoreClient extends MinigStoreClientImpl {
 	@Singleton
 	public static class Factory implements MinigStoreClient.Factory {
 
-		private ImapConnectionCounter counter;
+		private final ImapConnectionCounter counter;
+		private final StoreClient.Factory storeClientFactory;
 
 		@Inject
-		private Factory(ImapConnectionCounter counter) {
+		private Factory(ImapConnectionCounter counter, StoreClient.Factory storeClientFactory) {
 			this.counter = counter;
+			this.storeClientFactory = storeClientFactory;
 		}
 		
 		@Override
-		public MinigStoreClient create(StoreClient storeClient) {
+		public MinigStoreClient create(String hostname, String login, String password) {
+			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
 			return new CountingMinigStoreClient(storeClient, counter);
 		}
 		

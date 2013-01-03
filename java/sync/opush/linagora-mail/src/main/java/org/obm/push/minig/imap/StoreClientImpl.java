@@ -65,8 +65,26 @@ import org.obm.push.minig.imap.impl.StoreClientCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 public class StoreClientImpl implements StoreClient {
 
+	@Singleton
+	public static class Factory implements StoreClient.Factory {
+		
+		private final EmailConfiguration emailConfiguration;
+
+		@Inject
+		private Factory(EmailConfiguration emailConfiguration) {
+			this.emailConfiguration = emailConfiguration;
+		}
+		
+		public StoreClientImpl create(String hostname, String login, String password) {
+			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password, emailConfiguration.imapTimeoutInMilliseconds());
+		}
+	}
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(StoreClientImpl.class);
 	
@@ -79,15 +97,15 @@ public class StoreClientImpl implements StoreClient {
 	private ClientSupport cs;
 	private SocketConnector connector;
 
-	public StoreClientImpl(String hostname, EmailConfiguration emailConfiguration, String login, String password) {
+	private StoreClientImpl(String hostname, int port, String login, String password, Integer imapTimeoutInMs) {
 		this.hostname = hostname;
-		this.port = emailConfiguration.imapPort();
+		this.port = port;
 		this.login = login;
 		this.password = password;
 
 		IResponseCallback cb = new StoreClientCallback();
 		handler = new ClientHandler(cb);
-		cs = new ClientSupport(handler, emailConfiguration.imapTimeoutInMilliseconds());
+		cs = new ClientSupport(handler, imapTimeoutInMs);
 		cb.setClient(cs);
 		connector = new SocketConnector();
 	}
@@ -111,6 +129,10 @@ public class StoreClientImpl implements StoreClient {
 
 	@Override
 	public boolean select(String mailbox) {
+		return selectMailboxImpl(mailbox);
+	}
+
+	protected boolean selectMailboxImpl(String mailbox) {
 		return cs.select(mailbox);
 	}
 

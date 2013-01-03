@@ -33,6 +33,7 @@ package org.obm.push.mail.imap;
 
 import org.obm.push.minig.imap.StoreClient;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 public class MinigStoreClientImpl implements MinigStoreClient {
@@ -40,8 +41,16 @@ public class MinigStoreClientImpl implements MinigStoreClient {
 	@Singleton
 	public static class Factory implements MinigStoreClient.Factory {
 
+		private final StoreClient.Factory storeClientFactory;
+
+		@Inject
+		private Factory(StoreClient.Factory storeClientFactory) {
+			this.storeClientFactory = storeClientFactory;
+		}
+		
 		@Override
-		public MinigStoreClient create(StoreClient storeClient) {
+		public MinigStoreClient create(String hostname, String login, String password) {
+			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
 			return new MinigStoreClientImpl(storeClient);
 		}
 		

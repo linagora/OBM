@@ -39,6 +39,8 @@ import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.IdleClientImpl;
+import org.obm.push.minig.imap.StoreClient;
+import org.obm.push.minig.imap.StoreClientImpl;
 
 import com.google.inject.AbstractModule;
 
@@ -47,6 +49,7 @@ public class LinagoraImapModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
+		bind(StoreClient.Factory.class).to(StoreClientImpl.Factory.class);
 		bind(MailboxService.class).to(LinagoraMailboxService.class);
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);

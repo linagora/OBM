@@ -37,7 +37,7 @@ import org.obm.push.minig.imap.StoreClient;
 public interface MinigStoreClient extends Resource {
 
 	interface Factory {
-		MinigStoreClient create(StoreClient storeClient);
+		MinigStoreClient create(String hostname, String login, String password);
 	}
 
 	StoreClient getStoreClient();
