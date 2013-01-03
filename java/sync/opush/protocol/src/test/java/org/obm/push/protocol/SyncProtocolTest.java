@@ -360,7 +360,6 @@ public class SyncProtocolTest {
 		SyncCollection expectedSyncCollection = new SyncCollection();
 		expectedSyncCollection.setCollectionId(syncingCollectionId);
 		expectedSyncCollection.setCollectionPath(collectionPath(syncingCollectionId));
-		expectedSyncCollection.setDataClass("Email");
 		expectedSyncCollection.setDataType(PIMDataType.EMAIL);
 		expectedSyncCollection.setStatus(SyncStatus.OK);
 		expectedSyncCollection.setItemSyncState(null);
@@ -1610,7 +1609,6 @@ public class SyncProtocolTest {
 			SyncCollectionOptions options) {
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(collectionId));
 		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		syncCollection.setOptions(options);
 		
@@ -1629,7 +1627,6 @@ public class SyncProtocolTest {
 			int collectionId, String syncKey, Integer windowSize, PIMDataType pimDataType) {
 		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath(pimDataType, collectionId));
 		syncCollection.setDataType(pimDataType);
-		syncCollection.setDataClass(pimDataType.asXmlValue());
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		syncCollection.setWindowSize(windowSize);
 		return mockReadThenWriteSyncedCollectionCache(collectionId, syncCollection);

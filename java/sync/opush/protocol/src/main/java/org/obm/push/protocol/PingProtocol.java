@@ -33,6 +33,7 @@ package org.obm.push.protocol;
 
 import java.util.LinkedHashSet;
 
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.bean.PingRequest;
@@ -63,7 +64,7 @@ public class PingProtocol implements ActiveSyncProtocol<PingRequest, PingRespons
 		for (int i = 0; i < folders.getLength(); i++) {
 			SyncCollection syncCollection = new SyncCollection();
 			Element f = (Element) folders.item(i);
-			syncCollection.setDataClass(DOMUtils.getElementText(f, "Class"));
+			syncCollection.setDataType(PIMDataType.recognizeDataType(DOMUtils.getElementText(f, "Class")));
 			int id = Integer.valueOf(DOMUtils.getElementText(f, "Id"));
 			syncCollection.setCollectionId(id);
 			syncCollections.add(syncCollection);

@@ -240,7 +240,6 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			SyncCollection syncCollection = new SyncCollection(dataType, ImmutableList.of(serverId), bodyPreferences);
 			syncCollection.setCollectionId(collectionId);
 			syncCollection.setCollectionPath(collectionPath);
-			syncCollection.setDataClass(dataType.asXmlValue());
 			syncCollection.setOptions(new SyncCollectionOptions(bodyPreferences));
 			
 			List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection);

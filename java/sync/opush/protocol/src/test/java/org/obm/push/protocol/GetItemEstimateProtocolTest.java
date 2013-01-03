@@ -37,10 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
+
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class GetItemEstimateProtocolTest {
@@ -84,13 +88,13 @@ public class GetItemEstimateProtocolTest {
 		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<GetItemEstimate>" +
 				"<Collection>" +
-				"<Class>data</Class>" +
+				"<Class>Email</Class>" +
 				"<FilterType>0</FilterType>" +
 				"<SyncKey>123-456</SyncKey>" +
 				"<CollectionId>1</CollectionId>" +
 				"</Collection>" +
 				"<Collection>" +
-				"<Class>data2</Class>" +
+				"<Class>Contacts</Class>" +
 				"<FilterType>8</FilterType>" +
 				"<SyncKey>789-012</SyncKey>" +
 				"<CollectionId>2</CollectionId>" +
@@ -101,5 +105,58 @@ public class GetItemEstimateProtocolTest {
 		Document encodeResponse = getItemEstimateProtocol.encodeRequest(getItemEstimateRequest);
 		
 		assertThat(initialDocument).isEqualTo(DOMUtils.serialize(encodeResponse));
+	}
+	
+	@Test
+	public void testNoDataClass() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<GetItemEstimate>" +
+					"<Collection>" +
+						"<SyncKey>123-456</SyncKey>" +
+						"<CollectionId>1</CollectionId>" +
+					"</Collection>" +
+				"</GetItemEstimate>";
+		
+		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+
+		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		assertThat(syncCollection.getDataType()).isNull();
+		assertThat(syncCollection.getDataClass()).isNull();
+	}
+	
+	@Test
+	public void testUnkownDataClass() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<GetItemEstimate>" +
+					"<Collection>" +
+						"<Class>music</Class>" +
+						"<SyncKey>123-456</SyncKey>" +
+						"<CollectionId>1</CollectionId>" +
+					"</Collection>" +
+				"</GetItemEstimate>";
+		
+		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+
+		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		assertThat(syncCollection.getDataType()).isEqualTo(PIMDataType.UNKNOWN);
+		assertThat(syncCollection.getDataClass()).isNull();
+	}
+	
+	@Test
+	public void testEmailDataClass() throws Exception {
+		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<GetItemEstimate>" +
+					"<Collection>" +
+						"<Class>Email</Class>" +
+						"<SyncKey>123-456</SyncKey>" +
+						"<CollectionId>1</CollectionId>" +
+					"</Collection>" +
+				"</GetItemEstimate>";
+		
+		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
+
+		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		assertThat(syncCollection.getDataType()).isEqualTo(PIMDataType.EMAIL);
+		assertThat(syncCollection.getDataClass()).isEqualTo("Email");
 	}
 }

@@ -39,6 +39,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
@@ -46,9 +47,13 @@ import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
+import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import com.google.common.collect.Iterables;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
@@ -376,8 +381,100 @@ public class SyncDecoderTest {
 				"</Collection>");
 		
 		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
-		
+
 		assertThat(collection.getDataClass()).isNull();
+	}
+
+	@Test
+	public void testCollectionWhenUnkownClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<Class>Music</Class>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		
+		assertThat(collection.getDataClass()).isEqualTo("Music");
+	}
+
+	@Test
+	public void testCollectionWhenEmailClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Collection>" +
+					"<Class>Email</Class>" +
+					"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+					"<CollectionId>2</CollectionId>" +
+					"<WindowSize>150</WindowSize>" +
+				"</Collection>");
+		
+		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		
+		assertThat(collection.getDataClass()).isEqualTo("Email");
+	}
+
+	@Test
+	public void testResponseCollectionWhenNoClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+							"<WindowSize>150</WindowSize>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
+		
+		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
+		assertThat(collectionResponse.getSyncCollection().getDataClass()).isNull();
+		assertThat(collectionResponse.getSyncCollection().getDataType()).isNull();
+	}
+
+	@Test
+	public void testResponseCollectionWhenUnkonwClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<Class>Music</Class>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+							"<WindowSize>150</WindowSize>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
+		
+		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
+		assertThat(collectionResponse.getSyncCollection().getDataClass()).isNull();
+		assertThat(collectionResponse.getSyncCollection().getDataType()).isEqualTo(PIMDataType.UNKNOWN);
+	}
+
+	@Test
+	public void testResponseCollectionWhenEmailClass() throws Exception {
+		Document request = DOMUtils.parse(
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<Class>Email</Class>" +
+							"<SyncKey>ddcf2e35-9834-49de-96ff-09979c7e2aa0</SyncKey>" +
+							"<CollectionId>2</CollectionId>" +
+							"<WindowSize>150</WindowSize>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+		
+		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
+		
+		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
+		assertThat(collectionResponse.getSyncCollection().getDataClass()).isEqualTo("Email");
+		assertThat(collectionResponse.getSyncCollection().getDataType()).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test

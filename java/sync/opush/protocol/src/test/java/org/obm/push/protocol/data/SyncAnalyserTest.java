@@ -280,7 +280,6 @@ public class SyncAnalyserTest {
 		syncCollection.setCollectionId(collectionId);
 		syncCollection.setCollectionPath(collectionPath);
 		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		syncCollection.setOptions(syncCollectionOptions);
 		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 		
@@ -326,7 +325,6 @@ public class SyncAnalyserTest {
 		syncCollection.setCollectionId(collectionId);
 		syncCollection.setCollectionPath(collectionPath);
 		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		syncCollection.setOptions(syncCollectionOptions);
 		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
 		
@@ -360,7 +358,6 @@ public class SyncAnalyserTest {
 		syncCollection.setCollectionId(collectionId);
 		syncCollection.setCollectionPath(collectionPath);
 		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		syncCollection.setOptions(options);
 		syncCollection.setSyncKey(new SyncKey(syncKey));
 		return syncCollection;

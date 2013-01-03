@@ -227,13 +227,11 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	private ProcessedSyncCollectionResponse buildCollectionResponse(Element collectionEl) {
 		SyncCollection syncCollection = new SyncCollection();
 
-		syncCollection.setDataClass(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS));
 		syncCollection.setSyncKey(syncKey(uniqueStringFieldValue(collectionEl, SyncResponseFields.SYNC_KEY)));
 		syncCollection.setCollectionId(uniqueIntegerFieldValue(collectionEl, SyncResponseFields.COLLECTION_ID));
 		syncCollection.setStatus(getCollectionStatus(collectionEl));
 		syncCollection.setMoreAvailable(getMoreAvailable(collectionEl));
-		PIMDataType dataType = recognizePimDataType(syncCollection.getDataClass());
-		syncCollection.setDataType(dataType);
+		syncCollection.setDataType(dataType(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS)));
 		
 		Map<String, String> processedClientIds = appendResponsesAndGetProcessedIds(syncCollection, collectionEl);
 		appendCommands(syncCollection, collectionEl);
@@ -247,8 +245,8 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return new ProcessedSyncCollectionResponse(syncCollectionResponse, processedClientIds);
 	}
 	
-	private PIMDataType recognizePimDataType(String dataClass) {
-		return PIMDataType.fromSpecificationValue(dataClass);
+	private PIMDataType dataType(String dataClass) {
+		return PIMDataType.recognizeDataType(dataClass);
 	}
 
 	private SyncStatus getCollectionStatus(Element collectionEl) {

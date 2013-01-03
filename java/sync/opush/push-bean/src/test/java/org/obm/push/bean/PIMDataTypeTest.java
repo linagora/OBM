@@ -31,72 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Map;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public enum PIMDataType implements DBEnum {
+@RunWith(SlowFilterRunner.class)
+public class PIMDataTypeTest {
 
-	UNKNOWN("Unknown", "unknown"),
-	EMAIL("Email", "email"), 
-	CALENDAR("Calendar", "calendar"),
-	CONTACTS("Contacts", "contacts"),
-	TASKS("Tasks", "tasks");
-
-	private static final String DB_FIELD_NAME = "pimdata_type";
-	
-	private final String xmlValue;
-	private final String collectionPathValue;
-	
-	private PIMDataType(String xmlValue, String collectionPathValue) {
-		this.xmlValue = xmlValue;
-		this.collectionPathValue = collectionPathValue;
+	@Test
+	public void testRecognizeDataTypeForNull() {
+		assertThat(PIMDataType.recognizeDataType(null)).isEqualTo(null);
 	}
 	
-	public String asXmlValue() {
-		return xmlValue;
+	@Test
+	public void testRecognizeDataTypeForEmpty() {
+		assertThat(PIMDataType.recognizeDataType("")).isEqualTo(null);
 	}
 	
-	public String asCollectionPathValue() {
-		return collectionPathValue;
+	@Test
+	public void testRecognizeDataTypeForUnkonwn() {
+		assertThat(PIMDataType.recognizeDataType("Music")).isEqualTo(PIMDataType.UNKNOWN);
 	}
-
-	@Override
-	public String getDbFieldName() {
-		return DB_FIELD_NAME;
+	
+	@Test
+	public void testRecognizeDataTypeForEmail() {
+		assertThat(PIMDataType.recognizeDataType("Email")).isEqualTo(PIMDataType.EMAIL);
 	}
-
-	@Override
-	public String getDbValue() {
-		return asCollectionPathValue().toUpperCase();
+	
+	@Test
+	public void testRecognizeDataTypeForCalendar() {
+		assertThat(PIMDataType.recognizeDataType("Calendar")).isEqualTo(PIMDataType.CALENDAR);
 	}
-
-    
-    public static PIMDataType fromSpecificationValue(String specificationValue) {
-    	if (specValueToEnum.containsKey(specificationValue)) {
-    		return specValueToEnum.get(specificationValue);
-    	}
-		return null;
-    }
-
-    private static Map<String, PIMDataType> specValueToEnum;
-    
-    static {
-    	Builder<String, PIMDataType> builder = ImmutableMap.builder();
-    	for (PIMDataType status : PIMDataType.values()) {
-    		builder.put(status.asXmlValue(), status);
-    	}
-    	specValueToEnum = builder.build();
-    }
-
-	public static PIMDataType recognizeDataType(String dataClass) {
-		if (!Strings.isNullOrEmpty(dataClass)) {
-			PIMDataType recognizedDataType = fromSpecificationValue(dataClass);
-			return Objects.firstNonNull(recognizedDataType, UNKNOWN);
-		}
-		return null;
+	
+	@Test
+	public void testRecognizeDataTypeForContacts() {
+		assertThat(PIMDataType.recognizeDataType("Contacts")).isEqualTo(PIMDataType.CONTACTS);
+	}
+	
+	@Test
+	public void testRecognizeDataTypeForTasks() {
+		assertThat(PIMDataType.recognizeDataType("Tasks")).isEqualTo(PIMDataType.TASKS);
 	}
 }

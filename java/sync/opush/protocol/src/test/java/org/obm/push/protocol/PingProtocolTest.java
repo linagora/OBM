@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.bean.PingRequest;
@@ -122,10 +123,10 @@ public class PingProtocolTest {
 
 		SyncCollection syncCollection1 = new SyncCollection();
 		syncCollection1.setCollectionId(1);
-		syncCollection1.setDataClass("Calendar");
+		syncCollection1.setDataType(PIMDataType.CALENDAR);
 		SyncCollection syncCollection2 = new SyncCollection();
 		syncCollection2.setCollectionId(4);
-		syncCollection2.setDataClass("Contacts");
+		syncCollection2.setDataType(PIMDataType.CONTACTS);
 		
 		assertThat(new PingProtocol().decodeRequest(document)).isEqualTo(new PingRequest.Builder()
 			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
@@ -137,11 +138,11 @@ public class PingProtocolTest {
 	public void encodeNoChangesWithFolders() throws TransformerException {
 		SyncCollection syncCollection1 = new SyncCollection();
 		syncCollection1.setCollectionId(1);
-		syncCollection1.setDataClass("Calendar");
+		syncCollection1.setDataType(PIMDataType.CALENDAR);
 		
 		SyncCollection syncCollection2 = new SyncCollection();
 		syncCollection2.setCollectionId(4);
-		syncCollection2.setDataClass("Contacts");
+		syncCollection2.setDataType(PIMDataType.CONTACTS);
 
 		PingResponse pingResponse = new PingResponse.Builder()
 			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
@@ -173,4 +174,38 @@ public class PingProtocolTest {
 				"</Ping>");
 	}
 
+	@Test
+	public void testDecodeDataClass() throws Exception {
+		Document document = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Ping>" +
+					"<Folders>" +
+						"<Folder>" +
+							"<Id>1</Id>" +
+						"</Folder>" +
+						"<Folder>" +
+							"<Id>2</Id>" +
+							"<Class>Music</Class>" +
+						"</Folder>" +
+						"<Folder>" +
+							"<Id>3</Id>" +
+							"<Class>Contacts</Class>" +
+						"</Folder>" +
+					"</Folders>" +
+				"</Ping>");
+
+		SyncCollection syncCollection1 = new SyncCollection();
+		syncCollection1.setCollectionId(1);
+		syncCollection1.setDataType(null);
+		SyncCollection syncCollection2 = new SyncCollection();
+		syncCollection2.setCollectionId(2);
+		syncCollection2.setDataType(PIMDataType.UNKNOWN);
+		SyncCollection syncCollection3 = new SyncCollection();
+		syncCollection3.setCollectionId(3);
+		syncCollection3.setDataType(PIMDataType.CONTACTS);
+		
+		PingRequest decoded = new PingProtocol().decodeRequest(document);
+		
+		assertThat(decoded.getSyncCollections()).containsOnly(syncCollection1, syncCollection2, syncCollection3);
+	}
 }

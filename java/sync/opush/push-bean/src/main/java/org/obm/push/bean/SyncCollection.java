@@ -44,7 +44,6 @@ public class SyncCollection implements Serializable {
 	
 	private ItemSyncState itemSyncState;
 	private List<String> fetchIds;
-	private String dataClass;
 	private Integer collectionId;
 	private String collectionPath;
 	private SyncKey syncKey;
@@ -85,11 +84,10 @@ public class SyncCollection implements Serializable {
 	}
 
 	public String getDataClass() {
-		return dataClass;
-	}
-
-	public void setDataClass(String dataClass) {
-		this.dataClass = dataClass;
+		if (dataType != null && dataType != PIMDataType.UNKNOWN) {
+			return dataType.asXmlValue();
+		}
+		return null;
 	}
 
 	public Integer getCollectionId() {
@@ -182,7 +180,7 @@ public class SyncCollection implements Serializable {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(itemSyncState, fetchIds, dataClass, collectionId, collectionPath, 
+		return Objects.hashCode(itemSyncState, fetchIds, collectionId, collectionPath, 
 				syncKey, windowSize, moreAvailable, changes, status, dataType, options);
 	}
 	
@@ -192,7 +190,6 @@ public class SyncCollection implements Serializable {
 			SyncCollection that = (SyncCollection) object;
 			return Objects.equal(this.itemSyncState, that.itemSyncState)
 				&& Objects.equal(this.fetchIds, that.fetchIds)
-				&& Objects.equal(this.dataClass, that.dataClass)
 				&& Objects.equal(this.collectionId, that.collectionId)
 				&& Objects.equal(this.collectionPath, that.collectionPath)
 				&& Objects.equal(this.syncKey, that.syncKey)
@@ -211,7 +208,6 @@ public class SyncCollection implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("itemSyncState", itemSyncState)
 			.add("fetchIds", fetchIds)
-			.add("dataClass", dataClass)
 			.add("collectionId", collectionId)
 			.add("collectionPath", collectionPath)
 			.add("syncKey", syncKey)

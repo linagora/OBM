@@ -71,4 +71,49 @@ public class SyncCollectionTest {
 		
 		assertThat(syncCollection.isValidToProcess()).isFalse();
 	}
+
+	@Test
+	public void testDataClassForNullDataType() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setDataType(null);
+		
+		assertThat(syncCollection.getDataClass()).isNull();
+	}
+
+	@Test
+	public void testDataClassForUnknownDataType() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setDataType(PIMDataType.UNKNOWN);
+		
+		assertThat(syncCollection.getDataClass()).isNull();
+	}
+
+	@Test
+	public void testDataClassForEmailDataType() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		
+		assertThat(syncCollection.getDataClass()).isEqualTo("Email");
+	}
+
+	@Test
+	public void testDataClassForCalendarDataType() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setDataType(PIMDataType.CALENDAR);
+		
+		assertThat(syncCollection.getDataClass()).isEqualTo("Calendar");
+	}
+
+	@Test
+	public void testDataClassForContactDataType() {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setDataType(PIMDataType.CONTACTS);
+		
+		assertThat(syncCollection.getDataClass()).isEqualTo("Contacts");
+	}
+
+	@Test
+	public void testDataClassForDefaultDataType() {
+		assertThat(new SyncCollection().getDataClass()).isNull();
+	}
 }

@@ -379,7 +379,6 @@ public class SyncHandlerTest {
 		firstToStoreCollection.setCollectionId(collectionId);
 		firstToStoreCollection.setCollectionPath(collectionPath);
 		firstToStoreCollection.setDataType(PIMDataType.EMAIL);
-		firstToStoreCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		firstToStoreCollection.setOptions(toStoreOptions);
 		firstToStoreCollection.setWindowSize(25);
 		firstToStoreCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
@@ -388,7 +387,6 @@ public class SyncHandlerTest {
 		secondToStoreCollection.setCollectionId(collectionId);
 		secondToStoreCollection.setCollectionPath(collectionPath);
 		secondToStoreCollection.setDataType(PIMDataType.EMAIL);
-		secondToStoreCollection.setDataClass(PIMDataType.EMAIL.asXmlValue());
 		secondToStoreCollection.setOptions(toStoreOptions);
 		secondToStoreCollection.setSyncKey(secondSyncKey);
 		ItemSyncState secondRequestSyncState = ItemSyncState.builder()

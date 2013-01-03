@@ -35,6 +35,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
@@ -49,6 +50,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstimateRequest, GetItemEstimateResponse> {
 
@@ -67,13 +69,9 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 			final String collectionId = fid.getTextContent();
 	
 			final SyncCollection sc = new SyncCollection();
-			sc.setDataClass(dataClass);
+			sc.setDataType(PIMDataType.recognizeDataType(dataClass));
 			sc.setSyncKey(syncKey);
-			SyncCollectionOptions options = new SyncCollectionOptions();
-			if (filterType != null) {
-				options.setFilterType(FilterType.fromSpecificationValue(filterType));
-			}
-			sc.setOptions(options);
+			sc.setOptions(buildOptions(filterType));
 			try {
 				sc.setCollectionId(Integer.valueOf(collectionId));
 			} catch (NumberFormatException e) {
@@ -83,6 +81,14 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		}
 		return getItemEstimateRequestBuilder
 			.build();
+	}
+
+	private SyncCollectionOptions buildOptions(String filterType) {
+		SyncCollectionOptions options = new SyncCollectionOptions();
+		if (filterType != null) {
+			options.setFilterType(FilterType.fromSpecificationValue(filterType));
+		}
+		return options;
 	}
 
 	@Override
@@ -162,7 +168,9 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 
 		for (SyncCollection syncCollection : request.getSyncCollections()) {
 			Element collection = DOMUtils.createElement(giee, "Collection");
-			DOMUtils.createElementAndText(collection, "Class", syncCollection.getDataClass());
+			if (!Strings.isNullOrEmpty(syncCollection.getDataClass())) {
+				DOMUtils.createElementAndText(collection, "Class", syncCollection.getDataClass());
+			}
 			
 			SyncCollectionOptions syncCollectionOptions = syncCollection.getOptions();
 			if (syncCollectionOptions != null && syncCollectionOptions.getFilterType() != null) {
