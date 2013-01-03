@@ -65,6 +65,8 @@ import org.obm.push.minig.imap.impl.StoreClientCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -73,41 +75,51 @@ public class StoreClientImpl implements StoreClient {
 	@Singleton
 	public static class Factory implements StoreClient.Factory {
 		
-		private final EmailConfiguration emailConfiguration;
+		protected final EmailConfiguration emailConfiguration;
 
 		@Inject
-		private Factory(EmailConfiguration emailConfiguration) {
+		protected Factory(EmailConfiguration emailConfiguration) {
 			this.emailConfiguration = emailConfiguration;
 		}
 		
 		public StoreClientImpl create(String hostname, String login, String password) {
-			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password, emailConfiguration.imapTimeoutInMilliseconds());
+			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password,
+							createClientSupport(), createConnector());
 		}
+				
+		protected SocketConnector createConnector() {
+			return new SocketConnector();
+		}
+				
+		protected ClientSupport createClientSupport() {
+			IResponseCallback cb = new StoreClientCallback();
+			ClientHandler handler = new ClientHandler(cb);
+			ClientSupport clientSupport = new ClientSupport(handler, emailConfiguration.imapTimeoutInMilliseconds());
+			cb.setClient(clientSupport);
+			return clientSupport;
+ 		}
 	}
 	
 	private static final Logger logger = LoggerFactory
 			.getLogger(StoreClientImpl.class);
 	
-	private String password;
-	private String login;
-	private int port;
-	private String hostname;
+	private final String password;
+	private final String login;
+	private final int port;
+	private final String hostname;
+	@VisibleForTesting String activeMailbox;
 
-	private ClientHandler handler;
-	private ClientSupport cs;
-	private SocketConnector connector;
+	private final ClientSupport cs;
+	private final SocketConnector connector;
 
-	private StoreClientImpl(String hostname, int port, String login, String password, Integer imapTimeoutInMs) {
+	protected StoreClientImpl(String hostname, int port, String login, String password,
+			ClientSupport clientSupport, SocketConnector connector) {
 		this.hostname = hostname;
 		this.port = port;
 		this.login = login;
 		this.password = password;
-
-		IResponseCallback cb = new StoreClientCallback();
-		handler = new ClientHandler(cb);
-		cs = new ClientSupport(handler, imapTimeoutInMs);
-		cb.setClient(cs);
-		connector = new SocketConnector();
+		this.cs = clientSupport;
+		this.connector = connector;
 	}
 
 	@Override
@@ -129,7 +141,27 @@ public class StoreClientImpl implements StoreClient {
 
 	@Override
 	public boolean select(String mailbox) {
-		return selectMailboxImpl(mailbox);
+		if (hasToSelectMailbox(mailbox) && selectMailboxImpl(mailbox)) {
+			activeMailbox = mailbox;
+			return true;
+		}
+		return false;
+	}
+
+	@VisibleForTesting boolean hasToSelectMailbox(String mailbox) {
+		return givenMailboxIsSelectable(mailbox) && givenMailboxIsDifferentOfActive(mailbox);
+	}
+
+	private boolean givenMailboxIsSelectable(String mailbox) {
+		return !Strings.isNullOrEmpty(mailbox);
+	}
+
+	private boolean givenMailboxIsDifferentOfActive(String mailbox) {
+		return hasNoActiveMailbox() || !activeMailbox.equalsIgnoreCase(mailbox);
+	}
+
+	private boolean hasNoActiveMailbox() {
+		return Strings.isNullOrEmpty(activeMailbox);
 	}
 
 	protected boolean selectMailboxImpl(String mailbox) {

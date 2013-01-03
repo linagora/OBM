@@ -215,6 +215,7 @@ public class MailBackendGetItemEstimateTest {
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
 	}
 
 	@Test
@@ -259,6 +260,7 @@ public class MailBackendGetItemEstimateTest {
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
 	}
 
 	@Test
@@ -304,6 +306,7 @@ public class MailBackendGetItemEstimateTest {
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
 	}
 
 	private void expectInitialSyncWithTwoMails(SyncKey initialSyncKey, SyncKey firstAllocatedSyncKey, SyncKey secondAllocatedSyncKey) throws Exception {

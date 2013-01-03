@@ -31,21 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.obm.configuration.EmailConfiguration;
+import org.obm.push.minig.imap.StoreClientImpl;
+import org.obm.push.minig.imap.impl.ClientSupport;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-@Singleton
-public class ImapConnectionCounter {
+public class CountingStoreClient extends StoreClientImpl {
 
-	public final AtomicInteger loginCounter;
-	public final AtomicInteger closeCounter;
-	public final AtomicInteger selectCounter;
-	
-	public ImapConnectionCounter() {
-		this.loginCounter = new AtomicInteger();
-		this.closeCounter = new AtomicInteger();
-		this.selectCounter = new AtomicInteger();
+	private ImapConnectionCounter counter;
+
+	@Singleton
+	public static class Factory extends StoreClientImpl.Factory {
+
+		private final ImapConnectionCounter counter;
+
+		@Inject
+		private Factory(ImapConnectionCounter counter, EmailConfiguration emailConfiguration) {
+			super(emailConfiguration);
+			this.counter = counter;
+		}
+		
+		@Override
+		public CountingStoreClient create(String hostname, String login, String password) {
+			return new CountingStoreClient(counter, hostname, emailConfiguration.imapPort(),
+					login, password, super.createClientSupport(), super.createConnector());
+		}
+		
 	}
 	
+	private CountingStoreClient(ImapConnectionCounter counter, String hostname, int port,
+			String login, String password, ClientSupport clientSupport, SocketConnector connector) {
+		super(hostname, port, login, password, clientSupport, connector);
+		this.counter = counter;
+	}
+	
+	@Override
+	protected boolean selectMailboxImpl(String mailbox) {
+		boolean selected = super.selectMailboxImpl(mailbox);
+		counter.selectCounter.incrementAndGet();
+		return selected;
+	}
 }

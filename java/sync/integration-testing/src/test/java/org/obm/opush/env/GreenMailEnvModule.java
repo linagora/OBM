@@ -38,6 +38,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
+import org.obm.opush.CountingStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
@@ -46,6 +47,7 @@ import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
+import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.service.EventService;
 
 import com.google.inject.name.Names;
@@ -75,6 +77,7 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
+		bind(StoreClient.Factory.class).to(CountingStoreClient.Factory.class);
 		bind(UserDataRequest.Factory.class).to(TrackableUserDataRequest.Factory.class);
 	}
 }
