@@ -45,6 +45,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequestCollection;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
@@ -55,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -136,7 +138,7 @@ public class SyncAnalyser {
 			SyncCollection lastSyncCollection = findLastSyncedCollectionOptions(udr, isPartial, collectionId);
 			collection.setOptions(getUpdatedOptions(lastSyncCollection, requestCollection));
 			
-			recognizeCollection(collection, collectionId);
+			recognizeCollection(collection, collectionId, requestCollection.getDataClass());
 			syncedCollectionStoreService.put(udr.getCredentials(), udr.getDevice(), collection);
 			appendCommand(collection, requestCollection);
 		} catch (CollectionNotFoundException e) {
@@ -157,15 +159,23 @@ public class SyncAnalyser {
 		return lastSyncCollection;
 	}
 
-	private void recognizeCollection(SyncCollection collection, int collectionId) {
+	private void recognizeCollection(SyncCollection collection, int collectionId, String dataClass) {
 		try {
  			String collectionPath = collectionDao.getCollectionPath(collectionId);
  			collection.setCollectionPath(collectionPath);
  			PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
  			collection.setDataType(dataType);
+ 			if (isDifferentClassThanType(dataClass, dataType)) {
+ 				String msg = "The type of the collection found:{%s} is not the same than received in DataClass:{%s}";
+				throw new ServerErrorException(String.format(msg, dataType.asXmlValue() , dataClass));
+ 			}
 		} catch (CollectionNotFoundException e) {
 			collection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
  		}
+	}
+
+	private boolean isDifferentClassThanType(String dataClass, PIMDataType dataType) {
+		return !Strings.isNullOrEmpty(dataClass) && !dataType.asXmlValue().equals(dataClass);
 	}
 
 	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection, SyncRequestCollection requestCollection) {

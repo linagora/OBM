@@ -58,6 +58,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -351,6 +352,62 @@ public class SyncAnalyserTest {
 		SyncCollectionOptions options = analysedRequest.getCollection(collectionId).getOptions();
 		BodyPreference bodyPreference = options.getBodyPreferences().get(0);
 		assertThat(bodyPreference.getTruncationSize()).isEqualTo(1000);
+	}
+	
+	@Test
+	public void testRequestWithSameDataClassThanRecognizedDataType() throws Exception {
+		SyncCollection syncCollection = new SyncCollection();
+		syncCollection.setCollectionId(collectionId);
+		syncCollection.setCollectionPath(collectionPath);
+		syncCollection.setDataType(PIMDataType.EMAIL);
+		syncCollection.setSyncKey(new SyncKey("1234"));
+
+		Document requestWithoutOptions = DOMUtils.parse(
+				"<Sync>" +
+						"<Collections>" +
+							"<Collection>" +
+								"<Class>Email</Class>" +
+								"<SyncKey>1234</SyncKey>" +
+								"<CollectionId>" + collectionId + "</CollectionId>" +
+							"</Collection>" +
+						"</Collections>" +
+					"</Sync>");
+		
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		syncedCollectionDao.put(udr.getCredentials(), device, syncCollection);
+		expectLastCall().once();
+		
+		mocks.replay();
+		SyncRequest syncRequest = syncDecoder.decodeSync(requestWithoutOptions);
+		Sync analysed = syncAnalyser.analyseSync(udr, syncRequest);
+		
+		assertThat(analysed.getCollection(collectionId).getDataClass()).isEqualTo("Email");
+		assertThat(analysed.getCollection(collectionId).getDataType()).isEqualTo(PIMDataType.EMAIL);
+	}
+	
+	@Test(expected=ServerErrorException.class)
+	public void testRequestWithDifferentDataClassThanRecognizedDataType() throws Exception {
+		Document requestWithoutOptions = DOMUtils.parse(
+				"<Sync>" +
+						"<Collections>" +
+							"<Collection>" +
+								"<Class>Calendar</Class>" +
+								"<SyncKey>1234</SyncKey>" +
+								"<CollectionId>" + collectionId + "</CollectionId>" +
+							"</Collection>" +
+						"</Collections>" +
+					"</Sync>");
+		
+		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
+		
+		mocks.replay();
+		SyncRequest syncRequest = syncDecoder.decodeSync(requestWithoutOptions);
+		try {
+			syncAnalyser.analyseSync(udr, syncRequest);
+		} catch (ServerErrorException e) {
+			mocks.verify();
+			throw e;
+		}
 	}
 	
 	private SyncCollection buildRequestCollectionWithOptions(SyncCollectionOptions options, String syncKey) {

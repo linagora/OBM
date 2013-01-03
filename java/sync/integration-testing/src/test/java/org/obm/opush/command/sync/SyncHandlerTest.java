@@ -528,4 +528,21 @@ public class SyncHandlerTest {
 		SyncCollectionResponse mailboxResponse = getCollectionWithId(syncEmailResponse, String.valueOf(syncEmailUnexistingCollectionId));
 		assertThat(mailboxResponse.getSyncCollection().getStatus()).isEqualTo(SyncStatus.OBJECT_NOT_FOUND);
 	}
+
+	@Test
+	public void testSyncDataClassAtEmailButRecognizedAsCalendar() throws Exception {
+		SyncKey syncKey = new SyncKey("1");
+		int collectionId = 15105;
+		List<Integer> existingCollections = ImmutableList.of(collectionId);
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		SyncResponse syncResponse = opClient.sync(syncKey, collectionId, PIMDataType.EMAIL);
+
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
+	}
 }

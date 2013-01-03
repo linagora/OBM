@@ -44,6 +44,7 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -66,6 +67,7 @@ import org.obm.sync.push.client.commands.Options;
 import org.obm.sync.push.client.commands.PartialSyncCommand;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
+import org.obm.sync.push.client.commands.SimpleSyncCommand;
 import org.obm.sync.push.client.commands.Sync;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +148,10 @@ public abstract class OPClient {
 	
 	public SyncResponse sync(DocumentProvider template) throws Exception {
 		return run(new Sync(template));
+	}
+	
+	public SyncResponse sync(SyncKey syncKey, int collectionId, PIMDataType type) throws Exception {
+		return run(new SimpleSyncCommand(syncKey, collectionId, type));
 	}
 
 	public SyncResponse deleteEmail(SyncKey key, int collectionId, String uid) throws Exception {
