@@ -4538,13 +4538,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $displayedPeople[$id] = $name;
     }
   }
-  if ($current_view->contacts_count() > 0) {
-    $displayed_contacts = get_contact_from_ids($current_view->get_contacts(), false);
-    foreach($displayed_contacts['entity'] as $id => $entity) {
-      $name = phpStringToJsString($entity['label']);
-      $displayedPeople[$id] = $name;
-    }
-  }
 
   $possible_organizers = array();
   if(is_array($displayedPeople)){
