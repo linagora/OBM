@@ -962,7 +962,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		
 		if(syncRange != null){
 			fetchIds.append("AND (");
-			fetchIds.append("e.event_repeatkind != 'none' OR ");
+			fetchIds.append("(e.event_repeatkind != 'none' AND (e.event_endrepeat IS NULL OR e.event_endrepeat >= ?)) OR ");
+		
 			fetchIds.append("(e.event_date >= ? ");
 			if(syncRange.getBefore() != null){
 				fetchIds.append("AND e.event_date <= ? ");
@@ -996,6 +997,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 			}
 			if (syncRange != null) {
+				// Recurrent events
+				evps.setTimestamp(idx++, new Timestamp(syncRange.getAfter().getTime()));
+				// Non-recurrent events
 				evps.setTimestamp(idx++, new Timestamp(syncRange.getAfter().getTime()));
 				if(syncRange.getBefore() != null){
 					evps.setTimestamp(idx++, new Timestamp(syncRange.getBefore().getTime()));

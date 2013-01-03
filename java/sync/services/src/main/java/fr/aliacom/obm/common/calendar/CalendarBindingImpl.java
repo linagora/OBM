@@ -798,9 +798,9 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional(readOnly=true)
 	public EventChanges getSyncWithSortedChanges(AccessToken token,
-			String calendar, Date lastSync) throws ServerFault, NotAllowedException {
+			String calendar, Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException {
 
-		EventChanges changes = getSync(token, calendar, lastSync, null, false);
+		EventChanges changes = getSync(token, calendar, lastSync, syncRange, false);
 		
 		//sort between update and participation update based on event timestamp
 		sortUpdatedEvents(changes, lastSync);

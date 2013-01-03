@@ -35,6 +35,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,5 +58,26 @@ public class DateHelperTest extends TestCase{
 	@Test
 	public void testNullDateAsString() {
 		Assert.assertNull(DateHelper.asString(null));
+	}
+	
+	@Test
+	public void testAsDateReturnsDefaultWithNull() {
+		Date date = new Date(123456789);
+		
+		Assertions.assertThat(DateHelper.asDate(null, date)).isEqualTo(date);
+	}
+	
+	@Test
+	public void testAsDateReturnsDefaultWithEmptyString() {
+		Date date = new Date(123456789);
+		
+		Assertions.assertThat(DateHelper.asDate("", date)).isEqualTo(date);
+	}
+	
+	@Test
+	public void testAsDateReturnsDefaultWithNullString() {
+		Date date = new Date(123456789);
+		
+		Assertions.assertThat(DateHelper.asDate("null", date)).isEqualTo(date);
 	}
 }

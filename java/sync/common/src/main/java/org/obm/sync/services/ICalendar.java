@@ -154,7 +154,7 @@ public interface ICalendar {
 	 * rights on calendar.
 	 */
 	EventChanges getSyncWithSortedChanges(AccessToken token, String calendar,
-			Date lastSync) throws ServerFault, NotAllowedException;
+			Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException;
 
 	/**
 	 * return every event in calendar the will happen after start date Logged

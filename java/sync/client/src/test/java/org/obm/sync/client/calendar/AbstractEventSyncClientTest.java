@@ -188,7 +188,7 @@ public class AbstractEventSyncClientTest {
 		expect(responder.execute(eq(token), eq("/calendar/getSyncWithSortedChanges"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 		
-		client.getSyncWithSortedChanges(token, CALENDAR, null);
+		client.getSyncWithSortedChanges(token, CALENDAR, null, null);
 	}
 	
 	@Test(expected=NotAllowedException.class)

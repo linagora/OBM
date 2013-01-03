@@ -130,8 +130,8 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 
 	@Override
 	public EventChanges getSyncWithSortedChanges(AccessToken token,
-			String calendar, Date lastSync) throws ServerFault, NotAllowedException {
-		return getSync(token, calendar, lastSync, null, "getSyncWithSortedChanges");
+			String calendar, Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException {
+		return getSync(token, calendar, lastSync, syncRange, "getSyncWithSortedChanges");
 	}
 	
 	@Override

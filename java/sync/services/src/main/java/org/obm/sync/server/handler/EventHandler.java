@@ -471,13 +471,21 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarChanges(ret);
 	}
 
-	private String getSyncWithSortedChanges(
-			AccessToken at, Request request, XmlResponder responder)
+	private String getSyncWithSortedChanges(AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, NotAllowedException {
-			EventChanges ret = binding.getSyncWithSortedChanges(at, 
-					getCalendar(at, request),
-					DateHelper.asDate(request.getParameter("lastSync")));
-			return responder.sendCalendarChanges(ret);
+		SyncRange syncRange = null;
+		Date after = DateHelper.asDate(request.getParameter("syncRangeAfter"), null);
+		Date before = DateHelper.asDate(request.getParameter("syncRangeBefore"), null);
+		
+		if (after != null) {
+			syncRange = new SyncRange(before, after);
+		}
+		
+		EventChanges ret = binding.getSyncWithSortedChanges(at, 
+							getCalendar(at, request),
+							DateHelper.asDate(request.getParameter("lastSync")), syncRange);
+		
+		return responder.sendCalendarChanges(ret);
 	}
 
 	private String getSync(

@@ -45,10 +45,16 @@ public class DateHelper {
 	}
 
 	public static final Date asDate(String s) {
+		return asDate(s, new Date(0));
+	}
+	
+	public static final Date asDate(String s, Date defaultDate) {
 		String tmp = s;
+		
 		if (tmp == null || tmp.trim().isEmpty() || tmp.equals("null")) {
-			tmp = "0";
+			return defaultDate;
 		}
+		
 		try {
 			return new Date(Long.valueOf(tmp));
 		} catch (Throwable e) {

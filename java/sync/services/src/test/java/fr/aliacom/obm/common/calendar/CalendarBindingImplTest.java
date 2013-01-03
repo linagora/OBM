@@ -1382,7 +1382,7 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, rightsHelper, null, null);
 
-		EventChanges sortedChanges = calendarService.getSyncWithSortedChanges(accessToken, calendar, lastSync);
+		EventChanges sortedChanges = calendarService.getSyncWithSortedChanges(accessToken, calendar, lastSync, null);
 		EasyMock.verify(mocks);
 		return sortedChanges;
 	}
@@ -1834,7 +1834,7 @@ public class CalendarBindingImplTest {
 				calendarDao, null, rightsHelper, null, null);
 
 		EventChanges actualChanges = calendarService.getSyncWithSortedChanges(token, calendar,
-				lastSyncDate);
+				lastSyncDate, null);
 		EasyMock.verify(mocks);
 		assertThat(actualChanges).isEqualTo(anonymizedEventChanges);
 	}
@@ -2400,7 +2400,7 @@ public class CalendarBindingImplTest {
 		expectNoRightsForCalendar("calendar");
 		mocksControl.replay();
 		
-		binding.getSyncWithSortedChanges(token, "calendar", null);
+		binding.getSyncWithSortedChanges(token, "calendar", null, null);
 	}
 	
 	@Test(expected=NotAllowedException.class)
