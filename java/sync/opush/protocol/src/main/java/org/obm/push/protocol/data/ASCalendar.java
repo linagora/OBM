@@ -57,6 +57,7 @@ public enum ASCalendar {
 	EXCEPTION("Exception"),
 	EXCEPTION_IS_DELETED("ExceptionIsDeleted"),
 	CATEGORIES("Categories"),
+	CATEGORY("Category"),
 	EXCEPTION_START_TIME("ExceptionStartTime"),
 	RECURRENCE("Recurrence"),
 	RECURRENCE_TYPE("RecurrenceType"),
