@@ -38,6 +38,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.push.minig.imap.StoreClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +87,7 @@ public class LinagoraImapClientProvider {
 		
 		final String imapHost = locateImap(udr);
 		final String login = getLogin(udr);
-		StoreClient newStoreClient = new StoreClient(imapHost, emailConfiguration, login, udr.getPassword());
+		StoreClient newStoreClient = new StoreClientImpl(imapHost, emailConfiguration, login, udr.getPassword());
 		
 		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(newStoreClient);
 		newMinigStoreClient.login(activateTLS);

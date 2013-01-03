@@ -33,18 +33,11 @@
 package org.obm.push.minig.imap;
 
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.transport.socket.nio.SocketConnector;
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.ResourceType;
-import org.obm.annotations.technicallogging.TechnicalLogging;
-import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -57,53 +50,17 @@ import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.minig.imap.impl.ClientHandler;
-import org.obm.push.minig.imap.impl.ClientSupport;
-import org.obm.push.minig.imap.impl.IResponseCallback;
 import org.obm.push.minig.imap.impl.MailThread;
-import org.obm.push.minig.imap.impl.StoreClientCallback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * IMAP client entry point
  */
-public class StoreClient {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(StoreClient.class);
-	
-	private String password;
-	private String login;
-	private int port;
-	private String hostname;
-
-	private ClientHandler handler;
-	private ClientSupport cs;
-	private SocketConnector connector;
-
-	public StoreClient(String hostname, EmailConfiguration emailConfiguration, String login, String password) {
-		this.hostname = hostname;
-		this.port = emailConfiguration.imapPort();
-		this.login = login;
-		this.password = password;
-
-		IResponseCallback cb = new StoreClientCallback();
-		handler = new ClientHandler(cb);
-		cs = new ClientSupport(handler, emailConfiguration.imapTimeoutInMilliseconds());
-		cb.setClient(cs);
-		connector = new SocketConnector();
-	}
+public interface StoreClient {
 
 	/**
 	 * Logs into the IMAP store
 	 */
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
-	public void login(Boolean activateTLS) throws IMAPException {
-		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
-		SocketAddress sa = new InetSocketAddress(hostname, port);
-		cs.login(login, password, connector, sa, activateTLS);
-	}
+	void login(Boolean activateTLS) throws IMAPException;
 
 	/**
 	 * Logs out & disconnect from the IMAP server. The underlying network
@@ -111,13 +68,7 @@ public class StoreClient {
 	 * 
 	 * @throws IMAPException
 	 */
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
-	public void logout() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("logout attempt for " + login);
-		}
-		cs.logout();
-	}
+	void logout();
 
 	/**
 	 * Opens the given IMAP folder. Only one folder quand be active at a time.
@@ -126,128 +77,68 @@ public class StoreClient {
 	 *            utf8 mailbox name.
 	 * @throws IMAPException
 	 */
-	public boolean select(String mailbox) {
-		return cs.select(mailbox);
-	}
+	boolean select(String mailbox);
 
-	public boolean create(String mailbox) {
-		return cs.create(mailbox);
-	}
+	boolean create(String mailbox);
 
-	public boolean subscribe(String mailbox) {
-		return cs.subscribe(mailbox);
-	}
+	boolean subscribe(String mailbox);
 
-	public boolean unsubscribe(String mailbox) {
-		return cs.unsubscribe(mailbox);
-	}
+	boolean unsubscribe(String mailbox);
 
-	public boolean delete(String mailbox) {
-		return cs.delete(mailbox);
-	}
+	boolean delete(String mailbox);
 
-	public boolean rename(String mailbox, String newMailbox) {
-		return cs.rename(mailbox, newMailbox);
-	}
+	boolean rename(String mailbox, String newMailbox);
 
 	/**
 	 * Issues the CAPABILITY command to the IMAP server
 	 * 
 	 * @return
 	 */
-	public Set<String> capabilities() {
-		return cs.capabilities();
-	}
+	Set<String> capabilities();
 
-	public boolean noop() {
-		return cs.noop();
-	}
+	boolean noop();
+
+	NameSpaceInfo namespace();
 	
-	public  ListResult listSubscribed() {
-		return cs.listSubscribed();
-	}
+	boolean isConnected();
 	
-	public  ListResult listAll() {
-		return cs.listAll();
-	}
-
-	public boolean append(String mailbox, InputStream in, FlagsList fl) {
-		return cs.append(mailbox, in, fl);
-	}
-
-	public void expunge() {
-		cs.expunge();
-	}
-
-	public QuotaInfo quota(String mailbox) {
-		return cs.quota(mailbox);
-	}
-
-	public InputStream uidFetchMessage(long uid) {
-		return cs.uidFetchMessage(uid);
-	}
-
-	public MessageSet uidSearch(SearchQuery sq) {
-		return cs.uidSearch(sq);
-	}
-
-	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
-		return cs.uidFetchBodyStructure(messages);
-	}
-
-	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) {
-		return cs.uidFetchHeaders(uids, headers);
-	}
-
-	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
-		return cs.uidFetchEnvelope(messages);
-	}
-
-	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
-		return cs.uidFetchFlags(messages);
-	}
+	long uidNext(String mailbox);
 	
-	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
-		return cs.uidFetchInternalDate(uids);
-	}
+	long uidValidity(String mailbox);
+
+	void expunge();
 	
-	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
-		return cs.uidFetchFast(messages);
-	}
-
-	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
-		return cs.uidCopy(messages, destMailbox);
-	}
-
-	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
-		return cs.uidStore(messages, fl, set);
-	}
-
-	public InputStream uidFetchPart(long uid, String address, long truncation) {
-		return cs.uidFetchPart(uid, address, truncation);
-	}
+	ListResult listSubscribed();
 	
-	public InputStream uidFetchPart(long uid, String address) {
-		return cs.uidFetchPart(uid, address);
-	}
+	ListResult listAll();
 
-	public List<MailThread> uidThreads() {
-		return cs.uidThreads();
-	}
-
-	public NameSpaceInfo namespace() {
-		return cs.namespace();
-	}
-
-	public boolean isConnected() {
-		return cs.isConnected();
-	}
+	boolean append(String mailbox, InputStream in, FlagsList fl);
 	
-	public long uidNext(String mailbox) {
-		return cs.uidNext(mailbox);
-	}
+	QuotaInfo quota(String mailbox);
+
+	InputStream uidFetchMessage(long uid);
+
+	MessageSet uidSearch(SearchQuery sq);
+
+	Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages);
+
+	Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers);
+
+	Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages);
+
+	Map<Long, FlagsList> uidFetchFlags(MessageSet messages);
 	
-	public long uidValidity(String mailbox) {
-		return cs.uidValidity(mailbox);
-	}
+	Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids);
+	
+	Collection<FastFetch> uidFetchFast(MessageSet messages);
+
+	MessageSet uidCopy(MessageSet messages, String destMailbox);
+
+	boolean uidStore(MessageSet messages, FlagsList fl, boolean set);
+
+	InputStream uidFetchPart(long uid, String address, long truncation);
+	
+	InputStream uidFetchPart(long uid, String address);
+
+	List<MailThread> uidThreads();
 }
