@@ -54,6 +54,7 @@ import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventException;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.type.UnsignedShort;
@@ -312,5 +313,87 @@ public class CalendarDecoderTest {
 		
 		Date endTime = dateForTimeZone(DateTimeZone.forID("Europe/Paris"), 2011, 3, 6, 13, 0, 0, 0);
 		assertThat(event.getEndTime()).isEqualTo(endTime);
+	}
+	
+	@Test
+	public void testDecodeOneCategory() throws Exception{
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<Categories>");
+		builder.append("<Category>Cat</Category>");
+		builder.append("</Categories>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		assertThat(event.getCategories()).containsOnly("Cat");
+	}
+	
+	@Test
+	public void testDecodeCategories() throws Exception{
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<Categories>");
+		builder.append("<Category>Cat1</Category>");
+		builder.append("<Category>Cat2</Category>");
+		builder.append("</Categories>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		assertThat(event.getCategories()).containsOnly("Cat1", "Cat2");
+	}
+	
+	@Test
+	public void testDecodeOneCategoryInException() throws Exception{
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<Exceptions>");
+		builder.append("<Exception>");
+		builder.append("<Categories>");
+		builder.append("<Category>Cat</Category>");
+		builder.append("</Categories>");
+		builder.append("</Exception>");
+		builder.append("</Exceptions>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		assertThat(event.getExceptions()).hasSize(1);
+		MSEventException eventException = event.getExceptions().get(0);
+		assertThat(eventException.getCategories()).containsOnly("Cat");
+	}
+	
+	@Test
+	public void testDecodeCategoriesInException() throws Exception{
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ApplicationData>");
+		builder.append("<Exceptions>");
+		builder.append("<Exception>");
+		builder.append("<Categories>");
+		builder.append("<Category>Cat1</Category>");
+		builder.append("<Category>Cat2</Category>");
+		builder.append("</Categories>");
+		builder.append("</Exception>");
+		builder.append("</Exceptions>");
+		builder.append("</ApplicationData>");
+		Document doc = getXml(builder.toString());
+		
+		IApplicationData  data = decoder.decode(doc.getDocumentElement());
+		assertThat(data).isInstanceOf(MSEvent.class);
+		MSEvent event = (MSEvent)data;
+		
+		assertThat(event.getExceptions()).hasSize(1);
+		MSEventException eventException = event.getExceptions().get(0);
+		assertThat(eventException.getCategories()).containsOnly("Cat1", "Cat2");
 	}
 }

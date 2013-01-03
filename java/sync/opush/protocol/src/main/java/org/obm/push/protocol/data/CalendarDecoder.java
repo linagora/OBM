@@ -259,7 +259,7 @@ public class CalendarDecoder extends Decoder implements IDataDecoder {
 		common.setStartTime(parseDOMDate(DOMUtils.getUniqueElement(dom, ASCalendar.START_TIME.getName())));
 		common.setAllDayEvent(parseDOMInt2Boolean(DOMUtils.getUniqueElement(dom, ASCalendar.ALL_DAY_EVENT.getName())));
 		common.setReminder(parseDOMInt(DOMUtils.getUniqueElement(dom, ASCalendar.REMINDER_MINS_BEFORE.getName())));
-		common.setCategories(parseDOMStringCollection(DOMUtils.getUniqueElement(dom, ASCalendar.CATEGORIES.getName()), ASCalendar.CATEGORIES.getName()));
+		common.setCategories(parseDOMStringCollection(DOMUtils.getUniqueElement(dom, ASCalendar.CATEGORIES.getName()), ASCalendar.CATEGORY.getName()));
 		common.setBusyStatus(getCalendarBusyStatus(dom));
 		common.setSensitivity(getCalendarSensitivity(dom));
 		common.setMeetingStatus(getMeetingStatus(dom));
