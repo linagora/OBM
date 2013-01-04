@@ -500,7 +500,7 @@ $l_delete_event_occurrence = "Delete recurring event";
 $l_update_occurrence_message = "Change only this event or the series ?"; 
 
 //Share calendar
-$l_my_share_calendar = "Share my calendar";
+$l_my_share_calendar = "Remote sharing of calendar (URL is sent by email)";
 $l_share_calendar = "Manage calendars";
 $l_share_calendar_public = "Url from public calendar";
 $l_share_calendar_private = "Calendar Address Policy";
