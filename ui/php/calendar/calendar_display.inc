@@ -4492,7 +4492,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_tag ;
   global $c_none ;
   $repeatfrequency = 1;
-  $uid = $obm['uid']; 
+  $uid = $obm['uid'];
+  $uid_infos = get_user_info($uid);
+  $uid_label = $uid_infos['lastname'].' '.$uid_infos['firstname'];
   $tagcolor = "#eff0f2" ; // backcolor by default
   $organizer_name = null;
   $organizer_id = null;
@@ -4539,6 +4541,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
+  //always add current user to the list of users that can be organizers
+  if ( !array_key_exists($uid, $displayedPeople) ) {
+    $displayedPeople[$uid] = phpStringToJsString($uid_label);
+  }
+
   $possible_organizers = array();
   if(is_array($displayedPeople)){
     foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
@@ -4548,7 +4555,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
   }
-  else {
+  else              {
       if (!OBM_Acl::canWrite($uid, 'calendar',$organizer_id)) {
           error_log("The current user of id $uid doesn't have write rights on the $calendar of user $organizer_id");
           # Redirect to calendar index
@@ -4912,19 +4919,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       else{
         $block_organizer .= "
         <select name=\"sel_organizer\">";
-        $uid_is_displayed = false;
         foreach($possible_organizers as $displayed_person_id=>$displayed_person_name){
-          if( $displayed_person_id == $uid ){ $uid_is_displayed = true; }
           $selected_person = $displayed_person_id == $organizer_id ? "selected=selected" : "";
           $block_organizer .= "<option $selected_person
                                       value=\"".$displayed_person_id."\">".
                                 $displayed_person_name.
                               "</option>";
-        }
-        if ( !$uid_is_displayed ) {
-          $uid_infos = get_user_info($uid);
-          $uid_name = htmlspecialchars($uid_infos['lastname'].' '.$uid_infos['firstname']);
-          $block_organizer .=" <option value=\"".$uid."\">".$uid_name."</option></select>";
         }
       }
       $block_organizer .=
