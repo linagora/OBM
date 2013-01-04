@@ -22,37 +22,37 @@
             <input type='button' value='<?php echo __('Add fields') ?>' title="<?php echo __('Add Fields') ?>" class='dropDownButton' />
             <ul>
               <?php if(empty($contact->mname) && empty($contact->suffix)) { ?>
-              <li><a href="" onclick="$('kindField').removeClass('H');$('extendedName').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Extended name') ?></a></li>
+              <li><a href="" onclick="$('kindField').removeClass('H');$('extendedName').removeClass('H');OverText.update(); return false;"><?php echo __('Extended name') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->aka)) { ?>
-              <li><a href="" onclick="$('aka').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Also known as') ?></a></li>
+              <li><a href="" onclick="$('aka').removeClass('H');OverText.update(); return false;"><?php echo __('Also known as') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->title)) { ?>
-              <li><a href="" onclick="$('title').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Title') ?></a></li>
+              <li><a href="" onclick="$('title').removeClass('H');OverText.update(); return false;"><?php echo __('Title') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->commonname)) { ?>
-              <li><a href="" onclick="$('commonname').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Common name') ?></a></li>
+              <li><a href="" onclick="$('commonname').removeClass('H');OverText.update(); return false;"><?php echo __('Common name') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->im)) { ?>
-              <li><a  href="" onclick="$('IMLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Instant messaging') ?></a></li>
+              <li><a  href="" onclick="$('IMLayout').removeClass('H');OverText.update(); return false;"><?php echo __('Instant messaging') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->website)) { ?>
-              <li><a  href="" onclick="$('WebsiteLayout').removeClass('H');OverText.update();this.getParent().dispose();return false;"><?php echo __('Website') ?></a></li>
+              <li><a  href="" onclick="$('WebsiteLayout').removeClass('H');OverText.update(); return false;"><?php echo __('Website') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->birthday) && empty($contact->anniversary) && empty($contact->date)) { ?>
-              <li><a href="" onclick="$('datesLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Dates') ?></a></li>
+              <li><a href="" onclick="$('datesLayout').removeClass('H'); return false;"><?php echo __('Dates') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->function_id) && empty($contact->market_id) && empty($contact->datasource_id) && empty($contact->kind_id) && empty($contact->mailok) && empty($contact->newsletter)) { ?>
-              <li><a href="" onclick="$('crmLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Commercial fields') ?></a></li> 
+              <li><a href="" onclick="$('crmLayout').removeClass('H'); return false;"><?php echo __('Commercial fields') ?></a></li> 
               <?php } ?>
               <?php if(empty($contact->manager) && empty($contact->spouse) && empty($contact->assistant) && empty($contact->category) && empty($contact->service)) { ?>
-              <li><a href="" onclick="$('otherLayout').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Other properties') ?></a></li>
+              <li><a href="" onclick="$('otherLayout').removeClass('H'); return false;"><?php echo __('Other properties') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->comment2)) { ?>
-              <li><a href="" onclick="$('comment2').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Notes') ?></a></li>
+              <li><a href="" onclick="$('comment2').removeClass('H'); return false;"><?php echo __('Notes') ?></a></li>
               <?php } ?>
               <?php if(empty($contact->comment3)) { ?>
-              <li><a href="" onclick="$('comment3').removeClass('H');this.getParent().dispose();return false;"><?php echo __('Other comment') ?></a></li>
+              <li><a href="" onclick="$('comment3').removeClass('H'); return false;"><?php echo __('Other comment') ?></a></li>
               <?php } ?>
             </ul>
           </li>
