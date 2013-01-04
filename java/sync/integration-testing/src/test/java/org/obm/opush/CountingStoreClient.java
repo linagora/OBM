@@ -33,6 +33,7 @@ package org.obm.opush;
 
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.StoreClientImpl;
 import org.obm.push.minig.imap.impl.ClientSupport;
 
@@ -73,5 +74,12 @@ public class CountingStoreClient extends StoreClientImpl {
 		boolean selected = super.selectMailboxImpl(mailbox);
 		counter.selectCounter.incrementAndGet();
 		return selected;
+	}
+	
+	@Override
+	public ListResult listAll() {
+		ListResult listAll = super.listAll();
+		counter.listMailboxesCounter.incrementAndGet();
+		return listAll;
 	}
 }

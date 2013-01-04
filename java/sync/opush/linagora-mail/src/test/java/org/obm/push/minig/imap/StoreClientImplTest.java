@@ -35,11 +35,15 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.mail.bean.ListInfo;
+import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.ClientSupport;
 
 @RunWith(SlowFilterRunner.class)
@@ -187,6 +191,11 @@ public class StoreClientImplTest {
 
 	@Test
 	public void testSelectWhenActiveMailboxIsAParent() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("INBOX/sub", true, false));
+		listResult.add(new ListInfo("TRASH", true, false));
+		expect(clientSupport.listAll()).andReturn(listResult);
 		expect(clientSupport.select("INBOX/sub")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOX";
 		
@@ -274,5 +283,89 @@ public class StoreClientImplTest {
 	public void testHasToSelectMailboxForTrashWhenInboxActive() {
 		storeClientImpl.activeMailbox = "INBOX";
 		assertThat(storeClientImpl.hasToSelectMailbox("Trash")).isTrue();
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForInbox() {
+		String found = storeClientImpl.findMailboxNameWithServerCase("INBOX");
+		assertThat(found).isEqualTo("INBOX");
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForInboxCaseSensitive() {
+		String found = storeClientImpl.findMailboxNameWithServerCase("inBox");
+		assertThat(found).isEqualTo("INBOX");
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForLongerInbox() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBO", true, false));
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("INBOXX", true, false));
+		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		
+		mocks.replay();
+		String found = storeClientImpl.findMailboxNameWithServerCase("INBOXX");
+		mocks.verify();
+		
+		assertThat(found).isEqualTo("INBOXX");
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForShorterInbox() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBO", true, false));
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("INBOXX", true, false));
+		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		
+		mocks.replay();
+		String found = storeClientImpl.findMailboxNameWithServerCase("INBO");
+		mocks.verify();
+		
+		assertThat(found).isEqualTo("INBO");
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForTrash() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBO", true, false));
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("Trash", true, false));
+		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		
+		mocks.replay();
+		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
+		mocks.verify();
+		
+		assertThat(found).isEqualTo("Trash");
+	}
+	
+	@Test
+	public void testFindMailboxNameWithServerCaseForTrashOtherCase() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBO", true, false));
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("TRASH", true, false));
+		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		
+		mocks.replay();
+		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
+		mocks.verify();
+		
+		assertThat(found).isEqualTo("TRASH");
+	}
+	
+	@Test(expected=CollectionNotFoundException.class)
+	public void testFindMailboxNameWithServerCaseForNotInResult() {
+		ListResult listResult = new ListResult(3);
+		listResult.add(new ListInfo("INBO", true, false));
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo("TRASH", true, false));
+		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		
+		mocks.replay();
+		storeClientImpl.findMailboxNameWithServerCase("Youpi");
 	}
 }

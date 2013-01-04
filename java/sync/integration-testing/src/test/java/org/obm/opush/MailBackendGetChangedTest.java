@@ -222,6 +222,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -288,6 +289,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -361,6 +363,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 
@@ -632,6 +635,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -702,6 +706,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -788,6 +793,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -855,6 +861,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	private void expectItemTrackingDaoForNEmails(int numberOfEmails, ItemSyncState...itemSyncStates) 

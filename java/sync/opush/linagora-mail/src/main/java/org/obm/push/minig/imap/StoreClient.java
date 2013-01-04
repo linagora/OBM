@@ -145,4 +145,6 @@ public interface StoreClient {
 	InputStream uidFetchPart(long uid, String address);
 
 	List<MailThread> uidThreads();
+
+	String findMailboxNameWithServerCase(String mailbox);
 }

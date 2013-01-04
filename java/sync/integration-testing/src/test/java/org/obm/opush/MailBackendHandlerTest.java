@@ -174,6 +174,7 @@ public class MailBackendHandlerTest {
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(1);
 	}
 
 	private void bindCollectionIdToPath(int syncEmailCollectionId) {

@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
 import org.obm.opush.SingleUserFixture;
@@ -76,6 +77,7 @@ public class MoveItemsHandlerTest {
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
 	@Inject IMocksControl mocksControl;
+	@Inject ImapConnectionCounter imapConnectionCounter;
 	
 	private CollectionDao collectionDao;
 
@@ -136,6 +138,11 @@ public class MoveItemsHandlerTest {
 		assertThat(moveResult.status).isEqualTo(MoveItemsStatus.SUCCESS);
 		assertThat(moveResult.srcMsgId).isEqualTo(inboxCollectionId + emailId1);
 		assertThat(moveResult.dstMsgId).startsWith(trashCollectionId + ":");
+
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(1);
 	}
 
 	@Test
@@ -163,6 +170,11 @@ public class MoveItemsHandlerTest {
 		assertThat(moveResult2.status).isEqualTo(MoveItemsStatus.SUCCESS);
 		assertThat(moveResult2.srcMsgId).isEqualTo(inboxCollectionId + emailId2);
 		assertThat(moveResult2.dstMsgId).isEqualTo(trashCollectionId + emailId2);
+		
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(2);
 	}
 
 	@Ignore("Greenmail has replied that the command succeed")

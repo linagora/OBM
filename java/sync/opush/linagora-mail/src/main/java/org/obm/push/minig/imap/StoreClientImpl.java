@@ -45,10 +45,12 @@ import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
 import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
+import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.NameSpaceInfo;
@@ -100,8 +102,7 @@ public class StoreClientImpl implements StoreClient {
  		}
 	}
 	
-	private static final Logger logger = LoggerFactory
-			.getLogger(StoreClientImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(StoreClientImpl.class);
 	
 	private final String password;
 	private final String login;
@@ -109,7 +110,7 @@ public class StoreClientImpl implements StoreClient {
 	private final String hostname;
 	@VisibleForTesting String activeMailbox;
 
-	private final ClientSupport cs;
+	private final ClientSupport clientSupport;
 	private final SocketConnector connector;
 
 	protected StoreClientImpl(String hostname, int port, String login, String password,
@@ -118,7 +119,7 @@ public class StoreClientImpl implements StoreClient {
 		this.port = port;
 		this.login = login;
 		this.password = password;
-		this.cs = clientSupport;
+		this.clientSupport = clientSupport;
 		this.connector = connector;
 	}
 
@@ -127,7 +128,7 @@ public class StoreClientImpl implements StoreClient {
 	public void login(Boolean activateTLS) throws IMAPException {
 		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
 		SocketAddress sa = new InetSocketAddress(hostname, port);
-		cs.login(login, password, connector, sa, activateTLS);
+		clientSupport.login(login, password, connector, sa, activateTLS);
 	}
 
 	@Override
@@ -136,7 +137,7 @@ public class StoreClientImpl implements StoreClient {
 		if (logger.isDebugEnabled()) {
 			logger.debug("logout attempt for " + login);
 		}
-		cs.logout();
+		clientSupport.logout();
 	}
 
 	@Override
@@ -165,151 +166,170 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	protected boolean selectMailboxImpl(String mailbox) {
-		return cs.select(mailbox);
+		return clientSupport.select(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
 	public boolean create(String mailbox) {
-		return cs.create(mailbox);
+		return clientSupport.create(mailbox);
 	}
 
 	@Override
 	public boolean subscribe(String mailbox) {
-		return cs.subscribe(mailbox);
+		return clientSupport.subscribe(mailbox);
 	}
 
 	@Override
 	public boolean unsubscribe(String mailbox) {
-		return cs.unsubscribe(mailbox);
+		return clientSupport.unsubscribe(mailbox);
 	}
 
 	@Override
 	public boolean delete(String mailbox) {
-		return cs.delete(mailbox);
+		return clientSupport.delete(mailbox);
 	}
 
 	@Override
 	public boolean rename(String mailbox, String newMailbox) {
-		return cs.rename(mailbox, newMailbox);
+		return clientSupport.rename(mailbox, newMailbox);
 	}
 
 	@Override
 	public Set<String> capabilities() {
-		return cs.capabilities();
+		return clientSupport.capabilities();
 	}
 
 	@Override
 	public boolean noop() {
-		return cs.noop();
+		return clientSupport.noop();
 	}
 	
 	@Override
 	public  ListResult listSubscribed() {
-		return cs.listSubscribed();
+		return clientSupport.listSubscribed();
 	}
 	
 	@Override
 	public  ListResult listAll() {
-		return cs.listAll();
+		return clientSupport.listAll();
 	}
 
 	@Override
 	public boolean append(String mailbox, InputStream in, FlagsList fl) {
-		return cs.append(mailbox, in, fl);
+		return clientSupport.append(findMailboxNameWithServerCase(mailbox), in, fl);
 	}
 
 	@Override
 	public void expunge() {
-		cs.expunge();
+		clientSupport.expunge();
 	}
 
 	@Override
 	public QuotaInfo quota(String mailbox) {
-		return cs.quota(mailbox);
+		return clientSupport.quota(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
 	public InputStream uidFetchMessage(long uid) {
-		return cs.uidFetchMessage(uid);
+		return clientSupport.uidFetchMessage(uid);
 	}
 
 	@Override
 	public MessageSet uidSearch(SearchQuery sq) {
-		return cs.uidSearch(sq);
+		return clientSupport.uidSearch(sq);
 	}
 
 	@Override
 	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
-		return cs.uidFetchBodyStructure(messages);
+		return clientSupport.uidFetchBodyStructure(messages);
 	}
 
 	@Override
 	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) {
-		return cs.uidFetchHeaders(uids, headers);
+		return clientSupport.uidFetchHeaders(uids, headers);
 	}
 
 	@Override
 	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
-		return cs.uidFetchEnvelope(messages);
+		return clientSupport.uidFetchEnvelope(messages);
 	}
 
 	@Override
 	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
-		return cs.uidFetchFlags(messages);
+		return clientSupport.uidFetchFlags(messages);
 	}
 	
 	@Override
 	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
-		return cs.uidFetchInternalDate(uids);
+		return clientSupport.uidFetchInternalDate(uids);
 	}
 	
 	@Override
 	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
-		return cs.uidFetchFast(messages);
+		return clientSupport.uidFetchFast(messages);
 	}
 
 	@Override
 	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
-		return cs.uidCopy(messages, destMailbox);
+		return clientSupport.uidCopy(messages, findMailboxNameWithServerCase(destMailbox));
 	}
 
 	@Override
 	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
-		return cs.uidStore(messages, fl, set);
+		return clientSupport.uidStore(messages, fl, set);
 	}
 
 	@Override
 	public InputStream uidFetchPart(long uid, String address, long truncation) {
-		return cs.uidFetchPart(uid, address, truncation);
+		return clientSupport.uidFetchPart(uid, address, truncation);
 	}
 	
 	@Override
 	public InputStream uidFetchPart(long uid, String address) {
-		return cs.uidFetchPart(uid, address);
+		return clientSupport.uidFetchPart(uid, address);
 	}
 
 	@Override
 	public List<MailThread> uidThreads() {
-		return cs.uidThreads();
+		return clientSupport.uidThreads();
 	}
 
 	@Override
 	public NameSpaceInfo namespace() {
-		return cs.namespace();
+		return clientSupport.namespace();
 	}
 
 	@Override
 	public boolean isConnected() {
-		return cs.isConnected();
+		return clientSupport.isConnected();
 	}
 	
 	@Override
 	public long uidNext(String mailbox) {
-		return cs.uidNext(mailbox);
+		return clientSupport.uidNext(findMailboxNameWithServerCase(mailbox));
 	}
 	
 	@Override
 	public long uidValidity(String mailbox) {
-		return cs.uidValidity(mailbox);
+		return clientSupport.uidValidity(findMailboxNameWithServerCase(mailbox));
+	}
+	
+	@Override
+	public String findMailboxNameWithServerCase(String mailboxName) {
+		if (isINBOXSpecificCase(mailboxName)) {
+			return EmailConfiguration.IMAP_INBOX_NAME;
+		}
+		
+		ListResult listResult = listAll();
+		for (ListInfo result: listResult) {
+			if (result.getName().toLowerCase().equals(mailboxName.toLowerCase())) {
+				return result.getName();
+			}
+		}
+		throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + mailboxName + " ]");
+	}
+
+	private boolean isINBOXSpecificCase(String boxName) {
+		return boxName.toLowerCase().equals(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase());
 	}
 }

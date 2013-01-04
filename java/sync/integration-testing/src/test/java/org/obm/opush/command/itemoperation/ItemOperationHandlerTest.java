@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
 import org.obm.opush.SingleUserFixture;
@@ -78,6 +79,7 @@ public class ItemOperationHandlerTest {
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
 	@Inject IMocksControl mocksControl;
+	@Inject ImapConnectionCounter imapConnectionCounter;
 	
 	private CollectionDao collectionDao;
 
@@ -132,8 +134,12 @@ public class ItemOperationHandlerTest {
 		assertThat(fetchResponse.getServerId()).isEqualTo(inboxCollectionId + emailId1);
 		Element data = fetchResponse.getData();
 		assertThat(DOMUtils.getUniqueElement(data, "Type").getTextContent()).isEqualTo("1");
-		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent())
-			.contains("email body data");
+		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent()).contains("email body data");
+
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -157,6 +163,11 @@ public class ItemOperationHandlerTest {
 		assertThat(DOMUtils.getUniqueElement(data, "Type").getTextContent()).isEqualTo("2");
 		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent())
 			.contains("<html><body>email body data</body></html>");
+		
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -185,6 +196,11 @@ public class ItemOperationHandlerTest {
 			.contains("Content-Transfer-Encoding: 7bit")
 			.contains("To: jaures@sfio.fr")
 			.contains("email body data");
+		
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Test
@@ -208,6 +224,11 @@ public class ItemOperationHandlerTest {
 		Element data = fetchResponse.getData();
 		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent())
 			.contains("email 2 body data");
+		
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
 	@Ignore("Opush supports only one fetch in an ItemOperation command")

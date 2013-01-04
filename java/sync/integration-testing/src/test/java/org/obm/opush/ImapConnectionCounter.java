@@ -41,11 +41,13 @@ public class ImapConnectionCounter {
 	public final AtomicInteger loginCounter;
 	public final AtomicInteger closeCounter;
 	public final AtomicInteger selectCounter;
+	public final AtomicInteger listMailboxesCounter;
 	
 	public ImapConnectionCounter() {
 		this.loginCounter = new AtomicInteger();
 		this.closeCounter = new AtomicInteger();
 		this.selectCounter = new AtomicInteger();
+		this.listMailboxesCounter = new AtomicInteger();
 	}
 	
 }
