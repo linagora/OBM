@@ -1359,6 +1359,19 @@ function get_event_attachments_urls($event_id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Returns an external, tokenized url for a obm document attached
+// To an event
+// Parameters:
+//   - $document_id  :
+///////////////////////////////////////////////////////////////////////////////
+function get_document_attachments_url($document_id, $private) {
+  $private = $private ? 'private' : 'public';
+  return $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.
+    get_calendar_entity_share($document_id, 'document', $private , 'document').
+    '&document_id='.$document_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Returns an event description given its id
 // Parameters: 
 //   - $event_id  :

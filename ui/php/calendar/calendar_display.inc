@@ -3491,8 +3491,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
       $dis_document_list = '';
       $event_entity_id = $event_q->f('event_entity_id');
       foreach ($docs['entity'] as $d_id => $entity) {
-        if (!$entity['private'] || in_array($obm['uid'], $entities['user']['ids'])) {
-          $content = "<a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=download_document&document_id=$d_id&event_id=$id\">$entity[title]</a>";
+        if (!$entity['private'] || $entity['user'] == $obm['uid'] || in_array($obm['uid'], $entities['user']['ids'])) {
+          $content = "<a href=\"".get_document_attachments_url($d_id, $entity['private'])."\">$entity[title]</a>";
           if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
             $content = "
               <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
