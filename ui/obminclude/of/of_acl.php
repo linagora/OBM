@@ -722,11 +722,11 @@ class OBM_Acl {
   }
 
   public static function getCalendarJoin() {
-    return "INNER JOIN UserObm as AllowedEntity ON calendarentity_calendar_id = AllowedEntity.userobm_id";
+    return "INNER JOIN UserObm as AllowedEntity ON calendarentity_calendar_id = AllowedEntity.userobm_id AND AllowedEntity.userobm_archive = 0";
   }
 
   public static function getMailboxJoin() {
-    return "INNER JOIN UserObm as AllowedEntity ON mailboxentity_mailbox_id = AllowedEntity.userobm_id";
+    return "INNER JOIN UserObm as AllowedEntity ON mailboxentity_mailbox_id = AllowedEntity.userobm_id AND AllowedEntity.userobm_archive = 0";
   }
 
   public static function getAddressbookJoin() {
