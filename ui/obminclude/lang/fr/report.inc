@@ -114,7 +114,7 @@ $l_mail_server = "Serveur de mail";
 $l_mail_server_name = "mail_server_name";
 
 //Warning
-$l_warn_download = "Le type de rapport n'a pas été choisis";
+$l_warn_download = "Le type de rapport n'a pas été choisi";
 $l_warn_exp = "Attention le compte arrive bientôt à expiration";
 $l_warn_quota = "Attention le quota est bientôt atteind";
 $l_warn = "Alerte";
