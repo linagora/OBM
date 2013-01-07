@@ -52,5 +52,5 @@ créé par        : <?php echo $creator; ?>
 
 Commentaire     : <?php echo $targetComment; ?>.
 
-:: Pour accepter/refuser la réservation : 
+:: Pour accepter ou refuser la réservation, cliquer sur le lien ci-dessous ou, si vous utilisez le connecteur OBM, sur "Agenda OBM" situé dans la barre d'outil : 
 <?php echo $this->host; ?>/calendar/calendar_index.php?action=waiting_events
