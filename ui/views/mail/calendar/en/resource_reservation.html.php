@@ -64,7 +64,7 @@ applicable to the OBM software.
       </td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;" colspan="2">To accept or decline reservation, please click on the following link or, if you use OBM connector, click on "Agenda" in the toolbar.<br/>
+        <td style="text-align:right;padding-right:1em;" colspan="2">To accept or decline this reservation, please click on the following link or, if you use OBM connector, click on "Agenda" in the toolbar.<br/>
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=waiting_events">Accept/Refuse the reservation</a>
         </td>
     </tr>
