@@ -6126,7 +6126,7 @@ function run_query_calendar_solr_store($event_id) {
   $edate = new Of_Date($db->f('event_date'));
   $doc->setField('date', $edate->format('Y-m-d\TH:i:s\Z'));
   $doc->setField('duration', $db->f('event_duration'));
-  $doc->setMultiValue('ownerId', $db->f('owner'));
+  $doc->setMultiValue('ownerId', $db->f('event_owner'));
   $doc->setMultiValue('owner', $db->f('owner_lastname')." ".$db->f('owner_firstname'));
   $doc->setField('description', $db->f('event_description'));
   $doc->setMultiValue('tag', $db->f('eventtag_id'));

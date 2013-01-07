@@ -119,6 +119,9 @@ function dis_calendar_search_result($calendar, $current_view) {
   $readable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users())
   );
+  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+      OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write', $current_view->get_users())
+  );
 
   $events = null;
 
@@ -175,8 +178,18 @@ function dis_calendar_search_result($calendar, $current_view) {
       $pattern .= " category:($calendar[category])";
     }
   }
+  
+  // OBMFULL-4430
+  // Get private events only if we have write access to the calendar of the event owner
+  // If this is triggered as part of a public calendar share, assume we don't have write access
+  // as we absolutely cannot rely on Of_ACL!
+  if ($obm['uid'] == 0) {
+    $patternToSearch = $pattern . ' -is:private';
+  } else {
+    $patternToSearch = $pattern . ' -(is:private AND -ownerId:(' . implode(" OR ", $writable_entity['ids']) . '))';
+  }
 
-  $events = OBM_Search::search('event', $pattern, 0, 10000, array());
+  $events = OBM_Search::search('event', $patternToSearch, 0, 10000, array());
   $GLOBALS['display']['search'] = dis_calendar_html_search_form($calendar, $pattern);
   $GLOBALS['display']['search'] .= dis_back_to_calendar($action);
 
