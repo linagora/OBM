@@ -42,13 +42,19 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectAllocateFolderState;
 import static org.obm.opush.IntegrationTestUtils.expectContentExporterFetching;
 import static org.obm.opush.IntegrationTestUtils.expectCreateFolderMappingState;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
+import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasAddItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasDeleteItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasItems;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.checkMailFolderHasNoChange;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.lookupInbox;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncedCollectionDao;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 import static org.obm.push.bean.FilterType.THREE_DAYS_BACK;
 
 import java.io.ByteArrayInputStream;
@@ -56,6 +62,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -75,6 +82,7 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
@@ -92,12 +100,18 @@ import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.NotAllowedException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
+import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
@@ -544,5 +558,49 @@ public class SyncHandlerTest {
 		SyncResponse syncResponse = opClient.sync(syncKey, collectionId, PIMDataType.EMAIL);
 
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
+	}
+
+	@Test
+	public void testSyncOnHierarchyChangedException() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("1");
+		int syncEmailCollectionId = 4;
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncWithHierarchyChangedException(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId));
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		opClient.folderSync(initialSyncKey);
+		SyncResponse syncEmailResponse = opClient.syncEmail(syncEmailSyncKey, syncEmailCollectionId, FilterType.THREE_DAYS_BACK, 100);
+
+		assertThat(syncEmailResponse).isNotNull();
+		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.HIERARCHY_CHANGED);
+	}
+
+	private void mockEmailSyncWithHierarchyChangedException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds)
+			throws DaoException, ConversionException, FilterTypeChangedException {
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		mockEmailSyncedCollectionDao(syncedCollectionDao);
+		
+		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
+
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, syncEmailCollectionsIds);
+		mockCollectionDaoForEmailSync(collectionDao, syncKey, syncEmailCollectionsIds);
+		
+		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
+		mockItemTrackingDao(itemTrackingDao);
+		
+		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
+		expect(contentsExporterBackend.getChanged(
+				anyObject(UserDataRequest.class), 
+				anyObject(SyncCollection.class),
+				anyObject(SyncKey.class)))
+				.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 }

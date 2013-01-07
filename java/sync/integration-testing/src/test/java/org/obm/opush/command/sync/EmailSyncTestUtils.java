@@ -200,7 +200,7 @@ public class EmailSyncTestUtils {
 	}
 	
 
-	private static void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
+	public static void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
@@ -208,7 +208,7 @@ public class EmailSyncTestUtils {
 		expect(itemTrackingDao.isServerIdSynced(anyObject(ItemSyncState.class), anyObject(ServerId.class))).andReturn(false).anyTimes();
 	}
 
-	private static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, SyncKey syncEmailSyncKey,
+	public static void mockCollectionDaoForEmailSync(CollectionDao collectionDao, SyncKey syncEmailSyncKey,
 			Collection<Integer> syncEmailCollectionsIds) throws DaoException {
 		
 		for (Integer syncEmailCollectionId : syncEmailCollectionsIds) {

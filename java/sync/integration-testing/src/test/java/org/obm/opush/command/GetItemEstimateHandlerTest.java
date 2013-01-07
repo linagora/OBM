@@ -31,8 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectSyncState;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
+import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncedCollectionDao;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +50,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,10 +63,22 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.command.sync.EmailSyncTestUtils;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.NotAllowedException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.state.StateMachine;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.ItemTrackingDao;
+import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -103,9 +123,9 @@ public class GetItemEstimateHandlerTest {
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, collectionId);
 
-		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.OK);
-		Assertions.assertThat(response.getCollectionId()).isEqualTo(collectionId);
-		Assertions.assertThat(response.getEstimate()).isEqualTo(0);
+		assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.OK);
+		assertThat(response.getCollectionId()).isEqualTo(collectionId);
+		assertThat(response.getEstimate()).isEqualTo(0);
 	}
 
 	@Test
@@ -121,9 +141,9 @@ public class GetItemEstimateHandlerTest {
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, unexistingCollectionId);
 
-		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
-		Assertions.assertThat(response.getCollectionId()).isNull();
-		Assertions.assertThat(response.getEstimate()).isNull();
+		assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
+		assertThat(response.getCollectionId()).isNull();
+		assertThat(response.getEstimate()).isNull();
 	}
 
 	@Test
@@ -139,9 +159,9 @@ public class GetItemEstimateHandlerTest {
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(invalidSyncKey, collectionId);
 
-		Assertions.assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
-		Assertions.assertThat(response.getCollectionId()).isEqualTo(collectionId);
-		Assertions.assertThat(response.getEstimate()).isNull();
+		assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
+		assertThat(response.getCollectionId()).isEqualTo(collectionId);
+		assertThat(response.getEstimate()).isNull();
 	}
 
 	private void mockAccessAndStateThenStart(Set<Integer> existingCollections, SyncKey syncKey, ItemSyncState syncState)
@@ -152,5 +172,54 @@ public class GetItemEstimateHandlerTest {
 		EmailSyncTestUtils.mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		mocksControl.replay();
 		opushServer.start();
+	}
+
+	@Test
+	public void testGetItemEstimateWithHierarchyChangedException() throws Exception {
+		SyncKey syncKey = new SyncKey("1");
+		ItemSyncState syncState = ItemSyncState.builder().syncDate(DateUtils.getCurrentDate()).syncKey(syncKey).build();
+		int collectionId = 15105;
+		Set<Integer> syncEmailCollectionsIds = Sets.newHashSet(collectionId);
+		
+		expectSyncState(classToInstanceMap.get(StateMachine.class), syncKey, syncState);
+
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		
+		mockEmailSyncWithHierarchyChangedException(syncKey, syncEmailCollectionsIds);
+		
+		mocksControl.replay();
+		opushServer.start();
+		
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		
+		GetItemEstimateSingleFolderResponse response =
+				opClient.getItemEstimateOnMailFolder(syncKey, collectionId);
+
+		assertThat(response.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_COLLECTION);
+		assertThat(response.getCollectionId()).isNull();
+		assertThat(response.getEstimate()).isNull();
+	}
+
+	private void mockEmailSyncWithHierarchyChangedException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds)
+			throws DaoException, ConversionException, FilterTypeChangedException {
+		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
+		mockEmailSyncedCollectionDao(syncedCollectionDao);
+		
+		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
+
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, syncEmailCollectionsIds);
+		mockCollectionDaoForEmailSync(collectionDao, syncKey, syncEmailCollectionsIds);
+		
+		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
+		mockItemTrackingDao(itemTrackingDao);
+		
+		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
+		expect(contentsExporterBackend.getItemEstimateSize(
+				anyObject(UserDataRequest.class), 
+				anyObject(ItemSyncState.class),
+				anyObject(SyncCollection.class)))
+			.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 }

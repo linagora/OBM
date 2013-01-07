@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -46,7 +47,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -72,7 +72,9 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
@@ -194,7 +196,7 @@ public class MeetingResponseHandlerTest {
 		} catch (HttpRequestException e) {
 			expectedHttpStatus = e.getStatusCode();
 		}
-		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+		assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 	}
 
 	@Test
@@ -248,7 +250,17 @@ public class MeetingResponseHandlerTest {
 		} catch (HttpRequestException e) {
 			expectedHttpStatus = e.getStatusCode();
 		}
-		Assertions.assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+		assertThat(expectedHttpStatus).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+	}
+
+	@Test
+	public void testHierarchyChangedExceptionInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
+		prepareMockForMeetingResponseHandlingError(new HierarchyChangedException(new NotAllowedException("Not allowed")));
+		opushServer.start();
+
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsFailure(serverResponse);
 	}
 
 	private Document postMeetingAcceptedResponse()
@@ -264,19 +276,19 @@ public class MeetingResponseHandlerTest {
 	private void assertMeetingResponseIsSuccess(Document response) throws TransformerException {
 		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandSuccess();
-		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
+		assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void assertMeetingResponseIsFailure(Document response) throws TransformerException {
 		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandFailure();
-		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
+		assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void assertMeetingResponseIsInvalidRequest(Document response) throws TransformerException {
 		String responseAsText = DOMUtils.serialize(response);
 		String expectedResponse = buildMeetingResponseCommandInvalidRequest();
-		Assertions.assertThat(responseAsText).isEqualTo(expectedResponse);
+		assertThat(responseAsText).isEqualTo(expectedResponse);
 	}
 
 	private void prepareMockForEmailDeletionError(Exception triggeredException) throws Exception {

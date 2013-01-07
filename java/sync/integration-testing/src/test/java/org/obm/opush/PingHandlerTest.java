@@ -32,10 +32,16 @@
 package org.obm.opush;
 
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
-import static org.obm.opush.IntegrationTestUtils.*;
+import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
+import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.io.IOException;
@@ -78,10 +84,12 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.push.client.OPClient;
@@ -227,6 +235,21 @@ public class PingHandlerTest {
 		checkExecutionTime(5, 6, stopwatch);
 		checkHasChangeResponse(response);
 	}
+
+	@Test
+	@Ignore("OBMFULL-4125")
+	public void testPushNotificationOnBackendHierarchyChangedException() throws Exception {
+		prepareMockHierarchyChangedException();
+
+		opushServer.start();
+
+		Document document = buildPingCommand(20);
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		Document response = opClient.postXml("Ping", document, "Ping", null, false);
+		
+		checkFolderSyncRequiredResponse(response);
+	}
 	
 	private void prepareMockNoChange() throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, AuthFault, ConversionException, HierarchyChangedException {
@@ -241,6 +264,14 @@ public class PingHandlerTest {
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockForPingNeeds();
 		mockForCalendarHasChangePing(noChangeIterationCount);
+		mocksControl.replay();
+	}
+
+	private void prepareMockHierarchyChangedException() throws DaoException, CollectionNotFoundException, 
+			UnexpectedObmSyncServerException, AuthFault, ConversionException, HierarchyChangedException {
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockForPingNeeds();
+		mockForCalendarHierarchyChangedException();
 		mocksControl.replay();
 	}
 	
@@ -283,6 +314,14 @@ public class PingHandlerTest {
 					"<Status>2</Status>" +
 					"<Folders><Folder>1432</Folder></Folders></Ping>");
 	}
+	
+	private void checkFolderSyncRequiredResponse(Document response) throws TransformerException {
+		assertThat(DOMUtils.serialize(response))
+			.isEqualTo(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?><Ping>" +
+					"<Status>7</Status>" +
+					"</Ping>");
+	}
 
 	private void mockForPingNeeds() throws DaoException {
 		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
@@ -310,6 +349,16 @@ public class PingHandlerTest {
 		mockCalendarBackendHasContentChanges(calendarBackend);
 	}
 
+	private void mockForCalendarHierarchyChangedException() 
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ConversionException, HierarchyChangedException {
+		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
+		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
+
+		mockCollectionDaoHasChange(collectionDao, 1);
+		mockCalendarBackendHierarchyChangedException(calendarBackend);
+	}
+
 	private void mockCollectionDaoHasChange(CollectionDao collectionDao, int noChangeIterationCount) 
 			throws DaoException, CollectionNotFoundException {
 		Date dateFirstSyncFromASSpecs = new Date(0);
@@ -322,7 +371,10 @@ public class PingHandlerTest {
 		for (OpushUser user : fakeTestUsers) {
 			String collectionPathWhereChangesAppear = buildCalendarCollectionPath(user);
 			
-			ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
+			ItemSyncState syncState = ItemSyncState.builder()
+					.syncKey(new SyncKey("sync state"))
+					.syncDate(DateUtils.getCurrentDate())
+					.build();
 			expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).once();
 
 			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPathWhereChangesAppear).anyTimes();
@@ -335,7 +387,10 @@ public class PingHandlerTest {
 	
 	private void expectCollectionDaoUnchangeForXIteration(CollectionDao collectionDao, Date activeSyncSpecFirstSyncDate, 
 			int noChangeIterationCount) throws DaoException {
-		ItemSyncState syncState = ItemSyncState.builder().syncKey(new SyncKey("sync state")).build();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncKey(new SyncKey("sync state"))
+				.syncDate(DateUtils.getCurrentDate())
+				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).times(noChangeIterationCount);
 		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<SyncCollection>of());
 		expect(collectionDao.getContactChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).anyTimes();
@@ -353,6 +408,19 @@ public class PingHandlerTest {
 				anyInt(),
 				anyObject(SyncCollectionOptions.class)))
 			.andReturn(1).times(2);
+	}
+
+	private void mockCalendarBackendHierarchyChangedException(CalendarBackend calendarBackend)
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
+			ConversionException, HierarchyChangedException {
+		
+		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
+		expect(calendarBackend.getItemEstimateSize(
+				anyObject(UserDataRequest.class), 
+				anyObject(ItemSyncState.class),
+				anyInt(),
+				anyObject(SyncCollectionOptions.class)))
+			.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 
 	private void mockCalendarBackendHasNoChange(CalendarBackend calendarBackend) 
