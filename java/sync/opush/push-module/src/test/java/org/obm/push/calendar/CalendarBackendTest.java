@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -40,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,12 +81,14 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
@@ -849,5 +856,214 @@ public class CalendarBackendTest {
 		return FolderSyncState.builder()
 				.syncKey(syncKey)
 				.build();
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testGetChangedThrowsHierarchyChangedException() throws Exception {
+		Date currentDate = DateUtils.getCurrentDate();
+		SyncKey syncKey = new SyncKey("1234567890a");
+		ItemSyncState lastKnownState = ItemSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(syncKey)
+				.build();
+
+		int collectionId = 1;
+
+		expectLoginBehavior();
+
+		expectMappingServiceCollectionPathFor(collectionId);
+		
+		expect(calendarClient.getSync(token, "test", currentDate))
+			.andThrow(new NotAllowedException("Not Allowed")).once();
+		
+		mockControl.replay();
+		
+		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
+		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		
+		calendarBackend.getChanged(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testCreateOrUpdateThrowsHierarchyChangedException() throws Exception {
+		int collectionId = 1;
+		String serverId = "2";
+		String clientId = "3";
+		IApplicationData data = null;
+
+		expectLoginBehavior();
+		
+		expectMappingServiceCollectionPathFor(collectionId);
+		expect(mappingService.getServerIdFor(collectionId, serverId))
+			.andReturn(serverId).once();
+		
+		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), new EventObmId(serverId)))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+
+		mockControl.replay();
+		
+		calendarBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, data);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testCreateOrUpdateThrowsHierarchyChangedExceptionOnUpdateCalendarEntity() throws Exception {
+		int collectionId = 1;
+		String serverId = "2";
+		String clientId = "3";
+		IApplicationData data = null;
+
+		expectLoginBehavior();
+		
+		expectMappingServiceCollectionPathFor(collectionId);
+		expect(mappingService.getServerIdFor(collectionId, serverId))
+			.andReturn(serverId).once();
+		
+		Event event = new Event();
+		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), new EventObmId(serverId)))
+			.andReturn(event).once();
+	
+		expect(calendarClient.modifyEvent(token, "test", event, true, true))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+
+		expectEventConvertion(event, true);
+		
+		mockControl.replay();
+		
+		calendarBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, data);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testCreateOrUpdateThrowsHierarchyChangedExceptionOnCreateCalendarEntity() throws Exception {
+		int collectionId = 1;
+		String serverId = "2";
+		String clientId = "3";
+		IApplicationData data = new MSEvent();
+
+		expectLoginBehavior();
+		
+		expectMappingServiceCollectionPathFor(collectionId);
+		expect(mappingService.getServerIdFor(collectionId, serverId))
+			.andReturn(serverId).once();
+		
+		Event event = new Event();
+		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), new EventObmId(serverId)))
+			.andReturn(null).once();
+	
+		expect(calendarClient.createEvent(token, "test", event, true))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+
+		expect(eventConverter.isInternalEvent(null, true))
+			.andReturn(false).once();
+		
+		expect(eventConverter.convert(eq(userDataRequest.getUser()), EasyMock.anyObject(Event.class), anyObject(MSEvent.class), eq(false)))
+			.andReturn(event).once();
+		
+		eventService.trackEventExtIdMSEventUidTranslation(anyObject(EventExtId.class), anyObject(MSEventUid.class), eq(userDataRequest.getDevice()));
+		expectLastCall();
+		
+		mockControl.replay();
+		
+		calendarBackend.createOrUpdate(userDataRequest, collectionId, null, clientId, data);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testCreateOrUpdateThrowsHierarchyChangedExceptionOnEventAlreadyExist() throws Exception {
+		int collectionId = 1;
+		String serverId = "2";
+		String clientId = "3";
+		IApplicationData data = new MSEvent();
+
+		expectLoginBehavior();
+		
+		expectMappingServiceCollectionPathFor(collectionId);
+		expect(mappingService.getServerIdFor(collectionId, serverId))
+			.andReturn(serverId).once();
+		
+		Event event = new Event();
+		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), new EventObmId(serverId)))
+			.andReturn(null).once();
+	
+		expect(calendarClient.createEvent(token, "test", event, true))
+			.andThrow(new EventAlreadyExistException("Already exist")).once();
+
+		expect(calendarClient.getEventObmIdFromExtId(eq(token), eq("test"), anyObject(EventExtId.class)))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+		
+		expect(eventConverter.isInternalEvent(null, true))
+			.andReturn(false).once();
+		
+		expect(eventConverter.convert(eq(userDataRequest.getUser()), EasyMock.anyObject(Event.class), anyObject(MSEvent.class), eq(false)))
+			.andReturn(event).once();
+		
+		eventService.trackEventExtIdMSEventUidTranslation(anyObject(EventExtId.class), anyObject(MSEventUid.class), eq(userDataRequest.getDevice()));
+		expectLastCall();
+		
+		mockControl.replay();
+		
+		calendarBackend.createOrUpdate(userDataRequest, collectionId, null, clientId, data);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testHandleMettingResponseThrowsHierarchyChangedException() throws Exception {
+		String calendarDisplayName = userDataRequest.getUser().getLoginAtDomain();
+		String defaultCalendarName = "obm:\\\\test@test\\calendar\\" + calendarDisplayName;
+		
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		MSEmail invitation  = new MSEmail();
+		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
+
+		expectLoginBehavior();
+		
+		EventExtId eventExtId = new EventExtId("1");
+		expect(eventService.getEventExtIdFor(msEventUid, device))
+			.andReturn(eventExtId).once();
+
+		Event event = new Event();
+		event.setUid(new EventObmId(1));
+		expectGetAndModifyEvent(eventExtId, event);
+		expect(calendarClient.changeParticipationState(token, userDataRequest.getUser().getLoginAtDomain(), eventExtId, null, 0, true))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+		
+		expectEventConvertion(event, false);
+		expect(eventConverter.getParticipation(null, AttendeeStatus.ACCEPT))
+			.andReturn(null).once();
+		
+		String serverId = "123";
+		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
+			.andReturn(1).once();
+		expect(mappingService.getServerIdFor(1, "1"))
+			.andReturn(serverId);
+		
+		expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
+		
+		mockControl.replay();
+
+		calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
+	}
+	
+	@Test (expected=HierarchyChangedException.class)
+	public void testFetchThrowsHierarchyChangedException() throws Exception {
+		String serverId = "1:1";
+		Integer itemId = 1;
+		
+		expectLoginBehavior();
+		
+		expectGetItemIdFromServerId(serverId, itemId);
+		
+		EventObmId eventObmId = new EventObmId(itemId);
+		Event event = new Event();
+		event.setUid(eventObmId);
+		expect(calendarClient.getEventFromId(token, userDataRequest.getUser().getLoginAtDomain(), eventObmId))
+			.andThrow(new NotAllowedException("Not allowed")).once();
+		
+		mockControl.replay();
+		
+		List<String> itemIds = ImmutableList.<String> of(serverId);
+
+		calendarBackend.fetch(userDataRequest, 1, itemIds, null, null, null);
 	}
 }
