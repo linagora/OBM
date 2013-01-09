@@ -37,6 +37,7 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -49,6 +50,7 @@ import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
+import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.ItemOperationsStatus;
@@ -79,6 +81,7 @@ public class ItemOperationHandlerTest {
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
 	@Inject IMocksControl mocksControl;
+	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	
 	private CollectionDao collectionDao;
@@ -136,6 +139,7 @@ public class ItemOperationHandlerTest {
 		assertThat(DOMUtils.getUniqueElement(data, "Type").getTextContent()).isEqualTo("1");
 		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent()).contains("email body data");
 
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
@@ -164,6 +168,7 @@ public class ItemOperationHandlerTest {
 		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent())
 			.contains("<html><body>email body data</body></html>");
 		
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
@@ -197,6 +202,7 @@ public class ItemOperationHandlerTest {
 			.contains("To: jaures@sfio.fr")
 			.contains("email body data");
 		
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
@@ -225,6 +231,7 @@ public class ItemOperationHandlerTest {
 		assertThat(DOMUtils.getUniqueElement(data, "Data").getTextContent())
 			.contains("email 2 body data");
 		
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);

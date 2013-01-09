@@ -37,6 +37,7 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -49,6 +50,7 @@ import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
+import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.MoveItemsStatus;
@@ -77,6 +79,7 @@ public class MoveItemsHandlerTest {
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
 	@Inject IMocksControl mocksControl;
+	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	
 	private CollectionDao collectionDao;
@@ -139,6 +142,7 @@ public class MoveItemsHandlerTest {
 		assertThat(moveResult.srcMsgId).isEqualTo(inboxCollectionId + emailId1);
 		assertThat(moveResult.dstMsgId).startsWith(trashCollectionId + ":");
 
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
@@ -171,6 +175,7 @@ public class MoveItemsHandlerTest {
 		assertThat(moveResult2.srcMsgId).isEqualTo(inboxCollectionId + emailId2);
 		assertThat(moveResult2.dstMsgId).isEqualTo(trashCollectionId + emailId2);
 		
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
