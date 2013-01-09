@@ -73,6 +73,7 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
@@ -675,7 +676,7 @@ public class SyncProtocolTest {
 		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
 		expectedMSContact.setFirstName("JoLynn");
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", "13579", "Add", expectedMSContact, PIMDataType.CONTACTS);
+				"123", "13579", SyncCommand.ADD, expectedMSContact, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
@@ -733,14 +734,14 @@ public class SyncProtocolTest {
 		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
 		expectedMSContact.setFirstName("JoLynn");
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", "13579", "Add", expectedMSContact, PIMDataType.CONTACTS);
+				"123", "13579", SyncCommand.ADD, expectedMSContact, PIMDataType.CONTACTS);
 		
 		MSContact expectedMSContact2 = new MSContact();
 		expectedMSContact2.setEmail1Address("opush2@obm.org");
 		expectedMSContact2.setFileAs("Dobney2, JoLynn Julie");
 		expectedMSContact2.setFirstName("JoLynn2");
 		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
-				"456", "02468", "Add", expectedMSContact2, PIMDataType.CONTACTS);
+				"456", "02468", SyncCommand.ADD, expectedMSContact2, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
@@ -790,7 +791,7 @@ public class SyncProtocolTest {
 		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
 		expectedMSContact.setFirstName("JoLynn");
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", "13579", "Change", expectedMSContact, PIMDataType.CONTACTS);
+				"123", "13579", SyncCommand.CHANGE, expectedMSContact, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
@@ -848,14 +849,14 @@ public class SyncProtocolTest {
 		expectedMSContact.setFileAs("Dobney, JoLynn Julie");
 		expectedMSContact.setFirstName("JoLynn");
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", "13579", "Change", expectedMSContact, PIMDataType.CONTACTS);
+				"123", "13579", SyncCommand.CHANGE, expectedMSContact, PIMDataType.CONTACTS);
 		
 		MSContact expectedMSContact2 = new MSContact();
 		expectedMSContact2.setEmail1Address("opush2@obm.org");
 		expectedMSContact2.setFileAs("Dobney2, JoLynn Julie");
 		expectedMSContact2.setFirstName("JoLynn2");
 		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
-				"456", "02468", "Change", expectedMSContact2, PIMDataType.CONTACTS);
+				"456", "02468", SyncCommand.CHANGE, expectedMSContact2, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
@@ -894,7 +895,7 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", null, "Fetch", null, PIMDataType.EMAIL);
+				"123", null, SyncCommand.FETCH, null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
@@ -937,9 +938,9 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", null, "Fetch", null, PIMDataType.EMAIL);
+				"123", null, SyncCommand.FETCH, null, PIMDataType.EMAIL);
 		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
-				"456", null, "Fetch", null, PIMDataType.EMAIL);
+				"456", null, SyncCommand.FETCH, null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
@@ -980,7 +981,7 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", null, "Delete", null, PIMDataType.EMAIL);
+				"123", null, SyncCommand.DELETE, null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
@@ -1022,9 +1023,9 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"123", null, "Delete", null, PIMDataType.EMAIL);
+				"123", null, SyncCommand.DELETE, null, PIMDataType.EMAIL);
 		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
-				"456", null, "Delete", null, PIMDataType.EMAIL);
+				"456", null, SyncCommand.DELETE, null, PIMDataType.EMAIL);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.EMAIL);
@@ -1114,21 +1115,21 @@ public class SyncProtocolTest {
 		expectedMSContact.setFirstName("JoLynn");
 
 		SyncCollectionChange expectedSyncCollectionAdd = new SyncCollectionChange(
-				"12", "120", "Add", expectedMSContact, PIMDataType.CONTACTS);
+				"12", "120", SyncCommand.ADD, expectedMSContact, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionAdd2 = new SyncCollectionChange(
-				"13", "130", "Add", expectedMSContact, PIMDataType.CONTACTS);
+				"13", "130", SyncCommand.ADD, expectedMSContact, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionChange = new SyncCollectionChange(
-				"34", "340", "Change", expectedMSContact, PIMDataType.CONTACTS);
+				"34", "340", SyncCommand.CHANGE, expectedMSContact, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionChange2 = new SyncCollectionChange(
-				"35", "350", "Change", expectedMSContact, PIMDataType.CONTACTS);
+				"35", "350", SyncCommand.CHANGE, expectedMSContact, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionFetch = new SyncCollectionChange(
-				"56", null, "Fetch", null, PIMDataType.CONTACTS);
+				"56", null, SyncCommand.FETCH, null, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionFetch2 = new SyncCollectionChange(
-				"57", null, "Fetch", null, PIMDataType.CONTACTS);
+				"57", null, SyncCommand.FETCH, null, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionDelete = new SyncCollectionChange(
-				"78", null, "Delete", null, PIMDataType.CONTACTS);
+				"78", null, SyncCommand.DELETE, null, PIMDataType.CONTACTS);
 		SyncCollectionChange expectedSyncCollectionDelete2 = new SyncCollectionChange(
-				"79", null, "Delete", null, PIMDataType.CONTACTS);
+				"79", null, SyncCommand.DELETE, null, PIMDataType.CONTACTS);
 		
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
 				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);

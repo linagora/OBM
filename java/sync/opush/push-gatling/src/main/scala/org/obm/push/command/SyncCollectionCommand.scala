@@ -44,6 +44,7 @@ import com.excilys.ebi.gatling.core.check.Success
 import com.google.common.base.Strings
 import org.obm.push.helper.SyncHelper
 import org.obm.push.bean.SyncKey
+import org.obm.push.bean.change.SyncCommand
 
 class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractSyncCommand(syncContext, wbTools) {
@@ -101,18 +102,18 @@ object SyncCollectionCommand {
 		}
 	}
 	
-	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("add")
-	val atLeastOneModifyResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("change")
-	val atLeastOneDeleteResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse("delete")
-	def atLeastOneTypedResponse(modType: String): MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
+	val atLeastOneAddResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse(SyncCommand.ADD)
+	val atLeastOneModifyResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse(SyncCommand.CHANGE)
+	val atLeastOneDeleteResponse: MatchStrategy[SyncResponse] = atLeastOneTypedResponse(SyncCommand.DELETE)
+	def atLeastOneTypedResponse(commandType: SyncCommand): MatchStrategy[SyncResponse] = new MatchStrategy[SyncResponse] {
 		def apply(value: Option[SyncResponse], session: Session) = {
 			val hasAddChange = value.get
 					.getCollectionResponses()
 					.flatMap(_.getSyncCollection().getChanges())
-					.find(_.getModType().equalsIgnoreCase(modType))
+					.find(_.getCommand() == commandType)
 					.isDefined
 			if (hasAddChange) Success(value) 
-			else Failure("No %s in response".format(modType))
+			else Failure("No %s in response".format(commandType.asSpecificationValue()))
 		}
 	}
 	

@@ -314,20 +314,25 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	/**
 	 * Handles modifications requested by mobile device
 	 */
-	private Map<String, String> processModification(UserDataRequest udr, SyncCollection collection) throws CollectionNotFoundException, 
+	@VisibleForTesting Map<String, String> processModification(UserDataRequest udr, SyncCollection collection) throws CollectionNotFoundException, 
 		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
 		Map<String, String> processedClientIds = new HashMap<String, String>();
 		for (SyncCollectionChange change: collection.getChanges()) {
 			try {
-				if (change.getModType().equals("Modify")) {
+				switch (change.getCommand()) {
+				case FETCH:
+					break;
+				case MODIFY:
 					updateServerItem(udr, collection, change);
-					
-				} else if (change.getModType().equals("Add") || change.getModType().equals("Change")) {
-					addServerItem(udr, collection, processedClientIds, change);
-					
-				} else if (change.getModType().equals("Delete")) {
+					break;
+				case DELETE:
 					deleteServerItem(udr, collection, processedClientIds, change);
+					break;
+				case ADD:
+				case CHANGE:
+					addServerItem(udr, collection, processedClientIds, change);
+					break;
 				}
 			} catch (ItemNotFoundException e) {
 				logger.warn("Item with server id {} not found.", change.getServerId());

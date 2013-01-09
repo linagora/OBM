@@ -45,6 +45,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -274,7 +275,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
 			SyncCollectionChange change = buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType());
 			syncCollection.addChange(change);
-			if (change.getModType().equals("Fetch")) {
+			if (SyncCommand.FETCH.equals(change.getCommand())) {
 				fetchIds.add(change.getServerId());
 			}
 			processedClientIds.put(change.getServerId(), change.getClientId());
@@ -300,8 +301,9 @@ public class SyncDecoder extends ActiveSyncDecoder {
 
 		IApplicationData applicationData = getCommandApplicationData(command, dataType);
 		
+		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(command.getName());
 		SyncCollectionChange change = new SyncCollectionChange(
-				command.getServerId(), command.getClientId(), command.getName(), applicationData, dataType);
+				command.getServerId(), command.getClientId(), syncCommand, applicationData, dataType);
 		return change;
 	}
 
@@ -315,7 +317,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	private List<ItemChange> identifyChanges(Set<SyncCollectionChange> changes) {
 		List<ItemChange> itemChanges = Lists.newArrayList();
 		for (SyncCollectionChange change : changes) {
-			if (!change.getModType().equalsIgnoreCase("Delete")) {
+			if (!SyncCommand.DELETE.equals(change.getCommand())) {
 				ItemChange itemChange = new ItemChange(change.getServerId());
 				itemChange.setNew(isNewChange(change));
 				itemChange.setData(change.getData());
@@ -326,13 +328,13 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	}
 
 	private boolean isNewChange(SyncCollectionChange change) {
-		return change.getModType().equalsIgnoreCase("Add");
+		return SyncCommand.ADD.equals(change.getCommand());
 	}
 
 	private List<ItemDeletion> identifyDeletions(Set<SyncCollectionChange> changes) {
 		List<ItemDeletion> deletions = Lists.newArrayList();
 		for (SyncCollectionChange change : changes) {
-			if (change.getModType().equalsIgnoreCase("Delete")) {
+			if (SyncCommand.DELETE.equals(change.getCommand())) {
 				deletions.add(ItemDeletion.builder().serverId(change.getServerId()).build());
 			}
 		}

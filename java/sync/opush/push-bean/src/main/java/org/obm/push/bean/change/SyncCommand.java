@@ -29,80 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.bean.change;
 
-import java.io.Serializable;
+import java.util.Map;
 
-import org.obm.push.bean.change.SyncCommand;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
-import com.google.common.base.Objects;
+public enum SyncCommand {
 
-
-public class SyncCollectionChange implements Serializable {
-
-	private String serverId;
-	private String clientId;
-	private SyncCommand command;
-	private PIMDataType type;
-	private IApplicationData data;
+	FETCH("Fetch"),
+	DELETE("Delete"),
+	ADD("Add"),
+	CHANGE("Change"),
+	MODIFY("Modify");
 	
-	public SyncCollectionChange(String serverId, String clientId,
-			SyncCommand command, IApplicationData data, PIMDataType type) {
-		super();
-		this.serverId = serverId;
-		this.clientId = clientId;
-		this.command = command;
-		this.data = data;
-		this.type = type;
+	private final String specificationValue;
+
+	private SyncCommand(String specificationValue) {
+		this.specificationValue = specificationValue;
 	}
 
-	public String getServerId() {
-		return serverId;
-	}
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public SyncCommand getCommand() {
-		return command;
-	}
-
-	public IApplicationData getData() {
-		return data;
-	}
-
-	public PIMDataType getType() {
-		return type;
-	}
-
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(serverId, clientId, command, type, data);
+	public String asSpecificationValue() {
+		return specificationValue;
 	}
 	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof SyncCollectionChange) {
-			SyncCollectionChange that = (SyncCollectionChange) object;
-			return Objects.equal(this.serverId, that.serverId)
-				&& Objects.equal(this.clientId, that.clientId)
-				&& Objects.equal(this.command, that.command)
-				&& Objects.equal(this.type, that.type)
-				&& Objects.equal(this.data, that.data);
+	public static SyncCommand fromSpecificationValue(String specificationValue) {
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
 		}
-		return false;
+		throw new IllegalArgumentException("No SyncCommand for '" + specificationValue + "'");
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("serverId", serverId)
-			.add("clientId", clientId)
-			.add("command", command)
-			.add("type", type)
-			.add("data", data)
-			.toString();
-	}
+	private static Map<String, SyncCommand> specValueToEnum;
 	
+	static {
+		Builder<String, SyncCommand> builder = ImmutableMap.builder();
+		for (SyncCommand syncStatus : values()) {
+			builder.put(syncStatus.specificationValue, syncStatus);
+		}
+		specValueToEnum = builder.build();
+	}
 }

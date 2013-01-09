@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.MSEmailBody;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
@@ -82,7 +83,7 @@ public class SerializableTest {
 	@Test
 	public void testSyncCollection() throws IOException {
 		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.addChange(new SyncCollectionChange("serverId", "clientId", "modType", new MSContact(), PIMDataType.CALENDAR));
+		syncCollection.addChange(new SyncCollectionChange("serverId", "clientId", SyncCommand.ADD, new MSContact(), PIMDataType.CALENDAR));
 		syncCollection.setItemSyncState(ItemSyncState.builder()
 				.syncDate(new Date())
 				.syncKey(new SyncKey("key"))

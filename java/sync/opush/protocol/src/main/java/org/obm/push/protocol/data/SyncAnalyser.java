@@ -40,6 +40,7 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -204,7 +205,7 @@ public class SyncAnalyser {
 	}
 
 	private SyncCollectionChange getChange(SyncCollection collection, SyncRequestCollectionCommand command) {
-		String modType = command.getName();
+		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(command.getName());
 		String serverId = command.getServerId();
 		String clientId = command.getClientId();
 		Element syncData = command.getApplicationData();
@@ -213,7 +214,7 @@ public class SyncAnalyser {
 		if (data == null) {
 			logger.error("Decoding failed for " + collection.getDataType());
 		}
-		return new SyncCollectionChange(serverId, clientId, modType, data, collection.getDataType());
+		return new SyncCollectionChange(serverId, clientId, syncCommand, data, collection.getDataType());
 	}
 
 	protected IApplicationData decode(Element data, PIMDataType dataType) {
