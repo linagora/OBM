@@ -93,6 +93,7 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -335,7 +336,8 @@ public class SyncHandlerTest {
 		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
 		
 		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
-		SyncResponse syncEmailResponse = opClient.syncEmailWithFetch(syncEmailSyncKey, inbox.getCollectionId(), serverId);
+		SyncResponse syncEmailResponse = opClient.syncWithCommand(
+				syncEmailSyncKey, inbox.getCollectionId(), SyncCommand.FETCH, serverId);
 
 		checkMailFolderHasAddItems(syncEmailResponse, inbox.getCollectionId(),
 				new ItemChangeBuilder().serverId(syncEmailCollectionId + ":123").withNewFlag(false).build());

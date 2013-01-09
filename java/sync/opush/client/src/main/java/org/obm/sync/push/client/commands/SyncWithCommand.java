@@ -34,27 +34,31 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.protocol.data.SyncRequestFields;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class EmailSyncFetchCommand extends Sync {
+public class SyncWithCommand extends Sync {
 
-	public EmailSyncFetchCommand(final SyncKey syncKey, final String collectionId, final String serverId)
-			throws SAXException, IOException {
+	public SyncWithCommand(final SyncKey syncKey, final String collectionId, final SyncCommand command,
+			final String serverId) throws SAXException, IOException {
 		
-		super(new TemplateDocument("EmailSyncFetchRequest.xml") {
+		super(new TemplateDocument("SyncWithCommandRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {
-				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
+				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.SYNC_KEY.getName());
 				sk.setTextContent(syncKey.getSyncKey());
-				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), "CollectionId");
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COLLECTION_ID.getName());
 				collection.setTextContent(collectionId);
-				Element server = DOMUtils.getUniqueElement(document.getDocumentElement(), "ServerId");
-				server.setTextContent(serverId);
+				
+				Element commandsEl = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COMMANDS.getName());
+				Element commandEl = DOMUtils.createElement(commandsEl, command.asSpecificationValue());
+				DOMUtils.createElementAndText(commandEl, SyncRequestFields.SERVER_ID.getName(), serverId);
 			}
 		});
 	}

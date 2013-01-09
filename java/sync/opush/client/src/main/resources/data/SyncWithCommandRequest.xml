@@ -10,9 +10,6 @@
 				<FilterType>2</FilterType> 
 			</Options>
 			<Commands>
-				<Fetch>
-					<ServerId>DEFAULT_SERVER_ID</ServerId>
-				</Fetch>
 			</Commands>
 		</Collection>
 	</Collections>

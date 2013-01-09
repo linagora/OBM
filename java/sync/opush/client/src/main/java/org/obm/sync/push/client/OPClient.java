@@ -46,6 +46,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.wbxml.WBXmlException;
@@ -56,7 +57,7 @@ import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.obm.sync.push.client.commands.DocumentProvider;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
-import org.obm.sync.push.client.commands.EmailSyncFetchCommand;
+import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
@@ -134,8 +135,8 @@ public abstract class OPClient {
 		return run(new EmailSyncCommand(key, collectionId, filterType, windowSize));
 	}
 
-	public SyncResponse syncEmailWithFetch(SyncKey key, String collectionId, String serverId) throws Exception {
-		return run(new EmailSyncFetchCommand(key, collectionId, serverId));
+	public SyncResponse syncWithCommand(SyncKey key, String collectionId, SyncCommand command, String serverId) throws Exception {
+		return run(new SyncWithCommand(key, collectionId, command, serverId));
 	}
 
 	public SyncResponse syncWithoutOptions(SyncKey key, String collectionId) throws Exception {

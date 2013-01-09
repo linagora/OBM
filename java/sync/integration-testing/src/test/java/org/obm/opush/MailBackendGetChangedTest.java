@@ -67,6 +67,7 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -849,7 +850,8 @@ public class MailBackendGetChangedTest {
 		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 
 		String serverId = inboxCollectionIdAsString + ":1";
-		SyncResponse syncResponseWithFetch = opClient.syncEmailWithFetch(secondAllocatedSyncKey, inboxCollectionIdAsString, serverId);
+		SyncResponse syncResponseWithFetch = opClient.syncWithCommand(
+				secondAllocatedSyncKey, inboxCollectionIdAsString, SyncCommand.FETCH, serverId);
 		
 		mocksControl.verify();
 
