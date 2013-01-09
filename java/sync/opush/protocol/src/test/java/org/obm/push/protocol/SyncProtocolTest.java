@@ -79,6 +79,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
+import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -643,6 +644,69 @@ public class SyncProtocolTest {
 		
 		SyncCollectionOptions syncCollectionOptions = analyzedRequest.getSync().getCollection(syncingCollectionId).getOptions();
 		assertThat(syncCollectionOptions.getBodyPreferences()).containsOnly(bodyPreference(8, maxSpecTruncationSize, true));
+	}
+
+	@Test(expected=ProtocolException.class)
+	public void testCommandsAddWithoutApplicationData() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Add>" +
+									"<ServerId>123</ServerId>" +
+									"<ClientId>13579</ClientId>" +
+								"</Add>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
+
+		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
+		SyncRequest syncRequest = syncProtocol.decodeRequest(request);
+		syncProtocol.analyzeRequest(udr, syncRequest);
+	}
+
+	@Test(expected=ProtocolException.class)
+	public void testCommandsChangeWithoutApplicationData() throws Exception {
+		int syncingCollectionId = 3;
+		String syncingCollectionSyncKey = "1234-5678";
+		Document request = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<Sync>" +
+					"<Collections>" +
+						"<Collection>" +
+							"<SyncKey>" + syncingCollectionSyncKey  + "</SyncKey>" +
+							"<CollectionId>" +syncingCollectionId + "</CollectionId>" +
+							"<Commands>" +
+								"<Change>" +
+									"<ServerId>123</ServerId>" +
+								"</Change>" +
+							"</Commands>" +
+						"</Collection>" +
+					"</Collections>" +
+				"</Sync>");
+
+		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(
+				syncingCollectionId, syncingCollectionSyncKey, PIMDataType.CONTACTS);
+		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
+		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
+
+		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
+		SyncRequest syncRequest = syncProtocol.decodeRequest(request);
+		syncProtocol.analyzeRequest(udr, syncRequest);
 	}
 
 	@Test

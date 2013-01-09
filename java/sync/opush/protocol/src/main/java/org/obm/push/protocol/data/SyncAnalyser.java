@@ -53,8 +53,6 @@ import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
 import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Strings;
@@ -63,8 +61,6 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class SyncAnalyser {
-
-	private static final Logger logger = LoggerFactory.getLogger(SyncAnalyser.class);
 
 	private static final int DEFAULT_WAIT = 0;
 	private static final int DEFAULT_WINDOW_SIZE = 100;
@@ -208,13 +204,20 @@ public class SyncAnalyser {
 		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(command.getName());
 		String serverId = command.getServerId();
 		String clientId = command.getClientId();
-		Element syncData = command.getApplicationData();
+		IApplicationData data = decodeApplicationData(command.getApplicationData(), collection.getDataType(), syncCommand);
 		
-		IApplicationData data = decode(syncData, collection.getDataType());
-		if (data == null) {
-			logger.error("Decoding failed for " + collection.getDataType());
-		}
 		return new SyncCollectionChange(serverId, clientId, syncCommand, data, collection.getDataType());
+	}
+
+	private IApplicationData decodeApplicationData(Element applicationData, PIMDataType dataType, SyncCommand syncCommand) {
+		if (syncCommand.requireApplicationData()) {
+			IApplicationData data = decode(applicationData, dataType);
+			if (data == null) {
+				throw new ProtocolException("No decodable " + dataType + " data for " + applicationData);
+			}
+			return data;
+		}
+		return null;
 	}
 
 	protected IApplicationData decode(Element data, PIMDataType dataType) {

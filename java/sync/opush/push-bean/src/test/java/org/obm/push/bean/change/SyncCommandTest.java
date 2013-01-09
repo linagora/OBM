@@ -31,47 +31,38 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean.change;
 
-import java.util.Map;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public enum SyncCommand {
+@RunWith(SlowFilterRunner.class)
+public class SyncCommandTest {
 
-	FETCH("Fetch"),
-	DELETE("Delete"),
-	ADD("Add"),
-	CHANGE("Change"),
-	MODIFY("Modify");
+	@Test
+	public void testRequireApplicationDataForDelete() {
+		assertThat(SyncCommand.DELETE.requireApplicationData()).isFalse();
+	}
+
+	@Test
+	public void testRequireApplicationDataForFetch() {
+		assertThat(SyncCommand.FETCH.requireApplicationData()).isFalse();
+	}
+
+	@Test
+	public void testRequireApplicationDataForModify() {
+		assertThat(SyncCommand.MODIFY.requireApplicationData()).isTrue();
+	}
+
+	@Test
+	public void testRequireApplicationDataForChange() {
+		assertThat(SyncCommand.CHANGE.requireApplicationData()).isTrue();
+	}
+
+	@Test
+	public void testRequireApplicationDataForAdd() {
+		assertThat(SyncCommand.ADD.requireApplicationData()).isTrue();
+	}
 	
-	private final String specificationValue;
-
-	private SyncCommand(String specificationValue) {
-		this.specificationValue = specificationValue;
-	}
-
-	public String asSpecificationValue() {
-		return specificationValue;
-	}
-	
-	public static SyncCommand fromSpecificationValue(String specificationValue) {
-		if (specValueToEnum.containsKey(specificationValue)) {
-			return specValueToEnum.get(specificationValue);
-		}
-		throw new IllegalArgumentException("No SyncCommand for '" + specificationValue + "'");
-	}
-
-	private static Map<String, SyncCommand> specValueToEnum;
-	
-	static {
-		Builder<String, SyncCommand> builder = ImmutableMap.builder();
-		for (SyncCommand syncStatus : values()) {
-			builder.put(syncStatus.specificationValue, syncStatus);
-		}
-		specValueToEnum = builder.build();
-	}
-
-	public boolean requireApplicationData() {
-		return this == ADD || this == CHANGE || this == MODIFY;
-	}
 }
