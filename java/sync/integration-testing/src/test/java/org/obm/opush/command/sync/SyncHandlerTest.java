@@ -604,5 +604,32 @@ public class SyncHandlerTest {
 				anyObject(SyncCollection.class),
 				anyObject(SyncKey.class)))
 				.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
+
+	}
+
+	@Test
+	public void testSyncWithAddCommandButWithoutApplicationDataGetsProtocolError() throws Exception {
+		testSyncWithGivenCommandButWithoutApplicationDataGetsProtocolError(SyncCommand.ADD);
+	}
+
+	@Test
+	public void testSyncWithChangeCommandButWithoutApplicationDataGetsProtocolError() throws Exception {
+		testSyncWithGivenCommandButWithoutApplicationDataGetsProtocolError(SyncCommand.CHANGE);
+	}
+
+	private void testSyncWithGivenCommandButWithoutApplicationDataGetsProtocolError(SyncCommand command) throws Exception {
+		SyncKey syncKey = new SyncKey("1");
+		List<Integer> existingCollections = ImmutableList.of(15);
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
+
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		SyncResponse syncResponse = opClient.syncWithCommand(syncKey, "15", command, "15:51");
+
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.PROTOCOL_ERROR);
 	}
 }
