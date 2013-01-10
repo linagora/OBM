@@ -42,8 +42,8 @@ import org.obm.push.bean.jaxb.JAXBBean;
 import org.obm.push.bean.jaxb.Request;
 import org.obm.push.bean.jaxb.Resource;
 import org.obm.push.jaxb.JAXBParser;
-import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.obm.push.jaxb.store.ehcache.RequestNotFoundException;
+import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,35 +65,43 @@ public class TechnicalLoggerService {
 	}
 	
 	public void trace(JAXBBean jaxbBean) {
-		try {
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			JAXBParser.marshal(jaxbBean, byteArrayOutputStream);
-			technicalLogger.trace(byteArrayOutputStream.toString());
-		} catch (JAXBException e) {
-			logger.error("JAXB serialization failed", e);
+		if (technicalLogger.isTraceEnabled()) {
+			try {
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				JAXBParser.marshal(jaxbBean, byteArrayOutputStream);
+				technicalLogger.trace(byteArrayOutputStream.toString());
+			} catch (JAXBException e) {
+				logger.error("JAXB serialization failed", e);
+			}
 		}
 	}
 	
 	public void traceStartedRequest(Request request) {
-		trace(request);
-		Element previous = requestStore.put(Thread.currentThread().getId(), request);
-		if (previous != null) {
-			logger.error("Request {} already mapped", request.getRequestId());
+		if (technicalLogger.isTraceEnabled()) {
+			trace(request);
+			Element previous = requestStore.put(Thread.currentThread().getId(), request);
+			if (previous != null) {
+				logger.error("Request {} already mapped", request.getRequestId());
+			}
 		}
 	}
 	
 	public void traceEndedRequest(Request request) {
-		trace(request);
-		requestStore.delete(Thread.currentThread().getId());
+		if (technicalLogger.isTraceEnabled()) {
+			trace(request);
+			requestStore.delete(Thread.currentThread().getId());
+		}
 	}
 	
 	public void traceResource(Resource resource) {
-		try {
-			Request request = requestStore.getRequest(Thread.currentThread().getId());
-			request.add(resource);
-			trace(request);
-		} catch (RequestNotFoundException e) {
-			trace(resource);
+		if (technicalLogger.isTraceEnabled()) {
+			try {
+				Request request = requestStore.getRequest(Thread.currentThread().getId());
+				request.add(resource);
+				trace(request);
+			} catch (RequestNotFoundException e) {
+				trace(resource);
+			}
 		}
 	}
 }

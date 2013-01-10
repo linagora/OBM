@@ -48,8 +48,8 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.jaxb.Request;
 import org.obm.push.bean.jaxb.Resource;
 import org.obm.push.bean.jaxb.Transaction;
-import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.obm.push.jaxb.store.ehcache.RequestNotFoundException;
+import org.obm.push.jaxb.store.ehcache.RequestStore;
 import org.slf4j.Logger;
 
 @RunWith(SlowFilterRunner.class)
@@ -58,6 +58,8 @@ public class TechnicalLoggerServiceTest {
 	@Test
 	public void testTrace() {
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).once();
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 
@@ -90,6 +92,8 @@ public class TechnicalLoggerServiceTest {
 			.andReturn(null).once();
 		
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).times(2);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
@@ -119,6 +123,8 @@ public class TechnicalLoggerServiceTest {
 			.andReturn(previous).once();
 		
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).times(2);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
@@ -147,6 +153,8 @@ public class TechnicalLoggerServiceTest {
 		expectLastCall();
 		
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).times(2);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
@@ -181,6 +189,8 @@ public class TechnicalLoggerServiceTest {
 			.andReturn(request).once();
 		
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).times(2);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
@@ -206,6 +216,8 @@ public class TechnicalLoggerServiceTest {
 			.andThrow(new RequestNotFoundException()).once();
 		
 		Logger logger = createStrictMock(Logger.class);
+		expect(logger.isTraceEnabled())
+			.andReturn(true).times(2);
 		logger.trace(anyObject(String.class));
 		expectLastCall().once();
 		
