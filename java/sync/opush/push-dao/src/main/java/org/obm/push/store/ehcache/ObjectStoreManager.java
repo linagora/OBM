@@ -79,6 +79,7 @@ public class ObjectStoreManager {
 	
 	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache) {
 		Configuration configuration = new Configuration();
+		configuration.updateCheck(false);
 		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));

@@ -65,6 +65,7 @@ public class ObjectStoreManager {
 	
 	private Configuration ehCacheConfiguration() {
 		Configuration configuration = new Configuration();
+		configuration.updateCheck(false);
 		configuration.addCache(unlimitedMemoryConfiguration().name(REQUEST_STORE));
 		return configuration;
 	}
