@@ -1206,6 +1206,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "inner join UserObm on userobm_id=u2.calendarentity_calendar_id "
 				+ "where u1.userentity_user_id=? and (entityright_read=1 or entityright_write=1) "
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
+				+ "and userobm_id != ? "
 				+ SQLUtils.selectCalendarsCondition(calendarEmails);
 				
 		return query;
@@ -1219,6 +1220,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "where entityright_consumer_id is null and (entityright_read=1 or entityright_write=1) "
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
 				+ "and userobm_domain_id= ? "
+				+ "and userobm_id != ? "
 				+ SQLUtils.selectCalendarsCondition(calendarEmails);
 		
 		return query;
@@ -1233,6 +1235,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "inner join of_usergroup on of_usergroup_group_id = u1.groupentity_group_id "
 				+ "where of_usergroup_user_id=? "
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
+				+ "and userobm_id != ? "
 				+ SQLUtils.selectCalendarsCondition(calendarEmails);
 		
 		return query;
@@ -1272,17 +1275,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			// For the public query
 			ps.setInt(pos++, user.getDomain().getId());
+			ps.setInt(pos++, user.getUid());
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
 
 			// For the group query
 			ps.setInt(pos++, user.getUid());
+			ps.setInt(pos++, user.getUid());
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
 
 			// For the user query
+			ps.setInt(pos++, user.getUid());
 			ps.setInt(pos++, user.getUid());
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
