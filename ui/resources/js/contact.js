@@ -189,13 +189,14 @@ Obm.Contact.AddressBook = new Class ({
     if(form.get('id') == 'advancedSearchForm') {
       $('archive').set('value', '');
       var searchpattern='';
+      var self = this;
       form.getElements('input').each(function (elem) {
         if(elem.get('type') != 'submit' && elem.get('type') != 'button' && elem.get('inputValue') != '') {
           if(elem.get('type') != 'radio' || elem.get('checked') != false) {
             if(elem.get('inputValue').match(/^\s*NOT\s*.*/)) {
-              searchpattern += '-' + elem.get('name') + ':(' + elem.get('inputValue').replace('NOT','').trim() + ') ';
+              searchpattern += '-' + elem.get('name') + ':(' + self.formatSearchPattern(elem.get('inputValue').replace('NOT','')) + ') ';
             } else {
-              searchpattern += elem.get('name') + ':(' + elem.get('inputValue') + ') ';
+              searchpattern += elem.get('name') + ':(' + self.formatSearchPattern(elem.get('inputValue')) + ') ';
             }
           }
         }
@@ -205,14 +206,17 @@ Obm.Contact.AddressBook = new Class ({
           searchpattern += elem.get('name') + ':(' + elem.get('value') + ') ';
         }
       });
-      $('searchpattern').set('inputValue',  searchpattern)
-      form = $('searchForm');
     } else {
       if ($('searchpattern').get('value').match(/archive/i)) {
         $('archive').set('value', '');        
       }
+      searchpattern = this.formatSearchPattern($('searchpattern').get('value'));
     }
-    this.contactRequest.get(form); 
+    this.contactRequest.get({
+      action: 'search',
+      searchpattern: searchpattern,
+      archive: $('archive').get('value')
+    });
     $('archive').set('value', '-is:archive');      
     $('addressBookGrid').getElements('td.current').removeClass('current');
     this.addressbook = $('addressbook-search');
@@ -224,6 +228,14 @@ Obm.Contact.AddressBook = new Class ({
     return false; // No form submission
   },
 
+  formatSearchPattern: function(pattern){
+    pattern = pattern.trim().toLowerCase();
+    words = pattern.split(' ').map( function(word) {
+      return ( word.charAt(word.length-1) != '*' ) ? word + '*' : word ;
+    });
+    pattern = words.join(' ');
+    return pattern;
+  },
 
   filterContact: function(form) {
     this.hideContact();
