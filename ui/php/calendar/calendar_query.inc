@@ -1346,14 +1346,15 @@ function select_eventid_from_evententity($event_entity_id)
 ///////////////////////////////////////////////////////////////////////////////
 function get_event_attachments_urls($event_id)
 {
-  $documents_rs = run_query_get_events_documents(array($event_id));
+  $documents_rs = run_query_get_events_documents_with_name(array($event_id));
   $attachments = array();
   
   while ($documents_rs->next_record()) {
     $document_id = $documents_rs->f('document_id');
+    $document_name = $documents_rs->f('document_name');
     $attachments[] = $GLOBALS['cgp_host'].'document/document_download.php?externalToken='.
     get_calendar_entity_share($document_id, 'document', 'private', 'document').
-    '&document_id='.$document_id;
+    '&document_id='.$document_id."#".urlencode($document_name);
   }
   return $attachments;
 }
@@ -5144,6 +5145,35 @@ function run_query_get_events_documents($events) {
   return $obm_q;
 }
 
+/**
+ * Get all attached documents of an array of events
+ *  
+ * @param array $events 
+ * @access public
+ * @return void
+ */
+function run_query_get_events_documents_with_name($events) {
+  global $cdg_sql;
+
+  $event_list = implode(',',$events);
+  if ($event_list == '') {
+    $event_list = '0';
+  }
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+    evententity_event_id AS event_id,
+    documentlink_document_id AS document_id,
+    d.document_name
+    FROM DocumentLink
+    LEFT JOIN Document as d on DocumentLink.documentlink_document_id = d.document_id
+    INNER JOIN EventEntity ON documentlink_entity_id = evententity_entity_id
+    WHERE 
+    evententity_event_id IN ($event_list)";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_get_events_documents_with_name()');
+  $obm_q->xquery($query);
+  return $obm_q;
+}
 
 /**
  * Get all exceptions for an event
