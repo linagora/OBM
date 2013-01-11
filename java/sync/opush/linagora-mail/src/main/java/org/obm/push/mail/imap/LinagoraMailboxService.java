@@ -416,6 +416,7 @@ public class LinagoraMailboxService implements MailboxService {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			String folderName = extractMailboxNameFromCollectionPath(udr, collectionPath);
+			store.select(folderName);
 			FlagsList fl = new FlagsList();
 			if(isRead){
 				fl.add(Flag.SEEN);
