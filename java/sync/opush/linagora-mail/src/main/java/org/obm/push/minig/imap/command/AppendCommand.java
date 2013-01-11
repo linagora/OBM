@@ -32,14 +32,13 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.minig.imap.impl.LineTerminationCorrecter;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.minig.imap.CommandIOException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.utils.FileUtils;
 
 public class AppendCommand extends Command<Boolean> {
 
@@ -71,20 +70,17 @@ public class AppendCommand extends Command<Boolean> {
 			cmd.append(" ");
 		}
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			FileUtils.transfer(in, out, true);
+			byte[] mailData = LineTerminationCorrecter.correctLineTermination(in).toByteArray();
+			cmd.append("{");
+			cmd.append(mailData.length);
+			cmd.append("}");
+			return new CommandArgument(cmd.toString(), mailData);
 		} catch (IOException e) {
 			String msg = "Cannot create tmp buffer for append command";
 			logger.error(msg, e);
 			throw new CommandIOException(msg, e);
 		}
-
-		byte[] mailData = out.toByteArray();
-		cmd.append("{");
-		cmd.append(mailData.length);
-		cmd.append("}");
-		return new CommandArgument(cmd.toString(), mailData);
 	}
 
 	@Override

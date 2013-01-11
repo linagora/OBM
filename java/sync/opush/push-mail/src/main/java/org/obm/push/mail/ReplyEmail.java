@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.minig.imap.impl.LineTerminationCorrecter;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -328,8 +331,7 @@ public class ReplyEmail extends SendEmail {
 	private TextBody appendQuotedMailToPlainText(TextBody plainTextPart, String repliedEmail) throws NotQuotableEmailException {
 		try {	
 			StringBuilder bodyTextPlainBuilder = new StringBuilder();
-			Reader plainTextReader = plainTextPart.getReader();
-			bodyTextPlainBuilder.append(cleanLineBreaks(plainTextReader));
+			bodyTextPlainBuilder.append(cleanLineBreaks(plainTextPart.getInputStream()));
 			bodyTextPlainBuilder.append(quoteOnLineBreaks(repliedEmail));
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
 			return basicBodyFactory.textBody(bodyTextPlainBuilder.toString(), plainTextPart.getMimeCharset());
@@ -350,14 +352,9 @@ public class ReplyEmail extends SendEmail {
 		return stringBuilder.toString();
 	}
 	
-	private String cleanLineBreaks(Reader content) throws IOException {
-		// RFC 2821 2.3.7 : \r and \n are not supposed to be encountered alone 
-		List<String> linesWithoutTermination = CharStreams.readLines(content);
-		StringBuilder stringBuilder = new StringBuilder();
-		for (String line : linesWithoutTermination) {
-			stringBuilder.append(line).append(EMAIL_LINEBREAKER);
-		}
-		return stringBuilder.toString();
+	private String cleanLineBreaks(InputStream content) throws IOException {
+		ByteArrayOutputStream outputStream = LineTerminationCorrecter.correctLineTermination(content);
+		return new String(outputStream.toByteArray());
 	}
 
 	private TextBody appendRepliedMailToHtml(TextBody htmlPart, String repliedEmail) throws NotQuotableEmailException {
@@ -372,11 +369,11 @@ public class ReplyEmail extends SendEmail {
 			final Element bodyNode = DOMUtils.getUniqueElement(replyHtmlDoc.getDocumentElement(), "BODY");
 			bodyNode.appendChild(quoteBlock);
 
-			final String docAsText = DOMUtils.serializeHtmlDocument(replyHtmlDoc);
+			final ByteArrayInputStream inputStream = new ByteArrayInputStream(DOMUtils.serializeHtmlDocument(replyHtmlDoc).getBytes());
 
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
 			return basicBodyFactory.textBody( 
-					cleanLineBreaks( new StringReader(docAsText) ), 
+					cleanLineBreaks(inputStream), 
 					htmlPart.getMimeCharset());
 			
 		} catch (TransformerException e) {
