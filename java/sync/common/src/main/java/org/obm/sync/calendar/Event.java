@@ -777,5 +777,16 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 		return anonymizedEvent;
 	}
+
+	public void addOrReplaceAttendee(String emailOfAttendeeToReplace, Attendee newAttendee) {
+		Preconditions.checkNotNull(newAttendee);
+		for (Attendee attendee : attendees) {
+			if (emailOfAttendeeToReplace.equalsIgnoreCase(attendee.getEmail())) {
+				attendees.remove(attendee);
+				break;
+			}
+		}
+		attendees.add(newAttendee);
+	}
 	
 }

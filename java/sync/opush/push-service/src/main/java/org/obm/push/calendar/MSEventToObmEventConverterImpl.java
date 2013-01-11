@@ -100,7 +100,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			convertedEvent.setSequence(msEvent.getObmSequence());
 		}
 		
-		assignOrganizer(user, convertedEvent, msEvent);
+		assignOrganizer(user, convertedEvent, eventFromDB, msEvent);
 		fillEventProperties(user, convertedEvent, eventFromDB, msEvent, isObmInternalEvent);
 		
 		return convertedEvent;
@@ -558,15 +558,32 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return attendees;
 	}
 	
-	private void assignOrganizer(User user, Event e, MSEvent data) {
+	private void assignOrganizer(User user, Event e, Event eventFromDB, MSEvent data) {
 		if (e.findOrganizer() == null) {
+			Attendee attendeeOrganizer = null;
 			if (data.getOrganizerEmail() != null) {
-				Attendee attendee = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
-				e.getAttendees().add(attendee);
+				attendeeOrganizer = getOrganizer(data.getOrganizerEmail(), data.getOrganizerName());
 			} else {
-				e.getAttendees().add( getOrganizer(user.getEmail(), data.getOrganizerName()) );
-			}	
+				attendeeOrganizer = Objects.firstNonNull( 
+						getOrganizerOfEventFromDb(eventFromDB),
+						getOrganizerOfRequestUser(user));
+			}
+			e.addOrReplaceAttendee(attendeeOrganizer.getEmail(), attendeeOrganizer);
 		}
+	}
+
+	private Attendee getOrganizerOfEventFromDb(Event eventFromDB) {
+		if (eventFromDB != null) {
+			Attendee organizerFromDB = eventFromDB.findOrganizer();
+			if (organizerFromDB != null) {
+				return getOrganizer(organizerFromDB.getEmail(), organizerFromDB.getDisplayName());
+			}
+		}
+		return null;
+	}
+
+	private Attendee getOrganizerOfRequestUser(User user) {
+		return getOrganizer(user.getEmail(), user.getDisplayName());
 	}
 
 	private String convertTimeZone(MSEvent from) {

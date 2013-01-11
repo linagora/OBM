@@ -50,6 +50,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Participation.State;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.ToolBox;
@@ -1439,7 +1440,7 @@ public class EventTest {
 		assertThat(event.getTitle()).isNull();
 	}
 	
-    @Test
+	@Test
 	public void testChangeAttendeesParticipation() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = publicEvent.getAttendees();
@@ -1474,5 +1475,78 @@ public class EventTest {
 		for (Attendee updatedAttendee : updatedAttendees){
 			assertThat(updatedAttendee.getParticipation().getComment()).isEqualTo(Comment.EMPTY);
 		}
+	}
+	
+	@Test
+	public void testAddOrReplaceAttendeeWhenNoAttendee() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.<Attendee>newArrayList());
+
+		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		
+		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
+
+		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
+	}
+	
+	@Test
+	public void testAddOrReplaceAttendeeWhenSameAttendee() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.newArrayList(
+				Attendee.builder().email("user@domain").build()));
+
+		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		
+		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
+
+		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
+	}
+	
+	@Test
+	public void testAddOrReplaceAttendeeWhenSameAttendeeOtherCase() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.newArrayList(
+				Attendee.builder().email("user@domain").build()));
+
+		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		
+		publicEvent.addOrReplaceAttendee("User@domain", newAttendee);
+
+		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
+	}
+	
+	@Test
+	public void testAddOrReplaceAttendeeWhenSameAttendeeReplacingOtherEmail() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.newArrayList(
+				Attendee.builder().email("user@domain").build()));
+
+		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		
+		publicEvent.addOrReplaceAttendee("otheruser@domain", newAttendee);
+
+		assertThat(publicEvent.getAttendees()).containsOnly(
+				Attendee.builder().email("user@domain").build(),
+				newAttendee);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testAddOrReplaceAttendeeWhenNullAddess() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.newArrayList(
+				Attendee.builder().email("user@domain").build()));
+
+		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		
+		publicEvent.addOrReplaceAttendee(null, newAttendee);
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testAddOrReplaceAttendeeWhenNullAttendee() {
+		Event publicEvent = createNonRecurrentEventWithMostFields();
+		publicEvent.setAttendees(Lists.newArrayList(
+				Attendee.builder().email("user@domain").build()));
+
+		publicEvent.addOrReplaceAttendee("user@domain", null);
 	}
 }

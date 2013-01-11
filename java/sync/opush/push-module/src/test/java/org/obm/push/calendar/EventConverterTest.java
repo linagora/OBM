@@ -113,7 +113,7 @@ public class EventConverterTest {
 		assertNotNull(event);
 		assertEquals("Windows Mobile 6.1 - HTC", event.getTitle());
 		
-		checkOrganizer(userDataRequest.getCredentials().getUser().getEmail(), organizer);
+		checkOrganizer(userDataRequest.getCredentials().getUser(), organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).doesNotContain(organizer);
@@ -135,7 +135,9 @@ public class EventConverterTest {
 		Assert.assertNotNull(event);
 		Assert.assertEquals("Android 2.3.4 - Galaxy S", event.getTitle());
 
-		checkOrganizer("jribiera@obm.lng.org", organizer);
+		String requestUserEmail = "jribiera@obm.lng.org";
+		User requestUser = User.Factory.create().createUser(requestUserEmail, requestUserEmail, null);
+		checkOrganizer(requestUser, organizer);
 		
 		assertThat(event.getAttendees()).hasSize(4);
 		assertThat(attendees).hasSize(3).doesNotContain(organizer);
@@ -196,10 +198,10 @@ public class EventConverterTest {
 		return attendees;
 	}
 	
-	private void checkOrganizer(String email, Attendee organizer) {
+	private void checkOrganizer(User user, Attendee organizer) {
 		Assert.assertNotNull(organizer);
-		Assert.assertEquals(email, organizer.getEmail());
-		Assert.assertNull(organizer.getDisplayName());
+		Assert.assertEquals(user.getEmail(), organizer.getEmail());
+		Assert.assertEquals(user.getDisplayName(), organizer.getDisplayName());
 		Assert.assertEquals(Participation.accepted(), organizer.getParticipation());
 		Assert.assertEquals(ParticipationRole.REQ, organizer.getParticipationRole());
 		Assert.assertTrue(organizer.isOrganizer());

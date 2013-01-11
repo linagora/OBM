@@ -44,9 +44,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
@@ -57,10 +59,15 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventMeetingStatus;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
+import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -77,7 +84,7 @@ public class MSEventToObmEventConverterTest {
 		converter = new MSEventToObmEventConverterImpl();
 		String mailbox = "user@domain";
 	    user = User.Factory.create()
-				.createUser(mailbox, mailbox, null);
+				.createUser(mailbox, mailbox, "display name");
 	}
 
 	@Ignore("We should find in OBMEvent the corresponding UID of MSEvent")
@@ -726,7 +733,7 @@ public class MSEventToObmEventConverterTest {
 	}
 	
 	@Test
-	public void testConvertAttributeOrganizerNameOnly() throws ConversionException {
+	public void testConvertAttributeOrganizerNameOnlyGetsTheUserOne() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
@@ -734,15 +741,15 @@ public class MSEventToObmEventConverterTest {
 				.withOrganizerName("Any Name")
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.build();
-		
+
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
+		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(user.getDisplayName());
 	}
 
 	@Test
-	public void testConvertAttributeOrganizerNameOnlyNull() throws ConversionException {
+	public void testConvertAttributeOrganizerNameOnlyNullGetsTheUserOne() throws ConversionException {
 		MSEvent msEvent = new MSEventBuilder()
 				.withStartTime(date("2004-12-11T11:15:10Z"))
 				.withEndTime(date("2004-12-12T11:15:10Z"))
@@ -754,7 +761,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(user.getDisplayName());
 	}
 
 	@Test
@@ -787,7 +794,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(user.getDisplayName());
 		assertThat(convertedEventOrganizer.getEmail()).isEqualTo(user.getEmail());
 	}
 	
@@ -1041,6 +1048,348 @@ public class MSEventToObmEventConverterTest {
 		
 		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
 		assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+	}
+
+	@Test
+	public void testWithOrganizerEmailAndNameButNoAttendee() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail("organizer@thilaire.lng.org")
+				.withOrganizerName("organizer")
+				.withAttendees(ImmutableSet.<MSAttendee>of())
+				.build();
+		
+		Event editingEvent = new Event();
+		editingEvent.setUid(new EventObmId(52));
+		editingEvent.setExtId(new EventExtId("abc"));
+		editingEvent.setAllday(false);
+		editingEvent.setTimeCreate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setTimeUpdate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setStartDate(date("2004-12-11T11:15:10Z"));
+		editingEvent.setDuration(7200);
+		editingEvent.setTitle("Any Subject");
+		editingEvent.setOwner("other organizer name");
+		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
+		editingEvent.addAttendee(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testWithOrganizerEmailAndNameButNoAttendeeNoEditingEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail("organizer@thilaire.lng.org")
+				.withOrganizerName("organizer")
+				.withAttendees(ImmutableSet.<MSAttendee>of())
+				.build();
+		
+		Event editingEvent = null;
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testWithOrganizerEmailAndNameButAttendeeAndNoEditingEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail("organizer@thilaire.lng.org")
+				.withOrganizerName("organizer")
+				.withAttendees(ImmutableSet.of(
+					MSAttendee.builder()
+						.withName("invitee")
+						.withEmail("invitee@thilaire.lng.org")
+						.withType(AttendeeType.REQUIRED)
+						.build()))
+				.build();
+		
+		Event editingEvent = null;
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
+			Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build(),
+			Attendee.builder()
+				.asAttendee()
+				.displayName("invitee")
+				.email("invitee@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsAddedFromEditingEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.<MSAttendee>of())
+				.build();
+		
+		Event editingEvent = new Event();
+		editingEvent.setUid(new EventObmId(52));
+		editingEvent.setExtId(new EventExtId("abc"));
+		editingEvent.setAllday(false);
+		editingEvent.setTimeCreate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setTimeUpdate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setStartDate(date("2004-12-11T11:15:10Z"));
+		editingEvent.setDuration(7200);
+		editingEvent.setTitle("Any Subject");
+		editingEvent.setOwner("other organizer name");
+		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
+		editingEvent.addAttendee(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsTookFromEditingEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.of(
+					MSAttendee.builder()
+						.withName("organizer")
+						.withEmail("organizer@thilaire.lng.org")
+						.withType(AttendeeType.REQUIRED)
+						.build()))
+				.build();
+		
+		Event editingEvent = new Event();
+		editingEvent.setUid(new EventObmId(52));
+		editingEvent.setExtId(new EventExtId("abc"));
+		editingEvent.setAllday(false);
+		editingEvent.setTimeCreate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setTimeUpdate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setStartDate(date("2004-12-11T11:15:10Z"));
+		editingEvent.setDuration(7200);
+		editingEvent.setTitle("Any Subject");
+		editingEvent.setOwner("other organizer name");
+		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
+		editingEvent.addAttendee(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsAddedToAttendeesFromEditingEvent() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.of(
+					MSAttendee.builder()
+						.withName("invitee")
+						.withEmail("invitee@thilaire.lng.org")
+						.withType(AttendeeType.OPTIONAL)
+						.build()))
+				.build();
+		
+		Event editingEvent = new Event();
+		editingEvent.setUid(new EventObmId(52));
+		editingEvent.setExtId(new EventExtId("abc"));
+		editingEvent.setAllday(false);
+		editingEvent.setTimeCreate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setTimeUpdate(date("2004-12-10T11:15:10Z"));
+		editingEvent.setStartDate(date("2004-12-11T11:15:10Z"));
+		editingEvent.setDuration(7200);
+		editingEvent.setTitle("Any Subject");
+		editingEvent.setOwner("other organizer name");
+		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
+		editingEvent.addAttendee(Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
+			Attendee.builder()
+				.asAttendee()
+				.displayName("invitee")
+				.email("invitee@thilaire.lng.org")
+				.participationRole(ParticipationRole.OPT)
+				.participation(Participation.accepted())
+				.build(),
+			Attendee.builder()
+				.asOrganizer()
+				.displayName("organizer")
+				.email("organizer@thilaire.lng.org")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsAddedFromUserRequest() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.<MSAttendee>of())
+				.build();
+		
+		Event editingEvent = null;
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("display name")
+				.email("user@domain")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsTookFromUserRequest() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.of(
+					MSAttendee.builder()
+						.withName("display name")
+						.withEmail("user@domain")
+						.withType(AttendeeType.REQUIRED)
+						.build()))
+				.build();
+
+		Event editingEvent = null;
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+				.asOrganizer()
+				.displayName("display name")
+				.email("user@domain")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
+	}
+
+	@Test
+	public void testNoOrganizerEmailAndNameIsAddedToAttendeesFromUserRequest() throws ConversionException {
+		MSEvent msEvent = new MSEventBuilder()
+				.withSubject("Any Subject")
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-11T11:15:10Z"))
+				.withMeetingStatus(CalendarMeetingStatus.IS_NOT_A_MEETING)
+				.withOrganizerEmail(null)
+				.withOrganizerName(null)
+				.withAttendees(ImmutableSet.of(
+					MSAttendee.builder()
+						.withName("invitee")
+						.withEmail("invitee@thilaire.lng.org")
+						.withType(AttendeeType.OPTIONAL)
+						.build()))
+				.build();
+
+		Event editingEvent = null;
+
+		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
+
+		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
+			Attendee.builder()
+				.asAttendee()
+				.displayName("invitee")
+				.email("invitee@thilaire.lng.org")
+				.participationRole(ParticipationRole.OPT)
+				.participation(Participation.accepted())
+				.build(),
+			Attendee.builder()
+				.asOrganizer()
+				.displayName("display name")
+				.email("user@domain")
+				.participationRole(ParticipationRole.REQ)
+				.participation(Participation.accepted())
+				.build());
 	}
 	
 	@Test
