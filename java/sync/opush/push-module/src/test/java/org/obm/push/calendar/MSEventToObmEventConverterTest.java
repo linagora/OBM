@@ -31,13 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -104,7 +105,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.isAllday()).isFalse();
+		assertThat(convertedEvent.isAllday()).isFalse();
 	}
 
 	@Test
@@ -119,7 +120,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.isAllday()).isTrue();
+		assertThat(convertedEvent.isAllday()).isTrue();
 	}
 
 	@Test
@@ -134,7 +135,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.isAllday()).isFalse();
+		assertThat(convertedEvent.isAllday()).isFalse();
 	}
 
 	@Test(expected=ConversionException.class)
@@ -222,7 +223,7 @@ public class MSEventToObmEventConverterTest {
                 .build();
 
         Event convertedEvent = convertToOBMEvent(msEvent);
-        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(3600);
+        assertThat(convertedEvent.getDuration()).isEqualTo(3600);
     }
 
     @Test
@@ -242,7 +243,7 @@ public class MSEventToObmEventConverterTest {
                 .build();
 
         Event convertedEvent = convertToOBMEvent(msEvent);
-        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+        assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
     }
 
     @Test
@@ -262,7 +263,7 @@ public class MSEventToObmEventConverterTest {
                 .build();
 
         Event convertedEvent = convertToOBMEvent(msEvent);
-        Assertions.assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond() * 2));
+        assertThat(convertedEvent.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond() * 2));
     }
 
 	@Test
@@ -277,7 +278,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.TRANSPARENT);
+		assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.TRANSPARENT);
 	}
 
 	@Test
@@ -292,7 +293,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
+		assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
 	}
 
 	@Test
@@ -307,7 +308,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
+		assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
 	}
 	
 	@Test
@@ -322,7 +323,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
+		assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
 	}
 
 	@Test
@@ -337,7 +338,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
+		assertThat(convertedEvent.getOpacity()).isEqualTo(EventOpacity.OPAQUE);
 	}
 
 	@Test
@@ -352,7 +353,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getCategory()).isNull();
+		assertThat(convertedEvent.getCategory()).isNull();
 	}
 
 	@Test
@@ -367,7 +368,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getCategory()).isEqualTo("category1");
+		assertThat(convertedEvent.getCategory()).isEqualTo("category1");
 	}
 
 	@Test
@@ -382,7 +383,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getCategory()).isNull();
+		assertThat(convertedEvent.getCategory()).isNull();
 	}
 	
 	@Test
@@ -399,7 +400,7 @@ public class MSEventToObmEventConverterTest {
 				.build();
 		
 		Event event = convertToOBMEvent(msEvent);
-		Assertions.assertThat(event.getCategory()).isNull();
+		assertThat(event.getCategory()).isNull();
 	}
 
 	@Test
@@ -416,7 +417,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEventWithEditingEvent(msEvent, oldEvent);
 		
-		Assertions.assertThat(convertedEvent.getPriority()).isEqualTo(2);
+		assertThat(convertedEvent.getPriority()).isEqualTo(2);
 	}
 	
 	@Test
@@ -431,8 +432,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getTimeCreate()).isEqualTo(msEvent.getDtStamp());
-		Assertions.assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
+		assertThat(convertedEvent.getTimeCreate()).isEqualTo(msEvent.getDtStamp());
+		assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
 	}
 
 	@Test
@@ -451,8 +452,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		Assertions.assertThat(convertedEvent.getTimeCreate()).isEqualTo(previousDtStampDate);
-		Assertions.assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
+		assertThat(convertedEvent.getTimeCreate()).isEqualTo(previousDtStampDate);
+		assertThat(convertedEvent.getTimeUpdate()).isEqualTo(msEvent.getDtStamp());
 	}
 
 	@Test
@@ -467,8 +468,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getTimeCreate()).isNull();
-		Assertions.assertThat(convertedEvent.getTimeUpdate()).isNull();
+		assertThat(convertedEvent.getTimeCreate()).isNull();
+		assertThat(convertedEvent.getTimeUpdate()).isNull();
 	}
 
 	@Test
@@ -483,7 +484,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getDescription()).isEqualTo(msEvent.getDescription());
+		assertThat(convertedEvent.getDescription()).isEqualTo(msEvent.getDescription());
 	}
 	
 	@Test
@@ -498,7 +499,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getDescription()).isNull();
+		assertThat(convertedEvent.getDescription()).isNull();
 	}
 
 	@Test
@@ -513,7 +514,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getTimezoneName()).isEqualTo("America/Tijuana");
+		assertThat(convertedEvent.getTimezoneName()).isEqualTo("America/Tijuana");
 	}
 	
 	@Test
@@ -528,7 +529,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getTimezoneName()).isNull();
+		assertThat(convertedEvent.getTimezoneName()).isNull();
 	}
 	
 	@Test
@@ -543,7 +544,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getLocation()).isEqualTo(msEvent.getLocation());
+		assertThat(convertedEvent.getLocation()).isEqualTo(msEvent.getLocation());
 	}
 	
 	@Test
@@ -558,7 +559,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getLocation()).isNull();
+		assertThat(convertedEvent.getLocation()).isNull();
 	}
 
 	@Test
@@ -572,7 +573,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getTitle()).isEqualTo(msEvent.getSubject());
+		assertThat(convertedEvent.getTitle()).isEqualTo(msEvent.getSubject());
 	}
 
 	@Test
@@ -586,7 +587,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getTitle()).isNull();
+		assertThat(convertedEvent.getTitle()).isNull();
 	}
 
 	@Test
@@ -600,7 +601,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(convertedEvent.getTitle()).isNull();
+		assertThat(convertedEvent.getTitle()).isNull();
 	}
 	
 	@Test
@@ -616,7 +617,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		int reminderInSecond = minuteToSecond(msEvent.getReminder());
-		Assertions.assertThat(convertedEvent.getAlert()).isEqualTo(reminderInSecond);
+		assertThat(convertedEvent.getAlert()).isEqualTo(reminderInSecond);
 	}
 
 	@Test
@@ -631,7 +632,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getAlert()).isEqualTo(0);
+		assertThat(convertedEvent.getAlert()).isEqualTo(0);
 	}
 
 	@Test
@@ -646,7 +647,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getAlert()).isNull();
+		assertThat(convertedEvent.getAlert()).isNull();
 	}
 
 	@Test
@@ -661,7 +662,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 	
 	@Test
@@ -676,7 +677,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
 	}
 
 	@Test
@@ -691,7 +692,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
 	}
 
 	@Test
@@ -706,7 +707,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
 	}
 
 	@Test
@@ -721,7 +722,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 	
 	@Test
@@ -737,7 +738,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
+		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
 	}
 
 	@Test
@@ -753,7 +754,7 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		assertThat(convertedEventOrganizer.getDisplayName()).isNull();
 	}
 
 	@Test
@@ -769,8 +770,8 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
-		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
+		assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
 	}
 
 	@Test
@@ -786,8 +787,8 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isNull();
-		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(user.getEmail());
+		assertThat(convertedEventOrganizer.getDisplayName()).isNull();
+		assertThat(convertedEventOrganizer.getEmail()).isEqualTo(user.getEmail());
 	}
 	
 	@Test
@@ -804,8 +805,8 @@ public class MSEventToObmEventConverterTest {
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
 		Attendee convertedEventOrganizer = convertedEvent.findOrganizer();
-		Assertions.assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
-		Assertions.assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
+		assertThat(convertedEventOrganizer.getDisplayName()).isEqualTo(msEvent.getOrganizerName());
+		assertThat(convertedEventOrganizer.getEmail()).isEqualTo(msEvent.getOrganizerEmail());
 	}
 
 	@Test(expected=ConversionException.class)
@@ -872,8 +873,8 @@ public class MSEventToObmEventConverterTest {
 		Event converted = convertToOBMEvent(msEvent);
 
 		Date oneDayLaterStartDate = DateUtils.getOneDayLater(msEvent.getStartTime());
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
 	}
 	
 	@Test
@@ -887,8 +888,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
 	}
 
 	@Test
@@ -902,7 +903,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_A_MEETING);
+		assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_A_MEETING);
 	}
 
 	@Test
@@ -916,7 +917,7 @@ public class MSEventToObmEventConverterTest {
 	
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_NOT_A_MEETING);
+		assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.IS_NOT_A_MEETING);
 	}
 
 	@Test
@@ -930,7 +931,7 @@ public class MSEventToObmEventConverterTest {
 	
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED_AND_RECEIVED);
+		assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED_AND_RECEIVED);
 	}
 	
 	@Test
@@ -944,7 +945,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_RECEIVED);
+		assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_RECEIVED);
 	}
 	
 	@Test
@@ -958,7 +959,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED);
+		assertThat(converted.getMeetingStatus()).isEqualTo(EventMeetingStatus.MEETING_IS_CANCELED);
 	}
 
 	@Test(expected=ConversionException.class)
@@ -972,7 +973,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getMeetingStatus()).isNull();
+		assertThat(converted.getMeetingStatus()).isNull();
 	}
 
 	@Test
@@ -986,9 +987,9 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
-		Assertions.assertThat(converted.getDuration()).isEqualTo(getOneYearInSecond());
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getEndDate()).isEqualTo(msEvent.getEndTime());
+		assertThat(converted.getDuration()).isEqualTo(getOneYearInSecond());
 	}
 
 	@Test
@@ -1004,10 +1005,10 @@ public class MSEventToObmEventConverterTest {
 		Event converted = convertToOBMEvent(msEvent);
 
 		Date oneDayLaterStartDate = DateUtils.getOneDayLater(msEvent.getStartTime());
-		Assertions.assertThat(converted.isAllday()).isTrue();
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
-		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+		assertThat(converted.isAllday()).isTrue();
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getEndDate()).isEqualTo(oneDayLaterStartDate);
+		assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 
 	@Test
@@ -1022,8 +1023,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 
 	@Test
@@ -1038,8 +1039,8 @@ public class MSEventToObmEventConverterTest {
 		
 		Event converted = convertToOBMEvent(msEvent);
 		
-		Assertions.assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
-		Assertions.assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
+		assertThat(converted.getStartDate()).isEqualTo(msEvent.getStartTime());
+		assertThat(converted.getDuration()).isEqualTo(Ints.checkedCast(getOneDayInSecond()));
 	}
 	
 	@Test
@@ -1065,9 +1066,9 @@ public class MSEventToObmEventConverterTest {
 
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
 		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
-		Assertions.assertThat(exceptions).hasSize(1);
-		Assertions.assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
-		Assertions.assertThat(eventExceptions).isEmpty();
+		assertThat(exceptions).hasSize(1);
+		assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
+		assertThat(eventExceptions).isEmpty();
 	}
 
 	@Test
@@ -1093,9 +1094,9 @@ public class MSEventToObmEventConverterTest {
 		
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
 		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
-		Assertions.assertThat(exceptions).isEmpty();
-		Assertions.assertThat(eventExceptions).hasSize(1);
-		Assertions.assertThat(Iterables.getOnlyElement(eventExceptions).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
+		assertThat(exceptions).isEmpty();
+		assertThat(eventExceptions).hasSize(1);
+		assertThat(Iterables.getOnlyElement(eventExceptions).getRecurrenceId()).isEqualTo(msEventException.getExceptionStartTime());
 	}
 
 	private MSRecurrence simpleRecurrence(RecurrenceType type) {
