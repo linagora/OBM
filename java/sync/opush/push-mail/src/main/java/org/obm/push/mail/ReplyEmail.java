@@ -94,6 +94,8 @@ public class ReplyEmail extends SendEmail {
 		newMessage.setCc(this.message.getCc());
 		newMessage.setTo(this.message.getTo());
 		newMessage.setFrom(this.message.getFrom());
+		newMessage.setDate(this.message.getDate());
+		newMessage.setReplyTo(this.message.getReplyTo());
 		setMessage(newMessage);
 	}
 	

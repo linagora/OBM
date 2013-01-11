@@ -31,10 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.mail.MSMailTestsUtils.loadMimeMessage;
 import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -42,20 +44,17 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.fest.assertions.api.Assertions;
+import org.apache.james.mime4j.dom.address.AddressList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.collect.ImmutableMap;
-
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class ReplyEmailTest {
@@ -75,11 +74,11 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		String messageAsString = mime4jUtils.toString(message.getBody());
-		Assertions.assertThat(messageAsString).contains("Envoyé depuis mon HTC").contains("> origin");
+		assertThat(messageAsString).contains("Envoyé depuis mon HTC").contains("> origin");
 	}
 
 	@Test
@@ -89,10 +88,10 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 	
-		Assertions.assertThat(replyEmail.getFrom()).isEqualToIgnoringCase("from@linagora.test");
-		Assertions.assertThat(replyEmail.getTo()).containsOnly(MSMailTestsUtils.addr("a@test"), MSMailTestsUtils.addr("b@test"));
-		Assertions.assertThat(replyEmail.getCc()).containsOnly(MSMailTestsUtils.addr("c@test"));
-		Assertions.assertThat(replyEmail.getCci()).containsOnly(MSMailTestsUtils.addr("d@test"));
+		assertThat(replyEmail.getFrom()).isEqualToIgnoringCase("from@linagora.test");
+		assertThat(replyEmail.getTo()).containsOnly(MSMailTestsUtils.addr("a@test"), MSMailTestsUtils.addr("b@test"));
+		assertThat(replyEmail.getCc()).containsOnly(MSMailTestsUtils.addr("c@test"));
+		assertThat(replyEmail.getCci()).containsOnly(MSMailTestsUtils.addr("d@test"));
 	}
 	
 	@Test
@@ -103,7 +102,7 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.getCharset()).isEqualToIgnoringCase("UTF-8");
+		assertThat(message.getCharset()).isEqualToIgnoringCase("UTF-8");
 	}
 
 	@Test
@@ -114,12 +113,12 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/plain");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
+		assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
 	}
 	
 	@Test
@@ -130,13 +129,13 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		Multipart multipart = (Multipart) message.getBody();
 		Entity textPlainPart = mime4jUtils.getFirstTextPlainPart(multipart);
 		String messageAsString = mime4jUtils.toString(textPlainPart.getBody());
-		Assertions.assertThat(messageAsString).contains("C'est le message ;-)").contains("\n> origin").contains("\n> Cordialement");
+		assertThat(messageAsString).contains("C'est le message ;-)").contains("\n> origin").contains("\n> Cordialement");
 	}
 	
 	@Test
@@ -149,13 +148,13 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/plain");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).startsWith(replyTextExpected);
-		Assertions.assertThat(messageAsString).contains("\r\n> origin").contains("\r\n> Cordialement");
+		assertThat(messageAsString).startsWith(replyTextExpected);
+		assertThat(messageAsString).contains("\r\n> origin").contains("\r\n> Cordialement");
 	}
 	
 	@Test
@@ -166,13 +165,13 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/html");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/html");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).contains("response text").containsIgnoringCase("</blockquote>");
+		assertThat(messageAsString).contains("origin").contains("Cordialement");
+		assertThat(messageAsString).contains("response text").containsIgnoringCase("</blockquote>");
 	}
 	
 	@Test
@@ -183,12 +182,12 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/plain");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
+		assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
 	}
 
 	@Test
@@ -199,13 +198,13 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/html");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/html");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("<b>response html</b>").containsIgnoringCase("</blockquote>");
+		assertThat(messageAsString).contains("origin").contains("Cordialement");
+		assertThat(messageAsString).containsIgnoringCase("<b>response html</b>").containsIgnoringCase("</blockquote>");
 	}
 
 	@Test
@@ -216,19 +215,19 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		Multipart multipart = (Multipart) message.getBody();
-		Assertions.assertThat(multipart.getBodyParts()).hasSize(2);
+		assertThat(multipart.getBodyParts()).hasSize(2);
 		Entity plainTextPart = multipart.getBodyParts().get(0);
 		Entity htmlTextPart = multipart.getBodyParts().get(1);
-		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
+		assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
 		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
-		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
+		assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
 		String textHtmlAsString = mime4jUtils.toString(htmlTextPart.getBody());
-		Assertions.assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
+		assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
 	}
 	
 	@Test
@@ -239,12 +238,12 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/html");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/html");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		String messageAsString = mime4jUtils.toString(message.getBody());
-		Assertions.assertThat(messageAsString).contains("origin").contains("Cordialement");
-		Assertions.assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("response html");
+		assertThat(messageAsString).contains("origin").contains("Cordialement");
+		assertThat(messageAsString).containsIgnoringCase("</blockquote>").contains("response html");
 	}
 	
 	@Test
@@ -255,19 +254,19 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		Multipart multipart = (Multipart) message.getBody();
-		Assertions.assertThat(multipart.getBodyParts()).hasSize(2);
+		assertThat(multipart.getBodyParts()).hasSize(2);
 		Entity plainTextPart = multipart.getBodyParts().get(0);
 		Entity htmlTextPart = multipart.getBodyParts().get(1);
-		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
+		assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		assertThat(htmlTextPart.getMimeType()).isEqualTo("text/html");
 		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
-		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
+		assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
 		String textHtmlAsString = mime4jUtils.toString(htmlTextPart.getBody());
-		Assertions.assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
+		assertThat(textHtmlAsString).containsIgnoringCase("</blockquote>").contains("response html").contains("origin").contains("Cordialement");
 	}
 	
 	@Test
@@ -278,12 +277,12 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isFalse();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("text/plain");
-		Assertions.assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/plain");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
-		Assertions.assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
+		assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
 	}
 	
 	@Test
@@ -295,24 +294,24 @@ public class ReplyEmailTest {
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 		Message message = replyEmail.getMimeMessage();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		
 		Multipart parts = (Multipart) message.getBody();
-		Assertions.assertThat(parts.getCount()).isEqualTo(2);
-		Assertions.assertThat(mime4jUtils.getAttachmentCount(parts)).isEqualTo(1);
-		Assertions.assertThat(mime4jUtils.getAttachmentContentTypeList(parts)).containsOnly("image/png");
+		assertThat(parts.getCount()).isEqualTo(2);
+		assertThat(mime4jUtils.getAttachmentCount(parts)).isEqualTo(1);
+		assertThat(mime4jUtils.getAttachmentContentTypeList(parts)).containsOnly("image/png");
 		
 		BinaryBody binaryPart = (BinaryBody) parts.getBodyParts().get(0).getBody();
         byte[] dataRead = new byte[5];
         binaryPart.getInputStream().read(dataRead);
-        Assertions.assertThat(dataRead).isEqualTo(dataToSend);
+        assertThat(dataRead).isEqualTo(dataToSend);
 
 		Entity plainTextPart = parts.getBodyParts().get(1);
-		Assertions.assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
+		assertThat(plainTextPart.getMimeType()).isEqualTo("text/plain");
 		String textPlainAsString = mime4jUtils.toString(plainTextPart.getBody());
-		Assertions.assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
+		assertThat(textPlainAsString).contains("response text").contains("origin").contains("Cordialement");
 	}
 	
 	@Test
@@ -329,12 +328,12 @@ public class ReplyEmailTest {
 		String badReplyFormatMessage = buildReplyEmailWithEndLineCharacter("\n");
 		String goodReplyFormatMessage = buildReplyEmailWithEndLineCharacter(ReplyEmail.EMAIL_LINEBREAKER);
 		
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
-		Assertions.assertThat(message.getBody()).isInstanceOf(Multipart.class);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
+		assertThat(message.getBody()).isInstanceOf(Multipart.class);
 		
-		Assertions.assertThat(messageAsString).doesNotContain(badReplyFormatMessage);
-		Assertions.assertThat(messageAsString).contains(goodReplyFormatMessage );
+		assertThat(messageAsString).doesNotContain(badReplyFormatMessage);
+		assertThat(messageAsString).contains(goodReplyFormatMessage );
 	}
 	
 	private String buildReplyEmailWithEndLineCharacter(String endCharacter) {
@@ -358,5 +357,28 @@ public class ReplyEmailTest {
 		str.append("</HTML>").append(endCharacter);
 		return str.toString();
 	}
+
+	@Test
+	public void testReplyCopyDate() throws IOException, MimeException, NotQuotableEmailException {
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Message reply = loadMimeMessage("plainText.eml");
+		Date expectedDate = reply.getDate();
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
+				ImmutableMap.<String, MSAttachementData>of());
 	
+		Message message = replyEmail.getMimeMessage();
+		assertThat(message.getDate()).isEqualTo(expectedDate);
+	}
+
+	@Test
+	public void testReplyCopyReplyTo() throws IOException, MimeException, NotQuotableEmailException {
+		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Message reply = loadMimeMessage("plainText.eml");
+		AddressList expectedReplyTo = reply.getReplyTo();
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
+				ImmutableMap.<String, MSAttachementData>of());
+	
+		Message message = replyEmail.getMimeMessage();
+		assertThat(message.getReplyTo()).isEqualTo(expectedReplyTo);
+	}
 }
