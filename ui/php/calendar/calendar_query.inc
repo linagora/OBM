@@ -2067,6 +2067,11 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
     }
   }
 
+  // always set organizer == owner
+  if ( $calendar['organizer'] && is_numeric($calendar['organizer']) ) {
+    $calendar['owner'] = $calendar['organizer'];
+  }
+
   // XXXX bizarre les old_end et old_begin semblent etre affectes par l'update
   // ci-dessous sous mysql 4.0.23-10 (portable fourmi)
   run_query_calendar_update_event_data($calendar, $oldEvent); 
@@ -2203,6 +2208,11 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   }    
   $oldEvent_repeat_end = $oldEvent->repeat_end ? "'".$oldEvent->repeat_end."'" : "NULL";
 
+  $update_owner = "";
+  if ( $calendar["owner"] ) {
+    $update_owner = "event_owner = ".$calendar["owner"].", ";
+  }
+
   $frequency = $calendar['repeatfrequency']; 
   $color = $calendar['color'];
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
@@ -2264,6 +2274,7 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
       event_repeatkind = '$repeat_kind',
       event_repeatfrequence = '$frequency',
       event_repeatdays = '$repeat_days',
+      $update_owner
       event_endrepeat = $repeat_end
       WHERE
       event_id $event_id"; 
@@ -6954,6 +6965,8 @@ Class CalendarView {
   protected $entity_id_entity;
   protected $ndays;
 
+  protected $writable_calendars = array();
+
   /**
    * CalendarView constructor
    * 
@@ -7252,6 +7265,38 @@ Class CalendarView {
 
   public function entities_count() {
     return count($this->users) + count($this->resources) + $this->contacts_count();
+  }
+
+  public function get_writable_calendars($current_user_id) {
+    if ( isset($this->writable_calendars[$current_user_id]) ) {
+      return $this->writable_calendars[$current_user_id];
+    }
+    $writable_calendars = null;
+    $calendar_entity = $this->get_entities();
+    if (isset($calendar_entity['user'])) {
+      $calendar_user_objects = $calendar_entity['user'];
+      $writable_calendars = run_query_writable_calendars($current_user_id, array_values($calendar_user_objects));
+    }
+    $this->writable_calendars[$current_user_id] = $writable_calendars;
+    return $this->writable_calendars[$current_user_id];
+  }
+
+  public function get_default_writable_calendar($current_user_id) {
+    $default_writable_calendar = null;
+    $writable_calendars = $this->get_writable_calendars($current_user_id);
+    if (!is_array($writable_calendars) || count($writable_calendars) == 0 ) {
+      return $default_writable_calendar;
+    }
+
+    foreach ( $writable_calendars as $cal ) {
+      if ( $cal["id"] == $current_user_id ) {
+	$default_writable_calendar = $cal;
+      }
+    }
+    if ( !$default_writable_calendar ) {
+      $default_writable_calendar = $writable_calendars[0];
+    }
+    return $default_writable_calendar;
   }
 
   public function set_label($label) {

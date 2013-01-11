@@ -149,18 +149,12 @@ if (empty($users) && empty($resources)) {
   $current_view->add_user($obm['uid']);
 }
 # Retrieve the list of writable calendars
-$default_writable_calendar = null;
-$calendar_entity = $current_view->get_entities();
-if (isset($calendar_entity['user'])) {
-  $calendar_user_objects = $calendar_entity['user'];
-  $writable_calendars = run_query_writable_calendars($obm['uid'], array_values($calendar_user_objects));
-  if (count($writable_calendars) > 0) {
-    $default_writable_calendar = $writable_calendars[0];
-  }
-}
+$writable_calendars = $current_view->get_writable_calendars($obm["uid"]);
+$default_writable_calendar = $current_view->get_default_writable_calendar($obm["uid"]);
+
 
 get_calendar_action();
-update_calendar_action();
+update_calendar_action($writable_calendars);
 $perm->check_permissions($module, $action);
 
 page_close();
@@ -2289,8 +2283,8 @@ function get_calendar_action() {
 ///////////////////////////////////////////////////////////////////////////////
 // Calendar Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
-function update_calendar_action() {
-  global $actions, $params, $path, $obm, $writable_calendars;
+function update_calendar_action($writable_calendars) {
+  global $actions, $params, $path, $obm;
   if (!$writable_calendars) {
       unset($actions['calendar']['new']);
   }

@@ -4499,37 +4499,39 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $organizer_name = null;
   $organizer_id = null;
 
-  // Gets the organizerName
-  if(is_array($users['entity'])){
-    foreach($users['entity'] as $user_id=>$user_entity){
-      if($user_entity["is_organizer"]){
-        $organizer_name = $user_entity["label"];
-        $organizer_id = $user_id;
-        break;
-      }
-    }
-  }
-  if(empty($organizer_name) && is_array($contacts['entity'])){
-    foreach($contacts['entity'] as $contact_id=>$contact_entity){
-      if($contact_entity["is_organizer"]){
-        $organizer_name = $contact_entity["label"];
-        $organizer_id = $contact_id;
-        break;
-      }
-    }
-  }
-  $write_allowed_entities = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write', $current_view->get_users()));
-  if(sizeof($write_allowed_entities['ids']) == 1 ) {
-      $organizer_id = $write_allowed_entities['ids']['0'];
-  }
-
-  if (!isset($organizer_id) && isset($calendar['organizer'])) {
+  if ( isset($calendar['organizer']) ) {
     $organizer_id = $calendar['organizer'];
+  } else {
+    if(is_array($users['entity'])){
+      foreach($users['entity'] as $user_id=>$user_entity){
+	if($user_entity["is_organizer"]){
+	  $organizer_name = $user_entity["label"];
+	  $organizer_id = $user_id;
+	  break;
+	}
+      }
+    }
+    if(empty($organizer_id) && is_array($contacts['entity'])){
+      foreach($contacts['entity'] as $contact_id=>$contact_entity){
+	if($contact_entity["is_organizer"]){
+	  $organizer_name = $contact_entity["label"];
+	  $organizer_id = $contact_id;
+	  break;
+	}
+      }
+    }
+    if ( empty($organizer_id) ) {
+      $write_allowed_entities = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write', $current_view->get_users()));
+      if(sizeof($write_allowed_entities['ids']) == 1 ) {
+	  $organizer_id = $write_allowed_entities['ids']['0'];
+      }
+    }
+    if(empty($organizer_id) ) {
+      $organizer_id = $uid;
+    }
   }
 
-  elseif(!$organizer_id) {
-    $organizer_id = $uid;
-  }
+
 
 
   $displayedPeople = array();
