@@ -2372,6 +2372,11 @@ function run_query_calendar_quick_event_update($calendar) {
 	// increment sequence
 	if ( $newEvent->shouldIncrementSequence($oldEvent) ) {
 		run_query_increment_sequence($newEvent->uid);
+		
+		// OBMFULL-3499
+		// This is done here so that participation status is up-to-date BEFORE the email is sent
+		// This allows the attached ICS to contain the correct PARTSTAT for the attendees
+		run_query_quick_attendee_update($calendar, $calendar['calendar_id']);
 	}
 
 	// reload once again to have the correct sequence number
