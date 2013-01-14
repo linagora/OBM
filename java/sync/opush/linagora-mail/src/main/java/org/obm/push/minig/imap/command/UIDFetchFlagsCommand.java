@@ -42,7 +42,6 @@ import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
@@ -95,8 +94,20 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
-		Map<Long, FlagsList> result = Maps.newTreeMap();
 		String payload = response.getPayload();
+		long uid = getUid(payload);
+		
+		if (imapMessageSet.contains(uid)) {
+			FlagsList flags = parseResponse(payload);
+			if (flags != null) {
+				data.put(uid, flags);
+			} else {
+				logger.error("Failed to get flags in fetch response: {}", payload);
+			}
+		}
+	}
+
+	public static FlagsList parseResponse(String payload) {
 		int fidx = payload.indexOf("FLAGS (") + "FLAGS (".length();
 		
 		int endFlags = payload.indexOf(")", fidx);
@@ -104,21 +115,11 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 		if (fidx > 0 && endFlags >= fidx) {
 			flags = payload.substring(fidx, endFlags);
 		} else {
-			logger.error("Failed to get flags in fetch response: {}", payload);
+			return null;
 		}
-
-		long uid = getUid(payload);
-		if (imapMessageSet.contains(uid)) {
-			FlagsList flagsList = new FlagsList();
-			parseFlags(flags, flagsList);
-			result.put(uid, flagsList);
-		}
-		
-		if (data == null || data.isEmpty()) {
-			data = result;
-		} else {
-			data.putAll(result);
-		}
+		FlagsList flagsList = new FlagsList();
+		parseFlags(flags, flagsList);
+		return flagsList;
 	}
 
 	private long getUid(String fullPayload) {
@@ -130,7 +131,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 		}
 	}
 
-	private void parseFlags(String flags, FlagsList flagsList) {
+	private static void parseFlags(String flags, FlagsList flagsList) {
 		// TODO this is probably slow as hell
 		if (flags.contains("\\Seen")) {
 			flagsList.add(Flag.SEEN);
@@ -151,6 +152,6 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	@Override
 	public void setDataInitialValue() {
-		data = ImmutableMap.of();
+		data = Maps.newHashMap();
 	}
 }

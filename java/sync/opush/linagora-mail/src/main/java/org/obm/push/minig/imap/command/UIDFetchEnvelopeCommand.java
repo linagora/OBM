@@ -108,24 +108,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		}
 		
 		try {
-			String payload = response.getPayload();
-			String fullPayload = AtomHelper.getFullResponse(payload, response.getStreamData());
-			long uid = getUid(fullPayload);
-			String envel = getEnvelopePayload(fullPayload);
-			if (envel == null) {
-				return;
-			}
-	
-			List<UIDEnvelope> envelopes = new ArrayList<UIDEnvelope>(imapMessageSet.size());
-			try {
-				Envelope envelope = parseEnvelope(envel.getBytes(Charsets.US_ASCII));
-				logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
-				envelopes.add( new UIDEnvelope(uid, envelope) );
-			} catch (Throwable t) {
-				logger.error("fail parsing envelope for message UID {}", uid, t);
-				logger.error("Envelope payload in error was : {}", envel);
-				return;
-			}
+			List<UIDEnvelope> envelopes = parseResponse(response);
 			
 			if (data == null || data.isEmpty()) {
 				data = envelopes;
@@ -134,6 +117,28 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 			}
 		} catch (EndingResponseException e) {
 		}
+	}
+
+	private List<UIDEnvelope> parseResponse(IMAPResponse response) {
+		List<UIDEnvelope> envelopes = new ArrayList<UIDEnvelope>(imapMessageSet.size());
+		
+		String payload = response.getPayload();
+		String fullPayload = AtomHelper.getFullResponse(payload, response.getStreamData());
+		long uid = getUid(fullPayload);
+
+		try {
+			Envelope envelope = parseEnvelope(fullPayload);
+			if (envelope != null) {
+				logger.info("uid: {}  env.from: {}", uid, envelope.getFrom());
+				envelopes.add( new UIDEnvelope(uid, envelope) );
+			} else {
+				logger.error("Cannot parse Envelope in payload : {}", fullPayload);
+			}
+		} catch (Throwable t) {
+			logger.error("fail parsing envelope for message UID {}", uid, t);
+			logger.error("Envelope payload in error was : {}", fullPayload);
+		}
+		return envelopes;
 	}
 
 	private long getUid(String fullPayload) {
@@ -155,7 +160,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		return false;
 	}
 
-	@VisibleForTesting String getEnvelopePayload(String fullPayload) {
+	@VisibleForTesting static String getEnvelopePayload(String fullPayload) {
 		String envelopeStartToken = "ENVELOPE ";
 		int bsIdx = fullPayload.indexOf(envelopeStartToken);
 		if (bsIdx == -1) {
@@ -199,7 +204,13 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	 * 		)
 	 * </pre>
 	 **/
-	@VisibleForTesting Envelope parseEnvelope(byte[] envelopeWithContainer) {
+	public static Envelope parseEnvelope(String fullPayload) {
+		String envel = getEnvelopePayload(fullPayload);
+		if (envel == null) {
+			return null;
+		}
+		byte[] envelopeWithContainer = envel.getBytes(Charsets.US_ASCII);
+		
 		ParenListParser parser = new ParenListParser();
 		int pos = 0;
 		
@@ -252,7 +263,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 				messageID(mid).build();
 	}
 
-	private List<Address> parseList(byte[] token, ParenListParser parser) {
+	private static List<Address> parseList(byte[] token, ParenListParser parser) {
 		LinkedList<Address> ret = new LinkedList<Address>();
 
 		if (parser.getLastTokenType() != TokenType.LIST) {

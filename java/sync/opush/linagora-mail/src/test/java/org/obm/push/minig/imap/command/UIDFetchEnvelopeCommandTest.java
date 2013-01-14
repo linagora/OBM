@@ -72,15 +72,14 @@ public class UIDFetchEnvelopeCommandTest {
 	
 	@Test
 	public void testParseEnvelopeSyntax() {
-		String envelopeData = "(\"Thu, 13 Sep 2012 14:16:45 +0200\"" +
+		String envelopeData = "ENVELOPE (\"Thu, 13 Sep 2012 14:16:45 +0200\"" +
 				" \"subject\" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
 				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
 				" ((\"sender\" NIL \"sender\" \"thilaire.lng.org\"))" +
 				" ((\"toName toName\" NIL \"toName\" \"thilaire.lng.org\"))" +
 				" NIL NIL NIL \"<5051CEAD.8020706@thilaire.lng.org>\")";
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.empty());
 
-		Envelope envelope = command.parseEnvelope(envelopeData.getBytes());
+		Envelope envelope = UIDFetchEnvelopeCommand.parseEnvelope(envelopeData);
 		
 		assertThat(envelope.getFrom()).containsOnly(new Address("sender", "sender@thilaire.lng.org"));
 		assertThat(envelope.getTo()).containsOnly(new Address("toName toName", "toName@thilaire.lng.org"));
@@ -104,9 +103,7 @@ public class UIDFetchEnvelopeCommandTest {
 		
 		String fullPayload = "* 2 FETCH (UID 28 ENVELOPE " + expectedEnvelopePayload + ")";
 		
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.empty());
-
-		String parsedEnvelope = command.getEnvelopePayload(fullPayload);
+		String parsedEnvelope = UIDFetchEnvelopeCommand.getEnvelopePayload(fullPayload);
 		assertThat(parsedEnvelope).isEqualTo(expectedEnvelopePayload);
 	}
 	
@@ -119,9 +116,7 @@ public class UIDFetchEnvelopeCommandTest {
 				"((\"Robert Dupont\" NIL \"rdupont\" \"linagora.com\")) " +
 				"((NIL NIL \"boss\" \"linagora.com\")) NIL NIL \"<4D5547D2.9050008@linagora.com>\" \"<4D556074.8050406@linagora.com>\"))";
 		
-		UIDFetchEnvelopeCommand command = new UIDFetchEnvelopeCommand(MessageSet.singleton(590923l));
-		String parsedEnvelope = command.getEnvelopePayload(fullPayload);
-		Envelope envelope = command.parseEnvelope(parsedEnvelope.getBytes());
+		Envelope envelope = UIDFetchEnvelopeCommand.parseEnvelope(fullPayload);
 		
 		assertThat(envelope.getFrom()).containsOnly(new Address("Robert Dupont", "rdupont@linagora.com"));
 		assertThat(envelope.getTo()).containsOnly(new Address(null, "boss@linagora.com"));
