@@ -53,6 +53,7 @@ import org.apache.mina.common.WriteFuture;
 import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
@@ -83,6 +84,7 @@ import org.obm.push.minig.imap.command.StopIdleCommand;
 import org.obm.push.minig.imap.command.SubscribeCommand;
 import org.obm.push.minig.imap.command.UIDCopyCommand;
 import org.obm.push.minig.imap.command.UIDFetchBodyStructureCommand;
+import org.obm.push.minig.imap.command.UIDFetchEmailMetadataCommand;
 import org.obm.push.minig.imap.command.UIDFetchEnvelopeCommand;
 import org.obm.push.minig.imap.command.UIDFetchFastCommand;
 import org.obm.push.minig.imap.command.UIDFetchFlagsCommand;
@@ -355,6 +357,10 @@ public class ClientSupport {
 	
 	public InputStream uidFetchPart(long uid, String address, long truncation) {
 		return run(new UIDFetchPartCommand(uid, address, truncation));
+	}
+
+	public EmailMetadata uidFetchEmailMetadata(long uid) {
+		return run(new UIDFetchEmailMetadataCommand(new BodyStructureParser(), uid));
 	}
 
 	public List<MailThread> uidThreads() {

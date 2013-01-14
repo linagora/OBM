@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
@@ -144,7 +145,10 @@ public interface StoreClient {
 	
 	InputStream uidFetchPart(long uid, String address);
 
+	EmailMetadata uidFetchEmailMetadata(long uid);
+
 	List<MailThread> uidThreads();
 
 	String findMailboxNameWithServerCase(String mailbox);
+
 }

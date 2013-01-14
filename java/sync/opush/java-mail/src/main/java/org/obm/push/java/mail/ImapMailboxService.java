@@ -65,6 +65,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -130,6 +131,11 @@ public class ImapMailboxService implements MailboxService {
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		this.opushImapFolderConnection = new OpushImapFolderConnection();
+	}
+
+	@Override
+	public EmailMetadata fetchEmailMetadata(UserDataRequest udr, String collectionPath, long uid) throws MailException {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

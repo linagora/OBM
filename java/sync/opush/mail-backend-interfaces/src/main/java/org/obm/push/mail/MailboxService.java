@@ -48,6 +48,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
@@ -105,6 +106,8 @@ public interface MailboxService {
 	Collection<MimeMessage> fetchBodyStructure(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
 	Map<Long, FlagsList> fetchFlags(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
+	
+	EmailMetadata fetchEmailMetadata(UserDataRequest udr, String collectionPath, long uid) throws MailException;
 
 	InputStream fetchPartialMimePartStream(UserDataRequest udr, String collectionPath, long uid, MimeAddress partAddress, int limit) 
 			throws MailException;

@@ -102,6 +102,7 @@ public class BeansTest {
 		
 		EqualsVerifierBuilder.builder()
 		.equalsVerifiers(ImmutableList.<Class<?>>of(
+				EmailMetadata.class,
 				MimeMessage.class))
 		.prefabValue(IMimePart.class,
 				MimePart.builder().contentType("text/plain").encoding("7BIT").build(),

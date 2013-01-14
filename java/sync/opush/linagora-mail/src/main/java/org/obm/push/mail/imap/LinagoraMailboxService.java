@@ -53,6 +53,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
@@ -61,6 +62,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -113,6 +115,24 @@ public class LinagoraMailboxService implements MailboxService {
 		this.collectionPathHelper = collectionPathHelper;
 		this.activateTLS = emailConfiguration.activateTls();
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
+	}
+
+	@Override
+	public EmailMetadata fetchEmailMetadata(UserDataRequest udr, String collectionPath, long uid)
+			throws MailException, ItemNotFoundException {
+		try {
+			StoreClient store = imapClientProvider.getImapClient(udr);
+			store.select(extractMailboxNameFromCollectionPath(udr, collectionPath));
+			EmailMetadata response = store.uidFetchEmailMetadata(uid);
+			if (response != null) {
+				return response;
+			}
+			throw new ItemNotFoundException("Cannot find expected response:{" + uid + "} in imap results");
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		}
 	}
 
 	@Override

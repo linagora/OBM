@@ -122,7 +122,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 		return Long.valueOf(longAsString);		
 	}
 	
-	private String getBodyStructurePayload(String fullPayload) {
+	public static String getBodyStructurePayload(String fullPayload) {
 		String bodystructureStartToken = "BODYSTRUCTURE ";
 		int bsIdx = fullPayload.indexOf(bodystructureStartToken);
 		if (bsIdx == -1) {

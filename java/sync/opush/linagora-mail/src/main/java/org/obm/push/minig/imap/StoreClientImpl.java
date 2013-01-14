@@ -47,6 +47,7 @@ import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.FastFetch;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
@@ -287,6 +288,11 @@ public class StoreClientImpl implements StoreClient {
 	@Override
 	public InputStream uidFetchPart(long uid, String address) {
 		return clientSupport.uidFetchPart(uid, address);
+	}
+	
+	@Override
+	public EmailMetadata uidFetchEmailMetadata(long uid) {
+		return clientSupport.uidFetchEmailMetadata(uid);
 	}
 
 	@Override
