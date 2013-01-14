@@ -39,8 +39,9 @@ import java.util.List;
 
 import org.obm.push.mail.bean.IMAPHeaders;
 
-
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the mime tree of a message. The tree of a message can be obtained
@@ -93,27 +94,6 @@ public class MimeMessage implements IMimePart {
 		this.from = from;
 		this.uid = uid;
 		this.size = size;
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		printTree(sb);
-		return sb.toString();
-	}
-
-	private void printTree(StringBuilder sb) {
-		for (IMimePart part: this.listLeaves(true, false)) {
-			sb.append(part.getAddress()).append(" ");
-			printMimeDetails(sb, part);
-		}
-	}
-
-	private void printMimeDetails(StringBuilder sb, IMimePart mimeTree) {
-		sb.append(mimeTree.getFullMimeType());
-		String name = mimeTree.getName();
-		if (name != null) {
-			sb.append(" " + name);
-		}
 	}
 
 	public boolean isSinglePartMessage() {
@@ -236,7 +216,10 @@ public class MimeMessage implements IMimePart {
 
 	@Override
 	public Collection<IMimePart> listLeaves(boolean depthFirst, boolean filterNested) {
-		return from.listLeaves(depthFirst, filterNested);
+		if (from != null) {
+			return from.listLeaves(depthFirst, filterNested);
+		}
+		return ImmutableSet.of();
 	}
 	
 	@Override
@@ -309,6 +292,48 @@ public class MimeMessage implements IMimePart {
 	@Override
 	public IMAPHeaders decodeHeaders(InputStream is) throws IOException {
 		return from.decodeHeaders(is);
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(uid, size, from);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MimeMessage) {
+			MimeMessage that = (MimeMessage) object;
+			return Objects.equal(this.uid, that.uid)
+					&& Objects.equal(this.size, that.size)
+					&& Objects.equal(this.from, that.from);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("uid", uid)
+			.add("size", size)
+			.add("tree", printTree())
+			.toString();
+	}
+
+	private String printTree() {
+		StringBuilder sb = new StringBuilder();
+		for (IMimePart part: listLeaves(true, false)) {
+			sb.append(part.getAddress()).append(" ");
+			printMimeDetails(sb, part);
+		}
+		return sb.toString();
+	}
+
+	private void printMimeDetails(StringBuilder sb, IMimePart mimeTree) {
+		sb.append(mimeTree.getFullMimeType());
+		String name = mimeTree.getName();
+		if (name != null) {
+			sb.append(" " + name);
+		}
 	}
 
 }

@@ -365,12 +365,33 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	public boolean isICSAttachment() {
 		return contentType.getFullMimeType().equalsIgnoreCase("application/ics");
 	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(
+				parent, idx, contentType, contentTransfertEncoding, contentId, size, multipartSubType);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof MimePart) {
+			MimePart that = (MimePart) object;
+			return Objects.equal(this.parent, that.parent)
+					&& Objects.equal(this.idx, that.idx)
+					&& Objects.equal(this.contentType, that.contentType)
+					&& Objects.equal(this.contentTransfertEncoding, that.contentTransfertEncoding)
+					&& Objects.equal(this.contentId, that.contentId)
+					&& Objects.equal(this.size, that.size)
+					&& Objects.equal(this.multipartSubType, that.multipartSubType);
+		}
+		return false;
+	}
 
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(getClass())
-			.add("mime-type", getFullMimeType())
-			.add("addr", getAddress()).toString();
+			.add("contentType", contentType)
+			.add("idx", idx).toString();
 	}
 	
 	@Override
