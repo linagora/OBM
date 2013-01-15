@@ -81,7 +81,7 @@ public class UIDFetchEmailMetadataCommand extends Command<EmailMetadata> {
 			!payload.contains("ENVELOPE ") ||
 			!payload.contains("BODYSTRUCTURE ")
 			) {
-			logger.warn("not a UIDFetchEmailViewCommand: {}", payload);
+			logger.warn("not a UIDFetchEmailMetadataCommand: {}", payload);
 			return false;
 		}
 		return true;

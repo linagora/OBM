@@ -91,6 +91,8 @@ public interface OpushImapFolder {
 	
 	Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
 
+	Map<Long, IMAPMessage> fetchEmailView(MessageSet messages) throws MessagingException, ImapMessageNotFoundException;
+	
 	void noop() throws MessagingException;
 	
 	void close() throws MessagingException;
@@ -102,4 +104,5 @@ public interface OpushImapFolder {
 	long uidNext(String mailbox) throws MessagingException;
 	
 	long uidValidity(String mailbox) throws MessagingException;
+
 }

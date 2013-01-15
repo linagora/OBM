@@ -57,6 +57,7 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
@@ -134,8 +135,32 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public EmailMetadata fetchEmailMetadata(UserDataRequest udr, String collectionPath, long uid) throws MailException {
-		throw new UnsupportedOperationException();
+	public EmailMetadata fetchEmailMetadata(UserDataRequest udr, String collectionPath, long uid)
+			throws MailException, ItemNotFoundException {
+		try {
+			String mailboxName = parseMailBoxName(udr, collectionPath);
+			openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
+			Map<Long, IMAPMessage> results = currentOpushImapFolder().fetchEmailView(MessageSet.singleton(uid));
+			if (results.containsKey(uid)) {
+				IMAPMessage message = results.get(uid);
+				Set<Flag> flags = imapMailBoxUtils.buildFlagToIMAPMessageFlags(message.getFlags());
+				return EmailMetadata.builder()
+						.uid(uid)
+						.size(message.getSize())
+						.flags(new FlagsList(flags))
+						.mimeMessage(imapMailBoxUtils.buildMimeMessageFromIMAPMessage(uid, message))
+						.envelope(imapMailBoxUtils.buildEnvelopeFromMessage(message))
+						.build();
+			}
+			throw new ItemNotFoundException(String.format(
+					"Cannot find expected response:{%d} in imap results:{%s}", uid, results));
+		} catch (ImapMessageNotFoundException e) {
+			throw new ItemNotFoundException(e);
+		} catch (MessagingException e) {
+			throw new MailException(e);
+		} catch (LocatorClientException e) {
+			throw new MailException(e);
+		}
 	}
 
 	@Override

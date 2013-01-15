@@ -178,10 +178,14 @@ public class ImapMailBoxUtils {
 		
 		Collection<MimeMessage> mimeMessageCollection = new ArrayList<MimeMessage>();
 		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
-			MimePart mimePart = buildMimePartTree(entry.getValue());
-			mimeMessageCollection.add(MimeMessage.builder().from(mimePart).uid(entry.getKey()).build());
+			mimeMessageCollection.add(buildMimeMessageFromIMAPMessage(entry.getKey(), entry.getValue()));
 		}
 		return mimeMessageCollection;
+	}
+
+	public MimeMessage buildMimeMessageFromIMAPMessage(long uid, IMAPMessage message) {
+		MimePart mimePart = buildMimePartTree(message);
+		return MimeMessage.builder().from(mimePart).uid(uid).build();
 	}
 
 	private MimePart buildMimePartTree(javax.mail.internet.MimePart mimePart) throws MailException {

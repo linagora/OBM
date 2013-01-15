@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.imap.IMAPFolder;
@@ -193,9 +194,16 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 
 	@Override
 	public Map<Long, IMAPMessage> fetchEnvelope(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
-		FetchProfile fetchProfile = new FetchProfile();
-		fetchProfile.add(FetchProfile.Item.ENVELOPE);
-		return fetch(messages, fetchProfile);
+		return fetch(messages, fetchProfile(fetchEnvelopeProfileItems));
+	}
+
+	@Override
+	public Map<Long, IMAPMessage> fetchEmailView(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
+		return fetch(messages, fetchProfile(Iterables.concat(
+				fetchBodyStructureProfileItems,
+				fetchEnvelopeProfileItems,
+				fetchFlagsProfileItems
+			)));
 	}
 
 	@Override
@@ -203,7 +211,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		ImmutableMap.Builder<Long, FlagsList> response = ImmutableMap.builder();
 		for (long uid: messages) {
 			IMAPMessage messageToFetch = getMessageByUID(uid);
-			folder.fetch(new Message[]{messageToFetch}, getFetchFlagsProfile());
+			folder.fetch(new Message[]{messageToFetch}, fetchProfile(fetchFlagsProfileItems));
 			response.put(uid, flagsList(messageToFetch.getFlags()));
 		}
 		return response.build();
@@ -212,12 +220,6 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	private FlagsList flagsList(Flags flagsToConvert) {
 		Set<Flag> convertedFlags = imapMailBoxUtils.buildFlagToIMAPMessageFlags(flagsToConvert);
 		return new FlagsList(convertedFlags);
-	}
-
-	private FetchProfile getFetchFlagsProfile() {
-		FetchProfile fetchProfile = new FetchProfile();
-		fetchProfile.add(FetchProfile.Item.FLAGS);
-		return fetchProfile;
 	}
 
 	@Override
@@ -246,21 +248,15 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 
 	@Override
 	public Map<Long, IMAPMessage> fetchFast(MessageSet messages) throws MessagingException {
-		FetchProfile fetchFastProfile = getFetchFastProfile();
 		try {
-			return fetch(messages, fetchFastProfile);
+			return fetch(messages, fetchProfile(Iterables.concat(
+					fetchEnvelopeProfileItems,
+					fetchFlagsProfileItems,
+					fetchSizeProfileItems)));
 		} catch (ImapMessageNotFoundException e) {
 			logger.debug("Message {} not found", messages);
 		}
 		return ImmutableMap.<Long, IMAPMessage>of();
-	}
-
-	private FetchProfile getFetchFastProfile() {
-		FetchProfile fetchProfile = new FetchProfile();
-		fetchProfile.add(FetchProfile.Item.ENVELOPE);
-		fetchProfile.add(FetchProfile.Item.FLAGS);
-		fetchProfile.add(IMAPFolder.FetchProfileItem.SIZE);
-		return fetchProfile;
 	}
 	
 	@Override
@@ -325,15 +321,7 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 
 	@Override
 	public Map<Long, IMAPMessage> fetchBodyStructure(MessageSet messages) throws MessagingException, ImapMessageNotFoundException {
-		FetchProfile fetchFastProfile = getFetchBodyStructureProfile();
-		return fetch(messages, fetchFastProfile);
-	}
-
-	private FetchProfile getFetchBodyStructureProfile() {
-		FetchProfile fetchProfile = new FetchProfile();
-		fetchProfile.add(FetchProfile.Item.CONTENT_INFO);
-		fetchProfile.add(IMAPFolder.FetchProfileItem.SIZE);
-		return fetchProfile;
+		return fetch(messages, fetchProfile(fetchBodyStructureProfileItems));
 	}
 
 	@Override
@@ -377,5 +365,30 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	@Override
 	public long uidValidity(String mailbox) throws MessagingException {
 		return folder.getUIDValidity();
+	}
+
+	private Iterable<FetchProfile.Item> fetchBodyStructureProfileItems = ImmutableSet.of(
+			FetchProfile.Item.CONTENT_INFO,
+			IMAPFolder.FetchProfileItem.SIZE	
+	);
+	
+	private Iterable<FetchProfile.Item> fetchFlagsProfileItems = ImmutableSet.of(
+			FetchProfile.Item.FLAGS
+	);
+	
+	private Iterable<FetchProfile.Item> fetchEnvelopeProfileItems = ImmutableSet.of(
+			FetchProfile.Item.ENVELOPE
+	);
+	
+	private Iterable<? extends FetchProfile.Item> fetchSizeProfileItems = ImmutableSet.of(
+			IMAPFolder.FetchProfileItem.SIZE
+	);
+	
+	private FetchProfile fetchProfile(Iterable<FetchProfile.Item> items) {
+		FetchProfile fetchProfile = new FetchProfile();
+		for (FetchProfile.Item item : items) {
+			fetchProfile.add(item);
+		}
+		return fetchProfile;
 	}
 }

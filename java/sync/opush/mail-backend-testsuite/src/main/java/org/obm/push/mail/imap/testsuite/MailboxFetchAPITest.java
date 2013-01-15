@@ -32,6 +32,7 @@
 package org.obm.push.mail.imap.testsuite;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,19 +48,20 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.MessageSet;
@@ -119,7 +121,7 @@ public abstract class MailboxFetchAPITest {
 	@Ignore("AppendCommand should send optional message's internal date-time in command")
 	@Test
 	public void testFetchEnvelope() throws MailException, IOException {
-		Envelope envelope = Envelope.builder().date(DateUtils.date("2010-09-17T17:12:26")).
+		Envelope envelope = Envelope.builder().date(date("2010-09-17T17:12:26")).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
 		from(Lists.newArrayList(new Address("Ad Min", "admin@opush.test"))).
@@ -360,5 +362,49 @@ public abstract class MailboxFetchAPITest {
 		
 		long uIDValidity = mailboxService.fetchUIDValidity(udr, inbox);
 		assertThat(uIDValidity).isGreaterThan(-1);
+	}
+	
+	@Test(expected=ItemNotFoundException.class)
+	public void testFetchEmailMetadataOfWrongUid() throws Exception {
+		Date internalDate = date("2004-12-14T22:00:00");
+		String content = "content";
+		String from = "user@thilaire.lng.org";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		mailboxService.fetchEmailMetadata(udr, inbox, 15l);
+	}
+	
+	@Test
+	public void testFetchEmailMetadata() throws Exception {
+		Date internalDate = date("2004-12-14T22:00:00");
+		String content = "content";
+		String from = "user@thilaire.lng.org";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		EmailMetadata emailMetadata = mailboxService.fetchEmailMetadata(udr, inbox, 1l);
+
+		assertThat(emailMetadata.getUid()).isEqualTo(1L);
+		assertThat(emailMetadata.getSize()).isEqualTo(content.length());
+		assertThat(emailMetadata.getFlags()).isEmpty();
+		
+		Envelope envelope = emailMetadata.getEnvelope();
+		assertThat(envelope.getDate()).isEqualTo(internalDate);
+		assertThat(envelope.getSubject()).isEqualTo("subject");
+		assertThat(envelope.getMessageId()).isNotEmpty();
+		assertThat(envelope.getFrom()).containsOnly(new Address(null, from));
+		assertThat(envelope.getTo()).isEmpty();
+		assertThat(envelope.getCc()).isEmpty();
+		assertThat(envelope.getBcc()).isEmpty();
+		assertThat(envelope.getReplyTo()).containsOnly(new Address(null, from));
+		
+		org.obm.push.mail.mime.MimeMessage mimeMessage = emailMetadata.getMimeMessage();
+		assertThat(mimeMessage.getUid()).isEqualTo(1l);
+		assertThat(mimeMessage.getMimePart().isMultipart()).isFalse();
+		assertThat(mimeMessage.getMimePart().getChildren()).isEmpty();
+		assertThat(mimeMessage.getMimePart().getFullMimeType()).isEqualTo("text/plain");
 	}
 }
