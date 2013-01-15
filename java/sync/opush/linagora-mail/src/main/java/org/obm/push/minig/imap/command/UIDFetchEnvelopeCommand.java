@@ -241,7 +241,10 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		}
 
 		pos = parser.consumeToken(pos, envelope); // sender
-		pos = parser.consumeToken(pos, envelope); // reply to
+
+		// REPLY-TO
+		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
+		List<Address> replyTo = parseList(parser.getLastReadToken(), parser);
 
 		// TO
 		pos = parser.consumeToken(pos, envelope); // (("Raymon" NIL "ra" "cg82.fr"))
@@ -259,7 +262,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		parser.consumeToken(pos, envelope); // Message-ID
 		String mid = new String(parser.getLastReadToken());
 		
-		return Envelope.builder().date(d).subject(subject).to(to).cc(cc).bcc(bcc).from(from).
+		return Envelope.builder().date(d).subject(subject).replyTo(replyTo).to(to).cc(cc).bcc(bcc).from(from).
 				messageID(mid).build();
 	}
 

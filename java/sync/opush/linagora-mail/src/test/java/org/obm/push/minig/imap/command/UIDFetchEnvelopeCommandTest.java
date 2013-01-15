@@ -87,7 +87,7 @@ public class UIDFetchEnvelopeCommandTest {
 		assertThat(envelope.getBcc()).isEmpty();
 		assertThat(envelope.getDate()).isEqualTo(DateUtils.date("2012-09-13T14:16:45+02"));
 		assertThat(envelope.getMessageId()).isEqualTo("<5051CEAD.8020706@thilaire.lng.org>");
-		assertThat(envelope.getReplyTo()).isEmpty();
+		assertThat(envelope.getReplyTo()).containsOnly(new Address("sender", "sender@thilaire.lng.org"));
 		assertThat(envelope.getSubject()).isEqualTo("subject");
 	}
 	
@@ -124,7 +124,7 @@ public class UIDFetchEnvelopeCommandTest {
 		assertThat(envelope.getBcc()).isEmpty();
 		assertThat(envelope.getDate()).isEqualTo(DateUtils.date("2011-02-11T17:14:44"));
 		assertThat(envelope.getMessageId()).isEqualTo("<4D556074.8050406@linagora.com>");
-		assertThat(envelope.getReplyTo()).isEmpty();
+		assertThat(envelope.getReplyTo()).containsOnly(new Address("Robert Dupont", "rdupont@linagora.com"));
 		assertThat(envelope.getSubject()).isEqualTo("Re: Tu ne m'oublies pas ;-)");
 	}
 	
@@ -144,5 +144,26 @@ public class UIDFetchEnvelopeCommandTest {
 		command.handleResponses(ImmutableList.of(response, response2, response3));
 		
 		assertThat(command.getReceivedData()).hasSize(1);
+	}
+	
+	@Test
+	public void testParseEnvelopeWithDifferentFromThanReplyTo() {
+		String fullPayload = "* 1444 FETCH (UID 590923 ENVELOPE " +
+				"(\"Fri, 11 Feb 2011 17:14:44 +0100\" \"Re: Tu ne m'oublies pas ;-)\" " +
+				"((\"from address\" NIL \"from\" \"linagora.com\")) " +
+				"((\"sender address\" NIL \"sender\" \"linagora.com\")) " +
+				"((\"reply-to address\" NIL \"reply-to\" \"linagora.com\")) " +
+				"((NIL NIL \"boss\" \"linagora.com\")) NIL NIL \"<4D5547D2.9050008@linagora.com>\" \"<4D556074.8050406@linagora.com>\"))";
+		
+		Envelope envelope = UIDFetchEnvelopeCommand.parseEnvelope(fullPayload);
+		
+		assertThat(envelope.getFrom()).containsOnly(new Address("from address", "from@linagora.com"));
+		assertThat(envelope.getTo()).containsOnly(new Address(null, "boss@linagora.com"));
+		assertThat(envelope.getCc()).isEmpty();
+		assertThat(envelope.getBcc()).isEmpty();
+		assertThat(envelope.getDate()).isEqualTo(DateUtils.date("2011-02-11T17:14:44"));
+		assertThat(envelope.getMessageId()).isEqualTo("<4D556074.8050406@linagora.com>");
+		assertThat(envelope.getReplyTo()).containsOnly(new Address("reply-to address", "reply-to@linagora.com"));
+		assertThat(envelope.getSubject()).isEqualTo("Re: Tu ne m'oublies pas ;-)");
 	}
 }
