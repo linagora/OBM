@@ -2646,7 +2646,7 @@ function run_query_calendar_reset_occurrence_links($users, $contacts, $resources
  * @param mixed $event_q 
  * @param mixed $calendar 
  * @access public
- * @return mixed exception id if an exception event has been created in the event table, null otherwise
+ * @return mixed exception id if an exception event has been created in the event table, an array('already_set' => true, 'id' => exceptionid) otherwise
  */
 function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $run_observers = false, $date_occurrence = null, $sel_entity_id = null) {
   global $cdg_sql, $obm;

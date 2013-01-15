@@ -2196,7 +2196,7 @@ Obm.CommentedDecisionPopup = new Class({
     this.charCountForDecision = $('commentedDecisionPopup').getElementById('charCountForDecision');
     this.maxLength = 255;
   },
-  compute: function(uid, evtid, decision, oldDecision, type, comment, title , uriAction, propertyComment) {
+  compute: function(uid, evtid, decision, oldDecision, type, comment, title , uriAction, propertyComment, occurrenceDate) {
     this.uid = uid;
     this.evtid = evtid;
     this.decision = decision;
@@ -2205,6 +2205,7 @@ Obm.CommentedDecisionPopup = new Class({
     this.uriAction = uriAction;
     this.comment = comment;
     this.textarea.setProperty(propertyComment, this.comment);
+    this.occurrenceDate = occurrenceDate;
     this.show();
   },
   show: function() {
@@ -2214,61 +2215,38 @@ Obm.CommentedDecisionPopup = new Class({
     this.decision = this.oldDecision = this.comment = '';
     obm.popup.hide('commentedDecisionPopup');
   },
-  Accept: function(){
-    this.updateOnlyComment('ACCEPTED');
-    this.comment = this.textarea[0].value;
-    var self = this;
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onSuccess : obm.commentedDecisionPopup.redirectionSteps
-    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'ACCEPTED', entity_kind : this.type, uriAction: this.uriAction});
-  },
-  Wait: function(){
-    this.updateOnlyComment('NEEDS-ACTION');
-    this.comment = this.textarea[0].value;
-    var self = this;
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onSuccess : obm.commentedDecisionPopup.redirectionSteps
-    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'NEEDS-ACTION', entity_kind : this.type, uriAction: this.uriAction});
-  },
-  Refuse: function(){
-    this.updateOnlyComment('DECLINED');
-    this.comment = this.textarea[0].value;
-    var self = this;
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onSuccess : obm.commentedDecisionPopup.redirectionSteps
-    }).post({ajax : 1, action : 'update_decision_and_comment', calendar_id : this.evtid, entity_id : this.uid,comment : this.comment, decision_event : 'DECLINED', entity_kind : this.type, uriAction: this.uriAction});
-  },
-
-  redirectionSteps: function(message){
-    if(message.error == 0){
-      var redirectUrl = message.redirectUrl;
-      if (redirectUrl != null) {
-        showMessage('ok', message.message);
-        window.location=redirectUrl;
-      } else {
-        showMessage('ok', message.message);
-        window.location='../calendar/calendar_index.php?action=waiting_events';
-      }
-    }else{
-      var redirectUrl = message.redirectUrl;
-      if (redirectUrl != null) {
-        showMessage('error', message.message);
-        window.location=redirectUrl;
-      } else {
-        window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
-      }
+  sendRequest: function(decision){
+    this.comment = this.textarea[0].value == '' ? null : this.textarea[0].value ;
+    if ( this.updateOnlyComment(decision) ) {
+      return ;
     }
+    var options = {
+      uriAction: this.uriAction,
+      success: Obm.responseHandlers.update_decision_and_comment
+    };
+    if ( this.occurrenceDate && this.occurrenceDate.length ) {
+      options.date_edit_occurrence = this.occurrenceDate;
+    }
+    Obm.Rest.update_decision_and_comment(
+      this.type, 
+      this.uid, 
+      this.evtid, 
+      decision, 
+      this.comment, 
+      options
+    );
   },
-
+  Accept: function() {
+    this.sendRequest("ACCEPTED");
+  },
+  Wait: function() {
+    this.sendRequest("NEEDS-ACTION");
+  },
+  Refuse: function() {
+    this.sendRequest("DECLINED");
+  },
   updateOnlyComment: function(choice){
     if( choice == this.oldDecision ){
-      this.comment = this.textarea[0].value == '' ? null : this.textarea[0].value ;
       var self = this;
       new Request.JSON({      
         url: obm.vars.consts.calendarUrl,
@@ -2282,13 +2260,82 @@ Obm.CommentedDecisionPopup = new Class({
           }
         }
       }).post({ajax : 1, action : 'update_comment', calendar_id : this.evtid, user_id : this.uid, comment : this.comment, type : this.type});
+      return true;
     }
+    return false;
   },
   
   displayCharLimit: function(){
     this.charCountForDecision.innerHTML = this.maxLength - this.textarea[0].value.length;
   }
 });
+
+Obm.decisionCBHandler = function(decision) {
+  Obm.Rest.update_decision_and_comment(
+    "user",
+    this.getAttribute("data-entity-id"),
+    this.getAttribute("data-event-id"),
+    this.getAttribute("value"),
+    "",
+    {
+      date_edit_occurrence: this.getAttribute("data-occurrence-date"),
+      success: Obm.responseHandlers.update_decision_and_comment,
+      uriAction: "detailconsult"
+    }
+  );
+};
+
+Obm.Rest = {
+  update_decision_and_comment: function(entityKind, entityId, eventId, decision, comment, options){
+    var postData = {
+      ajax : 1, 
+      action : 'update_decision_and_comment', 
+      calendar_id : eventId, 
+      entity_kind : entityKind, 
+      entity_id : entityId,
+      comment : comment, 
+      decision_event : decision, 
+      uriAction: null
+    };
+    options = options || {};
+    options.success = options.success || function() {};
+    
+    if ( options.uriAction ) {
+      postData.uriAction = options.uriAction;
+    }
+    if ( options.date_edit_occurrence ) {
+      postData.date_edit_occurrence = options.date_edit_occurrence;
+    }
+    
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onSuccess : options.success
+    }).post(postData);
+  }
+};
+
+Obm.responseHandlers = {
+  update_decision_and_comment: function(message){
+    if(message.error == 0){
+      var redirectUrl = message.redirectUrl;
+      showMessage('ok', message.message);
+      if (redirectUrl != null) {
+        window.location=redirectUrl;
+      } else {
+        window.location='../calendar/calendar_index.php?action=waiting_events';
+      }
+    }else{
+      var redirectUrl = message.redirectUrl;
+      if (redirectUrl != null) {
+        showMessage('error', message.message);
+        window.location=redirectUrl;
+      } else {
+        window.location='../calendar/calendar_index.php?action=?action=waiting_events&errormessage='+encodeURIComponent(message.message);
+      }
+    }
+  }
+};
 
 Obm.calendarOccurenceEditPopup = new Class({
   compute: function (evt, location) {

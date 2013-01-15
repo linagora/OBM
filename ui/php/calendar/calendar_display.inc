@@ -3260,8 +3260,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
             $bell_alert_title = " title=\"$l_add_alarm\" ";
           }
           $$state = "checked=\"checked\" disabled";
-          $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
-
+          $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?calendar_id=$id&entity_kind=user&entity_id=$u_id&action=update_decision";
+	  
           $bell_alert_icon = "<a class=\"$bell_alert_class\" $bell_alert_onclick $bell_alert_title></a>";
           
           // comment  display
@@ -3270,18 +3270,27 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
           if($comment == '' ){
             $comment_style = 'text-align:center;';
             $user_comment = $GLOBALS[l_add_comment];
-            $user_comment_display = "<a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($u_id, $id,'ACCEPTED', '$saved_checked', 'user', '$user_comment', '$escaped_title', 'detailconsult', 'placeholder')\" />";
+            $user_comment_display = "<a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($u_id, $id,'ACCEPTED', '$saved_checked', 'user', '$user_comment', '$escaped_title', 'detailconsult', 'placeholder','$date_edit_occurrence')\" />";
           }else{
             $user_comment = phpStringToJsString(str_replace("\n\r", ', ', $comment));
-            $user_comment_display =  $comment." <a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($u_id, $id,'ACCEPTED', '$saved_checked', 'user', '$comment', '$escaped_title', 'detailconsult', 'value')\" />";
+            $user_comment_display =  $comment." <a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($u_id, $id,'ACCEPTED', '$saved_checked', 'user', '$comment', '$escaped_title', 'detailconsult', 'value', '$date_edit_occurrence')\" />";
           }
+	  if ( $date_edit_occurrence ) {
+	    $attrs = "data-entity-id=\"$u_id\" data-event-id=\"$id\" data-occurrence-date=\"$date_edit_occurrence\"";
+	    $decisionCheckboxes = "<label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"Obm.decisionCBHandler.call(this);\" $attrs /><span> $l_accepted</span></label>";
+	    $decisionCheckboxes .= "<label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"Obm.decisionCBHandler.call(this);\" $attrs  /><span> $l_needs_action</span></label>";
+	    $decisionCheckboxes .= "<label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"Obm.decisionCBHandler.call(this);\" $attrs  /><span> $l_declined</span></label>";
+	  } else {
+	    $decisionCheckboxes = "<label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span> $l_accepted</span></label>
+	      <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span> $l_needs_action</span></label>
+	      <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span> $l_declined</span></label>";
+	  }
+
           $dis_user_list .=
           "<tr>
            <td>$label</td>
            <td>
-            <label><input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span> $l_accepted</span></label>
-            <label><input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span> $l_needs_action</span></label>
-            <label><input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span> $l_declined</span></label>
+            $decisionCheckboxes
            </td>
            <td style=\"$comment_style\"> $user_comment_display </td>
            <td style=\"text-align:center;\">$bell_alert_icon</td>
