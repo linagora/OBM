@@ -29,11 +29,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.resource;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.ServletConfig;
@@ -183,6 +191,29 @@ public class ResourceServletTest {
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
+		verify(mocks);
+	}
+
+	@Test
+	public void testDoGetResourceHasNoEvents() throws Exception{
+		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class))).andReturn(Collections.<Event>emptyList());
+
+		String uid = "/resource@domain";
+
+		expect(request.getPathInfo()).andReturn(uid);
+
+		response.setContentType("text/calendar;charset=UTF-8");
+		expectLastCall();
+		response.setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+		expectLastCall();
+
+		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request, response };
+
+		replay(mocks);
+
+		resourceServlet.init(servletConfig);
+		resourceServlet.doGet(request, response);
+
 		verify(mocks);
 	}
 

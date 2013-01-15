@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.inject.Injector;
 
 import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
@@ -82,8 +83,13 @@ public class ResourceServlet extends HttpServlet {
 		try {
 			response.setContentType("text/calendar;charset=UTF-8");
 			String resourceICS = getResourceICS(resourceEmail);
-			response.getWriter().write(resourceICS);
-			response.setStatus(HttpServletResponse.SC_OK);
+			
+			if (resourceICS == null) {
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			} else {
+				response.getWriter().write(resourceICS);
+				response.setStatus(HttpServletResponse.SC_OK);
+			}
 		}
 		catch(ResourceNotFoundException e) {
 			logger.error(e.getMessage(),  e);
@@ -110,9 +116,12 @@ public class ResourceServlet extends HttpServlet {
 
 	@VisibleForTesting
 	String getResourceICS(String resourceEmail) throws ServerFault {
-		Date date = new Date();
-		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceEmail, date);
-		String resourceICS = this.ical4jHelper.buildIcs(null, resourceEvents, null);
-		return resourceICS;
+		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceEmail, new Date());
+		
+		if (Iterables.isEmpty(resourceEvents)) {
+			return null;
+		}
+		
+		return this.ical4jHelper.buildIcs(null, resourceEvents, null);
 	}
 }
