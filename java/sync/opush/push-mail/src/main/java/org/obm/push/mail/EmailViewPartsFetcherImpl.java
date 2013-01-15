@@ -38,8 +38,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
@@ -48,10 +46,7 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
-import org.obm.push.exception.activesync.ItemNotFoundException;
-import org.obm.push.mail.bean.Flag;
-import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.conversation.EmailView.Builder;
 import org.obm.push.mail.conversation.EmailViewAttachment;
@@ -69,7 +64,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -98,11 +92,13 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
 	public EmailView fetch(long uid) throws EmailViewPartsFetcherException {
 		try {
-			Builder emailViewBuilder = EmailView.builder().uid(uid);
-			fetchFlags(emailViewBuilder, uid);
-			fetchEnvelope(emailViewBuilder, uid);
+			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
+			Builder emailViewBuilder = EmailView.builder()
+					.uid(uid)
+					.flags(emailViewResponse.getFlags())
+					.envelope(emailViewResponse.getEnvelope());
 			
-			MimeMessage mimeMessage = getMimeMessage(uid);
+			MimeMessage mimeMessage = emailViewResponse.getMimeMessage();
 			FetchInstruction fetchInstruction = getFetchInstruction(mimeMessage);
 			if (fetchInstruction != null) {
 				fetchBody(emailViewBuilder, fetchInstruction, uid);
@@ -120,36 +116,6 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		} catch (EmailViewBuildException e) {
 			logger.error(e.getMessage(), e);
 			return null;
-		}
-	}
-
-
-	private void fetchFlags(Builder emailViewBuilder, long uid) throws MailException, ItemNotFoundException {
-		Set<Flag> emailFlags = mailboxService.fetchFlags(udr, collectionPath, MessageSet.singleton(uid)).get(uid);
-		if (emailFlags == null) {
-			throw new ItemNotFoundException();
-		}
-		emailViewBuilder.flags(emailFlags);
-	}
-
-	private void fetchEnvelope(Builder emailViewBuilder, long uid) throws MailException {
-		try {
-			UIDEnvelope envelope = Iterables.getOnlyElement(mailboxService.fetchEnvelope(udr, collectionPath, MessageSet.singleton(uid)));
-			emailViewBuilder.envelope(envelope.getEnvelope());
-		} catch (NoSuchElementException e) {
-			throw new ItemNotFoundException();
-		} catch (IllegalArgumentException e) {
-			throw new ItemNotFoundException();
-		}
-	}
-	
-	private MimeMessage getMimeMessage(long uid) throws MailException {
-		try {
-			return Iterables.getOnlyElement(mailboxService.fetchBodyStructure(udr, collectionPath, MessageSet.singleton(uid)));
-		} catch (NoSuchElementException e) {
-			throw new ItemNotFoundException();
-		} catch (IllegalArgumentException e) {
-			throw new ItemNotFoundException();
 		}
 	}
 

@@ -68,6 +68,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
@@ -131,32 +132,9 @@ public class MailboxBackendTest {
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
 				snapshotService, null, mappingService, null, msEmailFetcher, null, null);
 	}
-
-	@Test(expected=ItemNotFoundException.class)
-	public void testFetchWithFlagsFailure() throws Exception {
-		long itemId = 2;
-		int collectionId = 1;
-		String serverId = collectionId + ":" + itemId;
-		ImmutableList<BodyPreference> bodyPreferences = ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build());
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(bodyPreferences);
-		String collectionPath = "INBOX";
-
-		expect(mailboxService.fetchFlags(udr, collectionPath, MessageSet.singleton(itemId))).andReturn(ImmutableMap.<Long, FlagsList>of());
-		expect(mappingService.getCollectionIdFromServerId(serverId)).andReturn(collectionId);
-		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Ints.checkedCast(itemId));
-		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath);
-		
-		mocks.replay();
-		try {
-			mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions);
-		} catch (ItemNotFoundException e) {
-			mocks.verify();
-			throw e;
-		}
-	}
 	
 	@Test(expected=ItemNotFoundException.class)
-	public void testFetchWithEnvelopeFailure() throws Exception {
+	public void testFetchWithFailure() throws Exception {
 		long itemId = 2;
 		int collectionId = 1;
 		String serverId = collectionId + ":" + itemId;
@@ -164,33 +142,7 @@ public class MailboxBackendTest {
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(bodyPreferences);
 		String collectionPath = "INBOX";
 
-		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
-		expect(mailboxService.fetchEnvelope(udr, collectionPath, MessageSet.singleton(itemId))).andReturn(ImmutableList.<UIDEnvelope>of());
-		expect(mappingService.getCollectionIdFromServerId(serverId)).andReturn(collectionId);
-		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Ints.checkedCast(itemId));
-		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath);
-		
-		mocks.replay();
-		try {
-			mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions);
-		} catch (ItemNotFoundException e) {
-			mocks.verify();
-			throw e;
-		}
-	}
-	
-	@Test(expected=ItemNotFoundException.class)
-	public void testFetchWithBodyStructureFailure() throws Exception {
-		long itemId = 2;
-		int collectionId = 1;
-		String serverId = collectionId + ":" + itemId;
-		ImmutableList<BodyPreference> bodyPreferences = ImmutableList.of(BodyPreference.builder().bodyType(MSEmailBodyType.MIME).build());
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(bodyPreferences);
-		String collectionPath = "INBOX";
-
-		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
-		expectFetchEnvelope(collectionPath, itemId, buildUIDEnvelope(itemId));
-		expect(mailboxService.fetchBodyStructure(udr, collectionPath, MessageSet.singleton(itemId))).andReturn(ImmutableList.<MimeMessage>of());
+		expect(mailboxService.fetchEmailMetadata(udr, collectionPath, itemId)).andThrow(new ItemNotFoundException("failure"));
 		expect(mappingService.getCollectionIdFromServerId(serverId)).andReturn(collectionId);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Ints.checkedCast(itemId));
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath);
@@ -284,10 +236,20 @@ public class MailboxBackendTest {
 	}
 	
 	private void mockMailboxServiceFetchFullMail(InputStream mailStream, long itemId, String collectionPath) {
-		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
-		expectFetchEnvelope(collectionPath, itemId, buildUIDEnvelope(itemId));
-		expectFetchBodyStructure(collectionPath, itemId, buildMimeMessage(itemId));
+		mockMailboxServiceFetchEmailView(itemId, collectionPath);
 		expectFetchMailStream(collectionPath, itemId, mailStream);
+	}
+
+	private void mockMailboxServiceFetchEmailView(long itemId, String collectionPath) {
+		MimeMessage mimeMessage = buildMimeMessage(itemId);
+		expect(mailboxService.fetchEmailMetadata(udr, collectionPath, itemId)).andReturn(
+				EmailMetadata.builder()
+					.uid(mimeMessage.getUid())
+					.size(mimeMessage.getSize())
+					.flags(new FlagsList(ImmutableList.of(Flag.SEEN)))
+					.envelope(buildEnvelope())
+					.mimeMessage(mimeMessage)
+					.build());
 	}
 	
 	@Test
@@ -340,9 +302,7 @@ public class MailboxBackendTest {
 	}
 
 	private void mockMailboxServiceFetchFullMailWithMimePartAddress(InputStream mailStream, int itemId, String collectionPath) {
-		expectFetchFlags(collectionPath, itemId, new FlagsList(ImmutableList.of(Flag.SEEN)));
-		expectFetchEnvelope(collectionPath, itemId, buildUIDEnvelope(itemId));
-		expectFetchBodyStructure(collectionPath, itemId, buildMimeMessage(itemId));
+		mockMailboxServiceFetchEmailView(itemId, collectionPath);
 		expectFetchMimePartStream(collectionPath, itemId, mailStream, new MimeAddress("1"));
 	}
 	
@@ -359,10 +319,6 @@ public class MailboxBackendTest {
 				.contentType("text/plain; charset= utf-8")
 				.size(1)
 				.build();
-	}
-	
-	private UIDEnvelope buildUIDEnvelope(long uid) {
-		return new UIDEnvelope(uid, buildEnvelope());
 	}
 	
 	private Envelope buildEnvelope() {
