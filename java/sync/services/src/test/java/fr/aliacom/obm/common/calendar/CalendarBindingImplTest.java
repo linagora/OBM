@@ -145,10 +145,6 @@ public class CalendarBindingImplTest {
 	private CalendarBindingImpl binding;
 	@Inject
 	private HelperService helperService;
-	@Inject
-	private UserService userService;
-	@Inject
-	private CalendarDao calendarDao;
 	
 	private AccessToken token;
 	
