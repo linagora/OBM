@@ -57,6 +57,7 @@ import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.obm.sync.push.client.commands.DocumentProvider;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
+import org.obm.sync.push.client.commands.EmailSyncCommandWithWait;
 import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
@@ -135,6 +136,10 @@ public abstract class OPClient {
 		return run(new EmailSyncCommand(key, collectionId, filterType, windowSize));
 	}
 
+	public SyncResponse syncEmailWithWait(SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommandWithWait(key, collectionId, filterType, windowSize));
+	}
+	
 	public SyncResponse syncWithCommand(SyncKey key, String collectionId, SyncCommand command, String serverId) throws Exception {
 		return run(new SyncWithCommand(key, collectionId, command, serverId));
 	}

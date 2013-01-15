@@ -173,6 +173,27 @@ public class SyncHandlerTest {
 	}
 	
 	@Test
+	public void testSyncWithWaitReturnsServerError() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("1");
+		int syncEmailCollectionId = 4;
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), delta, fakeTestUsers, classToInstanceMap);
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(initialSyncKey);
+		CollectionChange inbox = lookupInbox(folderSyncResponse.getCollectionsAddedAndUpdated());
+		SyncResponse syncEmailResponse = opClient.syncEmailWithWait(syncEmailSyncKey, inbox.getCollectionId(), THREE_DAYS_BACK, 150);
+
+		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
+	}
+	
+	@Test
 	public void testSyncOneInboxMail() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey syncEmailSyncKey = new SyncKey("13424");

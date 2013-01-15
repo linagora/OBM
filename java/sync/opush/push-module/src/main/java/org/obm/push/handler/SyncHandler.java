@@ -197,7 +197,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (WaitIntervalOutOfRangeException e) {
 			sendResponse(responder, syncProtocol.encodeResponse());
 		} catch (WaitSyncFolderLimitException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), null);
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR.asSpecificationValue(), continuation);
 		} catch (DaoException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (UnexpectedObmSyncServerException e) {
