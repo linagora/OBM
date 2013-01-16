@@ -37,7 +37,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
@@ -51,7 +50,7 @@ import com.google.common.collect.ImmutableList;
 @RunWith(SlowFilterRunner.class)
 public class UIDFetchEnvelopeCommandTest {
 
-	@Test @Slow
+	@Test
 	public void testMoreThanOneLine() {
 		String firstLine = 
 			"* 20 FETCH (UID 20 ENVELOPE (\"Tue, 28 Apr 2009 17:10:03 +0200\" {43}";
