@@ -2129,15 +2129,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return userEntity;
 	}
 
-	private Integer getAttendeeEntityId(AccessToken token, Connection con, Event event, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
-		Integer userEntityId = getUserEntityIdFromEmail(token, con, userEntityCalendar, email, useObmUser);
-		if(userEntityId == null) {
-			return contactDao.findAttendeeContactEntityIdFrom(email, event);
-		} else {
-			return userEntityId;
-		}
-	}
-
 	private Integer getUserEntityIdFromEmail(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
 		Integer userEntity  = userDao.userEntityIdFromEmail(con, email, editor.getDomain().getId());
 		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
@@ -2162,7 +2153,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);
 			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, token.getDomain().getId());
 			for (Attendee at : event.getAttendees()) {
-				Integer userEntity = getAttendeeEntityId(token, con, event, userEntityCalendar, at.getEmail(), useObmUser);
+				Integer userEntity = getUserEntityOrContactEntity(token, con, userEntityCalendar, at.getEmail(), useObmUser);
 				if (userEntity == null) {
 					logger.info("skipping attendee update for email "
 							+ at.getEmail() + ". Will add as contact");
