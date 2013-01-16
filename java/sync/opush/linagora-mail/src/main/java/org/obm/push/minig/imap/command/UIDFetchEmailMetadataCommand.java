@@ -38,7 +38,6 @@ import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 /**
  * @author tom
@@ -73,15 +72,15 @@ public class UIDFetchEmailMetadataCommand extends Command<EmailMetadata> {
 
 	@Override
 	public boolean isMatching(IMAPResponse response) {
-		String payload = response.getPayload();
-		if (!payload.contains(" FETCH ") ||
-			!payload.contains("UID " + uid) ||
-			!payload.contains("FLAGS (") ||
-			!payload.contains("RFC822.SIZE ") ||
-			!payload.contains("ENVELOPE ") ||
-			!payload.contains("BODYSTRUCTURE ")
+		String fullPayload = response.getFullResponse();
+		if (!fullPayload.contains(" FETCH ") ||
+			!fullPayload.contains("UID " + uid) ||
+			!fullPayload.contains("FLAGS (") ||
+			!fullPayload.contains("RFC822.SIZE ") ||
+			!fullPayload.contains("ENVELOPE ") ||
+			!fullPayload.contains("BODYSTRUCTURE ")
 			) {
-			logger.warn("not a UIDFetchEmailMetadataCommand: {}", payload);
+			logger.warn("not a UIDFetchEmailMetadataCommand: {}", fullPayload);
 			return false;
 		}
 		return true;
@@ -89,8 +88,7 @@ public class UIDFetchEmailMetadataCommand extends Command<EmailMetadata> {
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
-		String fullPayload = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
-		
+		String fullPayload = response.getFullResponse();
 		long responseUid = parseUid(fullPayload);
 		if (responseUid == uid) {
 			int size = UIDFetchMessageSizeCommand.parseSize(fullPayload);

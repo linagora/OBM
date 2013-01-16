@@ -34,7 +34,6 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 import com.google.common.base.Strings;
 
@@ -64,13 +63,13 @@ public class UIDValidityCommand extends Command<Long> {
 
 	@Override
 	public boolean isMatching(IMAPResponse response) {
-		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		String fullPayload = response.getFullResponse();
 		
-		if (!s.contains(IMAP_COMMAND)) {
+		if (!fullPayload.contains(IMAP_COMMAND)) {
 			return false;
 		}
 		
-		String uidValidityHasString = getUIDValidityHasString(s);
+		String uidValidityHasString = getUIDValidityHasString(fullPayload);
 		if (Strings.isNullOrEmpty(uidValidityHasString)) {
 			return false;
 		}
@@ -79,8 +78,8 @@ public class UIDValidityCommand extends Command<Long> {
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
-		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
-		String uidValidityHasString = getUIDValidityHasString(s);
+		String fullPayload = response.getFullResponse();
+		String uidValidityHasString = getUIDValidityHasString(fullPayload);
 		
 		data = Long.valueOf(uidValidityHasString);
 	}

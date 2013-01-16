@@ -34,6 +34,11 @@ package org.obm.push.minig.imap.impl;
 
 import java.io.InputStream;
 
+import org.obm.push.minig.imap.mime.impl.AtomHelper;
+
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+
 public class IMAPResponse {
 
 	private String status;
@@ -41,13 +46,16 @@ public class IMAPResponse {
 	private String payload;
 	private String tag;
 	private InputStream streamData;
+	private final Supplier<String> fullResponseSupplier;
 
 	public IMAPResponse() {
+		this(null, null);
 	}
 
 	public IMAPResponse(String status, String payload) {
 		setStatus(status);
 		setPayload(payload);
+		fullResponseSupplier = buildFullResponseSupplier();
 	}
 
 	
@@ -105,6 +113,23 @@ public class IMAPResponse {
 
 	public void setStreamData(InputStream streamData) {
 		this.streamData = streamData;
+	}
+	
+	public String getFullResponse() {
+		return fullResponseSupplier.get();
+	}
+
+	private Supplier<String> buildFullResponseSupplier() {
+		return Suppliers.memoize(new Supplier<String>() {
+
+			@Override
+			public String get() {
+				if (payload == null) {
+					return null;
+				}
+				return AtomHelper.getFullResponse(payload, streamData);
+			}
+		});
 	}
 	
 	@Override

@@ -33,7 +33,6 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
-import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 import com.google.common.base.Strings;
 
@@ -63,13 +62,13 @@ public class UIDNextCommand extends Command<Long> {
 
 	@Override
 	public boolean isMatching(IMAPResponse response) {
-		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		String fullPayload = response.getFullResponse();
 		
-		if (!s.contains(IMAP_COMMAND)) {
+		if (!fullPayload.contains(IMAP_COMMAND)) {
 			return false;
 		}
 		
-		String uidNextHasString = getUIDNextHasString(s);
+		String uidNextHasString = getUIDNextHasString(fullPayload);
 		if (Strings.isNullOrEmpty(uidNextHasString)) {
 			return false;
 		}
@@ -78,8 +77,8 @@ public class UIDNextCommand extends Command<Long> {
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
-		String s = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
-		String uidNextHasString = getUIDNextHasString(s);
+		String fullPayload = response.getFullResponse();
+		String uidNextHasString = getUIDNextHasString(fullPayload);
 		
 		data = Long.valueOf(uidNextHasString);
 	}

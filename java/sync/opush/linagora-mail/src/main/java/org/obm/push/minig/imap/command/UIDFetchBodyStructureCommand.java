@@ -42,7 +42,6 @@ import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.mime.impl.AtomHelper;
 
 import com.google.common.collect.ImmutableList;
 
@@ -51,7 +50,6 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private ImapMessageSet imapMessageSet;
 	private final BodyStructureParser bodyStructureParser;
-	private String fullresponse;
 	private String bodyStructure;
 
 	public UIDFetchBodyStructureCommand(BodyStructureParser bodyStructureParser, MessageSet messages) {
@@ -73,15 +71,15 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	public boolean isMatching(IMAPResponse response) {
-		fullresponse = AtomHelper.getFullResponse(response.getPayload(), response.getStreamData());
+		String fullPayload = response.getFullResponse();
 		
-		bodyStructure = getBodyStructurePayload(fullresponse);
+		bodyStructure = getBodyStructurePayload(fullPayload);
 		if (bodyStructure == null) {
 			return false;
 		}
 		
 		if (bodyStructure.length() < 2) {
-			logger.warn("strange bs response: {}", fullresponse);
+			logger.warn("strange bs response: {}", fullPayload);
 			return false;
 		}
 		return true;
@@ -89,10 +87,11 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
+		String fullPayload = response.getFullResponse();
 		List<MimeMessage> mts = new LinkedList<MimeMessage>();
 		
-		long uid = getUid(fullresponse);
-		int size = getSize(fullresponse);
+		long uid = getUid(fullPayload);
+		int size = getSize(fullPayload);
 		
 		try {
 			//remove closing brace
@@ -106,8 +105,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 				data.addAll(mts);
 			}
 		} catch (RuntimeException re) {
-			logger.error("error parsing:\n{}", new String(fullresponse));
-			logger.error("payload was:\n{}", fullresponse);
+			logger.error("error parsing:\n{}", fullPayload);
 			throw re;
 		}
 	}

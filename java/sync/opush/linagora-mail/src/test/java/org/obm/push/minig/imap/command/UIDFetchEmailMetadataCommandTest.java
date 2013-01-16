@@ -34,6 +34,7 @@ package org.obm.push.minig.imap.command;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import org.junit.Before;
@@ -53,6 +54,7 @@ import org.obm.push.mail.mime.MimePart;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
@@ -407,6 +409,87 @@ public class UIDFetchEmailMetadataCommandTest {
 						.build())
 					.build())
 				.build());
+	}
+
+	@Test
+	public void handleRightResponseWithMoreData() {
+		String response = "* 17926 FETCH (FLAGS (\\Seen NonJunk)" +
+				" UID 741144 RFC822.SIZE 5516" +
+				" ENVELOPE (\"Tue, 15 Jan 2013 20:42:42 +0100\"" +
+				" \"Re: Subject\" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User Two\" NIL \"usertwo\" \"linagora.com\")" +
+				"(\"User Three\" NIL \"userthree\" \"linagora.com\"))" +
+				" ((\"User Four\" NIL \"userfour\" \"domain.org\")" +
+				"(NIL NIL \"userfive\" \"thilaire.lng.org\")) NIL {47}";
+		
+		String moreData = "<CD1B3CB8.260000000000E09%usertwo@linagora.com>" +
+				" \"<50F5B132.5000203@domain.org>\")" +
+				" BODYSTRUCTURE (\"TEXT\" \"PLAIN\" (\"CHARSET\" \"UTF-8\")" +
+				" NIL NIL \"8BIT\" 2807 108 NIL NIL NIL))";
+		
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		imapResponse.setStreamData(new ByteArrayInputStream(moreData.getBytes(Charsets.UTF_8)));
+		
+		UIDFetchEmailMetadataCommand command = new UIDFetchEmailMetadataCommand(bodyStructureParser, 741144l);
+		command.setDataInitialValue();
+		command.handleResponse(imapResponse);
+
+		EmailMetadata data = command.getReceivedData();
+		assertThat(data.getUid()).isEqualTo(741144l);
+		assertThat(data.getSize()).isEqualTo(5516l);
+		assertThat(data.getFlags()).isEqualTo(new FlagsList(ImmutableList.of(Flag.SEEN)));
+		assertThat(data.getEnvelope()).isEqualTo(Envelope.builder()
+					.subject("Re: Subject")
+					.date(date("2013-01-15T20:42:42+01"))
+					.from(addresses("userone@domain.org", "User One"))
+					.replyTo(addresses("userone@domain.org", "User One"))
+					.to(ImmutableList.of(
+							new Address("User Two", "usertwo@linagora.com"),
+							new Address("User Three", "userthree@linagora.com")))
+					.cc(ImmutableList.of(
+							new Address("User Four", "userfour@domain.org"),
+							new Address(null, "userfive@thilaire.lng.org")))
+					.messageID("<50F5B132.5000203@domain.org>")
+					.build());
+		assertThat(data.getMimeMessage()).isEqualTo(MimeMessage.builder()
+					.uid(741144l)
+					.size(5516)
+					.from(MimePart.builder()
+						.bodyParams(BodyParams.builder()
+							.add(new BodyParam("charset", "UTF-8"))
+							.build())
+						.contentType("text/plain")
+						.encoding("8BIT")
+						.size(2807)
+						.build())
+					.build());
+	}
+	
+	@Test
+	public void matchRightResponseWithMoreData() {
+		String response = "* 17926 FETCH (FLAGS (\\Seen NonJunk)" +
+				" UID 741144 RFC822.SIZE 5516" +
+				" ENVELOPE (\"Tue, 15 Jan 2013 20:42:42 +0100\"" +
+				" \"Re: Subject\" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User One\" NIL \"userone\" \"domain.org\"))" +
+				" ((\"User Two\" NIL \"usertwo\" \"linagora.com\")" +
+				"(\"User Three\" NIL \"userthree\" \"linagora.com\"))" +
+				" ((\"User Four\" NIL \"userfour\" \"domain.org\")" +
+				"(NIL NIL \"userfive\" \"thilaire.lng.org\")) NIL {47}";
+		
+		String moreData = "<CD1B3CB8.260000000000E09%usertwo@linagora.com>" +
+				" \"<50F5B132.5000203@domain.org>\")" +
+				" BODYSTRUCTURE (\"TEXT\" \"PLAIN\" (\"CHARSET\" \"UTF-8\")" +
+				" NIL NIL \"8BIT\" 2807 108 NIL NIL NIL))";
+		
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		imapResponse.setStreamData(new ByteArrayInputStream(moreData.getBytes(Charsets.UTF_8)));
+		
+		UIDFetchEmailMetadataCommand command = new UIDFetchEmailMetadataCommand(bodyStructureParser, 741144l);
+		assertThat(command.isMatching(imapResponse)).isTrue();
 	}
 
 	private List<Address> addresses(String address, String displayName) {

@@ -49,7 +49,6 @@ import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
-import org.obm.push.minig.imap.mime.impl.AtomHelper;
 import org.obm.push.minig.imap.mime.impl.ParenListParser;
 import org.obm.push.minig.imap.mime.impl.ParenListParser.TokenType;
 
@@ -122,8 +121,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 	private List<UIDEnvelope> parseResponse(IMAPResponse response) {
 		List<UIDEnvelope> envelopes = new ArrayList<UIDEnvelope>(imapMessageSet.size());
 		
-		String payload = response.getPayload();
-		String fullPayload = AtomHelper.getFullResponse(payload, response.getStreamData());
+		String fullPayload = response.getFullResponse();
 		long uid = getUid(fullPayload);
 
 		try {
