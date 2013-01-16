@@ -60,8 +60,8 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,15 +280,27 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return Participation.needsAction();
 	}
 
-	private boolean isOrganizer(MSEvent event, MSAttendee at) {
+	private boolean isOrganizer(MSEvent event, MSAttendee at, Event eventFromDB) {
 		if(at.getEmail() != null  && at.getEmail().equals(event.getOrganizerEmail())){
 			return true;
 		} else if(at.getName() != null  && at.getName().equals(event.getOrganizerName())){
 			return true;
 		}
-		return false;
+		return isOrganizerEmail(at.getEmail(), eventFromDB);
 	}
 	
+	@VisibleForTesting boolean isOrganizerEmail(String email, Event eventFromDB) {
+		if (email == null || eventFromDB == null) {
+			return false;
+		}
+		
+		Attendee organizer = eventFromDB.findOrganizer();
+		if (organizer != null && email.equals(organizer.getEmail())) {
+			return true;
+		}
+		return false;
+	}
+
 	private Attendee getOrganizer(String email, String displayName) {
 		Attendee att = new Attendee();
 		att.setEmail(email);
@@ -626,7 +638,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		
 		ret.setParticipation(status);
 		
-		ret.setOrganizer( isOrganizer(msEvent, msAttendee) );
+		ret.setOrganizer( isOrganizer(msEvent, msAttendee, eventFromDB) );
 		return ret;
 	}
 
