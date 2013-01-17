@@ -1279,8 +1279,8 @@ function display_menu($module) {
       <li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
       $dis_scope
       $wait_event
-      <li>$login ($domain)</li>
-      <li>$l_profile: $p</li>
+      <li id='informationUser'>$login ($domain)</li>
+      <li id='informationProfile'>$l_profile: $p</li>
       <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
       $dis_printer
     </ul>

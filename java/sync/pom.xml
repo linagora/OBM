@@ -96,6 +96,7 @@
 		<module>webapp-common-dependencies</module>
     		<module>icalendar</module>
     		<module>qos-filter</module>
+    		<module>ui-testing</module>
   </modules>
 
 	<build>
