@@ -1,3 +1,9 @@
+obm-ca (2.4.2.0~0.beta7) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Thu, 17 Jan 2013 15:46:55 +0000
+
 obm-ca (2.4.2.0~0.beta6) stable; urgency=low
 
   * New upstream release.
