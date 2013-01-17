@@ -43,7 +43,7 @@ $REGEX_EMAIL_RIGHT = $REGEX_DOMAIN;
 $REGEX_ROOTLDAP = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-$REGEX_LOGIN = "^([a-z0-9][a-z0-9-._]{0,63})\$";
+$REGEX_LOGIN = '^([a-zA-Z0-9][\w\.-]{0,63})$';
 
 # Realm regexp
 $REGEX_REALM = $REGEX_DOMAIN;
