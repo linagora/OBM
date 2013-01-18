@@ -31,10 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.easymock.EasyMock.*;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.sync.calendar.Attendee;
@@ -46,6 +51,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
@@ -53,14 +59,91 @@ import fr.aliacom.obm.common.user.UserDao;
 
 public class EventIndexerTest {
 
+	private IMocksControl mocksControl; 
+	private EventIndexer eventIndexer;
+	private UserDao userDao;
+	private ObmUser user;
+	private ObmDomain domain;
+	
+	@Before
+	public void setUp() {
+		mocksControl = createControl();
+		userDao = mocksControl.createMock(UserDao.class);
+		user = ToolBox.getDefaultObmUser();
+		domain = ToolBox.getDefaultObmDomain();
+	}
+	
+	@After
+	public void tearDown() {
+		mocksControl.verify();
+	}
+	
 	@Test
-	public void indexEventWithoutOwner() {
-		ObmDomain domain = new ObmDomain();
-		domain.setName("mydomain");
-		ObmUser user = new ObmUser();
-		user.setLastName("Lastname");
+	public void buildDocumentWithoutOwnerUsesOwnerEmail() {
+		Event event = buildEvent("", "owner@domain.com");
 		
+		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		mocksControl.replay();
+		
+		assertSolrDocumentIsBuilt(domain, event);
+	}
+	
+	@Test
+	public void buildDocumentWithoutOwnerEmailUsesOwner() {
+		Event event = buildEvent("owner", "");
+		
+		expect(userDao.findUser(eq("owner"), eq(domain))).andReturn(user);
+		mocksControl.replay();
+		
+		assertSolrDocumentIsBuilt(domain, event);
+	}
+	
+	@Test
+	public void buildDocumentWithOwnerAndOwnerEmailUsesOwnerEmail() {
+		Event event = buildEvent("owner", "owner@domain.com");
+		
+		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		mocksControl.replay();
+		
+		assertSolrDocumentIsBuilt(domain, event);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void buildDocumentWithoutOwnerNorOwnerEmailFails() {
+		Event event = buildEvent("", "");
+		
+		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
+		mocksControl.replay();
+		
+		assertSolrDocumentIsBuilt(domain, event);
+	}
+	
+	@Test
+	public void indexEventWithoutOwnerNorOwnerEmailSucceeds() throws Exception {
+		Event event = buildEvent("", "");
+		
+		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
+		mocksControl.replay();
+		
+		eventIndexer = new EventIndexer(null, null, userDao, domain, event);
+		
+		assertThat(eventIndexer.doIndex()).isTrue();
+	}
+	
+	private void assertSolrDocumentIsBuilt(ObmDomain domain, Event event) {
+		eventIndexer = new EventIndexer(null, null, userDao, domain, event);
+		
+		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		
+		assertThat(solrDocument.getFieldNames()).containsOnly(
+				"id", "timecreate", "timeupdate", "domain", "title", "location", 
+				"date", "duration", "owner", "ownerId", "description", "with",
+				"is");
+	}
+	
+	private Event buildEvent(String owner, String ownerEmail) {
 		Event event = new Event();
+		
 		event.setAllday(false);
 		event.setInternalEvent(true);
 		event.setSequence(0);
@@ -70,13 +153,13 @@ public class EventIndexerTest {
 		event.setOpacity(EventOpacity.OPAQUE);
 		event.setTitle("Grand saut ?");
 		event.setDescription("A lot of fun");
-		event.setOwnerEmail("owner@domain.com");
+		event.setOwnerEmail(ownerEmail);
 		event.setStartDate(DateUtils.date("2012-12-13T13:14:15"));
 		event.setDuration(3600);
 		event.setLocation("Mare Asthme");
 		event.setAlert(300);
 		event.setPriority(0);
-		event.setOwner("");
+		event.setOwner(owner);
 		event.setPrivacy(EventPrivacy.PUBLIC);
 		event.setUid(new EventObmId(1234));
 		event.addAttendee(
@@ -92,18 +175,7 @@ public class EventIndexerTest {
 					.email("owner@domain.com").asOrganizer()
 					.participationRole(ParticipationRole.REQ).participation(Participation.accepted()).build());
 		
-		UserDao userDao = createMock(UserDao.class);
-		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
-		replay(userDao);
-		
-		EventIndexer eventIndexer = new EventIndexer(null, null, userDao, domain, event);
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
-		
-		verify(userDao);
-		assertThat(solrDocument.getFieldNames()).containsOnly(
-				"id", "timecreate", "timeupdate", "domain", "title", "location", 
-				"date", "duration", "owner", "ownerId", "description", "with",
-				"is");
+		return event;
 	}
 	
 }

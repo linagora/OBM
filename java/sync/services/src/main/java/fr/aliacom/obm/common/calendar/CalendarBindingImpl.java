@@ -1423,7 +1423,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ImportICalendarException {
 		try {
 			if (!isEventExists(token, calendar, event)) {
-				final Event newEvent = calendarDao.createEvent(token, calendar, event, false);
+				final Event newEvent = calendarDao.createEvent(token, calendar, event, true);
 				if (newEvent != null) {
 					return true;
 				}

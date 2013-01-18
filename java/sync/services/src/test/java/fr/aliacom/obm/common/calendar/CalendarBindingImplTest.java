@@ -33,7 +33,14 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ToolBox.mockAccessToken;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.isNull;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
@@ -1205,7 +1212,7 @@ public class CalendarBindingImplTest {
 	private CalendarDao mockImportICalendarCalendarDao(AccessToken accessToken, String calendar, ObmUser obmUser, EventExtId eventExtId, Event eventWithOwnerAttendee) throws FindException, SQLException, ServerFault{
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(eq(accessToken), eq(obmUser), eq(eventExtId))).andReturn(null).once();
-		expect(calendarDao.createEvent(accessToken, calendar, eventWithOwnerAttendee, false)).andReturn(eventWithOwnerAttendee).once();
+		expect(calendarDao.createEvent(eq(accessToken), eq(calendar), eq(eventWithOwnerAttendee), eq(true))).andReturn(eventWithOwnerAttendee).once();
 		return calendarDao;
 	}
 	

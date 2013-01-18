@@ -118,9 +118,20 @@ public class EventIndexer extends SolrRequest {
 		}
 	}
 
-	private boolean doIndex() throws IOException, SolrServerException {
-		SolrInputDocument sid = buildDocument();
-
+	@VisibleForTesting boolean doIndex() throws IOException, SolrServerException {
+		SolrInputDocument sid = null;
+		
+		try {
+			sid = buildDocument();
+		}
+		catch (Exception e) {
+			logger.warn("Could not build SolR document, event cannot be indexed.", e);
+			
+			// We're returning true as we don't need to retry
+			// The event won't be indexed but the error will be logged
+			return true;
+		}
+		
 		try {
 			addTagsToEvent(sid);
 			server.add(sid);
@@ -143,15 +154,19 @@ public class EventIndexer extends SolrRequest {
 		// TODO usercreate
 		// TODO userupdate
 
-		f(sid, "domain", domain);
+		f(sid, "domain", domain.getId());
 		f(sid, "title", e.getTitle());
 		f(sid, "location", e.getLocation());
 		f(sid, "category", e.getCategory());
 		f(sid, "date", e.getStartDate());
 		f(sid, "duration", e.getDuration());
 
-		// owner: login ownerEmail: lAtDomain
-		ObmUser u = userDao.findUser(getOwner(), domain);
+		String owner = getOwner();
+		ObmUser u = userDao.findUser(owner, domain);
+		
+		if (u == null) {
+			throw new IllegalArgumentException("Cannot fetch owner details (using '" + owner + "') from database.");
+		}
 
 		f(sid, "owner", u.getLastName(), u.getFirstName(), u.getLogin(),
 				u.getEmail());
@@ -176,10 +191,10 @@ public class EventIndexer extends SolrRequest {
 	}
 
 	private String getOwner() {
-		if (!Strings.isNullOrEmpty(e.getOwner())) {
-			return e.getOwner();
-		} else {
+		if (!Strings.isNullOrEmpty(e.getOwnerEmail())) {
 			return e.getOwnerEmail();
+		} else {
+			return e.getOwner();
 		}
 	}
 
