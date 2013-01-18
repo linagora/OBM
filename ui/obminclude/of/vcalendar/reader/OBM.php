@@ -154,7 +154,7 @@ class Vcalendar_Reader_OBM {
 		  continue;
       $id = $set['event_id'];      
       if(is_null($this->vevents[$id])) {
-        $this->vevents[$id] = &$this->addVevent($set);
+        $this->vevents[$id] = &$this->addVevent($set, $method);
       }
     }
      $attendees = run_query_get_events_attendee(array_keys($this->vevents));
@@ -201,7 +201,7 @@ class Vcalendar_Reader_OBM {
     $vcalendar->set('method', strtoupper($method));
   }
 
-  function & addVevent(&$data) {
+  function & addVevent(&$data, $method) {
     $vevent = &$this->document->createElement('vevent');
     $vevent->private = ($vevent->private && $data['event_privacy']);
     $vevent->private = ($vevent->private && ($GLOBALS['obm']['uid'] != $data['event_owner']));
@@ -215,13 +215,16 @@ class Vcalendar_Reader_OBM {
     // OBMFULL-3595
     $timeupdate = (integer) $data['timeupdate'];
     if ($timeupdate == 0) {
-      $timeupdate = time();
+      $last_modified = $created;
+    } else {
+      $last_modified = $this->parseDate($timeupdate);
     }
-    
-    $last_modified = $this->parseDate($timeupdate);
     $last_modified->setOriginalTimeZone($data['event_timezone']);
+
+    $dtstamp = (strcasecmp($method, "reply") == 0) ? $this->parseDate(time()) : $last_modified;
+
     $vevent->set('last-modified', $last_modified);
-    $vevent->set('dtstamp', $last_modified);
+    $vevent->set('dtstamp', $dtstamp);
 
     if ($this->recurrenceId == null) {
       $dtstart = $this->parseDate($data['event_date']);
