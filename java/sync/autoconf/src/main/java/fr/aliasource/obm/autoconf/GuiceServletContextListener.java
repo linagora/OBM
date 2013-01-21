@@ -44,8 +44,11 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
@@ -82,6 +85,7 @@ public class GuiceServletContextListener implements ServletContextListener{
                bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
                bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
                bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+               bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             }
         }, new TransactionalModule());
 
