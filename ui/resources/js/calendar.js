@@ -1966,6 +1966,8 @@ Obm.CalendarAllDayEvent = new Class({
       });
       this.element.setOpacity(.7);
       obm.calendarManager.unregister(this);
+
+      this.drag.limit.x[1] += (dragOptions.container.getSize().x - this.drag.limit.x[1]) / 2;
       // Fix mouse position
       this.drag.mouse.pos.x = $('calendarHeaderGrid').offsetLeft.toInt() + $('calendarHeader').offsetLeft.toInt();
 
