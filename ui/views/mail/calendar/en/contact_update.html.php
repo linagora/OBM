@@ -40,6 +40,27 @@ applicable to the OBM software.
     <tr>
         <td colspan="2">
 The appointment <?php echo $title; ?>, initially scheduled from <?php echo $old_start; ?> to <?php echo $old_end; ?>, (location : <?php echo $old_location; ?>),
-was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?>, (location : <?php echo $location; ?>, attendee(s) : <?php echo $attendees; ?>). </td>
+was updated :</td>
+    </tr>
+    <tr>
+       <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;"><?php echo $start; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;"><?php echo $end; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Organized by</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Attendee(s)</td><td style="font-weight:bold;"><?php echo $attendees; ?></td>
     </tr>
 </table>

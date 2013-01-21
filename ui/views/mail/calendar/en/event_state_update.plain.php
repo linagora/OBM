@@ -38,13 +38,14 @@ ATTENDEE STATE UPDATED
 
 <?php echo $target; ?> has <?php echo $targetState; ?> the following event :
 
-Subject         : <?php echo $title; ?>
+subject         : <?php echo $title; ?>
 
-When            : <?php echo $start; ?>
+when            : <?php echo $start; ?>
 
-Organizer       : <?php echo $organizer; ?>
+organizer       : <?php echo $organizer; ?>
 
-Attendee(s)     : <?php echo $attendees; ?>
+attendee(s)     : <?php echo $attendees; ?>
+
 
 
 :: Comment :

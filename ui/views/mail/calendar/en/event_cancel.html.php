@@ -51,9 +51,9 @@ applicable to the OBM software.
       <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
     </tr>
     <tr>
-      <td style="text-align:right;padding-right:1em;">Organized by:</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+      <td style="text-align:right;padding-right:1em;">Organized by</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
     </tr>
     <tr>
-      <td style="text-align:right;padding-right:1em;">Created by:</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
+      <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
     </tr>
 </table>

@@ -36,7 +36,18 @@ This email was automatically sent by OBM
 APPOINTMENT DELETED !
 ------------------------------------------------------------------
 
-The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.
+This appointment has been deleted:
 
-::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this deletion.
+from        : <?php echo $start; ?>
+
+to          : <?php echo $end; ?>
+
+subject     : <?php echo $title; ?>
+
+location    : <?php echo $location; ?>
+
+organizer   : <?php echo $organizer; ?>
+
+created by  : <?php echo $creator; ?>
+
+::NB : If you are using the Thunderbird extension or ActiveSync, you should synchronize to view this deletion.

@@ -38,14 +38,17 @@ APPOINTMENT DELETED !
 
 This appointment has been deleted:
 
-From              : <?php echo $start; ?>
+from        : <?php echo $start; ?>
 
-to              : <?php echo $end; ?>
+to          : <?php echo $end; ?>
 
-Subject           : <?php echo $title; ?>
+subject     : <?php echo $title; ?>
 
-Location            : <?php echo $location; ?>
+location    : <?php echo $location; ?>
 
-Organized by   : <?php echo $organizer; ?>
+organizer   : <?php echo $organizer; ?>
 
-Created by        : <?php echo $creator; ?>
+created by  : <?php echo $creator; ?>
+
+
+::NB : If you are using the Thunderbird extension or ActiveSync, you should synchronize to view this deletion.

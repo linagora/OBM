@@ -37,7 +37,21 @@ RENDEZ-VOUS MODIFIÉ !
 ------------------------------------------------------------------
 
 Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
-a été modifié et se déroulera du <?php echo $start; ?> au <?php echo $end; ?>, (lieu : <?php echo $location; ?>, participant(s) : <?php echo $attendees; ?>).
+a été modifié :
+
+du              : <?php echo $start; ?>
+
+au              : <?php echo $end; ?>
+
+sujet           : <?php echo $title; ?>
+
+lieu            : <?php echo $location; ?>
+
+organisateur    : <?php echo $organizer; ?>
+
+créé par        : <?php echo $creator; ?>
+
+participant(s)  : <?php echo $attendees; ?>
 
 :: Pour plus de détails : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

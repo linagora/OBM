@@ -69,7 +69,7 @@ applicable to the OBM software.
     </tr>
     <tr>
         <td colspan="2">
-          <strong>NB : </strong>If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this deletion.
+          <strong>NB : </strong>If you are using the Thunderbird extension or ActiveSync, you must synchronize to view this deletion.
         </td>
     </tr>
 </table>

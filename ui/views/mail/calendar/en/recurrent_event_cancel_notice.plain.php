@@ -31,29 +31,29 @@ applicable to the OBM software.
 
 
 ?>
-Message automatique envoyé par OBM
+This email was automatically sent by OBM
 ------------------------------------------------------------------
-RENDEZ-VOUS RÉCURRENT ANNULÉ !
+RECURRENT APPOINTMENT DELETED !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant a été annulé
+The following appointment has been deleted
 
-du              : <?php echo $startDate; ?>
+from        : <?php echo $startDate; ?>
 
-au              : <?php echo $endDate; ?>
+to          : <?php echo $endDate; ?>
 
-heure           : <?php echo $startTime." - ".$endTime ; ?>
+time        : <?php echo $startTime." - ".$endTime ; ?>
 
-récurrence      : <?php echo $repeat_kind; ?>
+recurrence  : <?php echo $repeat_kind; ?>
 
-sujet           : <?php echo $title; ?>
+subject     : <?php echo $title; ?>
 
-lieu            : <?php echo $location; ?>
+location    : <?php echo $location; ?>
 
-organisateur    : <?php echo $organizer; ?>
+organizer   : <?php echo $organizer; ?>
 
-créé par        : <?php echo $creator; ?>
+created by  : <?php echo $creator; ?>
 
-participant(s)  : <?php echo $attendees; ?>
+attendee(s) : <?php echo $attendees; ?>
 
 ::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser cette annulation.

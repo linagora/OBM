@@ -57,7 +57,7 @@ created by  : <?php echo $creator; ?>
 
 attendee(s) : <?php echo $attendees; ?>
 
-::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
+::NB : If you are using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
 
 :: More information : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

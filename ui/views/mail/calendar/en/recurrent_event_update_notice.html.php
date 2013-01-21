@@ -104,7 +104,7 @@ was updated : </td>
     ?>
     <tr>
         <td colspan="2">
-          <strong>NB : </strong>If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
+          <strong>NB : </strong>If you are using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
         </td>
     </tr>   
     <tr>

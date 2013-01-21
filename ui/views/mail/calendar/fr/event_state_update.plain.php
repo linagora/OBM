@@ -38,13 +38,13 @@ PARTICIPATION : MISE A JOUR
 
 <?php echo $target; ?> a <?php echo $targetState; ?> l'événement suivant :
 
-Sujet           : <?php echo $title; ?>
+sujet           : <?php echo $title; ?>
 
-Quand           : <?php echo $start; ?>
+quand           : <?php echo $start; ?>
 
-Organisateur    : <?php echo $organizer; ?>
+organisateur    : <?php echo $organizer; ?>
 
-Participant(s)  : <?php echo $attendees; ?>
+participant(s)  : <?php echo $attendees; ?>
 
 
 :: Commentaire :
