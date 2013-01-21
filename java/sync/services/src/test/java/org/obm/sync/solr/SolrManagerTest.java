@@ -66,6 +66,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
@@ -117,7 +118,7 @@ public class SolrManagerTest {
 	public void test_event_serialization() throws Exception {
 		Event event = new Event();
 		EventRecurrence recurrence = new EventRecurrence();
-		Attendee attendee = Attendee.builder().email("Test").participationRole(ParticipationRole.REQ).build();
+		Attendee attendee = UserAttendee.builder().email("Test").participationRole(ParticipationRole.REQ).build();
 		
 		// We only set the fields that aren't simple types to verify that they're all Serializable
 		event.setUid(new EventObmId(1));

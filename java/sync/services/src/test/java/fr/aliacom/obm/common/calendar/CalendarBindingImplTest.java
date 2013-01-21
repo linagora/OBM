@@ -84,6 +84,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Comment;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -96,10 +97,13 @@ import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
+import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
+import org.obm.sync.services.AttendeeService;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -135,6 +139,7 @@ public class CalendarBindingImplTest {
 			bindWithMock(HelperService.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
+			bind(AttendeeService.class).toInstance(new SimpleAttendeeService());
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
 		
@@ -1081,17 +1086,9 @@ public class CalendarBindingImplTest {
 		EventObmId eventUid = new EventObmId("0");
 		int sequence = 2;
 
-		Attendee userAttendee = new Attendee();
-		userAttendee.setEmail(userEmail);
-		userAttendee.setParticipation(Participation.accepted());
-
-		Attendee guestAttendee1 = new Attendee();
-		guestAttendee1.setEmail(guestAttendee1Email);
-		guestAttendee1.setParticipation(Participation.accepted());
-
-		Attendee guestAttendee2 = new Attendee();
-		guestAttendee2.setEmail(guestAttendee2Email);
-		guestAttendee2.setParticipation(Participation.needsAction());
+		Attendee userAttendee = UserAttendee.builder().email(userEmail).participation(Participation.accepted()).build();
+		Attendee guestAttendee1 = ContactAttendee.builder().email(guestAttendee1Email).participation(Participation.accepted()).build();
+		Attendee guestAttendee2 = ContactAttendee.builder().email(guestAttendee2Email).participation(Participation.needsAction()).build();
 
 		boolean updateAttendees = true;
 		boolean notification = true;
@@ -1710,9 +1707,8 @@ public class CalendarBindingImplTest {
 		Event daoEvent = new Event();
 		daoEvent.setInternalEvent(false);
 
-		Attendee attendee = new Attendee();
-		attendee.setParticipation(Participation.accepted());
-		attendee.setEmail(user.getEmail());
+		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmail()).build();
+		
 		daoEvent.addAttendee(attendee);
 		daoEvent.setOwner(calendar);
 
@@ -1891,7 +1887,7 @@ public class CalendarBindingImplTest {
 	
 	@Test
 		public void testInheritsParticipationForSpecificAttendee() {
-			Attendee expectedAttendee = Attendee.builder()
+			Attendee expectedAttendee = UserAttendee.builder()
 				.email("attendee@test.lng")
 				.participation(Participation.needsAction())
 				.build();
@@ -1900,7 +1896,7 @@ public class CalendarBindingImplTest {
 			CalendarBindingImpl calendarService =
 					new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 
-			Attendee attendee = Attendee.builder()
+			Attendee attendee = UserAttendee.builder()
 				.email("attendee@test.lng")
 				.participation(Participation.accepted())
 				.build();
@@ -2241,8 +2237,8 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithoutDelegations() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
+		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
@@ -2253,8 +2249,8 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithDelegations() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
+		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
@@ -2266,10 +2262,10 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testApplyParticipationStateModificationsWithDelegationsWithExceptions() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
-		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
+		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee organizerForExc = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
+		Attendee att1ForExc = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
@@ -2285,8 +2281,8 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testInitDefaultParticipationState() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
+		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
 		
@@ -2298,10 +2294,10 @@ public class CalendarBindingImplTest {
 	
 	@Test
 	public void testInitDefaultParticipationStateWithExceptions() {
-		Attendee organizer = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee organizerForExc = Attendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1 = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
-		Attendee att1ForExc = Attendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
+		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee organizerForExc = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
+		Attendee att1ForExc = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null);
@@ -2411,12 +2407,11 @@ public class CalendarBindingImplTest {
 
 	private List<Attendee> createOrganiserAndContactAttendees(Participation contactState) {
 		return Arrays.asList(
-				Attendee.builder()
+				UserAttendee.builder()
 				.asOrganizer()
 				.participation(Participation.accepted())
 				.email("organiser@test.lng").build(),
-				Attendee.builder()
-				.asContact()
+				ContactAttendee.builder()
 				.participation(contactState)
 				.email("attendee@test.lng").build());
 	}

@@ -36,6 +36,7 @@ import org.obm.sync.calendar.Attendee;
 
 import fr.aliacom.obm.common.FindException;
 
+
 public interface UserService {
 
 	ObmUser getUserFromAccessToken(AccessToken token);

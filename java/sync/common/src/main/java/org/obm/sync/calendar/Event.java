@@ -50,6 +50,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
@@ -165,6 +166,18 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public void setAllday(boolean allDay) {
 		this.allday = allDay;
 	}
+	
+	public Collection<Attendee> getUserAttendees() {
+		return Collections2.filter(attendees, Predicates.instanceOf(UserAttendee.class));
+	}
+
+	public Collection<Attendee> getContactAttendees() {
+		return Collections2.filter(attendees, Predicates.instanceOf(ContactAttendee.class));
+	}
+
+	public Collection<Attendee> getResourceAttendees() {
+		return Collections2.filter(attendees, Predicates.instanceOf(ResourceAttendee.class));
+	}
 
 	public List<Attendee> getAttendees() {
 		return attendees;
@@ -177,8 +190,12 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		this.attendees.addAll(attendees);
 	}
 	
-	public void setAttendees(List<Attendee> attendees) {
-		this.attendees = attendees;
+	public void setAttendees(List<? extends Attendee> attendees) {
+		this.attendees.clear();
+		
+		if (attendees != null) {
+			addAttendees(attendees);
+		}
 	}
 
 	public String getDescription() {
@@ -347,7 +364,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	private LinkedList<Attendee> copyAttendees() {
 		LinkedList<Attendee> copyOfAttendees = Lists.newLinkedList();
 		for(Attendee attendee: attendees) {
-			copyOfAttendees.add(new Attendee(attendee));
+			copyOfAttendees.add(attendee.clone());
 		}
 
 		return copyOfAttendees;
@@ -485,10 +502,6 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 			}
 		}
 		return null;
-	}
-
-	public Attendee findOwner() {
-		return findAttendeeFromEmail(ownerEmail);
 	}
 
 	@Override

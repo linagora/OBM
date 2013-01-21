@@ -31,7 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
@@ -73,8 +80,11 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.server.template.ITemplateLoader;
+import org.obm.sync.services.AttendeeService;
 import org.slf4j.Logger;
 
 import com.google.common.base.Charsets;
@@ -99,6 +109,7 @@ public class EventChangeMailerTest {
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
 	private DateProvider dateProvider;
+	private AttendeeService attendeeService;
 	private Date now;
 	private Logger logger;
 	
@@ -106,8 +117,9 @@ public class EventChangeMailerTest {
 	public void setup() {
 		now = new Date();
 		dateProvider = createMock(DateProvider.class);
+		attendeeService = new SimpleAttendeeService();
 		Factory eventExtIdFactory = null;
-		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory);
+		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		
 		accessToken = new AccessToken(1, "unitTest");
 		obmUser = ServicesToolBox.getDefaultObmUser();
@@ -365,7 +377,7 @@ public class EventChangeMailerTest {
 				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
 				"du            : 23 janv. 2012", 
 				"au            : 23 nov. 2012",
-				"heure         : 12:00 - 13:00",
+				"heure         : 12:00:00 - 13:00:00",
 				"recurrence    : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
 				"sujet         : A random recurrent event", 
 				"lieu          : A random location",
@@ -378,7 +390,7 @@ public class EventChangeMailerTest {
 				"Sujet A random recurrent event", 
 				"Lieu A random location", 
 				"Organisateur Jack de Linagora",
-				"Heure 12:00 - 13:00",
+				"Heure 12:00:00 - 13:00:00",
 				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
 			    "Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.");
 	}
@@ -517,7 +529,7 @@ public class EventChangeMailerTest {
 		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT ANNULÉ",
 					"du           : 23 janv. 2012", 
 					"au           : 23 nov. 2012",
-					"heure        : 12:00 - 13:00",
+					"heure        : 12:00:00 - 13:00:00",
 					"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
 					"sujet        : A random recurrent event", 
 					"lieu         : A random location",
@@ -528,7 +540,7 @@ public class EventChangeMailerTest {
 					"Sujet A random recurrent event", 
 					"Lieu A random location", 
 					"Organisateur Jack de Linagora",
-					"Heure 12:00 - 13:00",
+					"Heure 12:00:00 - 13:00:00",
 					"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
 		checkIcs(parts, "BEGIN:VCALENDAR",
 					"CALSCALE:GREGORIAN",
@@ -620,7 +632,7 @@ public class EventChangeMailerTest {
 				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
 				"du           : 23 janv. 2012", 
 				"au           : 23 nov. 2012",
-				"heure        : 12:00 - 13:00",
+				"heure        : 12:00:00 - 13:00:00",
 				"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
 				"sujet        : A random recurrent event", 
 				"lieu         : A random location",
@@ -631,7 +643,7 @@ public class EventChangeMailerTest {
 				"Sujet A random recurrent event", 
 				"Lieu A random location", 
 				"Organisateur Jack de Linagora",
-				"Heure 12:00 - 13:00",
+				"Heure 12:00:00 - 13:00:00",
 				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
 		checkIcs(parts, "BEGIN:VCALENDAR",
 					"CALSCALE:GREGORIAN",
@@ -735,7 +747,7 @@ public class EventChangeMailerTest {
 		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 15 févr. 2012", 
 				"au 23 nov. 2012",
-				"de 13:00 à 15:00",
+				"de 13:00:00 à 15:00:00",
 				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
 				"lieu : A random location");
 		checkHtmlMessage(parts, 
@@ -745,7 +757,7 @@ public class EventChangeMailerTest {
 				"Sujet A random recurrent event", 
 				"Lieu A random location", 
 				"Organisateur Jack de Linagora",
-				"Heure 13:00 - 15:00",
+				"Heure 13:00:00 - 15:00:00",
 				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
 		checkIcs(parts, 
 				"BEGIN:VCALENDAR",
@@ -895,7 +907,7 @@ public class EventChangeMailerTest {
 		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 23 janv. 2012", 
 				"au 23 janv. 2012",
-				"de 12:00 à 13:00",
+				"de 12:00:00 à 13:00:00",
 				"au 23 nov. 2012",
 				"type de récurrence : Pas de récurrence",
 				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
@@ -905,7 +917,7 @@ public class EventChangeMailerTest {
 				"Invitation à un évènement récurrent : mise à jour",
 				"du 23 janv. 2012", 
 				"au 23 janv. 2012",
-				"Heure 12:00 - 13:00",
+				"Heure 12:00:00 - 13:00:00",
 				"Au 23 nov. 2012",
 				"Sujet A random recurrent event", 
 				"Lieu A random location", 
@@ -1004,7 +1016,7 @@ public class EventChangeMailerTest {
 		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 23 janv. 2012", 
 				"au 23 janv. 2012",
-				"de 12:00 à 13:00",
+				"de 12:00:00 à 13:00:00",
 				"au 23 nov. 2012",
 				"type de récurrence : Pas de récurrence",
 				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
@@ -1014,7 +1026,7 @@ public class EventChangeMailerTest {
 				"Invitation à un évènement récurrent : mise à jour",
 				"du 23 janv. 2012", 
 				"au 23 janv. 2012",
-				"Heure 12:00 - 13:00",
+				"Heure 12:00:00 - 13:00:00",
 				"Au 23 nov. 2012",
 				"Sujet A random recurrent event", 
 				"Lieu A random location", 

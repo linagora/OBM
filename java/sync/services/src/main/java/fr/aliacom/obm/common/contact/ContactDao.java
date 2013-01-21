@@ -90,6 +90,7 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
@@ -423,10 +424,14 @@ public class ContactDao {
 		e.setRecurrence(rec);
 		e.setPrivacy(EventPrivacy.PRIVATE);
 		e.setPriority(1);
-		Attendee at = new Attendee();
-		at.setEmail(token.getUserEmail());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setParticipation(Participation.accepted());
+		
+		Attendee at = UserAttendee
+				.builder()
+				.email(token.getUserEmail())
+				.participationRole(ParticipationRole.CHAIR)
+				.participation(Participation.accepted())
+				.build();
+		
 		e.addAttendee(at);
 
 		logger.info("inserting birthday with date " + cal.getTime());

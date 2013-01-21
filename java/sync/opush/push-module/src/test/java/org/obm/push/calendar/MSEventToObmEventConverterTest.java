@@ -66,6 +66,7 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -1073,7 +1074,7 @@ public class MSEventToObmEventConverterTest {
 		editingEvent.setTitle("Any Subject");
 		editingEvent.setOwner("other organizer name");
 		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
-		editingEvent.addAttendee(Attendee.builder()
+		editingEvent.addAttendee(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1083,7 +1084,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1108,7 +1109,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1139,14 +1140,14 @@ public class MSEventToObmEventConverterTest {
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
 		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
-			Attendee.builder()
+			UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
 				.participationRole(ParticipationRole.REQ)
 				.participation(Participation.accepted())
 				.build(),
-			Attendee.builder()
+			UserAttendee.builder()
 				.asAttendee()
 				.displayName("invitee")
 				.email("invitee@thilaire.lng.org")
@@ -1178,7 +1179,7 @@ public class MSEventToObmEventConverterTest {
 		editingEvent.setTitle("Any Subject");
 		editingEvent.setOwner("other organizer name");
 		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
-		editingEvent.addAttendee(Attendee.builder()
+		editingEvent.addAttendee(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1188,7 +1189,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1225,7 +1226,7 @@ public class MSEventToObmEventConverterTest {
 		editingEvent.setTitle("Any Subject");
 		editingEvent.setOwner("other organizer name");
 		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
-		editingEvent.addAttendee(Attendee.builder()
+		editingEvent.addAttendee(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1235,7 +1236,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1272,7 +1273,7 @@ public class MSEventToObmEventConverterTest {
 		editingEvent.setTitle("Any Subject");
 		editingEvent.setOwner("other organizer name");
 		editingEvent.setOwnerEmail("organizer@thilaire.lng.org");
-		editingEvent.addAttendee(Attendee.builder()
+		editingEvent.addAttendee(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1283,14 +1284,14 @@ public class MSEventToObmEventConverterTest {
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
 		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
-			Attendee.builder()
+			UserAttendee.builder()
 				.asAttendee()
 				.displayName("invitee")
 				.email("invitee@thilaire.lng.org")
 				.participationRole(ParticipationRole.OPT)
 				.participation(Participation.accepted())
 				.build(),
-			Attendee.builder()
+			UserAttendee.builder()
 				.asOrganizer()
 				.displayName("organizer")
 				.email("organizer@thilaire.lng.org")
@@ -1315,7 +1316,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("display name")
 				.email("user@domain")
@@ -1345,7 +1346,7 @@ public class MSEventToObmEventConverterTest {
 
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
-		assertThat(converted.getAttendees()).hasSize(1).containsOnly(Attendee.builder()
+		assertThat(converted.getAttendees()).hasSize(1).containsOnly(UserAttendee.builder()
 				.asOrganizer()
 				.displayName("display name")
 				.email("user@domain")
@@ -1376,14 +1377,14 @@ public class MSEventToObmEventConverterTest {
 		Event converted = convertToOBMEventWithEditingEvent(msEvent, editingEvent);
 
 		assertThat(converted.getAttendees()).hasSize(2).containsOnly(
-			Attendee.builder()
+			UserAttendee.builder()
 				.asAttendee()
 				.displayName("invitee")
 				.email("invitee@thilaire.lng.org")
 				.participationRole(ParticipationRole.OPT)
 				.participation(Participation.accepted())
 				.build(),
-			Attendee.builder()
+			UserAttendee.builder()
 				.asOrganizer()
 				.displayName("display name")
 				.email("user@domain")

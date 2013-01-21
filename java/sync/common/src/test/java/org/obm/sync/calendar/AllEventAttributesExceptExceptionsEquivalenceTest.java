@@ -92,19 +92,21 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		ev.setOpacity(EventOpacity.OPAQUE);
 		ev.setPriority(1);
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
-		la.add(at);
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		la.add(at);
+		la.add(UserAttendee
+				.builder()
+				.asOrganizer()
+				.displayName("John Do")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.email("john@do.fr")
+				.build());
+		la.add(ContactAttendee
+				.builder()
+				.displayName("noIn TheDatabase")
+				.email("notin@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build());
 		ev.setAttendees(la);
 		ev.setAlert(60);
 		EventRecurrence er = new EventRecurrence();
@@ -169,12 +171,13 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getStubBeforeSequenceEvent();
 		Event e2 = getStubAfterSequenceEvent();
 		
-		Attendee at = new Attendee();
-		at.setDisplayName("User Un");
-		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		e2.getAttendees().add(at);
+		e2.getAttendees().add(UserAttendee
+				.builder()
+				.displayName("User Un")
+				.email("uun@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build());
 		
 		boolean result = comparator.equivalent(e1, e2);
 		
@@ -215,12 +218,13 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getStubBeforeSequenceEvent();
 		Event e2 = getStubAfterSequenceEvent();
 		e2.getAttendees().remove(0);
-		Attendee at = new Attendee();
-		at.setDisplayName("User Un");
-		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		e2.getAttendees().add(at);
+		e2.getAttendees().add(UserAttendee
+				.builder()
+				.displayName("User Un")
+				.email("uun@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build());
 		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);
@@ -560,12 +564,13 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getStubBeforeTimeUpdateEvent();
 		Event e2 = getStubAfterTimeUpdateEvent();
 		
-		Attendee at = new Attendee();
-		at.setDisplayName("User Un");
-		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		e2.getAttendees().add(at);
+		e2.getAttendees().add(UserAttendee
+				.builder()
+				.displayName("User Un")
+				.email("uun@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build());
 		
 		boolean result = comparator.equivalent(e1, e2);
 		
@@ -589,12 +594,13 @@ public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 		Event e1 = getStubBeforeTimeUpdateEvent();
 		Event e2 = getStubAfterTimeUpdateEvent();
 		e2.getAttendees().remove(0);
-		Attendee at = new Attendee();
-		at.setDisplayName("User Un");
-		at.setEmail("uun@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		e2.getAttendees().add(at);
+		e2.getAttendees().add(UserAttendee
+				.builder()
+				.displayName("User Un")
+				.email("uun@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build());
 		boolean result = comparator.equivalent(e1, e2);
 		
 		Assert.assertEquals(false, result);

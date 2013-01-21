@@ -49,6 +49,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Participation.State;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -871,15 +872,19 @@ public class EventTest {
 	private List<Attendee> createAttendees(int count) {
 		List<Attendee> attendees = new ArrayList<Attendee>();
 		for (int i = 0; i < count; i++) {
-			Attendee attendee = new Attendee();
-			attendee.setCanWriteOnCalendar(false);
-			attendee.setDisplayName("DisplayName" + i);
-			attendee.setEmail("email" + i + "@email.com");
-			attendee.setObmUser(true);
+			Attendee attendee = UserAttendee
+					.builder()
+					.canWriteOnCalendar(false)
+					.displayName("DisplayName" + i)
+					.email("email" + i + "@email.com")
+					.percent(1)
+					.participationRole(ParticipationRole.REQ)
+					.participation(Participation.needsAction())
+					.build();
+			
 			attendee.setOrganizer(isOrganizer(i));
-			attendee.setPercent(1);
-			attendee.setParticipationRole(ParticipationRole.REQ);
-			attendee.setParticipation(Participation.needsAction());
+			
+			attendees.add(attendee);
 		}
 		return attendees;
 	}
@@ -1266,11 +1271,8 @@ public class EventTest {
 		event.setInternalEvent(false);
 		event.setSequence(2);
 
-		Attendee att1 = new Attendee();
-		att1.setEmail("att1@email.com");
-
-		Attendee att2 = new Attendee();
-		att2.setEmail("att2@email.com");
+		Attendee att1 = UserAttendee.builder().email("att1@email.com").build();
+		Attendee att2 = UserAttendee.builder().email("att2@email.com").build();
 
 		event.addAttendee(att1);
 		event.addAttendee(att2);
@@ -1482,7 +1484,7 @@ public class EventTest {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.setAttendees(Lists.<Attendee>newArrayList());
 
-		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
 		
 		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
 
@@ -1492,10 +1494,9 @@ public class EventTest {
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendee() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		publicEvent.setAttendees(Lists.newArrayList(
-				Attendee.builder().email("user@domain").build()));
+		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
-		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
 		
 		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
 
@@ -1505,10 +1506,9 @@ public class EventTest {
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendeeOtherCase() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		publicEvent.setAttendees(Lists.newArrayList(
-				Attendee.builder().email("user@domain").build()));
+		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
-		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
 		
 		publicEvent.addOrReplaceAttendee("User@domain", newAttendee);
 
@@ -1518,25 +1518,23 @@ public class EventTest {
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendeeReplacingOtherEmail() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		publicEvent.setAttendees(Lists.newArrayList(
-				Attendee.builder().email("user@domain").build()));
+		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
-		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
 		
 		publicEvent.addOrReplaceAttendee("otheruser@domain", newAttendee);
 
 		assertThat(publicEvent.getAttendees()).containsOnly(
-				Attendee.builder().email("user@domain").build(),
+				UserAttendee.builder().email("user@domain").build(),
 				newAttendee);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testAddOrReplaceAttendeeWhenNullAddess() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		publicEvent.setAttendees(Lists.newArrayList(
-				Attendee.builder().email("user@domain").build()));
+		publicEvent.addAttendee(UserAttendee.builder().email("user@domain").build());
 
-		Attendee newAttendee = Attendee.builder().email("user@domain").build();
+		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
 		
 		publicEvent.addOrReplaceAttendee(null, newAttendee);
 	}
@@ -1544,8 +1542,7 @@ public class EventTest {
 	@Test(expected=NullPointerException.class)
 	public void testAddOrReplaceAttendeeWhenNullAttendee() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		publicEvent.setAttendees(Lists.newArrayList(
-				Attendee.builder().email("user@domain").build()));
+		publicEvent.addAttendee(UserAttendee.builder().email("user@domain").build());
 
 		publicEvent.addOrReplaceAttendee("user@domain", null);
 	}

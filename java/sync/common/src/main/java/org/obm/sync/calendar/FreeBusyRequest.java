@@ -87,10 +87,6 @@ public class FreeBusyRequest {
 		return attendees;
 	}
 
-	public void setAttendees(List<Attendee> attendees) {
-		this.attendees = attendees;
-	}
-
 	public void addAttendee(Attendee att) {
 		this.attendees.add(att);
 	}

@@ -48,11 +48,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.sync.GuiceServletContextListener;
+import org.obm.sync.calendar.FreeBusyRequest;
+import org.obm.sync.calendar.UserAttendee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.obm.sync.GuiceServletContextListener;
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.FreeBusyRequest;
 
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
@@ -190,16 +190,11 @@ public class FreeBusyServlet extends HttpServlet {
 	}
 
 	private FreeBusyRequest makeFreeBusyRequest(String email, Date dstart, Date dend) {
-		Attendee att = new Attendee();
-		att.setEmail(email);
-
-		List<Attendee> atts = new ArrayList<Attendee>(1);
-		atts.add(att);
-		
 		FreeBusyRequest fbr = new FreeBusyRequest();
+		
 		fbr.setStart(dstart);
 		fbr.setEnd(dend);
-		fbr.setAttendees(atts);
+		fbr.addAttendee(UserAttendee.builder().email(email).build());
 		fbr.setOwner(email);
 		return fbr;
 	}

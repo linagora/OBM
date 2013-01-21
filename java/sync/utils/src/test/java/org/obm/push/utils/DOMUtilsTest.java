@@ -37,6 +37,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
@@ -208,6 +209,26 @@ public class DOMUtilsTest {
 		Element parent = DOMUtils.parse("<root><Seeking>data</Seeking><Seeking>data</Seeking></root>").getDocumentElement();
 		Iterable<Node> found = DOMUtils.getElementsByName(parent, "Seeking");
 		assertThat(Iterables.size(found)).isEqualTo(2);
+	}
+
+	@Test
+	public void testGetAttributes() throws Exception {
+		Element parent = DOMUtils.parse("<root><element a=\"a1\" b=\"b1\" c=\"c1\"/><element a=\"a2\" b=\"b2\" c=\"c2\"/></root>").getDocumentElement();
+		String[][] attributes = DOMUtils.getAttributes(parent, "element", new String[] {"a", "b"});
+		
+		assertThat(attributes).hasSize(2);
+		assertThat(Arrays.asList(attributes[0])).containsExactly("a1", "b1");
+		assertThat(Arrays.asList(attributes[1])).containsExactly("a2", "b2");
+	}
+	
+	@Test
+	public void testGetAttributesWithMissingValues() throws Exception {
+		Element parent = DOMUtils.parse("<root><element a=\"a1\" b=\"b1\" c=\"\"/><element a=\"a2\" b=\"b2\"/></root>").getDocumentElement();
+		String[][] attributes = DOMUtils.getAttributes(parent, "element", new String[] {"a", "b", "c"});
+		
+		assertThat(attributes).hasSize(2);
+		assertThat(Arrays.asList(attributes[0])).containsExactly("a1", "b1", ""); // Empty attribute
+		assertThat(Arrays.asList(attributes[1])).containsExactly("a2", "b2", ""); // Missing attribute
 	}
 }
 

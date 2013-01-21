@@ -38,6 +38,7 @@ import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -54,17 +55,10 @@ public class EventChangesTest {
 	public void testAnonymize() {
 		Date lastSync = new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate();
 
-		Attendee attendee1 = new Attendee();
-		attendee1.setEmail("attendee1@email.com");
-
-		Attendee attendee2 = new Attendee();
-		attendee2.setEmail("attendee2@email.com");
-
-		Attendee attendee3 = new Attendee();
-		attendee3.setEmail("attendee3@email.com");
-
-		Attendee attendee4 = new Attendee();
-		attendee4.setEmail("attendee4@email.com");
+		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
+		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
+		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
+		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
 
 		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId(
 				"deleted_event_1"));

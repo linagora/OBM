@@ -42,7 +42,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
-import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -50,6 +49,7 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.UserAttendee;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -163,15 +163,15 @@ public class EventIndexerTest {
 		event.setPrivacy(EventPrivacy.PUBLIC);
 		event.setUid(new EventObmId(1234));
 		event.addAttendee(
-				Attendee.builder().displayName("Attendee One")
+				UserAttendee.builder().displayName("Attendee One")
 					.email("attendee.one@domain.com").asAttendee()
 					.participationRole(ParticipationRole.REQ).participation(Participation.needsAction()).build());
 		event.addAttendee(
-				Attendee.builder().displayName("Test GT")
+				UserAttendee.builder().displayName("Test GT")
 					.email("testgt@domain.com").asAttendee()
 					.participationRole(ParticipationRole.REQ).participation(Participation.needsAction()).build());
 		event.addAttendee(
-				Attendee.builder().displayName("Owner")
+				UserAttendee.builder().displayName("Owner")
 					.email("owner@domain.com").asOrganizer()
 					.participationRole(ParticipationRole.REQ).participation(Participation.accepted()).build());
 		

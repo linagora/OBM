@@ -91,6 +91,8 @@ import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
 import org.obm.sync.ObmSyncHttpClientModule;
+import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.services.AttendeeService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -147,6 +149,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(ContinuationService.class).to(ContinuationServiceImpl.class);
 		bind(DateService.class).to(DateServiceImpl.class);
 		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
+		bind(AttendeeService.class).to(SimpleAttendeeService.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);

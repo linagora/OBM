@@ -37,20 +37,21 @@ import java.util.TimeZone;
 
 import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
 import org.obm.push.bean.RecurrenceType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.base.Objects;
 
@@ -305,10 +306,14 @@ public class TaskConverter {
 				}
 			}
 		}
-		Attendee ret = new Attendee();
-		ret.setEmail(udr.getCredentials().getUser().getEmail());
-		ret.setParticipationRole(ParticipationRole.REQ);
-		ret.setParticipation(status(oldState, AttendeeStatus.ACCEPT));
+		
+		Attendee ret = UserAttendee
+				.builder()
+				.email(udr.getCredentials().getUser().getEmail())
+				.participationRole(ParticipationRole.REQ)
+				.participation(status(oldState, AttendeeStatus.ACCEPT))
+				.build();
+		
 		return ret;
 	}
 

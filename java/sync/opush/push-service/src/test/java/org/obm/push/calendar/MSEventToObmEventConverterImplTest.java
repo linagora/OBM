@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.ImmutableList;
 
@@ -107,9 +108,10 @@ public class MSEventToObmEventConverterImplTest {
 	}
 
 	private Attendee fakeAttendee(String email, boolean organizer) {
-		Attendee attendee = new Attendee();
-		attendee.setEmail(email);
+		Attendee attendee = UserAttendee.builder().email(email).build();
+		
 		attendee.setOrganizer(organizer);
+		
 		return attendee;
 	}
 

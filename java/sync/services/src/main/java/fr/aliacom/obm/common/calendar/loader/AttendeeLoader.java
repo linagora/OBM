@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.ResourceAttendee;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
@@ -24,6 +27,11 @@ import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class AttendeeLoader {
+	
+	private static enum AttendeeType {
+		USER, CONTACT, RESOURCE;
+	}
+	
 	public static class Builder {
 		private Connection conn;
 		private String domainName;
@@ -80,7 +88,7 @@ public class AttendeeLoader {
 				"userobm_lastname AS attendee_lastname",
 				"userobm_commonname AS attendee_commonname",
 				"userentity_user_id AS attendee_entity_id",
-				"1 AS is_internal_attendee"
+				"'USER' as attendee_type"
 		});
 
 	private static final String EXTERNAL_ATTENDEE_FIELDS = Joiner
@@ -97,7 +105,7 @@ public class AttendeeLoader {
 				"contact_lastname AS attendee_lastname",
 				"contact_commonname AS attendee_commonname",
 				"contactentity_contact_id AS attendee_entity_id",
-				"0 AS is_internal_attendee"
+				"'CONTACT' as attendee_type"
 		});
 
 	private static final String RESOURCE_ATTENDEE_FIELDS = Joiner
@@ -114,7 +122,7 @@ public class AttendeeLoader {
 				"NULL AS attendee_lastname",
 				"resource_name AS attendee_commonname",
 				"resourceentity_resource_id AS attendee_entity_id",
-				"1 AS is_internal_attendee"
+				"'RESOURCE' as attendee_type"
 		});
 	// An attendee can be either an OBM user, a contact or a resource
 	private final static int ENTITY_TYPE_COUNT = 3;
@@ -198,15 +206,29 @@ public class AttendeeLoader {
 	}
 
 	private Attendee buildAttendee(ResultSet rs) throws SQLException {
-		Attendee att = new Attendee();
-		att.setObmUser(isInternalAttendee(rs));
+		Attendee att = createAttendeeFromType(AttendeeType.valueOf(rs.getString("attendee_type")));
+		
 		att.setDisplayName(getAttendeeDisplayName(rs));
 		att.setEmail(getAttendeeEmail(rs, domainName));
 		att.setParticipation(getAttendeeState(rs));
 		att.setParticipationRole(getAttendeeRequired(rs));
 		att.setPercent(getAttendeePercent(rs));
 		att.setOrganizer(getAttendeeOrganizer(rs));
+		
 		return att;
+	}
+
+	private Attendee createAttendeeFromType(AttendeeType type) {
+		switch (type) {
+			case USER:
+				return new UserAttendee();
+			case CONTACT:
+				return new ContactAttendee();
+			case RESOURCE:
+				return new ResourceAttendee();
+		}
+		
+		throw new IllegalArgumentException("Couldn't instantiate attendee of type " + type + ".");
 	}
 
 	private EventObmId buildEventId(ResultSet rs) throws SQLException {
@@ -220,10 +242,6 @@ public class AttendeeLoader {
 					"Found an event %d not present in the parent events", eventId.getObmId()));
 		}
 		event.getAttendees().add(att);
-	}
-
-	private boolean isInternalAttendee(ResultSet rs) throws SQLException {
-		return rs.getBoolean("is_internal_attendee");
 	}
 
 	private String getAttendeeDisplayName(ResultSet rs) throws SQLException {

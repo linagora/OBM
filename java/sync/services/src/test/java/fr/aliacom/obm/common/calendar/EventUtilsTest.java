@@ -40,14 +40,14 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
-
-import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.UserAttendee;
 
 @RunWith(SlowFilterRunner.class)
 public class EventUtilsTest {
@@ -76,13 +76,15 @@ public class EventUtilsTest {
 		Event ev = getSimpleEvent();
 
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
-		at.setObmUser(true);
+		Attendee at = UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		la.add(at);
 		ev.setAttendees(la);
 
@@ -94,13 +96,15 @@ public class EventUtilsTest {
 		Event ev = getSimpleEvent();
 
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
-		at.setObmUser(false);
+		Attendee at = ContactAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		la.add(at);
 		ev.setAttendees(la);
 
@@ -112,22 +116,26 @@ public class EventUtilsTest {
 		Event ev = getSimpleEvent();
 
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(false);
-		at.setObmUser(true);
+		Attendee at = UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asAttendee()
+				.build();
+		
 		la.add(at);
 
-		at = new Attendee();
-		at.setDisplayName("obm TheUser");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		at.setOrganizer(false);
-		at.setObmUser(false);
+		at = ContactAttendee
+				.builder()
+				.displayName("obm TheUser")
+				.email("notin@mydb.com")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asAttendee()
+				.build();
+		
 		la.add(at);
 		ev.setAttendees(la);
 		Assert.assertFalse(EventUtils.isInternalEvent(ev));
@@ -138,24 +146,29 @@ public class EventUtilsTest {
 		Event ev = getSimpleEvent();
 
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(false);
-		at.setObmUser(true);
+		Attendee at = UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		la.add(at);
 
-		at = new Attendee();
-		at.setDisplayName("obm TheUser");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
-		at.setOrganizer(false);
-		at.setObmUser(true);
+		at = UserAttendee
+				.builder()
+				.displayName("obm TheUser")
+				.email("notin@mydb.com")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asAttendee()
+				.build();
+
 		la.add(at);
 		ev.setAttendees(la);
+		
 		Assert.assertTrue(EventUtils.isInternalEvent(ev));
 	}
 

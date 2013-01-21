@@ -57,7 +57,9 @@ import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventExtId.Factory;
+import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
 
 import com.google.inject.Injector;
@@ -78,18 +80,16 @@ public class ResourceServletTest {
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private DateProvider dateProvider;
+	private AttendeeService attendeeService;
 	private Date now;
 	
 	@Before
 	public void setUp() {
 		now = new Date();
 		dateProvider = createMock(DateProvider.class);
+		attendeeService = new SimpleAttendeeService();
 		Factory eventExtIdFactory = createMock(EventExtId.Factory.class);
-		helper = new Ical4jHelper(dateProvider, eventExtIdFactory);
-		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
-				ToolBox.getDefaultObmDomain());
-		resourceServlet = new ResourceServlet();
-
+		helper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService
 		servletConfig = createMock(ServletConfig.class);
 		servletContext = createMock(ServletContext.class);
 		injector = createMock(Injector.class);

@@ -182,19 +182,22 @@ public class CalendarItemsParser extends AbstractItemsParser {
 						"percent", "isOrganizer" });
 		List<Attendee> la = new ArrayList<Attendee>(atVals.length);
 		for (String[] attendee : atVals) {
-			Attendee at = new Attendee();
-			at.setDisplayName(attendee[0]);
-			at.setEmail(attendee[1]);
-			at.setParticipation(Participation.getValueOf(attendee[2]));
-			at.setParticipationRole(ParticipationRole.valueOf(attendee[3]));
-			if (attendee[4] != null && !attendee[4].equals("")) {
+			Attendee at = UnknownAttendee
+					.builder()
+					.displayName(attendee[0])
+					.email(attendee[1])
+					.participation(Participation.getValueOf(attendee[2]))
+					.participationRole(ParticipationRole.valueOf(attendee[3]))
+					.build();
+			
+			if (!Strings.isNullOrEmpty(attendee[4])) {
 				at.setPercent(Integer.parseInt(attendee[4]));
 			} else {
 				at.setPercent(100);
 			}
-			if (attendee[5] != null) {
-				at.setOrganizer(Boolean.parseBoolean(attendee[5]));
-			}
+			
+			at.setOrganizer(Boolean.parseBoolean(attendee[5]));
+			
 			la.add(at);
 		}
 		return la;

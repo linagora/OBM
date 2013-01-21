@@ -78,6 +78,7 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.ICalendar;
@@ -1462,8 +1463,8 @@ public class CalendarBindingImpl implements ICalendar {
 	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) throws ImportICalendarException {
 		try {
 			final ObmUser obmUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			final Attendee attendee = new Attendee();
-			attendee.setEmail(obmUser.getEmail());
+			final Attendee attendee = UserAttendee.builder().email(obmUser.getEmail()).build();
+			
 			event.getAttendees().add(attendee);
 		} catch (FindException e) {
 			throw new ImportICalendarException("user " + calendar + " not found");

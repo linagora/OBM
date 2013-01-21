@@ -103,26 +103,37 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
+		Attendee at = UnknownAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		at = UnknownAttendee
+				.builder()
+				.displayName("noIn TheDatabase")
+				.email("notin@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase2");
-		at.setEmail("notin2@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		at = UnknownAttendee
+				.builder()
+				.displayName("noIn TheDatabase2")
+				.email("notin2@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
 		assertThat(ev.getRecurrence()).isNotNull();
@@ -174,26 +185,37 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
+		Attendee at = UnknownAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		at = UnknownAttendee
+				.builder()
+				.displayName("noIn TheDatabase")
+				.email("notin@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase2");
-		at.setEmail("notin2@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		at = UnknownAttendee
+				.builder()
+				.displayName("noIn TheDatabase2")
+				.email("notin2@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
 		assertThat(ev.getRecurrence()).isNotNull();
@@ -247,19 +269,26 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
+		Attendee at = UnknownAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		at = UnknownAttendee
+				.builder()
+				.displayName("noIn TheDatabase")
+				.email("notin@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.asOrganizer()
+				.build();
+
 		assertThat(ev.getAttendees()).contains(at);
 		
 		assertThat(ev.getRecurrence()).isNotNull();

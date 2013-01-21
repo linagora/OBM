@@ -1,98 +1,94 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * 
  * Copyright (C) 2011-2012  Linagora
  *
- * This program is free software: you can redistribute it and/or 
- * modify it under the terms of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
- * License, or (at your option) any later version, provided you comply 
- * with the Additional Terms applicable for OBM connector by Linagora 
- * pursuant to Section 7 of the GNU Affero General Public License, 
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
- * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
- * from infringing Linagora intellectual property rights over its trademarks 
- * and commercial brands. Other Additional Terms apply, 
- * see <http://www.linagora.com/licenses/> for more details. 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version, provided you comply with the Additional Terms applicable for OBM
+ * software by Linagora pursuant to Section 7 of the GNU Affero General Public
+ * License, subsections (b), (c), and (e), pursuant to which you must notably (i)
+ * retain the displaying by the interactive user interfaces of the “OBM, Free
+ * Communication by Linagora” Logo with the “You are using the Open Source and
+ * free version of OBM developed and supported by Linagora. Contribute to OBM R&D
+ * by subscribing to an Enterprise offer !” infobox, (ii) retain all hypertext
+ * links between OBM and obm.org, between Linagora and linagora.com, as well as
+ * between the expression “Enterprise offer” and pro.obm.org, and (iii) refrain
+ * from infringing Linagora intellectual property rights over its trademarks and
+ * commercial brands. Other Additional Terms apply, see
+ * <http://www.linagora.com/licenses/> for more details.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
- * for more details. 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License 
- * and its applicable Additional Terms for OBM along with this program. If not, 
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
- * OBM connectors. 
- * 
+ * You should have received a copy of the GNU Affero General Public License and
+ * its applicable Additional Terms for OBM along with this program. If not, see
+ * <http://www.gnu.org/licenses/> for the GNU Affero General   Public License
+ * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
+ * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
+
 
 import java.io.Serializable;
 
 import com.google.common.base.Objects;
 
-public class Attendee implements Serializable {
-
-	public static Builder builder() {
-		return new Builder();
-	}
+public abstract class Attendee implements Cloneable, Serializable {
 	
-	public static class Builder {
+	public abstract static class Builder<T extends Attendee> {
 		
-		private final Attendee attendee;
+		private final T attendee;
 		
-		private Builder() {
-			super();
-			attendee = new Attendee();
+		protected Builder() {
+			attendee = createInstance();
 		}
 		
-		public Builder participation(Participation participation) {
+		public Builder<T> participation(Participation participation) {
 			attendee.participation = participation;
 			return this;
 		}
 		
-		public Builder email(String email) {
+		public Builder<T> email(String email) {
 			attendee.email = email;
 			return this;
 		}
 		
-		public Builder participationRole(ParticipationRole role) {
+		public Builder<T> participationRole(ParticipationRole role) {
 			attendee.participationRole = role;
 			return this;
 		}
 		
-		public Builder displayName(String name) {
+		public Builder<T> displayName(String name) {
 			attendee.displayName = name;
 			return this;
 		}
 		
-		public Builder asOrganizer() {
+		public Builder<T> percent(int percent) {
+			attendee.percent = percent;
+			return this;
+		}
+		
+		public Builder<T> canWriteOnCalendar(boolean canWriteOnCalendar) {
+			attendee.canWriteOnCalendar = canWriteOnCalendar;
+			return this;
+		}
+		
+		public Builder<T> asOrganizer() {
 			attendee.organizer = true;
 			return this;
 		}
 		
-		public Builder asUser() {
-			attendee.obmUser = true;
-			return this;
-		}
-		
-		public Builder asContact() {
-			attendee.obmUser = false;
-			return this;
-		}
-		
-		public Attendee build() {
-			return attendee;
-		}
-
-		public Builder asAttendee() {
+		public Builder<T> asAttendee() {
 			attendee.organizer = false;
 			return this;
 		}
+		
+		public T build() {
+			return attendee;
+		}
+		
+		protected abstract T createInstance();
 	}
 	
 	private Participation participation;
@@ -101,11 +97,9 @@ public class Attendee implements Serializable {
 	private String displayName;
 	private int percent;
 	private boolean organizer;
-	private boolean obmUser;
 	private boolean canWriteOnCalendar;
 	
 	public Attendee() {
-		super();
 	}
 
 	public Attendee(Attendee attendee) {
@@ -114,9 +108,16 @@ public class Attendee implements Serializable {
 		this.displayName = attendee.displayName;
 		this.percent = attendee.percent;
 		this.organizer = attendee.organizer;
-		this.obmUser = attendee.obmUser;
 		this.canWriteOnCalendar = attendee.canWriteOnCalendar;
 		this.participationRole = attendee.participationRole;
+	}
+	
+	public abstract Attendee clone();
+	
+	public abstract CalendarUserType getCalendarUserType();
+	
+	public boolean isObmUser() {
+		return false;
 	}
 
 	public Participation getParticipation() {
@@ -166,14 +167,6 @@ public class Attendee implements Serializable {
 	public void setOrganizer(boolean organizer) {
 		this.organizer = organizer;
 	}
-	
-	public boolean isObmUser() {
-		return obmUser;
-	}
-
-	public void setObmUser(boolean obmUser) {
-		this.obmUser = obmUser;
-	}
 
 	public Boolean isCanWriteOnCalendar() {
 		return canWriteOnCalendar;
@@ -202,6 +195,10 @@ public class Attendee implements Serializable {
 		if (!(obj instanceof Attendee)) {
 			return false;
 		}
+		if (!obj.getClass().equals(getClass())) {
+			return false;
+		}
+		
 		Attendee other = (Attendee) obj;
 		if (email == null) {
 			if (other.email != null) {
@@ -220,5 +217,5 @@ public class Attendee implements Serializable {
 				add("participation", getParticipation()).
 				add("canWriteOnCalendar", isCanWriteOnCalendar()).toString();
 	}
-
+	
 }

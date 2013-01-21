@@ -42,14 +42,12 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.DateUtils;
+import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class EventRecurrenceTest {
@@ -379,15 +377,18 @@ public class EventRecurrenceTest {
 	private List<Attendee> createAttendees(int count) {
 		List<Attendee> attendees = new ArrayList<Attendee>();
 		for (int i = 0; i < count; i++) {
-			Attendee attendee = new Attendee();
-			attendee.setCanWriteOnCalendar(false);
-			attendee.setDisplayName("DisplayName" + i);
-			attendee.setEmail("email" + i + "@email.com");
-			attendee.setObmUser(true);
+			Attendee attendee = UserAttendee
+					.builder()
+					.canWriteOnCalendar(false)
+					.displayName("DisplayName" + i)
+					.email("email" + i + "@email.com")
+					.percent(1)
+					.participationRole(ParticipationRole.REQ)
+					.participation(Participation.needsAction())
+					.build();
+			
 			attendee.setOrganizer(isOrganizer(i));
-			attendee.setPercent(1);
-			attendee.setParticipationRole(ParticipationRole.REQ);
-			attendee.setParticipation(Participation.needsAction());
+			
 			attendees.add(attendee);
 		}
 		return attendees;

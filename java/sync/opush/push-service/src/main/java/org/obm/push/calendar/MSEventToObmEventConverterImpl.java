@@ -63,6 +63,7 @@ import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -302,13 +303,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	}
 
 	private Attendee getOrganizer(String email, String displayName) {
-		Attendee att = new Attendee();
-		att.setEmail(email);
-		att.setDisplayName(displayName);
-		att.setParticipation(Participation.accepted());
-		att.setParticipationRole(ParticipationRole.REQ);
-		att.setOrganizer(true);
-		return att;
+		return UserAttendee
+				.builder()
+				.email(email)
+				.displayName(displayName)
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.REQ)
+				.asOrganizer()
+				.build();
 	}	
 	
 	private EventPrivacy convertSensitivityToPrivacy(MSEventCommon msEvent) {
@@ -627,18 +629,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			throw new ConversionException("Attendees.Attendee.Email is required");
 		}
 		
-		Attendee ret = new Attendee();
-		ret.setEmail(msAttendee.getEmail());
-		ret.setDisplayName(msAttendee.getName());
-		ret.setParticipationRole( 
-				getParticipationRole(msAttendee.getAttendeeType()) );
+		Attendee ret = UserAttendee
+				.builder()
+				.email(msAttendee.getEmail())
+				.displayName(msAttendee.getName())
+				.participationRole(getParticipationRole(msAttendee.getAttendeeType()))
+				.participation(getParticipation(getAttendeeState(eventFromDB, msAttendee) , msAttendee.getAttendeeStatus()))
+				.build();
 		
-		Participation status = getParticipation(
-				getAttendeeState(eventFromDB, msAttendee) , msAttendee.getAttendeeStatus() );
+		ret.setOrganizer(isOrganizer(msEvent, msAttendee, eventFromDB));
 		
-		ret.setParticipation(status);
-		
-		ret.setOrganizer( isOrganizer(msEvent, msAttendee, eventFromDB) );
 		return ret;
 	}
 

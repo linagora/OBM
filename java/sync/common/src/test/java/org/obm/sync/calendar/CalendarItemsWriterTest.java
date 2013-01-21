@@ -190,18 +190,25 @@ private CalendarItemsWriter writer;
 		ev.setDuration(3600);
 		ev.setLocation("tlse");
 		List<Attendee> la = new LinkedList<Attendee>();
-		Attendee at = new Attendee();
-		at.setDisplayName("John Do");
-		at.setEmail("john@do.fr");
-		at.setParticipation(Participation.needsAction());
-		at.setParticipationRole(ParticipationRole.CHAIR);
-		at.setOrganizer(true);
+		Attendee at = UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build();
+		
 		la.add(at);
-		at = new Attendee();
-		at.setDisplayName("noIn TheDatabase");
-		at.setEmail("notin@mydb.com");
-		at.setParticipation(Participation.accepted());
-		at.setParticipationRole(ParticipationRole.OPT);
+		
+		at = ContactAttendee
+				.builder()
+				.displayName("noIn TheDatabase")
+				.email("notin@mydb.com")
+				.participation(Participation.accepted())
+				.participationRole(ParticipationRole.OPT)
+				.build();
+
 		la.add(at);
 		ev.setAttendees(la);
 		ev.setAlert(60);
@@ -235,17 +242,14 @@ private CalendarItemsWriter writer;
 	}
 
 	private List<Attendee> getFakeListOfAttendee() {
-		Attendee john = new Attendee();
-		john.setEmail("john@doe");
-		john.setParticipation(Participation.accepted());
-		Attendee jane = new Attendee();
-		jane.setEmail("jane@doe");
-		jane.setParticipation(Participation.builder()
-								.state(State.NEEDSACTION)
-								.comment("this is a new comment")
-								.build());
+		Attendee john = UserAttendee.builder().email("john@doe").participation(Participation.accepted()).build();
+		Attendee jane = UserAttendee
+				.builder().email("jane@doe")
+				.participation(Participation.builder().state(State.NEEDSACTION).comment("this is a new comment").build())
+				.build();
 
 		List<Attendee> attendees = Lists.newArrayList(john, jane);
+		
 		return attendees;
 	}
 

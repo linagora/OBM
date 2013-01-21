@@ -65,8 +65,10 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.services.AttendeeService;
 
 import com.google.common.io.ByteStreams;
 
@@ -74,6 +76,7 @@ import com.google.common.io.ByteStreams;
 public class EventServiceImplTest {
 	private Ical4jHelper ical4jHelper;
 	private DateProvider dateProvider;
+	private AttendeeService attendeeService;
 	private Date now;
 	private IMocksControl mocksControl;
 	private EventExtId.Factory eventExtIdFactory;
@@ -84,10 +87,12 @@ public class EventServiceImplTest {
 		
 		mocksControl = createControl();
 		dateProvider = mocksControl.createMock(DateProvider.class);
+		attendeeService = new SimpleAttendeeService();
 		eventExtIdFactory = mocksControl.createMock(EventExtId.Factory.class);
-		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory);
+		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		
 		expect(dateProvider.getDate()).andReturn(now).anyTimes();		
+		replay(dateProvider);
 	}
 	
 	@Test

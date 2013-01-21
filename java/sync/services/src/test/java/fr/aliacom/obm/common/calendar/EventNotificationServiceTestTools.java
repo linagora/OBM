@@ -42,8 +42,9 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.easymock.LogicalOperator;
 import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.UserAttendee;
 
 public class EventNotificationServiceTestTools {
 
@@ -84,12 +85,13 @@ public class EventNotificationServiceTestTools {
 	}
 	
 	static Attendee createRequiredAttendee(String email, Participation state) {
-		Attendee attendee = new Attendee();
-		attendee.setEmail(email);
-		attendee.setParticipationRole(ParticipationRole.REQ);
-		attendee.setParticipation(state);
-		attendee.setCanWriteOnCalendar(false);
-		return attendee;
+		return UserAttendee
+				.builder()
+				.email(email)
+				.participationRole(ParticipationRole.REQ)
+				.participation(state)
+				.canWriteOnCalendar(false)
+				.build();
 	}
 
 	static List<Attendee> createRequiredAttendees(String prefix, String suffix, Participation state, int start, int number) {

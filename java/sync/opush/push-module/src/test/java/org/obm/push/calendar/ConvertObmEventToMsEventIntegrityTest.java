@@ -58,7 +58,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
-import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -66,11 +65,12 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.Iterables;
 
@@ -113,12 +113,12 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		event.setType(EventType.VEVENT);
 		event.setUid(new EventObmId(121));
 		event.addAttendees(Arrays.asList(
-				Attendee.builder().email("jaures@sfio.fr")
+				UserAttendee.builder().email("jaures@sfio.fr")
 					.displayName("Jean Jaures")
 					.participation(Participation.accepted())
 					.participationRole(ParticipationRole.REQ)
 					.asOrganizer().build(),
-				Attendee.builder().email("blum@sfio.fr")
+				UserAttendee.builder().email("blum@sfio.fr")
 					.displayName("Léon Blum")
 					.participation(Participation.needsAction())
 					.participationRole(ParticipationRole.OPT)
@@ -314,7 +314,7 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 		eventRecurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday));
 		
 		Event secondOccurence = new Event();
-		secondOccurence.addAttendee(Attendee.builder().email("jaures@sfio.fr")
+		secondOccurence.addAttendee(UserAttendee.builder().email("jaures@sfio.fr")
 				.displayName("Jean Jaures")
 				.participation(Participation.declined())
 				.participationRole(ParticipationRole.REQ).build());

@@ -88,6 +88,7 @@ import org.obm.sync.calendar.RecurrenceDaysParser;
 import org.obm.sync.calendar.RecurrenceDaysSerializer;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
@@ -911,9 +912,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			throws FindException {
 		Calendar cal = getGMTCalendar();
 		String domainName = resourceInfo.getDomainName();
-		Attendee resourceAtt = new Attendee();
-		resourceAtt.setEmail(resourceInfo.getMail());
+		Attendee resourceAtt = ResourceAttendee.builder().email(resourceInfo.getMail()).build();
 		Connection conn = null;
+		
 		try {
 			conn = obmHelper.getConnection();
 			EventLoader loader = EventLoader.builder().connection(conn).domainName(domainName).calendar(cal).

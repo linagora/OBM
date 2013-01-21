@@ -11,6 +11,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -19,17 +20,11 @@ import com.google.common.collect.Sets;
 public class DeclinedAttendeeFilterTest {
 
 	private Attendee kimPhilby(Participation participation) {
-		Attendee philby = new Attendee();
-		philby.setEmail("kim.philby@mi6.gov.uk");
-		philby.setParticipation(participation);
-		return philby;
+		return UserAttendee.builder().email("kim.philby@mi6.gov.uk").participation(participation).build();
 	}
 
 	private Attendee guyBurgess(Participation participation) {
-		Attendee burgess = new Attendee();
-		burgess.setEmail("guy.burgess@mi6.gov.uk");
-		burgess.setParticipation(participation);
-		return burgess;
+		return UserAttendee.builder().email("guy.burgess@mi6.gov.uk").participation(participation).build();
 	}
 
 	@Test

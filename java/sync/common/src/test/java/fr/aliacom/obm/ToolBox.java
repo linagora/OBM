@@ -47,6 +47,7 @@ import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.Lists;
 
@@ -118,9 +119,7 @@ public class ToolBox {
 	}
 
 	public static Attendee getFakeAttendee(String userEmail) {
-		Attendee att = new Attendee();
-		att.setEmail(userEmail);
-		return att;
+		return UserAttendee.builder().email(userEmail).build();
 	}
 
 	public static List<Attendee> getFakeListOfAttendees() {

@@ -51,6 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.UserAttendee;
 
 import com.ctc.wstx.io.CharsetNames;
 import com.google.common.collect.ImmutableList;
@@ -132,10 +133,6 @@ public class MailSendTest {
 	}
 	
 	private Attendee newAttendee(String name) {
-		Attendee attendee = new Attendee();
-		
-		attendee.setEmail(name + "@test");
-		
-		return attendee;
+		return UserAttendee.builder().email(name + "@test").build();
 	}
 }

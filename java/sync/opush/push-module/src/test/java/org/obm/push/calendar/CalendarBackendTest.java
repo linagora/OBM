@@ -96,6 +96,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
 import org.obm.sync.client.login.LoginService;
@@ -1051,13 +1052,13 @@ public class CalendarBackendTest {
 		int collectionId = 1;
 		EventObmId eventObmId = new EventObmId(132453);
 		EventExtId eventExtId = new EventExtId("event-ext-id-bla-bla");
-		Attendee attendee = new Attendee();
-		attendee.setEmail(user.getLoginAtDomain());
-		attendee.setParticipation(Participation.declined());
+		Attendee attendee = UserAttendee.builder().email(user.getLoginAtDomain()).participation(Participation.declined()).build();
 		Event event = new Event();
+		
 		event.setExtId(eventExtId);
 		event.setUid(eventObmId);
 		event.addAttendee(attendee);
+		
 		DeletedEvent deletedEvent = createDeletedEvent(eventObmId, eventExtId);
 		EventChanges eventChanges = EventChanges.builder()
 			.deletes(Arrays.asList(deletedEvent))
