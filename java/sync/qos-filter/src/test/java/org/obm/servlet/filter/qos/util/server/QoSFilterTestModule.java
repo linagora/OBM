@@ -38,6 +38,8 @@ import javax.servlet.ServletContextListener;
 import net.sf.ehcache.CacheManager;
 
 import org.eclipse.jetty.continuation.ContinuationFilter;
+import org.mortbay.component.LifeCycle;
+import org.mortbay.component.LifeCycle.Listener;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
@@ -71,6 +73,7 @@ public class QoSFilterTestModule extends ServletModule {
 		Context root = new Context(server, "/", Context.SESSIONS);
 		root.addFilter(GuiceFilter.class, "/*", 0);
 		root.addServlet(DefaultServlet.class, "/");
+		root.addLifeCycleListener(buildServerStartedListener());
 		root.addEventListener(buildTransactionManagerListener());
 		return new EmbeddedServer() {
 			
@@ -108,7 +111,7 @@ public class QoSFilterTestModule extends ServletModule {
 				if (port > 0) {
 					return port;
 				}
-				throw new IllegalStateException("Could not get server's listening port.");
+				throw new IllegalStateException("Could not get server's listening port. Received port is " + port);
 			}
 		};
 	}
@@ -118,12 +121,32 @@ public class QoSFilterTestModule extends ServletModule {
 			
 			@Override
 			public void contextInitialized(ServletContextEvent sce) {
-				serverStartedLatch.countDown();
 			}
 			
 			@Override
 			public void contextDestroyed(ServletContextEvent sce) {
 				CacheManager.getInstance().shutdown();
+			}
+		};
+	}
+
+	private Listener buildServerStartedListener() {
+		return new Listener() {
+			@Override
+			public void lifeCycleStopping(LifeCycle event) {
+			}
+			@Override
+			public void lifeCycleStopped(LifeCycle event) {
+			}
+			@Override
+			public void lifeCycleStarting(LifeCycle event) {
+			}
+			@Override
+			public void lifeCycleStarted(LifeCycle event) {
+				serverStartedLatch.countDown();
+			}
+			@Override
+			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
 			}
 		};
 	}
