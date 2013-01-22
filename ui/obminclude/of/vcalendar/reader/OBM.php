@@ -172,6 +172,14 @@ class Vcalendar_Reader_OBM {
      while($attendees->next_record()) {
        $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
      }
+     // OBMFULL-3973: Recreate eventlink for deleted attendees
+     // to match TB's blue bar behavior when reading a CANCEL ICS.
+     if(strcasecmp($method, "CANCEL") == 0) {
+       $deletedAttendees = run_query_get_events_deletedAttendees(array_keys($this->vevents));
+       while($deletedAttendees->next_record()) {
+         $this->addAttendee($this->vevents[$deletedAttendees->f('event_id')], $deletedAttendees->Record);
+       }
+     }
     }
     /* this only adds exceptions that have been deleted. Those that have been changed have their own ics*/
     if(count($this->vevents) > 0 && $this->recurrenceId == null) {

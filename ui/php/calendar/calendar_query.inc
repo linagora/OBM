@@ -2162,6 +2162,7 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 
   $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $eventDiff = new OBM_EventDiff($oldEvent, $newEvent);
+
   if ($eventDiff->hasEventFullyChanged($oldEvent, $newEvent, false)
   	|| count($new_users) > 0 
   	|| count($removed_users) > 0
@@ -5075,6 +5076,50 @@ function run_query_get_events_attendee($events, $with_resources = true, $with_co
     WHERE event_id IN ($event_list) $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_attendee()');
+  $obm_q->xquery($query);
+  return $obm_q;
+}
+
+/**
+ * Get all deleted attendees of an array of events
+ *  
+ * @param array $events 
+ * @access public
+ * @return void
+ */
+function run_query_get_events_deletedAttendees($events) {
+  global $cdg_sql;
+
+  $event_list = implode(',',$events);
+  if ($event_list == '') {
+    $event_list = '0';
+  }
+  $obm_q = new DB_OBM;
+  $concat = array (
+    array ('type' => 'field','value' => 'UserObm.userobm_lastname'),
+    array (
+      'type' => 'string',
+      'value' => ' '
+    ),
+    array (
+      'type' => 'field',
+      'value' => 'UserObm.userobm_firstname'
+    ) 
+  );
+  $entity_label = sql_string_concat($db_type,$concat);
+  $multidomain = sql_multidomain('event');
+
+  $query = "SELECT event_id, 
+            'DECLINED' as eventlink_state, 
+            userobm_id as eventlink_entity_id, 
+            'user' as eventlink_entity, 
+            ".DB_OBM::CONCAT(array("userobm_lastname", "' '", "userobm_firstname"))." as eventlink_label 
+            FROM DeletedEvent 
+            LEFT JOIN UserObm ON userobm_id = deletedevent_user_id 
+            LEFT JOIN Event ON deletedevent_event_id = event_id 
+            WHERE event_id IN ($event_list) $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_get_events_deletedAttendees()');
   $obm_q->xquery($query);
   return $obm_q;
 }
