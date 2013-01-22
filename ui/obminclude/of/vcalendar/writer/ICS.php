@@ -32,8 +32,11 @@ applicable to the OBM software.
 
 
 include_once('obminclude/of/Vcalendar.php');
+include_once('obminclude/of/of_dynamicmethod.php');
 
 class Vcalendar_Writer_ICS {
+  
+  private static $methodCache = array();
 
   var $parsed_event;
 
@@ -97,13 +100,27 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeProperty($name,$value) {
-    $methodName = 'write'.str_replace(' ','',ucwords(str_replace('-',' ',$name)));
-    if(method_exists($this, $methodName)) {
-      $this->$methodName($name,$value);
+    $method = Vcalendar_Writer_ICS::$methodCache[$name];
+    
+    if (isset($method)) {
+      if ($method->exists) {
+        $methodName = $method->methodName;
+        
+        $this->$methodName($name,$value);
+      } else {
+        $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseText($value)) . "\r\n";
+      }
     } else {
-      $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseText($value));
-      $this->buffer .= "\r\n";      
-    }    
+      $methodName = 'write'.str_replace(' ','',ucwords(str_replace('-',' ',$name)));
+      
+      if(method_exists($this, $methodName)) {
+        Vcalendar_Writer_ICS::$methodCache[$name] = new DynamicMethod($methodName, true);
+        $this->$methodName($name,$value);
+      } else {
+        Vcalendar_Writer_ICS::$methodCache[$name] = new DynamicMethod($methodName, false);
+        $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseText($value)) . "\r\n";
+      }
+    }
   }
 
   function writeRecurrenceId($name, $value)
@@ -149,7 +166,13 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeOrganizer($name, $value) {
-    $userInfo = get_user_info($value);
+    // OBMFULL-2980
+    // This will share the cache with the attendees, which is an added benefit
+    // the primary benefit being we don't call get_user_info for every VEVENT !
+    if(!$this->attendees['user'][$value]) {
+      $this->attendees['user'][$value] = get_user_info($value);
+    }
+    $userInfo = $this->attendees['user'][$value];
     $params[] = $this->parseName('x-obm-id').'='.$value;
     $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
     if(!$userInfo['email']) $userInfo['email'] = $this->noreply ; 

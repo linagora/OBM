@@ -133,6 +133,15 @@ $params['category_filter'] = $c_all;
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == 'ics_export') {
+  global $ics_sharing_max_months;
+
+  // OBMFULL-2980
+  // With this added parameter, we export only event newer than a given date
+  $afterDate = new Of_Date();
+  $afterDate->subMonth($ics_sharing_max_months);
+  $params['event_after_date'] = $afterDate;
+  $params['export'] = "postdate";
+  
   dis_calendar_export_handle($params, $GLOBALS['token']['entity'], $GLOBALS['token']['entityId'], $GLOBALS['token']['type'] == 'private');
   # Remove the session to force auth next time (Mantis #3007)
   $sess->delete();

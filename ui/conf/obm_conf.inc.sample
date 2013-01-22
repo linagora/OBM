@@ -331,4 +331,7 @@ $cgp_show['module']['log'] = false;
 // Prevent public Agenda or Email sharing
 $prevent_public_agenda_sharing_by_url = false;
 $prevent_public_agenda_sharing_by_email = false;
+
+// ICS sharing: export only events newer than this number of months
+// $ics_sharing_max_months = 3;
 </script>

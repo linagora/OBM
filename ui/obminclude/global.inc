@@ -494,6 +494,8 @@ $set_debug_default = 0;
 $set_cal_interval_default = 2;
 $set_timezone_default = 'Europe/Paris';
 
+$ics_sharing_max_months = 3;
+
 //---------------------------------------------------------------------------//
 // END : OBM Default configurable Constants : Default values
 //---------------------------------------------------------------------------//
@@ -2167,31 +2169,22 @@ if (!function_exists('quoted_printable_encode')) {
   }
 }
 
-function mbStringToArray ($str) {
-  if (empty($str)) return false;
-  $len = mb_strlen($str);
-  $array = array();
-  for ($i = 0; $i < $len; $i++) {
-    $array[] = mb_substr($str, $i, 1);
-  }
-  return $array;
-}
-
 function mb_chunk_split($str, $len, $glue) {
-  if (empty($str)) return false;
-  mb_internal_encoding('UTF-8');  
-  $array = mbStringToArray ($str);
-  $n = -1;
-  $new = '';
-  foreach ($array as $char) {
-    $n++;
-    if ($n < $len) $new .= $char;
-    elseif ($n == $len) {
-      $new .= $glue . $char;
-      $n = 0;
+  mb_internal_encoding('UTF-8');
+
+  $mbStrLen = mb_strlen($str);
+  
+  if ($mbStrLen == 0) {
+    return false;
+  } else {
+    if ($mbStrLen <= $len) {
+      return $str;
+    } else if (strlen($str) == $mbStrLen) {
+      return preg_replace("/(.{0," . $len . "})/", "\\0" . $glue, $str);
+    } else {
+      return mb_ereg_replace("(.{0," . $len . "})", "\\0" . $glue, $str);
     }
   }
-  return $new;
 }
 
 

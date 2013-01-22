@@ -29,7 +29,7 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
-
+include_once('obminclude/of/of_dynamicmethod.php');
 
 /**
  * Vcalendar Element
@@ -40,6 +40,8 @@ applicable to the OBM software.
  * @author Mehdi Rande <mehdi.rande@aliasource.fr>
  */
 class Vcalendar_Element {
+  
+  private static $methodCache = array();
 
   var $document = NULL;
 
@@ -90,11 +92,26 @@ class Vcalendar_Element {
    * @return void
    */
   function set($name, $value) {
-    $methodName = 'set'.str_replace(' ','',ucwords(str_replace('-',' ',$name)));
-    if(method_exists($this, $methodName)) {
-      $this->$methodName($value);
+    $method = Vcalendar_Element::$methodCache[$name];
+    
+    if (isset($method)) {
+      if ($method->exists) {
+        $methodName = $method->methodName;
+        
+        $this->$methodName($value);
+      } else {
+        $this->setProperty($name, $value);
+      }
     } else {
-      $this->setProperty($name, $value);
+      $methodName = 'set'.str_replace(' ','',ucwords(str_replace('-',' ',$name)));
+      
+      if(method_exists($this, $methodName)) {
+        Vcalendar_Element::$methodCache[$name] = new DynamicMethod($methodName, true);
+        $this->$methodName($value);
+      } else {
+        Vcalendar_Element::$methodCache[$name] = new DynamicMethod($methodName, false);
+        $this->setProperty($name, $value);
+      }
     }
   }
   /**

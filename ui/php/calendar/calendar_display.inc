@@ -7187,11 +7187,18 @@ function xml_calendar_export_templates($template_id = null) {
 function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null, $private = false) {
   global $obm, $obm_version, $ccalendar_weekstart;
 
-  if($calendar['export'] == "date") {
+  $exportType = $calendar['export'];
+  
+  if ($exportType == "date") {
     $date = $calendar['event_before_date'];
     $start = clone $date;
     $start = $start->subYear(100);
     $end = clone $date;
+  } else if ($exportType == "postdate") {
+    $date = $calendar['event_after_date'];
+    $start = clone $date;
+    $end = clone $date;
+    $end->addYear(100);
   } else {
     $date = new Of_date() ;
     $start = clone $date;
