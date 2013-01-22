@@ -130,7 +130,7 @@ function dis_calendar_search_result($calendar, $current_view) {
     $begin = new Of_Date(0);
     $end = new Of_Date();
     $end->addYear(5);
-    $pattern = $calendar['pattern'];
+    $pattern = format_field_for_solr_query($calendar['pattern']);
   } else {
     if ($calendar['date_begin'] == null) {
       $begin = new Of_Date(0);
@@ -157,19 +157,19 @@ function dis_calendar_search_result($calendar, $current_view) {
     $pattern = "+(date:[$solrBegan TO $solrEnd] OR is:periodic)";
 
     if (isset($calendar['title']) && $calendar['title'] != '') {
-      $pattern .= " title:(".$calendar['title'].')';
+      $pattern .= " title:(".format_field_for_solr_query($calendar['title']).')';
     }    
     if (isset($calendar['location']) && $calendar['location'] != '') {
-      $pattern .= " location:(".$calendar['location'].')';
+      $pattern .= " location:(".format_field_for_solr_query($calendar['location']).')';
     }    
     if (isset($calendar['desc']) && $calendar['desc'] != '') {
-      $pattern .= " description:(".$calendar['desc'].')';
+      $pattern .= " description:(".format_field_for_solr_query($calendar['desc']).')';
     }   
     if (isset($calendar['owner']) && $calendar['owner'] != '' && $calendar['owner'] != $obm['uid']) {
-      $pattern .= " owner:(".$calendar['owner'].')';
+      $pattern .= " owner:(".format_field_for_solr_query($calendar['owner']).')';
     }
     if (isset($calendar['attendees']) && $calendar['attendees'] != '') {
-      $pattern .= " with:(".$calendar['attendees'].')';
+      $pattern .= " with:(".format_field_for_solr_query($calendar['attendees']).')';
     }   
     if (isset($calendar['tag']) && $calendar['tag'] != '') {
       $pattern .= " tag:($calendar[tag])";
@@ -190,7 +190,7 @@ function dis_calendar_search_result($calendar, $current_view) {
   }
 
   $events = OBM_Search::search('event', $patternToSearch, 0, 10000, array());
-  $GLOBALS['display']['search'] = dis_calendar_html_search_form($calendar, $pattern);
+  $GLOBALS['display']['search'] = dis_calendar_html_search_form($calendar, $calendar['pattern']);
   $GLOBALS['display']['search'] .= dis_back_to_calendar($action);
 
   $block = "<h1>$GLOBALS[l_search_result]</h1>";
@@ -199,6 +199,17 @@ function dis_calendar_search_result($calendar, $current_view) {
   return $block;
 }
 
+function format_field_for_solr_query($string){
+  $string = trim($string);
+  $string = strtolower($string);
+  $string = preg_replace('/([^\d\s][^\s])([0-9])/', '\1 \2', $string);
+  $words = split(' ', $string);
+  foreach ($words as $word){
+    $formated_word = ( substr($word, -1) == '*' ) ? $word : $word.'*';
+    $formated_string .= ( end($words) == $word ) ? $formated_word : $formated_word.' ';
+  }
+  return $formated_string;
+}
 
 /**
  * dis_calendar_view_bar 
