@@ -334,4 +334,8 @@ $prevent_public_agenda_sharing_by_email = false;
 
 // ICS sharing: export only events newer than this number of months
 // $ics_sharing_max_months = 3;
+
+// Backup desactivated mail of users
+$backup_desactived_mail = false;
+
 </script>
