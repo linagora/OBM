@@ -230,6 +230,7 @@ Obm.Contact.AddressBook = new Class ({
 
   formatSearchPattern: function(pattern){
     pattern = pattern.trim().toLowerCase();
+    pattern = pattern.replace(/([0-9])/, function(str,m) { return ' '+m});
     words = pattern.split(' ').map( function(word) {
       return ( word.charAt(word.length-1) != '*' ) ? word + '*' : word ;
     });
