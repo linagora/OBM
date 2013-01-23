@@ -31,24 +31,56 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.User;
-import org.obm.push.exception.ConversionException;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.Participation;
 
-public interface EventConverter {
+@RunWith(SlowFilterRunner.class)
+public class EventConverterImplTest {
 
-	MSEvent convert(Event eventToConvert, MSEventUid uid, User user) throws ConversionException;
+	private EventConverterImpl testee;
 
-	Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent) throws ConversionException;
-
-	boolean isInternalEvent(Event event, boolean defaultValue);
-	boolean isInternalEvent(Event oldEvent, EventExtId eventExtId);
+	@Before
+	public void setUp() {
+		testee = new EventConverterImpl(null, null);
+	}
 	
-	Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus);
+	@Test
+	public void testIsInternalWhenBothNull() {
+		assertThat(testee.isInternalEvent(null, null)).isTrue();
+	}
+
+	@Test
+	public void testIsInternalWhenOldEventInternal() {
+		Event oldEvent = new Event();
+		oldEvent.setInternalEvent(true);
+		
+		EventExtId eventExtId = new EventExtId("123");
+		
+		assertThat(testee.isInternalEvent(oldEvent, eventExtId)).isTrue();
+	}
+	
+	@Test
+	public void testIsInternalWhenOldEventExternal() {
+		Event oldEvent = new Event();
+		oldEvent.setInternalEvent(false);
+		
+		EventExtId eventExtId = new EventExtId("123");
+		
+		assertThat(testee.isInternalEvent(oldEvent, eventExtId)).isFalse();
+	}
+
+	@Test
+	public void testIsInternalOneventExtIdNotNull() {
+		Event oldEvent = null;
+		EventExtId eventExtId = new EventExtId("123");
+		
+		assertThat(testee.isInternalEvent(oldEvent, eventExtId)).isFalse();
+	}
 
 }

@@ -38,6 +38,7 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.Participation;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -71,6 +72,14 @@ public class EventConverterImpl implements EventConverter {
 		return msEventToObmEventConverter.isInternalEvent(event, defaultValue);
 	}
 
+	@Override
+	public boolean isInternalEvent(Event oldEvent, EventExtId eventExtId){
+		if (oldEvent != null) {
+			return oldEvent.isInternalEvent();
+		}
+		return eventExtId == null;
+	}
+	
 	@Override
 	public Event convert(User user, Event oldEvent, MSEvent data, boolean isInternal) throws ConversionException {
 		return msEventToObmEventConverter.convert(user, oldEvent, data, isInternal);
