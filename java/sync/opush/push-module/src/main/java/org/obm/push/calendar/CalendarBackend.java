@@ -357,7 +357,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private String getServerIdFor(Integer collectionId, EventObmId uid) {
-		return mappingService.getServerIdFor(collectionId, uid.serializeToString());
+		return ServerId.buildServerIdString(collectionId, uid.getObmId());
 	}
 
 	@Override

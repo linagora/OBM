@@ -505,7 +505,7 @@ public class CalendarBackendTest {
 
 		expectMappingServiceCollectionPathFor(collectionId);
 		
-		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, mappingService, collectionId);
+		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate);
 		
 		expect(calendarClient.getSync(token, "test", currentDate))
 			.andReturn(eventChanges).once();
@@ -549,7 +549,7 @@ public class CalendarBackendTest {
 
 		expectMappingServiceCollectionPathFor(collectionId);
 		
-		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, mappingService, collectionId);
+		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate);
 		
 		expect(calendarClient.getSync(token, "test", currentDate))
 			.andReturn(eventChanges).once();
@@ -575,7 +575,7 @@ public class CalendarBackendTest {
 		assertThat(dataDelta.getChanges()).hasSize(2);
 	}
 
-	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate, MappingService mappingService, int collectionId) {
+	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate) {
 		EventChanges eventChanges = new EventChanges();
 		Set<DeletedEvent> deletedEvents = ImmutableSet.of(
 				createDeletedEvent(new EventObmId(11), new EventExtId("11")),
@@ -590,11 +590,6 @@ public class CalendarBackendTest {
 		eventChanges.setUpdated(updated);
 		
 		eventChanges.setLastSync(currentDate);
-		
-		for (Event event : updated) {
-			expect(mappingService.getServerIdFor(collectionId, "" + event.getObmId().getObmId()))
-			.andReturn("" + event.getObmId().getObmId());
-		}
 		
 		return eventChanges;
 	}
@@ -619,28 +614,26 @@ public class CalendarBackendTest {
 	@Test
 	public void testCreateOrUpdate() throws Exception {
 		int collectionId = 1;
-		String serverId = "2";
+		String itemId = "2";
 		String clientId = "3";
 		IApplicationData data = null;
 
 		expectLoginBehavior();
 		
 		expectMappingServiceCollectionPathFor(collectionId);
-		expect(mappingService.getServerIdFor(collectionId, serverId))
-			.andReturn(serverId).once();
 		
 		Event event = new Event();
-		expectGetAndModifyEvent(serverId, event);
+		expectGetAndModifyEvent(itemId, event);
 
 		expectEventConvertion(event, true);
 		
 		mockControl.replay();
 		
-		String serverIdFor = calendarBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, data);
+		String serverIdFor = calendarBackend.createOrUpdate(userDataRequest, collectionId, itemId, clientId, data);
 		
 		mockControl.verify();
 		
-		assertThat(serverIdFor).isEqualTo(serverId);
+		assertThat(serverIdFor).isEqualTo(collectionId + ":" + itemId);
 	}
 
 	private void expectGetAndModifyEvent(String serverId, Event event) 
@@ -714,11 +707,8 @@ public class CalendarBackendTest {
 		expect(eventConverter.getParticipation(null, AttendeeStatus.ACCEPT))
 			.andReturn(null).once();
 		
-		String serverId = "123";
 		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
 			.andReturn(1).once();
-		expect(mappingService.getServerIdFor(1, "1"))
-			.andReturn(serverId);
 		
 		expectBuildCollectionPath(calendarDisplayName, defaultCalendarName);
 		
@@ -727,7 +717,7 @@ public class CalendarBackendTest {
 		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
 		
 		mockControl.verify();
-		assertThat(serverIdResponse).isEqualTo(serverId);
+		assertThat(serverIdResponse).isEqualTo("1:1");
 	}
 	
 	private void expectGetAndModifyEvent(EventExtId eventExtId, Event event) 
