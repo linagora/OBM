@@ -38,15 +38,21 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import net.freeutils.tnef.TNEFUtils;
+import com.google.common.io.BaseEncoding;
+import com.google.common.io.ByteStreams;
 
 /**
  * Decode a global object id
  */
 public class GlobalObjectId {
 
+	private static final int[] GLOBAL_OBJECT_ID_ARRAY_ID = 
+		{ 0x04, 0x00, 0x00, 0x00, 0x82, 0x00, 0xE0, 0x00, 0x74, 0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08};
+	
 	private String uid;
 	private Date recurrenceId;
+
+	private int size;
 
 	/**
 	 * http://msdn.microsoft.com/en-us/library/ee160198(EXCHG.80).aspx Spec
@@ -54,25 +60,99 @@ public class GlobalObjectId {
 	 */
 	public GlobalObjectId(InputStream obj, int recurStartTime)
 			throws IOException {
-		// int[] data = FileUtils.streamBytes(obj, false);
-		// Byte Array ID (16 bytes): An array of 16 bytes identifying this BLOB
-		// as a Global Object ID.
-		// The byte array MUST be as follows:
-		// int pos = 0;
-		int[] goiID = { 0x04, 0x00, 0x00, 0x00, 0x82, 0x00, 0xE0, 0x00, 0x74,
-				0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08 };
-		for (int i = 0; i < goiID.length; i++) {
-			if (goiID[i] != obj.read()) {
-				obj.reset();
-				byte[] endUid = new byte[obj.available()];
-				for (int l = 0; l < endUid.length; l++) {
-					endUid[l] = (byte) obj.read();
-				}
-				this.uid = TNEFUtils.toHexString(endUid);
-				return;
-			}
+		if (!isGlobalObjectId(obj)) {
+			obj.reset();
+			this.uid = bytesToHex(obj);
+			return;
 		}
 
+		short year = readYear(obj);
+		int month = readMonth(obj);
+		int dayOfMonth = readDayOfMonth(obj);
+
+		if (year != 0 && month != 0 && dayOfMonth != 0) {
+			recurrenceId = buildDate(recurStartTime, year, month, dayOfMonth);
+		}
+		// Creation Time (8 bytes): The date and time that this Global Object ID
+		// was generated.
+		// Creation Time is a FILETIME structure, as specified in [MS-DTYP].
+		obj.skip(8);
+		// X (8 bytes): Reserved, MUST be all zeroes.
+		obj.skip(8);
+
+		size = readDataSize(obj);
+
+		String uidLabel = readUidLabel(obj);
+		
+		if (!"vCal-Uid".equals(uidLabel)) {
+			// TODO USE buf
+			StringBuilder uidBuilder = new StringBuilder(
+					"040000008200E00074C5B7101A82E00800000000");
+			obj.reset();
+			obj.skip(20);
+			uidBuilder.append(bytesToHex(obj));
+			this.uid = uidBuilder.toString();
+		} else {
+			// // skip 0x01,0x00,0x00,0x00
+			obj.skip(4);
+			size -= 4;
+			// skip 0x00 at the end
+			InputStream truncatedStream = ByteStreams.limit(obj, size - 1);
+			this.uid = bytesToHex(truncatedStream);
+		}
+	}
+
+	private String bytesToHex(InputStream truncatedStream) throws IOException {
+		return BaseEncoding.base16().encode(ByteStreams.toByteArray(truncatedStream));
+	}
+
+	private String readUidLabel(InputStream obj) throws IOException {
+		int dataSize = 8;
+		byte[] b = new byte[dataSize];
+		for (int i = 0; i < dataSize; i++) {
+			b[i] = (byte) obj.read();
+		}
+		String uidLabel = new String(b);
+		size -= dataSize;
+		return uidLabel;
+	}
+
+	private int readDataSize(InputStream obj) throws IOException {
+		// Size (4 bytes): A LONG value that defines the size of the Data
+		// component.
+		int[] tsize = new int[4];
+		tsize[3] = obj.read();
+		tsize[2] = obj.read();
+		tsize[1] = obj.read();
+		tsize[0] = obj.read();
+		int size = readInt(tsize);
+		return size;
+	}
+
+	private Date buildDate(int recurStartTime, short year, int month,
+			int dayOfMonth) {
+		int h = (recurStartTime >> 12);
+		int min = (recurStartTime - h * 4096) >> 6;
+		Calendar cal = new GregorianCalendar(year, month, dayOfMonth, h, min, 0);
+		Date date = cal.getTime();
+		return date;
+	}
+
+	private int readDayOfMonth(InputStream obj) throws IOException {
+		// D (1 byte): The Day of the month from the PidLidExceptionReplaceTime
+		// property if the object
+		// represents an exception; otherwise, zero.
+		int dayOfMonth = obj.read();
+		return dayOfMonth;
+	}
+
+	private int readMonth(InputStream obj) throws IOException {
+		int m = readDayOfMonth(obj);
+		int month = getMonth(m);
+		return month;
+	}
+
+	private short readYear(InputStream obj) throws IOException {
 		int[] yearBuf = new int[2];
 		// YH (1 byte): The high-ordered byte of the 2-byte Year from the
 		// PidLidExceptionReplaceTime
@@ -83,108 +163,49 @@ public class GlobalObjectId {
 		yearBuf[0] = obj.read();
 		yearBuf[1] = obj.read();
 		short year = readShort(yearBuf);
-		// M (1 byte): The Month from the PidLidExceptionReplaceTime property if
-		// the object represents
-		// an exception; otherwise, zero. If it represents an exception, the
-		// value MUST be one of those
-		// listed in the following table.
-		int m = obj.read();
-		int month = 0;
+		return year;
+	}
+
+	private boolean isGlobalObjectId(InputStream obj) throws IOException {
+		// Byte Array ID (16 bytes): An array of 16 bytes identifying this BLOB
+		// as a Global Object ID.
+		for (int i = 0; i < GLOBAL_OBJECT_ID_ARRAY_ID.length; i++) {
+			if (GLOBAL_OBJECT_ID_ARRAY_ID[i] != obj.read()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private int getMonth(int m) {
 		switch (m) {
+		case 0:
 		case 1:
-			month = Calendar.JANUARY;
-			break;
+			return Calendar.JANUARY;
 		case 2:
-			month = Calendar.FEBRUARY;
-			break;
+			return Calendar.FEBRUARY;
 		case 3:
-			month = Calendar.MARCH;
-			break;
+			return Calendar.MARCH;
 		case 4:
-			month = Calendar.APRIL;
-			break;
+			return Calendar.APRIL;
 		case 5:
-			month = Calendar.MAY;
-			break;
+			return Calendar.MAY;
 		case 6:
-			month = Calendar.JUNE;
-			break;
+			return Calendar.JUNE;
 		case 7:
-			month = Calendar.JULY;
-			break;
+			return Calendar.JULY;
 		case 8:
-			month = Calendar.AUGUST;
-			break;
+			return Calendar.AUGUST;
 		case 9:
-			month = Calendar.SEPTEMBER;
-			break;
+			return Calendar.SEPTEMBER;
 		case 10:
-			month = Calendar.OCTOBER;
-			break;
+			return Calendar.OCTOBER;
 		case 11:
-			month = Calendar.NOVEMBER;
-			break;
+			return Calendar.NOVEMBER;
 		case 12:
-			month = Calendar.DECEMBER;
-			break;
-		}
-
-		// D (1 byte): The Day of the month from the PidLidExceptionReplaceTime
-		// property if the object
-		// represents an exception; otherwise, zero.
-		int dayOfMonth = obj.read();
-		if (year != 0 && month != 0 && dayOfMonth != 0) {
-			int h = (recurStartTime >> 12);
-			int min = (recurStartTime - h * 4096) >> 6;
-			Calendar cal = new GregorianCalendar(year, month, dayOfMonth, h - 2,
-					min, 0);
-			recurrenceId = cal.getTime();
-		}
-		// Creation Time (8 bytes): The date and time that this Global Object ID
-		// was generated.
-		// Creation Time is a FILETIME structure, as specified in [MS-DTYP].
-		obj.skip(8);
-		// X (8 bytes): Reserved, MUST be all zeroes.
-		obj.skip(8);
-
-		// Size (4 bytes): A LONG value that defines the size of the Data
-		// component.
-		int[] tsize = new int[4];
-		tsize[3] = obj.read();
-		tsize[2] = obj.read();
-		tsize[1] = obj.read();
-		tsize[0] = obj.read();
-		int size = readInt(tsize);
-
-		byte[] b = new byte[8];
-		for (int i = 0; i < b.length; i++) {
-			b[i] = (byte) obj.read();
-		}
-		size = size - 8;
-		String uidLabel = new String(b);
-		if (!"vCal-Uid".equals(uidLabel)) {
-			// TODO USE buf
-			StringBuilder uidBuilder = new StringBuilder(
-					"040000008200E00074C5B7101A82E00800000000");
-			obj.reset();
-			obj.skip(20);
-			byte[] endUid = new byte[obj.available()];
-			for (int i = 0; i < endUid.length; i++) {
-				endUid[i] = (byte) obj.read();
-			}
-			uidBuilder.append(TNEFUtils.toHexString(endUid));
-			this.uid = uidBuilder.toString();
-		} else {
-			// // skip 0x01,0x00,0x00,0x00
-			obj.skip(4);
-			size = size - 4;
-			// skip 0x00 at the end
-			size = size - 1;
-			byte[] uid = new byte[size];
-			for (int l = 0; l < size; l++) {
-				uid[l] = (byte) obj.read();
-			}
-			this.uid = TNEFUtils.toHexString(uid);
+			return Calendar.DECEMBER;
+		default:
+			throw new IllegalArgumentException("out of bound value : " + m);
 		}
 	}
 
