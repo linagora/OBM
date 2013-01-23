@@ -97,7 +97,7 @@ public abstract class OpushBackend {
 								return collectionPath.pimType() == filterPimDataType;
 							}
 						})
-				.toImmutableSet();
+				.toSet();
 	}
 
 	protected Iterable<OpushCollection> addedCollections(

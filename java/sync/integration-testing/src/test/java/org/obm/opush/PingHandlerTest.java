@@ -293,7 +293,7 @@ public class PingHandlerTest {
 	private void checkExecutionTime(int delta, int expected,
 			Stopwatch stopwatch) {
 		stopwatch.stop();
-		long elapsedTime = stopwatch.elapsedTime(TimeUnit.SECONDS);
+		long elapsedTime = stopwatch.elapsed(TimeUnit.SECONDS);
 		assertThat(elapsedTime)
 			.isGreaterThanOrEqualTo(expected)
 			.isLessThan(expected + delta);

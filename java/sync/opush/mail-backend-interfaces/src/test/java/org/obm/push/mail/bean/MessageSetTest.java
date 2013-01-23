@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
-import com.google.common.collect.Ranges;
+import com.google.common.collect.Range;
 
 @RunWith(SlowFilterRunner.class)
 public class MessageSetTest {
@@ -79,57 +79,57 @@ public class MessageSetTest {
 	
 	@Test
 	public void simpleRangeRangeBuilder() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l);
 	}
 	
 	@Test
 	public void duplicateRangeRangeBuilder() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(1l, 5l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(1l, 5l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l);
 	}
 	
 	@Test
 	public void spanningRangeRangeBuilder() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(4l, 7l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(4l, 7l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 6l, 7l);
 	}
 	
 	@Test
 	public void spanningRangeRangeBuilder2() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(2l, 5l)).add(Ranges.closed(1l, 4l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(2l, 5l)).add(Range.closed(1l, 4l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l);
 	}
 	
 	@Test
 	public void notIntersectingRangeBuilder() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(10l, 12l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(10l, 12l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(2);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 10l, 11l, 12l);
 	}
 	
 	@Test
 	public void connectingRangeRangeBuilder() {
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(7l, 8l)).add(Ranges.closed(6l, 7l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(7l, 8l)).add(Range.closed(6l, 7l)).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l);
 	}
 	
 	@Test
 	public void messageSetMergingRangeBuilder() {
-		MessageSet toMerge = MessageSet.builder().add(Ranges.closed(6l, 7l)).add(Ranges.closed(9l, 10l)).build();
-		MessageSet actual = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(7l, 8l)).add(toMerge).build();
+		MessageSet toMerge = MessageSet.builder().add(Range.closed(6l, 7l)).add(Range.closed(9l, 10l)).build();
+		MessageSet actual = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(7l, 8l)).add(toMerge).build();
 		assertThat(actual.rangeNumber()).isEqualTo(1);
 		assertThat(actual.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l);
 	}
 	
 	@Test
 	public void messageSetBuilderFromExistingMessageSet() {
-		MessageSet firstSet = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(7l, 8l)).build();
+		MessageSet firstSet = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(7l, 8l)).build();
 		MessageSet secondSet = MessageSet.from(firstSet).add(6l).build();
 		assertThat(firstSet.rangeNumber()).isEqualTo(2);
 		assertThat(secondSet.rangeNumber()).isEqualTo(1);
@@ -139,7 +139,7 @@ public class MessageSetTest {
 	
 	@Test
 	public void messageSetBuilderExtendTo() {
-		MessageSet firstSet = MessageSet.builder().add(Ranges.closed(1l, 5l)).add(Ranges.closed(7l, 8l))
+		MessageSet firstSet = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(7l, 8l))
 				.extendTo(10l)
 				.build();
 		assertThat(firstSet.rangeNumber()).isEqualTo(2);

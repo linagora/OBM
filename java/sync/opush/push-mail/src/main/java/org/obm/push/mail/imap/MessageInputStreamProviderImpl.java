@@ -35,7 +35,7 @@ import java.io.InputStream;
 
 import org.obm.push.mail.mime.MimeAddress;
 
-import com.google.common.io.LimitInputStream;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPInputStream;
 import com.sun.mail.imap.IMAPMessage;
@@ -55,7 +55,7 @@ public class MessageInputStreamProviderImpl implements MessageInputStreamProvide
 	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit) {
 		IMAPInputStream imapInputStream = 
 				new IMAPInputStream(messageToFetch, address(mimePartAddress), NO_MAX_BYTE_COUNT, USE_PEEK);
-		return new LimitInputStream(imapInputStream, limit);
+		return ByteStreams.limit(imapInputStream, limit);
 	}
 	
 	private String address(MimeAddress mimeAddress) {

@@ -499,7 +499,7 @@ public class MailBackendTest {
 								return new MailboxFolder(input);
 							}
 						})
-					.toImmutableList());
+					.toList());
 	}
 
 	private void expectMappingServiceSnapshot(FolderSyncState outgoingSyncState, Iterable<Integer> collectionIds)

@@ -34,6 +34,7 @@ package org.obm.push.mail.greenmail;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +104,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 				return outputLines;
 			}
 			Thread.sleep(5);
-		} while (stopwatch.elapsedMillis() < MAX_PROCESS_STARTTIME);
+		} while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < MAX_PROCESS_STARTTIME);
 		throw new ExternalProcessException(
 				"Process started tag not received in accepted delay of : " + MAX_PROCESS_STARTTIME + " ms");
 	}

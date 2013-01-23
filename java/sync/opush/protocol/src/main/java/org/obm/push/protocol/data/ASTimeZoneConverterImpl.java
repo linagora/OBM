@@ -92,7 +92,7 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 		String[] availableIDs = TimeZone.getAvailableIDs(rawOffset);
 		return FluentIterable.from(Arrays.asList(availableIDs))
 					.filter(Predicates.in(DateTimeZone.getAvailableIDs()))
-					.toImmutableSortedSet(new TimeZoneComparator());
+					.toSortedSet(new TimeZoneComparator());
 	}
 	
 	private int toMillis(int minutes) {

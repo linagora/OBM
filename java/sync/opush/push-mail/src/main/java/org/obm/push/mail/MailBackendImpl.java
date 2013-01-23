@@ -232,7 +232,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 								public String apply(MailboxFolder input) {
 									return input.getName();
 								}})
-					.toImmutableList());
+					.toList());
 	}
 
 	private HierarchyCollectionChanges computeChanges(UserDataRequest udr, FolderSyncState lastKnownState,
