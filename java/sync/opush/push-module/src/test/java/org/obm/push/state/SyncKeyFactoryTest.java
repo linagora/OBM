@@ -35,26 +35,36 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncKeyFactoryTest {
 
+	private SyncKeyFactory syncKeyFactory;
+
+	@Before
+	public void setUp() {
+		UUIDFactory uuidFactory = new UUIDFactory() {};
+		syncKeyFactory = new SyncKeyFactory(uuidFactory);
+	}
+	
 	@Test
 	public void testNotNull() {
-		assertThat(new SyncKeyFactory().randomSyncKey()).isNotNull();
+		assertThat(syncKeyFactory.randomSyncKey()).isNotNull();
 	}
 	
 	@Test
 	public void testNotEmtpy() {
-		SyncKey randomSyncKey = new SyncKeyFactory().randomSyncKey();
+		SyncKey randomSyncKey = syncKeyFactory.randomSyncKey();
 		assertThat(randomSyncKey.getSyncKey()).isNotNull();
 		assertThat(randomSyncKey.getSyncKey()).isNotEmpty();
 	}
@@ -63,7 +73,6 @@ public class SyncKeyFactoryTest {
 	@Test @Slow
 	public void testNotSameKeyForMillionsGeneration() {
 		int syncKeyGenerationCount = 1000000;
-		SyncKeyFactory syncKeyFactory = new SyncKeyFactory();
 
 		List<SyncKey> allGeneratedSyncKeys = Lists.newArrayListWithExpectedSize(syncKeyGenerationCount);
 		for (int count = 0; count < syncKeyGenerationCount; count++) {

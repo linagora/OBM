@@ -2353,7 +2353,7 @@ public class CalendarBindingImplTest {
 	
 	@Test(expected=NotAllowedException.class)
 	public void testRemoveEventByExtIdNoWriteRights() throws Exception {
-		EventExtId eventExtId = EventExtId.newExtId();
+		EventExtId eventExtId = new EventExtId("abc");
 		
 		expectNoRightsForCalendar("calendar");
 		mocksControl.replay();
@@ -2363,7 +2363,7 @@ public class CalendarBindingImplTest {
 	
 	@Test(expected=NotAllowedException.class)
 	public void testChangeParticipationStateNoWriteRights() throws Exception {
-		EventExtId eventExtId = EventExtId.newExtId();
+		EventExtId eventExtId = new EventExtId("abc");
 		
 		expectNoRightsForCalendar("calendar");
 		mocksControl.replay();
@@ -2373,7 +2373,7 @@ public class CalendarBindingImplTest {
 	
 	@Test(expected=NotAllowedException.class)
 	public void testChangeParticipationStateRecurrentNoWriteRights() throws Exception {
-		EventExtId eventExtId = EventExtId.newExtId();
+		EventExtId eventExtId = new EventExtId("abc");
 		RecurrenceId recurrenceId = new RecurrenceId("RecurrenceId");
 		
 		expectNoRightsForCalendar("calendar");

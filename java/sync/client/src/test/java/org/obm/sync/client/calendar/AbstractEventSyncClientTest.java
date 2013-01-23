@@ -455,7 +455,7 @@ public class AbstractEventSyncClientTest {
 		Event event = new Event();
 		
 		event.setType(EventType.VEVENT);
-		event.setExtId(EventExtId.newExtId());
+		event.setExtId(new EventExtId("abc"));
 		
 		return event;
 	}

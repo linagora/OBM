@@ -128,13 +128,16 @@ public class ContactDao {
 	private final Factory solrHelperFactory;
 	private final ObmHelper obmHelper;
 	private final ContactConfiguration contactConfiguration;
+	private final EventExtId.Factory eventExtIdFactory;
 
 	@Inject
-	private ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper) {
+	private ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao,
+			SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.contactConfiguration = contactConfiguration;
 		this.calendarDao = calendarDao;
 		this.solrHelperFactory = solrHelperFactory;
 		this.obmHelper = obmHelper;
+		this.eventExtIdFactory = eventExtIdFactory;
 	}
 
 	private String getSelectForFindUpdatedContacts() {
@@ -407,7 +410,7 @@ public class ContactDao {
 
 		Event e = new Event();
 		
-		e.setExtId(EventExtId.newExtId());
+		e.setExtId(eventExtIdFactory.generate());
 		e.setTitle(displayName);
 		e.setStartDate(cal.getTime());
 		e.setDuration(3600);

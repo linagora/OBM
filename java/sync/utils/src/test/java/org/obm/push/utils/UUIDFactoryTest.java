@@ -29,27 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.state;
+package org.obm.push.utils;
 
-import org.obm.push.bean.SyncKey;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.UUIDFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.collect.Lists;
 
-@Singleton
-public class SyncKeyFactory {
-
-	private final UUIDFactory uuidFactory;
-
-	@Inject
-	@VisibleForTesting SyncKeyFactory(UUIDFactory uuidFactory) {
-		this.uuidFactory = uuidFactory;
+@RunWith(SlowFilterRunner.class)
+public class UUIDFactoryTest {
+	
+	@Test
+	public void testNotNull() {
+		assertThat(new UUIDFactory().randomUUID()).isNotNull();
 	}
 	
-	public SyncKey randomSyncKey() {
-		return new SyncKey(uuidFactory.randomUUID().toString());
+	@Test
+	public void testNotEmtpy() {
+		assertThat(new UUIDFactory().randomUUID().toString()).isNotNull().isNotEmpty();
 	}
 	
+	@Ignore("too slow : https://github.com/alexruiz/fest-assert-2.x/issues/122")
+	@Test @Slow
+	public void testNotSameUUIDForMillionsGeneration() {
+		int generationCount = 1000000;
+
+		UUIDFactory uuidFactory = new UUIDFactory();
+		List<UUID> allGeneratedUUID = Lists.newArrayListWithExpectedSize(generationCount);
+		for (int count = 0; count < generationCount; count++) {
+			allGeneratedUUID.add(uuidFactory.randomUUID());
+		}
+		
+		assertThat(allGeneratedUUID).doesNotHaveDuplicates();
+	}
 }

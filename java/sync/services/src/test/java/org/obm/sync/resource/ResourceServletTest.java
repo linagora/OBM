@@ -55,6 +55,8 @@ import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.ICalendar;
 
@@ -82,7 +84,8 @@ public class ResourceServletTest {
 	public void setUp() {
 		now = new Date();
 		dateProvider = createMock(DateProvider.class);
-		helper = new Ical4jHelper(dateProvider);
+		Factory eventExtIdFactory = createMock(EventExtId.Factory.class);
+		helper = new Ical4jHelper(dateProvider, eventExtIdFactory);
 		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
 				ToolBox.getDefaultObmDomain());
 		resourceServlet = new ResourceServlet();

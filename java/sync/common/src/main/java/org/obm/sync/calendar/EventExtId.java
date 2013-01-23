@@ -32,13 +32,36 @@
 package org.obm.sync.calendar;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+import org.obm.push.utils.UUIDFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 public class EventExtId implements Serializable {
 
+	@Singleton
+	public static class Factory {
+		
+		private final UUIDFactory uuidFactory;
+
+		@Inject
+		@VisibleForTesting Factory(UUIDFactory uuidFactory) {
+			this.uuidFactory = uuidFactory;
+		}
+		
+		public EventExtId create(String extId) {
+			return new EventExtId(extId);
+		}
+		
+		public EventExtId generate() {
+			return new EventExtId(uuidFactory.randomUUID().toString());
+		}
+	}
+	
 	private final String extId;
 	
 	public EventExtId(String extId) {
@@ -53,14 +76,6 @@ public class EventExtId implements Serializable {
 		return extId;
 	}
 
-	public static UUID generateUid() {
-		return UUID.randomUUID();
-	}
-	
-	public static EventExtId newExtId() {
-		return new EventExtId(generateUid().toString());
-	}
-	
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof EventExtId) {

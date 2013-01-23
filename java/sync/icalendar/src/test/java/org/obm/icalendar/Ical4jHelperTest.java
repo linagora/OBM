@@ -31,9 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -165,13 +173,15 @@ public class Ical4jHelperTest {
 	
 	private Ical4jHelper ical4jHelper;
 	private DateProvider dateProvider;
+	private EventExtId.Factory eventExtIdFactory;
 	private Date now;
 
 	@Before
 	public void setUp() {
 		now = getCalendarPrecisionOfSecond().getTime();
 		dateProvider = createMock(DateProvider.class);
-		ical4jHelper = new Ical4jHelper(dateProvider);
+		eventExtIdFactory = createMock(EventExtId.Factory.class);
+		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory);
 		
 		expect(dateProvider.getDate()).andReturn(now).anyTimes();
 		replay(dateProvider);
@@ -533,10 +543,12 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = ical4jHelper.getComponents(calendar,
-				Component.VEVENT);
+
+		ComponentList vEvents = ical4jHelper.getComponents(calendar, Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
+		
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent);
+		
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -554,10 +566,12 @@ public class Ical4jHelperTest {
 		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
 		net.fortuna.ical4j.model.Calendar calendar = builder.build(icsStream);
-		ComponentList vEvents = ical4jHelper.getComponents(calendar,
-				Component.VEVENT);
+	
+		ComponentList vEvents = ical4jHelper.getComponents(calendar, Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
+		
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent);
+		
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -1032,8 +1046,22 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParsingICSFilesWhichDontProvideUid() throws IOException, ParserException {
 		final String ics = IOUtils.toString(getStreamICS("calendar_pst.ics"));
+
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab0")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab1")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab2")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab3")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab4")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab5")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab6")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab7")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab8")).once();
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab9")).once();
 		
+		replay(eventExtIdFactory);
 		final List<Event> events = ical4jHelper.parseICSEvent(ics, getDefaultObmUser());
+		verify(eventExtIdFactory);
+		
 		for (final Event event: events) {
 			assertNotNull(event.getExtId());
 		}
@@ -1304,6 +1332,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testImportICSWithRecurrenceIdAfterParentEventDefinition() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2963sorted.ics";
+		
 		List<Event> events = testIcsParsing(icsFilename);
 
 		assertThat(events).hasSize(2);
@@ -1425,9 +1454,13 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithEmptyUid() throws Exception {
 		String ics = IOUtils.toString(getStreamICS("meetingWithEmptyUid.ics"));
+		
+		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("abc"));
+		replay(eventExtIdFactory);
 		List<Event> events = ical4jHelper.parseICS(ics, getDefaultObmUser());
+		verify(eventExtIdFactory);
 
 		assertThat(events).hasSize(1);
-		assertThat(events.get(0).getExtId().getExtId()).isNotNull();
+		assertThat(events.get(0).getExtId().getExtId()).isEqualTo("abc");
 	}
 }

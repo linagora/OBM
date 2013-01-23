@@ -121,6 +121,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
@@ -177,11 +178,13 @@ public class Ical4jHelper {
 			.put(RecurrenceKind.yearly, Recur.YEARLY).put(RecurrenceKind.yearlybyday, Recur.YEARLY).build();
 	
 	private final DateProvider dateProvider;
+	private final Factory eventExtIdFactory;
 	
 	@Inject
 	@VisibleForTesting
-	public Ical4jHelper(DateProvider obmHelper) {
+	public Ical4jHelper(DateProvider obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.dateProvider = obmHelper;
+		this.eventExtIdFactory = eventExtIdFactory;
 	}
 
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
@@ -615,9 +618,12 @@ public class Ical4jHelper {
 	}
 
 	private void appendUid(Event event, Uid uid) {
-		String extId = uid != null && !Strings.isNullOrEmpty(uid.getValue()) ? uid.getValue() : EventExtId.generateUid().toString();
+		if (uid != null && !Strings.isNullOrEmpty(uid.getValue())) {
+			event.setExtId(new EventExtId(uid.getValue()));
+		} else {
+			event.setExtId(eventExtIdFactory.generate());
+		}
 		
-		event.setExtId(new EventExtId(extId));
 	}
 
 	private void appendDescription(Event event, Description description) {

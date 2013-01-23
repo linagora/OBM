@@ -66,6 +66,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.Participation;
@@ -105,7 +106,8 @@ public class EventChangeMailerTest {
 	public void setup() {
 		now = new Date();
 		dateProvider = createMock(DateProvider.class);
-		ical4jHelper = new Ical4jHelper(dateProvider);
+		Factory eventExtIdFactory = null;
+		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory);
 		
 		accessToken = new AccessToken(1, "unitTest");
 		obmUser = ServicesToolBox.getDefaultObmUser();

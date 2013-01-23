@@ -29,27 +29,20 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.state;
+package org.obm.push.utils;
 
-import org.obm.push.bean.SyncKey;
-import org.obm.push.utils.UUIDFactory;
+import java.util.UUID;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class SyncKeyFactory {
+public class UUIDFactory {
 
-	private final UUIDFactory uuidFactory;
-
-	@Inject
-	@VisibleForTesting SyncKeyFactory(UUIDFactory uuidFactory) {
-		this.uuidFactory = uuidFactory;
-	}
+	@VisibleForTesting
+	protected UUIDFactory() {}
 	
-	public SyncKey randomSyncKey() {
-		return new SyncKey(uuidFactory.randomUUID().toString());
+	public UUID randomUUID() {
+		return UUID.randomUUID();
 	}
-	
 }

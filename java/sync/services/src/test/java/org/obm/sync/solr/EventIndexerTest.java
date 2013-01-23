@@ -149,7 +149,7 @@ public class EventIndexerTest {
 		event.setSequence(0);
 		event.setTimeCreate(DateUtils.date("2012-12-12T13:14:15"));
 		event.setTimeUpdate(DateUtils.date("2012-12-12T13:14:15"));
-		event.setExtId(new EventExtId(EventExtId.generateUid().toString()));
+		event.setExtId(new EventExtId("abc"));
 		event.setOpacity(EventOpacity.OPAQUE);
 		event.setTitle("Grand saut ?");
 		event.setDescription("A lot of fun");
