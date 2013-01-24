@@ -128,10 +128,10 @@ public class XmlResponder {
 	}
 
 	public Document toXML(AccessToken at) throws FactoryConfigurationError {
-		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getVersion(), at.getDomain(), at.getUserSettings(), at.getServerCapabilities());
+		return prepareAccessTokenXML(at.getSessionId(), at.getUserEmail(), at.getUserDisplayName(), at.getVersion(), at.getDomain(), at.getUserSettings(), at.getServerCapabilities());
 	}
 
-	public Document prepareAccessTokenXML(String sessionId, String userEmail,
+	public Document prepareAccessTokenXML(String sessionId, String userEmail, String displayName,
 			MavenVersion version, ObmDomain tokenDomain, UserSettings userSettings, Map<ServerCapability, String> serverCapabilities)
 			throws FactoryConfigurationError {
 		Document doc = DOMUtils.createDoc(
@@ -144,6 +144,9 @@ public class XmlResponder {
 		v.setAttribute("release", version.getRelease());
 
 		DOMUtils.createElementAndText(root, "email", userEmail);
+		if (!Strings.isNullOrEmpty(displayName)) {
+			DOMUtils.createElementAndText(root, "displayname", displayName);
+		}
 
 		Element domain = DOMUtils.createElementAndText(root, "domain", tokenDomain.getName());
 		domain.setAttribute("uuid", tokenDomain.getUuid());

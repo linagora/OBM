@@ -62,6 +62,7 @@ public class XmlResponderTest {
 	public void testToXMLNoUserSettingsNoCapabilities() throws Exception {
 		expect(at.getUserSettings()).andReturn(null).once();
 		expect(at.getServerCapabilities()).andReturn(null).once();
+		expect(at.getUserDisplayName()).andReturn(null).once();
 		replay(at);
 
 		Document doc = responder.toXML(at);
@@ -77,11 +78,30 @@ public class XmlResponderTest {
 		
 		expect(at.getUserSettings()).andReturn(new UserSettings(settings)).once();
 		expect(at.getServerCapabilities()).andReturn(caps).once();
+		expect(at.getUserDisplayName()).andReturn(null).once();
 		replay(at);
 
 		Document doc = responder.toXML(at);
 
 		XMLAssert.assertXMLEqual(loadXMLFile("tokenWithFiveUserSettings.xml"), DOMUtils.serialize(doc));
+		verify(at);
+	}
+
+	@Test
+	public void testToXMLDisplayName() throws Exception {
+		String displayName = "user user";
+		expect(at.getUserSettings()).andReturn(null).once();
+		expect(at.getServerCapabilities()).andReturn(null).once();
+		expect(at.getUserDisplayName()).andReturn(displayName).once();
+		replay(at);
+
+		Document doc = responder.toXML(at);
+
+		String loadXMLFile = loadXMLFile("tokenWithDisplayName.xml");
+		System.out.println(loadXMLFile);
+		String serialize = DOMUtils.serialize(doc);
+		System.out.println(serialize);
+		XMLAssert.assertXMLEqual(loadXMLFile, serialize);
 		verify(at);
 	}
 
