@@ -221,7 +221,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
         </td>
         <td>
-          <input type=\"checkbox\" name=\"cb_accept_admin[]\" onclick=\"apply_checked_admin(this, '$tr_id')\" value=\"$sel_id\" $checked_admin $disabled_admin />
+          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin $disabled_admin />
         </td>
       </tr>
 ";
@@ -394,12 +394,6 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         if (cb_element !== null && cb_element.getProperty('type') == 'checkbox') {
           cb_element.setProperty('checked', false);
         }
-      }
-    }
-
-    function apply_checked_admin(formElement, tr_id) {
-      if (formElement.checked) {
-        select_all_perms(tr_id)
       }
     }
     
@@ -588,7 +582,6 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         new Element('td').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_admin+'[]')
-                              .setProperty('onclick', 'apply_checked_admin(this, \''+tr_id+'\')')
                               .setProperty('value', id)
         ).injectInside(result);
 
