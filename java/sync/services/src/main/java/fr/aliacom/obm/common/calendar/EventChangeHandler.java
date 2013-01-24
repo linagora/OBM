@@ -108,7 +108,7 @@ public class EventChangeHandler {
 	public void updateParticipation(Event event, ObmUser calendarOwner,
 			Participation participation, boolean notification, AccessToken token) {
 		
-		jmsService.writeIcsInvitationReply(token, event);
+		jmsService.writeIcsInvitationReply(token, event, calendarOwner);
 		if (notification) {
 			eventNotificationService.notifyUpdatedParticipationAttendees(event, calendarOwner, participation, token);
 		}

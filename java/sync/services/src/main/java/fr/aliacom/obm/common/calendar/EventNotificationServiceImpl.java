@@ -143,11 +143,10 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			ObmUser calendarOwner, Participation participation, AccessToken token) {
 		
 		if (isHandledParticipation(participation)) {
-			
-			ObmUser user = userService.getUserFromAccessToken(token);
-			Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
-			String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser, token);
-			
+
+			Ical4jUser replyIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(calendarOwner);
+			String ics = ical4jHelper.buildIcsInvitationReply(event, replyIcal4jUser, token);
+
 			final Attendee organizer = event.findOrganizer();
 			if (organizer != null) {
 				if (updateParticipationNeedsNotification(calendarOwner, organizer)) {

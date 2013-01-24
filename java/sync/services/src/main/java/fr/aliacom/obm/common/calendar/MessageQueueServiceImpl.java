@@ -80,9 +80,9 @@ public class MessageQueueServiceImpl implements MessageQueueService {
 	}
 	
 	@Override
-	public void writeIcsInvitationReply(AccessToken token, Event event) {
-		Ical4jUser buildIcal4jUser = getIcal4jUser(token);
-		String ics = ical4jHelper.buildIcsInvitationReply(event, buildIcal4jUser, token);
+	public void writeIcsInvitationReply(AccessToken token, Event event, ObmUser calendarOwner) {
+		Ical4jUser replyIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(calendarOwner);
+		String ics = ical4jHelper.buildIcsInvitationReply(event, replyIcal4jUser, token);
 		writeIcs(ics);
 	}
 

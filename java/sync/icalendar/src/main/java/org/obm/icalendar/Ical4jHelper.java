@@ -216,10 +216,10 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	public String buildIcsInvitationReply(final Event event, final Ical4jUser iCal4jUser, AccessToken token) {
+	public String buildIcsInvitationReply(final Event event, final Ical4jUser replyICal4jUser, AccessToken token) {
 		Method method = Method.REPLY;
-		final Attendee replyAttendee = findAttendeeFromObmUserReply(event.getAttendees(), iCal4jUser);
-		final Calendar calendar = buildVEvent(iCal4jUser, event, replyAttendee,method, token);		
+		final Attendee replyAttendee = event.findAttendeeFromEmail(replyICal4jUser.getEmail());
+		final Calendar calendar = buildVEvent(replyICal4jUser, event, replyAttendee,method, token);
 		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
@@ -692,16 +692,6 @@ public class Ical4jHelper {
 			}
 		}
 		return calendar;
-	}
-
-	
-	private Attendee findAttendeeFromObmUserReply(final List<Attendee> attendees, final Ical4jUser iCal4jUser) {
-		for (final Attendee attendee: attendees) {
-			if (attendee.getEmail().equalsIgnoreCase(iCal4jUser.getEmail())) {
-				return attendee;
-			}
-		}
-		return null;
 	}
 
 	private void appendDurationToIcs(PropertyList prop, Event event) {

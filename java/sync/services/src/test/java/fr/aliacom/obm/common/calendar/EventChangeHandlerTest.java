@@ -36,7 +36,10 @@ import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.a
 import java.util.Date;
 import java.util.Set;
 
-import org.easymock.EasyMock;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.expectLastCall;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,8 +48,10 @@ import org.junit.runner.RunWith;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.Participation;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.ObmUser;
 
 import org.obm.filter.SlowFilterRunner;
 
@@ -65,8 +70,8 @@ public class EventChangeHandlerTest {
 	public void setUp() {
 		token = ToolBox.mockAccessToken();
 		previousEvent = getFakePreviousEvent();
-		jmsService = EasyMock.createMock(MessageQueueService.class);
-		eventNotificationService = EasyMock.createMock(EventNotificationService.class);
+		jmsService = createMock(MessageQueueService.class);
+		eventNotificationService = createMock(EventNotificationService.class);
 	}
 
 	@Test
@@ -201,6 +206,21 @@ public class EventChangeHandlerTest {
 		verifyEventChangeHandlerUpdate(token, previousEvent, currentParentEvent, jmsService, eventNotificationService);
 	}
 
+	@Test
+	public void testOBMFULL4510updateParticipation() {
+		ObmUser calendarOwner = new ObmUser();
+
+		jmsService.writeIcsInvitationReply(token, previousEvent, calendarOwner);
+		expectLastCall().once();
+		eventNotificationService.notifyUpdatedParticipationAttendees(previousEvent, calendarOwner, Participation.accepted(), token);
+		expectLastCall().once();
+
+		replay(token, jmsService, eventNotificationService);
+		EventChangeHandler handler = new EventChangeHandler(jmsService, eventNotificationService);
+		handler.updateParticipation(previousEvent, calendarOwner, Participation.accepted(), true, token);
+		verify(jmsService, eventNotificationService);
+	}
+
 	private Event getFakePreviousEvent() {
 		Attendee attendee = ToolBox.getFakeAttendee("james.jesus.angleton@cia.gov");
 		Date eventDate = after();
@@ -211,11 +231,11 @@ public class EventChangeHandlerTest {
 
 	private void verifyEventChangeHandlerUpdate(AccessToken token, Event previousEvent, Event currentEvent,
 			MessageQueueService jmsService, EventNotificationService eventNotificationService) {
-		EasyMock.replay(token, jmsService, eventNotificationService);
+		replay(token, jmsService, eventNotificationService);
 
 		EventChangeHandler handler = new EventChangeHandler(jmsService, eventNotificationService);
 		handler.update(previousEvent, currentEvent, true, token);
 
-		EasyMock.verify(jmsService, eventNotificationService);
+		verify(jmsService, eventNotificationService);
 	}
 }
