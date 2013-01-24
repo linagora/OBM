@@ -13,10 +13,10 @@ was updated: </td>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start?string.medium_short}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.end}</td>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.end?string.medium_short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${new.location}</td>

@@ -12,10 +12,10 @@ a été modifié :</td>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${new.start}</td>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${new.start?string.medium_short}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${new.end}</td>
+        <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${new.end?string.medium_short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;">${new.location}</td>

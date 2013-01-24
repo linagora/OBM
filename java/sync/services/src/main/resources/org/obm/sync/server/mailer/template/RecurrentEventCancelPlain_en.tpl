@@ -9,7 +9,7 @@ from            : ${start}
 
 to              : ${recurrenceEnd}
 
-time            : ${startTime} - ${endTime}
+time            : ${startTime?string.short} - ${endTime?string.short}
 
 recurrence      : ${recurrenceKind}
 

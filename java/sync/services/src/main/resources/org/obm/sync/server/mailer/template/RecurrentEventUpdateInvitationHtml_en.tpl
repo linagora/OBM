@@ -13,13 +13,13 @@ was updated </td>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start?string.medium_short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.recurrenceEnd}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${new.startTime} - ${new.endTime}</td>
+        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${new.startTime?string.short} - ${new.endTime?string.short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;">${new.recurrenceKind}</td>

@@ -4,7 +4,7 @@ RECURRENT APPOINTMENT UPDATED !
 ------------------------------------------------------------------
 
 The recurrent appointment ${new.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime} - ${old.endTime}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}),
-was updated and will take place from ${new.start} to ${new.recurrenceEnd} at ${new.startTime} - ${new.endTime}, (location : ${new.location}, recurrence kind : ${new.recurrenceKind}).
+was updated and will take place from ${new.start} to ${new.recurrenceEnd} at ${new.startTime?string.short} - ${new.endTime?string.short}, (location : ${new.location}, recurrence kind : ${new.recurrenceKind}).
 
 
 :: To accept this update :

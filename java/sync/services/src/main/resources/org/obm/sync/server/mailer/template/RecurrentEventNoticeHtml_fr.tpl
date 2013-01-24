@@ -11,13 +11,13 @@
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${start}</td>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${start?string.medium_short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${recurrenceEnd}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Heure</td><td style="font-weight:bold;">${startTime} - ${endTime}</td>
+        <td style="text-align:right;padding-right:1em;">Heure</td><td style="font-weight:bold;">${startTime?string.short} - ${endTime?string.short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Type de récurrence</td><td style="font-weight:bold;">${recurrenceKind}</td>

@@ -17,7 +17,7 @@
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${recurrenceEnd}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${startTime} - ${endTime}</td>
+        <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${startTime?string.short} - ${endTime?string.short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;">${recurrenceKind}</td>

@@ -9,7 +9,7 @@ du           : ${start}
 
 au           : ${recurrenceEnd}
 
-heure        : ${startTime} - ${endTime}
+heure        : ${startTime?string.short} - ${endTime?string.short}
 
 recurrence   : ${recurrenceKind}
 

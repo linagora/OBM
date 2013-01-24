@@ -4,7 +4,7 @@ RENDEZ-VOUS RÉCURRENT MODIFIÉ !
 ------------------------------------------------------------------
 
 Le rendez-vous récurrent ${new.subject}, initialement prévu du ${old.start} au ${old.recurrenceEnd} de ${old.startTime} à ${old.endTime}, (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}),
-a été modifié et se déroulera du ${new.start} au ${new.recurrenceEnd} de ${new.startTime} à ${new.endTime}, (lieu : ${new.location}, type de récurrence : ${new.recurrenceKind}).
+a été modifié et se déroulera du ${new.start} au ${new.recurrenceEnd} de ${new.startTime?string.short} à ${new.endTime?string.short}, (lieu : ${new.location}, type de récurrence : ${new.recurrenceKind}).
 
 :: Pour plus de détails : 
 ${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}

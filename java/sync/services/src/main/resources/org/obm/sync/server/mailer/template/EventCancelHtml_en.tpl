@@ -11,10 +11,10 @@
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${start}</td>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${start?string.medium_short}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${end}</td>
+        <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${end?string.medium_short}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${location}</td>
