@@ -55,8 +55,8 @@ public class AutodiscoverProtocolTest {
 	@Test
 	public void testLoopWithinResponseProtocolMethods() throws Exception {
 		String initialDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<Autodiscover>" +
-				"<Response>" +
+				"<Autodiscover xmlns:Autodiscover=\"http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006\">" +
+				"<Response xmlns=\"http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006\">" +
 				"<Culture>culture</Culture>" +
 				"<User>" +
 				"<DisplayName>displayName</DisplayName>" +

@@ -51,6 +51,10 @@ import com.google.common.base.Strings;
 
 public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequest, AutodiscoverResponse> {
 
+	private final static String AUTODISCOVER_NS = "xmlns:Autodiscover";
+	private final static String AUTODISCOVER_NS_VALUE = "http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006";
+	private final static String RESPONSE_NS_VALUE = "http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006";
+	
 	@Override
 	public AutodiscoverRequest decodeRequest(Document document) throws NoDocumentException {
 		if (document == null) {
@@ -187,6 +191,8 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 	@Override
 	public Document encodeResponse(AutodiscoverResponse autodiscoverResponse) throws AutodiscoverProtocolException {
 		Document autodiscover = DOMUtils.createDoc(null, "Autodiscover");
+		Element autodiscoverElement = autodiscover.getDocumentElement();
+		autodiscoverElement.setAttribute(AUTODISCOVER_NS, AUTODISCOVER_NS_VALUE);
 		
 		Element response = createAutodiscoverResponseElement(autodiscover);
 		
@@ -213,7 +219,9 @@ public class AutodiscoverProtocol implements ActiveSyncProtocol<AutodiscoverRequ
 	}
 
 	private Element createAutodiscoverResponseElement(Document autodiscover) {
-		return DOMUtils.createElement(autodiscover.getDocumentElement(), "Response");
+		Element responseElement = DOMUtils.createElement(autodiscover.getDocumentElement(), "Response");
+		responseElement.setAttribute("xmlns", RESPONSE_NS_VALUE);
+		return responseElement;
 	}
 	
 	private void createAutodiscoverResponseCultureElement(Element response, AutodiscoverResponse autodiscoverResponse) {

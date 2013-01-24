@@ -99,8 +99,8 @@ public class AutodiscoverHandlerTest {
 	private void checkAutodiscoverResponse(Document response, String externalUrl, String culture) throws TransformerException {
 		Assertions.assertThat(DOMUtils.serialize(response)).
 		isEqualTo( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<Autodiscover>" +
-				"<Response>" +
+				"<Autodiscover xmlns:Autodiscover=\"http://schemas.microsoft.com/exchange/autodiscover/responseschema/2006\">" +
+				"<Response xmlns=\"http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006\">" +
 				"<Culture>" + culture + "</Culture>" +
 				"<User>" +
 				"<DisplayName>Jean Jaures</DisplayName><EMailAddress>jaures@sfio.fr</EMailAddress>" +
