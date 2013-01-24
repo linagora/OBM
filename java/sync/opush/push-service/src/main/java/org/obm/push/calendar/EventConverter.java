@@ -50,5 +50,6 @@ public interface EventConverter {
 	boolean isInternalEvent(Event oldEvent, EventExtId eventExtId);
 	
 	Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus);
+	Participation getParticipation(AttendeeStatus status);
 
 }

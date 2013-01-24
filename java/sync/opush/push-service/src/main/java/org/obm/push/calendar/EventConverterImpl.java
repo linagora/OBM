@@ -68,6 +68,11 @@ public class EventConverterImpl implements EventConverter {
 	}
 
 	@Override
+	public Participation getParticipation(AttendeeStatus status) {
+		return msEventToObmEventConverter.getParticipation(status);
+	}
+	
+	@Override
 	public boolean isInternalEvent(Event event, boolean defaultValue){
 		return msEventToObmEventConverter.isInternalEvent(event, defaultValue);
 	}

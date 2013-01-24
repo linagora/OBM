@@ -779,8 +779,12 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		if (attendeeStatus == null) {
 			return oldParticipation;
 		}
-		
-		switch (attendeeStatus) {
+		return getParticipation(attendeeStatus);
+	}
+
+	@Override
+	public Participation getParticipation(AttendeeStatus status) {
+		switch (status) {
 		case DECLINE:
 			return Participation.declined();
 		case NOT_RESPONDED:
@@ -793,7 +797,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			return Participation.accepted();
 		}
 	}
-
+	
 	@Override
 	public boolean isInternalEvent(Event event, boolean defaultValue){
 		return event != null ? event.isInternalEvent() : defaultValue;

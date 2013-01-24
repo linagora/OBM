@@ -45,4 +45,5 @@ public interface MSEventToObmEventConverter {
 	boolean isInternalEvent(Event event, boolean defaultValue);
 	
 	Participation getParticipation(Participation oldParticipation, AttendeeStatus attendeeStatus);
+	Participation getParticipation(AttendeeStatus status);
 }
