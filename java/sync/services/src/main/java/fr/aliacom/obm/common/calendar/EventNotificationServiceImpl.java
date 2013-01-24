@@ -99,7 +99,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		ObmUser user = userService.getUserFromAccessToken(token);
 		Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
 		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, event, token);
-		Attendee owner = findOwner(event);
+		Attendee owner = event.findOwner();
 		
 		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
 		if (eventCreationInvolveNotification(event)) {
@@ -118,7 +118,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
 			String ics = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, event, token);
 
-			Attendee owner = findOwner(event);
+			Attendee owner = event.findOwner();
 
 			Collection<Attendee> attendees = filterOwner(event,
 					ensureAttendeeUnicity(event.getAttendees()));
@@ -126,14 +126,17 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 			Set<Attendee> notify = Sets.union(
 					attendeeGroups.get(Participation.needsAction()),
 					attendeeGroups.get(Participation.accepted()));
+
+			UserSettings settings = settingsService.getSettings(user);
 			if (!notify.isEmpty()) {
-				UserSettings settings = settingsService.getSettings(user);
 				eventChangeMailer.notifyRemovedUsers(user, notify, event,
 						settings.locale(), settings.timezone(), ics,
 						token);
 			}
 			if (owner != null && !isUserEventOwner(user, event)) {
-				notifyOwnerDelete(user, event, owner, token);
+				eventChangeMailer.notifyOwnerRemovedEvent(user, owner, event,
+						settings.locale(), settings.timezone(),
+						token);
 			}
 		}
 	}
@@ -168,36 +171,57 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		Ical4jUser buildIcal4jUser = calendarFactory.createIcal4jUserFromObmUser(user);
 		
 		String addUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current, token);
-		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, current, token);
+		String removedUserIcs = ical4jHelper.buildIcsInvitationCancel(buildIcal4jUser, previous, token);
 		String updateUserIcs = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, current, token);
-		
-		boolean notifyImportantChanges = previous.getSequence() != current.getSequence();
+
 		UserSettings settings = settingsService.getSettings(user);
-		
 		TimeZone timezone = settings.timezone();
 		Locale locale = settings.locale();
 
 		Map<AttendeeStateValue, Set<Attendee>> attendeeGroups = computeUpdateNotificationGroups(previous, current);
-		final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
-		if (!removedAttendees.isEmpty()) {
-			eventChangeMailer.notifyRemovedUsers(user, removedAttendees, current, locale, timezone, removedUserIcs, token);
-		}
+		notifyRemovedUsers(previous, token, user, removedUserIcs, timezone, locale, attendeeGroups);
+		notifyAddedUsers(current, token, user, addUserIcs, attendeeGroups);
 
-		Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
-		if (!addedAttendees.isEmpty()) {
-			notifyCreate(user, addedAttendees, current, addUserIcs, token);
+		boolean notifyImportantChanges = previous.getSequence() != current.getSequence();
+		if(notifyImportantChanges) {
+			notifyKeptUsers(previous, current, token, user, updateUserIcs, timezone, locale, attendeeGroups);
+			notifyOwnerOfUpdate(previous, current, token, user, timezone, locale);
 		}
+	}
 
+	private void notifyOwnerOfUpdate(Event previous, Event current,
+			AccessToken token, ObmUser user, TimeZone timezone, Locale locale) {
+		Attendee owner = current.findOwner();
+		if (owner != null && !isUserEventOwner(user, current)) {
+			notifyOwnerUpdate(user, owner, previous, current, locale, timezone, token);
+		}
+	}
+
+	private void notifyKeptUsers(Event previous, Event current,
+			AccessToken token, ObmUser user, String updateUserIcs, TimeZone timezone, Locale locale,
+			Map<AttendeeStateValue, Set<Attendee>> attendeeGroups) {
 		Set<Attendee> keptAttendees = attendeeGroups.get(AttendeeStateValue.KEPT);
-		if (!keptAttendees.isEmpty() && notifyImportantChanges) {
+		if (!keptAttendees.isEmpty()) {
 			Map<Participation, Set<Attendee>> atts = computeParticipationGroups(keptAttendees);
 			notifyAcceptedUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs, token);
 			notifyNeedActionUpdateUsers(user, previous, current, locale, atts, timezone, updateUserIcs, token);
 		}
-		
-		Attendee owner = findOwner(current);
-		if (owner != null && !isUserEventOwner(user, current) && notifyImportantChanges) {
-			notifyOwnerUpdate(user, owner, previous, current, locale, timezone, token);
+	}
+
+	private void notifyAddedUsers(Event current, AccessToken token,
+			ObmUser user, String addUserIcs, Map<AttendeeStateValue, Set<Attendee>> attendeeGroups) {
+		Set<Attendee> addedAttendees = attendeeGroups.get(AttendeeStateValue.ADDED);
+		if (!addedAttendees.isEmpty()) {
+			notifyCreate(user, addedAttendees, current, addUserIcs, token);
+		}
+	}
+
+	private void notifyRemovedUsers(Event previous, AccessToken token,
+			ObmUser user, String removedUserIcs, TimeZone timezone,
+			Locale locale, Map<AttendeeStateValue, Set<Attendee>> attendeeGroups) {
+		final Set<Attendee> removedAttendees = attendeeGroups.get(AttendeeStateValue.REMOVED);
+		if (!removedAttendees.isEmpty()) {
+			eventChangeMailer.notifyRemovedUsers(user, removedAttendees, previous, locale, timezone, removedUserIcs, token);
 		}
 	}
 	
@@ -237,15 +261,6 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		default:
 			return false;
 		}
-	}
-	private void notifyOwnerDelete(ObmUser user, Event event, Attendee owner, AccessToken token) {
-		UserSettings settings = settingsService.getSettings(user);
-		Locale locale = settings.locale();
-		TimeZone timezone = settings.timezone();
-		
-		Collection<Attendee> ownerAsCollection = new ArrayList<Attendee>(1);
-		ownerAsCollection.add(owner);
-		eventChangeMailer.notifyOwnerRemovedEvent(user, owner, event, locale, timezone, token);		
 	}
 
 	private boolean eventDeletionInvolveNotification(final Event event) {
@@ -291,15 +306,6 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	
 	private boolean isUserEventOwner(ObmUser user, Event event) {
 		return user.getEmail().equals(event.getOwnerEmail());
-	}
-	
-	private Attendee findOwner(final Event event) {
-		for (Attendee attendee : event.getAttendees()) {
-			boolean isOwner = attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
-			if (isOwner)
-				return attendee;
-		}
-		return null;
 	}
 	
 	private void notifyOwnerUpdate(ObmUser user, Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone, AccessToken token) {

@@ -46,6 +46,7 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.expect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,12 +87,12 @@ import fr.aliacom.obm.utils.HelperService;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-	EventNotificationServiceTest.UpdateTests.class, 
-	EventNotificationServiceTest.CreateTests.class, 
-	EventNotificationServiceTest.DeleteTests.class, 
-	EventNotificationServiceTest.UpdateParticipationTests.class,
-	EventNotificationServiceTest.ComputeAttendeesDiffsTests.class})
-public class EventNotificationServiceTest {
+	EventNotificationServiceImplTest.UpdateTests.class, 
+	EventNotificationServiceImplTest.CreateTests.class, 
+	EventNotificationServiceImplTest.DeleteTests.class, 
+	EventNotificationServiceImplTest.UpdateParticipationTests.class,
+	EventNotificationServiceImplTest.ComputeAttendeesDiffsTests.class})
+public class EventNotificationServiceImplTest {
 	
 	@Rule
 	public SlowFilterRule slowFilterRule = new SlowFilterRule();
@@ -464,7 +465,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, eventAfter, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, eventAfter, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, eventAfter, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
@@ -499,7 +500,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -541,7 +542,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -646,7 +647,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -688,7 +689,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -706,6 +707,38 @@ public class EventNotificationServiceTest {
 			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
 			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
 			
+			verify(mailer, ical4jHelper);
+		}
+
+		@Test
+		public void testOBMFULL3973NotifyUpdatedEvent() {
+			Ical4jUser ical4jUser = ServicesToolBox.getIcal4jUser();
+			ObmUser defaultObmUser = getDefaultObmUser();
+			Event previousEvent = new Event();
+			previousEvent.setTitle("previous");
+			Event currentEvent = new Event();
+			currentEvent.setTitle("current");
+
+			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
+			AccessToken accessToken = ToolBox.mockAccessToken();
+
+			expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
+			expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
+
+			EventChangeMailer mailer = createMock(EventChangeMailer.class);
+
+			ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
+			expect(calendarFactory.createIcal4jUserFromObmUser(defaultObmUser)).andReturn(ical4jUser).anyTimes();
+
+			UserService userService = createMock(UserService.class);
+			expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultObmUser);
+
+			replay(mailer, ical4jHelper, calendarFactory, userService);
+
+			EventNotificationService eventNotificationService = getEventNotificationServiceToNotifyUpdatedEvent(mailer, ical4jHelper, calendarFactory, userService);
+			eventNotificationService.notifyUpdatedEvent(previousEvent, currentEvent, accessToken);
+
 			verify(mailer, ical4jHelper);
 		}
 
@@ -730,7 +763,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);
@@ -817,7 +850,7 @@ public class EventNotificationServiceTest {
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken();
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_ADD);
-			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
+			EasyMock.expect(ical4jHelper.buildIcsInvitationCancel(ical4jUser, previousEvent, accessToken)).andReturn(ICS_DATA_REMOVE);
 			EasyMock.expect(ical4jHelper.buildIcsInvitationRequest(ical4jUser, currentEvent, accessToken)).andReturn(ICS_DATA_UPDATE);
 			
 			EventChangeMailer mailer = createMock(EventChangeMailer.class);

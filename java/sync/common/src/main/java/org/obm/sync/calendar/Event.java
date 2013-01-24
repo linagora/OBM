@@ -487,6 +487,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		return null;
 	}
 
+	public Attendee findOwner() {
+		return findAttendeeFromEmail(ownerEmail);
+	}
+
 	@Override
 	public Integer getIndex() {
 		return getObmId().getIndex();
