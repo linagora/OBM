@@ -65,8 +65,8 @@ function prepare_session_roundcube(){
 									 VALUES (\''.$saved_session.'\', NOW(), NOW(), \''.$_SERVER['REMOTE_ADDR'].'\', \''.$encoded_vars.'\')';
 			$obm_q2->query($insert_session_query);
 		}
-		$obmdb_db = $saved_db;
 	}
+	$obmdb_db = $saved_db;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
