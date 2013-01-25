@@ -37,7 +37,6 @@ import java.util.List;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.apache.commons.codec.binary.Hex;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.push.bean.UserDataRequest;
@@ -86,7 +85,6 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	@Transactional
 	public MSEvent convertEventToMSEvent(UserDataRequest udr, Event event) throws DaoException, ConversionException {
 		MSEventUid msEventUid = getMSEventUidFor(event.getExtId(), udr.getDevice());
 		MSEvent msEvent = eventConverter.convert(event, msEventUid, udr.getCredentials().getUser());
@@ -94,7 +92,6 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	@Override
-	@Transactional
 	public MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException {
 		Preconditions.checkNotNull(eventExtId, "Event must contain an extId");
 		MSEventUid msEventUidFromDatabase = retrieveMSEventUidFromDatabase(eventExtId, device);
@@ -131,13 +128,11 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
 	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException {
 		return calendarDao.getEventExtIdFor(msEventUid, device);
 	}
 	
 	@Override
-	@Transactional
 	public void trackEventExtIdMSEventUidTranslation(EventExtId eventExtId,
 			MSEventUid msEventUid, Device device) throws DaoException {
 		byte[] hashedExtId = hashExtId(eventExtId);
@@ -145,7 +140,6 @@ public class EventServiceImpl implements EventService {
 	}
 	
 	@Override
-	@Transactional
 	public MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException {
 		
 		Credentials credentials = udr.getCredentials();
