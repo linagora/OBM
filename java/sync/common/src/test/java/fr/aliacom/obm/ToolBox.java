@@ -80,6 +80,7 @@ public class ToolBox {
 	}
 	
 	private static AccessToken mockAccessTokenMethods(AccessToken accessToken, String login, ObmDomain domain) {
+		EasyMock.expect(accessToken.getObmId()).andReturn(1).anyTimes();
 		EasyMock.expect(accessToken.getDomain()).andReturn(domain).anyTimes();
 		EasyMock.expect(accessToken.getUserLogin()).andReturn(login).anyTimes();
 		EasyMock.expect(accessToken.getUserEmail()).andReturn(login + '@' + domain.getName()).anyTimes();

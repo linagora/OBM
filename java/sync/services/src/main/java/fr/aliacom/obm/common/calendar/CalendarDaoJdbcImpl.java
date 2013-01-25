@@ -2027,7 +2027,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void insertAttendees(AccessToken editor, String calendar, Event ev, Connection con,
+	@VisibleForTesting void insertAttendees(AccessToken editor, String calendar, Event ev, Connection con,
 			List<Attendee> attendees, boolean useObmUser) throws SQLException, ServerFault {
 		String attQ = "INSERT INTO EventLink (" + ATT_INSERT_FIELDS
 				+ ") VALUES (" + "?, " + // event_id
@@ -2047,11 +2047,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			
 			final int eventObmId = ev.getObmId().getObmId();
 			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);
+			Set<Integer> alreadyAddedAttendees = Sets.newHashSet();
 			
 			for (final Attendee at : listAttendee) {
 				boolean isOrganizer = Objects.firstNonNull(at.isOrganizer(), false);
 				
-				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, at.getEmail(), useObmUser);
+				String attendeeEmail = at.getEmail();
+				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, attendeeEmail, useObmUser);
 
 				// There must be only one organizer in a given event
 				if (isOrganizer) {
@@ -2064,11 +2066,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					Contact c = new Contact();
 					c.setLastname(at.getDisplayName());
 					c.setFirstname("");
-					c.addEmail("INTERNET;X-OBM-Ref1", new Email(at.getEmail()));
+					c.addEmail("INTERNET;X-OBM-Ref1", new Email(attendeeEmail));
 					c.setCollected(true);
 					c = contactDao.createContact(editor, con, c);
 					userEntity = c.getEntityId();
+				} else {
+					if (alreadyAddedAttendees.contains(userEntity)) {
+						logger.info("Attendee {} with entity ID {} already added, skipping.", attendeeEmail, userEntity);
+						
+						continue;
+					}
 				}
+				
 				ps.setInt(1, eventObmId);
 				ps.setInt(2, userEntity);
 				ps.setObject(3, getJdbcObjectParticipation(at));
@@ -2077,7 +2086,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(6, editor.getObmId());
 				ps.setBoolean(7, isOrganizer);
 				ps.addBatch();
-				logger.info(LogUtils.prefix(editor) + "Adding " + at.getEmail() + ( isOrganizer ? " as organizer" : " as attendee"));
+				logger.info(LogUtils.prefix(editor) + "Adding " + attendeeEmail + ( isOrganizer ? " as organizer" : " as attendee"));
+				
+				alreadyAddedAttendees.add(userEntity);
 			}
 			
 			// Clear the previous organizer if needed

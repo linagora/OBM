@@ -42,6 +42,7 @@ import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -59,7 +60,8 @@ public class UserDao {
 	private final ObmHelper obmHelper;
 	
 	@Inject
-	private UserDao(ObmHelper obmHelper) {
+	@VisibleForTesting
+	UserDao(ObmHelper obmHelper) {
 		this.obmHelper = obmHelper;
 	}
 	
@@ -92,7 +94,7 @@ public class UserDao {
 		return ImmutableMap.of();
 	}
 	
-	private Integer userIdFromEmailQuery(Connection con, String mail, String domain) throws SQLException {
+	@VisibleForTesting Integer userIdFromEmailQuery(Connection con, String mail, String domain) throws SQLException {
 		Statement st = null;
 		ResultSet rs = null;
 		
@@ -305,7 +307,7 @@ public class UserDao {
 	}
 
 	
-	private Integer userIdFromLogin(Connection con, String login, Integer domainId) {
+	@VisibleForTesting Integer userIdFromLogin(Connection con, String login, Integer domainId) {
 		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -334,13 +336,21 @@ public class UserDao {
 		String[] parts = email.split("@");
 		String login = parts[0];
 		String domain = "-";
+		Integer ownerId = null;
+		
+		// OBMFULL-4353
+		// We only fetch the user by login if a login was provided
+		// If a full email is given, we must favor the fetch by email
 		if (parts.length > 1) {
 			domain = parts[1];
+		} else {
+			ownerId = userIdFromLogin(con, login, domainId);
 		}
-		Integer ownerId = userIdFromLogin(con, login, domainId);
+		
 		if(ownerId == null){
 			ownerId = userIdFromEmailQuery(con, login, domain);	
 		}
+		
 		return ownerId;
 	}
 	
