@@ -182,11 +182,10 @@ public abstract class ConvertObmEventToMsEventIntegrityTest {
 	public void testAllDayEvent() throws ConversionException {
 		Event event = basicEvent();
 		event.setAllday(true);
-		event.setStartDate(date("2004-12-13"));
 		User jaures = jauresUser();
 		MSEvent msEvent = converter.convert(event, new MSEventUid("mseventuid"), jaures);
 		assertThat(msEvent.getAllDayEvent()).isEqualTo(true);
-		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-14"));
+		assertThat(msEvent.getEndTime()).isEqualTo(date("2004-12-14T21:39:45Z"));
 	}
 	
 	@Test

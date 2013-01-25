@@ -80,8 +80,6 @@ import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.fest.assertions.api.Assertions;
 import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Before;
@@ -1057,44 +1055,6 @@ public class Ical4jHelperTest {
 		
 		Assert.assertThat(ics, StringContains.containsString(icsAttendee));
 		Assert.assertEquals(1, countStringOccurrences(ics, "ATTENDEE;"));	
-	}
-	
-	@Test
-	public void testBuildIcsInvitationAllDayEvent() throws Exception {
-		final Event event = buildEvent();
-		
-		event.setAllday(true);
-
-		final Ical4jUser ical4jUser = getDefaultObmUser();
-		
-		Ical4jHelper ical4jHelper = new Ical4jHelper();
-		AccessToken token = new AccessToken(0, "OBM");
-		String actualIcs = ical4jHelper.buildIcsInvitationRequest(ical4jUser, event, token);
-		String expectedIcs = IOUtils.toString(getStreamICS("allday.ics"));
-		
-		List<Event> expectedList = ical4jHelper.parseICS(expectedIcs, ical4jUser);
-		List<Event> actualList = ical4jHelper.parseICS(actualIcs, ical4jUser);
-		
-		Assertions.assertThat(actualList).containsAll(expectedList);
-	}
-	
-	@Test
-	public void testBuildIcsInvitationOneHourEvent() throws Exception {
-		final Event event = buildEvent();
-		
-		event.setDuration(3600);
-
-		final Ical4jUser ical4jUser = getDefaultObmUser();
-		
-		Ical4jHelper ical4jHelper = new Ical4jHelper();
-		AccessToken token = new AccessToken(0, "OBM");
-		String actualIcs = ical4jHelper.buildIcsInvitationRequest(ical4jUser, event, token);
-		String expectedIcs = IOUtils.toString(getStreamICS("onehour.ics"));
-		
-		List<Event> expectedList = ical4jHelper.parseICS(expectedIcs, ical4jUser);
-		List<Event> actualList = ical4jHelper.parseICS(actualIcs, ical4jUser);
-		
-		Assertions.assertThat(actualList).containsAll(expectedList);
 	}
 	
 	private Event buildEvent() {

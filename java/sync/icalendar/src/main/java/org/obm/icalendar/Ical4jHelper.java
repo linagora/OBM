@@ -242,7 +242,8 @@ public class Ical4jHelper {
 		appendSequence(prop, event);
 		appendAttendeesToICS(prop, event.getAttendees());
 		appendCategoryToICS(prop, event);
-		appendEventDates(prop, event);
+		appendDtStartToICS(prop, event);
+		appendDurationToIcs(prop, event);
 		appendDescriptionToICS(prop, event);
 		appendLocationToICS(prop, event);
 		appendTranspToICS(prop, event);
@@ -257,7 +258,7 @@ public class Ical4jHelper {
 		appendXMozLastAck(prop);
 		return vEvent;
 	}
-
+	
 	private VEvent buildIcsInvitationVEventException(Event event) {
 		return buildIcsInvitationVEventDefaultValue(event);
 	}
@@ -697,6 +698,10 @@ public class Ical4jHelper {
 		return null;
 	}
 
+	private void appendDurationToIcs(PropertyList prop, Event event) {
+		prop.add(new Duration(new Dur(event.getStartDate(), event.getEndDate())));
+	}
+	
 	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token) {
 		return getVEvent(iCal4jUser, event, null, null, replyAttendee, method, token);
 	}
@@ -721,7 +726,8 @@ public class Ical4jHelper {
 			appendReplyCommentToICS(prop, replyAttendee);
 		}
 		appendCategoryToICS(prop, event);
-		appendEventDates(prop, event);
+		appendDtStartToICS(prop, event);
+		appendDtEndOrDurationToICS(prop, event);
 		appendDescriptionToICS(prop, event);
 		appendLocationToICS(prop, event);
 		appendTranspToICS(prop, event);
@@ -956,14 +962,16 @@ public class Ical4jHelper {
 		}
 
 	}
-	
-	private void appendEventDates(PropertyList prop, Event event) {
+
+	private void appendDtEndOrDurationToICS(PropertyList prop, Event event) {
+		Property dtEndOrDurationProperty = null;
 		if (event.isAllday()) {
-			appendStartDateToICS(prop, event);
-			appendEndDateToICS(prop, event);
+			dtEndOrDurationProperty = getDuration(event.getStartDate(), event.getEndDate());
 		} else {
-			appendDtStartToICS(prop, event);
-			appendDurationToICS(prop, event);
+			dtEndOrDurationProperty = getDtEnd(event.getEndDate());
+		}
+		if (dtEndOrDurationProperty != null) {
+			prop.add(dtEndOrDurationProperty);
 		}
 	}
 
@@ -984,19 +992,7 @@ public class Ical4jHelper {
 	}
 
 	private void appendDtStartToICS(PropertyList prop, Event event) {
-			prop.add(getDtStart(event.getStartDate()));
-	}
-	
-	private void appendStartDateToICS(PropertyList prop, Event event) {
-		prop.add(getDateStart(event.getStartDate()));
-	}
-	
-	private void appendDurationToICS(PropertyList prop, Event event) {
-		prop.add(new Duration(new Dur(event.getStartDate(), event.getEndDate())));
-	}
-	
-	private void appendEndDateToICS(PropertyList prop, Event event) {
-		prop.add(getDtEnd(event.getEndDate()));
+		prop.add(getDtStart(event.getStartDate()));
 	}
 
 	private void appendCategoryToICS(PropertyList prop, Event event) {
@@ -1506,14 +1502,6 @@ public class Ical4jHelper {
 
 	@VisibleForTesting DtStart getDtStart(Date start) {
 		return new DtStart(new DateTime(start), true);
-	}
-	
-	private DtEnd getDateEnd(Date end) {
-		return new DtEnd(new net.fortuna.ical4j.model.Date(end));
-	}
-
-	private DtStart getDateStart (Date start) {
-		return new DtStart(new net.fortuna.ical4j.model.Date(start), true);
 	}
 
 	@VisibleForTesting Duration getDuration(Date startDate, Date endDate) {
