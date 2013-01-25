@@ -256,7 +256,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
-		CollectionPath collectionPath = buildCollectionPath(collectionId);
+		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		AccessToken token = login(udr);
 
 		ItemSyncState newState = state.newWindowedSyncState(syncCollectionOptions.getFilterType());
@@ -337,9 +337,10 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		return true;
 	}
 	
-	private CollectionPath buildCollectionPath(int collectionId) {
+	private CollectionPath buildCollectionPath(UserDataRequest udr, int collectionId) {
 		return collectionPathBuilderProvider
 			.get()
+			.userDataRequest(udr)
 			.fullyQualifiedCollectionPath(mappingService.getCollectionPathFor(collectionId))
 			.build();
 	}
@@ -367,13 +368,13 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 		MSEvent msEvent = (MSEvent) data;
 
-		CollectionPath collectionPath = buildCollectionPath(collectionId);
+		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		AccessToken token = login(udr);
 		
 		logger.info("createOrUpdate( calendar = {}, serverId = {} )", collectionPath.backendName(), serverId);
 		
 		try {
-			EventExtId eventExtId = eventService.getEventExtIdFor(msEvent.getUid(), udr.getDevice());
+			EventExtId eventExtId = getEventExtId(udr, msEvent);
 			Event oldEvent = fetchReferenceEvent(token, serverId, eventExtId, collectionPath);
 			EventObmId eventId = getEventId(oldEvent);
 			
@@ -388,6 +389,14 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			throw new ItemNotFoundException(e);
 		} finally {
 			logout(token);
+		}
+	}
+
+	private EventExtId getEventExtId(UserDataRequest udr, MSEvent msEvent) {
+		try {
+			return eventService.getEventExtIdFor(msEvent.getUid(), udr.getDevice());
+		} catch (EventNotFoundException e) {
+			return null;
 		}
 	}
 
@@ -506,7 +515,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public void delete(UserDataRequest udr, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ItemNotFoundException {
 
-		CollectionPath collectionPath = buildCollectionPath(collectionId);
+		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		if (serverId != null) {
 
 			AccessToken token = login(udr);
@@ -559,7 +568,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		
 		try {
 			
-			EventExtId extId = eventService.getEventExtIdFor(event.getUid(), udr.getDevice());
+			EventExtId extId = getEventExtId(udr, event);
 			Event previousEvent = getEventFromExtId(at, extId, collectionPath);
 			
 			boolean isInternal = eventConverter.isInternalEvent(previousEvent, false);
@@ -628,7 +637,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions)
 			throws DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 	
-		CollectionPath collectionPath = buildCollectionPath(collectionId);
+		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
 		AccessToken token = login(udr);
