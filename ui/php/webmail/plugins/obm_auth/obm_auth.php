@@ -37,23 +37,14 @@ class obm_auth extends rcube_plugin
   {
     $this->add_hook('startup', array($this, 'startup'));
     $this->add_hook('authenticate', array($this, 'authenticate'));
+    $this->add_hook('logout_after', array($this, 'logout_after'));
   }
 
   function startup($args)
   {
     $rcmail = rcmail::get_instance();
-
-    if (isset($_SESSION['obm_user_id']) && is_numeric($_SESSION['obm_user_id'])) {
-      $query = 'SELECT userobm_password_type FROM userobm WHERE userobm_id='.$_SESSION['obm_user_id'];
-
-      $obm_q = new DB_OBM;
-      $obm_q->query($query);
-
-      $obm_q->next_record();
-      if ($obm_q->f('userobm_password_type') == 'PLAIN') {
-        $rcmail->config->set('obm_user_id', $_SESSION['obm_user_id']);
-        $args['action'] = 'login';
-      }
+    if( isset($_GET['obm_token']) ){
+      $args['action'] = 'login';
     }
 
     return $args;
@@ -66,27 +57,27 @@ class obm_auth extends rcube_plugin
     if (!empty($args['user'])) {
         return $args;
     }
+    $token = $_GET['obm_token'];
+    $obm_q = new DB_OBM;
 
-    $obm_user_id = $rcmail->config->get('obm_user_id');
+    $query = 'SELECT email, password
+              FROM TrustToken 
+              WHERE token=\''.$token.'\';';
+              
+    $obm_q->query($query);
 
-    if ($obm_user_id && is_numeric($obm_user_id)) {
-      $obm_q = new DB_OBM;
+    $obm_q->next_record();
+    $args['user'] = $obm_q->f('email');
+    $args['pass'] = $obm_q->f('password');
+    $args['cookiecheck'] = false;
+    $args['valid'] = true;
+  
+    return $args;
+  }
 
-      $query = 'SELECT userobm_email, userobm_password, domain_name 
-                FROM UserObm 
-                INNER JOIN Domain ON userobm_domain_id=domain_id 
-                WHERE userobm_id='.$obm_user_id;
-                
-      $obm_q->query($query);
-
-      $obm_q->next_record();
-      $username_array = explode("\n", $obm_q->f('userobm_email'));
-      $username_array = array_map('trim', $username);
-      $args['user'] = $username_array[0].'@'.$obm_q->f('domain_name');
-      $args['pass'] = $obm_q->f('userobm_password');
-      $args['cookiecheck'] = false;
-      $args['valid'] = true;
-    }
+  function logout_after($args){
+    // TODO: check le nom de cookie OBM
+    setcookie('OBM_Session', false, time()-3600 );
 
     return $args;
   }

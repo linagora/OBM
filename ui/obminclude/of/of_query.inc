@@ -2438,14 +2438,14 @@ function get_user_info($id='') {
  * 
  * @return String The trust token.
  */
-function get_trust_token($username){
+function get_trust_token($userInfo){
 	global $cdg_sql;
-	
+
 	$obm_q = new DB_OBM ;
-	$deleteQuery = "DELETE FROM TrustToken WHERE login='$username'";
-	$insertQuery = "INSERT INTO TrustToken (login, token) VALUES ('$username', UUID())";
-	$query = "SELECT token FROM TrustToken WHERE login='$username'";
-	
+	$deleteQuery = "DELETE FROM TrustToken WHERE login='".$userInfo['login']."'";
+	$insertQuery = "INSERT INTO TrustToken (login, email, password, token) VALUES ('".$userInfo['login']."', '".$userInfo['email']."', '".$userInfo['password']."', UUID())";
+	$query = "SELECT token FROM TrustToken WHERE login='".$userInfo['login']."'";
+
 	display_debug_msg($query, $cdg_sql, 'get_trust_token()');
 	
 	$obm_q->query($deleteQuery);
@@ -2456,7 +2456,7 @@ function get_trust_token($username){
 	if (is_array($obm_q->Record)) {
 		$token = $obm_q->Record[0];
 	}
-	
+
 	return $token;
 }
 

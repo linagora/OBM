@@ -38,35 +38,28 @@ $params = get_global_params('webmail');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 include("webmail_display.inc");
+require_once("$obminclude/of/of_query.inc");
 page_close();
 
 ///////////////////////////////////////////////////////////////////////////////
-// Write session in Roundcube DB
+// Create Token to be used by Roundcube
 //////////////////////////////////////////////////////////////////////////////
-prepare_session_roundcube();
+$token = generate_token();
 
-function prepare_session_roundcube(){
-	global $obm, $full_locale, $obmdb_db;
-	$saved_db = $obmdb_db;
-	$obmdb_db = 'roundcubemail';
+function generate_token(){
+	global $obm, $path;
 
-	if (!isset($saved_session)){
-		$saved_session = session_id();
-		$query = 'SELECT sess_id FROM session WHERE sess_id=\''.$saved_session.'\'';
+	$userInfo = get_user_info($obm['uid']);
 
-		$obm_q = new DB_OBM;
-		$obm_q->query($query);
-
-		if(!$obm_q->next_record()){		
-			$vars = 'language|s:'.strlen($full_locale).':"'.$full_locale.'";obm_user_id|s:'.strlen((string) $obm['uid']).':"'.$obm['uid'].'";';
-			$encoded_vars = base64_encode($vars);
-			$obm_q2 = new DB_OBM;
-			$insert_session_query = 'INSERT INTO session (sess_id, created, changed, ip, vars)
-									 VALUES (\''.$saved_session.'\', NOW(), NOW(), \''.$_SERVER['REMOTE_ADDR'].'\', \''.$encoded_vars.'\')';
-			$obm_q2->query($insert_session_query);
-		}
+	if( isset($userInfo['email']) ){
+		$token = get_trust_token($userInfo);
+	} else {
+		$url_redirect = $path."/calendar/calendar_index.php";
+		header('Status: 301 OK');
+		header("Location: $url_redirect");
+		exit();
 	}
-	$obmdb_db = $saved_db;
+	return $token;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,14 +75,14 @@ $spreadlove= "<h2 class=\"spreadLove\"><div>"
 
 $display['header'] = display_menu($module).$spreadlove;
 
-$get_params = params_for_iframe();
+$get_params = params_for_iframe($token);
 
 $display['detail'] = '<iframe src="index.php'.$get_params.'" style="border:none;width:100%;height:94%;" id="webmail_iframe"></iframe>';
 display_outframe($display);
 
 
-function params_for_iframe(){
-	$get_params = '';
+function params_for_iframe($token){
+	$get_params = ( isset($token) ) ? '?obm_token='.$token : '';
 	if (!empty($_GET)) {
 		foreach ($_GET as $key => $value) {
 			if ($get_params == '') {
