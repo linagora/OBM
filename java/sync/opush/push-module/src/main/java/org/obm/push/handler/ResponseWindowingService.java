@@ -230,5 +230,9 @@ public class ResponseWindowingService {
 		}).window(c, delta.getDeletions(), clientCommands);
 	}
 
+	public boolean hasPendingResponse(Credentials credentials, Device device, Integer collectionId) {
+		return unSynchronizedItemCache.hasAnyItemsFor(credentials, device, collectionId);
+	}
+
 	
 }

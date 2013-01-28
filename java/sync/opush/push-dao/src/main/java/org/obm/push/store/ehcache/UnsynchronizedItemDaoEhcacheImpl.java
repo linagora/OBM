@@ -96,6 +96,12 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		clearItems(key);
 	}
 
+	@Override
+	public boolean hasAnyItemsFor(Credentials credentials, Device device, int collectionId) {
+		return !listItemsToAdd(credentials, device, collectionId).isEmpty()
+			|| !listItemsToRemove(credentials, device, collectionId).isEmpty();
+	}
+
 	private <T> void storeItems(Collection<T> ic, Key key) {
 		HashSet<T> itemChanges = Sets.newHashSet(ic);
 		store.put( new Element(key, itemChanges) );

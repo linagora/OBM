@@ -52,4 +52,6 @@ public interface UnsynchronizedItemDao {
 
 	void clearItemsToRemove(Credentials credentials, Device device, int collectionId);
 
+	boolean hasAnyItemsFor(Credentials credentials, Device device, int collectionId);
+
 }

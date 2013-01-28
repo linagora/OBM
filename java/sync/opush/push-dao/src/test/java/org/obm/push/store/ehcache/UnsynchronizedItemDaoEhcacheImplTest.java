@@ -31,13 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Set;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
-
-import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -51,7 +49,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
-import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.slf4j.Logger;
@@ -60,13 +57,14 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
 
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
 	private Credentials credentials;
 	private TransactionManager transactionManager;
+	private Device device;
 	
 	public UnsynchronizedItemDaoEhcacheImplTest() {
 		super();
@@ -81,6 +79,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
+		this.device = new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 	
 	@After
@@ -92,17 +91,17 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Test
 	public void list() {
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(itemChanges);
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1)).isNotNull();
 	}
 	
 	@Test
 	public void add() {
-		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, ImmutableList.of(buildItemChange("test 1")));
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(itemChanges);
-		Assert.assertEquals(1, itemChanges.size());
-		Assert.assertEquals("test 1", itemChanges.iterator().next().getServerId());
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, ImmutableList.of(buildItemChange("test 1")));
+		
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1))
+			.isNotNull()
+			.hasSize(1)
+			.containsOnly(new ItemChange("test 1"));
 	}
 	
 	@Test
@@ -112,15 +111,13 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		ItemChange itemChange3 = buildItemChange("3");
 		
 		unSynchronizedItemImpl.storeItemsToAdd(
-				credentials, getFakeDeviceId(), 1, ImmutableList.of(itemChange1, itemChange2));
+				credentials, device, 1, ImmutableList.of(itemChange1, itemChange2));
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(itemChanges);
-		Assert.assertEquals(2, itemChanges.size());
-		
-		Assert.assertTrue( contains(itemChanges, itemChange1) );
-		Assert.assertTrue( contains(itemChanges, itemChange2) );
-		Assert.assertFalse( contains(itemChanges, itemChange3) );
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1))
+			.isNotNull()
+			.hasSize(2)
+			.doesNotContain(itemChange3)
+			.containsOnly(itemChange1, itemChange2);
 	}
 	
 	@Test
@@ -129,71 +126,169 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		ItemChange itemChange2 = buildItemChange("test 1.2");
 		ItemChange itemChange21 = buildItemChange("test 2.1");
 		
-		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
 				ImmutableList.of(itemChange1, itemChange2));
-		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 2, 
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 2, 
 				ImmutableList.of(itemChange21));
-		Set<ItemChange> itemChangesOneCollection = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Set<ItemChange> itemChangesTwoCollection = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 2);
 		
-		Assert.assertNotNull(itemChangesOneCollection);
-		Assert.assertEquals(2, itemChangesOneCollection.size());
-		Assert.assertTrue( contains(itemChangesOneCollection, itemChange1) );
-		Assert.assertTrue( contains(itemChangesOneCollection, itemChange2) );
-		
-		Assert.assertNotNull(itemChangesTwoCollection);
-		Assert.assertEquals(1, itemChangesTwoCollection.size());
-		Assert.assertTrue( contains(itemChangesTwoCollection, itemChange21) );	
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1))
+			.isNotNull()
+			.hasSize(2)
+			.containsOnly(itemChange1, itemChange2);
+
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 2))
+			.isNotNull()
+			.hasSize(1)
+			.containsOnly(itemChange21);
 	}
 	
-	@Test @Slow
+	@Test
 	public void addTwoItemsDifferentTypeOnTheSameCollection() {
 		ItemChange itemChange1 = buildItemChange("test 1");
 		ItemDeletion itemDeletion2 = ItemDeletion.builder().serverId("test 2").build();
 		ItemChange itemChange3 = buildItemChange("test 3");
 		
-		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
 				ImmutableList.of(itemChange1));
-		unSynchronizedItemImpl.storeItemsToRemove(credentials, getFakeDeviceId(), 1, 
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
 				ImmutableList.of(itemDeletion2));
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(itemChanges);
-		Assert.assertEquals(1, itemChanges.size());
-		
-		Assert.assertTrue( contains(itemChanges, itemChange1) );
-		Assert.assertFalse( contains(itemChanges, itemDeletion2) );
-		Assert.assertFalse( contains(itemChanges, itemChange3) );
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1))
+			.isNotNull()
+			.hasSize(1)
+			.doesNotContain(itemChange3)
+			.containsOnly(itemChange1);
 	}
 	
-	@Test @Slow
+	@Test
 	public void clear() {
-		unSynchronizedItemImpl.storeItemsToAdd(credentials, getFakeDeviceId(), 1, 
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
 				ImmutableList.of(buildItemChange("test 1")));
-		unSynchronizedItemImpl.clearItemsToAdd(credentials, getFakeDeviceId(), 1);		
+		unSynchronizedItemImpl.clearItemsToAdd(credentials, device, 1);		
 		
-		Set<ItemChange> itemChanges = unSynchronizedItemImpl.listItemsToAdd(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(itemChanges);
-		Assert.assertEquals(0, itemChanges.size());
+		assertThat(unSynchronizedItemImpl.listItemsToAdd(credentials, device, 1))
+			.isNotNull()
+			.hasSize(0);
+	}
+	
+	@Test
+	public void hasAnyItemForNoAdd() {
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForOneAdd() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1")));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
+	}
+	
+	@Test
+	public void hasAnyItemForThreeAdd() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1"), buildItemChange("test 2"), buildItemChange("test 3")));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
+	}
+
+	@Test
+	public void hasAnyItemForOtherCollectionAdd() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1"), buildItemChange("test 2"), buildItemChange("test 3")));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 2)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForThreeAddAfterClear() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1"), buildItemChange("test 2"), buildItemChange("test 3")));
+		unSynchronizedItemImpl.clearItemsToAdd(credentials, device, 1);
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForNoRemove() {
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForOneRemove() {
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build()));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
+	}
+	
+	@Test
+	public void hasAnyItemForThreeRemove() {
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build(),
+						ItemDeletion.builder().serverId("test 2").build(),
+						ItemDeletion.builder().serverId("test 3").build()));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
+	}
+
+	@Test
+	public void hasAnyItemForOtherCollectionRemove() {
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build(),
+						ItemDeletion.builder().serverId("test 2").build(),
+						ItemDeletion.builder().serverId("test 3").build()));
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 2)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForThreeRemoveAfterClear() {
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build(),
+						ItemDeletion.builder().serverId("test 2").build(),
+						ItemDeletion.builder().serverId("test 3").build()));
+		unSynchronizedItemImpl.clearItemsToRemove(credentials, device, 1);
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isFalse();
+	}
+	
+	@Test
+	public void hasAnyItemForOneAddAndDeleteButAddCleaned() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1")));
+		
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build()));
+		
+		unSynchronizedItemImpl.clearItemsToAdd(credentials, device, 1);
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
+	}
+	
+	@Test
+	public void hasAnyItemForOneAddAndDeleteButRemoveCleaned() {
+		unSynchronizedItemImpl.storeItemsToAdd(credentials, device, 1, 
+				ImmutableList.of(buildItemChange("test 1")));
+		
+		unSynchronizedItemImpl.storeItemsToRemove(credentials, device, 1, 
+				ImmutableList.of(
+						ItemDeletion.builder().serverId("test 1").build()));
+		
+		unSynchronizedItemImpl.clearItemsToRemove(credentials, device, 1);
+		
+		assertThat(unSynchronizedItemImpl.hasAnyItemsFor(credentials, device, 1)).isTrue();
 	}
 	
 	private ItemChange buildItemChange(String displayName) {
 		ItemChange itemChange = new ItemChange();
 		itemChange.setServerId(displayName);
 		return itemChange;
-	}
-	
-	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
-	}
-	
-	private boolean contains(Set<? extends ASItem> expected, ASItem actual) {
-		for (ASItem itemChange: expected) {
-			if (itemChange.getServerId().equals(actual.getServerId())) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 }
