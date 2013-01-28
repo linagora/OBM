@@ -940,12 +940,12 @@ function display_page(&$display) {
 
     return;
   }
-
+/*
 $display["supportOBMBanner"] = "<h2 class=\"spreadLove\"><div>"
   .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
   ."</div><div class=\"supportUs\">"
   .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
-  ."</div></h2>";
+  ."</div></h2>";*/
 
   echo $display['head'] . $display['header'] . "
     <!-- left panel -->
@@ -1265,28 +1265,63 @@ function display_menu($module) {
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
 
-  $wait_event = "<li><a id=\"bannerWaitingEvent\" href='".$path."/calendar/calendar_index.php?action=waiting_events'></a></li>";
+  $userInfo = get_user_info($obm['uid']);
+  
+  if ( isset($userInfo['email']) ){
+    $mailbox= imap_open('{127.0.0.1:143/novalidate-cert}INBOX', $userInfo['email'], $userInfo['password']);
+    $mail = imap_mailboxmsginfo($mailbox);
+    $mail_notif = ($mail->Unread > '0') ? "<span id=\"mail_notification\" class='notification_popup' style=\"display:inline-block;\">".$mail->Unread."</span>" : '';
+  }
+
+  $wait_event = "<span id=\"bannerWaitingEvent\" class='notification_popup'></span>";
 
   $block = "
     <!-- Bandeau -->
     <div id='banner'>
 
     <div style='float:left;'>
-      <a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
-      ".$display['section']."
+      <a href=\"$path/obm.php?redirect=false\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
+      <ul id='section'>
+        <li><a href=\"$path/webmail/webmail_index.php\">Mail $mail_notif</a></li>
+        <li><a href=\"$path/calendar/calendar_index.php?action=waiting_events\">Agenda $wait_event</a></li>
+        <li><a href=\"$path/contact/contact_index.php\">Contact</a></li>
+      </ul>
+      <!-- ".$display['section']." -->
     </div>
 
     <div style='float:right;'> 
     <ul id='information'>
       <li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
       $dis_scope
-      $wait_event
+      <li style='font-size:13px;'>
+      <a href=\"$path/settings/settings_index.php\" style='text-decoration:none;margin-right:0;'>
+      $login <img src='http://icdn.pro/images/en/u/s/user-gray-icone-7895-32.png' style='width:25px;border:2px solid #AAA; border-radius:5px;background-color:#FFF;'/>
+      </a>
+      </li>
+      <li style='font-size:13px;'>
+      <a href='#' style='text-decoration:none;margin-right:0;' onclick='showAllInOneMenu();'>
+      <img src='http://icongal.com/gallery/image/81019/format_indent_more_submenu.png' style='margin-top:-1px;width:33px;'/>
+      </a>
+      </li>  
+
+      <!-- <li>$l_profile: $p</li> -->
+      <li style='text-decoration:none;'>
+        <a href='".$path."/obm.php?action=logout' style='text-decoration:none;'>
+        <img src='http://www.azerty.be/icones/img101gr.gif
+        ' alt='$l_logout' style='width:32px;text-decoration:none;margin-top:-4px;margin-left:0;'/>
+        </a>
+      </li>
+
+      
+      <!-- $wait_event
+       
       <li>$login ($domain)</li>
-      <li>$l_profile: $p</li>
+      <li>$l_profile: $p</li> 
       <li><a href='".$path."/obm.php?action=logout' onclick='logout_roundcube()'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
-      $dis_printer
+      $dis_printer -->
     </ul>
     </div>
+    ".dis_all_in_one_menu()."
 
     </div>
     <script type='text/javascript'>
@@ -1369,7 +1404,7 @@ function display_sections($section) {
 //   - $section : selected section
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_modules($section, $module) {
+function display_modules($section, $module, $portlet = false) {
 
   // If a theme specif function is provided
   if (function_exists('display_modules_theme')) {
@@ -1389,7 +1424,7 @@ function display_modules($section, $module) {
   $section_link = array_keys($cgp_show['module'],$section);
   if (is_array($section_link)) {
     $id = $section.'Items';
-    $block .= "<div class='module' id='section-$section-items-wrapper'><ul id='section-$section-items'>";
+    $block .= ( $portlet ) ? "<ul id='section-$section-items' style='list-style-type:none;'>" : "<div class='module' id='section-$section-items-wrapper'><ul id='section-$section-items'>";
     foreach ($section_link as $mod) {
       $module_name = $modules[$mod]['Name'];
       $module_tooltip = $modules[$mod]['Tooltip'];
@@ -1416,7 +1451,7 @@ function display_modules($section, $module) {
         $block .= "</a></li>";
       }
     }
-    $block .= '</ul></div>';
+    $block .= ( $portlet ) ? '</ul>' : '</ul></div>';
   }
 
   return $block;
@@ -1561,7 +1596,7 @@ function display_last_visited() {
     </ul>
   </div>";
 
-  return $block;
+  return '';//$block;
 }
 
 
@@ -1846,6 +1881,27 @@ function display_document_form($params, $label='') {
 
   return $block;
 
+}
+
+function dis_all_in_one_menu() {
+  global $uid, $ico_big_settings, $path, $cgp_show, $perm, $cright_read;
+  global $l_module_settings, $cright_write, $sections;
+
+  $block = '<div id="allinonemenu" class="allinonemenu">';
+
+  foreach($cgp_show['section'] as $section => $value){
+    //var_dump($value['url']);
+    $portlet_need = array('gw', 'admin', 'user', 'dic','my');
+    if( in_array($section, $portlet_need) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
+      if (display_modules($section, null, true) !=''){
+        $portlet_title = "l_section_".$section;
+        $block .= "<h3>".$sections[$section]['Name']."</h3>";
+        $block .= display_modules($section, null, true);
+      }
+    }
+  }
+  $block.= "</div>";
+  return $block;
 }
 
 

@@ -100,7 +100,7 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // If home page has a redirection
-if ($c_home_redirect != '' && !$params['error']) {
+if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false') {
   header('Status: 301 OK');
   header("Location: $c_home_redirect");
   exit();
@@ -161,6 +161,8 @@ if ($cgp_show['module']['invoice'] && $perm->check_right('invoice', $cright_read
 if ($cgp_show['module']['settings'] && $perm->check_right('settings', $cright_read)) { 
   $block .= dis_my_portal();
 }
+
+$block .= dis_portlets_menu();
 
 $display['result'] = "
 $block
@@ -620,5 +622,26 @@ function dis_my_portal() {
   return $block;
 }
 
+function dis_portlets_menu() {
+  global $uid, $ico_big_settings, $path, $cgp_show, $perm, $cright_read;
+  global $l_module_settings, $cright_write, $sections;
 
+  //var_dump($sections);
+
+  foreach($cgp_show['section'] as $section => $value){
+    //var_dump($value['url']);
+    $portlet_need = array('gw', 'admin', 'user', 'dic', 'my');
+    if( in_array($section, $portlet_need) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
+      $portlet_title = "l_section_".$section;
+      $block .= "
+       <div class=\"summaryBox\"> 
+      <h1>".$sections[$section]['Name']."</h1>
+      ";
+      $block .= display_modules($section, null, true);
+      $block.= "</div>";
+    }
+  }
+
+  return $block;
+}
 </script>

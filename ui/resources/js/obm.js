@@ -560,6 +560,13 @@ function popup(url,name,height,width) {
   window.open(url,name,'height='+height+',width='+width+',scrollbars=yes,menubar=yes');
   return false;
 }
+function showAllInOneMenu(){
+  if ( $('allinonemenu').isVisible() ){
+    $('allinonemenu').setStyle('display', 'none');
+  }else{
+    $('allinonemenu').setStyle('display', 'block');
+  }
+}
 
 function showOkMessage(message) {
   showMessage('ok',message);
@@ -671,6 +678,11 @@ function refreshWaitEvent() {
             var elem = $('bannerWaitingEvent');
             if(elem){
               elem.set('text',response.msg);
+              if(response.msg > 0){
+                elem.setStyle('display', 'inline-block');
+              } else {
+                elem.setStyle('display', 'none');
+              }
               //setTimeout(refreshWaitEvent,30000);
             }
         }

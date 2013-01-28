@@ -276,7 +276,7 @@ $rcmail_config['display_version'] = false;
 
 // Session lifetime in minutes
 // must be greater than 'keep_alive'/60
-$rcmail_config['session_lifetime'] = 10;
+$rcmail_config['session_lifetime'] = 3600;
 
 // session domain: .example.org
 $rcmail_config['session_domain'] = '';
@@ -417,7 +417,7 @@ $rcmail_config['email_dns_check'] = false;
 // ----------------------------------
 
 // List of active plugins (in plugins/ directory)
-$rcmail_config['plugins'] = array('multiple_smtp_server', 'obm_auth');
+$rcmail_config['plugins'] = array('multiple_smtp_server', 'obm_auth', 'obm_addressbook');
 
 // ----------------------------------
 // USER INTERFACE
@@ -530,7 +530,7 @@ $rcmail_config['max_pagesize'] = 200;
 
 // Minimal value of user's 'keep_alive' setting (in seconds)
 // Must be less than 'session_lifetime'
-$rcmail_config['min_keep_alive'] = 60;
+$rcmail_config['min_keep_alive'] = 72000;
 
 // Enables files upload indicator. Requires APC installed and enabled apc.rfc1867 option.
 // By default refresh time is set to 1 second. You can set this value to true

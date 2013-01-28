@@ -66,18 +66,18 @@ function generate_token(){
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display['head'] = display_head('Webmail', false);
-
+/*
 $spreadlove= "<h2 class=\"spreadLove\"><div>"
   .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
   ."</div><div class=\"supportUs\">"
   .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
   ."</div></h2>";
-
+*/
 $display['header'] = display_menu($module).$spreadlove;
 
 $get_params = params_for_iframe($token);
 
-$display['detail'] = '<iframe src="index.php'.$get_params.'" style="border:none;width:100%;height:94%;" id="webmail_iframe"></iframe>';
+$display['detail'] = '<iframe src="index.php'.$get_params.'" style="border:none;width:100%;height:94%;padding-top:40px;" id="webmail_iframe"></iframe>';
 display_outframe($display);
 
 

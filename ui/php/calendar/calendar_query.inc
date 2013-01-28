@@ -834,9 +834,9 @@ function get_json_waiting_events($id) {
     $obm_q->next_record();
     $nb_event = $obm_q->f('nb_event');
     if($nb_event != 0) {
-      $display['json'] = "{msg : '".phpStringToJsString($l_waiting_events.' : '.$nb_event)."'}";
+      $display['json'] = "{msg : ".phpStringToJsString($nb_event)."}";
     } else {
-      $display['json'] = "{msg : '".phpStringToJsString($l_waiting_events.' : 0')."'}";
+      $display['json'] = "{msg : ".phpStringToJsString('0')."}";
     }
 
   }
