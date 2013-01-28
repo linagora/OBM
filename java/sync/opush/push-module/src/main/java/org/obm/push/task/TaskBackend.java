@@ -78,7 +78,7 @@ public class TaskBackend implements PIMBackend {
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException {
-		return DataDelta.newEmptyDelta(new Date());
+		return DataDelta.newEmptyDelta(new Date(), newSyncKey);
 	}
 	
 	@Override

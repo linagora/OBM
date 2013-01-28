@@ -315,6 +315,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 					.changes(serverItemChanges.getItemChanges())
 					.deletions(serverItemChanges.getItemDeletions())
 					.syncDate(syncData.getDataDeltaDate())
+					.syncKey(newSyncKey)
 					.build();
 			
 		} catch (EmailViewPartsFetcherException e) {

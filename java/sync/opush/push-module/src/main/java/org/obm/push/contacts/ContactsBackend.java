@@ -298,6 +298,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 				.changes(addUpd)
 				.deletions(deletions)
 				.syncDate(contactChanges.getLastSync())
+				.syncKey(newSyncKey)
 				.build();
 	}
 	

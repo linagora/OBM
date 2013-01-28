@@ -155,7 +155,7 @@ public class SyncHandlerTest {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int syncEmailCollectionId = 4;
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncEmailSyncKey).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
@@ -177,7 +177,7 @@ public class SyncHandlerTest {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int syncEmailCollectionId = 4;
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncEmailSyncKey).build();
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
@@ -206,6 +206,7 @@ public class SyncHandlerTest {
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
 					.build())
 			.syncDate(new Date())
+			.syncKey(syncEmailSyncKey)
 			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
@@ -280,6 +281,7 @@ public class SyncHandlerTest {
 						new ItemChangeBuilder().serverId(syncEmailCollectionId + ":1")
 							.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
 					.build())
+			.syncKey(syncEmailSyncKey)
 			.syncDate(new Date())
 			.build();
 
@@ -311,6 +313,7 @@ public class SyncHandlerTest {
 			.deletions(ImmutableList.of(
 					ItemDeletion.builder().serverId(syncEmailCollectionId + ":0").build()))
 			.syncDate(new Date())
+			.syncKey(syncEmailSyncKey)
 			.build();
 
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
@@ -343,6 +346,7 @@ public class SyncHandlerTest {
 					.build())
 			.deletions(ImmutableList.of(
 					ItemDeletion.builder().serverId(syncEmailCollectionId + ":122").build()))
+			.syncKey(syncEmailSyncKey)
 			.syncDate(new Date())
 			.build();
 
@@ -379,6 +383,7 @@ public class SyncHandlerTest {
 			.changes(itemChanges)
 			.deletions(ImmutableList.of(
 					ItemDeletion.builder().serverId(syncEmailCollectionId + ":122").build()))
+			.syncKey(syncEmailSyncKey)
 			.syncDate(new Date())
 			.build();
 
@@ -482,7 +487,7 @@ public class SyncHandlerTest {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
-			.andReturn(DataDelta.newEmptyDelta(secondRequestSyncState.getSyncDate()));
+			.andReturn(DataDelta.newEmptyDelta(secondRequestSyncState.getSyncDate(), secondRequestSyncState.getSyncKey()));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).anyTimes();
@@ -560,7 +565,7 @@ public class SyncHandlerTest {
 
 		SyncKey initialSyncKey = new SyncKey("1234");
 		int syncEmailCollectionId = 12;
-		DataDelta emptyDelta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta emptyDelta = DataDelta.builder().syncDate(new Date()).syncKey(initialSyncKey).build();
 		
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(nextFolderSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -594,7 +599,7 @@ public class SyncHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		java.util.Collection<Integer> existingCollections = Collections.emptySet();
 		int syncEmailUnexistingCollectionId = 15105;
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncEmailSyncKey).build();
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncEmailSyncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		mocksControl.replay();
@@ -612,7 +617,7 @@ public class SyncHandlerTest {
 		SyncKey syncKey = new SyncKey("1");
 		int collectionId = 15105;
 		List<Integer> existingCollections = ImmutableList.of(collectionId);
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncKey).build();
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		mocksControl.replay();
@@ -682,7 +687,7 @@ public class SyncHandlerTest {
 	private void testSyncWithGivenCommandButWithoutApplicationDataGetsProtocolError(SyncCommand command) throws Exception {
 		SyncKey syncKey = new SyncKey("1");
 		List<Integer> existingCollections = ImmutableList.of(15);
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncKey).build();
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 

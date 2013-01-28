@@ -34,6 +34,7 @@ package org.obm.push.backend;
 import java.util.Date;
 import java.util.List;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
@@ -52,6 +53,7 @@ public class DataDelta {
 		private List<ItemChange> changes;
 		private List<ItemDeletion> deletions;
 		private Date syncDate;
+		private SyncKey syncKey;
 		
 		private Builder() {
 			super();
@@ -71,16 +73,22 @@ public class DataDelta {
 			this.syncDate = syncDate;
 			return this;
 		}
+
+		public Builder syncKey(SyncKey syncKey) {
+			this.syncKey = syncKey;
+			return this;
+		}
 		
 		public DataDelta build() {
 			Preconditions.checkNotNull(syncDate);
+			Preconditions.checkNotNull(syncKey);
 			if (changes == null) {
 				changes = ImmutableList.of();
 			}
 			if (deletions == null) {
 				deletions = ImmutableList.of();
 			}
-			return new DataDelta(changes, deletions, syncDate);
+			return new DataDelta(changes, deletions, syncDate, syncKey);
 		}
 		
 	}
@@ -88,9 +96,11 @@ public class DataDelta {
 	private final List<ItemChange> changes;
 	private final List<ItemDeletion> deletions;
 	private final Date syncDate;
+	private final SyncKey syncKey;
 	
-	private DataDelta(List<ItemChange> changes, List<ItemDeletion> deletions, Date syncDate) {
+	private DataDelta(List<ItemChange> changes, List<ItemDeletion> deletions, Date syncDate, SyncKey syncKey) {
 		this.syncDate = syncDate;
+		this.syncKey = syncKey;
 		this.changes = ImmutableList.copyOf(changes);
 		this.deletions = ImmutableList.copyOf(deletions);
 	}
@@ -107,6 +117,10 @@ public class DataDelta {
 		return syncDate;
 	}
 	
+	public SyncKey getSyncKey() {
+		return syncKey;
+	}
+
 	public int getItemEstimateSize() {
 		int count = 0;
 		if (changes != null) {
@@ -124,19 +138,21 @@ public class DataDelta {
 			.add("changes", changes)
 			.add("deletions", deletions)
 			.add("syncDate", syncDate)
+			.add("syncKey", syncKey)
 			.toString();
 	}
 	
 	public String statistics() {
-		return String.format("%d changes, %d deletions, syncdate %tc", 
-					changes.size(), deletions.size(), syncDate);
+		return String.format("%d changes, %d deletions, syncdate %tc, %s syncKey", 
+					changes.size(), deletions.size(), syncDate, syncKey.getSyncKey());
 	}
 
-	public static DataDelta newEmptyDelta(Date lastSync) {
+	public static DataDelta newEmptyDelta(Date lastSync, SyncKey syncKey) {
 		return DataDelta.builder()
 				.changes(ImmutableList.<ItemChange>of())
 				.deletions(ImmutableList.<ItemDeletion>of())
 				.syncDate(lastSync)
+				.syncKey(syncKey)
 				.build();
 	}
 }

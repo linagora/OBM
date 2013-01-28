@@ -150,6 +150,7 @@ public class MailBackendHandlerTest {
 					.withApplicationData(applicationData("text", MSEmailBodyType.PlainText)))
 				.build())
 			.syncDate(new Date())
+			.syncKey(syncState.getSyncKey())
 			.build();
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));

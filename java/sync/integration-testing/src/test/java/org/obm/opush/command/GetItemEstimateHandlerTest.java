@@ -168,7 +168,7 @@ public class GetItemEstimateHandlerTest {
 			throws Exception {
 		expectSyncState(classToInstanceMap.get(StateMachine.class), syncKey, syncState);
 
-		DataDelta delta = DataDelta.builder().syncDate(new Date()).build();
+		DataDelta delta = DataDelta.builder().syncDate(new Date()).syncKey(syncKey).build();
 		EmailSyncTestUtils.mockEmailSyncClasses(syncKey, existingCollections, delta, fakeTestUsers, classToInstanceMap);
 		mocksControl.replay();
 		opushServer.start();

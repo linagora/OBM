@@ -46,6 +46,7 @@ import org.obm.push.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.change.client.SyncClientCommands;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -282,6 +283,7 @@ public class ResponseWindowingTest {
 						duplicateEntry,
 						ItemDeletion.builder().serverId("12:24").build()))
 				.syncDate(DateUtils.date("2012-01-01"))
+				.syncKey(new SyncKey("1234"))
 				.build();
 		List<ItemDeletion> actual = 
 				responseWindowingProcessor.windowDeletions(syncCollection(2), deltas, user.userDataRequest, SyncClientCommands.empty());
@@ -302,7 +304,7 @@ public class ResponseWindowingTest {
 	}
 
 	private DataDelta emptyDelta() {
-		return DataDelta.newEmptyDelta(DateUtils.date("2012-01-01"));
+		return DataDelta.newEmptyDelta(DateUtils.date("2012-01-01"), new SyncKey("1324"));
 	}
 
 	private DataDelta deletions(int nbDeletions) {
@@ -314,6 +316,7 @@ public class ResponseWindowingTest {
 				.changes(buildItemChangeList(0, "addServerId", 0)) 
 				.deletions(buildItemDeletions(nbDeletions, "delServerId", offset)) 
 				.syncDate(DateUtils.date("2012-01-01"))
+				.syncKey(new SyncKey("1324"))
 				.build();
 	}
 
@@ -326,6 +329,7 @@ public class ResponseWindowingTest {
 				.changes(buildItemChangeList(nbAdditions, "addServerId", offset)) 
 				.deletions(buildItemDeletions(0, "delServerId", 0))
 				.syncDate(DateUtils.date("2012-01-01"))
+				.syncKey(new SyncKey("1324"))
 				.build();
 	}
 	
