@@ -123,7 +123,7 @@ public class SyncRequestTest {
 
 	@Test
 	public void testBuilderCollectionsNonEmpty() {
-		List<SyncRequestCollection> collections = Lists.newArrayList(SyncRequestCollection.builder()
+		List<SyncCollectionRequest> collections = Lists.newArrayList(SyncCollectionRequest.builder()
 				.id(1)
 				.syncKey(new SyncKey("1234"))
 				.build());

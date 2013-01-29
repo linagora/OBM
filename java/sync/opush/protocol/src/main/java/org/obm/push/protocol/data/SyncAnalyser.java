@@ -48,9 +48,9 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequestCollection;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
+import org.obm.push.protocol.bean.SyncCollectionRequest;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.w3c.dom.Element;
@@ -89,7 +89,7 @@ public class SyncAnalyser {
 	
 		int defaultRequestWindowSize = getWindowSize(syncRequest);
 
-		for (SyncRequestCollection syncRequestCollection : syncRequest.getCollections()) {
+		for (SyncCollectionRequest syncRequestCollection : syncRequest.getCollections()) {
 			builder.addCollection(getCollection(userDataRequest, syncRequestCollection,
 					defaultRequestWindowSize, false));
 		}
@@ -116,7 +116,7 @@ public class SyncAnalyser {
 		return DEFAULT_WAIT;
 	}
 
-	private SyncCollection getCollection(UserDataRequest udr, SyncRequestCollection requestCollection,
+	private SyncCollection getCollection(UserDataRequest udr, SyncCollectionRequest requestCollection,
 			int requestDefaultWindowSize, boolean isPartial)
 			throws PartialException, ProtocolException, DaoException, CollectionPathException{
 		
@@ -175,7 +175,7 @@ public class SyncAnalyser {
 		return !Strings.isNullOrEmpty(dataClass) && !dataType.asXmlValue().equals(dataClass);
 	}
 
-	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection, SyncRequestCollection requestCollection) {
+	private SyncCollectionOptions getUpdatedOptions(SyncCollection lastSyncCollection, SyncCollectionRequest requestCollection) {
 		SyncCollectionOptions lastUsedOptions = null;
 		if (lastSyncCollection != null) {
 			lastUsedOptions = lastSyncCollection.getOptions();
@@ -189,18 +189,18 @@ public class SyncAnalyser {
 		return new SyncCollectionOptions();
 	}
 
-	private void appendCommand(SyncCollection collection, SyncRequestCollection requestCollection) {
-		SyncRequestCollectionCommands commands = requestCollection.getCommands();
+	private void appendCommand(SyncCollection collection, SyncCollectionRequest requestCollection) {
+		SyncCollectionRequestCommands commands = requestCollection.getCommands();
 		if (commands != null) {
 			collection.setFetchIds(commands.getFetchIds());
 			
-			for (SyncRequestCollectionCommand command : commands.getCommands()) {
+			for (SyncCollectionRequestCommand command : commands.getCommands()) {
 				collection.addChange(getChange(collection, command));
 			}
 		}
 	}
 
-	private SyncCollectionChange getChange(SyncCollection collection, SyncRequestCollectionCommand command) {
+	private SyncCollectionChange getChange(SyncCollection collection, SyncCollectionRequestCommand command) {
 		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(command.getName());
 		String serverId = command.getServerId();
 		String clientId = command.getClientId();

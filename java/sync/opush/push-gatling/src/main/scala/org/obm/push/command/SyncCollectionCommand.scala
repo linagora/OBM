@@ -34,7 +34,6 @@ package org.obm.push.command
 import scala.collection.JavaConversions.collectionAsScalaIterable
 import org.obm.push.bean.SyncStatus
 import org.obm.push.checks.Check
-import org.obm.push.protocol.bean.SyncRequestCollection
 import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Session
@@ -45,12 +44,13 @@ import com.google.common.base.Strings
 import org.obm.push.helper.SyncHelper
 import org.obm.push.bean.SyncKey
 import org.obm.push.bean.change.SyncCommand
+import org.obm.push.protocol.bean.SyncCollectionRequest
 
 class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractSyncCommand(syncContext, wbTools) {
 
-	def buildSyncRequestCollections(session: Session) = {
-		List(SyncRequestCollection.builder()
+	def buildSyncCollectionRequests(session: Session) = {
+		List(SyncCollectionRequest.builder()
 				.id(syncContext.findCollectionId(session))
 				.syncKey(syncContext.nextSyncKey(session))
 				.build())

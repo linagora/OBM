@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Objects;
 
-public class SyncRequestCollectionCommand {
+public class SyncCollectionRequestCommand {
 
 	public static Builder builder() {
 		return new Builder();
@@ -70,8 +70,8 @@ public class SyncRequestCollectionCommand {
 			return this;
 		}
 		
-		public SyncRequestCollectionCommand build() {
-			return new SyncRequestCollectionCommand(name, serverId, clientId, data);
+		public SyncCollectionRequestCommand build() {
+			return new SyncCollectionRequestCommand(name, serverId, clientId, data);
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class SyncRequestCollectionCommand {
 	private final String clientId;
 	private final Element data;
 	
-	private SyncRequestCollectionCommand(String name, String serverId, String clientId, Element data) {
+	private SyncCollectionRequestCommand(String name, String serverId, String clientId, Element data) {
 		this.name = name;
 		this.serverId = serverId;
 		this.clientId = clientId;
@@ -110,8 +110,8 @@ public class SyncRequestCollectionCommand {
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncRequestCollectionCommand) {
-			SyncRequestCollectionCommand that = (SyncRequestCollectionCommand) object;
+		if (object instanceof SyncCollectionRequestCommand) {
+			SyncCollectionRequestCommand that = (SyncCollectionRequestCommand) object;
 			return Objects.equal(this.name, that.name)
 				&& Objects.equal(this.serverId, that.serverId)
 				&& Objects.equal(this.clientId, that.clientId)

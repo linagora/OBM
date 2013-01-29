@@ -36,9 +36,9 @@ import java.util.List;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequestCollection;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
+import org.obm.push.protocol.bean.SyncCollectionRequest;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -77,16 +77,16 @@ public class SyncEncoder extends ActiveSyncDecoder {
 	}
 
 	private void appendCollections(Element root, SyncRequest request) {
-		List<SyncRequestCollection> requestCollections = request.getCollections();
+		List<SyncCollectionRequest> requestCollections = request.getCollections();
 		if (requestCollections != null && !requestCollections.isEmpty()) {
 			Element collections = DOMUtils.createElement(root, SyncRequestFields.COLLECTIONS.getName());
-			for (SyncRequestCollection collection : requestCollections) {
+			for (SyncCollectionRequest collection : requestCollections) {
 				appendCollection(collections, collection);
 			}
 		}
 	}
 	
-	private void appendCollection(Element collections, SyncRequestCollection collection) {
+	private void appendCollection(Element collections, SyncCollectionRequest collection) {
 		Element collectionEl = DOMUtils.createElement(collections, SyncRequestFields.COLLECTION.getName());
 		appendString(collectionEl, SyncRequestFields.DATA_CLASS, collection.getDataClass());
 		appendString(collectionEl, SyncRequestFields.SYNC_KEY, collection.getSyncKey().getSyncKey());
@@ -121,17 +121,17 @@ public class SyncEncoder extends ActiveSyncDecoder {
 		appendBoolean(bodyPreferenceEl, SyncRequestFields.ALL_OR_NONE, bodyPreference.isAllOrNone());
 	}
 	
-	private void appendCommands(Element collectionElement, SyncRequestCollectionCommands commands) {
+	private void appendCommands(Element collectionElement, SyncCollectionRequestCommands commands) {
 		if (commands == null) {
 			return;
 		}
 		Element commandsElement = DOMUtils.createElement(collectionElement, SyncRequestFields.COMMANDS.getName());
-		for (SyncRequestCollectionCommand command : commands.getCommands()) {
+		for (SyncCollectionRequestCommand command : commands.getCommands()) {
 			appendCommand(commandsElement, command);
 		}
 	}
 
-	private void appendCommand(Element commandsElement, SyncRequestCollectionCommand command) {
+	private void appendCommand(Element commandsElement, SyncCollectionRequestCommand command) {
 		Element commandElement = DOMUtils.createElement(commandsElement, command.getName());
 		appendString(commandElement, SyncRequestFields.SERVER_ID, command.getServerId());
 		appendString(commandElement, SyncRequestFields.CLIENT_ID, command.getClientId());

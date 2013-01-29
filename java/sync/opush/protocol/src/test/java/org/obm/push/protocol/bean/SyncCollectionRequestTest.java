@@ -41,12 +41,12 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
-import org.obm.push.protocol.bean.SyncRequestCollection.Builder;
+import org.obm.push.protocol.bean.SyncCollectionRequest.Builder;
 
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
-public class SyncRequestCollectionTest {
+public class SyncCollectionRequestTest {
 
 	@Test(expected=ASRequestIntegerFieldException.class)
 	public void testBuilderIdIsRequired() {
@@ -55,7 +55,7 @@ public class SyncRequestCollectionTest {
 
 	@Test
 	public void testBuilderIdValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().id(135).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().id(135).build();
 		
 		assertThat(syncRequestCollection.getId()).isEqualTo(135);
 	}
@@ -67,56 +67,56 @@ public class SyncRequestCollectionTest {
 
 	@Test
 	public void testBuilderSyncKeyValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().syncKey(new SyncKey("blabla")).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().syncKey(new SyncKey("blabla")).build();
 		
 		assertThat(syncRequestCollection.getSyncKey()).isEqualTo(new SyncKey("blabla"));
 	}
 	
 	@Test
 	public void testBuilderDataClassIsNotRequired() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().dataClass(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataClass(null).build();
 		
 		assertThat(syncRequestCollection.getDataClass()).isNull();
 	}
 
 	@Test
 	public void testBuilderDataClassValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().dataClass("Email").build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataClass("Email").build();
 		
 		assertThat(syncRequestCollection.getDataClass()).isEqualTo("Email");
 	}
 	
 	@Test
 	public void testBuilderWindowSizeIsNotRequired() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(null).build();
 		
 		assertThat(syncRequestCollection.getWindowSize()).isNull();
 	}
 
 	@Test
 	public void testBuilderWindowSizeValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(5).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
 		assertThat(syncRequestCollection.getWindowSize()).isEqualTo(5);
 	}
 	
 	@Test
 	public void testHasWindowSizeWhenNull() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(null).build();
 		
 		assertThat(syncRequestCollection.hasWindowSize()).isFalse();
 	}
 
 	@Test
 	public void testHasWindowSizeWhenValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().windowSize(5).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
 		assertThat(syncRequestCollection.hasWindowSize()).isTrue();
 	}
 	
 	@Test
 	public void testBuilderOptionsIsNotRequired() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().options(null).build();
 		
 		assertThat(syncRequestCollection.getOptions()).isNull();
 	}
@@ -129,47 +129,47 @@ public class SyncRequestCollectionTest {
 		options.setMimeTruncation(3);
 		options.setMimeSupport(4);
 		
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(options).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().options(options).build();
 		
 		assertThat(syncRequestCollection.getOptions()).isEqualTo(options);
 	}
 	
 	@Test
 	public void testHasOptionsWhenNull() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().options(null).build();
 		
 		assertThat(syncRequestCollection.hasOptions()).isFalse();
 	}
 
 	@Test
 	public void testHasOptionsWhenValid() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().options(new SyncCollectionOptions()).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().options(new SyncCollectionOptions()).build();
 		
 		assertThat(syncRequestCollection.hasOptions()).isTrue();
 	}
 	
 	@Test
 	public void testBuilderCommandsIsNotRequired() {
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().commands(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().commands(null).build();
 		
 		assertThat(syncRequestCollection.getCommands()).isNull();
 	}
 
 	@Test
 	public void testBuilderCommandsValid() {
-		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
+		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
 			.fetchIds(ImmutableList.of("1234"))
 			.commands(ImmutableList.of(
-					SyncRequestCollectionCommand.builder().serverId("100").name("Delete").build()))
+					SyncCollectionRequestCommand.builder().serverId("100").name("Delete").build()))
 			.build();
 		
-		SyncRequestCollection syncRequestCollection = builderWithRequirement().commands(commands).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().commands(commands).build();
 		
 		assertThat(syncRequestCollection.getCommands()).isEqualTo(commands);
 	}
 
 	private Builder builderWithRequirement() {
-		return SyncRequestCollection.builder()
+		return SyncCollectionRequest.builder()
 			.id(140)
 			.syncKey(new SyncKey("1234"));
 	}

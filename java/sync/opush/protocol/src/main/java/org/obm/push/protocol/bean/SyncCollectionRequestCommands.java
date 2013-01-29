@@ -31,51 +31,83 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
-public class SyncRequestCollectionCommandsTest {
+public class SyncCollectionRequestCommands {
 
-	@Test
-	public void testBuilderFetchIdsIsNotRequired() {
-		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
-			.fetchIds(null).build();
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
 		
-		assertThat(commands.getFetchIds()).isEmpty();
+		private List<String> fetchIds;
+		private List<SyncCollectionRequestCommand> commands;
+
+		private Builder() {}
+		
+		public Builder fetchIds(List<String> fetchIds) {
+			this.fetchIds = fetchIds;
+			return this;
+		}
+		
+		public Builder commands(List<SyncCollectionRequestCommand> commands) {
+			this.commands = commands;
+			return this;
+		}
+		
+		public SyncCollectionRequestCommands build() {
+			if (fetchIds == null) {
+				fetchIds = ImmutableList.of();
+			}
+			if (commands == null) {
+				commands = ImmutableList.of();
+			}
+			
+			return new SyncCollectionRequestCommands(fetchIds, commands);
+		}
+	}
+	
+	private final List<String> fetchIds;
+	private final List<SyncCollectionRequestCommand> commands;
+	
+	private SyncCollectionRequestCommands(List<String> fetchIds, List<SyncCollectionRequestCommand> commands) {
+		this.fetchIds = fetchIds;
+		this.commands = commands;
 	}
 
-	@Test
-	public void testBuilderFetchIdsValid() {
-		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
-			.fetchIds(ImmutableList.of("1234", "5678")).build();
-		
-		assertThat(commands.getFetchIds()).containsOnly("1234", "5678");
+	public List<String> getFetchIds() {
+		return fetchIds;
+	}
+	
+	public List<SyncCollectionRequestCommand> getCommands() {
+		return commands;
 	}
 
-	@Test
-	public void testBuilderCommandsIsNotRequired() {
-		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
-			.commands(null).build();
-		
-		assertThat(commands.getCommands()).isEmpty();
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(fetchIds, commands);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SyncCollectionRequestCommands) {
+			SyncCollectionRequestCommands that = (SyncCollectionRequestCommands) object;
+			return Objects.equal(this.fetchIds, that.fetchIds)
+				&& Objects.equal(this.commands, that.commands);
+		}
+		return false;
 	}
 
-	@Test
-	public void testBuilderCommandsValid() {
-		SyncRequestCollectionCommands commands = SyncRequestCollectionCommands.builder()
-			.commands(ImmutableList.of(
-					SyncRequestCollectionCommand.builder().name("Delete").serverId("3").build(),
-					SyncRequestCollectionCommand.builder().name("Fetch").serverId("8").build())).build();
-		
-		assertThat(commands.getCommands()).containsOnly(
-				SyncRequestCollectionCommand.builder().name("Delete").serverId("3").build(),
-				SyncRequestCollectionCommand.builder().name("Fetch").serverId("8").build());
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("fetchIds", fetchIds)
+			.add("commands", commands)
+			.toString();
 	}
 	
 }

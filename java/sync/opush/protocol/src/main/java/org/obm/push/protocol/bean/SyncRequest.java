@@ -49,7 +49,7 @@ public class SyncRequest {
 		private Integer waitInMinute;
 		private Boolean partial;
 		private Integer windowSize;
-		private List<SyncRequestCollection> collections;
+		private List<SyncCollectionRequest> collections;
 
 		private Builder() {}
 		
@@ -68,7 +68,7 @@ public class SyncRequest {
 			return this;
 		}
 
-		public Builder collections(List<SyncRequestCollection> collections) {
+		public Builder collections(List<SyncCollectionRequest> collections) {
 			this.collections = collections;
 			return this;
 		}
@@ -100,10 +100,10 @@ public class SyncRequest {
 	private final Integer waitInMinute;
 	private final Boolean partial;
 	private final Integer windowSize;
-	private final List<SyncRequestCollection> collections;
+	private final List<SyncCollectionRequest> collections;
 	
 	protected SyncRequest(Integer waitInMinute, Boolean partial, Integer windowSize,
-			List<SyncRequestCollection> collections) {
+			List<SyncCollectionRequest> collections) {
 		this.waitInMinute = waitInMinute;
 		this.partial = partial;
 		this.windowSize = windowSize;
@@ -118,7 +118,7 @@ public class SyncRequest {
 		return partial;
 	}
 	
-	public List<SyncRequestCollection> getCollections() {
+	public List<SyncCollectionRequest> getCollections() {
 		return collections;
 	}
 

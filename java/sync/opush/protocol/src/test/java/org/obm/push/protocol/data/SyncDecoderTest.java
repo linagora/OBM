@@ -45,8 +45,8 @@ import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequestCollection;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
+import org.obm.push.protocol.bean.SyncCollectionRequest;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
@@ -339,7 +339,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getSyncKey()).isEqualTo(new SyncKey("ddcf2e35-9834-49de-96ff-09979c7e2aa0"));
 		assertThat(collection.getId()).isEqualTo(2);
@@ -380,7 +380,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getDataClass()).isNull();
 	}
@@ -395,7 +395,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getDataClass()).isEqualTo("Music");
 	}
@@ -410,7 +410,7 @@ public class SyncDecoderTest {
 					"<WindowSize>150</WindowSize>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getDataClass()).isEqualTo("Email");
 	}
@@ -486,7 +486,7 @@ public class SyncDecoderTest {
 					"<Class>Email</Class>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
 		assertThat(collection.getWindowSize()).isNull();
 	}
@@ -499,7 +499,7 @@ public class SyncDecoderTest {
 					"<CollectionId>2</CollectionId>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions()).isNull();
 		assertThat(collection.hasOptions()).isFalse();
@@ -529,7 +529,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getFilterType()).isEqualTo(FilterType.ONE_MONTHS_BACK);
 		assertThat(collection.getOptions().getConflict()).isEqualTo(1);
@@ -558,7 +558,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getFilterType()).isNull();
 	}
@@ -581,7 +581,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getConflict()).isNull();
 	}
@@ -604,7 +604,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getMimeTruncation()).isNull();
 	}
@@ -627,7 +627,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getMimeSupport()).isNull();
 	}
@@ -646,7 +646,7 @@ public class SyncDecoderTest {
 					"</Options>" +
 				"</Collection>");
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getOptions().getBodyPreferences()).isEmpty();
 	}
@@ -684,7 +684,7 @@ public class SyncDecoderTest {
 					"</Commands>" +
 				"</Collection>").getDocumentElement();
 		
-		SyncRequestCollection collection = new SyncDecoder(null).getCollection(request);
+		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request);
 		
 		Element addElement = DOMUtils.getUniqueElement(request, "Add");
 		Element addDataElement = DOMUtils.getUniqueElement(addElement, "ApplicationData");
@@ -693,12 +693,12 @@ public class SyncDecoderTest {
 		
 		assertThat(collection.getCommands().getFetchIds()).containsOnly("56");
 		assertThat(collection.getCommands().getCommands()).containsOnly(
-				SyncRequestCollectionCommand.builder()
+				SyncCollectionRequestCommand.builder()
 					.name("Add").serverId("12").clientId("120").applicationData(addDataElement).build(),
-				SyncRequestCollectionCommand.builder()
+				SyncCollectionRequestCommand.builder()
 					.name("Change").serverId("35").clientId("350").applicationData(changeDataElement).build(),
-				SyncRequestCollectionCommand.builder().name("Fetch").serverId("56").build(),
-				SyncRequestCollectionCommand.builder().name("Delete").serverId("79").build());
+				SyncCollectionRequestCommand.builder().name("Fetch").serverId("56").build(),
+				SyncCollectionRequestCommand.builder().name("Delete").serverId("79").build());
 	}
 
 	@Test
@@ -713,7 +713,7 @@ public class SyncDecoderTest {
 							"</ApplicationData>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getServerId()).isNull();
 	}
@@ -730,7 +730,7 @@ public class SyncDecoderTest {
 							"</ApplicationData>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getClientId()).isNull();
 	}
@@ -743,7 +743,7 @@ public class SyncDecoderTest {
 							"<ClientId>120</ClientId>" +
 						"</Name>");
 		
-		SyncRequestCollectionCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getApplicationData()).isNull();
 	}

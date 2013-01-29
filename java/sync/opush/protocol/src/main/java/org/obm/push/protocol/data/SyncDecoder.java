@@ -54,9 +54,9 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncRequest.Builder;
-import org.obm.push.protocol.bean.SyncRequestCollection;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand;
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands;
+import org.obm.push.protocol.bean.SyncCollectionRequest;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
+import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
@@ -90,7 +90,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		requestBuilder.partial(isPartial(root));
 		requestBuilder.windowSize(getWindowSize(root));
 		
-		List<SyncRequestCollection> syncRequestCollections = Lists.newArrayList();
+		List<SyncCollectionRequest> syncRequestCollections = Lists.newArrayList();
 		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
 			syncRequestCollections.add(getCollection((Element)collectionNodes.item(i)));
@@ -112,8 +112,8 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return uniqueIntegerFieldValue(root, SyncRequestFields.WINDOW_SIZE);
 	}
 
-	@VisibleForTesting SyncRequestCollection getCollection(Element collection) {
-		return SyncRequestCollection.builder()
+	@VisibleForTesting SyncCollectionRequest getCollection(Element collection) {
+		return SyncCollectionRequest.builder()
 			.id(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
 			.syncKey(syncKey(uniqueStringFieldValue(collection, SyncRequestFields.SYNC_KEY)))
 			.dataClass(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS))
@@ -151,28 +151,28 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return options;
 	}
 
-	@VisibleForTesting SyncRequestCollectionCommands getCommands(Element commandsElement) {
+	@VisibleForTesting SyncCollectionRequestCommands getCommands(Element commandsElement) {
 		if (commandsElement == null) {
 			return null;
 		}
 
 		List<String> fetchIds = Lists.newArrayList();
-		List<SyncRequestCollectionCommand> commands = Lists.newArrayList();
+		List<SyncCollectionRequestCommand> commands = Lists.newArrayList();
 		
 		NodeList collectionNodes = commandsElement.getChildNodes();
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			SyncRequestCollectionCommand command = getCommand((Element)collectionNodes.item(i));
+			SyncCollectionRequestCommand command = getCommand((Element)collectionNodes.item(i));
 			commands.add(command);
 			if (command.getName().equals("Fetch")) {
 				fetchIds.add(command.getServerId());
 			}
 		}
 		
-		return SyncRequestCollectionCommands.builder().commands(commands).fetchIds(fetchIds).build();
+		return SyncCollectionRequestCommands.builder().commands(commands).fetchIds(fetchIds).build();
 	}
 	
-	@VisibleForTesting SyncRequestCollectionCommand getCommand(Element commandElement) {
-		return SyncRequestCollectionCommand.builder()
+	@VisibleForTesting SyncCollectionRequestCommand getCommand(Element commandElement) {
+		return SyncCollectionRequestCommand.builder()
 			.name(commandElement.getNodeName())
 			.serverId(uniqueStringFieldValue(commandElement, SyncRequestFields.SERVER_ID))
 			.clientId(uniqueStringFieldValue(commandElement, SyncRequestFields.CLIENT_ID))
@@ -299,7 +299,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	}
 
 	private SyncCollectionChange buildChangeFromCommandElement(Element commandElement, PIMDataType dataType) {
-		SyncRequestCollectionCommand command = getCommand(commandElement);
+		SyncCollectionRequestCommand command = getCommand(commandElement);
 
 		IApplicationData applicationData = getCommandApplicationData(command, dataType);
 		
@@ -309,7 +309,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return change;
 	}
 
-	private IApplicationData getCommandApplicationData(SyncRequestCollectionCommand command, PIMDataType dataType) {
+	private IApplicationData getCommandApplicationData(SyncCollectionRequestCommand command, PIMDataType dataType) {
 		if (decoderFactory != null && dataType != null && command.getApplicationData() != null) {
 			return decoderFactory.decode(command.getApplicationData(), dataType);
 		}

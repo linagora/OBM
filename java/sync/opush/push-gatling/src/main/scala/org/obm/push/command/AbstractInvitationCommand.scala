@@ -33,34 +33,29 @@ package org.obm.push.command
 
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.JavaConversions.collectionAsScalaIterable
-
 import org.obm.push.bean.MSEvent
 import org.obm.push.checks.Check
 import org.obm.push.context.User
 import org.obm.push.encoder.GatlingEncoders.calendarEncoder
-import org.obm.push.protocol.bean.SyncRequestCollection
-import org.obm.push.protocol.bean.SyncRequestCollectionCommand
-import org.obm.push.protocol.bean.SyncRequestCollectionCommands
 import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.utils.DOMUtils
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Session
-import com.excilys.ebi.gatling.core.check.Failure
-import com.excilys.ebi.gatling.core.check.MatchStrategy
-import com.excilys.ebi.gatling.core.check.Success
+import org.obm.push.protocol.bean.SyncCollectionRequest
+import org.obm.push.protocol.bean.SyncCollectionRequestCommands
 import com.google.common.collect.ImmutableList
+import org.obm.push.protocol.bean.SyncCollectionRequestCommand
 
 abstract class AbstractInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 		extends AbstractSyncCommand(invitation, wbTools) {
 
-	override def buildSyncRequestCollections(session: Session) = {
-		List(SyncRequestCollection.builder()
+	override def buildSyncCollectionRequests(session: Session) = {
+		List(SyncCollectionRequest.builder()
 				.id(invitation.findCollectionId(session))
 				.syncKey(invitation.nextSyncKey(session))
-				.commands(SyncRequestCollectionCommands.builder()
+				.commands(SyncCollectionRequestCommands.builder()
 					.commands(ImmutableList.of(
-						SyncRequestCollectionCommand.builder()
+						SyncCollectionRequestCommand.builder()
 							.name(collectionCommandName)
 							.clientId(clientId(session))
 							.serverId(serverId(session))

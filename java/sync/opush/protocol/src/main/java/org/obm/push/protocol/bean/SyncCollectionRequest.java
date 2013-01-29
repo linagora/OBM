@@ -39,7 +39,7 @@ import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
-public class SyncRequestCollection {
+public class SyncCollectionRequest {
 
 	public static Builder builder() {
 		return new Builder();
@@ -52,7 +52,7 @@ public class SyncRequestCollection {
 		private String dataClass;
 		private Integer windowSize;
 		private SyncCollectionOptions options;
-		private SyncRequestCollectionCommands commands;
+		private SyncCollectionRequestCommands commands;
 
 		private Builder() {}
 		
@@ -81,12 +81,12 @@ public class SyncRequestCollection {
 			return this;
 		}
 		
-		public Builder commands(SyncRequestCollectionCommands commands) {
+		public Builder commands(SyncCollectionRequestCommands commands) {
 			this.commands = commands;
 			return this;
 		}
 		
-		public SyncRequestCollection build() {
+		public SyncCollectionRequest build() {
 			if (id == null) {
 				throw new ASRequestIntegerFieldException("Collection id field is required");
 			}
@@ -94,7 +94,7 @@ public class SyncRequestCollection {
 				throw new ASRequestStringFieldException("Collection SyncKey field is required");
 			}
 			
-			return new SyncRequestCollection(id, syncKey, dataClass, windowSize, options, commands);
+			return new SyncCollectionRequest(id, syncKey, dataClass, windowSize, options, commands);
 		}
 
 	}
@@ -104,10 +104,10 @@ public class SyncRequestCollection {
 	private final String dataClass;
 	private final Integer windowSize;
 	private final SyncCollectionOptions options;
-	private final SyncRequestCollectionCommands commands;
+	private final SyncCollectionRequestCommands commands;
 	
-	protected SyncRequestCollection(int id, SyncKey syncKey, String dataClass, Integer windowSize,
-			SyncCollectionOptions options, SyncRequestCollectionCommands commands) {
+	protected SyncCollectionRequest(int id, SyncKey syncKey, String dataClass, Integer windowSize,
+			SyncCollectionOptions options, SyncCollectionRequestCommands commands) {
 		this.id = id;
 		this.syncKey = syncKey;
 		this.dataClass = dataClass;
@@ -144,7 +144,7 @@ public class SyncRequestCollection {
 		return options != null;
 	}
 	
-	public SyncRequestCollectionCommands getCommands() {
+	public SyncCollectionRequestCommands getCommands() {
 		return commands;
 	}
 
@@ -155,8 +155,8 @@ public class SyncRequestCollection {
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncRequestCollection) {
-			SyncRequestCollection that = (SyncRequestCollection) object;
+		if (object instanceof SyncCollectionRequest) {
+			SyncCollectionRequest that = (SyncCollectionRequest) object;
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.syncKey, that.syncKey)
 				&& Objects.equal(this.dataClass, that.dataClass)
