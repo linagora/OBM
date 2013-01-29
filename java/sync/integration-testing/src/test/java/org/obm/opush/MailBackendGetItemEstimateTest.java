@@ -63,7 +63,6 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
-import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
@@ -158,7 +157,7 @@ public class MailBackendGetItemEstimateTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		expect(collectionDao.findItemStateForKey(invalidSyncKey)).andReturn(null);
-		expectUnsynchronizedItemToNeverExceedWindowSize();
+		expectUnsynchronizedItemToNeverHavePendingAdds();
 
 		mocksControl.replay();
 		
@@ -193,7 +192,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverExceedWindowSize();
+		expectUnsynchronizedItemToNeverHavePendingAdds();
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -239,7 +238,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverExceedWindowSize();
+		expectUnsynchronizedItemToNeverHavePendingAdds();
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -285,7 +284,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverExceedWindowSize();
+		expectUnsynchronizedItemToNeverHavePendingAdds();
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -340,17 +339,9 @@ public class MailBackendGetItemEstimateTest {
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
 	}
 
-	private void expectUnsynchronizedItemToNeverExceedWindowSize() {
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId))
-				.andReturn(false).anyTimes();
+	private void expectUnsynchronizedItemToNeverHavePendingAdds() {
 		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
-				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, inboxCollectionId);
-		expectLastCall().anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, inboxCollectionId);
-		expectLastCall().anyTimes();
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState, ItemSyncState newItemSyncState)

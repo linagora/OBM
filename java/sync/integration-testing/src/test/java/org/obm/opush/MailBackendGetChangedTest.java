@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -68,11 +67,9 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.SyncCommand;
-import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -81,12 +78,10 @@ import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.store.MailFolder;
@@ -106,7 +101,6 @@ public class MailBackendGetChangedTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
 	
-	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
 	private DateService dateService;
@@ -138,7 +132,6 @@ public class MailBackendGetChangedTest {
 		trashCollectionId = 1645;
 		trashCollectionIdAsString = String.valueOf(trashCollectionId);
 		
-		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
@@ -195,7 +188,6 @@ public class MailBackendGetChangedTest {
 		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, allocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -263,7 +255,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -332,7 +323,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -405,7 +395,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKey)).andReturn(currentAllocatedState).times(2);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -464,7 +453,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -538,8 +526,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, secondAllocatedState, thirdAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedStateTrash, trashCollectionId);
 		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKeyTrash)).andReturn(firstAllocatedStateTrash).times(2);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(trashCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
@@ -604,7 +590,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(currentAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(true);
@@ -675,7 +660,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(currentAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(true);
@@ -741,42 +725,18 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKey)).andReturn(currentAllocatedState).times(2);
 
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(false).once();
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemChange>of()).once();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemDeletion>of()).once();
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(true);
-
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(true);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemChange>of(
-					new ItemChange(inboxCollectionIdAsString + ":" + 4), 
-					new ItemChange(inboxCollectionIdAsString + ":" + 5))).once();
-		unsynchronizedItemDao.storeItemsToAdd(eq(user.credentials), eq(user.device), anyInt(), anyObject(java.util.Collection.class));
-		expectLastCall().once();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemDeletion>of()).once();
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(false);
-		
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, inboxCollectionId);
-		expectLastCall().anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, inboxCollectionId);
-		expectLastCall().anyTimes();
-		
-		expectItemTrackingDaoForNEmails(windowSize, firstAllocatedState);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
-		expect(itemTrackingDao.isServerIdSynced(currentAllocatedState, new ServerId(inboxCollectionIdAsString + ":" + 4)))
-			.andReturn(false);
-		expect(itemTrackingDao.isServerIdSynced(currentAllocatedState, new ServerId(inboxCollectionIdAsString + ":" + 5)))
-			.andReturn(false);
-		
+		expect(itemTrackingDao.isServerIdSynced(eq(firstAllocatedState), anyObject(ServerId.class))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(eq(firstAllocatedState), anyObject(ServerId.class))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(eq(firstAllocatedState), anyObject(ServerId.class))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(eq(currentAllocatedState), anyObject(ServerId.class))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(eq(currentAllocatedState), anyObject(ServerId.class))).andReturn(false);
+
 		mocksControl.replay();
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendNEmailsToImapServer(numberOfEmails);
-		
 		
 		SyncResponse initialSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, windowSize);
 		SyncCollectionResponse initialInboxResponse = getCollectionWithId(initialSyncResponse, inboxCollectionIdAsString);
@@ -796,9 +756,9 @@ public class MailBackendGetChangedTest {
 		
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, numberOfEmails);
 		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
-		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(1);
-		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(1);
-		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
@@ -837,7 +797,6 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
-		expectUnsynchronizedItemToNeverExceedWindowSize(inboxCollectionId);
 
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(currentAllocatedState, new ServerId(inboxCollectionId + ":" + emailId))).andReturn(true);
@@ -869,31 +828,6 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
-	}
-
-	private void expectItemTrackingDaoForNEmails(int numberOfEmails, ItemSyncState...itemSyncStates) 
-			throws DaoException, InvalidServerId {
-		
-		for (int i = 1; i <= numberOfEmails ; i++) {
-			ServerId serverId = new ServerId(inboxCollectionId + ":" + i);
-			
-			for (ItemSyncState itemSyncState : itemSyncStates) {
-				expect(itemTrackingDao.isServerIdSynced(itemSyncState, serverId)).andReturn(false);
-			}
-		}
-	}
-
-	private void expectUnsynchronizedItemToNeverExceedWindowSize(int collectionId) {
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, collectionId))
-				.andReturn(false).anyTimes();
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, collectionId))
-				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, collectionId))
-				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, collectionId);
-		expectLastCall().anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, collectionId);
-		expectLastCall().anyTimes();
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,

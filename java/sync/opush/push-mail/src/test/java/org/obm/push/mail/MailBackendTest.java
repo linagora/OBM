@@ -55,7 +55,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.OpushCollection;
@@ -109,9 +108,9 @@ public class MailBackendTest {
 	private UserDataRequest udr;
 	private MailboxService mailboxService;
 	private MappingService mappingService;
+	private WindowingService windowingService;
 	private Provider<Builder> collectionPathBuilderProvider;
 	private CollectionPath.Builder collectionPathBuilder;
-	private BackendWindowingService backendWindowingService;
 	private MailBackend testee;
 
 
@@ -127,10 +126,10 @@ public class MailBackendTest {
 		expect(collectionPathBuilderProvider.get()).andReturn(collectionPathBuilder).anyTimes();
 		mailboxService = createMock(MailboxService.class);
 		mappingService = createMock(MappingService.class);
-		backendWindowingService = createMock(BackendWindowingService.class);
+		windowingService = createMock(WindowingService.class);
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, backendWindowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
 	}
 	
 	private void replayCommonMocks() {
@@ -168,7 +167,7 @@ public class MailBackendTest {
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, calendarClient, login, new Mime4jUtils(),
 				mockOpushConfigurationService(), null, null, mappingService, null, null,
-				collectionPathBuilderProvider, null, backendWindowingService);
+				collectionPathBuilderProvider, null, windowingService);
 
 		replay(mailboxService, calendarClient, userDataRequest, login);
 		replayCommonMocks();
@@ -392,7 +391,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, backendWindowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -416,7 +415,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, backendWindowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -442,7 +441,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks(); replay(collectionPath);
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, backendWindowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
 		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
 		verifyCommonMocks(); verify(collectionPath);
 		

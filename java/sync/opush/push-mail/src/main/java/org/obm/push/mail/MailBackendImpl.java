@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -50,8 +51,6 @@ import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
-import org.obm.push.backend.BackendWindowingService;
-import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushBackend;
@@ -92,6 +91,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.EmailChanges.SplittedEmailChanges;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
@@ -156,7 +156,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final SnapshotService snapshotService;
 	private final EmailChangesFetcher emailChangesFetcher;
 	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
-	private final BackendWindowingService backendWindowingService;
+	private final WindowingService windowingService;
 
 
 	@Inject
@@ -170,7 +170,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			MSEmailFetcher msEmailFetcher,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
 			MailBackendSyncDataFactory mailBackendSyncDataFactory,
-			BackendWindowingService backendWindowingService)  {
+			WindowingService windowingService)  {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
@@ -183,7 +183,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.eventService = eventService;
 		this.msEmailFetcher = msEmailFetcher;
 		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
-		this.backendWindowingService = backendWindowingService;
+		this.windowingService = windowingService;
 	}
 
 	@Override
@@ -307,37 +307,55 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			SyncClientCommands clientCommands, final SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
-		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
-			
-			@Override
-			public DataDelta getAllChanges() {
-				return MailBackendImpl.this.getAllChanges(udr, collection, newSyncKey);
-			}
-		});
-	}
-
-	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) {
 		try {
-			int collectionId = collection.getCollectionId();
-			SyncCollectionOptions options = collection.getOptions();
-			ItemSyncState syncState = collection.getItemSyncState();
+			Integer collectionId = collection.getCollectionId();
+			SyncKey requestSyncKey = collection.getSyncKey();
 			
-			MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, syncState, collectionId, options);
-			takeSnapshot(udr, collectionId, options, syncData, newSyncKey);
-			
-			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
-					syncData.getCollectionPath(), options.getBodyPreferences(), syncData.getEmailChanges());
-			
-			return DataDelta.builder()
-					.changes(serverItemChanges.getItemChanges())
-					.deletions(serverItemChanges.getItemDeletions())
-					.syncDate(syncData.getDataDeltaDate())
-					.syncKey(newSyncKey)
-					.build();
-			
+			EmailChanges pendingChanges = windowingService.getPendingWindowing(collection.getSyncKey());
+			if (pendingChanges != null && pendingChanges.hasChanges()) {
+				return continueWindowing(udr, collection, pendingChanges,
+						collection.getItemSyncState().getSyncDate(), requestSyncKey);
+			} else {
+				MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, collection.getItemSyncState(),
+						collectionId, collection.getOptions());
+				takeSnapshot(udr, collectionId, collection.getOptions(), syncData, newSyncKey);
+				return continueWindowing(udr, collection, syncData.getEmailChanges(),
+						syncData.getDataDeltaDate(), newSyncKey);
+			}
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
+	}
+
+	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection syncCollection, EmailChanges pendingChanges,
+			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey)
+			throws DaoException, EmailViewPartsFetcherException {
+
+		DataDelta.Builder dataDeltaBuilder = DataDelta.builder();
+		EmailChanges fittingEmailChanges = splitAndHandlePendingChanges(
+				syncCollection.getWindowSize(), pendingChanges, dataDeltaBuilder, dataDeltaSyncKey);
+		
+		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, syncCollection.getCollectionId(),
+				syncCollection.getCollectionPath(), syncCollection.getOptions().getBodyPreferences(), fittingEmailChanges);
+		
+		return dataDeltaBuilder
+				.changes(serverItemChanges.getItemChanges())
+				.deletions(serverItemChanges.getItemDeletions())
+				.syncDate(dataDelaSyncDate)
+				.syncKey(dataDeltaSyncKey)
+				.build();
+	}
+
+	private EmailChanges splitAndHandlePendingChanges(int windowSize, EmailChanges pendingChanges,
+			DataDelta.Builder dataDeltaBuilder, SyncKey dataDeltaSyncKey) {
+		
+		SplittedEmailChanges splittedEmailChanges = pendingChanges.splitToFit(windowSize);
+		windowingService.setPendingWindowing(dataDeltaSyncKey, splittedEmailChanges.getRemainingEmailChanges());
+		
+		if (splittedEmailChanges.getRemainingEmailChanges().hasChanges()) {
+			dataDeltaBuilder.moreAvailable(true);
+		}
+		return splittedEmailChanges.getFittingEmailChanges();
 	}
 
 	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 
