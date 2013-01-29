@@ -56,7 +56,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
-	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login";
+	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
 	private final ObmHelper obmHelper;
 	
 	@Inject
@@ -168,30 +168,6 @@ public class UserDao {
 		return email;
 	}
 	
-	public Integer contactEntityFromEmailQuery(Connection con, String mail) {
-		Integer ret = null;
-		String q = "SELECT email_entity_id FROM Email "
-				// prevents linking to an orphan email row
-				+ "INNER JOIN ContactEntity ON email_entity_id=contactentity_entity_id "
-				+ "WHERE email_address=?";
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = con.prepareStatement(q);
-			st.setString(1, mail);
-			rs = st.executeQuery();
-			if (rs.next()) {
-				ret = rs.getInt(1);
-			}
-		} catch (SQLException se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(null, st, rs);
-		}
-		return ret;
-	}
-
-	
 	public ObmUser findUser(String email, ObmDomain domain) {
 		Connection con = null;
 		Integer id = null;
@@ -219,7 +195,9 @@ public class UserDao {
 
 		ObmUser obmUser = null;
 		String uq = "SELECT " + USER_FIELDS
-				+ " FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
 		try {
@@ -252,6 +230,8 @@ public class UserDao {
 		obmUser.setFirstName(rs.getString("userobm_firstname"));
 		obmUser.setLastName(rs.getString("userobm_lastname"));
 		obmUser.setCommonName(rs.getString("userobm_commonname"));
+		obmUser.setEntityId(rs.getInt("userentity_entity_id"));
+		
 		return obmUser;
 	}
 
@@ -273,7 +253,9 @@ public class UserDao {
 
 		ObmUser obmUser = null;
 		String uq = "SELECT " + USER_FIELDS
-				+ " FROM UserObm LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
 				+ "WHERE userobm_id=? ";
 		try {
@@ -352,32 +334,5 @@ public class UserDao {
 		}
 		
 		return ownerId;
-	}
-	
-	public Integer userEntityIdFromEmail(Connection con, String calendar, Integer domainId) throws SQLException{
-		Integer userId = userIdFromEmail(con, calendar, domainId);
-		return userId != null ? getUserEntityIdFromUserId(con, userId) : null;
-	}
-	
-	private Integer getUserEntityIdFromUserId(Connection con, Integer userId){
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		Integer ret = null;
-		String uq = "SELECT userentity_entity_id "
-				+ "FROM UserEntity "
-				+ "WHERE userentity_user_id=? ";
-		try {
-			ps = con.prepareStatement(uq);
-			ps.setInt(1, userId);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				ret = rs.getInt(1);
-			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(null, ps, rs);
-		}
-		return ret;
 	}
 }

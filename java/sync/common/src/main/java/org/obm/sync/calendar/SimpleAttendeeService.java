@@ -33,27 +33,29 @@ import org.obm.sync.services.AttendeeService;
 
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 @Singleton
 public class SimpleAttendeeService implements AttendeeService {
 
 	@Override
-	public UserAttendee findUserAttendee(String name, String email) {
+	public UserAttendee findUserAttendee(String name, String email, ObmDomain domain) {
 		return UserAttendee.builder().email(email).displayName(name).build();
 	}
 
 	@Override
-	public ContactAttendee findContactAttendee(String name, String email, boolean createIfNeeded) {
+	public ContactAttendee findContactAttendee(String name, String email, boolean createIfNeeded, ObmDomain domain, Integer userId) {
 		return ContactAttendee.builder().email(email).displayName(name).build();
 	}
 
 	@Override
-	public ResourceAttendee findResourceAttendee(String name, String email) {
+	public ResourceAttendee findResourceAttendee(String name, String email, ObmDomain domain, Integer userId) {
 		return ResourceAttendee.builder().email(email).displayName(name).build();
 	}
 
 	@Override
-	public Attendee findAttendee(String name, String email, boolean createContactIfNeeded) {
-		return findUserAttendee(name, email);
+	public Attendee findAttendee(String name, String email, boolean createContactIfNeeded, ObmDomain domain, Integer userId) {
+		return findUserAttendee(name, email, domain);
 	}
 
 }

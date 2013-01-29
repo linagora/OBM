@@ -27,23 +27,102 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.services;
+package fr.aliacom.obm.common.resource;
 
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.ContactAttendee;
-import org.obm.sync.calendar.ResourceAttendee;
-import org.obm.sync.calendar.UserAttendee;
+import com.google.common.base.Objects;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public interface AttendeeService {
+public class Resource {
 	
-	UserAttendee findUserAttendee(String name, String email, ObmDomain domain);
-
-	ContactAttendee findContactAttendee(String name, String email, boolean createIfNeeded, ObmDomain domain, Integer userId);
-
-	ResourceAttendee findResourceAttendee(String name, String email, ObmDomain domain, Integer userId);
+	private final Integer id;
+	private final Integer entityId;
+	private final String name;
+	private final String email;
 	
-	Attendee findAttendee(String name, String email, boolean createContactIfNeeded, ObmDomain domain, Integer userId);
+	public static class Builder {
+		private Integer id;
+		private Integer entityId;
+		private String name;
+		private String mail;
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+		
+		public Builder entityId(Integer entityId) {
+			this.entityId = entityId;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder mail(String mail) {
+			this.mail = mail;
+			return this;
+		}
+
+		public Resource build() {
+			return new Resource(id, entityId, name, mail);
+		}
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	private Resource(Integer id, Integer entityId, String name, String email) {
+		this.id = id;
+		this.entityId = entityId;
+		this.name = name;
+		this.email = email;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(id, email, entityId, name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Resource)) {
+			return false;
+		}
+		
+		Resource other = (Resource) obj;
+		
+		return Objects.equal(id, other.id)
+				&& Objects.equal(email, other.email)
+				&& Objects.equal(entityId, other.entityId)
+				&& Objects.equal(name, other.name);
+	}
+
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(this)
+				.add("id", id)
+				.add("name", name)
+				.add("email", email)
+				.toString();
+	}
 	
 }

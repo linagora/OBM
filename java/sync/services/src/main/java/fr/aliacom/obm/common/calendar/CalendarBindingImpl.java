@@ -78,9 +78,9 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
-import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
+import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
 import org.obm.sync.services.ImportICalendarException;
 import org.slf4j.Logger;
@@ -120,6 +120,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private final Ical4jHelper ical4jHelper;
 
 	private final ICalendarFactory calendarFactory;
+	private final AttendeeService attendeeService;
 	
 
 	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
@@ -139,7 +140,7 @@ public class CalendarBindingImpl implements ICalendar {
 			DomainService domainService, UserService userService,
 			CalendarDao calendarDao,
 			CategoryDao categoryDao, HelperService helperService, 
-			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory) {
+			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory, AttendeeService attendeeService) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
@@ -148,6 +149,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.helperService = helperService;
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
+		this.attendeeService = attendeeService;
 	}
 
 	@Override
@@ -402,6 +404,7 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 			
 			assertEventCanBeModified(token, calendarUser, before);
+			convertAttendees(event, calendarUser);
 			
 			if (before.isInternalEvent()) {
 				return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
@@ -620,6 +623,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ServerFault, EventAlreadyExistException, NotAllowedException {
 
 		assertCanCreateEvent(token, calendar, event);
+		convertAttendees(event, calendar, token.getDomain());
 		assignDelegationRightsOnAttendees(token, event);
 		Event ev = null;
 		if (event.isInternalEvent()) {
@@ -1049,7 +1053,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
 		String calendar = getDefaultCalendarFromToken(token);
-		List<Event> events = ical4jHelper.parseICS(fixedIcs, createIcal4jUserFrom(token));
+		List<Event> events = ical4jHelper.parseICS(fixedIcs, createIcal4jUserFrom(token), token.getObmId());
 		for (Event event: events) {
 			try {
 				EventObmId id = getEventObmIdFromExtId(token, calendar, event.getExtId());
@@ -1091,7 +1095,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public FreeBusyRequest parseICSFreeBusy(AccessToken token, String ics)
 			throws ServerFault {
 		try {
-			return ical4jHelper.parseICSFreeBusy(ics);
+			return ical4jHelper.parseICSFreeBusy(ics, token.getDomain(), token.getObmId());
 		} catch (Exception e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -1383,7 +1387,16 @@ public class CalendarBindingImpl implements ICalendar {
 
 		assertUserCanWriteOnCalendar(token, calendar);
 		
-		final List<Event> events = parseICSEvent(token, ics);
+		ObmUser calendarUser = null;
+		
+		try {
+			calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
+		}
+		catch (Exception e) {
+			throw new ServerFault(e);
+		}
+		
+		final List<Event> events = parseICSEvent(token, ics, calendarUser.getUid());
 		int countEvent = 0;
 		for (final Event event: events) {
 
@@ -1450,9 +1463,9 @@ public class CalendarBindingImpl implements ICalendar {
 		return false;
 	}
 	
-	private List<Event> parseICSEvent(final AccessToken token, final String icsToString) throws ImportICalendarException {
+	private List<Event> parseICSEvent(final AccessToken token, final String icsToString, Integer ownerId) throws ImportICalendarException {
 		try {
-			return ical4jHelper.parseICS(icsToString, createIcal4jUserFrom(token));
+			return ical4jHelper.parseICS(icsToString, createIcal4jUserFrom(token), ownerId);
 		} catch (IOException e) {
 			throw new ImportICalendarException(e);
 		} catch (ParserException e) {
@@ -1460,15 +1473,10 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) throws ImportICalendarException {
-		try {
-			final ObmUser obmUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			final Attendee attendee = UserAttendee.builder().email(obmUser.getEmail()).build();
+	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) {
+		Attendee attendee = attendeeService.findUserAttendee(null, calendar, token.getDomain());
 			
-			event.getAttendees().add(attendee);
-		} catch (FindException e) {
-			throw new ImportICalendarException("user " + calendar + " not found");
-		}
+		event.getAttendees().add(attendee);
 	}
 
 	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final List<Attendee> attendees) {
@@ -1529,4 +1537,41 @@ public class CalendarBindingImpl implements ICalendar {
 		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
+	private void convertAttendees(Event event, ObmUser owner) {
+		List<Attendee> typedAttendees = Lists.newArrayList();
+		
+		for (Attendee attendee : event.getAttendees()) {
+			Attendee typedAttendee = findAttendee(attendee.getDisplayName(), attendee.getEmail(), owner.getDomain(), owner.getUid());
+
+			typedAttendee.setCanWriteOnCalendar(attendee.isCanWriteOnCalendar());
+			typedAttendee.setOrganizer(attendee.isOrganizer());
+			typedAttendee.setParticipation(attendee.getParticipation());
+			typedAttendee.setParticipationRole(attendee.getParticipationRole());
+			typedAttendee.setPercent(attendee.getPercent());
+
+			typedAttendees.add(typedAttendee);
+		}
+		
+		event.setAttendees(typedAttendees);
+	}
+	
+	private Attendee findAttendee(String name, String email, ObmDomain domain, Integer ownerId) {
+		Attendee attendee = attendeeService.findUserAttendee(name, email, domain);
+		
+		// User not found, we'll fallback to a contact and create it if needed
+		if (attendee == null) {
+			attendee = attendeeService.findContactAttendee(name, email, true, domain, ownerId);
+		}
+		
+		return attendee;
+	}
+
+	private void convertAttendees(Event event, String calendar, ObmDomain domain) throws ServerFault {
+		try {
+			convertAttendees(event, userService.getUserFromCalendar(calendar, domain.getName()));
+		}
+		catch (Exception e) {
+			throw new ServerFault(e);
+		}
+	}
 }

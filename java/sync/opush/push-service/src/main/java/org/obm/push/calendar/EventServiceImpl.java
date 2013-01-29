@@ -39,11 +39,11 @@ import net.fortuna.ical4j.data.ParserException;
 import org.apache.commons.codec.binary.Hex;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.EventService;
@@ -147,7 +147,7 @@ public class EventServiceImpl implements EventService {
 		try {
 			accessToken = loginService.authenticate(credentials.getUser().getLoginAtDomain(), credentials.getPassword());
 			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
-			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser);
+			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser, accessToken.getObmId());
 			
 			if (!obmEvents.isEmpty()) {
 				final Event icsEvent = obmEvents.get(0);

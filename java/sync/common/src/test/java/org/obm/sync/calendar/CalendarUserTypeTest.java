@@ -29,37 +29,38 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public class UnknownAttendee extends Attendee {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-	public static class Builder extends Attendee.Builder<UnknownAttendee> {
-
-		@Override
-		protected UnknownAttendee createInstance() {
-			return new UnknownAttendee();
-		}
-		
+@RunWith(SlowFilterRunner.class)
+public class CalendarUserTypeTest {
+	
+	@Test
+	public void testUNKNOWNName() {
+		assertThat(CalendarUserType.UNKNOWN.name()).isEqualTo("UNKNOWN");
 	}
 	
-	public static Builder builder() {
-		return new Builder();
+	@Test
+	public void testROOMame() {
+		assertThat(CalendarUserType.ROOM.name()).isEqualTo("ROOM");
 	}
 	
-	public UnknownAttendee() {
-	}
-
-	public UnknownAttendee(UnknownAttendee attendee) {
-		super(attendee);
+	@Test
+	public void testRESOURCEName() {
+		assertThat(CalendarUserType.RESOURCE.name()).isEqualTo("RESOURCE");
 	}
 	
-	@Override
-	public UnknownAttendee clone() {
-		return new UnknownAttendee(this);
+	@Test
+	public void testINDIVIDUALName() {
+		assertThat(CalendarUserType.INDIVIDUAL.name()).isEqualTo("INDIVIDUAL");
 	}
-
-	@Override
-	public CalendarUserType getCalendarUserType() {
-		return CalendarUserType.UNKNOWN;
+	
+	@Test
+	public void testGROUPName() {
+		assertThat(CalendarUserType.GROUP.name()).isEqualTo("GROUP");
 	}
-
+	
 }

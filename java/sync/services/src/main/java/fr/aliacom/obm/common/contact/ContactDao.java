@@ -97,11 +97,14 @@ import org.obm.sync.solr.SolrHelper.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.calendar.CalendarDao;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -132,7 +135,8 @@ public class ContactDao {
 	private final EventExtId.Factory eventExtIdFactory;
 
 	@Inject
-	private ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao,
+	@VisibleForTesting
+	ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao,
 			SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.contactConfiguration = contactConfiguration;
 		this.calendarDao = calendarDao;
@@ -401,6 +405,36 @@ public class ContactDao {
 			obmHelper.cleanup(con, null, null);
 		}
 		return c;
+	}
+	
+	public Contact createCollectedContact(String name, String email, ObmDomain domain, Integer ownerId) throws ServerFault, SQLException {
+		Contact c = new Contact();
+		
+		c.setLastname(Objects.firstNonNull(name, ""));
+		c.setFirstname("");
+		c.addEmail("INTERNET;X-OBM-Ref1", new Email(email));
+		c.setCollected(true);
+		
+		logger.info("Attendee {} not found in OBM, will create a contact.", email);
+		
+		return createContact(c, domain, ownerId);
+	}
+	
+	private Contact createContact(Contact c, ObmDomain domain, Integer ownerId) throws SQLException, ServerFault {
+		Connection con = null;
+		
+		try {
+			con = obmHelper.getConnection();
+			
+			int addressbookId = chooseAddressBookFromContact(con, ownerId, c);
+			AccessToken token = new AccessToken(ownerId, "automatically-collected");
+			
+			token.setDomain(domain);
+			
+			return createContactInAddressBook(con, token, c, addressbookId);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
 	}
 
 	private Event getEvent(AccessToken token, String displayName, Date startDate) {
@@ -689,6 +723,10 @@ public class ContactDao {
 	}
 
 	private int chooseAddressBookFromContact(Connection con, AccessToken at, Contact c) throws SQLException {
+		return chooseAddressBookFromContact(con, at.getObmId(), c);
+	}
+	
+	private int chooseAddressBookFromContact(Connection con, Integer ownerId, Contact c) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -699,7 +737,7 @@ public class ContactDao {
 			} else {
 				ps.setString(1, contactConfiguration.getDefaultAddressBookName());
 			}
-			ps.setInt(2, at.getObmId());
+			ps.setInt(2, ownerId);
 
 			rs = ps.executeQuery();
 			rs.next();
@@ -929,17 +967,20 @@ public class ContactDao {
 			obmHelper.cleanup(con, ps, rs);
 		}
 	}
-
-	public Integer findAttendeeContactEntityIdFrom(String contactEmail, Event event) throws SQLException {
-		String q = "SELECT contactentity_entity_id "
+	
+	public Contact findAttendeeContactFromEmailForUser(String email, Integer userId) throws SQLException {
+		String q = "SELECT contact_id, contactentity_entity_id, contact_firstname, contact_lastname, contact_commonname, email_label "
 				+ "FROM Contact "
-				+ "JOIN ContactEntity ON contactentity_contact_id = contact_id "
-				+ "JOIN EventLink ON eventlink_entity_id = contactentity_entity_id "
-				+ "JOIN Email ON email_entity_id = contactentity_entity_id "
-				+ "WHERE email_address = ? "
-				+ "AND eventlink_event_id = ? "
-				+ "AND contact_archive != 1";
-
+				+ "INNER JOIN ContactEntity ON contactentity_contact_id = contact_id "
+				+ "INNER JOIN Email ON email_entity_id = contactentity_entity_id "
+				+ "INNER JOIN AddressBook ON id = contact_addressbook_id "
+				+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id = id "
+				+ "INNER JOIN UserEntity ON userentity_user_id = ? "
+				+ "LEFT JOIN EntityRight urights ON (urights.entityright_entity_id = addressbookentity_entity_id AND urights.entityright_consumer_id = userentity_entity_id) "
+				+ "LEFT JOIN EntityRight grights ON (grights.entityright_entity_id = addressbookentity_entity_id AND grights.entityright_consumer_id IN (" + MY_GROUPS_QUERY + ")) "
+				+ "LEFT JOIN EntityRight prights ON (prights.entityright_entity_id = addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL) "
+				+ "WHERE email_address = ? AND contact_archive != 1 AND (contact_usercreate = ? OR owner = ? OR urights.entityright_access = 1 or grights.entityright_access = 1 or prights.entityright_access = 1)";
+		
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -948,19 +989,30 @@ public class ContactDao {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
 
-			int idx = 1;
-			ps.setString(idx++, contactEmail);
-			ps.setInt(idx++, event.getObmId().getObmId());
+			ps.setInt(1, userId);
+			ps.setInt(2, userId);
+			ps.setString(3, email);
+			ps.setInt(4, userId);
+			ps.setInt(5, userId);
 			rs = ps.executeQuery();
 
-			Integer contactId = null;
 			if (rs.next()) {
-				contactId = rs.getInt(1);
+				Contact contact = new Contact();
+				
+				contact.setUid(rs.getInt("contact_id"));
+				contact.setEntityId(rs.getInt("contactentity_entity_id"));
+				contact.addEmail(rs.getString("email_label"), new Email(email));
+				contact.setCommonname(rs.getString("contact_commonname"));
+				contact.setFirstname(rs.getString("contact_firstname"));
+				contact.setLastname(rs.getString("contact_lastname"));
+				
+				return contact;
 			}
-			return contactId;
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+		
+		return null;
 	}
 
 	/**

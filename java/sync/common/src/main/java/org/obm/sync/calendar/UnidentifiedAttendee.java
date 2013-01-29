@@ -27,23 +27,39 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.services;
+package org.obm.sync.calendar;
 
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.ContactAttendee;
-import org.obm.sync.calendar.ResourceAttendee;
-import org.obm.sync.calendar.UserAttendee;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+public class UnidentifiedAttendee extends Attendee {
 
-public interface AttendeeService {
+	public static class Builder extends Attendee.Builder<UnidentifiedAttendee> {
+
+		@Override
+		protected UnidentifiedAttendee createInstance() {
+			return new UnidentifiedAttendee();
+		}
+		
+	}
 	
-	UserAttendee findUserAttendee(String name, String email, ObmDomain domain);
-
-	ContactAttendee findContactAttendee(String name, String email, boolean createIfNeeded, ObmDomain domain, Integer userId);
-
-	ResourceAttendee findResourceAttendee(String name, String email, ObmDomain domain, Integer userId);
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	Attendee findAttendee(String name, String email, boolean createContactIfNeeded, ObmDomain domain, Integer userId);
+	public UnidentifiedAttendee() {
+	}
+
+	public UnidentifiedAttendee(UnidentifiedAttendee attendee) {
+		super(attendee);
+	}
 	
+	@Override
+	public UnidentifiedAttendee clone() {
+		return new UnidentifiedAttendee(this);
+	}
+
+	@Override
+	public CalendarUserType getCalendarUserType() {
+		return CalendarUserType.UNKNOWN;
+	}
+
 }

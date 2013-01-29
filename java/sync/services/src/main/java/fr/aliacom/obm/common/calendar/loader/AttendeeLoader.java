@@ -87,7 +87,7 @@ public class AttendeeLoader {
 				"userobm_firstname AS attendee_firstname",
 				"userobm_lastname AS attendee_lastname",
 				"userobm_commonname AS attendee_commonname",
-				"userentity_user_id AS attendee_entity_id",
+				"userentity_entity_id AS attendee_entity_id",
 				"'USER' as attendee_type"
 		});
 
@@ -104,7 +104,7 @@ public class AttendeeLoader {
 				"contact_firstname AS attendee_firstname",
 				"contact_lastname AS attendee_lastname",
 				"contact_commonname AS attendee_commonname",
-				"contactentity_contact_id AS attendee_entity_id",
+				"contactentity_entity_id AS attendee_entity_id",
 				"'CONTACT' as attendee_type"
 		});
 
@@ -121,7 +121,7 @@ public class AttendeeLoader {
 				"NULL AS attendee_firstname",
 				"NULL AS attendee_lastname",
 				"resource_name AS attendee_commonname",
-				"resourceentity_resource_id AS attendee_entity_id",
+				"resourceentity_entity_id AS attendee_entity_id",
 				"'RESOURCE' as attendee_type"
 		});
 	// An attendee can be either an OBM user, a contact or a resource
@@ -208,6 +208,7 @@ public class AttendeeLoader {
 	private Attendee buildAttendee(ResultSet rs) throws SQLException {
 		Attendee att = createAttendeeFromType(AttendeeType.valueOf(rs.getString("attendee_type")));
 		
+		att.setEntityId(getAttendeeEntityId(rs));
 		att.setDisplayName(getAttendeeDisplayName(rs));
 		att.setEmail(getAttendeeEmail(rs, domainName));
 		att.setParticipation(getAttendeeState(rs));
@@ -272,5 +273,9 @@ public class AttendeeLoader {
 
 	private boolean getAttendeeOrganizer(ResultSet rs) throws SQLException {
 		return rs.getBoolean("eventlink_is_organizer");
+	}
+	
+	private int getAttendeeEntityId(ResultSet rs) throws SQLException {
+		return rs.getInt("attendee_entity_id");
 	}
 }

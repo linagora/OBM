@@ -113,10 +113,11 @@ public class EventHandler extends SecureSyncHandler {
 	private CalendarItemsParser cip;
 
 	@Inject
-	public EventHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl) {
+	public EventHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
 		super(sessionManagement);
-		binding = calendarBindingImpl;
-		cip = new CalendarItemsParser();
+		
+		this.binding = calendarBindingImpl;
+		this.cip = cip;
 	}
 
 	@Override

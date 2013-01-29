@@ -1608,15 +1608,15 @@ public class EventTest {
 		assertThat(event.belongsToCalendar("creator@email.com")).isFalse();
 	}
 
-  @Test
+	@Test
 	public void testFindOwner() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
-		Attendee ownerAttendee = Attendee.builder().email("owner@email.com").asOrganizer().build();
+		Attendee ownerAttendee = UserAttendee.builder().email("owner@email.com").asOrganizer().build();
 		publicEvent.addAttendee(ownerAttendee);
 		assertThat(publicEvent.findOwner()).isEqualTo(ownerAttendee);
 	}
 
-  @Test
+	@Test
 	public void testNullFindOwner() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		assertThat(publicEvent.findOwner()).isNull();

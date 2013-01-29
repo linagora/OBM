@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.EventType;
 
 import com.google.inject.Inject;
@@ -43,8 +44,9 @@ import fr.aliacom.obm.common.session.SessionManagement;
 public class TodoHandler extends EventHandler {
 
 	@Inject
-	public TodoHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl) {
-		super(sessionManagement, calendarBindingImpl);
+	public TodoHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
+		super(sessionManagement, calendarBindingImpl, cip);
+		
 		calendarBindingImpl.setEventType(EventType.VTODO);
 	}
 

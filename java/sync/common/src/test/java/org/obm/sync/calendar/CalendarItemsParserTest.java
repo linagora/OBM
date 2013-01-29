@@ -103,7 +103,7 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = UnknownAttendee
+		Attendee at = UnidentifiedAttendee
 				.builder()
 				.displayName("John Do")
 				.email("john@do.fr")
@@ -114,7 +114,7 @@ public class CalendarItemsParserTest {
 		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = UnknownAttendee
+		at = UnidentifiedAttendee
 				.builder()
 				.displayName("noIn TheDatabase")
 				.email("notin@mydb.com")
@@ -125,7 +125,7 @@ public class CalendarItemsParserTest {
 		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = UnknownAttendee
+		at = UnidentifiedAttendee
 				.builder()
 				.displayName("noIn TheDatabase2")
 				.email("notin2@mydb.com")
@@ -185,7 +185,7 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = UnknownAttendee
+		Attendee at = UnidentifiedAttendee
 				.builder()
 				.displayName("John Do")
 				.email("john@do.fr")
@@ -196,7 +196,7 @@ public class CalendarItemsParserTest {
 		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = UnknownAttendee
+		at = UnidentifiedAttendee
 				.builder()
 				.displayName("noIn TheDatabase")
 				.email("notin@mydb.com")
@@ -207,7 +207,7 @@ public class CalendarItemsParserTest {
 		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = UnknownAttendee
+		at = UnidentifiedAttendee
 				.builder()
 				.displayName("noIn TheDatabase2")
 				.email("notin2@mydb.com")
@@ -269,7 +269,7 @@ public class CalendarItemsParserTest {
 		assertThat(ev.getAlert()).isEqualTo(60);
 		assertThat(ev.getEndDate().getTime()).isEqualTo(1295262000000L);
 		
-		Attendee at = UnknownAttendee
+		Attendee at = UnidentifiedAttendee
 				.builder()
 				.displayName("John Do")
 				.email("john@do.fr")
@@ -280,7 +280,7 @@ public class CalendarItemsParserTest {
 		
 		assertThat(ev.getAttendees()).contains(at);
 		
-		at = UnknownAttendee
+		at = UnidentifiedAttendee
 				.builder()
 				.displayName("noIn TheDatabase")
 				.email("notin@mydb.com")

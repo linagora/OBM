@@ -40,6 +40,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.Login;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Contact;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -47,10 +48,13 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.trust.TrustToken;
 
 @RunWith(SlowFilterRunner.class)
@@ -78,7 +82,9 @@ public class BeansTest {
 				EventExtId.class,
 				EventObmId.class,
 				EventRecurrence.class,
-				RecurrenceId.class);
+				RecurrenceId.class,
+				Resource.class,
+				UserAttendee.class, ContactAttendee.class, ResourceAttendee.class);
 	}
 	
 	@Test

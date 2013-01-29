@@ -64,8 +64,6 @@ import org.obm.push.utils.jdbc.WildcardStringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.book.Contact;
-import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.DeletedEvent;
@@ -118,7 +116,6 @@ import fr.aliacom.obm.common.SQLUtils;
 import fr.aliacom.obm.common.calendar.loader.AttendeeLoader;
 import fr.aliacom.obm.common.calendar.loader.EventLoader;
 import fr.aliacom.obm.common.calendar.loader.ResourceLoader;
-import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
@@ -219,7 +216,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private static final String EXCEPS_FIELDS = "event_id, eventexception_date";
 
 	private final UserDao userDao;
-	private final ContactDao contactDao;
 	private final ObmHelper obmHelper;
 
 	private final Ical4jHelper ical4jHelper;
@@ -228,11 +224,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 
 	@Inject
-	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
-			ObmHelper obmHelper, Ical4jHelper ical4jHelper) {
+	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, Ical4jHelper ical4jHelper) {
 		this.userDao = userDao;
 		this.solrHelperFactory = solrHelperFactory;
-		this.contactDao = contactDao;
 		this.obmHelper = obmHelper;
 		this.ical4jHelper = ical4jHelper;
 	}
@@ -325,7 +319,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		obmHelper.linkEntity(con, "EventEntity", "event_id", id.getObmId());
 
-		insertAttendees(editor, calendar, ev, con, ev.getAttendees(), useObmUser);
+		insertAttendees(editor, ev, con, ev.getAttendees());
 
 		insertExceptions(editor, ev, con, id);
 		if (ev.isRecurrent()) {
@@ -1685,12 +1679,12 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.close();
 			ps = null;
 			if (updateAttendees) {
-				removeAttendees(editor, con, attendeetoRemove, ev);
+				removeAttendees(con, attendeetoRemove, ev);
 				insertDeletedEventLinks(editor, con, attendeetoRemove, ev);
 			}
 
 			if (updateAttendees) {
-				updateAttendees(editor, con, calendar, ev, useObmUser);
+				updateAttendees(editor, con, ev);
 				markUpdated(con, ev.getObmId());
 			}
 
@@ -1849,30 +1843,24 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private void removeAttendees(AccessToken editor, Connection con, List<Attendee> toRemove,
-			Event ev) throws SQLException {
-		logger.info("event update will remove " + toRemove.size()
-				+ " attendees.");
-		String q = "delete from EventLink where eventlink_event_id=? and eventlink_entity_id=? ";
+	private void removeAttendees(Connection con, List<Attendee> toRemove, Event ev) throws SQLException {
 		PreparedStatement ps = null;
+		String q = "DELETE FROM EventLink WHERE eventlink_event_id=? AND eventlink_entity_id=? ";
+		
+		logger.info("event update will remove {} attendees.", toRemove.size());
 		try {
 			ps = con.prepareStatement(q);
+			
 			for (Attendee at : toRemove) {
-				Integer id = userDao.userEntityIdFromEmail(con,
-						at.getEmail(), editor.getDomain().getId());
-				if (id == null) {
-					id = userDao
-							.contactEntityFromEmailQuery(con, at.getEmail());
-				}
 				ps.setInt(1, ev.getObmId().getObmId());
-				ps.setInt(2, id);
+				ps.setInt(2, at.getEntityId());
 				ps.addBatch();
 			}
+			
 			ps.executeBatch();
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
-
 	}
 
 	private void removeAllException(Connection con, Event eventParent)
@@ -2028,8 +2016,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	@VisibleForTesting void insertAttendees(AccessToken editor, String calendar, Event ev, Connection con,
-			List<Attendee> attendees, boolean useObmUser) throws SQLException, ServerFault {
+	@VisibleForTesting void insertAttendees(AccessToken editor, Event ev, Connection con,
+			List<Attendee> attendees) throws SQLException {
 		String attQ = "INSERT INTO EventLink (" + ATT_INSERT_FIELDS
 				+ ") VALUES (" + "?, " + // event_id
 				"?, " + // entity_id
@@ -2044,7 +2032,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		
 		try {
 			ps = con.prepareStatement(attQ);
-			Integer userEntityCalender = userDao.userEntityIdFromEmail(con, calendar, editor.getDomain().getId());
 			
 			final int eventObmId = ev.getObmId().getObmId();
 			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);
@@ -2054,29 +2041,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				boolean isOrganizer = Objects.firstNonNull(at.isOrganizer(), false);
 				
 				String attendeeEmail = at.getEmail();
-				Integer userEntity = getUserEntityOrContactEntity(editor, con, userEntityCalender, attendeeEmail, useObmUser);
+				Integer userEntity = at.getEntityId();
 
 				// There must be only one organizer in a given event
 				if (isOrganizer) {
 					shouldClearOrganizer = true;
 				}
 				
-				if (userEntity == null) {
-					logger.info("Attendee " + at.getEmail()
-							+ " not found in OBM, will create a contact");
-					Contact c = new Contact();
-					c.setLastname(at.getDisplayName());
-					c.setFirstname("");
-					c.addEmail("INTERNET;X-OBM-Ref1", new Email(attendeeEmail));
-					c.setCollected(true);
-					c = contactDao.createContact(editor, con, c);
-					userEntity = c.getEntityId();
-				} else {
-					if (alreadyAddedAttendees.contains(userEntity)) {
-						logger.info("Attendee {} with entity ID {} already added, skipping.", attendeeEmail, userEntity);
-						
-						continue;
-					}
+				if (alreadyAddedAttendees.contains(userEntity)) {
+					logger.info("Attendee {} with entity ID {} already added, skipping.", attendeeEmail, userEntity);
+					
+					continue;
 				}
 				
 				ps.setInt(1, eventObmId);
@@ -2133,29 +2108,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ImmutableSet.copyOf(attendees);
 	}
 
-	private Integer getUserEntityOrContactEntity(AccessToken token, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
-		Integer userEntity = getUserEntityIdFromEmail(token, con, userEntityCalendar, email, useObmUser);
-		if (userEntity == null) {
-			userEntity = userDao.contactEntityFromEmailQuery(con, email);
-		}
-		return userEntity;
-	}
-
-	private Integer getUserEntityIdFromEmail(AccessToken editor, Connection con, Integer userEntityCalendar, String email, boolean useObmUser) throws SQLException {
-		Integer userEntity  = userDao.userEntityIdFromEmail(con, email, editor.getDomain().getId());
-		if(!useObmUser && !userEntityCalendar.equals(userEntity)){
-			userEntity = null;
-			logger.info("user with email " + email + " not found. Checking contacts.");
-		}
-		return userEntity;
-	}
-
-	private void updateAttendees(AccessToken token, Connection con, String calendar, Event event, Boolean useObmUser) throws SQLException, ServerFault {
+	private void updateAttendees(AccessToken token, Connection con, Event event) throws SQLException {
 		String q = "update EventLink set eventlink_state=?, eventlink_required=?, eventlink_userupdate=?, eventlink_percent=?, eventlink_is_organizer=? "
-				+ "where eventlink_event_id=? AND "
-				+ "eventlink_entity_id IN "
-				+ "(select userentity_entity_id from UserEntity where userentity_entity_id=?  "
-				+ "UNION SELECT contactentity_entity_id from ContactEntity where contactentity_entity_id=?)";
+				+ "where eventlink_event_id = ? AND eventlink_entity_id = ?";
 		PreparedStatement ps = null;
 		int[] updatedAttendees;
 		List<Attendee> mightInsert = new LinkedList<Attendee>();
@@ -2163,17 +2118,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			ps = con.prepareStatement(q);
-			Integer userEntityCalendar = userDao.userEntityIdFromEmail(con, calendar, token.getDomain().getId());
-			for (Attendee at : event.getAttendees()) {
-				Integer userEntity = getUserEntityOrContactEntity(token, con, userEntityCalendar, at.getEmail(), useObmUser);
-				if (userEntity == null) {
-					logger.info("skipping attendee update for email "
-							+ at.getEmail() + ". Will add as contact");
-					toInsert.add(at);
-					continue;
-				}
 
+			for (Attendee at : event.getAttendees()) {
+				Integer userEntity = at.getEntityId();
 				int idx = 1;
+				
 				ps.setObject(idx++, obmHelper.getDBCP()
 						.getJdbcObject(ObmHelper.VPARTSTAT, at.getParticipation().getState().toString()));
 				ps.setObject(idx++, obmHelper.getDBCP()
@@ -2182,7 +2131,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(idx++, at.getPercent());
 				ps.setBoolean(idx++, at.isOrganizer());
 				ps.setInt(idx++, event.getObmId().getObmId());
-				ps.setInt(idx++, userEntity);
 				ps.setInt(idx++, userEntity);
 				ps.addBatch();
 				mightInsert.add(at);
@@ -2200,7 +2148,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 		
 		logger.info("event modification needs to add " + toInsert.size() + " attendees.");
-		insertAttendees(token, calendar, event, con, toInsert, useObmUser);
+		insertAttendees(token, event, con, toInsert);
 	}
 
 	private void updateAlerts(AccessToken token, Connection con, Event event, int ownerId)

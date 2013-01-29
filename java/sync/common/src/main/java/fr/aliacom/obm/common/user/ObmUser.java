@@ -42,6 +42,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class ObmUser {
 
 	private int uid;
+	private int entityId;
 	private String login;
 	private String commonName;
 	private String lastName;
@@ -217,6 +218,14 @@ public class ObmUser {
 
 	public void setUid(int uid) {
 		this.uid = uid;
+	}
+	
+	public int getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(int entityId) {
+		this.entityId = entityId;
 	}
 
 	public String getLastName() {

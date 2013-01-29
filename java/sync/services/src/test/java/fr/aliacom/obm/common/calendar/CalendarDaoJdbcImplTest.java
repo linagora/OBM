@@ -60,7 +60,10 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.services.AttendeeService;
 import org.obm.sync.solr.SolrManager;
 
 import com.google.common.collect.ImmutableList;
@@ -89,6 +92,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bindWithMock(SolrManager.class);
+			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
 		
@@ -147,22 +151,16 @@ public class CalendarDaoJdbcImplTest {
 	public void testInsertAttendeesWithSameUserTwice() throws Exception {
 		Integer userEntity = 1;
 		Event event = new Event();
-		String calendar = "calendar";
 		ObmUser user = ToolBox.getDefaultObmUser();
-		int domainId = user.getDomain().getId();
 		Connection connection = mocksControl.createMock(Connection.class);
 		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
 		AccessToken token = ToolBox.mockAccessToken(user.getLogin(), user.getDomain(), mocksControl);
-		List<Attendee> attendees = ImmutableList.of(getAttendee("user1@test.com"), getAttendee("user1alias@test.com"));
+		List<Attendee> attendees = ImmutableList.of(getAttendee("user1@test.com", userEntity), getAttendee("user1alias@test.com", userEntity));
 		
 		event.setUid(new EventObmId(1));
 		
-		expect(userDao.userEntityIdFromEmail(connection, calendar, domainId)).andReturn(0);
-		expect(userDao.userEntityIdFromEmail(connection, "user1@test.com", domainId)).andReturn(userEntity);
-		expect(userDao.userEntityIdFromEmail(connection, "user1alias@test.com", domainId)).andReturn(userEntity);
-		
 		ps.addBatch();
-		expectLastCall().times(1); // Because UserDao returns the same entity_id for the two email addresses
+		expectLastCall().times(1); // Because the two attendees have the same entityId
 		
 		expect(ps.executeBatch()).andReturn(new int[0]);
 		
@@ -171,13 +169,13 @@ public class CalendarDaoJdbcImplTest {
 		
 		mocksControl.replay();
 		
-		calendarDaoJdbcImpl.insertAttendees(token, calendar, event, connection, attendees, true);
+		calendarDaoJdbcImpl.insertAttendees(token, event, connection, attendees);
 		
 		mocksControl.verify();
 	}
 	
-	private Attendee getAttendee(String email) {
-		return Attendee.builder().email(email).build();
+	private Attendee getAttendee(String email, Integer entityId) {
+		return UserAttendee.builder().email(email).entityId(entityId).build();
 	}
 
 	private void expectgetJDBCObjects() throws Exception {

@@ -182,7 +182,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 						"percent", "isOrganizer" });
 		List<Attendee> la = new ArrayList<Attendee>(atVals.length);
 		for (String[] attendee : atVals) {
-			Attendee at = UnknownAttendee
+			Attendee at = UnidentifiedAttendee
 					.builder()
 					.displayName(attendee[0])
 					.email(attendee[1])

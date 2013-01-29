@@ -119,8 +119,10 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.commons.lang.StringUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.CalendarUserType;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
@@ -135,6 +137,7 @@ import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
+import org.obm.sync.services.AttendeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -277,7 +280,7 @@ public class Ical4jHelper {
 		return vEvent;
 	}
 	
-	public FreeBusyRequest parseICSFreeBusy(String ics) 
+	public FreeBusyRequest parseICSFreeBusy(String ics, ObmDomain domain, Integer ownerId) 
 		throws IOException, ParserException {
 		CalendarBuilder builder = new CalendarBuilder();
 		Calendar calendar = builder.build(new StringReader(ics));
@@ -286,14 +289,14 @@ public class Ical4jHelper {
 			ComponentList comps = getComponents(calendar, Component.VFREEBUSY);
 			if (comps.size() > 0) {
 				VFreeBusy vFreeBusy = (VFreeBusy) comps.get(0);
-				freeBusy = getFreeBusy(vFreeBusy);
+				freeBusy = getFreeBusy(vFreeBusy, domain, ownerId);
 			}
 		}
 
 		return freeBusy;
 	}
 
-	public List<Event> parseICS(String ics, Ical4jUser ical4jUser) 
+	public List<Event> parseICS(String ics, Ical4jUser ical4jUser, Integer ownerId) 
 		throws IOException, ParserException {
 		
 		Calendar calendar = buildCalendar(ics);
@@ -301,8 +304,8 @@ public class Ical4jHelper {
 		if (calendar != null) {
 			return ImmutableList.copyOf(
 					Iterables.concat(
-							getEvents(calendar, ical4jUser),
-							getTodos(ical4jUser, calendar)));
+							getEvents(calendar, ical4jUser, ownerId),
+							getTodos(ical4jUser, calendar, ownerId)));
 		}
 		return ImmutableList.<Event>of();
 	}
@@ -314,32 +317,32 @@ public class Ical4jHelper {
 	}
 
 
-	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser) throws IOException, ParserException {
+	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser, Integer ownerId) throws IOException, ParserException {
 		Calendar calendar = buildCalendar(ics);
 		if (calendar != null) {
-			return ImmutableList.copyOf(getEvents(calendar, ical4jUser));
+			return ImmutableList.copyOf(getEvents(calendar, ical4jUser, ownerId));
 		}
 		return ImmutableList.<Event>of();
 	}
 	
-	private Collection<Event> getTodos(Ical4jUser ical4jUser, Calendar calendar) {
+	private Collection<Event> getTodos(Ical4jUser ical4jUser, Calendar calendar, Integer ownerId) {
 		List<Event> todos = Lists.newArrayList();
 		ComponentList comps = getComponents(calendar, Component.VTODO);
 		for (Object obj: comps) {
 			VToDo vTodo = (VToDo) obj;
-			Event event = convertVTodoToEvent(ical4jUser, vTodo);
+			Event event = convertVTodoToEvent(ical4jUser, vTodo, ownerId);
 			todos.add(event);
 		}
 		return todos;
 	}
 
-	private Collection<Event> getEvents(Calendar calendar, Ical4jUser ical4jUser) {
+	private Collection<Event> getEvents(Calendar calendar, Ical4jUser ical4jUser, Integer ownerId) {
 		Map<EventExtId, Event> mapEvents = Maps.newHashMap();
 		Multimap<EventExtId, Event> mapExceptionEvents = HashMultimap.create();
 		ComponentList comps = getComponents(calendar, Component.VEVENT);
 		for (Object obj: comps) {
 			VEvent vEvent = (VEvent) obj;
-			Event event = convertVEventToEvent(ical4jUser, vEvent);
+			Event event = convertVEventToEvent(ical4jUser, vEvent, ownerId);
 			if(event.getRecurrenceId() == null) {
 				mapEvents.put(event.getExtId(), event);
 			} else {
@@ -376,7 +379,7 @@ public class Ical4jHelper {
 		recurrenceTarget.getEventExceptions().addAll(eventsToAdd);
 	}
 	
-	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent) {
+	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent, Integer ownerId) {
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
 		appendSummary(event, vEvent.getSummary());
@@ -392,7 +395,7 @@ public class Ical4jHelper {
 		appendAllDay(event, vEvent.getDuration());
 		appendPriority(event, vEvent.getPriority());
 		appendRecurrenceId(event, vEvent.getRecurrenceId());
-		appendAttendees(event, vEvent);
+		appendAttendees(event, vEvent, ical4jUser.getObmDomain(), ownerId);
 		appendRecurence(event, vEvent);
 		appendAlert(event, vEvent.getAlarms());
 		appendOpacity(event, vEvent.getTransparency(), event.isAllday());
@@ -403,7 +406,7 @@ public class Ical4jHelper {
 		return event;
 	}
 
-	/* package */ Event convertVTodoToEvent(Ical4jUser ical4jUser, VToDo vTodo) {
+	/* package */ Event convertVTodoToEvent(Ical4jUser ical4jUser, VToDo vTodo, Integer ownerId) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
 		appendSummary(event, vTodo.getSummary());
@@ -419,7 +422,7 @@ public class Ical4jHelper {
 		appendPriority(event, vTodo.getPriority());
 		appendRecurrenceId(event, vTodo.getRecurrenceId());
 
-		appendAttendees(event, vTodo);
+		appendAttendees(event, vTodo, ical4jUser.getObmDomain(), ownerId);
 		appendRecurence(event, vTodo);
 		appendAlert(event, vTodo.getAlarms());
 		appendPercent(event, vTodo.getPercentComplete(), ical4jUser.getEmail());
@@ -1004,12 +1007,16 @@ public class Ical4jHelper {
 			prop.add(getAttendee(attendee));
 		}
 	}
+	
+	@VisibleForTesting CuType calendarUserTypeToCuType(CalendarUserType type) {
+		return new CuType(type.name());
+	}
 
 	private net.fortuna.ical4j.model.property.Attendee getAttendee(
 			Attendee attendee) {
 		net.fortuna.ical4j.model.property.Attendee att = new net.fortuna.ical4j.model.property.Attendee();
 
-		att.getParameters().add(new CuType(attendee.getCalendarUserType().name()));
+		att.getParameters().add(calendarUserTypeToCuType(attendee.getCalendarUserType()));
 
 		PartStat ps = getPartStat(attendee);
 		att.getParameters().add(ps);
@@ -1303,18 +1310,24 @@ public class Ical4jHelper {
 		event.setRecurrence(er);
 	}
 
-	private void appendAttendees(Event event, Component vEvent) {
+	private void appendAttendees(Event event, Component vEvent, ObmDomain domain, Integer ownerId) {
 		Map<String, Attendee> emails = new HashMap<String, Attendee>();
 		
 		for (Property prop : getProperties(vEvent, Property.ATTENDEE)) {
-			Attendee att = convertAttendeePropertyToAttendee(prop);
+			Attendee att = convertAttendeePropertyToAttendee(prop, domain, ownerId);
+			
+			if (att == null) {
+				logger.warn("Couldn't find an attendee matching {}, skipping.", prop);
+				
+				continue;
+			}
 			
 			if (att.getEmail() != null && !attendeeAlreadyExist(emails, att)) {
 				emails.put(att.getEmail(), att);
 			}
 		}
 		
-		appendOrganizer(emails, vEvent);
+		appendOrganizer(emails, vEvent, domain, ownerId);
 		event.addAttendees(new ArrayList<Attendee>(emails.values()));
 	}
 
@@ -1323,7 +1336,7 @@ public class Ical4jHelper {
 	}
 
 	private void appendOrganizer(Map<String, Attendee> emails,
-			Component vEvent) {
+			Component vEvent, ObmDomain domain, Integer ownerId) {
 		Property prop = vEvent.getProperty(Property.ORGANIZER);
 		if(prop != null){
 			Organizer orga = (Organizer) prop;
@@ -1334,7 +1347,7 @@ public class Ical4jHelper {
 				if(organizer != null){
 					organizer.setOrganizer(true);
 				} else {
-					organizer = convertAttendeePropertyToAttendee(prop);
+					organizer = convertAttendeePropertyToAttendee(prop, domain, ownerId);
 					
 					organizer.setParticipationRole(ParticipationRole.REQ);
 					organizer.setParticipation(Participation.accepted());
@@ -1349,7 +1362,7 @@ public class Ical4jHelper {
 	private String removeMailto(Property prop) {
 		String email = extractEmail(prop);
 		
-		return email != null ? email : prop.getValue();
+		return Objects.firstNonNull(email, prop.getValue());
 	}
 	
 	private String extractEmail(Property prop) {
@@ -1555,7 +1568,7 @@ public class Ical4jHelper {
 		return st == null || "".equals(st);
 	}
 
-	private FreeBusyRequest getFreeBusy(VFreeBusy vFreeBusy) {
+	private FreeBusyRequest getFreeBusy(VFreeBusy vFreeBusy, ObmDomain domain, Integer ownerId) {
 		FreeBusyRequest fb = new FreeBusyRequest();
 		appendOwner(fb, vFreeBusy.getOrganizer());
 		fb.setUid(vFreeBusy.getUid().getValue());
@@ -1567,56 +1580,61 @@ public class Ical4jHelper {
 			fb.setEnd(vFreeBusy.getEndDate().getDate());
 		}
 
-		appendAttendees(fb, vFreeBusy);
+		appendAttendees(fb, vFreeBusy, domain, ownerId);
 		return fb;
 	}
 	
 	private String getParameterValue(Parameter parameter) {
-		if (parameter != null) {
-			return parameter.getValue();
+		if (parameter == null) {
+			return null;
 		}
 		
-		return null;
+		return parameter.getValue();
 	}
 	
-	private Attendee findAttendeeUsingCuType(String name, String email, String cuType) {
+	@VisibleForTesting Attendee findAttendeeUsingCuType(String name, String email, String cuType, ObmDomain domain, Integer ownerId) {
 		Attendee attendee = null;
 		
 		if (cuType == null) {
-			return attendeeService.findAttendee(name, email, true);
+			attendee = attendeeService.findAttendee(name, email, true, domain, ownerId);
 		} else {
 			CalendarUserType type = CalendarUserType.valueOf(cuType);
 			
 			switch (type) {
 				case GROUP:
-					return null;
+					break;
 				case INDIVIDUAL:
-					attendee = attendeeService.findUserAttendee(name, email);
-					// User not found, we'll fallback to a contact and create it if needed
+					attendee = attendeeService.findUserAttendee(name, email, domain);
+					
 					if (attendee == null) {
-						attendee = attendeeService.findContactAttendee(name, email, true);
+						attendee = attendeeService.findContactAttendee(name, email, true, domain, ownerId);
 					}
 					
 					break;
 				case ROOM:
 				case RESOURCE:
-					attendee = attendeeService.findResourceAttendee(name, email);
+					attendee = attendeeService.findResourceAttendee(name, email, domain, ownerId);
 					
 					break;
 				case UNKNOWN:
-					attendee = attendeeService.findAttendee(name, email, true);
+					attendee = attendeeService.findAttendee(name, email, true, domain, ownerId);
 			}
 		}
 		
 		return attendee;
 	}
 	
-	private Attendee convertAttendeePropertyToAttendee(Property prop) {
+	private Attendee convertAttendeePropertyToAttendee(Property prop, ObmDomain domain, Integer ownerId) {
 		String email = removeMailto(prop);
 		String cn = getParameterValue(prop.getParameter(Parameter.CN));
 		String cuType = getParameterValue(prop.getParameter(Parameter.CUTYPE));
 		
-		Attendee attendee = findAttendeeUsingCuType(cn, email, cuType);
+		Attendee attendee = findAttendeeUsingCuType(cn, email, cuType, domain, ownerId);
+		
+		// Couldn't find a resource matching the attendee...
+		if (attendee == null) {
+			return null;
+		}
 		
 		String role = getParameterValue(prop.getParameter(Parameter.ROLE));
 		String partStat = getParameterValue(prop.getParameter(Parameter.PARTSTAT));
@@ -1647,11 +1665,11 @@ public class Ical4jHelper {
 		return attendee;
 	}
 
-	private void appendAttendees(FreeBusyRequest fb, VFreeBusy vFreeBusy) {
+	private void appendAttendees(FreeBusyRequest fb, VFreeBusy vFreeBusy, ObmDomain domain, Integer ownerId) {
 		List<Property> props = getProperties(vFreeBusy, Property.ATTENDEE);
 		
 		for (Property prop : props) {
-			fb.addAttendee(convertAttendeePropertyToAttendee(prop));
+			fb.addAttendee(convertAttendeePropertyToAttendee(prop, domain, ownerId));
 		}
 	}
 

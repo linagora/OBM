@@ -51,11 +51,12 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.locator.store.LocatorService;
 import org.obm.locator.store.LocatorCache;
+import org.obm.locator.store.LocatorService;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
+import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,7 @@ import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 
+import fr.aliacom.obm.common.calendar.AttendeeServiceJdbcImpl;
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
@@ -147,6 +149,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
         		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
         		bind(DateProvider.class).to(ObmHelper.class);
+        		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
             }
         }, new MessageQueueModule(), new TransactionalModule(), new SolrJmsModule());
     }

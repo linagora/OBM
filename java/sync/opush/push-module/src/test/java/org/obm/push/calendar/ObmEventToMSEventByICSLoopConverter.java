@@ -66,7 +66,7 @@ public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventCon
 		try {
 			Ical4jUser ical4jUser = convertIcal4jUser(user);
 			String eventAsICS = ical4j.parseEvent(eventToConvert, ical4jUser, new AccessToken(0, "unit testing"));
-			List<Event> eventsFromICS = ical4j.parseICSEvent(eventAsICS, ical4jUser);
+			List<Event> eventsFromICS = ical4j.parseICSEvent(eventAsICS, ical4jUser, 0);
 			Event eventFromICS = Iterables.getOnlyElement(eventsFromICS);
 			return obmEventToMSEventConverter.convert(eventFromICS, uid, user);
 		} catch (ParserException e) {
