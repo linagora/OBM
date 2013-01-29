@@ -50,6 +50,7 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -243,23 +244,21 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
-		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions, state.getSyncKey());
+		DataDelta dataDelta = getChanged(udr, collection, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws DaoException,
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws DaoException,
 			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
-		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
+		CollectionPath collectionPath = buildCollectionPath(udr, collection.getCollectionId());
 		AccessToken token = login(udr);
 
-		ItemSyncState newState = state.newWindowedSyncState(syncCollectionOptions.getFilterType());
+		ItemSyncState newState = collection.getItemSyncState().newWindowedSyncState(collection.getOptions().getFilterType());
 		try {
 			
 			EventChanges changes = null;
@@ -274,7 +273,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 		
 			DataDelta delta = 
-					buildDataDelta(udr, collectionId, token, changes);
+					buildDataDelta(udr, collection.getCollectionId(), token, changes);
 			
 			logger.info("getContentChanges( {}, lastSync = {} ) => {}",
 				new Object[]{collectionPath.backendName(), newState.getSyncDate(), delta.statistics()});

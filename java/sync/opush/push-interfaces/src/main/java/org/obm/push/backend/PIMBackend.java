@@ -37,6 +37,7 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -82,12 +83,11 @@ public interface PIMBackend {
 		throws ProcessingEmailException, CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException;
 
-	DataDelta getChanged(UserDataRequest udr, ItemSyncState itemSyncState, Integer collectionId,
-			SyncCollectionOptions options, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
+	DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey)
+		throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 	
-	int getItemEstimateSize(UserDataRequest udr, ItemSyncState syncState, Integer collectionId, 
-			SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
+	int getItemEstimateSize(UserDataRequest udr, ItemSyncState syncState, SyncCollection syncCollection) throws CollectionNotFoundException, 
 			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
 			FilterTypeChangedException, HierarchyChangedException;
 

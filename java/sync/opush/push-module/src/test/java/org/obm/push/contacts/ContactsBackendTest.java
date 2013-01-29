@@ -58,6 +58,7 @@ import org.obm.push.bean.FolderType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -157,6 +158,9 @@ public class ContactsBackendTest {
 		List<AddressBook> books = ImmutableList.of(
 				newAddressBookObject("folder", otherContactCollectionUid, false),
 				newAddressBookObject("folder_1", targetcontactCollectionUid, false));
+
+		SyncCollection collection = new SyncCollection(targetcontactCollectionUid, COLLECTION_CONTACT_PREFIX);
+		collection.setSyncKey(new SyncKey("1234567890a"));
 		
 		expectListAllBooks(token, books);
 		expectBuildCollectionPath("folder", otherContactCollectionUid);
@@ -176,7 +180,7 @@ public class ContactsBackendTest {
 		mocks.replay();
 		
 		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
-		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, lastKnownState, targetcontactCollectionUid, null);
+		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, lastKnownState, collection);
 
 		mocks.verify();
 		

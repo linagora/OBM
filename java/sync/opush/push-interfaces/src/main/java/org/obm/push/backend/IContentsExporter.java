@@ -50,8 +50,8 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 public interface IContentsExporter {
 
 	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey)
-			throws DaoException, CollectionNotFoundException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
+		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
 	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;

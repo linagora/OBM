@@ -52,6 +52,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -267,31 +268,29 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException {
 		
-		DataDelta dataDelta = getChanged(udr, state, collectionId, syncCollectionOptions, state.getSyncKey());
+		DataDelta dataDelta = getChanged(udr, syncCollection, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
-			SyncCollectionOptions syncCollectionOptions, SyncKey newSyncKey) throws UnexpectedObmSyncServerException, 
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws UnexpectedObmSyncServerException, 
 			DaoException, CollectionNotFoundException {
 		
-		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
-		ContactChanges contactChanges = listContactsChanged(udr, state.getSyncDate(), addressBookId);
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collection.getCollectionId());
+		ContactChanges contactChanges = listContactsChanged(udr, collection.getItemSyncState().getSyncDate(), addressBookId);
 
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
-			addUpd.add(convertContactToItemChange(collectionId, contact));
+			addUpd.add(convertContactToItemChange(collection.getCollectionId(), contact));
 		}
 
 		List<ItemDeletion> deletions = new LinkedList<ItemDeletion>();
 		for (Integer remove : contactChanges.getRemoved()) {
 			deletions.add(ItemDeletion.builder()
-					.serverId(ServerId.buildServerIdString(collectionId, remove))
+					.serverId(ServerId.buildServerIdString(collection.getCollectionId(), remove))
 					.build());
 		}
 
@@ -301,7 +300,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 				.syncDate(contactChanges.getLastSync())
 				.build();
 	}
-
+	
 	private Integer findAddressBookIdFromCollectionId(UserDataRequest udr, Integer collectionId) 
 			throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 		

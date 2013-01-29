@@ -65,12 +65,11 @@ public class ContentsExporter implements IContentsExporter {
 
 	@Override
 	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) 
-					throws DaoException, CollectionNotFoundException, 
-					UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+				ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getChanged(udr, syncCollection.getItemSyncState(), 
-				syncCollection.getCollectionId(), syncCollection.getOptions(), newSyncKey);
+		return backend.getChanged(udr, syncCollection, newSyncKey);
 	}
 
 	@Override
@@ -95,8 +94,7 @@ public class ContentsExporter implements IContentsExporter {
 					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 
-				syncCollection.getCollectionId(), syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), syncCollection);
 	}
 
 	@Override
@@ -105,8 +103,7 @@ public class ContentsExporter implements IContentsExporter {
 			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, state, 
-				syncCollection.getCollectionId(), syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, state, syncCollection);
 	}
 
 	@Override
@@ -115,7 +112,6 @@ public class ContentsExporter implements IContentsExporter {
 			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
-		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), 
-				syncCollection.getCollectionId(), syncCollection.getOptions());
+		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), syncCollection);
 	}
 }

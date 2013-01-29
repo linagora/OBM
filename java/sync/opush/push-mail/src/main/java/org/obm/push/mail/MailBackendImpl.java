@@ -66,6 +66,7 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -279,11 +280,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
-			SyncCollectionOptions options) throws ProcessingEmailException, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException, FilterTypeChangedException {
 		
-		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state, collectionId, options);
+		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state,
+				collection.getCollectionId(), collection.getOptions());
 		return computeEmailChangesNumber(syncData.getEmailChanges());
 	}
 
@@ -296,11 +297,15 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, ItemSyncState state, Integer collectionId, SyncCollectionOptions options, SyncKey newSyncKey)
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey)
+		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
 		try {
-			MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state, collectionId, options);
+			int collectionId = collection.getCollectionId();
+			SyncCollectionOptions options = collection.getOptions();
+			ItemSyncState syncState = collection.getItemSyncState();
+			
+			MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, syncState, collectionId, options);
 			takeSnapshot(udr, collectionId, options, syncData, newSyncKey);
 
 			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,

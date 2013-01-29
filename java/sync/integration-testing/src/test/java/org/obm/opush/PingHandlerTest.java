@@ -75,7 +75,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
@@ -405,8 +404,7 @@ public class PingHandlerTest {
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
 				anyObject(ItemSyncState.class),
-				anyInt(),
-				anyObject(SyncCollectionOptions.class)))
+				anyObject(SyncCollection.class)))
 			.andReturn(1).times(2);
 	}
 
@@ -416,10 +414,9 @@ public class PingHandlerTest {
 		
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(UserDataRequest.class), 
+				anyObject(UserDataRequest.class),  
 				anyObject(ItemSyncState.class),
-				anyInt(),
-				anyObject(SyncCollectionOptions.class)))
+				anyObject(SyncCollection.class)))
 			.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 
@@ -428,10 +425,9 @@ public class PingHandlerTest {
 			ConversionException, HierarchyChangedException {
 		
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(UserDataRequest.class), 
+				anyObject(UserDataRequest.class),  
 				anyObject(ItemSyncState.class),
-				anyInt(),
-				anyObject(SyncCollectionOptions.class)))
+				anyObject(SyncCollection.class)))
 			.andReturn(0).anyTimes();
 	}
 
