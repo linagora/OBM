@@ -106,8 +106,6 @@ public class ResponseWindowingService {
 		private List<T> handleChangesOverflow(
 				SyncCollection c, SyncClientCommands clientCommands, List<T> changes) {
 			
-			c.setMoreAvailable(true);
-			
 			logWindowingInformation(c, changes);
 
 			List<T> changesFromClient = changedFromClient(changes, clientCommands);
@@ -169,7 +167,17 @@ public class ResponseWindowingService {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
+	public DataDelta windowedResponse(UserDataRequest udr, SyncCollection c, DataDelta delta, SyncClientCommands clientCommands) {
+		return DataDelta.builder()
+				.changes(windowChanges(c, delta, udr, clientCommands))
+				.deletions(windowDeletions(c, delta, udr, clientCommands))
+				.syncDate(delta.getSyncDate())
+				.syncKey(delta.getSyncKey())
+				.moreAvailable(hasPendingResponse(udr.getCredentials(), udr.getDevice(), c.getCollectionId()))
+				.build();
+	}
+	
+	@VisibleForTesting List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
 			UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		Preconditions.checkNotNull(delta);
 		Preconditions.checkNotNull(c);
@@ -202,7 +210,7 @@ public class ResponseWindowingService {
 		}).window(c, delta.getChanges(), clientCommands);
 	}
 
-	public List<ItemDeletion> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
+	@VisibleForTesting List<ItemDeletion> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		final Credentials credentials = userDataRequest.getCredentials();
 		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();

@@ -255,11 +255,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			delta = DataDelta.newEmptyDelta(lastSync, treatmentSyncKey);
 		}
 
-		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, clientCommands);
-		syncCollectionResponse.setItemChanges(changed);
-	
-		List<ItemDeletion> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, clientCommands);
-		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
+		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(udr, c, delta, clientCommands);
+		syncCollectionResponse.setItemChanges(windowedResponse.getChanges());
+		syncCollectionResponse.setItemChangesDeletion(windowedResponse.getDeletions());
+		
+		c.setMoreAvailable(windowedResponse.hasMoreAvailable());
 		
 		return ItemSyncState.builder()
 				.syncKey(treatmentSyncKey)

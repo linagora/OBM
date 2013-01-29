@@ -240,6 +240,61 @@ public class ResponseWindowingTest {
 		assertThat(actual).isEqualTo(deltas.getDeletions());
 	}
 
+	@Test
+	public void processWindowSizeDeletionsAndChangesFitTheWindows() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, 1)).andReturn(false);
+		replay(unsynchronizedItemDao);
+		
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		
+		DataDelta deltas = deltas(2);
+		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(user.userDataRequest,
+				syncCollection(5), deltas, SyncClientCommands.empty());
+		
+		verify(unsynchronizedItemDao);
+				
+		assertThat(windowedResponse.getChanges()).isEqualTo(deltas.getChanges());
+		assertThat(windowedResponse.getDeletions()).isEqualTo(deltas.getDeletions());
+		assertThat(windowedResponse.getSyncDate()).isEqualTo(deltas.getSyncDate());
+		assertThat(windowedResponse.getSyncKey()).isEqualTo(deltas.getSyncKey());
+		assertThat(windowedResponse.hasMoreAvailable()).isFalse();
+	}
+
+	@Test
+	public void processWindowSizeDeletionsAndChangesDoNotFitTheWindows() {
+		OpushUser user = OpushUser.create("usera@domain", "pw");
+
+		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
+		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
+		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltasWithOffset(3, 2).getChanges());
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, 1)).andReturn(true);
+		replay(unsynchronizedItemDao);
+		
+		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
+		
+		DataDelta deltas = deltas(5);
+		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(user.userDataRequest,
+				syncCollection(2), deltas, SyncClientCommands.empty());
+		
+		verify(unsynchronizedItemDao);
+				
+		assertThat(windowedResponse.getChanges()).isEqualTo(deltas(2).getChanges());
+		assertThat(windowedResponse.getDeletions()).isEqualTo(deltas.getDeletions());
+		assertThat(windowedResponse.getSyncDate()).isEqualTo(deltas.getSyncDate());
+		assertThat(windowedResponse.getSyncKey()).isEqualTo(deltas.getSyncKey());
+		assertThat(windowedResponse.hasMoreAvailable()).isTrue();
+	}
+
 	@Test(expected=IllegalStateException.class)
 	public void windowChangesWithDuplicates() {
 		OpushUser user = OpushUser.create("usera@domain", "pw");

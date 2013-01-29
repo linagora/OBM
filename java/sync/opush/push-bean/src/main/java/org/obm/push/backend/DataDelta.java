@@ -54,6 +54,7 @@ public class DataDelta {
 		private List<ItemDeletion> deletions;
 		private Date syncDate;
 		private SyncKey syncKey;
+		private Boolean moreAvailable;
 		
 		private Builder() {
 			super();
@@ -78,17 +79,21 @@ public class DataDelta {
 			this.syncKey = syncKey;
 			return this;
 		}
+
+		public Builder moreAvailable(boolean moreAvailable) {
+			this.moreAvailable = moreAvailable;
+			return this;
+		}
 		
 		public DataDelta build() {
 			Preconditions.checkNotNull(syncDate);
 			Preconditions.checkNotNull(syncKey);
-			if (changes == null) {
-				changes = ImmutableList.of();
-			}
-			if (deletions == null) {
-				deletions = ImmutableList.of();
-			}
-			return new DataDelta(changes, deletions, syncDate, syncKey);
+			
+			changes = Objects.firstNonNull(changes, ImmutableList.<ItemChange>of());
+			deletions = Objects.firstNonNull(deletions, ImmutableList.<ItemDeletion>of());
+			moreAvailable = Objects.firstNonNull(moreAvailable, false);
+			
+			return new DataDelta(changes, deletions, syncDate, syncKey, moreAvailable);
 		}
 		
 	}
@@ -97,10 +102,13 @@ public class DataDelta {
 	private final List<ItemDeletion> deletions;
 	private final Date syncDate;
 	private final SyncKey syncKey;
+	private final boolean moreAvailable;
 	
-	private DataDelta(List<ItemChange> changes, List<ItemDeletion> deletions, Date syncDate, SyncKey syncKey) {
+	private DataDelta(List<ItemChange> changes, List<ItemDeletion> deletions, Date syncDate, SyncKey syncKey,
+			boolean moreAvailable) {
 		this.syncDate = syncDate;
 		this.syncKey = syncKey;
+		this.moreAvailable = moreAvailable;
 		this.changes = ImmutableList.copyOf(changes);
 		this.deletions = ImmutableList.copyOf(deletions);
 	}
@@ -132,6 +140,28 @@ public class DataDelta {
 		return count;
 	}
 
+	public boolean hasMoreAvailable() {
+		return moreAvailable;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(changes, deletions, syncDate, syncKey, moreAvailable);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof DataDelta) {
+			DataDelta that = (DataDelta) object;
+			return Objects.equal(this.changes, that.changes)
+				&& Objects.equal(this.deletions, that.deletions)
+				&& Objects.equal(this.syncDate, that.syncDate)
+				&& Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.moreAvailable, that.moreAvailable);
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
@@ -139,12 +169,13 @@ public class DataDelta {
 			.add("deletions", deletions)
 			.add("syncDate", syncDate)
 			.add("syncKey", syncKey)
+			.add("moreAvailable", moreAvailable)
 			.toString();
 	}
 	
 	public String statistics() {
-		return String.format("%d changes, %d deletions, syncdate %tc, %s syncKey", 
-					changes.size(), deletions.size(), syncDate, syncKey.getSyncKey());
+		return String.format("%d changes, %d deletions, syncdate %tc, %s syncKey, %b moreAvailable", 
+					changes.size(), deletions.size(), syncDate, syncKey.getSyncKey(), moreAvailable);
 	}
 
 	public static DataDelta newEmptyDelta(Date lastSync, SyncKey syncKey) {
@@ -153,6 +184,7 @@ public class DataDelta {
 				.deletions(ImmutableList.<ItemDeletion>of())
 				.syncDate(lastSync)
 				.syncKey(syncKey)
+				.moreAvailable(false)
 				.build();
 	}
 }

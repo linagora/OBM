@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
@@ -118,6 +119,7 @@ public class BeansTest {
 					.add(SyncClientCommands.class)
 					.add(SyncClientCommands.Add.class)
 					.add(SyncClientCommands.Change.class)
+					.add(DataDelta.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
