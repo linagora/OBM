@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.obm.push.mail.bean.Email;
@@ -38,7 +39,7 @@ import org.obm.push.mail.bean.Email;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 
-public class EmailChanges {
+public class EmailChanges implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();

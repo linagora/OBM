@@ -46,6 +46,8 @@ import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailViewToMSEmailConverterImpl;
 import org.obm.push.mail.SnapshotService;
 import org.obm.push.mail.SnapshotServiceImpl;
+import org.obm.push.mail.WindowingService;
+import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
@@ -53,8 +55,10 @@ import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.store.SnapshotDao;
 import org.obm.push.store.SyncKeysDao;
+import org.obm.push.store.WindowingDao;
 import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncKeysDaoEhcacheImpl;
+import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -65,6 +69,7 @@ public class OpushMailModule extends AbstractModule {
 	protected void configure() {
 		bind(MailMonitoringBackend.class).to(NoopImapMonitoringImpl.class);
 		bind(SnapshotService.class).to(SnapshotServiceImpl.class);
+		bind(WindowingService.class).to(WindowingServiceImpl.class);
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
@@ -80,6 +85,7 @@ public class OpushMailModule extends AbstractModule {
 		transformers.addBinding().to(Identity.Factory.class);
 		transformers.addBinding().to(HtmlToText.Factory.class);
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
+		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
 	}
 

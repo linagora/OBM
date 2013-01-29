@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 
 import bitronix.tm.TransactionManagerServices;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
@@ -72,10 +72,10 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	public void loadStores() {
 		List<String> stores = opushCacheManager.listStores();
 		Assert.assertNotNull(stores);
-		Assert.assertEquals(6, stores.size());
+		Assert.assertEquals(7, stores.size());
 	}
 	
-	@Test @Slow
+	@Test
 	public void createNewThreeCachesAndRemoveOne() {
 		opushCacheManager.createNewStore("test 1");
 		opushCacheManager.createNewStore("test 2");
@@ -88,7 +88,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 		Assert.assertNull(opushCacheManager.getStore("test 2"));
 		
-		Assert.assertEquals(8, opushCacheManager.listStores().size());
+		Assert.assertEquals(9, opushCacheManager.listStores().size());
 	}
 	
 	@Test
@@ -105,7 +105,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		opushCacheManager.createNewStore("test 1");
 		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
 
-		Assert.assertEquals(7, opushCacheManager.listStores().size());
+		Assert.assertEquals(8, opushCacheManager.listStores().size());
 	}
 
 }

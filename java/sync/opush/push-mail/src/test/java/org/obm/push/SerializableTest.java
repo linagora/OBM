@@ -29,81 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.bean;
+package org.obm.push;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import static org.obm.DateUtils.date;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.utils.DateUtils;
+import org.obm.push.mail.EmailChanges;
+import org.obm.push.mail.bean.Email;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.SerializableTester;
 
 @RunWith(SlowFilterRunner.class)
 public class SerializableTest {
 
-	private ObjectOutputStream objectOutputStream;
-
-
-	@Before
-	public void buildOutputStream() throws IOException {
-		objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());	
-	}
-
 	@Test
-	public void testEmail() throws IOException {
-		Email email = Email.builder()
-				.uid(1)
-				.read(true)
-				.date(DateUtils.getCurrentDate())
-				.answered(true)
-				.build();
-		objectOutputStream.writeObject(email);
-	}
-	
-	@Test
-	public void testSnapshot() throws IOException {
-		Snapshot snapshot = Snapshot.builder()
-				.collectionId(1)
-				.deviceId(new DeviceId("deviceId"))
-				.filterType(FilterType.THREE_DAYS_BACK)
-				.syncKey(new SyncKey("syncKey"))
-				.uidNext(2)
-				.addEmail(Email.builder()
-						.uid(1)
-						.read(true)
-						.date(DateUtils.getCurrentDate())
+	public void testSyncCollectionOptions() {
+		SerializableTester.reserializeAndAssert(EmailChanges.builder()
+				.additions(ImmutableSet.of(
+						Email.builder()
+						.date(date("2012-12-12T23:59:00"))
 						.answered(true)
-						.build())
-				.build();
-		objectOutputStream.writeObject(snapshot);
+						.deleted(true)
+						.read(false)
+						.uid(15l)
+						.build()))
+				.changes(ImmutableSet.of(
+						Email.builder()
+							.date(date("2012-12-12T23:59:00"))
+							.answered(true)
+							.deleted(true)
+							.read(false)
+							.uid(15l)
+							.build()))
+				.build());
 	}
 	
-	@Test
-	public void testSnapshotKey() throws IOException {
-		SnapshotKey snapshotKey = SnapshotKey.builder()
-				.deviceId(new DeviceId("deviceId"))
-				.syncKey(new SyncKey("syncKey"))
-				.collectionId(1)
-				.build();
-		objectOutputStream.writeObject(snapshotKey);
-	}
-	
-	@Test
-	public void testDeviceId() throws IOException {
-		DeviceId deviceId = new DeviceId("deviceId");
-		objectOutputStream.writeObject(deviceId);
-	}
-
-	@Test
-	public void testSyncKey() throws IOException {
-		SyncKey syncKey = new SyncKey("syncKey");
-		objectOutputStream.writeObject(syncKey);
-	}
-
 }
