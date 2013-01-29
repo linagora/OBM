@@ -74,6 +74,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
@@ -212,7 +213,7 @@ public class SyncProtocolTest {
 	}
 	
 	private SyncResponse syncResponse(SyncCollectionResponse collectionResponse) {
-		return new SyncResponse(Sets.newHashSet(collectionResponse), Collections.<String, String>emptyMap());
+		return new SyncResponse(Sets.newHashSet(collectionResponse), SyncClientCommands.empty());
 	}
 
 	private SyncCollectionResponse newSyncCollectionResponse(int collectionId) {

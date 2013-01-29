@@ -36,10 +36,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Map;
-
 import org.easymock.IMocksControl;
-import org.fest.assertions.data.MapEntry;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +52,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.client.SyncClientCommands;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncHandlerTest {
@@ -88,10 +86,11 @@ public class SyncHandlerTest {
 		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.FETCH, null, PIMDataType.EMAIL));
 
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).isEmpty();
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).isEmpty();
 	}
 
 	@Test
@@ -100,10 +99,11 @@ public class SyncHandlerTest {
 		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.FETCH, null, PIMDataType.EMAIL));
 
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).isEmpty();
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).isEmpty();
 	}
 	
 	@Test
@@ -114,10 +114,11 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).isEmpty();
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
 	}
 	
 	@Test
@@ -128,24 +129,22 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).isEmpty();
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
 	}
 	
-	@Test
-	public void testProcessModificationForAdd() throws Exception {
+	@Test(expected=IllegalArgumentException.class)
+	public void testProcessModificationForAddNoClientId() throws Exception {
 		SyncCollection collection = new SyncCollection(15, inboxPath);
 		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.ADD, null, PIMDataType.EMAIL));
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
-		mocks.verify();
-		
-		assertThat(processedModification).contains(MapEntry.entry("15:3", null));
+		testee.processClientModification(udr, collection);
 	}
 	
 	@Test
@@ -156,10 +155,11 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).contains(MapEntry.entry("15:3", null));
+		assertThat(clientCommands.getAdds()).containsOnly(new SyncClientCommands.Add("1234", "15:3"));
+		assertThat(clientCommands.getChanges()).isEmpty();
 	}
 	
 	@Test
@@ -170,10 +170,11 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, null, "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).contains(MapEntry.entry("15:3", "1234"));
+		assertThat(clientCommands.getAdds()).containsOnly(new SyncClientCommands.Add("1234", "15:3"));
+		assertThat(clientCommands.getChanges()).isEmpty();
 	}
 	
 	@Test
@@ -185,10 +186,11 @@ public class SyncHandlerTest {
 		expectLastCall();
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-
-		assertThat(processedModification).contains(MapEntry.entry("15:2", null));
+		
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:2"));
 	}
 	
 	@Test
@@ -200,10 +202,11 @@ public class SyncHandlerTest {
 		expectLastCall();
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-
-		assertThat(processedModification).contains(MapEntry.entry("15:2", null));
+		
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:2"));
 	}
 
 	@Test
@@ -214,10 +217,11 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-
-		assertThat(processedModification).contains(MapEntry.entry("15:3", null));
+		
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
 	}
 
 	@Test
@@ -228,10 +232,11 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-
-		assertThat(processedModification).contains(MapEntry.entry("15:3", null));
+		
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
 	}
 	
 	@Test
@@ -242,9 +247,10 @@ public class SyncHandlerTest {
 		expect(contentsImporter.importMessageChange(udr, 15, null, "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
-		Map<String, String> processedModification = testee.processModification(udr, collection);
+		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
 		
-		assertThat(processedModification).contains(MapEntry.entry("15:3", "1234"));
+		assertThat(clientCommands.getAdds()).isEmpty();
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
 	}
 }

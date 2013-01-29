@@ -40,6 +40,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.item.ItemChange;
@@ -114,6 +115,9 @@ public class BeansTest {
 					.add(SyncKeysKey.class)
 					.add(FolderSyncState.class)
 					.add(MoveItem.class)
+					.add(SyncClientCommands.class)
+					.add(SyncClientCommands.Add.class)
+					.add(SyncClientCommands.Change.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

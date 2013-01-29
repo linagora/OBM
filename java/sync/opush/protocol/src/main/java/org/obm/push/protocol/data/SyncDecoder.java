@@ -32,7 +32,6 @@
 package org.obm.push.protocol.data;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.obm.push.bean.BodyPreference;
@@ -46,6 +45,7 @@ import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -67,9 +67,7 @@ import org.w3c.dom.NodeList;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -213,16 +211,16 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		Element root = responseDocument.getDocumentElement();
 		
 		SyncStatus status = getCollectionStatus(root);
-		Map<String, String> processedClientIds = Maps.newHashMap();
+		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 		List<SyncCollectionResponse> responseCollections = Lists.newArrayList();
 		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
 			ProcessedSyncCollectionResponse collection = buildCollectionResponse((Element)collectionNodes.item(i));
 			responseCollections.add(collection.getSyncCollectionResponse());
-			processedClientIds.putAll(collection.getProcessedClientIds());
+			clientCommandsBuilder.merge(collection.getClientCommands());
 		}
 		
-		return new SyncResponse(responseCollections, processedClientIds, status);
+		return new SyncResponse(responseCollections, clientCommandsBuilder.build(), status);
 	}
 
 	private ProcessedSyncCollectionResponse buildCollectionResponse(Element collectionEl) {
@@ -234,7 +232,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		syncCollection.setMoreAvailable(getMoreAvailable(collectionEl));
 		syncCollection.setDataType(dataType(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS)));
 		
-		Map<String, String> processedClientIds = appendResponsesAndGetProcessedIds(syncCollection, collectionEl);
+		SyncClientCommands clientCommands = appendResponsesAndClientCommands(syncCollection, collectionEl);
 		appendCommands(syncCollection, collectionEl);
 		
 		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
@@ -243,7 +241,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		syncCollectionResponse.setItemChanges(identifyChanges(syncCollection.getChanges()));
 		syncCollectionResponse.setItemChangesDeletion(identifyDeletions(syncCollection.getChanges()));
 		
-		return new ProcessedSyncCollectionResponse(syncCollectionResponse, processedClientIds);
+		return new ProcessedSyncCollectionResponse(syncCollectionResponse, clientCommands);
 	}
 	
 	private PIMDataType dataType(String dataClass) {
@@ -263,14 +261,14 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return Objects.firstNonNull(moreAvailable, false);
 	}
 
-	private Map<String, String> appendResponsesAndGetProcessedIds(SyncCollection syncCollection, Element collectionEl) {
+	private SyncClientCommands appendResponsesAndClientCommands(SyncCollection syncCollection, Element collectionEl) {
 		Element responsesEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.RESPONSES.getName());
 		if (responsesEl == null) {
-			return ImmutableMap.of();
+			return SyncClientCommands.empty();
 		}
 
 		List<String> fetchIds = Lists.newArrayList();
-		Map<String, String> processedClientIds = Maps.newHashMap();
+		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 		NodeList collectionNodes = responsesEl.getChildNodes();
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
 			SyncCollectionChange change = buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType());
@@ -278,10 +276,14 @@ public class SyncDecoder extends ActiveSyncDecoder {
 			if (SyncCommand.FETCH.equals(change.getCommand())) {
 				fetchIds.add(change.getServerId());
 			}
-			processedClientIds.put(change.getServerId(), change.getClientId());
+			if (SyncCommand.ADD.equals(change.getCommand())) {
+				clientCommandsBuilder.putAdd(new SyncClientCommands.Add(change.getClientId(), change.getServerId()));
+			} else {
+				clientCommandsBuilder.putChange(new SyncClientCommands.Change(change.getServerId()));
+			}
 		}
 		syncCollection.setFetchIds(fetchIds);
-		return processedClientIds;
+		return clientCommandsBuilder.build();
 	}
 
 	private void appendCommands(SyncCollection syncCollection, Element collectionEl) {
@@ -344,22 +346,22 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	private static class ProcessedSyncCollectionResponse {
 		
 		private final SyncCollectionResponse syncCollectionResponse;
-		private final Map<String, String> processedClientIds;
+		private final SyncClientCommands clientCommands;
 
 		public ProcessedSyncCollectionResponse(
 				SyncCollectionResponse syncCollectionResponse,
-				Map<String, String> processedClientIds) {
+				SyncClientCommands clientCommands) {
 			
 			this.syncCollectionResponse = syncCollectionResponse;
-			this.processedClientIds = processedClientIds;
+			this.clientCommands = clientCommands;
 		}
 
 		public SyncCollectionResponse getSyncCollectionResponse() {
 			return syncCollectionResponse;
 		}
 
-		public Map<String, String> getProcessedClientIds() {
-			return processedClientIds;
+		public SyncClientCommands getClientCommands() {
+			return clientCommands;
 		}
 	}
 }

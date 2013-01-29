@@ -33,11 +33,11 @@ package org.obm.push.protocol.bean;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
@@ -87,17 +87,17 @@ public class SyncResponse {
 	}
 	
 	private final Collection<SyncCollectionResponse> collectionResponses;
-	private final Map<String, String> processedClientIds;
+	private final SyncClientCommands clientCommands;
 	private final SyncStatus status;
 	
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds) {
-		this(collectionResponses, processedClientIds, SyncStatus.OK);
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, SyncClientCommands clientCommands) {
+		this(collectionResponses, clientCommands, SyncStatus.OK);
 	}
 
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds,
+	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, SyncClientCommands clientCommands,
 			SyncStatus status) {
 		this.collectionResponses = collectionResponses;
-		this.processedClientIds = processedClientIds;
+		this.clientCommands = clientCommands;
 		this.status = status;
 	}
 
@@ -105,8 +105,8 @@ public class SyncResponse {
 		return collectionResponses;
 	}
 	
-	public Map<String, String> getProcessedClientIds() {
-		return processedClientIds;
+	public SyncClientCommands getClientCommands() {
+		return clientCommands;
 	}
 
 	public SyncStatus getStatus() {

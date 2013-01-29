@@ -34,13 +34,13 @@ package org.obm.push.handler;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -79,14 +79,14 @@ public class ResponseWindowingService {
 			this.changesMergePolicy = changesMergePolicy;
 		}
 		
-		List<T> window(SyncCollection c, List<T> newChanges, Map<String, String> processedClientIds) {
+		List<T> window(SyncCollection c, List<T> newChanges, SyncClientCommands clientCommands) {
 		
 			List<T> changes = listChanges(newChanges);
 			
 			if (changesFitWindow(c.getWindowSize(), changes)) {
 				return changes;
 			} else {
-				return handleChangesOverflow(c, processedClientIds, changes);
+				return handleChangesOverflow(c, clientCommands, changes);
 			}
 		}
 		
@@ -104,13 +104,13 @@ public class ResponseWindowingService {
 		}
 		
 		private List<T> handleChangesOverflow(
-				SyncCollection c, Map<String, String> processedClientIds, List<T> changes) {
+				SyncCollection c, SyncClientCommands clientCommands, List<T> changes) {
 			
 			c.setMoreAvailable(true);
 			
 			logWindowingInformation(c, changes);
 
-			List<T> changesFromClient = changedFromClient(changes, processedClientIds);
+			List<T> changesFromClient = changedFromClient(changes, clientCommands);
 			List<T> changesFromServer = changesFromServer(changes, changesFromClient);
 			
 			int numberOfChangesFromServerToInclude = Math.max(0, c.getWindowSize() - changesFromClient.size());
@@ -139,13 +139,13 @@ public class ResponseWindowingService {
 				);
 		}
 
-		private List<T> changedFromClient(List<T> changes, Map<String, String> processedClientIds) {
+		private List<T> changedFromClient(List<T> changes, SyncClientCommands clientCommands) {
 			List<T> itemsChangedByClient = Lists.newArrayList();
 			for (T change: changes) {
-				if (processedClientIds.containsKey(change.getServerId())) {
+				if (clientCommands.hasCommandWithServerId(change.getServerId())) {
 					itemsChangedByClient.add(change);
 				}
-				if (processedClientIds.size() == itemsChangedByClient.size()) {
+				if (clientCommands.sumOfCommands() == itemsChangedByClient.size()) {
 					break;
 				}
 			}
@@ -170,11 +170,11 @@ public class ResponseWindowingService {
 	}
 	
 	public List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
-			UserDataRequest userDataRequest, Map<String, String> processedClientIds) {
+			UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		Preconditions.checkNotNull(delta);
 		Preconditions.checkNotNull(c);
 		Preconditions.checkNotNull(userDataRequest);
-		Preconditions.checkNotNull(processedClientIds);
+		Preconditions.checkNotNull(clientCommands);
 		
 		final Credentials credentials = userDataRequest.getCredentials();
 		final Device device = userDataRequest.getDevice();
@@ -199,10 +199,10 @@ public class ResponseWindowingService {
 			public List<ItemChange> merge(Collection<ItemChange> lhs, List<ItemChange> rhs) {
 				return Lists.newArrayList(Iterables.concat(lhs, rhs));
 			}
-		}).window(c, delta.getChanges(), processedClientIds);
+		}).window(c, delta.getChanges(), clientCommands);
 	}
 
-	public List<ItemDeletion> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, Map<String, String> processedClientIds) {
+	public List<ItemDeletion> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		final Credentials credentials = userDataRequest.getCredentials();
 		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();
@@ -227,7 +227,7 @@ public class ResponseWindowingService {
 				return Lists.newArrayList(
 						ImmutableSet.copyOf(Iterables.concat(lhs, rhs)));
 			}
-		}).window(c, delta.getDeletions(), processedClientIds);
+		}).window(c, delta.getDeletions(), clientCommands);
 	}
 
 	

@@ -39,23 +39,21 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 
@@ -66,7 +64,7 @@ public class ResponseWindowingTest {
 		OpushUser user = OpushUser.create("usera@domain", "pw");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(syncCollection(5), null, user.userDataRequest, ImmutableMap.<String, String>of());
+		responseWindowingProcessor.windowChanges(syncCollection(5), null, user.userDataRequest, SyncClientCommands.empty());
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -74,14 +72,14 @@ public class ResponseWindowingTest {
 		OpushUser user = OpushUser.create("usera@domain", "pw");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(null, deltas(2), user.userDataRequest, ImmutableMap.<String, String>of());
+		responseWindowingProcessor.windowChanges(null, deltas(2), user.userDataRequest, SyncClientCommands.empty());
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void processWindowSizeUserDataRequestIsNull() {
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), null, ImmutableMap.<String, String>of());
+		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), null, SyncClientCommands.empty());
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -106,7 +104,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -131,11 +129,11 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> firstCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.userDataRequest, SyncClientCommands.empty());
 		List<ItemChange> secondCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
 		List<ItemChange> thirdCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -155,7 +153,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -173,7 +171,7 @@ public class ResponseWindowingTest {
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -194,7 +192,7 @@ public class ResponseWindowingTest {
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltasWithOffset(2, 3), 
-						user.userDataRequest, changesToMap(deltasWithOffset(2, 3)));
+						user.userDataRequest, clientCommands(deltasWithOffset(2, 3)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -214,7 +212,7 @@ public class ResponseWindowingTest {
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
 						syncCollection(2), deltas(5),
-						user.userDataRequest, changesToMap(deltas(5)));
+						user.userDataRequest, clientCommands(deltas(5)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -234,7 +232,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deletions(2);
 		List<ItemDeletion> actual = 
-				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -254,7 +252,7 @@ public class ResponseWindowingTest {
 		
 		DataDelta deltas = deltas(2);
 		try {
-			responseWindowingProcessor.windowChanges(syncCollection(2), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+			responseWindowingProcessor.windowChanges(syncCollection(2), deltas, user.userDataRequest, SyncClientCommands.empty());
 		} catch (IllegalStateException e) {
 			verify(unsynchronizedItemDao);
 			throw e;
@@ -286,7 +284,7 @@ public class ResponseWindowingTest {
 				.syncDate(DateUtils.date("2012-01-01"))
 				.build();
 		List<ItemDeletion> actual = 
-				responseWindowingProcessor.windowDeletions(syncCollection(2), deltas, user.userDataRequest, ImmutableMap.<String, String>of());
+				responseWindowingProcessor.windowDeletions(syncCollection(2), deltas, user.userDataRequest, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -295,12 +293,12 @@ public class ResponseWindowingTest {
 				duplicateEntry);
 	}
 	
-	private Map<String, String> changesToMap(DataDelta deltasWithOffset) {
-		Map<String, String> map = Maps.newHashMap();
+	private SyncClientCommands clientCommands(DataDelta deltasWithOffset) {
+		SyncClientCommands.Builder builder = SyncClientCommands.builder();
 		for (ItemChange change: deltasWithOffset.getChanges()) {
-			map.put(change.getServerId(), null);
+			builder.putChange(new SyncClientCommands.Change(change.getServerId()));
 		}
-		return map;
+		return builder.build();
 	}
 
 	private DataDelta emptyDelta() {

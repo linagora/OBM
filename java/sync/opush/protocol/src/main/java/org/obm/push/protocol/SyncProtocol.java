@@ -41,6 +41,7 @@ import java.util.Set;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -63,6 +64,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -153,7 +155,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 	
 					if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
 						if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
-							buildUpdateItemChange(collectionResponse, syncResponse.getProcessedClientIds(), ce);
+							buildUpdateItemChange(collectionResponse, syncResponse.getClientCommands(), ce);
 						} else {
 							buildFetchItemChange(collectionResponse, ce);
 						}
@@ -207,7 +209,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		}
 	}
 	
-	private void buildUpdateItemChange(SyncCollectionResponse c, Map<String, String> processedClientIds, 
+	private void buildUpdateItemChange(SyncCollectionResponse c, SyncClientCommands syncClientCommands, 
 			Element ce) throws IOException {
 		
 		Element responses = DOMUtils.createElement(ce, "Responses");
@@ -223,15 +225,16 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 			serializeDeletion(commands, deletion);
 		}
 		
+		Map<String, String> processedClientIds = buildProcessedClientIds(syncClientCommands);
 		for (ItemChange ic : c.getItemChanges()) {
-			String clientId = processedClientIds.get(ic.getServerId());
-			if (itemChangeIsClientAddAck(clientId)) {
+			if (itemChangeIsClientAddAck(syncClientCommands, ic)) {
+				SyncClientCommands.Add clientAdd = syncClientCommands.getAddWithServerId(ic.getServerId()).get();
 				Element add = DOMUtils.createElement(responses, "Add");
-				DOMUtils.createElementAndText(add, "ClientId", clientId);
+				DOMUtils.createElementAndText(add, "ClientId", clientAdd.clientId);
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
 			
-			} else if (itemChangeIsClientChangeAck(processedClientIds, ic)) {
+			} else if (itemChangeIsClientChangeAck(syncClientCommands, ic)) {
 				Element add = DOMUtils.createElement(responses, "Change");
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
@@ -278,6 +281,17 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		}
 	}
 
+	private Map<String, String> buildProcessedClientIds(SyncClientCommands syncClientCommands) {
+		Map<String, String> processedClientIds = Maps.newHashMap();
+		for (SyncClientCommands.Add add : syncClientCommands.getAdds()) {
+			processedClientIds.put(add.serverId, add.clientId);
+		}
+		for (SyncClientCommands.Change change : syncClientCommands.getChanges()) {
+			processedClientIds.put(change.serverId, null);
+		}
+		return processedClientIds;
+	}
+
 	private String selectCommandName(ItemChange itemChange) {
 		if (itemChange.isNew()) {
 			return "Add";
@@ -290,13 +304,12 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		}
 	}
 
-	private boolean itemChangeIsClientChangeAck(
-			Map<String, String> processedClientIds, ItemChange ic) {
-		return processedClientIds.keySet().contains(ic.getServerId());
+	private boolean itemChangeIsClientChangeAck(SyncClientCommands syncClientCommands, ItemChange itemChange) {
+		return syncClientCommands.hasChangeWithServerId(itemChange.getServerId());
 	}
 
-	private boolean itemChangeIsClientAddAck(String clientId) {
-		return clientId != null;
+	private boolean itemChangeIsClientAddAck(SyncClientCommands syncClientCommands, ItemChange itemChange) {
+		return syncClientCommands.hasAddWithServerId(itemChange.getServerId());
 	}
 	
 	private static void serializeDeletion(Element commands, ItemDeletion deletion) {

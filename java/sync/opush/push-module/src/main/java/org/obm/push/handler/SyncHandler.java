@@ -33,11 +33,8 @@ package org.obm.push.handler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.ContinuationService;
@@ -59,6 +56,9 @@ import org.obm.push.bean.SyncCollectionChange;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
+import org.obm.push.bean.change.client.SyncClientCommands.Add;
+import org.obm.push.bean.change.client.SyncClientCommands.Change;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -103,31 +103,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-//<?xml version="1.0" encoding="UTF-8"?>
-//<Sync>
-//<Collections>
-//<Collection>
-//<Class>Contacts</Class>
-//<SyncKey>ff16677f-ee9c-42dc-a562-709f899c8d31</SyncKey>
-//<CollectionId>obm://contacts/user@domain</CollectionId>
-//<DeletesAsMoves/>
-//<GetChanges/>
-//<WindowSize>100</WindowSize>
-//<Options>
-//<Truncation>4</Truncation>
-//<RTFTruncation>4</RTFTruncation>
-//<Conflict>1</Conflict>
-//</Options>
-//</Collection>
-//</Collections>
-//</Sync>
 @Singleton
 public class SyncHandler extends WbxmlRequestHandler implements IContinuationHandler {
 
-	private static class ModificationStatus {
-		public Map<String, String> processedClientIds = new HashMap<String, String>();
-	}
-	
 	private final SyncProtocol.Factory syncProtocolFactory;
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
@@ -174,12 +152,12 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			AnalysedSyncRequest analyzedSyncRequest = syncProtocol.analyzeRequest(udr, syncRequest);
 			
 			continuationService.cancel(udr.getDevice(), SyncStatus.NEED_RETRY.asSpecificationValue());
-			ModificationStatus modificationStatus = processCollections(udr, analyzedSyncRequest.getSync());
+			SyncClientCommands clientCommands = processClientCommands(udr, analyzedSyncRequest.getSync());
 			if (analyzedSyncRequest.getSync().getWaitInSecond() > 0) {
 				registerWaitingSync(continuation, udr, analyzedSyncRequest.getSync());
 			} else {
 				SyncResponse syncResponse = doTheJob(udr, analyzedSyncRequest.getSync().getCollections(), 
-						 modificationStatus.processedClientIds, continuation);
+						clientCommands, continuation);
 				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
 			}
 		} catch (InvalidServerId e) {
@@ -258,7 +236,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuationService.suspend(udr, continuation, sync.getWaitInSecond());
 	}
 
-	private ItemSyncState doUpdates(UserDataRequest udr, SyncCollection c,	Map<String, String> processedClientIds, 
+	private ItemSyncState doUpdates(UserDataRequest udr, SyncCollection c,	SyncClientCommands clientCommands, 
 			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
@@ -277,10 +255,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			delta = DataDelta.newEmptyDelta(lastSync);
 		}
 
-		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, processedClientIds);
+		List<ItemChange> changed = responseWindowingProcessor.windowChanges(c, delta, udr, clientCommands);
 		syncCollectionResponse.setItemChanges(changed);
 	
-		List<ItemDeletion> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, processedClientIds);
+		List<ItemDeletion> itemChangesDeletion = responseWindowingProcessor.windowDeletions(c, delta, udr, clientCommands);
 		syncCollectionResponse.setItemChangesDeletion(itemChangesDeletion);
 		
 		return ItemSyncState.builder()
@@ -289,10 +267,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				.build();
 	}
 
-	private ModificationStatus processCollections(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
+	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
-		ModificationStatus modificationStatus = new ModificationStatus();
+		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 
 		for (SyncCollection collection : sync.getCollectionsValidToProcess()) {
 
@@ -301,8 +279,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 			if (collectionState != null) {
 				collection.setItemSyncState(collectionState);
-				Map<String, String> processedClientIds = processModification(udr, collection);
-				modificationStatus.processedClientIds.putAll(processedClientIds);
+				clientCommandsBuilder.merge(processClientModification(udr, collection));
 			} else {
 				ItemSyncState syncState = ItemSyncState.builder()
 						.syncDate(dateService.getEpochPlusOneSecondDate())
@@ -311,73 +288,61 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				collection.setItemSyncState(syncState);
 			}
 		}
-		return modificationStatus;
+		return clientCommandsBuilder.build();
 	}
 	
-	/**
-	 * Handles modifications requested by mobile device
-	 */
-	@VisibleForTesting Map<String, String> processModification(UserDataRequest udr, SyncCollection collection) throws CollectionNotFoundException, 
-		DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
-		
-		Map<String, String> processedClientIds = new HashMap<String, String>();
+	@VisibleForTesting SyncClientCommands processClientModification(UserDataRequest udr, SyncCollection collection)
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
+
+		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 		for (SyncCollectionChange change: collection.getChanges()) {
 			try {
 				switch (change.getCommand()) {
 				case FETCH:
 					break;
 				case MODIFY:
-					updateServerItem(udr, collection, change);
+				case CHANGE:
+					clientCommandsBuilder.putChange(updateServerItem(udr, collection, change));
 					break;
 				case DELETE:
-					deleteServerItem(udr, collection, processedClientIds, change);
+					clientCommandsBuilder.putChange(deleteServerItem(udr, collection, change));
 					break;
 				case ADD:
-				case CHANGE:
-					addServerItem(udr, collection, processedClientIds, change);
+					clientCommandsBuilder.putAdd(addServerItem(udr, collection, change));
 					break;
 				}
 			} catch (ItemNotFoundException e) {
 				logger.warn("Item with server id {} not found.", change.getServerId());
 			}
 		}
-		return processedClientIds;
+		return clientCommandsBuilder.build();
 	}
 
-	private void updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
+	private Change updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
-		contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), 
-				change.getData());
+		return new SyncClientCommands.Change(contentsImporter.importMessageChange(
+				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
 	}
 
-	private void addServerItem(UserDataRequest udr, SyncCollection collection, 
-			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
+	private Add addServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
-		String obmId = contentsImporter.importMessageChange(udr, collection.getCollectionId(), change.getServerId(),
-				change.getClientId(), change.getData());
-		if (obmId != null) {
-			if (change.getClientId() != null) {
-				processedClientIds.put(obmId, change.getClientId());
-			}
-			if (change.getServerId() != null) {
-				processedClientIds.put(obmId, null);
-			}
-		}
+		return new SyncClientCommands.Add(change.getClientId(), contentsImporter.importMessageChange(
+				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
 	}
 	
-	private void deleteServerItem(UserDataRequest udr, SyncCollection collection,
-			Map<String, String> processedClientIds, SyncCollectionChange change) throws CollectionNotFoundException, DaoException,
+	private Change deleteServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
+			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		String serverId = change.getServerId();
-		contentsImporter.importMessageDeletion(udr, change.getType(), collection.getCollectionId(), serverId, collection
-				.getOptions().isDeletesAsMoves());
-		if (serverId != null) {
-			processedClientIds.put(serverId, null);
-		}
+		contentsImporter.importMessageDeletion(udr, change.getType(), collection.getCollectionId(), serverId,
+				collection.getOptions().isDeletesAsMoves());
+		return new SyncClientCommands.Change(serverId);
 	}
 
 	@Override
@@ -391,7 +356,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			if (enablePush) {
 				SyncProtocol syncProtocol = syncProtocolFactory.create(udr);
 				SyncResponse syncResponse = doTheJob(udr, monitoredCollectionService.list(udr.getCredentials(), udr.getDevice()),
-						Collections.EMPTY_MAP, continuation);
+						SyncClientCommands.empty(), continuation);
 				sendResponse(responder, syncProtocol.encodeResponse(syncResponse));
 			} else {
 				//Push is not supported, after the heartbeat interval is over, we ask the phone to retry
@@ -417,20 +382,20 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	}
 
 	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
-			Map<String, String> processedClientIds, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
+			SyncClientCommands clientCommands, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, HierarchyChangedException {
 
 		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
 		for (SyncCollection c : changedFolders) {
-			SyncCollectionResponse syncCollectionResponse = computeSyncState(udr, processedClientIds, c);
+			SyncCollectionResponse syncCollectionResponse = computeSyncState(udr, clientCommands, c);
 			syncCollectionResponses.add(syncCollectionResponse);
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
-		return new SyncResponse(syncCollectionResponses, processedClientIds);
+		return new SyncResponse(syncCollectionResponses, clientCommands);
 	}
 	
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
-			Map<String, String> processedClientIds, SyncCollection syncCollection)
+			SyncClientCommands clientCommands, SyncCollection syncCollection)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, HierarchyChangedException {
 
@@ -441,7 +406,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			handleInitialSync(udr, syncCollection, syncCollectionResponse);
 		} else {
 			try {
-				handleDataSync(udr, processedClientIds, syncCollection, syncCollectionResponse);
+				handleDataSync(udr, clientCommands, syncCollection, syncCollectionResponse);
 			} catch (FilterTypeChangedException e) {
 				syncCollectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
 			}
@@ -455,7 +420,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	private void handleDataSync(UserDataRequest udr, Map<String, String> processedClientIds, SyncCollection syncCollection,
+	private void handleDataSync(UserDataRequest udr, SyncClientCommands clientCommands, SyncCollection syncCollection,
 			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
@@ -469,7 +434,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			Date syncDate = null;
 			SyncKey treatmentSyncKey = null;
 			if (syncCollection.getFetchIds().isEmpty()) {
-				ItemSyncState itemSyncState = doUpdates(udr, syncCollection, processedClientIds, syncCollectionResponse);
+				ItemSyncState itemSyncState = doUpdates(udr, syncCollection, clientCommands, syncCollectionResponse);
 				syncDate = itemSyncState.getSyncDate();
 				treatmentSyncKey = itemSyncState.getSyncKey();
 			} else {
