@@ -86,12 +86,18 @@ class HashEventExtId extends UpdateObject {
     private function upgrade_to_alpha9($con) {
         $con->begin();
         try {
-            $con->lock_table_for_writing('opush_event_mapping');
-
-	    $con->query('CREATE TABLE opush_event_mappingTmp AS SELECT * FROM opush_event_mapping e1 JOIN (SELECT MAX(id) unique_id FROM opush_event_mapping GROUP BY device_id, event_ext_id) e2 ON e1.id=e2.unique_id');	
-	    $con->query('DELETE FROM opush_event_mapping');	
-	    $con->query('INSERT INTO opush_event_mapping (id, device_id, event_uid, event_ext_id) SELECT id, device_id, event_uid, event_ext_id FROM opush_event_mappingTmp;');	
-	    $con->query('DROP TABLE opush_event_mappingTmp;');	
+            $con->query("CREATE TABLE opush_event_mappingTmp (id INT(11) NOT NULL DEFAULT 0, device_id INT(11) NOT NULL, event_uid VARCHAR(300) NOT NULL, event_ext_id VARCHAR(300) NOT NULL, unique_id INT(11))");
+            $con->lock_table_for_writing(
+              array(
+                'opush_event_mapping',
+                'opush_event_mapping as e1',
+                'opush_event_mappingTmp'
+              )
+            );
+            $con->query("INSERT INTO opush_event_mappingTmp SELECT * FROM opush_event_mapping e1 JOIN (SELECT MAX(id) unique_id FROM opush_event_mapping GROUP BY device_id, event_ext_id) e2 ON e1.id=e2.unique_id");
+            $con->query('DELETE FROM opush_event_mapping');
+            $con->query('INSERT INTO opush_event_mapping (id, device_id, event_uid, event_ext_id) SELECT id, device_id, event_uid, event_ext_id FROM opush_event_mappingTmp;');
+            $con->query('DROP TABLE opush_event_mappingTmp;');
 
             $con->query('ALTER TABLE opush_event_mapping '.
                 'ADD COLUMN event_ext_id_hash BINARY(20)');

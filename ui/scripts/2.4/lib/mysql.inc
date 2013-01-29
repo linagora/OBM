@@ -176,6 +176,13 @@ class DB {
   }
 
   function lock_table_for_writing($table) {
+    if ( is_array($table) ) {
+      $query = array();
+      foreach ( $table as $t ) {
+        $query [] = $t." WRITE";
+      }
+      return $this->query("LOCK TABLES ".implode(",",$query));
+    }
     $this->query("LOCK TABLES $table WRITE");
   }
 
