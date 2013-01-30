@@ -37,10 +37,18 @@ import java.util.Set;
 import org.obm.push.mail.bean.Email;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public class EmailChanges implements Serializable {
-
+	
+	private static EmailChanges empty() {
+		return builder().build();
+	}
+	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -106,6 +114,25 @@ public class EmailChanges implements Serializable {
 		return additions;
 	}
 
+	public boolean hasChanges() {
+		return !additions.isEmpty() || !changes.isEmpty() || !deletions.isEmpty();
+	}
+
+	public int sumOfChanges() {
+		return additions.size() + changes.size() + deletions.size();
+	}
+	
+	public SplittedEmailChanges splitToFit(int firstPartSize) {
+		Preconditions.checkArgument(firstPartSize > 0, "firstPartSize must be a positive integer");
+		
+		if (firstPartSize >= sumOfChanges()) {
+			return new SplittedEmailChanges(this, EmailChanges.empty());
+		} else {
+			Splitter splitter = new Splitter(this, firstPartSize);
+			return new SplittedEmailChanges(splitter.fit, splitter.left);
+		}
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(deletions, changes, additions);
@@ -121,4 +148,77 @@ public class EmailChanges implements Serializable {
 		}
 		return false;
 	}
+	
+	public static class SplittedEmailChanges {
+		
+		private final EmailChanges fittingEmailChanges;
+		private final EmailChanges remainingEmailChanges;
+
+		public SplittedEmailChanges(EmailChanges fittingEmailChanges, EmailChanges remainingEmailChanges) {
+			this.fittingEmailChanges = fittingEmailChanges;
+			this.remainingEmailChanges = remainingEmailChanges;
+		}
+
+		public EmailChanges getFittingEmailChanges() {
+			return fittingEmailChanges;
+		}
+
+		public EmailChanges getRemainingEmailChanges() {
+			return remainingEmailChanges;
+		}
+	}
+	
+	public static class Splitter {
+			
+		private final EmailChanges fit;
+		private final EmailChanges left;
+		
+		public Splitter(EmailChanges origin, int limit) {
+			Predicate<Email> limitFilter = new LimitFilter(limit); 
+			this.fit = builder()
+				.additions(limit(origin.additions, limitFilter))
+				.changes(limit(origin.changes, limitFilter))
+				.deletions(limit(origin.deletions, limitFilter))
+				.build();
+			this.left = builder()
+				.additions(skip(origin.additions, fit.additions.size()))
+				.changes(skip(origin.changes, fit.changes.size()))
+				.deletions(skip(origin.deletions, fit.deletions.size()))
+				.build();
+		}
+
+		private ImmutableSet<Email> limit(Set<Email> emails, Predicate<Email> limitFilter) {
+			return ImmutableSet.copyOf(Iterables.filter(emails, limitFilter));
+		}
+
+		private ImmutableSet<Email> skip(Set<Email> emails, int skipCount) {
+			if (skipCount > 0) {
+				return FluentIterable.from(emails).skip(skipCount).toImmutableSet();
+			} else {
+				return ImmutableSet.copyOf(emails);
+			}
+		}
+		
+		private static class LimitFilter implements Predicate<Email> {
+			private int count;
+
+			public LimitFilter(int count) {
+				this.count = count;
+			}
+			
+			@Override
+			public boolean apply(Email input) {
+				return count-- > 0;
+			}
+		}
+		
+		public EmailChanges getFit() {
+			return fit;
+		}
+		
+		public EmailChanges getLeft() {
+			return left;
+		}
+	}
+
 }
