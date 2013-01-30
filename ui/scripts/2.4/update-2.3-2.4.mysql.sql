@@ -237,10 +237,6 @@ CREATE TABLE `P_CategoryLink` (LIKE `CategoryLink`);
 INSERT INTO DomainProperty VALUES ('mailshares_quota_default','integer','0','0');
 INSERT INTO DomainProperty VALUES ('mailshares_quota_max','integer','0','0');
 
---
--- Eventlink property
---
-ALTER TABLE EventLink ADD COLUMN eventlink_comment VARCHAR(255);
 
 --
 -- Table structure for table `field`
