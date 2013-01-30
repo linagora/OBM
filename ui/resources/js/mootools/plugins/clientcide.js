@@ -1125,7 +1125,9 @@ var StickyWin = new Class({
   destroyOthers: function() {
     if(!this.options.allowMultipleByClass || !this.options.allowMultiple) {
       $$('div.StickyWinInstance').each(function(sw) {
-        if(!this.options.allowMultiple || (!this.options.allowMultipleByClass && sw.hasClass(this.options.className))) 
+        // weird, on FF18+, sw.hasClass("") === true (OBMFULL-4567)
+        var hasClassName = this.options.className ? true : false;
+        if(!this.options.allowMultiple || (!this.options.allowMultipleByClass && hasClassName && sw.hasClass(this.options.className)))
           sw.retrieve('StickyWin').destroy();
       }, this);
     }
