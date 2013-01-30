@@ -69,6 +69,7 @@ $l_sync_ad = "S'abonner";
 $l_desync_ad = "Se désabonner";
 $l_confirm_delete_ad = "Voulez-vous supprimer le carnet d'adresse";
 $l_confirm_delete_contact = "Voulez-vous supprimer le contact";
+$l_confirm_add_homonym = "Il existe déjà au moins un contact homonyme, confirmez-vous la création ?";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";

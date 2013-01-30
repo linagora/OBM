@@ -237,6 +237,7 @@ function contact_export_js_labels() {
   $GLOBALS['js']['vars']['labels']['addressCountry'] = $GLOBALS['l_country'];
   $GLOBALS['js']['vars']['labels']['confirmDeleteAddressBook'] = $GLOBALS['l_confirm_delete_ad'];
   $GLOBALS['js']['vars']['labels']['confirmDeleteContact'] = $GLOBALS['l_confirm_delete_contact'];
+  $GLOBALS['js']['vars']['labels']['confirmAddHomonym'] = $GLOBALS['l_confirm_add_homonym'];
   $ctry_q = run_query_global_country_for_lang();
   $GLOBALS['js']['vars']['labels']['countries']['none'] = '---';
   while($ctry_q->next_record()) {

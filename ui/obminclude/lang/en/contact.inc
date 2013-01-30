@@ -85,6 +85,7 @@ $l_desync_ad = "Unsubscribe";
 $l_delete_ad = "Delete";
 $l_update_ad = "Update";
 $l_confirm_delete_ad = "Remove address book ";
+$l_confirm_add_homonym = "There is already a contact with the same name, would you like to add it anyway ?";
 
 
 // Messages
