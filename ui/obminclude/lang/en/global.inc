@@ -106,6 +106,7 @@ $l_event_templates_already_exists = "An event template with the same name alread
 $l_invalid_email = "Invalid Email";
 $l_insert_ok = "Insertion successful";
 $l_insert_error = "Insertion Error";
+$l_invalid_vcard = "The vcard file is invalid.";
 $l_update_ok = "Update successful";
 $l_update_error = "Update Error";
 $l_delete_ok = "Deletion successful";

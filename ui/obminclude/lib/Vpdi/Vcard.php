@@ -42,7 +42,27 @@ applicable to the OBM software.
  */
 class Vpdi_Vcard extends Vpdi_Entity {
 
+  const PHONE_NUMBER_DB_MAX_SIZE = 32;
+  
   protected $profile = 'VCARD';
+  
+  public function isValid() {
+    $nameValid = $this->getProperty("N") !== null || $this->getProperty("FN") !== null;
+    
+    if (!$nameValid) {
+      return false;
+    }
+    
+    $phones = $this->getPhones();
+    
+    foreach ($phones as $phone) {
+      if (strlen($phone->value) > self::PHONE_NUMBER_DB_MAX_SIZE) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
   
   /**
    * Returns a Vpdi_Vcard_Name object wrapping the value of the N property

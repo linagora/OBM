@@ -113,6 +113,7 @@ $l_event_templates_already_exists = "Un modèle d'évènement de même nom exist
 $l_invalid_email = "Email invalide";
 $l_insert_ok = "Insertion réussie";
 $l_insert_error = "Erreur à l'insertion";
+$l_invalid_vcard = "Le fichier vcard est invalide.";
 $l_update_ok = "Mise à jour réussie";
 $l_update_error = "Erreur à la mise à jour";
 $l_duplicate_ok = "Copie réussie";

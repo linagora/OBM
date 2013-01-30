@@ -175,7 +175,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     if ($ids !== false) {
       header('location: '.$GLOBALS['path'].'/contact/contact_index.php');
     } else {
-      $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
+      $display['msg'] .= display_err_msg("$l_contact : $l_insert_error - $l_invalid_vcard");
       $display['detail'] .= dis_vcard_import_form($params['addressbook']);
     }
   } else {
