@@ -151,13 +151,22 @@ Obm.Contact.AddressBook = new Class ({
     var self = this;
     function callback(contacts) {
       if ( contacts.length <= 0  || ( contacts.length > 0 && confirm(obm.vars.labels.confirmAddHomonym) ) ) {
-        $('informationGrid').show();
-        self.dataRequest.write(form);
-        $('dataGrid').removeClass('expanded');
-        $('dataGrid').addClass('shrinked');
+        self.storeContactRequest(form);
       }
     }
-    this.searchSimilarContact(form.firstname.value, form.lastname.value, callback);
+    if (id != '') {
+      $('informationGrid').show();
+      this.storeContactRequest(form);
+    } else {
+      this.searchSimilarContact(form.firstname.value, form.lastname.value, callback);
+    }
+  },
+
+  storeContactRequest: function(form){
+      $('informationGrid').show();
+      this.dataRequest.write(form);
+      $('dataGrid').removeClass('expanded');
+      $('dataGrid').addClass('shrinked');
   },
 
   searchSimilarContact: function(firstname, lastname, callback){

@@ -545,6 +545,7 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     }
     
     echo(json_encode($contacts_id));
+    exit();
   } elseif ($action == 'countContact') {
   ///////////////////////////////////////////////////////////////////////////////
     if(isset($params['searchpattern'])) {
