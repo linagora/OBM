@@ -47,6 +47,7 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 
 require_once(dirname(__file__)."/../contact/addressbook.php");
+require_once('obm_eventdiff.php');
 
 function run_query_calendar_detail($calendar_id, $occurrence_date=null) {
   global $cdg_sql;
