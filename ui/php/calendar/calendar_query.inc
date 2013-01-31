@@ -2247,14 +2247,6 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   
   $event_tag_id = run_query_calendar_create_or_update_tag($calendar);
 
-  if ($all_day == 'TRUE') {
-    $dateend = clone $datebegin;
-    $dateend->addSecond($event_duration - 1);
-    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $event_duration = $dateend->diffTimestamp($datebegin);
-  }
-	
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
