@@ -1177,6 +1177,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.insertError = '".phpStringToJsString($GLOBALS['l_insert_error'])."';
   obm.vars.labels.updateError = '".phpStringToJsString($GLOBALS['l_update_error'])."';
   obm.vars.labels.deleteError = '".phpStringToJsString($GLOBALS['l_delete_error'])."';
+  obm.vars.labels.details = '".phpStringToJsString($GLOBALS['l_details'])."';
   $obm_vars
   // ]]>
   </script> 

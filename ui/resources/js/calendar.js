@@ -1925,7 +1925,7 @@ Obm.CalendarAllDayEvent = new Class({
     var title = this.event.title;
     var time = this.event.date.format(obm.vars.regexp.dispTimeFormat) + ' ' + title;
     if (this.event.all_day) {
-      time = title;
+      time = (title != '') ? title : obm.vars.labels.details;
     }
 
     var location = '';
@@ -2596,7 +2596,13 @@ Obm.CalendarQuickForm = new Class({
   },
 
   submit: function(action) {
-    if (this.form.tf_title.value != '') {
+    if (action == 'quick_delete') {
+      obm.calendarManager.sendDeleteEvent(this.eventData);
+    } else if (action == 'detailupdate') {
+      var evt = obm.calendarManager.events.get(this.eventData.element_id);
+      obm.calendarManager.sendDetailUpdate(evt);
+      this.hide();
+    } else if (this.form.tf_title.value != '') {
       this.eventData.title = this.form.tf_title.value;
       this.eventData.entity_id = this.entityView.get('inputValue');
       this.eventData.entity_kind = this.entityKind.value;
@@ -2607,11 +2613,6 @@ Obm.CalendarQuickForm = new Class({
       action = action || this.eventData.formAction;
       if (action == 'quick_insert') {
         obm.calendarManager.sendCreateEvent(this.eventData);
-      } else if (action == 'quick_delete') {
-        obm.calendarManager.sendDeleteEvent(this.eventData); 
-      } else if (action == 'detailupdate') {
-    	var evt = obm.calendarManager.events.get(this.eventData.element_id);
-    	obm.calendarManager.sendDetailUpdate(evt);
       } else {
         var evt = obm.calendarManager.events.get(this.eventData.element_id);
         if (evt.event.title != this.eventData.title)  {

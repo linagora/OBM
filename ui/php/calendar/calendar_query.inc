@@ -4484,14 +4484,9 @@ function check_calendar_data_quick_form($calendar) {
   global $err, $php_regexp_isodate, $php_regexp_isodatetime;
   global $l_fill_title, $l_fill_dateend,$l_fill_datebegin,$l_err_begin_end;
 
-  $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $duration = $calendar['duration'];
   $all_day = $calendar['all_day'];
-  if (trim($title) == '') {
-    $err['msg'] = $l_fill_title;
-    return false;
-  }
 
   // Begin Date check
   if (trim($datebegin) == '') {
