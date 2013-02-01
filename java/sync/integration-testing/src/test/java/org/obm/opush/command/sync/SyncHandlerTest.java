@@ -94,6 +94,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -105,12 +106,12 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
-import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -251,6 +252,7 @@ public class SyncHandlerTest {
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 
 				anyObject(SyncCollection.class),
+				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
 				.andThrow(new ItemNotFoundException());
 		
@@ -486,7 +488,10 @@ public class SyncHandlerTest {
 		expectUnsynchronizedItemToNeverExceedWindowSize(unsynchronizedItemDao, user, collectionId);
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
-				anyObject(UserDataRequest.class), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
+				anyObject(UserDataRequest.class),
+				anyObject(SyncCollection.class),
+				anyObject(SyncClientCommands.class),
+				anyObject(SyncKey.class)))
 			.andReturn(DataDelta.newEmptyDelta(secondRequestSyncState.getSyncDate(), secondRequestSyncState.getSyncKey()));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
@@ -494,7 +499,7 @@ public class SyncHandlerTest {
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
 		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(secondRequestSyncState).times(2);
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(),
-				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).times(2);
+				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).once();
 		collectionDao.resetCollection(user.device, collectionId);
 		expectLastCall();
 		
@@ -669,6 +674,7 @@ public class SyncHandlerTest {
 		expect(contentsExporterBackend.getChanged(
 				anyObject(UserDataRequest.class), 
 				anyObject(SyncCollection.class),
+				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
 				.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 

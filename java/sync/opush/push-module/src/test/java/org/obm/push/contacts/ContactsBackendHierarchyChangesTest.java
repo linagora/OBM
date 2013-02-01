@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Credentials;
@@ -99,6 +100,8 @@ public class ContactsBackendHierarchyChangesTest {
 	
 	private ContactsBackend contactsBackend;
 
+	private BackendWindowingService backendWindowingService;
+
 
 	@Before
 	public void setUp() throws Exception {
@@ -116,12 +119,14 @@ public class ContactsBackendHierarchyChangesTest {
 		loginService = mocks.createMock(LoginService.class);
 		contactConfiguration = publicContactConfiguration();
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
+		backendWindowingService = mocks.createMock(BackendWindowingService.class);
 		
 		contactsBackend = new ContactsBackend(mappingService, 
 				bookClient, 
 				loginService, 
 				contactConfiguration, 
-				collectionPathBuilderProvider);
+				collectionPathBuilderProvider,
+				backendWindowingService);
 		
 		expectLoginBehavior();
 	}

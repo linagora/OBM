@@ -715,13 +715,14 @@ public class MailBackendGetChangedTest {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey firstAllocatedSyncKey = new SyncKey("456");
 		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		SyncKey thirdAllocatedSyncKey = new SyncKey("321");
 		int allocatedStateId = 3;
 		int allocatedStateId2 = 4;
 		int windowSize = 3;
 		int numberOfEmails = 5;
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
-		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey, thirdAllocatedSyncKey);
 		
 		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		ItemSyncState firstAllocatedState = ItemSyncState.builder()
@@ -739,26 +740,30 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
 		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKey)).andReturn(currentAllocatedState).times(2);
-		
+
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(false).once();
 		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemChange>of()).times(2);
+			.andReturn(ImmutableList.<ItemChange>of()).once();
 		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
 			.andReturn(ImmutableList.<ItemDeletion>of()).once();
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(true);
+
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(true);
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
+			.andReturn(ImmutableList.<ItemChange>of(
+					new ItemChange(inboxCollectionIdAsString + ":" + 4), 
+					new ItemChange(inboxCollectionIdAsString + ":" + 5))).once();
+		unsynchronizedItemDao.storeItemsToAdd(eq(user.credentials), eq(user.device), anyInt(), anyObject(java.util.Collection.class));
+		expectLastCall().once();
+		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
+			.andReturn(ImmutableList.<ItemDeletion>of()).once();
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId)).andReturn(false);
+		
 		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, inboxCollectionId);
 		expectLastCall().anyTimes();
 		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, inboxCollectionId);
 		expectLastCall().anyTimes();
 		
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemChange>of(
-					new ItemChange(inboxCollectionIdAsString + ":" + 4), 
-					new ItemChange(inboxCollectionIdAsString + ":" + 5)))
-			.times(2);
-		unsynchronizedItemDao.storeItemsToAdd(eq(user.credentials), eq(user.device), anyInt(), anyObject(java.util.Collection.class));
-		expectLastCall().once();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))
-			.andReturn(ImmutableList.<ItemDeletion>of()).once();
-
 		expectItemTrackingDaoForNEmails(windowSize, firstAllocatedState);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
@@ -879,6 +884,8 @@ public class MailBackendGetChangedTest {
 	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize(int collectionId) {
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, collectionId))
+				.andReturn(false).anyTimes();
 		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, collectionId))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, collectionId))

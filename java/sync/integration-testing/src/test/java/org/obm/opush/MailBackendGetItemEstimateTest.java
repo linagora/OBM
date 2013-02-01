@@ -341,6 +341,8 @@ public class MailBackendGetItemEstimateTest {
 	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize() {
+		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, inboxCollectionId))
+				.andReturn(false).anyTimes();
 		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, inboxCollectionId))

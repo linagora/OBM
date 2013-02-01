@@ -39,11 +39,13 @@ import java.util.Set;
 import javax.naming.NoPermissionException;
 
 import org.obm.configuration.ContactConfiguration;
+import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
+import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
@@ -56,6 +58,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -98,15 +101,18 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	private final ContactConfiguration contactConfiguration;
 	private final IAddressBook bookClient;
+	private final BackendWindowingService backendWindowingService;
 	
 	@Inject
 	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
-			Provider<CollectionPath.Builder> collectionPathBuilderProvider) {
+			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
+			BackendWindowingService backendWindowingService) {
 		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.bookClient = bookClient;
 		this.contactConfiguration = contactConfiguration;
+		this.backendWindowingService = backendWindowingService;
 	}
 
 	@Override
@@ -271,29 +277,42 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException {
 		
-		DataDelta dataDelta = getChanged(udr, syncCollection, state.getSyncKey());
+		DataDelta dataDelta = getAllChanges(udr, state, syncCollection, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws UnexpectedObmSyncServerException, 
-			DaoException, CollectionNotFoundException {
+	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
+			final SyncClientCommands clientCommands, final SyncKey newSyncKey)
+		throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
+
+		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
+			
+			@Override
+			public DataDelta getAllChanges() {
+				return ContactsBackend.this.getAllChanges(udr, collection.getItemSyncState(), collection, newSyncKey);
+			}
+		});
+	}
+	
+	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, ItemSyncState state,
+			SyncCollection collection, SyncKey newSyncKey) {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collection.getCollectionId());
-		ContactChanges contactChanges = listContactsChanged(udr, collection.getItemSyncState().getSyncDate(), addressBookId);
-
+		ContactChanges contactChanges = listContactsChanged(udr, state.getSyncDate(), addressBookId);
+		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
 			addUpd.add(convertContactToItemChange(collection.getCollectionId(), contact));
 		}
-
+		
 		List<ItemDeletion> deletions = new LinkedList<ItemDeletion>();
 		for (Integer remove : contactChanges.getRemoved()) {
 			deletions.add(ItemDeletion.builder()
 					.serverId(ServerId.buildServerIdString(collection.getCollectionId(), remove))
 					.build());
 		}
-
+		
 		return DataDelta.builder()
 				.changes(addUpd)
 				.deletions(deletions)

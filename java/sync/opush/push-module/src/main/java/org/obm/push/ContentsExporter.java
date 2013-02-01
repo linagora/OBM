@@ -41,6 +41,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -50,6 +51,7 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -59,17 +61,18 @@ public class ContentsExporter implements IContentsExporter {
 	private final Backends backends;
 	
 	@Inject
-	private ContentsExporter(Backends backends) {
+	@VisibleForTesting ContentsExporter(Backends backends) {
 		this.backends = backends;
 	}
 
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
-				ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection,
+			SyncClientCommands clientCommands, SyncKey newSyncKey) 
+		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getChanged(udr, syncCollection, newSyncKey);
+		return backend.getChanged(udr, syncCollection, clientCommands, newSyncKey);
 	}
 
 	@Override

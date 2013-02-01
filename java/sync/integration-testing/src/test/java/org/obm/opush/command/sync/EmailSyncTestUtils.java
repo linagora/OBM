@@ -54,6 +54,7 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -235,6 +236,7 @@ public class EmailSyncTestUtils {
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class), 
 				anyObject(SyncCollection.class),
+				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
 				.andReturn(delta).once();
 		

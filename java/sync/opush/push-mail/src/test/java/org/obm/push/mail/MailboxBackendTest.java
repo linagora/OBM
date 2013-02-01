@@ -54,6 +54,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -108,6 +109,7 @@ public class MailboxBackendTest {
 	private Transformer transformer;
 	private EventService eventService;
 	private SnapshotService snapshotService;
+	private BackendWindowingService backendWindowingService;
 
 	@Before
 	public void setUp() {
@@ -129,8 +131,10 @@ public class MailboxBackendTest {
 		expect(transformersFactory.create(anyObject(FetchInstruction.class))).andReturn(transformer).anyTimes();
 		msEmailFetcher = new MSEmailFetcher(mailboxService, transformersFactory, msEmailConverter);
 		snapshotService = mocks.createMock(SnapshotService.class);
+		backendWindowingService = mocks.createMock(BackendWindowingService.class);
+		
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
-				snapshotService, null, mappingService, null, msEmailFetcher, null, null);
+				snapshotService, null, mappingService, null, msEmailFetcher, null, null, backendWindowingService);
 	}
 	
 	@Test(expected=ItemNotFoundException.class)

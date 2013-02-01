@@ -32,8 +32,9 @@
 package org.obm.push.mail.exception;
 
 import org.obm.push.bean.FilterType;
+import org.obm.push.exception.activesync.ActiveSyncException;
 
-public class FilterTypeChangedException extends Exception {
+public class FilterTypeChangedException extends ActiveSyncException {
 	
 	private final int collectionId;
 

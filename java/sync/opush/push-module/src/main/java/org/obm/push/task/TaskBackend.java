@@ -44,6 +44,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
@@ -76,8 +77,8 @@ public class TaskBackend implements PIMBackend {
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException {
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
 		return DataDelta.newEmptyDelta(new Date(), newSyncKey);
 	}
 	

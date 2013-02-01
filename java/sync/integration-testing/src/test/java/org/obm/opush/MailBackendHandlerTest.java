@@ -66,6 +66,7 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
@@ -190,7 +191,11 @@ public class MailBackendHandlerTest {
 
 	private void bindChangedToDelta(DataDelta delta) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
-		expect(contentsExporter.getChanged(anyObject(UserDataRequest.class), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
+		expect(contentsExporter.getChanged(
+				anyObject(UserDataRequest.class), 
+				anyObject(SyncCollection.class), 
+				anyObject(SyncClientCommands.class),
+				anyObject(SyncKey.class)))
 			.andReturn(delta).once();
 	}
 

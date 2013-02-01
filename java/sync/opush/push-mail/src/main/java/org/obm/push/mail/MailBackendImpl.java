@@ -50,6 +50,8 @@ import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
+import org.obm.push.backend.BackendWindowingService;
+import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushBackend;
@@ -70,6 +72,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -153,6 +156,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final SnapshotService snapshotService;
 	private final EmailChangesFetcher emailChangesFetcher;
 	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
+	private final BackendWindowingService backendWindowingService;
 
 
 	@Inject
@@ -165,7 +169,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			EventService eventService,
 			MSEmailFetcher msEmailFetcher,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
-			MailBackendSyncDataFactory mailBackendSyncDataFactory)  {
+			MailBackendSyncDataFactory mailBackendSyncDataFactory,
+			BackendWindowingService backendWindowingService)  {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
@@ -178,6 +183,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.eventService = eventService;
 		this.msEmailFetcher = msEmailFetcher;
 		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
+		this.backendWindowingService = backendWindowingService;
 	}
 
 	@Override
@@ -297,9 +303,20 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey)
+	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
+			SyncClientCommands clientCommands, final SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
+		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
+			
+			@Override
+			public DataDelta getAllChanges() {
+				return MailBackendImpl.this.getAllChanges(udr, collection, newSyncKey);
+			}
+		});
+	}
+
+	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) {
 		try {
 			int collectionId = collection.getCollectionId();
 			SyncCollectionOptions options = collection.getOptions();
@@ -307,7 +324,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			
 			MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, syncState, collectionId, options);
 			takeSnapshot(udr, collectionId, options, syncData, newSyncKey);
-
+			
 			MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
 					syncData.getCollectionPath(), options.getBodyPreferences(), syncData.getEmailChanges());
 			

@@ -92,7 +92,6 @@ import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -107,11 +106,9 @@ import com.google.inject.name.Named;
 public class SyncHandler extends WbxmlRequestHandler implements IContinuationHandler {
 
 	private final SyncProtocol.Factory syncProtocolFactory;
-	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
 	private final CollectionPathHelper collectionPathHelper;
-	private final ResponseWindowingService responseWindowingProcessor;
 	private final ContinuationService continuationService;
 	private final boolean enablePush;
 	private final SyncKeyFactory syncKeyFactory;
@@ -119,11 +116,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@Inject SyncHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter,
-			StateMachine stMachine, UnsynchronizedItemDao unSynchronizedItemCache,
+			StateMachine stMachine,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol.Factory syncProtocolFactory,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
 			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ResponseWindowingService responseWindowingProcessor,
 			ContinuationService continuationService,
 			@Named("enable-push") boolean enablePush,
 			SyncKeyFactory syncKeyFactory,
@@ -132,12 +128,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
-		this.unSynchronizedItemCache = unSynchronizedItemCache;
 		this.monitoredCollectionService = monitoredCollectionService;
 		this.syncProtocolFactory = syncProtocolFactory;
 		this.itemTrackingDao = itemTrackingDao;
 		this.collectionPathHelper = collectionPathHelper;
-		this.responseWindowingProcessor = responseWindowingProcessor;
 		this.continuationService = continuationService;
 		this.enablePush = enablePush;
 		this.syncKeyFactory = syncKeyFactory;
@@ -240,30 +234,15 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
-		DataDelta delta = null;
-		Date lastSync = null;
-		SyncKey treatmentSyncKey = null;
-		
-		int unSynchronizedItemNb = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), udr.getDevice(), c.getCollectionId()).size();
-		if (unSynchronizedItemNb == 0) {
-			treatmentSyncKey = syncKeyFactory.randomSyncKey();
-			delta = contentsExporter.getChanged(udr, c, treatmentSyncKey);
-			lastSync = delta.getSyncDate();
-		} else {
-			treatmentSyncKey = c.getSyncKey();
-			lastSync = c.getItemSyncState().getSyncDate();
-			delta = DataDelta.newEmptyDelta(lastSync, treatmentSyncKey);
-		}
+		DataDelta delta = contentsExporter.getChanged(udr, c, clientCommands, syncKeyFactory.randomSyncKey());
 
-		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(udr, c, delta, clientCommands);
-		syncCollectionResponse.setItemChanges(windowedResponse.getChanges());
-		syncCollectionResponse.setItemChangesDeletion(windowedResponse.getDeletions());
-		
-		c.setMoreAvailable(windowedResponse.hasMoreAvailable());
+		syncCollectionResponse.setItemChanges(delta.getChanges());
+		syncCollectionResponse.setItemChangesDeletion(delta.getDeletions());
+		c.setMoreAvailable(delta.hasMoreAvailable());
 		
 		return ItemSyncState.builder()
-				.syncKey(treatmentSyncKey)
-				.syncDate(lastSync)
+				.syncKey(delta.getSyncKey())
+				.syncDate(delta.getSyncDate())
 				.build();
 	}
 

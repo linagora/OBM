@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.OpushCollection;
@@ -101,7 +102,9 @@ public class ContactsBackendTest {
 	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
+	private BackendWindowingService backendWindowingService;
 	private AccessToken token;
+	private ContactsBackend contactsBackend;
 	
 	@Before
 	public void setUp() {
@@ -116,6 +119,11 @@ public class ContactsBackendTest {
 		loginService = mocks.createMock(LoginService.class);
 		contactConfiguration = mocks.createMock(ContactConfiguration.class);
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
+		backendWindowingService = mocks.createMock(BackendWindowingService.class);
+		
+		contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration,
+				collectionPathBuilderProvider, backendWindowingService);
+		
 		expectDefaultAddressAndParentForContactConfiguration();
 	}
 	
@@ -139,7 +147,7 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void testGetPIMDataType() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null);
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null);
 		assertThat(contactsBackend.getPIMDataType()).isEqualTo(PIMDataType.CONTACTS);
 	}
 
@@ -178,10 +186,7 @@ public class ContactsBackendTest {
 			.andReturn("1215");
 		
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		int itemEstimateSize = contactsBackend.getItemEstimateSize(userDataRequest, lastKnownState, collection);
-
 		mocks.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(1);
@@ -214,13 +219,10 @@ public class ContactsBackendTest {
 		expect(mappingService.getServerIdFor(targetcontactCollectionUid, serverIdAsString))
 			.andReturn(serverIdAsString);
 
-		mocks.replay();
-		
 		MSContact msContact = new MSContact();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
+
+		mocks.replay();
 		String newServerId = contactsBackend.createOrUpdate(userDataRequest, targetcontactCollectionUid, serverIdAsString, clientId, msContact);
-		
 		mocks.verify();
 		
 		assertThat(newServerId).isEqualTo(serverIdAsString);
@@ -249,10 +251,7 @@ public class ContactsBackendTest {
 		expectMappingServiceCollectionIdBehavior(books);
 
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		contactsBackend.delete(userDataRequest, serverId, serverIdAsString, true);
-		
 		mocks.verify();
 	}
 
@@ -280,10 +279,7 @@ public class ContactsBackendTest {
 		expect(mappingService.getServerIdFor(targetcontactCollectionUid, String.valueOf(itemId))).andReturn(serverId);
 	
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, targetcontactCollectionUid, ImmutableList.of(serverId), null, null, null);
-		
 		mocks.verify();
 		
 		ItemChange itemChange = new ItemChange(serverId, false, false);
@@ -393,10 +389,7 @@ public class ContactsBackendTest {
 		expectBuildCollectionPath(folder2Name, 2);
 
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		Iterable<OpushCollection> actual = contactsBackend.changedCollections(userDataRequest, changes).collections();
-		
 		mocks.verify();
 		
 		assertThat(actual).containsOnly(
@@ -433,10 +426,7 @@ public class ContactsBackendTest {
 		expectBuildCollectionPath(folder2Name, folder2Uid);
 
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown, adds);
-		
 		mocks.verify();
 		
 		assertThat(actual).containsOnly(f1CollectionPath, f2CollectionPath);
@@ -459,7 +449,6 @@ public class ContactsBackendTest {
 				.build();
 		
 		mocks.replay();
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration, collectionPathBuilderProvider);
 		CollectionChange itemChange = contactsBackend.createCollectionChange(userDataRequest, collection);
 		mocks.verify();
 		
@@ -488,10 +477,7 @@ public class ContactsBackendTest {
 		expectBuildCollectionPath(folderTwoName, 2);
 
 		mocks.replay();
-		
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
 		Iterable<CollectionPath> actual = contactsBackend.deletedCollections(userDataRequest, changes, lastKnown, adds);
-		
 		mocks.verify();
 		
 		assertThat(actual).containsOnly(f1CollectionPath);
@@ -511,7 +497,6 @@ public class ContactsBackendTest {
 				.build();
 		
 		mocks.replay();
-		ContactsBackend contactsBackend = new ContactsBackend(mappingService, null, null, contactConfiguration, collectionPathBuilderProvider);
 		CollectionChange itemChange = contactsBackend.createCollectionChange(userDataRequest, collection);
 		mocks.verify();
 
@@ -525,7 +510,6 @@ public class ContactsBackendTest {
 		Folder folder3 = Folder.builder().name("users").uid(3).ownerLoginAtDomain(user.getLoginAtDomain()).build();
 		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3).build();
 		
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
 		Iterable<Folder> result = contactsBackend.sortedFolderChangesByDefaultAddressBook(changes, "defaultName");
 		
 		assertThat(result).hasSize(3);
@@ -542,7 +526,6 @@ public class ContactsBackendTest {
 		
 		FolderChanges changes = FolderChanges.builder().updated(folder1, folder2, folder3, folder4, folder5).build();
 		
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, collectionPathBuilderProvider);
 		Iterable<Folder> result = contactsBackend.sortedFolderChangesByDefaultAddressBook(changes, "defaultName");
 		
 		assertThat(result).hasSize(3);
@@ -558,10 +541,10 @@ public class ContactsBackendTest {
 				.build();
 
 		mocks.replay();
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		boolean defaultFolder = contactsBackend.isDefaultFolder(userDataRequest, collection);
 		mocks.verify();
 		
-		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isFalse();
+		assertThat(defaultFolder).isFalse();
 	}
 	
 	@Test
@@ -573,10 +556,10 @@ public class ContactsBackendTest {
 				.build();
 
 		mocks.replay();
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		boolean defaultFolder = contactsBackend.isDefaultFolder(userDataRequest, collection);
 		mocks.verify();
 		
-		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isFalse();
+		assertThat(defaultFolder).isFalse();
 	}
 	
 	@Test
@@ -588,9 +571,9 @@ public class ContactsBackendTest {
 				.build();
 		
 		mocks.replay();
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, contactConfiguration, null);
+		boolean defaultFolder = contactsBackend.isDefaultFolder(userDataRequest, collection);
 		mocks.verify();
 		
-		assertThat(contactsBackend.isDefaultFolder(userDataRequest, collection)).isTrue();
+		assertThat(defaultFolder).isTrue();
 	}
 }

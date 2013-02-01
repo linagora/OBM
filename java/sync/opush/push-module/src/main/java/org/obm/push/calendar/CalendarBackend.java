@@ -35,11 +35,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
+import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.FolderSyncState;
@@ -54,6 +56,7 @@ import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -110,6 +113,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final ICalendar calendarClient;
 	private final ConsistencyEventChangesLogger consistencyLogger;
 	private final EventExtId.Factory eventExtIdFactory;
+	private final BackendWindowingService backendWindowingService;
 
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
@@ -118,13 +122,16 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			EventService eventService,
 			LoginService login,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger,
-			EventExtId.Factory eventExtIdFactory) {
+			EventExtId.Factory eventExtIdFactory,
+			BackendWindowingService backendWindowingService) {
+		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
 		this.consistencyLogger = consistencyLogger;
 		this.eventExtIdFactory = eventExtIdFactory;
+		this.backendWindowingService = backendWindowingService;
 	}
 	
 	@Override
@@ -247,18 +254,33 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
-		DataDelta dataDelta = getChanged(udr, collection, state.getSyncKey());
+		DataDelta dataDelta = getAllChanges(udr, state, collection, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws DaoException,
-			CollectionNotFoundException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
+	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
+			SyncClientCommands clientCommands, final SyncKey newSyncKey)
+		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
+			ConversionException, HierarchyChangedException {
+
+		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
+			
+			@Override
+			public DataDelta getAllChanges() {
+				return CalendarBackend.this.getAllChanges(udr, collection.getItemSyncState(), collection, newSyncKey);
+			}
+		});
+	}
+
+	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, ItemSyncState state,
+			SyncCollection collection, SyncKey newSyncKey) {
 		
 		CollectionPath collectionPath = buildCollectionPath(udr, collection.getCollectionId());
 		AccessToken token = login(udr);
 
-		ItemSyncState newState = collection.getItemSyncState().newWindowedSyncState(collection.getOptions().getFilterType());
+		ItemSyncState newState = state.newWindowedSyncState(collection.getOptions().getFilterType());
+
 		try {
 			
 			EventChanges changes = null;
@@ -271,7 +293,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			consistencyLogger.log(logger, changes);
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
-		
+			
 			DataDelta delta = 
 					buildDataDelta(udr, collection.getCollectionId(), token, changes, newSyncKey);
 			
@@ -287,7 +309,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			logout(token);
 		}
 	}
-
+	
 	@VisibleForTesting DataDelta buildDataDelta(UserDataRequest udr, Integer collectionId,
 			AccessToken token, EventChanges changes, SyncKey newSyncKey) throws ServerFault,
 			DaoException, ConversionException {

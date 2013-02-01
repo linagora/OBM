@@ -76,7 +76,7 @@ public class SyncHandlerTest {
 		mocks = createControl();
 		contentsImporter = mocks.createMock(ContentsImporter.class);
 		
-		testee = new SyncHandler(null, null, contentsImporter, null, null, null, null, null, null,
+		testee = new SyncHandler(null, null, contentsImporter, null, null, null, null,
 				null, null, null, null, null, null, false, null, null);
 	}
 
