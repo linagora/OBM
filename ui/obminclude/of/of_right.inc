@@ -194,6 +194,13 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
     } else {
       $checked_access = '';
     }
+
+    if( $id == $entity_id ){
+      $disabled_line = 'disabled="disabled"';
+      $checked_access = $checked_read = $checked_write = $checked_admin = 'checked="checked"';
+    } else {
+      $disabled_line = '';
+    }
     
     $sel_id = 'data-'.$consumer.'-'.$id;
     $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
@@ -212,16 +219,16 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <a href=\"#\" onclick=\"select_all_perms('$tr_id')\">$l_select_all</a>/<a href=\"#\" onclick=\"unselect_all_perms('$tr_id')\">$l_unselect_all</a>
         </td>
         <td class=\"cell_perms_access\">
-          <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access/>
+          <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access $disabled_line/>
         </td>
         <td class=\"cell_perms_read\">
-          <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" onclick=\"apply_checked_access(this, '$tr_id')\" onchange=\"apply_checked_access(this, '$tr_id')\" value=\"$sel_id\" $checked_read $disabled_read/>
+          <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" onclick=\"apply_checked_access(this, '$tr_id')\" onchange=\"apply_checked_access(this, '$tr_id')\" value=\"$sel_id\" $checked_read $disabled_read $disabled_line/>
         </td>
         <td class=\"cell_perms_write\">
-          <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
+          <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write $disabled_line/>
         </td>
         <td>
-          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin $disabled_admin />
+          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin $disabled_admin $disabled_line/>
         </td>
       </tr>
 ";
