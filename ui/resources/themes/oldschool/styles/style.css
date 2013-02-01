@@ -1827,11 +1827,15 @@ form.button-to input {
 .submenu-left {
   background-image: url('../images/arrow_right.gif');
   background-repeat: no-repeat;
-  background-position: center right;  
+  background-position: center right;
 }
 
 .submenu-left ul{
   margin-left: 14em;
+  width:auto;
+}
+.submenu-left ul li{
+  padding-right: 10px;
 }
 
 /* ------------------------------------------------------------------------- */ 
