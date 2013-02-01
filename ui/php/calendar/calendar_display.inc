@@ -3192,8 +3192,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
       if ($exception_child_id) {
         $exception_date = new Of_Date($exception_q->f('eventexception_event_date'), 'GMT');
         $exception_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$exception_child_id";
-        $exception_link = "<a href=\"$exception_url\">".$exception_date->getOutputDateTime()."</a>";
-        $exception_desc = sprintf($GLOBALS['l_eventexception_moved_to'],$exception_link);
+        $begin_date = "<a href=\"$exception_url\">".$exception_date->getOutputDate();
+        $begin_hour = $exception_date->getOutputTime();
+        $exception_end_date = $exception_date->addSecond($exception_q->f('eventexception_event_duration'));
+        $end_date = $exception_end_date->getOutputTime()."</a>";
+        $exception_desc = sprintf($GLOBALS['l_eventexception_moved_to'], $begin_date, $begin_hour, $end_date);
       } else {
         $exception_desc = $GLOBALS['l_eventexception_canceled'];
       }

@@ -5246,6 +5246,7 @@ function run_query_get_one_event_exception($calendar_id) {
     eventexception_parent_id,
     eventexception_child_id,
     eventexception_date,
+    event_duration AS eventexception_event_duration,
     event_date AS eventexception_event_date
     FROM EventException
     LEFT JOIN Event ON eventexception_child_id = event_id
