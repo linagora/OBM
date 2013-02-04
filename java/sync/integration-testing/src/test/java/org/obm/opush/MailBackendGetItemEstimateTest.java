@@ -59,7 +59,6 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
@@ -312,8 +311,6 @@ public class MailBackendGetItemEstimateTest {
 	}
 
 	private void expectInitialSyncWithTwoMails(SyncKey initialSyncKey, SyncKey firstAllocatedSyncKey, SyncKey secondAllocatedSyncKey) throws Exception {
-		String emailId1 = ":1";
-		String emailId2 = ":2";
 		int allocatedStateId = 3;
 		int allocatedStateId2 = 4;
 		
@@ -334,9 +331,6 @@ public class MailBackendGetItemEstimateTest {
 		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, allocatedState);
-
-		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
-		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
 	}
 
 	private void expectUnsynchronizedItemToNeverHavePendingAdds() {

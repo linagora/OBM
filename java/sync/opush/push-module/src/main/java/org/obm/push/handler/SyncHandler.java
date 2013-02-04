@@ -458,11 +458,13 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private void identifyNewItems(
 			SyncCollectionResponse syncCollectionResponse, ItemSyncState st)
 			throws DaoException, InvalidServerId {
-		
-		for (ItemChange change: syncCollectionResponse.getItemChanges()) {
-			boolean isItemAddition = st.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
-					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
-			change.setNew(isItemAddition);
+
+		if (!PIMDataType.EMAIL.equals(syncCollectionResponse.getSyncCollection().getDataType())) {
+			for (ItemChange change: syncCollectionResponse.getItemChanges()) {
+				boolean isItemAddition = st.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
+						!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
+				change.setNew(isItemAddition);
+			}
 		}
 	}
 	
