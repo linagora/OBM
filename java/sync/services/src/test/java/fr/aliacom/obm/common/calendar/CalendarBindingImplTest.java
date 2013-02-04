@@ -701,7 +701,7 @@ public class CalendarBindingImplTest {
 	public void testAttendeeHasRightToWriteOnCalendar() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
-		String calendar = "cal1";
+		String calendar = defaultUser.getEmail();
 		EventExtId extId = new EventExtId("extId");
 		boolean updateAttendee = true;
 		boolean notification = false;
@@ -754,7 +754,7 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(true, event.getAttendees().iterator().next().isCanWriteOnCalendar());
 	}
 
-	@Test
+	@Test(expected=NotAllowedException.class)
 	public void testAttendeeHasNoRightToWriteOnCalendar() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 
@@ -790,26 +790,16 @@ public class CalendarBindingImplTest {
 				.atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(
 				beforeEvent).atLeastOnce();
-		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false).anyTimes();
-		expect(helper.canWriteOnCalendar(accessToken, calendar)).andReturn(true).once();
-		expect(helper.eventBelongsToCalendar(beforeEvent, calendar)).andReturn(true).once();
-		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
-						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
-
-		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
-		EasyMock.expectLastCall();
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(false).anyTimes();
 
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
 				userService, calendarDao, null, helper, null, null);
-		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
-				notification);
+		
+		calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
-
-		Assert.assertEquals(Participation.needsAction(), newEvent.getAttendees().get(0)
-				.getParticipation());
 	}
 
 	@Test
@@ -887,12 +877,9 @@ public class CalendarBindingImplTest {
 				.atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(
 				beforeEvent).atLeastOnce();
-		expect(helper.canWriteOnCalendar(accessToken, calendar)).andReturn(true).once();
-		expect(helper.eventBelongsToCalendar(beforeEvent, calendar)).andReturn(true).once();
-		expect(helper.canWriteOnCalendar(accessToken, attendee.getEmail())).andReturn(false)
-				.atLeastOnce();
-		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail()))
-				.andReturn(true).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(true).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail())).andReturn(true).atLeastOnce();
+		expect(helper.eventBelongsToCalendar(beforeEvent, defaultUser.getEmail())).andReturn(true).once();
 		expect(
 				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
 						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
@@ -907,7 +894,7 @@ public class CalendarBindingImplTest {
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		Assert.assertEquals(Participation.needsAction(),
+		Assert.assertEquals(Participation.accepted(),
 				Iterables.getOnlyElement(newEvent.getAttendees()).getParticipation());
 		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
 				.getEventExceptions());
@@ -917,7 +904,7 @@ public class CalendarBindingImplTest {
 		Assert.assertEquals(true, afterExceptionAttendee.isCanWriteOnCalendar());
 	}
 
-	@Test
+	@Test(expected=NotAllowedException.class)
 	public void testAttendeeOfExceptionHasNoRightToWriteOnCalendar() throws Exception {
 		
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
@@ -998,35 +985,22 @@ public class CalendarBindingImplTest {
 				.atLeastOnce();
 		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail()))
 				.andReturn(false).atLeastOnce();
-		expect(
-				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
-						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
-		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
 
 		EasyMock.replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
 				userService, calendarDao, null, helper, null, null);
-		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
-				notification);
+		
+		calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 
 		EasyMock.verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
-
-		Assert.assertEquals(Participation.needsAction(),
-				Iterables.getOnlyElement(newEvent.getAttendees()).getParticipation());
-		Event afterException = Iterables.getOnlyElement(newEvent.getRecurrence()
-				.getEventExceptions());
-		Attendee afterExceptionAttendee = afterException
-				.findAttendeeFromEmail(exceptionAttendeeEmail);
-		Assert.assertEquals(Participation.needsAction(), afterExceptionAttendee.getParticipation());
-		Assert.assertEquals(false, afterExceptionAttendee.isCanWriteOnCalendar());
 	}
 	
 	@Test
 	public void testCreateAnEventExceptionAndUpdateItsStatusButNotTheParent() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
-		String calendar = "cal1";
+		String calendar = defaultUser.getEmail();
 		String attendeeEmail = "attendee@domain1";
 		EventExtId extId = new EventExtId("extId");
 		boolean updateAttendee = true;
@@ -1856,7 +1830,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
+		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
 	
 	@Test(expected=NotAllowedException.class)
@@ -1874,7 +1848,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
+		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
 	
 	@Test
@@ -1892,7 +1866,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
+		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
 	
 	@Test
@@ -1912,7 +1886,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, helperService, null, null);
 		
-		calendarService.assertEventCanBeModified(token, calendar, eventToModify);
+		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
 	
 	@Test

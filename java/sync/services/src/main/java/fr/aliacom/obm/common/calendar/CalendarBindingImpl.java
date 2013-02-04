@@ -400,7 +400,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return null;
 			}
 			
-			assertEventCanBeModified(token, calendar, before);
+			assertEventCanBeModified(token, calendarUser, before);
 			
 			if (before.isInternalEvent()) {
 				return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
@@ -432,7 +432,9 @@ public class CalendarBindingImpl implements ICalendar {
 		throw new NotAllowedException("User " + token.getUserLogin() + " has no " + right + " rights on calendar " + calendar + ".");
 	}
 
-	@VisibleForTesting void assertEventCanBeModified(AccessToken token, String calendar, Event event) throws NotAllowedException {
+	@VisibleForTesting void assertEventCanBeModified(AccessToken token, ObmUser calendarUser, Event event) throws NotAllowedException {
+		String calendar = calendarUser.getEmail();
+		
 		assertUserCanWriteOnCalendar(token, calendar);
 		
 		if (!helperService.eventBelongsToCalendar(event, calendar) && !eventBelongsToUser(event, token)) {
