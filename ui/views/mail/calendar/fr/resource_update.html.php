@@ -38,7 +38,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-      <td colspan="2">La réservation de ressource, concernant: <?php  echo $resourceLabel; ?>, du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>), a été modifiée:</td>
+      <td colspan="2">La réservation de ressource, concernant: "<?php  echo $resourceLabel; ?>", du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>), a été modifiée:</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em; width:20%;">Sujet</td><td><?php echo $title; ?></td>

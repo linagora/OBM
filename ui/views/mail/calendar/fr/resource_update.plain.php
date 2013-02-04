@@ -36,7 +36,7 @@ Message automatique envoyé par OBM
 MISE A JOUR DE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-La réservation de la ressource : <?php  echo $resourceLabel; ?>, dont vous êtes responsable, 
+La réservation de la ressource : "<?php  echo $resourceLabel; ?>", dont vous êtes responsable, 
 et qui avait été réservée du <?php echo $old_start; ?> au <?php echo $old_end; ?>, 
 (lieu : <?php echo $old_location; ?>), a été mise à jour:
 

@@ -36,7 +36,7 @@ This email was automatically sent by OBM
 RESOURCE RESERVATION UPDATED !
 ------------------------------------------------------------------
 
-The reservation of the resource : <?php  echo $resourceLabel; ?>, you are manager for, 
+The reservation of the resource : "<?php  echo $resourceLabel; ?>", you are manager for, 
 and that was reserved from <?php echo $old_start; ?> to <?php echo $old_end; ?>, 
 (location : <?php echo $old_location; ?>), has been updated:
 

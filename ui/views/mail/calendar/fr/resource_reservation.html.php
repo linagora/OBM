@@ -38,7 +38,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-      <td colspan="2">La ressource : <?php  echo $resourceLabel; ?>, dont vous êtes responsable a été réservée</td>
+      <td colspan="2">La ressource : "<?php  echo $resourceLabel; ?>", dont vous êtes responsable a été réservée</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em; width:20%;">Sujet</td><td><?php echo $title; ?></td>

@@ -36,7 +36,7 @@ Message automatique envoyé par OBM
 NOUVELLE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-La ressource : <?php  echo $resourceLabel; ?>,dont vous êtes responsable a été réservée
+La ressource : "<?php  echo $resourceLabel; ?>",dont vous êtes responsable a été réservée
 
 du              : <?php echo $start; ?>
 

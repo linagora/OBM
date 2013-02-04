@@ -38,7 +38,7 @@ NEW RESOURCE RESERVATION !
 
 A new resource reservation was scheduled
 
-Ressource name : <?php  echo $resourceLabel; ?>
+Ressource name : "<?php  echo $resourceLabel; ?>"
 
 from           : <?php echo $start; ?>
 

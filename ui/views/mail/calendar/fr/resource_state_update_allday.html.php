@@ -39,7 +39,7 @@ applicable to the OBM software.
     </tr>
     <tr>
       <td colspan="2">
-L'administrateur de la ressource <?php echo $target; ?> a <?php echo $targetState; ?> sa participation pour l'événement <?php echo $title; ?> prévu le <?php echo $startDate; ?> toute la journée.
+L'administrateur de la ressource "<?php echo $target; ?>" a <?php echo $targetState; ?> sa participation pour l'événement "<?php echo $title; ?>" prévu le <?php echo $startDate; ?> toute la journée.
       </td>
     </tr>
     <tr>
