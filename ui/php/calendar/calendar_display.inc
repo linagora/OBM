@@ -5988,7 +5988,7 @@ function dis_calendar_meeting_form($current_view, $calendar) {
      </td>
      </tr>";
     $resource_js = "
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch', {filter_entity:'Resource'});
       new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroupSearch');  
       ";
     $dis_block_resource = "
