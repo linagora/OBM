@@ -4188,7 +4188,7 @@ function dis_calendar_quick_form($calendar_entity) {
 
     $block_template = "
       <th>$GLOBALS[l_template]:</th>
-      <td><select id='template_id' name='template_id' onchange='setQuickTitle();'>
+      <td><select id='template_id' name='template_id'>
         <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
         $select
       </select></td>";

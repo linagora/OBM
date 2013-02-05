@@ -2577,12 +2577,6 @@ Obm.CalendarQuickForm = new Class({
     this.attendees.set('html','');
   },
 
-  setQuickTitle: function() {
-    if ($('tf_quick_title').value == '') {
-      $('tf_quick_title').value = obm.vars.consts.template_title[$('template_id').selectedIndex];
-    }
-  },
-
   show: function() {
     obm.popup.show('calendarQuickForm');
   },
