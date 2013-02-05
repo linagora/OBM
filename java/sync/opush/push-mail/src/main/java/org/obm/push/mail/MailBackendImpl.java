@@ -91,7 +91,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.EmailChanges.SplittedEmailChanges;
+import org.obm.push.mail.EmailChanges.Splitter;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
@@ -349,13 +349,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private EmailChanges splitAndHandlePendingChanges(int windowSize, EmailChanges pendingChanges,
 			DataDelta.Builder dataDeltaBuilder, SyncKey dataDeltaSyncKey) {
 		
-		SplittedEmailChanges splittedEmailChanges = pendingChanges.splitToFit(windowSize);
-		windowingService.setPendingWindowing(dataDeltaSyncKey, splittedEmailChanges.getRemainingEmailChanges());
+		Splitter splittedEmailChanges = pendingChanges.splitToFit(windowSize);
+		windowingService.setPendingWindowing(dataDeltaSyncKey, splittedEmailChanges.getLeft());
 		
-		if (splittedEmailChanges.getRemainingEmailChanges().hasChanges()) {
+		if (splittedEmailChanges.getLeft().hasChanges()) {
 			dataDeltaBuilder.moreAvailable(true);
 		}
-		return splittedEmailChanges.getFittingEmailChanges();
+		return splittedEmailChanges.getFit();
 	}
 
 	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 

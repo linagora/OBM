@@ -32,20 +32,26 @@
 package org.obm.push.mail;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import org.obm.push.mail.bean.Email;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 
 public class EmailChanges implements Serializable {
 	
-	private static EmailChanges empty() {
+	public static EmailChanges empty() {
 		return builder().build();
 	}
 	
@@ -55,41 +61,68 @@ public class EmailChanges implements Serializable {
 	
 	public static class Builder {
 	
-		private Set<Email> deletions;
-		private Set<Email> changes;
 		private Set<Email> additions;
+		private Set<Email> changes;
+		private Set<Email> deletions;
 		
 		private Builder() {
 			super();
+			additions = Sets.newHashSet();
+			changes = Sets.newHashSet();
+			deletions = Sets.newHashSet();
 		}
 
-		public Builder deletions(Set<Email> deletions) {
-			this.deletions = deletions;
-			return this;
-		}
-
-		public Builder changes(Set<Email> changes) {
-			this.changes = changes;
-			return this;
-		}
-
-		public Builder additions(Set<Email> additions) {
-			this.additions = additions;
+		public Builder deletion(Email... emails) {
+			this.deletions.addAll(Arrays.asList(emails));
 			return this;
 		}
 		
-		public EmailChanges build() {
-			if (deletions == null) {
-				deletions = ImmutableSet.<Email>of();
-			}
-			if (changes == null) {
-				changes = ImmutableSet.<Email>of();
-			}
-			if (additions == null) {
-				additions = ImmutableSet.<Email>of();
-			}
-			return new EmailChanges(deletions, changes, additions);
+		public Builder deletions(Set<Email> deletions) {
+			Preconditions.checkArgument(deletions != null, "deletions must not be null");
+			this.deletions.addAll(deletions);
+			return this;
 		}
+
+		public Builder change(Email... emails) {
+			this.changes.addAll(Arrays.asList(emails));
+			return this;
+		}
+		
+		public Builder changes(Set<Email> changes) {
+			Preconditions.checkArgument(changes != null, "changes must not be null");
+			this.changes.addAll(changes);
+			return this;
+		}
+
+		public Builder addition(Email... emails) {
+			this.additions.addAll(Arrays.asList(emails));
+			return this;
+		}
+		
+		public Builder additions(Set<Email> additions) {
+			Preconditions.checkArgument(additions != null, "additions must not be null");
+			this.additions.addAll(additions);
+			return this;
+		}
+		
+		public Builder merge(EmailChanges changes) {
+			additions(changes.additions());
+			changes(changes.changes());
+			deletions(changes.deletions());
+			return this;
+		}
+		
+		public int sumOfChanges() {
+			return additions.size() + changes.size() + deletions.size();
+		}
+		
+		public EmailChanges build() {
+			return new EmailChanges(
+					ImmutableSet.copyOf(deletions), 
+					ImmutableSet.copyOf(changes),
+					ImmutableSet.copyOf(additions));
+		}
+
 	}
 
 	private final Set<Email> deletions;
@@ -122,15 +155,8 @@ public class EmailChanges implements Serializable {
 		return additions.size() + changes.size() + deletions.size();
 	}
 	
-	public SplittedEmailChanges splitToFit(int firstPartSize) {
-		Preconditions.checkArgument(firstPartSize > 0, "firstPartSize must be a positive integer");
-		
-		if (firstPartSize >= sumOfChanges()) {
-			return new SplittedEmailChanges(this, EmailChanges.empty());
-		} else {
-			Splitter splitter = new Splitter(this, firstPartSize);
-			return new SplittedEmailChanges(splitter.fit, splitter.left);
-		}
+	public Splitter splitToFit(int firstPartSize) {
+		return new Splitter(this, firstPartSize);
 	}
 
 	@Override
@@ -149,23 +175,13 @@ public class EmailChanges implements Serializable {
 		return false;
 	}
 	
-	public static class SplittedEmailChanges {
-		
-		private final EmailChanges fittingEmailChanges;
-		private final EmailChanges remainingEmailChanges;
-
-		public SplittedEmailChanges(EmailChanges fittingEmailChanges, EmailChanges remainingEmailChanges) {
-			this.fittingEmailChanges = fittingEmailChanges;
-			this.remainingEmailChanges = remainingEmailChanges;
-		}
-
-		public EmailChanges getFittingEmailChanges() {
-			return fittingEmailChanges;
-		}
-
-		public EmailChanges getRemainingEmailChanges() {
-			return remainingEmailChanges;
-		}
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("additions", additions)
+				.add("changes", changes)
+				.add("deletions", deletions)
+				.toString();
 	}
 	
 	public static class Splitter {
@@ -174,44 +190,18 @@ public class EmailChanges implements Serializable {
 		private final EmailChanges left;
 		
 		public Splitter(EmailChanges origin, int limit) {
-			Predicate<Email> limitFilter = new LimitFilter(limit); 
-			this.fit = builder()
-				.additions(limit(origin.additions, limitFilter))
-				.changes(limit(origin.changes, limitFilter))
-				.deletions(limit(origin.deletions, limitFilter))
-				.build();
-			this.left = builder()
-				.additions(skip(origin.additions, fit.additions.size()))
-				.changes(skip(origin.changes, fit.changes.size()))
-				.deletions(skip(origin.deletions, fit.deletions.size()))
-				.build();
-		}
-
-		private ImmutableSet<Email> limit(Set<Email> emails, Predicate<Email> limitFilter) {
-			return ImmutableSet.copyOf(Iterables.filter(emails, limitFilter));
-		}
-
-		private ImmutableSet<Email> skip(Set<Email> emails, int skipCount) {
-			if (skipCount > 0) {
-				return FluentIterable.from(emails).skip(skipCount).toImmutableSet();
-			} else {
-				return ImmutableSet.copyOf(emails);
-			}
-		}
-		
-		private static class LimitFilter implements Predicate<Email> {
-			private int count;
-
-			public LimitFilter(int count) {
-				this.count = count;
-			}
+			Preconditions.checkArgument(limit > 0, "limit must be a positive integer");
 			
-			@Override
-			public boolean apply(Email input) {
-				return count-- > 0;
+			if (limit >= origin.sumOfChanges()) {
+				this.fit = origin;
+				this.left = EmailChanges.empty();
+			} else {
+				Iterable<EmailPartitionEntry> entries = origin.toEntries();
+				this.fit = fromEntries(Iterables.limit(entries, limit));
+				this.left = fromEntries(Iterables.skip(entries, limit));
 			}
 		}
-		
+
 		public EmailChanges getFit() {
 			return fit;
 		}
@@ -220,5 +210,94 @@ public class EmailChanges implements Serializable {
 			return left;
 		}
 	}
+
+	private static class EmailPartitionEntry {
+
+		enum Type {
+			ADD, CHANGE, DELETION
+		}
+		
+		private final Type type;
+		private final Email email;
+
+		public EmailPartitionEntry(Type type, Email email) {
+			this.type = type;
+			this.email = email;
+		}
+
+		public Type getType() {
+			return type;
+		}
+
+		public Email getEmail() {
+			return email;
+		}
+	}
+
+	private final class EntryProducer implements Function<Email, EmailPartitionEntry> {
+
+		private final EmailPartitionEntry.Type type;
+
+		public EntryProducer(EmailPartitionEntry.Type type) {
+			this.type = type;
+		}
+
+		@Override
+		public EmailPartitionEntry apply(Email input) {
+			return new EmailPartitionEntry(type, input);
+		}
+	}
+	
+	private Iterable<EmailPartitionEntry> toEntries() {
+		return FluentIterable.from(
+				Iterables.concat(
+					FluentIterable.from(additions).transform(new EntryProducer(EmailPartitionEntry.Type.ADD)),
+					FluentIterable.from(changes).transform(new EntryProducer(EmailPartitionEntry.Type.CHANGE)),
+					FluentIterable.from(deletions).transform(new EntryProducer(EmailPartitionEntry.Type.DELETION)))
+					).toSortedImmutableList(new Comparator<EmailPartitionEntry>() {
+
+						@Override
+						public int compare(EmailPartitionEntry o1, EmailPartitionEntry o2) {
+							return Longs.compare(o2.getEmail().getUid(), o1.getEmail().getUid());
+						}
+					});
+	}
+
+	private static EmailChanges fromEntries(Iterable<EmailPartitionEntry> entries) {
+		Builder builder = EmailChanges.builder();
+		for (EmailPartitionEntry entry: entries) {
+			switch (entry.getType()) {
+			case ADD:
+				builder.addition(entry.getEmail());
+				break;
+			case CHANGE:
+				builder.change(entry.getEmail());
+				break;
+			case DELETION:
+				builder.deletion(entry.getEmail());
+				break;
+			}
+		}
+		return builder.build();
+	}
+	
+	public Iterable<EmailChanges> partition(int windowSize) {
+		Preconditions.checkArgument(windowSize > 0);
+		if (sumOfChanges() == 0) {
+			return ImmutableList.<EmailChanges>of();
+		}
+		if (sumOfChanges() < windowSize) {
+			return ImmutableList.of(this);
+		}
+		return FluentIterable
+			.from(Iterables.partition(toEntries(), windowSize))
+			.transform(new Function<List<EmailPartitionEntry>, EmailChanges>() {
+				@Override
+				public EmailChanges apply(List<EmailPartitionEntry> input) {
+					return EmailChanges.fromEntries(input);
+				}
+			});
+	}
+	
 
 }

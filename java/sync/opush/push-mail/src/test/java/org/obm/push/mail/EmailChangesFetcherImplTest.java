@@ -200,7 +200,7 @@ public class EmailChangesFetcherImplTest {
 					.build())
 				.build();
 		
-		expect(msEmailFetcher.fetch(udr, collectionId, collectionPath, ImmutableList.of(33l, 156l), bodyPreferences))
+		expect(msEmailFetcher.fetch(udr, collectionId, collectionPath, ImmutableList.of(156l, 33l), bodyPreferences))
 			.andReturn(ImmutableList.of(email1ChangeData, email2ChangeData));
 		
 		mocks.replay();
