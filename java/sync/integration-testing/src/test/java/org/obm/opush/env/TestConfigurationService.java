@@ -29,17 +29,82 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.opush.env;
 
-import org.obm.push.bean.SyncKey;
-import org.obm.push.mail.EmailChanges;
+import java.nio.charset.Charset;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 
-public interface WindowingDao {
+import javax.naming.ConfigurationException;
+
+import org.obm.configuration.ConfigurationService;
+
+public class TestConfigurationService implements ConfigurationService {
+		
+	private final Configuration configuration;
 	
-	Iterable<EmailChanges> consumingChunksIterable(SyncKey syncKey);
+	public TestConfigurationService(Configuration configuration) {
+		this.configuration = configuration;
+	}
 
-	void pushPendingElements(SyncKey syncKey, EmailChanges partition);
+	@Override
+	public String getLocatorUrl() throws ConfigurationException {
+		return configuration.locatorUrl;
+	}
 
-	boolean hasPendingElements(SyncKey syncKey);
+	@Override
+	public String getObmUIBaseUrl() {
+		return configuration.obmUiBaseUrl;
+	}
 
+	@Override
+	public String getObmSyncUrl(String obmSyncHost) {
+		return configuration.obmSyncUrl;
+	}
+
+	@Override
+	public int getLocatorCacheTimeout() {
+		return configuration.locatorCacheTimeout;
+	}
+
+	@Override
+	public TimeUnit getLocatorCacheTimeUnit() {
+		return configuration.locatorCacheTimeUnit;
+	}
+
+	@Override
+	public ResourceBundle getResourceBundle(Locale locale) {
+		return configuration.bundle;
+	}
+
+	@Override
+	public String getActiveSyncServletUrl() {
+		return configuration.activeSyncServletUrl;
+	}
+
+	@Override
+	public Charset getDefaultEncoding() {
+		return configuration.defautEncoding;
+	}
+
+	@Override
+	public int transactionTimeoutInSeconds() {
+		return configuration.transaction.timeoutInSeconds;
+	}
+
+	@Override
+	public boolean usePersistentCache() {
+		return configuration.transaction.usePersistentCache;
+	}
+
+	@Override
+	public int trustTokenTimeoutInSeconds() {
+		return configuration.trustTokenTimeoutInSeconds;
+	}
+
+	@Override
+	public int solrCheckingInterval() {
+		return configuration.solrCheckingInterval;
+	}
 }

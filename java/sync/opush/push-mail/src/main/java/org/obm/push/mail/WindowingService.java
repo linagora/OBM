@@ -34,9 +34,11 @@ package org.obm.push.mail;
 import org.obm.push.bean.SyncKey;
 
 public interface WindowingService {
+
+	EmailChanges popNextPendingElements(SyncKey syncKey, int maxSize);
 	
-	EmailChanges getPendingWindowing(SyncKey syncKey);
-	
-	void setPendingWindowing(SyncKey syncKey, EmailChanges changes);
-	
+	void pushPendingElements(SyncKey syncKey, EmailChanges changes, int windowSize);
+
+	boolean hasPendingElements(SyncKey syncKey);
+
 }

@@ -32,9 +32,13 @@
 package org.obm.push.mail;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.mail.EmailChanges.Builder;
+import org.obm.push.mail.EmailChanges.Splitter;
 import org.obm.push.store.WindowingDao;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,13 +53,38 @@ public class WindowingServiceImpl implements WindowingService {
 	}
 
 	@Override
-	public EmailChanges getPendingWindowing(SyncKey syncKey) {
-		return windowingDao.getPendingWindowing(syncKey);
+	public EmailChanges popNextPendingElements(SyncKey syncKey, int maxSize) {
+		Preconditions.checkArgument(syncKey != null);
+		Preconditions.checkArgument(!SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncKey));
+		Preconditions.checkArgument(maxSize > 0);
+		
+		EmailChanges changes = getEnoughChunks(syncKey, maxSize);
+		Splitter parts = changes.splitToFit(maxSize);
+		pushPendingElements(syncKey, parts.getLeft(), maxSize);
+		return parts.getFit();
+	}
+
+	private EmailChanges getEnoughChunks(SyncKey syncKey, int maxSize) {
+		Builder builder = EmailChanges.builder();
+		for (EmailChanges changes: windowingDao.consumingChunksIterable(syncKey)) {
+			builder.merge(changes);
+			if (builder.sumOfChanges() >= maxSize) {
+				break;
+			}
+		}
+		return builder.build();
+	}
+	
+	@Override
+	public void pushPendingElements(SyncKey syncKey, EmailChanges changes, int windowSize) {
+		for (EmailChanges chunk: ImmutableList.copyOf(changes.partition(windowSize)).reverse()) {
+			windowingDao.pushPendingElements(syncKey, chunk);
+		}
 	}
 
 	@Override
-	public void setPendingWindowing(SyncKey syncKey, EmailChanges changes) {
-		windowingDao.setPendingWindowing(syncKey, changes);
+	public boolean hasPendingElements(SyncKey syncKey) {
+		return windowingDao.hasPendingElements(syncKey);
 	}
 
 }

@@ -29,17 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.opush.windowing;
 
-import org.obm.push.bean.SyncKey;
-import org.obm.push.mail.EmailChanges;
 
-public interface WindowingDao {
+
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.module.LoggerModule;
+import org.obm.opush.env.Configuration;
+import org.obm.opush.env.TestConfigurationService;
+import org.obm.push.mail.WindowingService;
+import org.obm.push.mail.WindowingServiceImpl;
+import org.obm.push.store.WindowingDao;
+import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+
+public class WindowingModule extends AbstractModule {
+
+	private final Logger configurationLogger;
+
+	public WindowingModule() {
+		configurationLogger = LoggerFactory.getLogger(getClass());
+	}
 	
-	Iterable<EmailChanges> consumingChunksIterable(SyncKey syncKey);
+	@Override
+	protected void configure() {
+		bind(ConfigurationService.class).toInstance(configuration());
+		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
+		bind(WindowingService.class).to(WindowingServiceImpl.class);
+		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
+	}		
 
-	void pushPendingElements(SyncKey syncKey, EmailChanges partition);
-
-	boolean hasPendingElements(SyncKey syncKey);
+	protected ConfigurationService configuration() {
+		return new TestConfigurationService(new Configuration());
+	}
 
 }

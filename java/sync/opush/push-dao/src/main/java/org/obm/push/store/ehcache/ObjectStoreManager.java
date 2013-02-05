@@ -45,7 +45,6 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.slf4j.Logger;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -57,7 +56,8 @@ public class ObjectStoreManager {
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
 	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
 	public static final String MAIL_SNAPSHOT_STORE = "mailSnapshotStore";
-	public static final String MAIL_WINDOWING_STORE = "mailWindowingStore";
+	public static final String MAIL_WINDOWING_INDEX_STORE = "mailWindowingIndexStore";
+	public static final String MAIL_WINDOWING_CHUNKS_STORE = "mailWindowingChunksStore";
 	public static final String SYNC_KEYS_STORE = "syncKeysStore";
 	public static final String PENDING_CONTINUATIONS = "pendingContinuation";
 	
@@ -74,7 +74,7 @@ public class ObjectStoreManager {
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache));
 	}
 
-	@VisibleForTesting void shutdown() {
+	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
 	
@@ -85,7 +85,8 @@ public class ObjectStoreManager {
 		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(MAIL_WINDOWING_STORE).eternal(usePersistentCache));
+		configuration.addCache(defaultCacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE).eternal(usePersistentCache));
+		configuration.addCache(defaultCacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE).eternal(usePersistentCache));
 		configuration.addCache(defaultCacheConfiguration().name(SYNC_KEYS_STORE).eternal(usePersistentCache));
 		configuration.addCache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS));
 		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);

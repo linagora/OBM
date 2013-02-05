@@ -91,7 +91,6 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.EmailChanges.Splitter;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
@@ -291,11 +290,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		
 		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state,
 				collection.getCollectionId(), collection.getOptions());
-		return computeEmailChangesNumber(syncData.getEmailChanges());
-	}
-
-	private int computeEmailChangesNumber(EmailChanges emailChanges) {
-		return emailChanges.additions().size() + emailChanges.changes().size() + emailChanges.deletions().size();
+		return syncData.getEmailChanges().sumOfChanges();
 	}
 
 	/**
@@ -303,59 +298,60 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
-			SyncClientCommands clientCommands, final SyncKey newSyncKey)
+	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
 		try {
-			Integer collectionId = collection.getCollectionId();
 			SyncKey requestSyncKey = collection.getSyncKey();
 			
-			EmailChanges pendingChanges = windowingService.getPendingWindowing(collection.getSyncKey());
-			if (pendingChanges != null && pendingChanges.hasChanges()) {
-				return continueWindowing(udr, collection, pendingChanges,
-						collection.getItemSyncState().getSyncDate(), requestSyncKey);
+			if (windowingService.hasPendingElements(requestSyncKey)) {
+				return continueWindowing(udr, collection, collection.getItemSyncState().getSyncDate(), requestSyncKey);
 			} else {
-				MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, collection.getItemSyncState(),
-						collectionId, collection.getOptions());
-				takeSnapshot(udr, collectionId, collection.getOptions(), syncData, newSyncKey);
-				return continueWindowing(udr, collection, syncData.getEmailChanges(),
-						syncData.getDataDeltaDate(), newSyncKey);
+				return startWindowing(udr, collection, newSyncKey);
 			}
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection syncCollection, EmailChanges pendingChanges,
-			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey)
-			throws DaoException, EmailViewPartsFetcherException {
+	private DataDelta startWindowing(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws EmailViewPartsFetcherException {
+		Integer collectionId = collection.getCollectionId();
+		ItemSyncState syncState = collection.getItemSyncState();
+		SyncCollectionOptions options = collection.getOptions();
+		
+		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, syncState, collectionId, options);
+		takeSnapshot(udr, collectionId, collection.getOptions(), syncData, newSyncKey);
 
-		DataDelta.Builder dataDeltaBuilder = DataDelta.builder();
-		EmailChanges fittingEmailChanges = splitAndHandlePendingChanges(
-				syncCollection.getWindowSize(), pendingChanges, dataDeltaBuilder, dataDeltaSyncKey);
+		if (collection.getWindowSize() >= syncData.getEmailChanges().sumOfChanges()) {
+			return fetchChanges(udr, collection, syncData.getDataDeltaDate(), newSyncKey, syncData.getEmailChanges());
+		} else {
+			windowingService.pushPendingElements(newSyncKey, syncData.getEmailChanges(), collection.getWindowSize());
+			return continueWindowing(udr, collection, syncData.getDataDeltaDate(), newSyncKey);
+		}
+	}
+
+	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection collection,
+			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey)
+		throws DaoException, EmailViewPartsFetcherException {
 		
-		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, syncCollection.getCollectionId(),
-				syncCollection.getCollectionPath(), syncCollection.getOptions().getBodyPreferences(), fittingEmailChanges);
+		EmailChanges pendingChanges = windowingService.popNextPendingElements(dataDeltaSyncKey, collection.getWindowSize());
+		return fetchChanges(udr, collection, dataDelaSyncDate, dataDeltaSyncKey, pendingChanges);
+	}
+
+	private DataDelta fetchChanges(UserDataRequest udr, SyncCollection collection, Date dataDelaSyncDate,
+			SyncKey dataDeltaSyncKey, EmailChanges pendingChanges)
+		throws EmailViewPartsFetcherException {
 		
-		return dataDeltaBuilder
+		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collection.getCollectionId(),
+				collection.getCollectionPath(), collection.getOptions().getBodyPreferences(), pendingChanges);
+		
+		return DataDelta.builder()
 				.changes(serverItemChanges.getItemChanges())
 				.deletions(serverItemChanges.getItemDeletions())
 				.syncDate(dataDelaSyncDate)
 				.syncKey(dataDeltaSyncKey)
+				.moreAvailable(windowingService.hasPendingElements(dataDeltaSyncKey))
 				.build();
-	}
-
-	private EmailChanges splitAndHandlePendingChanges(int windowSize, EmailChanges pendingChanges,
-			DataDelta.Builder dataDeltaBuilder, SyncKey dataDeltaSyncKey) {
-		
-		Splitter splittedEmailChanges = pendingChanges.splitToFit(windowSize);
-		windowingService.setPendingWindowing(dataDeltaSyncKey, splittedEmailChanges.getLeft());
-		
-		if (splittedEmailChanges.getLeft().hasChanges()) {
-			dataDeltaBuilder.moreAvailable(true);
-		}
-		return splittedEmailChanges.getFit();
 	}
 
 	private void takeSnapshot(UserDataRequest udr, Integer collectionId, 

@@ -59,7 +59,7 @@ public class ObjectStoreManager {
 		this.singletonManager = new CacheManager(ehCacheConfiguration());
 	}
 
-	@VisibleForTesting void shutdown() {
+	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
 	

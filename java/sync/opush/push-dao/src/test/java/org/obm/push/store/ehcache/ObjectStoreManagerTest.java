@@ -72,7 +72,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	public void loadStores() {
 		List<String> stores = opushCacheManager.listStores();
 		Assert.assertNotNull(stores);
-		Assert.assertEquals(7, stores.size());
+		Assert.assertEquals(8, stores.size());
 	}
 	
 	@Test
@@ -88,7 +88,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 		Assert.assertNull(opushCacheManager.getStore("test 2"));
 		
-		Assert.assertEquals(9, opushCacheManager.listStores().size());
+		Assert.assertEquals(10, opushCacheManager.listStores().size());
 	}
 	
 	@Test
@@ -105,7 +105,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		opushCacheManager.createNewStore("test 1");
 		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
 
-		Assert.assertEquals(8, opushCacheManager.listStores().size());
+		Assert.assertEquals(9, opushCacheManager.listStores().size());
 	}
 
 }

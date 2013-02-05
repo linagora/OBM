@@ -29,17 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.opush.windowing;
 
-import org.obm.push.bean.SyncKey;
-import org.obm.push.mail.EmailChanges;
+import org.junit.runner.RunWith;
 
-public interface WindowingDao {
+import cucumber.api.junit.Cucumber;
+
+@RunWith(Cucumber.class)
+public class WindowingCucumber {
 	
-	Iterable<EmailChanges> consumingChunksIterable(SyncKey syncKey);
-
-	void pushPendingElements(SyncKey syncKey, EmailChanges partition);
-
-	boolean hasPendingElements(SyncKey syncKey);
-
 }

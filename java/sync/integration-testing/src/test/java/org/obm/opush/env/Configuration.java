@@ -31,8 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Charsets;
 
 public class Configuration {
 	
@@ -55,5 +59,13 @@ public class Configuration {
 	public SyncPerms syncPerms = new SyncPerms();
 	public Mail mail = new Mail();
 	public Transaction transaction = new Transaction();
-	
+	public String locatorUrl = null;
+	public String obmUiBaseUrl = null;
+	public String obmSyncUrl = null;
+	public int locatorCacheTimeout = 10;
+	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
+	public String activeSyncServletUrl = null;
+	public Charset defautEncoding = Charsets.UTF_8;
+	public int trustTokenTimeoutInSeconds = 10;
+	public int solrCheckingInterval = 10;
 }
