@@ -58,6 +58,7 @@ public class ObmHelper implements DateProvider {
 	public static final String VROLE = "vrole";
 	public static final String VPARTSTAT = "vpartstat";
 	public static final String VOPACITY = "vopacity";
+	public static final String VKIND = "vkind";
 
 	private final DatabaseConnectionProvider dbcp;
 
