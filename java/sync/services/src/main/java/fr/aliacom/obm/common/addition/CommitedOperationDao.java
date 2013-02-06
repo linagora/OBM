@@ -29,71 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package fr.aliacom.obm.common.addition;
 
-import nl.jqno.equalsverifier.Warning;
+import java.sql.SQLException;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.auth.Login;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
-import org.obm.sync.calendar.ContactAttendee;
-import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.RecurrenceDays;
-import org.obm.sync.calendar.RecurrenceId;
-import org.obm.sync.calendar.ResourceAttendee;
-import org.obm.sync.calendar.SyncRange;
-import org.obm.sync.calendar.UserAttendee;
-import org.obm.sync.items.EventChanges;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.resource.Resource;
-import fr.aliacom.obm.common.trust.TrustToken;
+public interface CommitedOperationDao {
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+	void store(AccessToken at, CommitedElement commitedElement) throws SQLException, ServerFault;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	Event findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault;
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
-	@Test
-	public void test() {
-		equalsVerifierUtilsTest.test(
-				ObmDomain.class,
-				Event.class,
-				DeletedEvent.class,
-				EventRecurrence.class,
-				EventChanges.class,
-				Contact.class,
-				TrustToken.class,
-				Login.class,
-				SyncRange.class,
-				EventExtId.class,
-				EventObmId.class,
-				EventRecurrence.class,
-				RecurrenceId.class,
-				Resource.class,
-				UserAttendee.class, ContactAttendee.class, ResourceAttendee.class,
-				CommitedElement.class);
-	}
-	
-	@Test
-	public void testWhereNullableFields() {
-		EqualsVerifierUtils
-			.createEqualsVerifier(RecurrenceDays.class)
-			.suppress(Warning.NULL_FIELDS)
-			.verify();
-	}
+	Contact findAsContact(AccessToken token, String clientId) throws SQLException;
 }
