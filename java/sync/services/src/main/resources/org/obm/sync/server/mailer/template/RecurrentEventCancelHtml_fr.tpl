@@ -11,7 +11,7 @@
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${start?string.medium_short}</td>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${start}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${recurrenceEnd}</td>

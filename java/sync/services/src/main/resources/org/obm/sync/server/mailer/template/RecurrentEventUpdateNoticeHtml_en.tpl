@@ -6,14 +6,13 @@
     </tr>
     <tr>
         <td colspan="2">
-The recurrent appointment ${new.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime} - ${old.endTime}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}),
-was updated : </td>
+The recurrent appointment ${old.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated : </td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start?string.medium_short}</td>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.recurrenceEnd}</td>

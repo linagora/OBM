@@ -5,9 +5,9 @@ APPOINTMENT DELETED !
 
 The next appointment ${subject} has been deleted.
 
-from            : ${start}
+from            : ${start?string.medium_short}
 
-to              : ${end}
+to              : ${end?string.medium_short}
 
 subject         : ${subject}
 

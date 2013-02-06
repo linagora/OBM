@@ -3,8 +3,26 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS RÉCURRENT MODIFIÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous récurrent ${new.subject}, initialement prévu du ${old.startDate} au ${old.endDate} de ${old.startTime} à ${old.endTime}, (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}),
-a été modifié et se déroulera du ${new.start} au ${new.recurrenceEnd} de ${new.startTime?string.short} à ${new.endTime?string.short}, (lieu : ${new.location}, type de récurrence : ${new.recurrenceKind}).
+Le rendez-vous récurrent ${old.subject}, initialement prévu du ${old.startDate} au ${old.endDate} de ${old.startTime?string.short} à ${old.endTime?string.short}, (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}), a été modifié :
+
+du            : ${new.start}
+
+au            : ${new.recurrenceEnd}
+
+heure         : ${new.startTime?string.short} - ${new.endTime?string.short}
+
+recurrence    : ${new.recurrenceKind}
+
+sujet         : ${new.subject}
+
+lieu          : ${new.location}
+
+organisateur  : ${new.organizer}
+
+créé par      : ${new.creator}
+
+participant(s): ${new.attendees}
+
 
 ::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.
 

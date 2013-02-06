@@ -3,11 +3,22 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS MODIFIÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous ${new.subject}, initialement prévu du ${old.start} au ${old.end}, (lieu : ${old.location}),
-a été modifié et se déroulera du ${new.start} au ${new.end}, (lieu : ${new.location}).
+Le rendez-vous ${old.subject}, initialement prévu du ${old.start?string.medium_short} au ${old.end?string.medium_short}, (lieu : ${old.location}),
+a été modifié :
 
-:: Pour plus de détails : 
-${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}
+du              : ${new.start?string.medium_short}
+
+au              : ${new.end?string.medium_short}
+
+sujet           : ${new.subject}
+
+lieu            : ${new.location}
+
+organisateur    : ${new.organizer}
+
+créé par        : ${new.creator}
+
+participant(s)	: ${new.attendees}
 
 
 :: Pour accepter les modifications :
@@ -15,3 +26,6 @@ ${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendar
 
 :: Pour refuser les modifications : 
 ${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=DECLINED
+
+:: Pour plus de détails : 
+${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}

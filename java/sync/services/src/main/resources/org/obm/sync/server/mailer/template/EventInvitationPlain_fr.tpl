@@ -5,9 +5,9 @@ NOUVEAU RENDEZ-VOUS !
 
 Vous êtes invité à participer à ce rendez-vous
 
-du              : ${start}
+du              : ${start?string.medium_short}
 
-au              : ${end}
+au              : ${end?string.medium_short}
 
 sujet           : ${subject}
 

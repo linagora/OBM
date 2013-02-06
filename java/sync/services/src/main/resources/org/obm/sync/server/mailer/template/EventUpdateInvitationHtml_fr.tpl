@@ -5,7 +5,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous <strong><?php echo $title; ?></strong>, initialement prévu du ${old.start} au ${old.end}, (lieu : ${old.location}),
+        <td colspan="2">Le rendez-vous <strong><?php echo $title; ?></strong>, initialement prévu du ${old.start?string.medium_short} au ${old.end?string.medium_short}, (lieu : ${old.location}),
 a été modifié :</td>
     </tr>
     <tr>

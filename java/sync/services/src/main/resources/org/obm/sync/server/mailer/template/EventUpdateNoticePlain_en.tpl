@@ -3,8 +3,23 @@ This email was automatically sent by OBM
 APPOINTMENT UPDATED !
 ------------------------------------------------------------------
 
-The appointment ${new.subject}, initially scheduled from ${old.start} to ${old.end}, (location : ${old.location}),
-was updated and will take place from ${new.start} to ${new.end}, (location : ${new.location}).
+The appointment ${old.subject}, initially scheduled from ${old.start?string.medium_short} to ${old.end?string.medium_short}, (location : ${old.location}),
+was updated :
+
+from        : ${new.start?string.medium_short}
+
+to          : ${new.end?string.medium_short}
+
+subject     : ${new.subject}
+
+location    : ${new.location}
+
+organizer   : ${new.organizer}
+
+created by  : ${new.creator}
+
+attendee(s) : ${new.attendees}
+
 
 ::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this update.
 

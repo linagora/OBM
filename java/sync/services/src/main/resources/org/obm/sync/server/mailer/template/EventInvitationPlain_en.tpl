@@ -5,9 +5,9 @@ NEW APPOINTMENT
 
 You are invited to participate to this appointment
 
-from        : ${start}
+from        : ${start?string.medium_short}
 
-to          : ${end}
+to          : ${end?string.medium_short}
 
 subject     : ${subject}
 
@@ -16,6 +16,7 @@ location    : ${location}
 organizer   : ${organizer}
 
 created by  : ${creator}
+
 
 :: To accept this appointment : 
 ${host}calendar/calendar_index.php?action=update_decision&calendar_id=${calendarId}&entity_kind=user&rd_decision_event=ACCEPTED

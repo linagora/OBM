@@ -6,14 +6,13 @@
     </tr>
     <tr>
         <td colspan="2">Le rendez-vous récurrent <strong><?php echo $title; ?></strong>, initialement prévu du ${old.start} au ${old.recurrenceEnd} 
-        de ${old.startTime} à ${old.endTime} (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}),
-a été modifié :</td>
+        de ${old.startTime?string.short} à ${old.endTime?string.short} (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}), a été modifié :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${new.start?string.medium_short}</td>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">${new.start}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${new.recurrenceEnd}</td>

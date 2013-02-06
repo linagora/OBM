@@ -577,7 +577,7 @@ public class EventChangeMailerTest {
 				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
 				"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
 		checkPlainMessage(parts, "NOUVEAU RENDEZ-VOUS",
-				"du              : 8 nov. 2010 11:00:00", 
+				"du              : 8 nov. 2010 11:00", 
 				"au              : 8 nov. 2010 11:45",
 				"sujet           : Sprint planning OBM", 
 				"lieu            : ",

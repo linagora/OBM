@@ -6,7 +6,7 @@
     </tr>
     <tr>
         <td colspan="2">
-The appointment ${new.subject}, initially scheduled from ${old.start} to ${old.end}, (location : ${old.location}),
+The appointment ${old.subject}, initially scheduled from ${old.start?string.medium_short} to ${old.end?string.medium_short}, (location : ${old.location}),
 was updated:</td>
     </tr>
     <tr>

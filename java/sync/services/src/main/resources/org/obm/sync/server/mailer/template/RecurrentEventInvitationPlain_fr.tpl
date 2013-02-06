@@ -19,7 +19,7 @@ lieu         : ${location}
 
 organisateur : ${organizer}
 
-created by   : ${creator}
+créé par     : ${creator}
 
 
 :: Pour accepter : 
