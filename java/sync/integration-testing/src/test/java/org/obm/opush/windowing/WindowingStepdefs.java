@@ -39,10 +39,14 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.User;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 
 import bitronix.tm.TransactionManagerServices;
@@ -65,12 +69,18 @@ public class WindowingStepdefs {
 	private final TransactionManager tm;
 	private final ObjectStoreManager storeManager;
 
+	private WindowingIndexKey windowingIndexKey;
 	private SyncKey syncKey;
+	private int collectionId;
+	private User user;
+	private DeviceId deviceId;
+
 	private EmailChanges inbox;
 	private EmailChanges retrievedElements;
-	private int elements;
+	private int elementsLeft;
 	private int retreivingChangesIteration;
 	private int retreivingChangesSum;
+	
 	
 	@Inject
 	public WindowingStepdefs(WindowingService windowingService, ObjectStoreManager storeManager) {
@@ -82,7 +92,11 @@ public class WindowingStepdefs {
 	@Before
 	public void setup() throws NotSupportedException, SystemException {
 		tm.begin();
-		syncKey = new SyncKey(UUID.randomUUID().toString());		
+		collectionId = 5;
+		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
+		deviceId = new DeviceId("ab123");
+		
+		windowingIndexKey = new WindowingIndexKey(user, deviceId, collectionId);
 	}
 	
 	@After
@@ -93,15 +107,21 @@ public class WindowingStepdefs {
 	
 	@Given("user has (\\d+) elements in INBOX")
 	public void elementsInInbox(int elements) {
-		this.elements = elements;
 		inbox = generateEmails(elements);
 	}
 	
 	@When("user ask for the first (\\d+) elements")
 	public void retrieveFirstElements(int elements) {
+		userGenerateANewSyncKey();
 		startToRetrieveElements();
-		windowingService.pushPendingElements(syncKey, inbox, elements);
+		windowingService.hasPendingElements(windowingIndexKey, syncKey);
+		windowingService.pushPendingElements(windowingIndexKey, syncKey, inbox, elements);
+		this.elementsLeft = inbox.sumOfChanges();
 		retrieveElements(elements);
+	}
+
+	private void userGenerateANewSyncKey() {
+		syncKey = new SyncKey(UUID.randomUUID().toString());
 	}
 	
 	@When("user ask for the next (\\d+) elements")
@@ -113,7 +133,7 @@ public class WindowingStepdefs {
 	@When("user ask repeatedly for (\\d+) elements")
 	public void retreiveUntilPendingElementIsEmpty(int elements) {
 		startToRetrieveElements();
-		while (this.elements > 0) {
+		while (this.elementsLeft > 0) {
 			retrieveElements(elements);
 			retreivingChangesSum += retrievedElements.sumOfChanges();
 			retreivingChangesIteration++;
@@ -121,19 +141,19 @@ public class WindowingStepdefs {
 	}
 
 	private void retrieveElements(int elements) {
-		retrievedElements = windowingService.popNextPendingElements(syncKey, elements);
-		this.elements -= retrievedElements.sumOfChanges();
+		retrievedElements = windowingService.popNextPendingElements(windowingIndexKey, elements);
+		this.elementsLeft -= retrievedElements.sumOfChanges();
 	}
 	
 	@Then("user get (\\d+) elements")
 	public void assertRetrievedElement(int elements) {
-		assertThat(retrievedElements).isEqualTo(generateEmails(this.elements, elements));
+		assertThat(retrievedElements).isEqualTo(generateEmails(this.elementsLeft, elements));
 	}
 	
 	@Then("there is (\\d+) elements left in store")
 	public void assertElementsInStore(int elements) {
-		assertThat(windowingService.hasPendingElements(syncKey)).isEqualTo(elements > 0);
-		EmailChanges pendingChanges = windowingService.popNextPendingElements(syncKey, Integer.MAX_VALUE);
+		assertThat(windowingService.hasPendingElements(windowingIndexKey, syncKey)).isEqualTo(elements > 0);
+		EmailChanges pendingChanges = windowingService.popNextPendingElements(windowingIndexKey, Integer.MAX_VALUE);
 		assertThat(pendingChanges).isEqualTo(generateEmails(elements));
 	}
 	

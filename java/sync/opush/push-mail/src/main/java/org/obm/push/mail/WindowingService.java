@@ -32,13 +32,14 @@
 package org.obm.push.mail;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.mail.bean.WindowingIndexKey;
 
 public interface WindowingService {
 
-	EmailChanges popNextPendingElements(SyncKey syncKey, int maxSize);
+	EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize);
 	
-	void pushPendingElements(SyncKey syncKey, EmailChanges changes, int windowSize);
+	void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges changes, int windowSize);
 
-	boolean hasPendingElements(SyncKey syncKey);
+	boolean hasPendingElements(WindowingIndexKey key, SyncKey syncKey);
 
 }

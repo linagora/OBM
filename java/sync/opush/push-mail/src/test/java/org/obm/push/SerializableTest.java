@@ -46,7 +46,7 @@ import com.google.common.testing.SerializableTester;
 public class SerializableTest {
 
 	@Test
-	public void testSyncCollectionOptions() {
+	public void testEmailChanges() {
 		SerializableTester.reserializeAndAssert(EmailChanges.builder()
 				.additions(ImmutableSet.of(
 						Email.builder()

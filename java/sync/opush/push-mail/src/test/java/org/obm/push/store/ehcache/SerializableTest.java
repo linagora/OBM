@@ -29,47 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.windowing;
+package org.obm.push.store.ehcache;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.User;
+import org.obm.push.mail.bean.WindowingIndexKey;
 
+import com.google.common.testing.SerializableTester;
 
-import java.util.concurrent.TimeUnit;
+@RunWith(SlowFilterRunner.class)
+public class SerializableTest {
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.opush.env.Configuration;
-import org.obm.opush.env.TestConfigurationService;
-import org.obm.push.mail.WindowingService;
-import org.obm.push.mail.WindowingServiceImpl;
-import org.obm.push.store.WindowingDao;
-import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.primitives.Ints;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-
-public class WindowingModule extends AbstractModule {
-
-	private final Logger configurationLogger;
-
-	public WindowingModule() {
-		configurationLogger = LoggerFactory.getLogger(getClass());
-	}
-	
-	@Override
-	protected void configure() {
-		bind(ConfigurationService.class).toInstance(configuration());
-		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
-		bind(WindowingService.class).to(WindowingServiceImpl.class);
-		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
-	}		
-
-	protected ConfigurationService configuration() {
-		Configuration configuration = new Configuration();
-		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
-		return new TestConfigurationService(configuration);
+	@Test
+	public void testWindowingIndex() {
+		SerializableTester.reserializeAndAssert(new WindowingDaoEhcacheImpl.WindowingIndex(5, new SyncKey("123")));
 	}
 
+	@Test
+	public void testChunkKey() {
+		User user = User.Factory.create().createUser("user@email.org", "user@email.org", "display name");
+		WindowingIndexKey windowingIndexKey = new WindowingIndexKey(user, new DeviceId("564"), 456);
+		SerializableTester.reserializeAndAssert(new WindowingDaoEhcacheImpl.ChunkKey(windowingIndexKey, 5));
+	}	
 }

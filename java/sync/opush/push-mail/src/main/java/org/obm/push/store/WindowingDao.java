@@ -33,13 +33,18 @@ package org.obm.push.store;
 
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.EmailChanges;
+import org.obm.push.mail.bean.WindowingIndexKey;
 
 public interface WindowingDao {
 	
-	Iterable<EmailChanges> consumingChunksIterable(SyncKey syncKey);
+	Iterable<EmailChanges> consumingChunksIterable(WindowingIndexKey key);
 
-	void pushPendingElements(SyncKey syncKey, EmailChanges partition);
+	void pushPendingElements(WindowingIndexKey key, EmailChanges partition);
+	
+	void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges partition);
 
-	boolean hasPendingElements(SyncKey syncKey);
+	SyncKey getWindowingSyncKey(WindowingIndexKey key);
+
+	void removePreviousCollectionWindowing(WindowingIndexKey key);
 
 }

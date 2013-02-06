@@ -40,11 +40,14 @@ import net.sf.ehcache.Element;
 
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.EmailChanges;
+import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.WindowingDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -62,7 +65,7 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 	}
 
 	@Override
-	public Iterable<EmailChanges> consumingChunksIterable(final SyncKey syncKey) {
+	public Iterable<EmailChanges> consumingChunksIterable(final WindowingIndexKey key) {
 		return new Iterable<EmailChanges>() {
 			@Override
 			public Iterator<EmailChanges> iterator() {
@@ -70,32 +73,32 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 
 					@Override
 					public boolean hasNext() {
-						return getIndex(syncKey) != null;
+						return getWindowingIndex(key) != null;
 					}
 
 					@Override
 					public EmailChanges next() {
-						Integer index = getIndex(syncKey);
+						WindowingIndex index = getWindowingIndex(key);
 						if (index == null) {
 							throw new NoSuchElementException();
 						}
-						EmailChanges emailChanges = consumeChunk(syncKey, index);
-						udpateIndex(syncKey, index);
+						EmailChanges emailChanges = consumeChunk(key, index);
+						udpateIndex(key, index);
 						return emailChanges;
 					}
 
-					private EmailChanges consumeChunk(SyncKey syncKey, Integer index) {
-						ChunkKey key = new ChunkKey(index, syncKey);
-						Element emailChanges = chunksStore.get(key);
-						chunksStore.remove(key);
+					private EmailChanges consumeChunk(WindowingIndexKey key, WindowingIndex index) {
+						ChunkKey chunkKey = new ChunkKey(key, index.getIndex());
+						Element emailChanges = chunksStore.get(chunkKey);
+						chunksStore.remove(chunkKey);
 						return (EmailChanges) emailChanges.getValue();
 					}
 
-					private void udpateIndex(final SyncKey syncKey, int index) {
-						if (index == 0) {
-							indexStore.remove(syncKey);
+					private void udpateIndex(final WindowingIndexKey key, WindowingIndex index) {
+						if (index.getIndex() == 0) {
+							indexStore.remove(key);
 						} else {
-							indexStore.put(new Element(syncKey, index - 1));
+							indexStore.replace(new Element(key, index.nextToBeRetrieved()));
 						}
 					}
 
@@ -109,26 +112,74 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 	}
 	
 	@Override
-	public void pushPendingElements(SyncKey syncKey, EmailChanges partition) {
-		logger.debug("put windowing EmailChanges with key {} : {}", syncKey, partition);
-		int lastIndex = getNextIndex(syncKey);
-		chunksStore.put(new Element(new ChunkKey(lastIndex, syncKey), partition));
-		indexStore.put(new Element(syncKey, lastIndex));
+	public void pushPendingElements(WindowingIndexKey indexKey, EmailChanges partition) {
+		pushNextChunk(indexKey, partition, getWindowingIndex(indexKey).nextToBeStored());
+	}
+	
+	@Override
+	public void pushPendingElements(WindowingIndexKey indexKey, SyncKey syncKey, EmailChanges partition) {
+		pushNextChunk(indexKey, partition, nextToBeStored(indexKey, syncKey));
 	}
 
-	public static class ChunkKey implements Serializable {
+	private WindowingIndex nextToBeStored(WindowingIndexKey indexKey, SyncKey syncKey) {
+		WindowingIndex windowingIndex = getWindowingIndex(indexKey);
+		if (windowingIndex == null) {
+			return new WindowingIndex(0, syncKey);
+		} else {
+			return windowingIndex.nextToBeStored();
+		}
+	}
+
+	private void pushNextChunk(WindowingIndexKey indexKey, EmailChanges partition, WindowingIndex nextIndex) {
+		logger.debug("put windowing EmailChanges with key {} : {}", indexKey, partition);
+		chunksStore.put(new Element(new ChunkKey(indexKey, nextIndex.getIndex()), partition));
+		indexStore.put(new Element(indexKey, nextIndex));
+	}
+	
+	private WindowingIndex getWindowingIndex(WindowingIndexKey key) {
+		Element indexElement = indexStore.get(key);
+		return (WindowingIndex) (indexElement != null ? indexElement.getValue() : null);
+	}
+
+	@Override
+	public SyncKey getWindowingSyncKey(WindowingIndexKey key) {
+		WindowingIndex windowingIndex = getWindowingIndex(key);
+		if (windowingIndex != null) {
+			return windowingIndex.getSyncKey();
+		}
+		return null;
+	}
+
+	@Override
+	public void removePreviousCollectionWindowing(WindowingIndexKey key) {
+		WindowingIndex windowingIndex = getWindowingIndex(key);
+		if (windowingIndex != null) {
+			indexStore.remove(key);
+			removePreviousCollectionChunks(key, windowingIndex);
+		}
+	}
+
+	private void removePreviousCollectionChunks(WindowingIndexKey key, WindowingIndex startingIndex) {
+		WindowingIndex indexToRemove = startingIndex;
+		while (indexToRemove != null) {
+			chunksStore.remove(new ChunkKey(key, indexToRemove.getIndex()));
+			indexToRemove = indexToRemove.nextToBeRetrieved();
+		}
+	}
+
+	@VisibleForTesting static class ChunkKey implements Serializable {
 		
-		private int index;
-		private SyncKey syncKey;
+		private final WindowingIndexKey key;
+		private final int index;
 		
-		public ChunkKey(int index, SyncKey syncKey) {
+		public ChunkKey(WindowingIndexKey key, int index) {
+			this.key = key;
 			this.index = index;
-			this.syncKey = syncKey;
 		}
 		
 		@Override
 		public final int hashCode(){
-			return Objects.hashCode(index, syncKey);
+			return Objects.hashCode(index, key);
 		}
 		
 		@Override
@@ -136,28 +187,66 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 			if (object instanceof ChunkKey) {
 				ChunkKey that = (ChunkKey) object;
 				return Objects.equal(this.index, that.index)
-					&& Objects.equal(this.syncKey, that.syncKey);
+					&& Objects.equal(this.key, that.key);
 			}
 			return false;
 		}		
 		
 	}
 	
-	private int getNextIndex(SyncKey syncKey) {
-		Integer index = getIndex(syncKey);
-		if (index != null) {
-			return index + 1;
+	@VisibleForTesting static class WindowingIndex implements Serializable {
+		
+		private final int index;
+		private final SyncKey syncKey;
+		
+		public WindowingIndex(int index, SyncKey syncKey) {
+			Preconditions.checkArgument(index >= 0, "illegal index");
+			Preconditions.checkArgument(syncKey != null && syncKey != SyncKey.INITIAL_FOLDER_SYNC_KEY, "illegal syncKey");
+			this.index = index;
+			this.syncKey = syncKey;
 		}
-		return 0;
-	}
+		
+		public int getIndex() {
+			return index;
+		}
 
-	private Integer getIndex(SyncKey syncKey) {
-		Element indexElement = indexStore.get(syncKey);
-		return (Integer) (indexElement != null ? indexElement.getValue() : null);
-	}
+		public SyncKey getSyncKey() {
+			return syncKey;
+		}
 
-	@Override
-	public boolean hasPendingElements(SyncKey syncKey) {
-		return indexStore.get(syncKey) != null;
+		@Override
+		public final int hashCode(){
+			return Objects.hashCode(index, syncKey);
+		}
+		
+		@Override
+		public final boolean equals(Object object){
+			if (object instanceof WindowingIndex) {
+				WindowingIndex that = (WindowingIndex) object;
+				return Objects.equal(this.index, that.index)
+					&& Objects.equal(this.syncKey, that.syncKey);
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(this)
+				.add("index", index)
+				.add("syncKey", syncKey)
+				.toString();
+		}
+
+		public WindowingIndex nextToBeStored() {
+			return new WindowingIndex(index +1, syncKey);
+		}
+		
+		public WindowingIndex nextToBeRetrieved() {
+			if (index > 0) {
+				return new WindowingIndex(index -1, syncKey);
+			} else {
+				return null;
+			}
+		}
 	}
 }

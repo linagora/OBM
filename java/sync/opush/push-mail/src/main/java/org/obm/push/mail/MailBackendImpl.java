@@ -95,6 +95,7 @@ import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.service.EventService;
@@ -303,18 +304,21 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 		try {
 			SyncKey requestSyncKey = collection.getSyncKey();
+			WindowingIndexKey key = new WindowingIndexKey(udr.getUser(), udr.getDevId(), collection.getCollectionId());
 			
-			if (windowingService.hasPendingElements(requestSyncKey)) {
-				return continueWindowing(udr, collection, collection.getItemSyncState().getSyncDate(), requestSyncKey);
+			if (windowingService.hasPendingElements(key, requestSyncKey)) {
+				return continueWindowing(udr, collection, key, collection.getItemSyncState().getSyncDate(), requestSyncKey);
 			} else {
-				return startWindowing(udr, collection, newSyncKey);
+				return startWindowing(udr, collection, key, newSyncKey);
 			}
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
 
-	private DataDelta startWindowing(UserDataRequest udr, SyncCollection collection, SyncKey newSyncKey) throws EmailViewPartsFetcherException {
+	private DataDelta startWindowing(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key, SyncKey newSyncKey)
+			throws EmailViewPartsFetcherException {
+		
 		Integer collectionId = collection.getCollectionId();
 		ItemSyncState syncState = collection.getItemSyncState();
 		SyncCollectionOptions options = collection.getOptions();
@@ -323,23 +327,23 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		takeSnapshot(udr, collectionId, collection.getOptions(), syncData, newSyncKey);
 
 		if (collection.getWindowSize() >= syncData.getEmailChanges().sumOfChanges()) {
-			return fetchChanges(udr, collection, syncData.getDataDeltaDate(), newSyncKey, syncData.getEmailChanges());
+			return fetchChanges(udr, collection, key, syncData.getDataDeltaDate(), newSyncKey, syncData.getEmailChanges());
 		} else {
-			windowingService.pushPendingElements(newSyncKey, syncData.getEmailChanges(), collection.getWindowSize());
-			return continueWindowing(udr, collection, syncData.getDataDeltaDate(), newSyncKey);
+			windowingService.pushPendingElements(key, newSyncKey, syncData.getEmailChanges(), collection.getWindowSize());
+			return continueWindowing(udr, collection, key, syncData.getDataDeltaDate(), newSyncKey);
 		}
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection collection,
+	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key,
 			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey)
 		throws DaoException, EmailViewPartsFetcherException {
 		
-		EmailChanges pendingChanges = windowingService.popNextPendingElements(dataDeltaSyncKey, collection.getWindowSize());
-		return fetchChanges(udr, collection, dataDelaSyncDate, dataDeltaSyncKey, pendingChanges);
+		EmailChanges pendingChanges = windowingService.popNextPendingElements(key, collection.getWindowSize());
+		return fetchChanges(udr, collection, key, dataDelaSyncDate, dataDeltaSyncKey, pendingChanges);
 	}
 
-	private DataDelta fetchChanges(UserDataRequest udr, SyncCollection collection, Date dataDelaSyncDate,
-			SyncKey dataDeltaSyncKey, EmailChanges pendingChanges)
+	private DataDelta fetchChanges(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key,
+			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey, EmailChanges pendingChanges)
 		throws EmailViewPartsFetcherException {
 		
 		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collection.getCollectionId(),
@@ -350,7 +354,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				.deletions(serverItemChanges.getItemDeletions())
 				.syncDate(dataDelaSyncDate)
 				.syncKey(dataDeltaSyncKey)
-				.moreAvailable(windowingService.hasPendingElements(dataDeltaSyncKey))
+				.moreAvailable(windowingService.hasPendingElements(key, dataDeltaSyncKey))
 				.build();
 	}
 

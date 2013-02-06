@@ -34,7 +34,10 @@ package org.obm.push.mail;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.EmailChanges.Builder;
 import org.obm.push.mail.EmailChanges.Splitter;
+import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.WindowingDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -45,6 +48,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class WindowingServiceImpl implements WindowingService {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private final WindowingDao windowingDao;
 
 	@Inject
@@ -53,20 +58,34 @@ public class WindowingServiceImpl implements WindowingService {
 	}
 
 	@Override
-	public EmailChanges popNextPendingElements(SyncKey syncKey, int maxSize) {
-		Preconditions.checkArgument(syncKey != null);
-		Preconditions.checkArgument(!SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncKey));
+	public EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize) {
+		Preconditions.checkArgument(key != null);
 		Preconditions.checkArgument(maxSize > 0);
+
+		logger.info("retrieve a maximum of {} changes for key {}", maxSize, key);
 		
-		EmailChanges changes = getEnoughChunks(syncKey, maxSize);
+		EmailChanges changes = getEnoughChunks(key, maxSize);
+		return splitToFitWindowSize(key, changes, maxSize);
+	}
+
+	private EmailChanges splitToFitWindowSize(WindowingIndexKey key, EmailChanges changes, int maxSize) {
 		Splitter parts = changes.splitToFit(maxSize);
-		pushPendingElements(syncKey, parts.getLeft(), maxSize);
+
+		logger.info("a chunk has been splitted, fit:{} and left:{}", parts.getFit(), parts.getLeft());
+		
+		if (parts.getLeft().hasChanges()) {
+			windowingDao.pushPendingElements(key, parts.getLeft());
+		}
+		
 		return parts.getFit();
 	}
 
-	private EmailChanges getEnoughChunks(SyncKey syncKey, int maxSize) {
+	private EmailChanges getEnoughChunks(WindowingIndexKey key, int maxSize) {
 		Builder builder = EmailChanges.builder();
-		for (EmailChanges changes: windowingDao.consumingChunksIterable(syncKey)) {
+		for (EmailChanges changes: windowingDao.consumingChunksIterable(key)) {
+
+			logger.info("a chunk is retrieved {}", changes);
+			
 			builder.merge(changes);
 			if (builder.sumOfChanges() >= maxSize) {
 				break;
@@ -76,15 +95,32 @@ public class WindowingServiceImpl implements WindowingService {
 	}
 	
 	@Override
-	public void pushPendingElements(SyncKey syncKey, EmailChanges changes, int windowSize) {
+	public void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges changes, int windowSize) {
+		
+		logger.info("pushing windowing elements, key:{}, syncKey:{}, changes:{}, windowSize:{}", 
+				new Object[]{key, syncKey, changes, windowSize});
+		
 		for (EmailChanges chunk: ImmutableList.copyOf(changes.partition(windowSize)).reverse()) {
-			windowingDao.pushPendingElements(syncKey, chunk);
+			windowingDao.pushPendingElements(key, syncKey, chunk);
 		}
 	}
 
 	@Override
-	public boolean hasPendingElements(SyncKey syncKey) {
-		return windowingDao.hasPendingElements(syncKey);
+	public boolean hasPendingElements(WindowingIndexKey key, SyncKey syncKey) {
+		SyncKey windowingSyncKey = windowingDao.getWindowingSyncKey(key);
+		
+		if (windowingSyncKey == null) {
+			logger.info("no pending windowing for key {}", key);
+			return false;
+		} else if(!windowingSyncKey.equals(syncKey)) {
+			logger.info("reseting a pending windowing for key {} and syncKey {} by a new syncKey {}",
+					new Object[] {key, windowingSyncKey, syncKey});
+			windowingDao.removePreviousCollectionWindowing(key);
+			return false;
+		} else {
+			logger.info("there is a pending windowing for key {}, syncKey is {}", key, windowingSyncKey);
+			return true;
+		}
 	}
 
 }

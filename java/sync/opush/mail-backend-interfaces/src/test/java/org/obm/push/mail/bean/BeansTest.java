@@ -74,6 +74,7 @@ public class BeansTest {
 					.add(Snapshot.class)
 					.add(SnapshotKey.class)
 					.add(MessageSet.class)
+					.add(WindowingIndexKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		

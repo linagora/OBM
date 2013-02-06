@@ -39,8 +39,12 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.User;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.WindowingDao;
 
 import com.google.common.collect.ImmutableList;
@@ -51,54 +55,53 @@ public class WindowingServiceImplTest {
 	private WindowingDao windowingDao;
 	private WindowingServiceImpl testee;
 	private IMocksControl control;
+	private int collectionId;
+	private DeviceId deviceId;
+	private User user;
 
 	@Before
 	public void setup() {
+		collectionId = 5;
+		deviceId = new DeviceId("ab123");
+		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
+
 		control = createControl();
 		windowingDao = control.createMock(WindowingDao.class);
 		testee = new WindowingServiceImpl(windowingDao);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void popNextPendingElementsNullSyncKey() {
-		SyncKey syncKey = null;
+	public void popNextPendingElementsNullKey() {
+		WindowingIndexKey key = null;
 		int expectedSize = 12;
 
-		testee.popNextPendingElements(syncKey, expectedSize);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void popNextPendingElementsZeroSyncKey() {
-		SyncKey syncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
-		int expectedSize = 12;
-
-		testee.popNextPendingElements(syncKey, expectedSize);
+		testee.popNextPendingElements(key, expectedSize);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void popNextPendingElementsZeroExpectedSize() {
-		SyncKey syncKey = new SyncKey("sk1");
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		int expectedSize = 0;
-		testee.popNextPendingElements(syncKey, expectedSize);
+		testee.popNextPendingElements(key, expectedSize);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void popNextPendingElementsNegativeExpectedSize() {
-		SyncKey syncKey = new SyncKey("sk1");
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		int expectedSize = -5;
-		testee.popNextPendingElements(syncKey, expectedSize);
+		testee.popNextPendingElements(key, expectedSize);
 	}
 	
 	@Test
 	public void popNextPendingElementsEmpty() {
-		SyncKey syncKey = new SyncKey("sk1");
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		int expectedSize = 12;
 
-		expect(windowingDao.consumingChunksIterable(syncKey))
+		expect(windowingDao.consumingChunksIterable(key))
 			.andReturn(ImmutableList.<EmailChanges>of()).once();
 
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(syncKey, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
 		control.verify();
 
 		assertThat(elements.sumOfChanges()).isEqualTo(0);
@@ -106,17 +109,17 @@ public class WindowingServiceImplTest {
 	
 	@Test
 	public void popNextPendingElementsFewElements() {
-		SyncKey syncKey = new SyncKey("sk1");
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		int expectedSize = 12;
 
-		expect(windowingDao.consumingChunksIterable(syncKey))
+		expect(windowingDao.consumingChunksIterable(key))
 			.andReturn(ImmutableList.<EmailChanges>of(
 					EmailChanges.builder().addition(Email.builder().uid(1).build()).build(),
 					EmailChanges.builder().addition(Email.builder().uid(2).build()).build()))
 			.once();
 	
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(syncKey, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
 		control.verify();
 
 		assertThat(elements.sumOfChanges()).isEqualTo(2);
@@ -124,10 +127,10 @@ public class WindowingServiceImplTest {
 	
 	@Test
 	public void popNextPendingElementsEnoughElements() {
-		SyncKey syncKey = new SyncKey("sk1");
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		int expectedSize = 2;
 
-		expect(windowingDao.consumingChunksIterable(syncKey))
+		expect(windowingDao.consumingChunksIterable(key))
 			.andReturn(ImmutableList.<EmailChanges>of(
 					EmailChanges.builder().addition(
 							Email.builder().uid(1).build(),
@@ -138,7 +141,7 @@ public class WindowingServiceImplTest {
 					EmailChanges.builder().addition(Email.builder().uid(5).build()).build()))
 			.once();
 
-		windowingDao.pushPendingElements(syncKey, EmailChanges.builder()
+		windowingDao.pushPendingElements(key, EmailChanges.builder()
 				.addition(
 					Email.builder().uid(2).build(),
 					Email.builder().uid(1).build())
@@ -146,31 +149,52 @@ public class WindowingServiceImplTest {
 		expectLastCall();
 		
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(syncKey, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
 		control.verify();
 		
 		assertThat(elements.sumOfChanges()).isEqualTo(2);
 	}
 
 	@Test
-	public void hasPendingElementsTrue() {
+	public void hasPendingElementsNoIndex() {
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
 		SyncKey syncKey = new SyncKey("123");
-		expect(windowingDao.hasPendingElements(syncKey)).andReturn(true); 
+		
+		expect(windowingDao.getWindowingSyncKey(key)).andReturn(null);
 		
 		control.replay();
-		boolean hasPendingElements = testee.hasPendingElements(syncKey);
+		boolean hasPendingElements = testee.hasPendingElements(key, syncKey);
+		control.verify();
+		
+		assertThat(hasPendingElements).isFalse();
+	}
+
+	@Test
+	public void hasPendingElementsSameIndexSyncKey() {
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey requestSyncKey = new SyncKey("123");
+		
+		expect(windowingDao.getWindowingSyncKey(key)).andReturn(requestSyncKey); 
+		
+		control.replay();
+		boolean hasPendingElements = testee.hasPendingElements(key, requestSyncKey);
 		control.verify();
 		
 		assertThat(hasPendingElements).isTrue();
 	}
-
+	
 	@Test
-	public void hasPendingElementsFalse() {
-		SyncKey syncKey = new SyncKey("123");
-		expect(windowingDao.hasPendingElements(syncKey)).andReturn(false); 
+	public void hasPendingElementsDifferentIndexSyncKey() {
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey requestSyncKey = new SyncKey("123");
+		SyncKey storedIndexSyncKey = new SyncKey("456");
+		
+		expect(windowingDao.getWindowingSyncKey(key)).andReturn(storedIndexSyncKey);
+		windowingDao.removePreviousCollectionWindowing(key);
+		expectLastCall();
 		
 		control.replay();
-		boolean hasPendingElements = testee.hasPendingElements(syncKey);
+		boolean hasPendingElements = testee.hasPendingElements(key, requestSyncKey);
 		control.verify();
 		
 		assertThat(hasPendingElements).isFalse();

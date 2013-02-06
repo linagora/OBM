@@ -52,3 +52,20 @@ Feature: store and retrieve emails by chunks
     When user ask repeatedly for 25 elements
     Then user get 975 elements in 39 iterations
     And there is 0 elements left in store
+
+  Scenario: user ask for first elements after that a big mailbox synchronization has been started
+    Given user has 1000 elements in INBOX
+    And user ask for the first 25 elements
+    And user ask for the next 25 elements
+    When user ask for the first 25 elements
+    Then user get 25 elements
+    And there is 975 elements left in store
+
+  Scenario: user refill INBOX ask for first elements after that a big INBOX synchronization has been started
+    Given user has 1000 elements in INBOX
+    And user ask for the first 25 elements
+    And user ask for the next 25 elements
+    And user has 500 elements in INBOX
+    When user ask for the first 25 elements
+    Then user get 25 elements
+    And there is 475 elements left in store
