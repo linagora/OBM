@@ -1537,7 +1537,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
-	private void convertAttendees(Event event, ObmUser owner) {
+	private void convertAttendeesOnEvent(Event event, ObmUser owner) {
 		List<Attendee> typedAttendees = Lists.newArrayList();
 		
 		for (Attendee attendee : event.getAttendees()) {
@@ -1553,6 +1553,14 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 		
 		event.setAttendees(typedAttendees);
+	}
+	
+	private void convertAttendees(Event event, ObmUser owner) {
+		convertAttendeesOnEvent(event, owner);
+		
+		for (Event exception : event.getEventsExceptions()) {
+			convertAttendeesOnEvent(exception, owner);
+		}
 	}
 	
 	private Attendee findAttendee(String name, String email, ObmDomain domain, Integer ownerId) {

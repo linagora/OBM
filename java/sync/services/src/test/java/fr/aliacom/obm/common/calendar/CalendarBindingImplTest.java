@@ -160,6 +160,14 @@ public class CalendarBindingImplTest {
 	private HelperService helperService;
 	@Inject
 	private AttendeeService attendeeService;
+	@Inject
+	private UserService userService;
+	@Inject
+	private CalendarDao calendarDao;
+	@Inject
+	private MessageQueueService messageQueueService;
+	@Inject
+	private EventChangeHandler eventChangeHandler;
 	
 	private AccessToken token;
 	
@@ -394,7 +402,7 @@ public class CalendarBindingImplTest {
 		expect(event.isInternalEvent()).andReturn(false).atLeastOnce();
 		expect(event.getTitle()).andReturn("title").atLeastOnce();
 		expect(event.getAttendees()).andReturn(ImmutableList.of(ToolBox.getFakeAttendee(defaultUser.getEmail()))).atLeastOnce();
-		expect(event.getEventsExceptions()).andReturn(ImmutableSet.<Event>of());
+		expect(event.getEventsExceptions()).andReturn(ImmutableSet.<Event>of()).anyTimes();
 		event.setAttendees(isA(List.class));
 		expectLastCall();
 		
@@ -2387,6 +2395,45 @@ public class CalendarBindingImplTest {
 		mocksControl.replay();
 		
 		binding.getSyncEventDate(token, "calendar", null);
+	}
+	
+	@Test
+	public void testCreateEventConvertsAttendees() throws Exception {
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
+		ContactAttendee contactAttendee = ContactAttendee.builder().email("test@obm.com").build();
+		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, helperService, null, null, attendeeService);
+		
+		List<Attendee> attendees = ImmutableList.of(ToolBox.getFakeAttendee(calendar), ToolBox.getFakeAttendee("test@obm.com"));
+		Event event = createEvent(attendees);
+		Event exception = createEventException(attendees, DateUtils.date("2012-01-01T00:00:00"));
+		Event exception2 = createEventException(ImmutableList.of(ToolBox.getFakeAttendee(calendar)), DateUtils.date("2012-02-01T00:00:00"));
+		
+		event.setInternalEvent(true);
+		event.addEventException(exception);
+		event.addEventException(exception2);
+		event.getRecurrence().setKind(RecurrenceKind.daily);
+		
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(helperService.canWriteOnCalendar(token, "test@obm.com")).andReturn(false).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
+		// times(3) = 1 for the event, 1 for each exception 
+		expect(attendeeService.findUserAttendee(null, calendar, user.getDomain())).andReturn(userAttendee).times(3);
+		// times(2) = 1 for the event, 1 for the first exception
+		expect(attendeeService.findUserAttendee(null, "test@obm.com", user.getDomain())).andReturn(null).times(2);
+		expect(attendeeService.findContactAttendee(null, "test@obm.com", true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
+		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
+		expect(calendarDao.findEventById(token, null)).andReturn(event);
+		messageQueueService.writeIcsInvitationRequest(token, event);
+		expectLastCall();
+		
+		mocksControl.replay();
+		
+		binding.createEvent(token, calendar, event, false);
+		
+		mocksControl.verify();
 	}
 	
 	private void expectNoRightsForCalendar(String calendar) {
