@@ -32,9 +32,13 @@ package fr.aliacom.obm.common.user;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMockBuilder;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -134,6 +138,81 @@ public class UserDaoTest {
 		mocksControl.replay();
 
 		assertThat(userDao.userIdFromEmail(connection, email, 1)).isEqualTo(userId);
+	}
+	
+	@Test
+	public void testUserIdFromEmailQuery() throws Exception {
+		String email = "usera";
+		String domain = "test.com";
+		Connection connection = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		UserDao dao = new UserDao(obmHelper);
+		
+		expectEmailQueryCalls(connection, rs, 1);
+		expectMatchingUserOfEmailQuery(rs, 1, email, domain, null);
+		
+		mocksControl.replay();
+		
+		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isEqualTo(1);
+	}
+	
+	@Test
+	public void testUserIdFromEmailQueryNoResult() throws Exception {
+		String email = "usera";
+		String domain = "test.com";
+		Connection connection = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		UserDao dao = new UserDao(obmHelper);
+		
+		expectEmailQueryCalls(connection, rs, 0);
+		
+		mocksControl.replay();
+		
+		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isNull();
+	}
+
+	@Test
+	public void testUserIdFromEmailQueryMultipleResults() throws Exception {
+		String email = "usera";
+		String domain = "test.com";
+		Connection connection = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		UserDao dao = new UserDao(obmHelper);
+		
+		expectEmailQueryCalls(connection, rs, 4);
+		expectMatchingUserOfEmailQuery(rs, 1, "useraa", domain, null);
+		expectMatchingUserOfEmailQuery(rs, 2, "anotherusera", domain, null);
+		expectMatchingUserOfEmailQuery(rs, 3, email, "anotherdomain.com", null);
+		expectMatchingUserOfEmailQuery(rs, 4, email, domain, null);
+		
+		mocksControl.replay();
+		
+		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isEqualTo(4);
+	}
+	
+	private void expectEmailQueryCalls(Connection connection, ResultSet rs, int numberOfMatches) throws Exception {
+		Statement st = mocksControl.createMock(Statement.class);
+		
+		expect(connection.createStatement()).andReturn(st);
+		expect(st.executeQuery(isA(String.class))).andReturn(rs);
+		
+		if (numberOfMatches > 0) {
+			expect(rs.next()).andReturn(true).times(1, numberOfMatches);
+		} else {
+			expect(rs.next()).andReturn(false);
+		}
+		
+		rs.close();
+		expectLastCall();
+		st.close();
+		expectLastCall();
+	}
+	
+	private void expectMatchingUserOfEmailQuery(ResultSet rs, Integer id, String email, String domain, String domainAlias) throws Exception {
+		expect(rs.getInt(1)).andReturn(id);
+		expect(rs.getString(2)).andReturn(email);
+		expect(rs.getString(3)).andReturn(domain);
+		expect(rs.getString(4)).andReturn(domainAlias);
 	}
 
 }

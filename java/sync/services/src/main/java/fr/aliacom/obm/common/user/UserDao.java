@@ -107,7 +107,8 @@ public class UserDao {
 					"WHERE UPPER(userobm_email) like UPPER('%" + mail + "%') AND userobm_archive != 1";
 			
 			rs = st.executeQuery(request);
-			if (rs.next()) {
+			
+			while (rs.next()) {
 				
 				int id = rs.getInt(1);
 				String emailsToCompare = rs.getString(2); 
