@@ -39,6 +39,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
@@ -59,8 +60,8 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	
 	@Inject
 	@VisibleForTesting
-	ObmSyncConfigurationService(IniFile.Factory iniFileFactory) {
-		super(iniFileFactory);
+	ObmSyncConfigurationService(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName) {
+		super(iniFileFactory, applicationName);
 	}
 
 	public String getDefaultTemplateFolder() {

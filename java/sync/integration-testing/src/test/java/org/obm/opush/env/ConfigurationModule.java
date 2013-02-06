@@ -31,52 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-
-import java.util.Locale;
-
-import org.easymock.IMocksControl;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
-public final class ConfigurationModule extends AbstractOverrideModule {
+import com.google.inject.AbstractModule;
+
+public final class ConfigurationModule extends AbstractModule {
 
 	private final Configuration configuration;
 
-	public ConfigurationModule(Configuration configuration, IMocksControl mocksControl) {
-		super(mocksControl);
+	public ConfigurationModule(Configuration configuration) {
 		this.configuration = configuration;
 	}
 	
 	@Override
-	protected void configureImpl() {
-		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
-		bindWithMock(ConfigurationService.class);
-		bindWithMock(EmailConfigurationImpl.class);
-		bindWithMock(SyncPermsConfigurationService.class);
-		defineBehavior();
+	protected void configure() {
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
+		bind(SyncPermsConfigurationService.class).toInstance(new StaticConfigurationService.SyncPerms(configuration.syncPerms));
 	}
-
-	private void defineBehavior() {
-		ConfigurationService configurationService = getMock(ConfigurationService.class);
-		expect(configurationService.getResourceBundle(anyObject(Locale.class)))
-			.andReturn(configuration.bundle).anyTimes();
-		expect(configurationService.transactionTimeoutInSeconds())
-			.andReturn(configuration.transaction.timeoutInSeconds).anyTimes();
-		expect(configurationService.usePersistentCache())
-			.andReturn(configuration.transaction.usePersistentCache).anyTimes();
-		
-		SyncPermsConfigurationService syncPerms = getMock(SyncPermsConfigurationService.class);
-		expect(syncPerms.getBlackListUser()).andReturn(configuration.syncPerms.blacklist).anyTimes();
-		expect(syncPerms.allowUnknownPdaToSync()).andReturn(configuration.syncPerms.allowUnkwownDevice).anyTimes();
-		
-		EmailConfiguration emailConfiguration = getMock(EmailConfigurationImpl.class);
-		expect(emailConfiguration.activateTls()).andReturn(configuration.mail.activateTls).anyTimes();
-		expect(emailConfiguration.loginWithDomain()).andReturn(configuration.mail.loginWithDomain).anyTimes();
-	}
+	
 }

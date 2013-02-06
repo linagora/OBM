@@ -29,82 +29,28 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.push.store.ehcache;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+import java.math.BigDecimal;
+import java.util.Properties;
 
-import javax.naming.ConfigurationException;
+import org.junit.Test;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.User;
 
-import org.obm.configuration.ConfigurationService;
+import com.google.common.testing.SerializableTester;
 
-public class TestConfigurationService implements ConfigurationService {
-		
-	private final Configuration configuration;
+public class SerializableTest {
+
+	@Test
+	public void unsynchronizedItemDaoEhcacheImplKey() {
+		UnsynchronizedItemDaoEhcacheImpl.Key key = new UnsynchronizedItemDaoEhcacheImpl.Key(
+				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
+				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), BigDecimal.valueOf(12)),
+				12, UnsynchronizedItemType.ADD);
+		SerializableTester.reserializeAndAssert(key);
+	}
 	
-	public TestConfigurationService(Configuration configuration) {
-		this.configuration = configuration;
-	}
-
-	@Override
-	public String getLocatorUrl() throws ConfigurationException {
-		return configuration.locatorUrl;
-	}
-
-	@Override
-	public String getObmUIBaseUrl() {
-		return configuration.obmUiBaseUrl;
-	}
-
-	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
-		return configuration.obmSyncUrl;
-	}
-
-	@Override
-	public int getLocatorCacheTimeout() {
-		return configuration.locatorCacheTimeout;
-	}
-
-	@Override
-	public TimeUnit getLocatorCacheTimeUnit() {
-		return configuration.locatorCacheTimeUnit;
-	}
-
-	@Override
-	public ResourceBundle getResourceBundle(Locale locale) {
-		return configuration.bundle;
-	}
-
-	@Override
-	public String getActiveSyncServletUrl() {
-		return configuration.activeSyncServletUrl;
-	}
-
-	@Override
-	public Charset getDefaultEncoding() {
-		return configuration.defautEncoding;
-	}
-
-	@Override
-	public int transactionTimeoutInSeconds() {
-		return configuration.transaction.timeoutInSeconds;
-	}
-
-	@Override
-	public boolean usePersistentCache() {
-		return configuration.transaction.usePersistentCache;
-	}
-
-	@Override
-	public int trustTokenTimeoutInSeconds() {
-		return configuration.trustTokenTimeoutInSeconds;
-	}
-
-	@Override
-	public int solrCheckingInterval() {
-		return configuration.solrCheckingInterval;
-	}
 }

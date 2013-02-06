@@ -58,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.transform.TransformerException;
 
 import org.easymock.IMocksControl;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -68,6 +69,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.Configuration;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.ChangedCollections;
@@ -110,6 +112,7 @@ public class PingHandlerTest {
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 
 	private List<OpushUser> fakeTestUsers;
 	private int pingOnCollectionId;
@@ -123,6 +126,7 @@ public class PingHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

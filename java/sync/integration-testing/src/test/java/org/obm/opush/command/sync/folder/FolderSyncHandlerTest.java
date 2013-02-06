@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.IMocksControl;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,6 +55,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.Configuration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
@@ -83,6 +85,7 @@ public class FolderSyncHandlerTest {
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 	
 	private List<OpushUser> userAsList;
 	private OpushUser user;
@@ -96,6 +99,7 @@ public class FolderSyncHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

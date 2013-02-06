@@ -124,7 +124,7 @@ public class EmailChanges implements Serializable {
 		}
 
 	}
-
+	
 	private final Set<Email> deletions;
 	private final Set<Email> changes;
 	private final Set<Email> additions;

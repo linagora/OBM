@@ -47,6 +47,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,6 +57,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
+import org.obm.opush.env.Configuration;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.AttendeeStatus;
@@ -106,6 +108,7 @@ public class MeetingResponseHandlerTest {
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject MeetingProtocol protocol;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 
 	private int meetingCollectionId;
 	private int meetingItemId;
@@ -123,6 +126,7 @@ public class MeetingResponseHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

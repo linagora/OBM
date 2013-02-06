@@ -37,17 +37,17 @@ import java.util.Locale;
 
 import javax.xml.transform.TransformerException;
 
-import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.env.Configuration;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.DaoException;
@@ -75,16 +75,19 @@ public class AutodiscoverHandlerTest {
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test
 	public void testAutodiscoverCommand() throws Exception {
+		prepareMocks();
 		String externalUrl = "https://external-url/Microsoft-Server-ActiveSync";
-		prepareMocks(externalUrl);
+		configuration.activeSyncServletUrl = externalUrl;
 		mocksControl.replay();
 		opushServer.start();
 
@@ -117,11 +120,10 @@ public class AutodiscoverHandlerTest {
 				"</Autodiscover>");
 	}
 
-	private void prepareMocks(String externalUrl) throws CollectionNotFoundException, DaoException, AuthFault {
+	private void prepareMocks() throws CollectionNotFoundException, DaoException, AuthFault {
 		mockDeviceDao();
 		mockLoginService();
 		mockCollectionDaoNoChange();
-		mockConfigurationService(externalUrl);
 	}
 
 	private void mockDeviceDao() throws DaoException {
@@ -137,11 +139,6 @@ public class AutodiscoverHandlerTest {
 	private void mockLoginService() throws AuthFault {
 		LoginService loginService = classToInstanceMap.get(LoginService.class);
 		IntegrationTestUtils.expectUserLoginFromOpush(loginService, singleUserFixture.jaures);
-	}
-	
-	private void mockConfigurationService(String externalUrl) {
-		ConfigurationService configurationService = classToInstanceMap.get(ConfigurationService.class);
-		EasyMock.expect(configurationService.getActiveSyncServletUrl()).andReturn(externalUrl);
 	}
 	
 	private Document buildAutodiscoverCommand(String emailAddress)

@@ -44,6 +44,8 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -126,7 +128,7 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		return new Key(credentials, device, collectionId, unsynchronizedItemType);
 	}
 
-	private class Key implements Serializable {
+	@VisibleForTesting static class Key implements Serializable {
 
 		private final Credentials credentials;
 		private final int collectionId;
@@ -142,53 +144,32 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		}
 		
 		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + collectionId;
-			result = prime * result
-					+ ((credentials == null) ? 0 : credentials.hashCode());
-			result = prime * result
-					+ ((device == null) ? 0 : device.hashCode());
-			result = prime
-					* result
-					+ ((unsynchronizedItemType == null) ? 0
-							: unsynchronizedItemType.hashCode());
-			return result;
+		public int hashCode(){
+			return Objects.hashCode(credentials, collectionId, unsynchronizedItemType, device);
+		}
+		
+		@Override
+		public boolean equals(Object object){
+			if (object instanceof Key) {
+				Key that = (Key) object;
+				return Objects.equal(this.credentials, that.credentials)
+					&& Objects.equal(this.collectionId, that.collectionId)
+					&& Objects.equal(this.unsynchronizedItemType, that.unsynchronizedItemType)
+					&& Objects.equal(this.device, that.device);
+			}
+			return false;
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Key other = (Key) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (collectionId != other.collectionId)
-				return false;
-			if (credentials == null) {
-				if (other.credentials != null)
-					return false;
-			} else if (!credentials.equals(other.credentials))
-				return false;
-			if (device == null) {
-				if (other.device != null)
-					return false;
-			} else if (!device.equals(other.device))
-				return false;
-			if (unsynchronizedItemType != other.unsynchronizedItemType)
-				return false;
-			return true;
+		public String toString() {
+			return Objects.toStringHelper(this)
+				.add("credentials", credentials)
+				.add("collectionId", collectionId)
+				.add("unsynchronizedItemType", unsynchronizedItemType)
+				.add("device", device)
+				.toString();
 		}
 		
-		private UnsynchronizedItemDaoEhcacheImpl getOuterType() {
-			return UnsynchronizedItemDaoEhcacheImpl.this;
-		}
 	}
 
 }

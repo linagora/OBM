@@ -64,4 +64,6 @@ public interface ConfigurationService {
 	int trustTokenTimeoutInSeconds();
 	
 	int solrCheckingInterval();
+
+	String getDataDirectory();
 }

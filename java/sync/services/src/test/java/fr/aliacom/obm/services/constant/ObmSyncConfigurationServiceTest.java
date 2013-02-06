@@ -67,7 +67,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getData()).andReturn(
 				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "InvalidEncoding"));
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -77,7 +77,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getData()).andReturn(
 				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, ""));
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -86,7 +86,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingNoPropertyDefined() {
 		expect(configuration.getData()).andReturn(ImmutableMap.<String, String>of());
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -96,7 +96,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getData()).andReturn(
 				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "Base64"));
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Base64);
 		control.verify();
 	}
@@ -106,7 +106,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getData()).andReturn(
 				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "QuotedPrintable"));
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.QuotedPrintable);
 		control.verify();
 	}
@@ -116,7 +116,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getData()).andReturn(
 				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "SevenBit"));
 		control.replay();
-		service = new ObmSyncConfigurationService(factory);
+		service = new ObmSyncConfigurationService(factory, "test");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
 		control.verify();
 	}

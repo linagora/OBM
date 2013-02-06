@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -57,7 +58,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	}
 	
 	@Before
-	public void init() {
+	public void init() throws IOException {
 		logger = EasyMock.createNiceMock(Logger.class);
 		this.opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
 	}

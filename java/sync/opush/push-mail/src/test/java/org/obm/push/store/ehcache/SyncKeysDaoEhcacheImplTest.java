@@ -33,6 +33,8 @@ package org.obm.push.store.ehcache;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.transaction.NotSupportedException;
@@ -41,7 +43,9 @@ import javax.transaction.SystemException;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
@@ -57,12 +61,15 @@ import bitronix.tm.TransactionManagerServices;
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncKeysDaoEhcacheImplTest {
 
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+	
 	private ObjectStoreManager objectStoreManager;
 	private SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl;
 	private BitronixTransactionManager transactionManager;
 	
 	@Before
-	public void init() throws NotSupportedException, SystemException {
+	public void init() throws NotSupportedException, SystemException, IOException {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
@@ -70,12 +77,13 @@ public class SyncKeysDaoEhcacheImplTest {
 		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
 	}
 	
-	private ConfigurationService initConfigurationServiceMock() {
+	private ConfigurationService initConfigurationServiceMock() throws IOException {
+		File dataDir = temporaryFolder.newFolder();
 		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
 		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(false);
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true);
+		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
 		EasyMock.replay(configurationService);
-		
 		return configurationService;
 	}
 	

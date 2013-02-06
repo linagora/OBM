@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.opush.env.Configuration;
-import org.obm.opush.env.TestConfigurationService;
+import org.obm.opush.env.StaticConfigurationService;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.store.WindowingDao;
@@ -69,7 +69,7 @@ public class WindowingModule extends AbstractModule {
 	protected ConfigurationService configuration() {
 		Configuration configuration = new Configuration();
 		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
-		return new TestConfigurationService(configuration);
+		return new StaticConfigurationService(configuration);
 	}
 
 }

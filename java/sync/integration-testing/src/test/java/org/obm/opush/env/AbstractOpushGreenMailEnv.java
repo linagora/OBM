@@ -31,23 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 public abstract class AbstractOpushGreenMailEnv extends AbstractOpushEnv {
 
+	public AbstractOpushGreenMailEnv() {
+		super();
+	}
+	
 	@Override
 	protected Module overrideModule() throws Exception {
-		AbstractOverrideModule[] modules = new AbstractOverrideModule[] {
-			configuration(),
-			dao(),
-			obmSync(),
-			greenMail()
-		};
+		ImmutableList<AbstractOverrideModule> modules = ImmutableList.of( 
+				dao(),
+				obmSync(),
+				greenMail()
+				);
 		for (AbstractOverrideModule module: modules) {
 			getMockMap().addMap(module.getMockMap());
 		}
-		return Modules.combine(modules);
+		return Modules.combine(ImmutableList.<Module>builder().addAll(modules).add(configuration()).build());
 	}
 	
 	protected GreenMailEnvModule greenMail() {

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -68,7 +69,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	private TransactionManager transactionManager;
 	
 	@Before
-	public void init() throws NotSupportedException, SystemException {
+	public void init() throws NotSupportedException, SystemException, IOException {
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);

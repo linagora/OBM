@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.easymock.IMocksControl;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -53,6 +54,7 @@ import org.obm.opush.MailBackendTestModule;
 import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.Configuration;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.imap.GuiceModule;
@@ -83,6 +85,7 @@ public class ItemOperationHandlerTest {
 	@Inject IMocksControl mocksControl;
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
+	@Inject Configuration configuration;
 	
 	private CollectionDao collectionDao;
 
@@ -117,6 +120,7 @@ public class ItemOperationHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

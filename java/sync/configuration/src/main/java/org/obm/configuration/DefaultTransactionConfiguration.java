@@ -51,12 +51,12 @@ public class DefaultTransactionConfiguration implements TransactionConfiguration
 
 	@Override
 	public File getJournalPart1Path() {
-		return new File(String.format("/var/lib/%1$s/%1$s-btm1.tlog", applicationName));
+		return new File(String.format("%s/%s-btm1.tlog", configurationService.getDataDirectory(), applicationName));
 	}
 
 	@Override
 	public File getJournalPart2Path() {
-		return new File(String.format("/var/lib/%1$s/%1$s-btm2.tlog", applicationName));
+		return new File(String.format("%s/%s-btm2.tlog", configurationService.getDataDirectory(), applicationName));
 	}
 
 	@Override

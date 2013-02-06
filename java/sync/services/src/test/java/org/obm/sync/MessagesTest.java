@@ -62,7 +62,7 @@ public class MessagesTest {
 		Factory factory = control.createMock(IniFile.Factory.class);
 		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		control.replay();
-		configurationService = new ConfigurationServiceImpl(factory);
+		configurationService = new ConfigurationServiceImpl(factory, "test");
 		Locale.setDefault(Locale.US);
 	}
 

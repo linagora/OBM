@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +57,7 @@ import org.obm.filter.Slow;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.Configuration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.CollectionPathHelper;
@@ -112,6 +114,7 @@ public class MailBackendHandlerTest {
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 	
 	private ServerSetup smtpServerSetup;
 	private String mailbox;
@@ -133,6 +136,7 @@ public class MailBackendHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

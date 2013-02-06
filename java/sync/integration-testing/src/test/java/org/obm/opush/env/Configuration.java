@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -39,26 +40,31 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Charsets;
 
 public class Configuration {
-	
+
 	public static class SyncPerms {
 		public String blacklist = "";
 		public boolean allowUnkwownDevice = true;
 	}
-	
+
 	public static class Mail {
 		public boolean activateTls = false;
 		public boolean loginWithDomain = true;
+		public int timeoutInMilliseconds = 5000;
+		public int imapPort = 143;
+		protected int maxMessageSize = 1024;
+		protected int fetchBlockSize = 1 << 20;
 	}
-	
+
 	public static class Transaction {
 		public int timeoutInSeconds = 10;
-		public boolean usePersistentCache = false;
+		public boolean usePersistentCache = true;
 	}
-	
+
 	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
 	public SyncPerms syncPerms = new SyncPerms();
 	public Mail mail = new Mail();
 	public Transaction transaction = new Transaction();
+	public File dataDir;
 	public String locatorUrl = null;
 	public String obmUiBaseUrl = null;
 	public String obmSyncUrl = null;
@@ -68,4 +74,5 @@ public class Configuration {
 	public Charset defautEncoding = Charsets.UTF_8;
 	public int trustTokenTimeoutInSeconds = 10;
 	public int solrCheckingInterval = 10;
+
 }

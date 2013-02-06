@@ -52,6 +52,7 @@ import javax.mail.Flags.Flag;
 
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
+import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,6 +61,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.opush.env.Configuration;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollection;
@@ -99,6 +101,7 @@ public class MailBackendGetChangedTest {
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 	
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
@@ -157,6 +160,7 @@ public class MailBackendGetChangedTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
 
 	@Test

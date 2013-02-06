@@ -37,6 +37,7 @@ import java.util.List;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
@@ -69,28 +70,30 @@ public class ObjectStoreManager {
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
 		boolean usePersistentCache = configurationService.usePersistentCache();
+		String dataDirectory = configurationService.getDataDirectory();
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
-		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache));
+		configurationLogger.info("EhCache data directory : {}", dataDirectory);
+		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 	}
 
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
 	
-	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache) {
-		Configuration configuration = new Configuration();
-		configuration.updateCheck(false);
-		configuration.addCache(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE).eternal(usePersistentCache));
-		configuration.addCache(defaultCacheConfiguration().name(SYNC_KEYS_STORE).eternal(usePersistentCache));
-		configuration.addCache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS));
-		configuration.setDefaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
-		return configuration;
+	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
+		return new Configuration()
+			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
+			.updateCheck(false)
+			.cache(eternal(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNC_KEYS_STORE), usePersistentCache))
+			.cache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS))
+			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 	}
 	
 	private CacheConfiguration pendingContinuationConfiguration() {
@@ -108,6 +111,10 @@ public class ObjectStoreManager {
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.XA);
+	}
+	
+	private CacheConfiguration eternal(CacheConfiguration configuration, boolean eternal) {
+		return configuration.eternal(eternal).diskPersistent(eternal);
 	}
 	
 	public Cache createNewStore(String storeName) {

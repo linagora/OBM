@@ -33,6 +33,8 @@ package org.obm.push.store.ehcache;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
@@ -71,7 +73,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	}
 	
 	@Before
-	public void init() throws NotSupportedException, SystemException {
+	public void init() throws NotSupportedException, SystemException, IOException {
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		this.transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);

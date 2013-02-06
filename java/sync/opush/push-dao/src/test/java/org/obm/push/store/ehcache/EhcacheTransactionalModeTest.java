@@ -42,8 +42,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.transaction.DeadLockException;
 import net.sf.ehcache.transaction.TransactionException;
+import net.sf.ehcache.transaction.TransactionTimeoutException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -173,7 +173,7 @@ public class EhcacheTransactionalModeTest {
 		}
 	}
 	
-	@Test(expected=DeadLockException.class)
+	@Test(expected=TransactionTimeoutException.class)
 	public void transactionIsGreaterThanCacheTimeout() throws Throwable {
 		manager.getTransactionController().setDefaultTransactionTimeout(1);
 		try {

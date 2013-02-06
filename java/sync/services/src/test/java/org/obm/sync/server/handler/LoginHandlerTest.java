@@ -67,6 +67,7 @@ import org.obm.sync.server.template.ITemplateLoader;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -215,6 +216,7 @@ public class LoginHandlerTest {
 		
 		@Override
 		protected void configure() {
+			bind(String.class).annotatedWith(Names.named("application-name")).toInstance("obm-sync");
 			Connection connection = control.createMock(Connection.class);
 			PreparedStatement ps = control.createMock(PreparedStatement.class);
 			ResultSet rs = control.createMock(ResultSet.class);

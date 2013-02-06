@@ -46,6 +46,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class ConfigurationServiceImpl extends AbstractConfigurationService
@@ -80,10 +81,13 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
     private final ImmutableMap<String, TimeUnit> timeUnits;
 
+	private final String applicationName;
+
     @Inject
-	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory) {
+	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName) {
 		super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
-		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
+		this.applicationName = applicationName;
+		this.timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,
 								"minutes", TimeUnit.MINUTES,
 								"hours", TimeUnit.HOURS);
@@ -183,5 +187,10 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 	@Override
 	public int solrCheckingInterval() {
 		return getIntValue(SOLR_CHECKING_INTERVAL_KEY, SOLR_CHECKING_INTERVAL_DEFAULT);
+	}
+	
+	@Override
+	public String getDataDirectory() {
+		return "/var/lib/" + applicationName;
 	}
 }

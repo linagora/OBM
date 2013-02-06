@@ -31,14 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
 import java.util.Collections;
 import java.util.Date;
 
 import org.easymock.IMocksControl;
 import org.obm.DateUtils;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.SyncCollection;
@@ -48,6 +49,9 @@ import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.io.Files;
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.util.Modules;
@@ -57,10 +61,13 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ClassToInstanceAgregateView<Object> mockMap;
 	private final IMocksControl mocksControl;
+	private Configuration configuration;
 	
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
 		mocksControl = createControl();
+		configuration = new Configuration();
+		configuration.dataDir = Files.createTempDir();
 	}
 
 	@Provides
@@ -75,16 +82,20 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	
 	@Override
 	protected Module overrideModule() throws Exception {
-		AbstractOverrideModule[] modules = new AbstractOverrideModule[] {
-			configuration(),
+		ImmutableList<AbstractOverrideModule> modules = ImmutableList.of( 
 			dao(),
 			email(),
 			obmSync()
-		};
+		);
 		for (AbstractOverrideModule module: modules) {
 			mockMap.addMap(module.getMockMap());
 		}
-		return Modules.combine(modules);
+		return Modules.combine(
+				ImmutableList.<Module>builder()
+					.addAll(modules)
+					.add(configuration())
+					.add(emailConfiguration())
+					.build());
 	}
 
 	protected ObmSyncModule obmSync() {
@@ -100,7 +111,21 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	protected ConfigurationModule configuration() {
-		return new ConfigurationModule(new Configuration(), mocksControl);
+		return new ConfigurationModule(configuration);
+	}
+
+	protected Module emailConfiguration() {
+		return new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(EmailConfiguration.class).toInstance(new StaticConfigurationService.Email(configuration.mail));
+			}
+		};
+	}
+	
+	@Provides
+	public Configuration configurationProvider() {
+		return configuration;
 	}
 	
 	public ClassToInstanceAgregateView<Object> getMockMap() {
