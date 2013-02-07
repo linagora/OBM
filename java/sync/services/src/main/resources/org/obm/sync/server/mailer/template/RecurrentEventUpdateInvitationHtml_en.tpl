@@ -1,18 +1,18 @@
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Recurrent appointment Updated
+          Recurrent appointment updated !
         </th>
     </tr>
     <tr>
         <td colspan="2">
-The recurrent appointment ${old.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated </td>
+The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd?date} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>
     </tr>
     <tr>
-        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start}</td>
+        <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;">${new.start?date}</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${new.recurrenceEnd}</td>

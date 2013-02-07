@@ -1,18 +1,20 @@
 This email was automatically sent by OBM
 ------------------------------------------------------------------
-APPOINTMENT DELETED !
+APPOINTMENT CANCELED !
 ------------------------------------------------------------------
 
-The next appointment ${subject} has been deleted.
+The following appointment has been canceled :
 
-from            : ${start?string.medium_short}
+from          : ${start?string.medium_short}
 
-to              : ${end?string.medium_short}
+to            : ${end?string.medium_short}
 
-subject         : ${subject}
+subject       : ${subject}
 
-location        : ${location}
+location      : ${location}
 
-organizer       : ${organizer}
+organizer     : ${organizer}
 
-created by      : ${creator}
+created by    : ${creator}
+
+attendee(s)   : ${attendees}

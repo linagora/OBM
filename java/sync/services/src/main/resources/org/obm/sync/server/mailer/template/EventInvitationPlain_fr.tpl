@@ -3,19 +3,21 @@ Message automatique envoyé par OBM
 NOUVEAU RENDEZ-VOUS !
 ------------------------------------------------------------------
 
-Vous êtes invité à participer à ce rendez-vous
+Vous êtes invité à participer à ce rendez-vous :
 
-du              : ${start?string.medium_short}
+du            : ${start?string.medium_short}
 
-au              : ${end?string.medium_short}
+au            : ${end?string.medium_short}
 
-sujet           : ${subject}
+sujet         : ${subject}
 
-lieu            : ${location}
+lieu          : ${location}
 
-organisateur    : ${organizer}
+organisateur  : ${organizer}
 
-créé par        : ${creator}
+créé par      : ${creator}
+
+participant(s): ${attendees}
 
 
 :: Pour accepter : 

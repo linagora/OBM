@@ -1,28 +1,30 @@
 This email was automatically sent by OBM
 ------------------------------------------------------------------
-NEW RECURRENT APPOINTMENT
+NEW RECURRENT APPOINTMENT !
 ------------------------------------------------------------------
 
-You are invited to participate to this appointment
+You are invited to attend this appointment :
 
-from       : ${start}
+from          : ${start?date}
 
-to         : ${recurrenceEnd}
+to            : ${recurrenceEnd}
 
-time       : ${startTime?string.short} - ${endTime?string.short}
+time          : ${startTime?string.short} - ${endTime?string.short}
 
-recurrence : ${recurrenceKind}  
+recurrence    : ${recurrenceKind}  
 
-subject    : ${subject}
+subject       : ${subject}
 
-location   : ${location}
+location      : ${location}
 
-organizer  : ${organizer}
+organizer     : ${organizer}
 
-created by : ${creator}
+created by    : ${creator}
+
+attendee(s)   : ${attendees}
 
 
-::NB : If you're using the Thunderbird extension or ActiveSync, you must synchronize to view this appointment.
+::NB : If you are using the Thunderbird extension or ActiveSync, you must synchronize to view this appointment.
 
 :: More information about this appointment : 
 ${host}calendar/calendar_index.php?action=detailconsult&calendar_id=${calendarId}

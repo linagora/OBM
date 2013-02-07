@@ -5,8 +5,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous <strong>${old.subject}</strong>, initialement prévu du ${old.start?string.medium_short} au ${old.end?string.medium_short}, (lieu : ${old.location}),
-a été modifié :</td>
+        <td colspan="2">Le rendez-vous <strong>${old.subject}</strong>, initialement prévu du ${old.start?string.medium_short} au ${old.end?string.medium_short}, (lieu : ${old.location}), a été modifié :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">${new.subject}</td>

@@ -3,25 +3,25 @@ This email was automatically sent by OBM
 RECURRENT APPOINTMENT UPDATED !
 ------------------------------------------------------------------
 
-The recurrent appointment ${old.subject}, initially scheduled from ${old.start} to ${old.recurrenceEnd} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :
+The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd?date} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :
 
-from       : ${new.start}
+from          : ${new.start?date}
 
-to         : ${new.recurrenceEnd}
+to            : ${new.recurrenceEnd}
 
-time       : ${new.startTime?string.short} - ${new.endTime?string.short}
+time          : ${new.startTime?string.short} - ${new.endTime?string.short}
 
-recurrence : ${new.recurrenceKind}  
+recurrence    : ${new.recurrenceKind}  
 
-subject    : ${new.subject}
+subject       : ${new.subject}
 
-location   : ${new.location}
+location      : ${new.location}
 
-organizer  : ${new.organizer}
+organizer     : ${new.organizer}
 
-created by : ${new.creator}
+created by    : ${new.creator}
 
-attendee(s): ${new.attendees}
+attendee(s)   : ${new.attendees}
 
 
 :: To accept this update :

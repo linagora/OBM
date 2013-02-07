@@ -3,23 +3,25 @@ Message automatique envoyé par OBM
 NOUVEAU RENDEZ-VOUS RÉCURRENT !
 ------------------------------------------------------------------
 
-Vous êtes invité(e) à participer à ce rendez-vous
+Vous êtes invité(e) à participer à ce rendez-vous :
 
-du           : ${start}
+du            : ${start?date}
 
-au           : ${recurrenceEnd}
+au            : ${recurrenceEnd}
 
-heure        : ${startTime?string.short} - ${endTime?string.short}
+heure         : ${startTime?string.short} - ${endTime?string.short}
 
-recurrence   : ${recurrenceKind}
+recurrence    : ${recurrenceKind}
 
-sujet        : ${subject}
+sujet         : ${subject}
 
-lieu         : ${location}
+lieu          : ${location}
 
-organisateur : ${organizer}
+organisateur  : ${organizer}
 
-créé par     : ${creator}
+créé par      : ${creator}
+
+participant(s): ${attendees}
 
 
 :: Pour accepter : 

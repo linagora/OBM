@@ -1,11 +1,11 @@
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Appointment Deleted !
+          Appointment canceled !
         </th>
     </tr>
     <tr>
-        <td colspan="2">The next appointment ${subject} has been deleted.</td>
+        <td colspan="2">The following appointment has been canceled :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${subject}</td>

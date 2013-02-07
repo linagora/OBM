@@ -45,6 +45,7 @@ import static org.obm.DateUtils.date;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,6 @@ import javax.mail.util.SharedByteArrayInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
-import org.easymock.EasyMock;
 import org.jsoup.Jsoup;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,7 +73,6 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.Participation;
@@ -89,6 +88,7 @@ import org.slf4j.Logger;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.common.MailService;
@@ -99,30 +99,60 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @RunWith(SlowFilterRunner.class)
-public class EventChangeMailerTest {
+public abstract class EventChangeMailerTest {
 
-	private static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
-	
-	private MailService mailService;
+	protected static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
+
 	private EventChangeMailer eventChangeMailer;
+	protected abstract EventChangeMailer newEventChangeMailer();
+	protected abstract Locale getLocale();
+	protected abstract ArrayList<String> getInvitationPlainMessage();
+	protected abstract ArrayList<String> getInvitationHtmlMessage();
+	protected abstract ArrayList<String> getUpdatePlainMessage();
+	protected abstract ArrayList<String> getUpdateHtmlMessage();
+	protected abstract ArrayList<String> getCancelPlainMessage();
+	protected abstract ArrayList<String> getCancelHtmlMessage();
+	protected abstract ArrayList<String> getRecurrentInvitationPlainMessage();
+	protected abstract ArrayList<String> getRecurrentInvitationHtmlMessage();
+	protected abstract ArrayList<String> getRecurrentUpdatePlainMessage();
+	protected abstract ArrayList<String> getRecurrentUpdateHtmlMessage();
+	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdatePlainMessage();
+	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdateHtmlMessage();
+	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdatePlainMessage();
+	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdateHtmlMessage();
+	protected abstract ArrayList<String> getRecurrentCancelPlainMessage();
+	protected abstract ArrayList<String> getRecurrentCancelHtmlMessage();
+	protected abstract ArrayList<String> getChangeParticipationPlainMessage();
+	protected abstract ArrayList<String> getChangeParticipationHtmlMessage();
+	protected abstract String getNewEventSubject();
+	protected abstract String getNewRecurrentEventSubject();
+	protected abstract String getCancelEventSubject();
+	protected abstract String getCancelRecurrentEventSubject();
+	protected abstract String getUpdateEventSubject();
+	protected abstract String getUpdateRecurrentEventSubject();
+	protected abstract String getChangeParticipationSubject();
+	protected abstract String getNotice();
+
+	protected MailService mailService;
+	protected DateProvider dateProvider;
 	private AccessToken accessToken;
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
-	private DateProvider dateProvider;
 	private AttendeeService attendeeService;
-	private Date now;
-	private Logger logger;
 	
-	@Before
-	public void setup() {
-		now = new Date();
-		dateProvider = createMock(DateProvider.class);
-		attendeeService = new SimpleAttendeeService();
-		Factory eventExtIdFactory = null;
-		ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
-		
-		accessToken = new AccessToken(1, "unitTest");
-		obmUser = ServicesToolBox.getDefaultObmUser();
+	protected Logger logger;
+
+	private Event event;
+	private Event recurrentEvent;
+	private ArrayList<String> icsToCheck;
+
+	private final static String RECIPIENTS =
+			"Ronan LANORE <rlanore@linagora.com>, " +
+			"Guillaume ALAUX <galaux@linagora.com>, " +
+			"Matthieu BAECHLER <mbaechler@linagora.com>, " +
+			"Blandine DESCAMPS <blandine.descamps@linagora.com>";
+
+	protected EventChangeMailer getLocaleEventChangeMailer(Locale locale) {
 		ITemplateLoader templateLoader = new ITemplateLoader() {
 			@Override
 			public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
@@ -137,18 +167,68 @@ public class EventChangeMailerTest {
 		
 		ObmSyncConfigurationService constantService = createMock(ObmSyncConfigurationService.class);
 		
-		expect(dateProvider.getDate()).andReturn(now).anyTimes();		
-		
+		expect(dateProvider.getDate()).andReturn(new Date()).anyTimes();
+
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
-		expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+		expect(constantService.getResourceBundle(locale)).andReturn(ResourceBundle.getBundle("Messages", locale)).atLeastOnce();
 		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
 		replay(constantService, dateProvider);
-		
-		mailService = createMock(MailService.class);
-		logger = createNiceMock(Logger.class);
-		eventChangeMailer = new EventChangeMailer(mailService, constantService, templateLoader, logger);
+
+		return new EventChangeMailer(mailService, constantService, templateLoader, logger);
 	}
 	
+	private ArrayList<String> getRawMessageWithSubject(String subject) {
+		return Lists.newArrayList(
+				"From: Obm User <user@test>",
+				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
+				"Subject: " + subject
+		);
+	}
+	
+	private ArrayList<String> getCommonICSFields() {
+		return Lists.newArrayList(
+				"BEGIN:VCALENDAR",
+				"CALSCALE:GREGORIAN",
+				"VERSION:2.0",
+				"BEGIN:VEVENT",
+				"SUMMARY:Sprint planning OBM",
+				"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
+				"UID:f1514f44bf39311568d64072c1fec10f47fe",
+				"X-OBM-DOMAIN:test.tlse.lng",
+				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
+				"CREATED:20090608T142253Z",
+				"LAST-MODIFIED:20090608T142315Z",
+				"SEQUENCE:2",
+				"DURATION:PT45M"
+		);
+	}
+	
+	private ArrayList<String> getNoAllowedTimeFormat() {
+		return Lists.newArrayList(
+				"11:00:00",
+				"11:45:00",
+				"12:00:00",
+				"13:00:00",
+				"1:00:00"
+		);
+	}
+
+	@Before
+	public void setup() {
+		dateProvider = createMock(DateProvider.class);
+		mailService = createMock(MailService.class);
+		logger = createNiceMock(Logger.class);
+		attendeeService = new SimpleAttendeeService();
+		ical4jHelper = new Ical4jHelper(dateProvider, null, attendeeService);
+		accessToken = new AccessToken(1, "unitTest");
+		obmUser = ServicesToolBox.getDefaultObmUser();
+
+		eventChangeMailer = newEventChangeMailer();
+		event = buildTestEvent();
+		recurrentEvent = buildTestRecurrentEvent();
+		icsToCheck = getCommonICSFields();
+	}
+
 	private static Attendee createAttendee(String name, String email) {
 		return UserAttendee.builder().email(email).displayName(name).build();
 	}
@@ -159,6 +239,7 @@ public class EventChangeMailerTest {
 	
 	private static Event buildTestEvent() {
 		Event event = new Event();
+		event.setSequence(2);
 		event.setTimeCreate(date("2009-06-08T16:22:53"));
 		event.setTimeUpdate(date("2009-06-08T16:23:15"));
 		event.addAttendee(createAttendee("Ronan LANORE", "rlanore@linagora.com"));
@@ -174,32 +255,23 @@ public class EventChangeMailerTest {
 		event.setStartDate(date("2010-11-08T11:00:00"));
 		event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 		event.setDuration(2700);
+		event.setLocation("A random location");
 		event.setUid(new EventObmId(1354));
 		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.lookup("none"));
+		recurrence.setKind(RecurrenceKind.none);
 		event.setRecurrence(recurrence);
 		return event;
 	}
 	
 	private static Event buildTestRecurrentEvent() {
-		Event event = new Event();
-		event.setTimeCreate(date("2009-06-08T16:22:53"));
-		event.setTimeUpdate(date("2009-06-08T16:23:15"));
-		event.addAttendee(createAttendee("Jean Dupont", "jdupont@obm.linagora.com"));
-		event.addAttendee(createAttendee("Pierre Dupond", "pdupond@obm.linagora.com"));
-		event.setTitle("A random recurrent event");
-		event.setOwner("jack");
-		event.setOwnerDisplayName("Jack de Linagora");
-		event.setOwnerEmail("jdlinagora@obm.linagora.com");
-		event.setStartDate(date("2012-01-23T12:00:00"));
-		event.setExtId(new EventExtId("1234567890"));
-		event.setDuration(3600);
-		event.setLocation("A random location");
-		event.setUid(new EventObmId(1234));
+		Event event = buildTestEvent();
 		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.lookup("weekly"));
+		recurrence.setKind(RecurrenceKind.weekly);
 		recurrence.setFrequence(2);
-		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Thursday));
+		recurrence.setDays(new RecurrenceDays(
+				RecurrenceDay.Monday,
+				RecurrenceDay.Wednesday,
+				RecurrenceDay.Thursday));
 		recurrence.setEnd(date("2012-11-23T12:00:00"));
 		event.setRecurrence(recurrence);
 		return event;
@@ -220,43 +292,58 @@ public class EventChangeMailerTest {
 		return capturedMessage;
 	}
 	
-	private void checkStringContains(String text, String... expected) {
+	private void checkStringContains(String text, List<String> expected) {
 		for (String s: expected) {
 			assertThat(text).contains(s);
 		}
 	}
 	
-	private void checkHtmlMessage(InvitationParts parts, String... expected) throws IOException, MessagingException {
+	private void checkStringDoesNotContains(String text, List<String> expected) {
+		for (String s: expected) {
+			assertThat(text).doesNotContain(s);
+		}
+	}
+	
+	private void checkHtmlMessage(InvitationParts parts, List<String> expected) throws IOException, MessagingException {
 		BodyPart htmlText = parts.htmlText;
 		assertThat(htmlText.getContent()).isInstanceOf(String.class);
 		String text = Jsoup.parse((String)htmlText.getContent()).text();
 		checkStringContains(text, expected);
+		checkStringDoesNotContains(text, getNoAllowedTimeFormat());
 	}
 
-	private void checkPlainMessage(InvitationParts parts, String... expected) throws IOException, MessagingException {
+	private void checkPlainMessage(InvitationParts parts, List<String> expected) throws IOException, MessagingException {
 		BodyPart plainText = parts.plainText;
 		assertThat(plainText.getContent()).isInstanceOf(String.class);
 		String text = (String) plainText.getContent();
 		checkStringContains(text, expected);
+		checkStringDoesNotContains(text, getNoAllowedTimeFormat());
 	}
 	
-	private void checkRawMessage(InvitationParts parts, String... expected) {
+	private void checkNotice(InvitationParts parts) throws IOException, MessagingException {
+		String htmlText = Jsoup.parse((String)parts.htmlText.getContent()).text();
+		String plainText = (String) parts.plainText.getContent();
+		checkStringContains(htmlText, Lists.newArrayList(getNotice()));
+		checkStringContains(plainText, Lists.newArrayList(getNotice()));
+	}
+
+	private void checkRawMessage(InvitationParts parts, List<String> expected) {
 		String rawMessage = parts.rawMessage;
 		checkStringContains(rawMessage, expected);
 	}
 	
-	private void checkIcs(InvitationParts parts, String... expected) throws IOException, MessagingException {
+	private void checkIcs(InvitationParts parts, List<String> expected) throws IOException, MessagingException {
 		checkTextCalendar(parts.textCalendar, expected);
 		checkApplicationIcs(parts.applicationIcs, expected);
 	}
 	
-	private void checkTextCalendar(BodyPart textCalendar, String... expected) throws IOException, MessagingException {
+	private void checkTextCalendar(BodyPart textCalendar, List<String> expected) throws IOException, MessagingException {
 		assertThat(textCalendar.getContent()).isInstanceOf(String.class);
 		String text = (String) textCalendar.getContent();
 		checkStringContains(text, expected);
 	}
 
-	private void checkApplicationIcs(BodyPart applicationIcs, String... expected) throws IOException, MessagingException {
+	private void checkApplicationIcs(BodyPart applicationIcs, List<String> expected) throws IOException, MessagingException {
 		assertThat(applicationIcs.getContent()).isInstanceOf(SharedByteArrayInputStream.class);
 		SharedByteArrayInputStream stream = (SharedByteArrayInputStream) applicationIcs.getContent();
 		String decodedString = IOUtils.toString(stream, Charsets.US_ASCII.displayName());
@@ -279,7 +366,8 @@ public class EventChangeMailerTest {
 		public BodyPart applicationIcs;
 	}
 	
-	protected InvitationParts checkNotificationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
+	protected InvitationParts checkNotificationStructure(MimeMessage mimeMessage)
+			throws UnsupportedEncodingException, IOException, MessagingException {
 		InvitationParts parts = new InvitationParts();
 		parts.rawMessage = getRawMessage(mimeMessage);
 		assertThat(mimeMessage.getContentType()).startsWith("multipart/alternative");
@@ -293,7 +381,8 @@ public class EventChangeMailerTest {
 		return parts;
 	}
 
-	private InvitationParts checkInvitationStructure(MimeMessage mimeMessage) throws UnsupportedEncodingException, IOException, MessagingException {
+	private InvitationParts checkInvitationStructure(MimeMessage mimeMessage)
+			throws UnsupportedEncodingException, IOException, MessagingException {
 		InvitationParts parts = new InvitationParts();
 		parts.rawMessage = getRawMessage(mimeMessage);
 		assertThat(mimeMessage.getContentType()).startsWith("multipart/mixed");
@@ -315,91 +404,63 @@ public class EventChangeMailerTest {
 		return parts;
 	}
 
+	/*
+	 * Test against :
+	 * EventNoticeHtml_en.tpl, EventNoticePlain_en.tpl
+	 * EventNoticeHtml_fr.tpl, EventNoticePlain_fr.tpl
+	 */
 	@Test
 	public void testAcceptedCreation() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-				"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-				"DESCAMPS <blandine.descamps@linagora.com>");
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
-		Event event = buildTestEvent();
-		
-		eventChangeMailer.notifyAcceptedNewUsers(obmUser, event.getAttendees(), event, Locale.FRENCH, TIMEZONE, accessToken);
+		eventChangeMailer.notifyAcceptedNewUsers(
+				obmUser, event.getAttendees(),
+				event, getLocale(),
+				TIMEZONE, accessToken);
 
 		verify(mailService);
-		
+
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
-		checkPlainMessage(parts, 
-				"NOUVEAU RENDEZ-VOUS",
-				"du              : 8 nov. 2010 11:00", 
-				"au              : 8 nov. 2010 11:45",
-				"sujet           : Sprint planning OBM", 
-				"lieu            : ",
-				"organisateur    : Raphael ROUGERON",
-				"créé par        : Emmanuel SURLEAU",
-				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.");
-		checkHtmlMessage(parts, 
-				"Invitation à un événement",
-				"Du 8 nov. 2010 11:00", 
-				"Au 8 nov. 2010 11:45", 
-				"Sujet Sprint planning OBM", 
-				"Lieu", 
-				"Organisateur Raphael ROUGERON",
-				"Créé par Emmanuel SURLEAU",
-			    "Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.");
+		checkRawMessage(parts, getRawMessageWithSubject(getNewEventSubject()));
+		checkPlainMessage(parts, getInvitationPlainMessage());
+		checkHtmlMessage(parts, getInvitationHtmlMessage());
+		checkNotice(parts);
 	}
-	
+
+	/*
+	 * Test against :
+	 * RecurrentEventNoticeHtml_en.tpl, RecurrentEventNoticePlain_en.tpl
+	 * RecurrentEventNoticeHtml_fr.tpl, RecurrentEventNoticePlain_fr.tpl
+	 */
 	@Test
 	public void testAcceptedCreationRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond " +
-				"<pdupond@obm.linagora.com>");
-		Event event = buildTestRecurrentEvent();
-		eventChangeMailer.notifyAcceptedNewUsers(obmUser, event.getAttendees(), event, Locale.FRENCH, TIMEZONE, accessToken);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
+		eventChangeMailer.notifyAcceptedNewUsers(
+				obmUser, recurrentEvent.getAttendees(),
+				recurrentEvent, getLocale(),
+				TIMEZONE, accessToken);
 
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora_:_A_random_recurrent_event");
-		checkPlainMessage(parts, 
-				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
-				"du            : 23 janv. 2012", 
-				"au            : 23 nov. 2012",
-				"heure         : 12:00 - 13:00",
-				"recurrence    : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-				"sujet         : A random recurrent event", 
-				"lieu          : A random location",
-				"organisateur  : Jack de Linagora",		
-				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.");
-		checkHtmlMessage(parts, 
-				"Invitation à un événement récurrent",
-				"Du 23 janv. 2012", 
-				"Au 23 nov. 2012", 
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora",
-				"Heure 12:00 - 13:00",
-				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-			    "Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ce nouveau rendez-vous.");
+		checkRawMessage(parts, getRawMessageWithSubject(getNewRecurrentEventSubject()));
+		checkPlainMessage(parts, getRecurrentInvitationPlainMessage());
+		checkHtmlMessage(parts, getRecurrentInvitationHtmlMessage());
+		checkNotice(parts);
 	}
 	
+	/*
+	 * Test against :
+	 * ParticipationChangeHtml_en.tpl, ParticipationChangePlain_en.tpl
+	 * ParticipationChangeHtml_fr.tpl, ParticipationChangePlain_fr.tpl
+	 */
 	@Test
 	public void testAcceptedParticipationChangeEvent() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Raphael ROUGERON <rrougeron@linagora.com>"
-			);
-		
-		Event event = buildTestEvent();
-		event.setSequence(4);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients("Raphael ROUGERON <rrougeron@linagora.com>");
+
 		List<Attendee> attendees = event.getAttendees();
 		Attendee updatedAttendee = attendees.get(2);
 		updatedAttendee.setParticipation(Participation.accepted());
@@ -413,259 +474,164 @@ public class EventChangeMailerTest {
 				ServicesToolBox.getIcal4jUserFrom("mbaechler@linagora.com"), accessToken);
 
 		eventChangeMailer.notifyUpdateParticipation(
-				event,
-				event.findOrganizer(),
+				event, event.findOrganizer(),
 				ServicesToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
-				updatedAttendeeStatus, Locale.FRENCH, TIMEZONE, ics, accessToken);
+				updatedAttendeeStatus, getLocale(),
+				TIMEZONE, ics, accessToken);
 		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Matthieu BAECHLER <mbaechler@linagora.com>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_de_participation_?=\r\n =?UTF-8?Q?dans_OBM_:_Sprint_planning_OBM");
-		checkPlainMessage(parts, 
-				"PARTICIPATION : MISE A JOUR",
-				"Matthieu BAECHLER a accepté",
-				"l'événement Sprint planning OBM prévu le 8 nov. 2010",
-				"This is a random comment");
-		checkHtmlMessage(parts, 
-				"Participation : mise à jour ",
-				"Matthieu BAECHLER a accepté",
-				"l'événement Sprint planning OBM prévu le 8 nov. 2010",
-				"Commentaire This is a random comment");
+		ArrayList<String> rawMessage = getRawMessageWithSubject(getChangeParticipationSubject());
+		rawMessage.remove("From: Obm User <user@test>");
+		rawMessage.add("From: Matthieu BAECHLER <mbaechler@linagora.com>");
+		checkRawMessage(parts, rawMessage);
+		checkPlainMessage(parts, getChangeParticipationPlainMessage());
+		checkHtmlMessage(parts, getChangeParticipationHtmlMessage());
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REPLY;");
-		checkIcs(parts, "BEGIN:VCALENDAR",
-					"CALSCALE:GREGORIAN",
-					"VERSION:2.0",
-					"METHOD:REPLY",
-					"BEGIN:VEVENT",
-					"DTSTART:20101108T100000Z",
-					"SUMMARY:Sprint planning OBM",
-					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-					"UID:f1514f44bf39311568d64072c1fec10f47fe",
-					"X-OBM-DOMAIN:test.tlse.lng",
-					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-					"CREATED:20090608T142253Z",
-					"SEQUENCE:4",
-					"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;CN=Matthieu BAECHLE\r\n R;ROLE=OPT-P" +
-					"ARTICIPANT:mailto:mbaechler@linagora.com",
-					"COMMENT:This is a random comment");
-		
+		icsToCheck.add("METHOD:REPLY");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;CN=Matthieu BAECHLE\r\n R;ROLE=OPT-P" +
+				"ARTICIPANT:mailto:mbaechler@linagora.com");
+		icsToCheck.add("COMMENT:This is a random comment");
+		// TODO This is a bug ! DTEND should be DURATION or in GMT at best.
+		icsToCheck.remove("DURATION:PT45M");
+		icsToCheck.add("DTEND:20101108T114500");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * EventCancelHtml_en.tpl, EventCancelPlain_en.tpl
+	 * EventCancelHtml_fr.tpl, EventCancelPlain_fr.tpl
+	 */
 	@Test
 	public void testCancelation() throws AddressException, MessagingException, UnsupportedEncodingException, IOException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-			"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-			"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-			"DESCAMPS <blandine.descamps@linagora.com>");
-		
-		Event event = buildTestEvent();
-		event.setSequence(2);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, accessToken);
-		eventChangeMailer.notifyRemovedUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyRemovedUsers(
+				ServicesToolBox.getDefaultObmUser(), event.getAttendees(),
+				event, getLocale(),
+				TIMEZONE, ics,
+				accessToken);
 		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Annulation_d'un_=C3=A9v=C3=A9nement_de_Raphael");
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS ANNULÉ",
-				"du              : 8 nov. 2010 11:00", 
-				"au              : 8 nov. 2010 11:45",
-				"sujet           : Sprint planning OBM", 
-				"lieu            : ",
-				"organisateur    : Raphael ROUGERON");
-		checkHtmlMessage(parts, "Annulation d'un événement",
-					"Du 8 nov. 2010 11:00", 
-					"Au 8 nov. 2010 11:45", 
-					"Sujet Sprint planning OBM", 
-					"Lieu", 
-					"Organisateur Raphael ROUGERON",
-					"Créé par Emmanuel SURLEAU");
+		checkRawMessage(parts, getRawMessageWithSubject(getCancelEventSubject()));
+		checkPlainMessage(parts, getCancelPlainMessage());
+		checkHtmlMessage(parts, getCancelHtmlMessage());
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=CANCEL;");
-		checkIcs(parts, "BEGIN:VCALENDAR",
-					"CALSCALE:GREGORIAN",
-					"VERSION:2.0",
-					"METHOD:CANCEL",
-					"BEGIN:VEVENT",
-					"DTSTART:20101108T100000Z",
-					"SUMMARY:Sprint planning OBM",
-					"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-					"UID:f1514f44bf39311568d64072c1fec10f47fe",
-					"X-OBM-DOMAIN:test.tlse.lng",
-					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z",
-					"SEQUENCE:2");
+		icsToCheck.add("METHOD:CANCEL");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		// TODO This is a bug ! DTEND should be DURATION or in GMT at best.
+		icsToCheck.remove("DURATION:PT45M");
+		icsToCheck.add("DTEND:20101108T114500");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * RecurrentEventCancelHtml_en.tpl, RecurrentEventCancelPlain_en.tpl
+	 * RecurrentEventCancelHtml_fr.tpl, RecurrentEventCancelPlain_fr.tpl
+	 */
 	@Test
 	public void testCancelationRecurrentEvent() throws AddressException, MessagingException, UnsupportedEncodingException, IOException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
-		Event event = buildTestRecurrentEvent();
-		event.setSequence(2);
-		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, accessToken);
-		eventChangeMailer.notifyRemovedUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
+		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
+		eventChangeMailer.notifyRemovedUsers(
+				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
+				recurrentEvent, getLocale(),
+				TIMEZONE, ics,
+				accessToken);
 
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, "From: Obm User <user@test>",
-					"To: Jean Dupont <jdupont@obm.linagora.com>",
-					"Subject: =?UTF-8?Q?Annulation_d'un_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora");
-		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT ANNULÉ",
-					"du           : 23 janv. 2012", 
-					"au           : 23 nov. 2012",
-					"heure        : 12:00 - 13:00",
-					"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-					"sujet        : A random recurrent event", 
-					"lieu         : A random location",
-					"organisateur : Jack de Linagora");
-		checkHtmlMessage(parts, "Annulation d'un événement récurrent",
-					"Du 23 janv. 2012", 
-					"Au 23 nov. 2012", 
-					"Sujet A random recurrent event", 
-					"Lieu A random location", 
-					"Organisateur Jack de Linagora",
-					"Heure 12:00 - 13:00",
-					"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
-		checkIcs(parts, "BEGIN:VCALENDAR",
-					"CALSCALE:GREGORIAN",
-					"VERSION:2.0",
-					"METHOD:CANCEL",
-					"BEGIN:VEVENT",
-					"DTSTART:20120123T110000Z",
-					"SUMMARY:A random recurrent event",
-					"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-					"UID:1234567890",
-					"X-OBM-DOMAIN:test.tlse.lng",
-					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z",
-					"SEQUENCE:2",
-					"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		checkRawMessage(parts, getRawMessageWithSubject(getCancelRecurrentEventSubject()));
+		checkPlainMessage(parts, getRecurrentCancelPlainMessage());
+		checkHtmlMessage(parts, getRecurrentCancelHtmlMessage());
+		icsToCheck.add("METHOD:CANCEL");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		// TODO This is a bug ! DTEND should be DURATION or in GMT at best.
+		icsToCheck.remove("DURATION:PT45M");
+		icsToCheck.add("DTEND:20101108T114500");
+		checkIcs(parts, icsToCheck);
 	}
 
-	
+	/*
+	 * Test against :
+	 * EventInvitationHtml_en.tpl, EventInvitationPlain_en.tpl
+	 * EventInvitationHtml_fr.tpl, EventInvitationPlain_fr.tpl
+	 */
 	@Test
 	public void testNeedActionCreation() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-				"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-				"DESCAMPS <blandine.descamps@linagora.com>");
-		Event event = buildTestEvent();
-		event.setSequence(5);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, accessToken);
-		eventChangeMailer.notifyNeedActionNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyNeedActionNewUsers(
+				ServicesToolBox.getDefaultObmUser(),event.getAttendees(),
+				event, getLocale(),
+				TIMEZONE, ics,
+				accessToken);
+		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_de_Raphael_R?=\r\n =?UTF-8?Q?OUGERON_:_Sprint_planning_OBM");
-		checkPlainMessage(parts, "NOUVEAU RENDEZ-VOUS",
-				"du              : 8 nov. 2010 11:00", 
-				"au              : 8 nov. 2010 11:45",
-				"sujet           : Sprint planning OBM", 
-				"lieu            : ",
-				"organisateur    : Raphael ROUGERON",
-				"créé par        : Emmanuel SURLEAU");
-		checkHtmlMessage(parts, "Invitation à un événement",
-				"Du 8 nov. 2010 11:00", 
-				"Au 8 nov. 2010 11:45", 
-				"Sujet Sprint planning OBM", 
-				"Lieu", 
-				"Organisateur Raphael ROUGERON",
-				"Créé par Emmanuel SURLEAU");
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20101108T100000Z",
-				"DURATION:PT45M",
-				"SUMMARY:Sprint planning OBM",
-				"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-				"UID:f1514f44bf39311568d64072c1fec10f47fe",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"SEQUENCE:5");
+		checkRawMessage(parts, getRawMessageWithSubject(getNewEventSubject()));
+		checkPlainMessage(parts, getInvitationPlainMessage());
+		checkHtmlMessage(parts, getInvitationHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * RecurrentEventInvitationHtml_en.tpl, RecurrentEventInvitationPlain_en.tpl
+	 * RecurrentEventInvitationHtml_fr.tpl, RecurrentEventInvitationPlain_fr.tpl
+	 */
 	@Test
 	public void testNeedActionCreationRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>"
-				);
-		Event event = buildTestRecurrentEvent();
-		event.setSequence(5);
-		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, accessToken);
-		eventChangeMailer.notifyNeedActionNewUsers(ServicesToolBox.getDefaultObmUser(), event.getAttendees(), event, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
+		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
+		eventChangeMailer.notifyNeedActionNewUsers(
+				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
+				recurrentEvent, getLocale(),
+				TIMEZONE, ics,
+				accessToken);
+		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Nouvel_=C3=A9v=C3=A9nement_r=C3=A9current_de_Jack_d?=\r\n =?UTF-8?Q?e_Linagora_:_A_random_recurrent_event");
-		checkPlainMessage(parts, 
-				"NOUVEAU RENDEZ-VOUS RÉCURRENT",
-				"du           : 23 janv. 2012", 
-				"au           : 23 nov. 2012",
-				"heure        : 12:00 - 13:00",
-				"recurrence   : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-				"sujet        : A random recurrent event", 
-				"lieu         : A random location",
-				"organisateur : Jack de Linagora");
-		checkHtmlMessage(parts, "Invitation à un événement récurrent",
-				"Du 23 janv. 2012", 
-				"Au 23 nov. 2012", 
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora",
-				"Heure 12:00 - 13:00",
-				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
-		checkIcs(parts, "BEGIN:VCALENDAR",
-					"CALSCALE:GREGORIAN",
-					"VERSION:2.0",
-					"METHOD:REQUEST",
-					"BEGIN:VEVENT",
-					"DTSTART:20120123T110000Z",
-					"DURATION:PT1H",
-					"SUMMARY:A random recurrent event",
-					"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-					"UID:1234567890",
-					"X-OBM-DOMAIN:test.tlse.lng",
-					"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-					"CREATED:20090608T142253Z",
-					"LAST-MODIFIED:20090608T142315Z",
-					"SEQUENCE:5",
-					"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		checkRawMessage(parts, getRawMessageWithSubject(getNewRecurrentEventSubject()));
+		checkPlainMessage(parts, getRecurrentInvitationPlainMessage());
+		checkHtmlMessage(parts, getRecurrentInvitationHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * EventUpdateInvitationHtml_en.tpl, EventUpdateInvitationPlain_en.tpl
+	 * EventUpdateInvitationHtml_fr.tpl, EventUpdateInvitationPlain_fr.tpl
+	 */
 	@Test
 	public void testNeedActionUpdate() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-				"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-				"DESCAMPS <blandine.descamps@linagora.com>");
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		Event before = buildTestEvent();
 		Event after = before.clone();
 		after.setStartDate(date("2010-11-08T12:00:00"));
@@ -674,113 +640,82 @@ public class EventChangeMailerTest {
 			att.setParticipation(Participation.needsAction());
 		}
 		after.setSequence(4);
+		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyNeedActionUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(
+				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
-		checkRawMessage(parts, "From: Obm User <user@test>",
-					"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS MODIFIÉ !",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Le rendez-vous Sprint planning OBM", 
-				"lieu : ");
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement : mise à jour",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Du 8 nov. 2010 12:00", 
-				"Au 8 nov. 2010 13:00",
-				"Sujet Sprint planning OBM", 
-				"Lieu", 
-				"Organisateur Raphael ROUGERON",
-				"Créé par Emmanuel SURLEAU");
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20101108T110000Z",
-				"DURATION:PT1H",
-				"SUMMARY:Sprint planning OBM",
-				"ORGANIZER;CN=Raphael ROUGERON:mailto:rrougeron@linagora.com",
-				"UID:f1514f44bf39311568d64072c1fec10f47fe",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"SEQUENCE:4");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateEventSubject()));
+		checkPlainMessage(parts, getUpdatePlainMessage());
+		checkHtmlMessage(parts, getUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.remove("SEQUENCE:2");
+		icsToCheck.add("SEQUENCE:4");
+		icsToCheck.remove("DURATION:PT45M");
+		icsToCheck.add("DURATION:PT1H");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * RecurrentEventUpdateInvitationHtml_en.tpl, RecurrentEventUpdateInvitationPlain_en.tpl
+	 * RecurrentEventUpdateInvitationHtml_fr.tpl, RecurrentEventUpdateInvitationPlain_fr.tpl
+	 */
 	@Test
 	public void testNeedActionUpdateRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>"
-				);
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
-		after.setStartDate(date("2012-02-15T13:00:00"));
-		after.setDuration(7200);
+		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setDuration(3600);
 		for (Attendee att : before.getAttendees()) {
 			att.setParticipation(Participation.needsAction());
 		}
 		after.setSequence(4);
+		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyNeedActionUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(
+				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REQUEST;");
-		checkRawMessage(parts, "From: Obm User <user@test>",
-					"To: Jean Dupont <jdupont@obm.linagora.com>",
-					"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event");
-		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
-				"du 15 févr. 2012", 
-				"au 23 nov. 2012",
-				"de 13:00 à 15:00",
-				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-				"lieu : A random location");
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement récurrent : mise à jour",
-				"Du 15 févr. 2012", 
-				"Au 23 nov. 2012", 
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora",
-				"Heure 13:00 - 15:00",
-				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20120215T120000Z",
-				"DURATION:PT2H",
-				"SUMMARY:A random recurrent event",
-				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-				"UID:1234567890",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"SEQUENCE:4");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateRecurrentEventSubject()));
+		checkPlainMessage(parts, getRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getRecurrentUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.remove("SEQUENCE:2");
+		icsToCheck.add("SEQUENCE:4");
+		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		icsToCheck.remove("DURATION:PT45M");
+		icsToCheck.add("DURATION:PT1H");
+		checkIcs(parts, icsToCheck);
 	}
 	
+	/*
+	 * Test against :
+	 * EventUpdateNoticeHtml_en.tpl, EventUpdateNoticePlain_en.tpl
+	 * EventUpdateNoticeHtml_fr.tpl, EventUpdateNoticePlain_fr.tpl
+	 */
 	@Test
 	public void testNotifyAcceptedUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-				"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-				"DESCAMPS <blandine.descamps@linagora.com>");
-		
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
 		Event before = buildTestEvent();
 		Event after = before.clone();
@@ -790,43 +725,63 @@ public class EventChangeMailerTest {
 			att.setParticipation(Participation.accepted());
 		}
 		
-		eventChangeMailer.notifyAcceptedUpdateUsers(ServicesToolBox.getDefaultObmUser(), before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, "", accessToken);
+		eventChangeMailer.notifyAcceptedUpdateUsers(
+				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				"", accessToken);
 		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS MODIFIÉ !",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Le rendez-vous Sprint planning OBM", 
-				"lieu : ",
-				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.");
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement : mise à jour",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Du 8 nov. 2010 12:00", 
-				"Au 8 nov. 2010 13:00",
-				"Sujet Sprint planning OBM", 
-				"Lieu", 
-				"Organisateur Raphael ROUGERON",
-				"Créé par Emmanuel SURLEAU",
-				"Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateEventSubject()));
+		checkPlainMessage(parts, getUpdatePlainMessage());
+		checkHtmlMessage(parts, getUpdateHtmlMessage());
+		checkNotice(parts);
+	}
+
+	/*
+	 * Test against :
+	 * RecurrentEventUpdateNoticeHtml_en.tpl, RecurrentEventUpdateNoticePlain_en.tpl
+	 * RecurrentEventUpdateNoticeHtml_fr.tpl, RecurrentEventUpdateNoticePlain_fr.tpl
+	 */
+	@Test
+	public void testNotifyAcceptedUpdateUsersWithRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
+		Event before = buildTestRecurrentEvent();
+		Event after = before.clone();
+		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setDuration(3600);
+		for (Attendee att: before.getAttendees()) {
+			att.setParticipation(Participation.accepted());
+		}
+		
+		eventChangeMailer.notifyAcceptedUpdateUsers(
+				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				"", accessToken);
+		
+		verify(mailService);
+		
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateRecurrentEventSubject()));
+		checkPlainMessage(parts, getRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getRecurrentUpdateHtmlMessage());
+		checkNotice(parts);
 	}
 	
+	/*
+	 * Test against :
+	 * EventUpdateNoticeHtml_en.tpl, EventUpdateNoticePlain_en.tpl
+	 * EventUpdateNoticeHtml_fr.tpl, EventUpdateNoticePlain_fr.tpl
+	 */
 	@Test
 	public void testNotifyAcceptedUpdateUsersCanWriteOnCalendar() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Ronan LANORE <rlanore@linagora.com>, Guillaume ALAUX " +
-				"<galaux@linagora.com>, Matthieu BAECHLER <mbaechler@linagora.com>, Blandine " +
-				"DESCAMPS <blandine.descamps@linagora.com>");
-		
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
 		Event before = buildTestEvent();
 		Event after = before.clone();
@@ -835,270 +790,156 @@ public class EventChangeMailerTest {
 		for (Attendee att: before.getAttendees()) {
 			att.setParticipation(Participation.accepted());
 		}
-		eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, accessToken);
+		
+		eventChangeMailer.notifyAcceptedUpdateUsersCanWriteOnCalendar(
+				obmUser, before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				accessToken);
 		
 		verify(mailService);
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
-		checkRawMessage(parts, 
-				"From: Obm User <user@test>",
-				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Raphael");
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS MODIFIÉ !",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Le rendez-vous Sprint planning OBM", 
-				"lieu : ",
-				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.");
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement : mise à jour",
-				"du 8 nov. 2010 11:00", 
-				"au 8 nov. 2010 11:45",
-				"Du 8 nov. 2010 12:00", 
-				"Au 8 nov. 2010 13:00",
-				"Sujet Sprint planning OBM", 
-				"Lieu", 
-				"Organisateur Raphael ROUGERON",
-				"Créé par Emmanuel SURLEAU",
-				"Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateEventSubject()));
+		checkPlainMessage(parts, getUpdatePlainMessage());
+		checkHtmlMessage(parts, getUpdateHtmlMessage());
+		checkNotice(parts);
 	}
 	
 	@Test
-		public void testBuildUpdateParticipationDatamodel() {
-			Event event = new Event();
-			event.setStartDate(new Date());
-			ObmUser obmUser = new ObmUser();
-			Participation status = Participation.accepted();
-			status.setComment(new Comment(null));
+	public void testBuildUpdateParticipationDatamodel() {
+		Event event = new Event();
+		event.setStartDate(new Date());
+		ObmUser obmUser = new ObmUser();
+		Participation status = Participation.accepted();
+		status.setComment(new Comment(null));
 
-		ObmSyncConfigurationService constantService = EasyMock.createMock(ObmSyncConfigurationService.class);
+		ObmSyncConfigurationService constantService = createMock(ObmSyncConfigurationService.class);
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
-		expect(constantService.getResourceBundle(Locale.FRENCH)).andReturn(ResourceBundle.getBundle("Messages", Locale.FRENCH)).atLeastOnce();
+		expect(constantService.getResourceBundle(getLocale())).andReturn(ResourceBundle.getBundle("Messages", getLocale())).atLeastOnce();
 		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
 
 		replay(constantService);
 
-			EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
+		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
 
-			eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, Locale.FRENCH);
-		}
+		eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, getLocale());
+	}
 	
 	@Test
 	public void testNonRecurrentToRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
+		Event after = buildTestRecurrentEvent();
+		after.setSequence(4);
+		Event before = after.clone();
+		before.setRecurrence(new EventRecurrence());
+		
+		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
+		eventChangeMailer.notifyAcceptedUpdateUsers(
+				obmUser, before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
+		verify(mailService);
+		
+		MimeMessage mimeMessage = capturedMessage.getValue();
+		InvitationParts parts = checkInvitationStructure(mimeMessage);
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateRecurrentEventSubject()));
+		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.remove("SEQUENCE:2");
+		icsToCheck.add("SEQUENCE:4");
+		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		checkIcs(parts, icsToCheck);
+		checkNotice(parts);
+	}
+	
+	@Test
+	public void testNonRecurrentToRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		Event after = buildTestRecurrentEvent();
 		Event before = after.clone();
 		before.setRecurrence(new EventRecurrence());
+		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyAcceptedUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(
+				obmUser, before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
 		verify(mailService);
+		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, "From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event"
-				);
-		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
-				"du 23 janv. 2012", 
-				"au 23 janv. 2012",
-				"de 12:00 à 13:00",
-				"au 23 nov. 2012",
-				"type de récurrence : Pas de récurrence",
-				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-				"lieu : A random location"
-				);
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement récurrent : mise à jour",
-				"du 23 janv. 2012", 
-				"au 23 janv. 2012",
-				"Heure 12:00 - 13:00",
-				"Au 23 nov. 2012",
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora",
-				"type de récurrence : Pas de récurrence",
-				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20120123T110000Z",
-				"DURATION:PT1H",
-				"SUMMARY:A random recurrent event",
-				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-				"UID:1234567890",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE",
-				"SEQUENCE:0");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateRecurrentEventSubject()));
+		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
+		checkIcs(parts, icsToCheck);
 	}
 	
 	@Test
 	public void testRecurrentToNonRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		after.setRecurrence(new EventRecurrence());
+		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyAcceptedUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyAcceptedUpdateUsers(
+				obmUser, before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
 		verify(mailService);
+		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, "From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Jack_de_Li?=\r\n =?UTF-8?Q?nagora_sur_OBM_:_A_random_recurrent_event?="
-				);
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS MODIFIÉ !",
-				"du 23 janv. 2012 12:00",
-				"au 23 janv. 2012 13:00",
-				"Le rendez-vous A random recurrent event", 
-				"lieu : A random location",
-				"::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications."
-				);
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement : mise à jour",
-				"du 23 janv. 2012 12:00",
-				"au 23 janv. 2012 13:00",
-				"lieu : A random location",
-				"Du 23 janv. 2012 12:00",
-				"Au 23 janv. 2012 13:00",
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora"
-				);
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20120123T110000Z",
-				"DURATION:PT1H",
-				"SUMMARY:A random recurrent event",
-				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-				"UID:1234567890",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"SEQUENCE:0");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateEventSubject()));
+		checkPlainMessage(parts, getRecurrentToNonRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getRecurrentToNonRecurrentUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		checkIcs(parts, icsToCheck);
+		checkNotice(parts);
 	}
-	
 
 	@Test
-	public void testNonRecurrentToRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
-		Event after = buildTestRecurrentEvent();
-		Event before = after.clone();
-		before.setRecurrence(new EventRecurrence());
-		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyNeedActionUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
-		verify(mailService);
-		MimeMessage mimeMessage = capturedMessage.getValue();
-		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, "From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9ne?=\r\n =?UTF-8?Q?ment_r=C3=A9current_de_Jack_?=\r\n =?UTF-8?Q?de_Linagora_sur_OBM_:_A_random_recurrent_event"
-				);
-		checkPlainMessage(parts, "RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
-				"du 23 janv. 2012", 
-				"au 23 janv. 2012",
-				"de 12:00 à 13:00",
-				"au 23 nov. 2012",
-				"type de récurrence : Pas de récurrence",
-				"type de récurrence : Toutes les 2 semaines [Lundi, Mercredi, Jeudi]",
-				"lieu : A random location"
-				);
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement récurrent : mise à jour",
-				"du 23 janv. 2012", 
-				"au 23 janv. 2012",
-				"Heure 12:00 - 13:00",
-				"Au 23 nov. 2012",
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora",
-				"type de récurrence : Pas de récurrence",
-				"Type de récurrence Toutes les 2 semaines [Lundi, Mercredi, Jeudi]");
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20120123T110000Z",
-				"DURATION:PT1H",
-				"SUMMARY:A random recurrent event",
-				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-				"UID:1234567890",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE",
-				"SEQUENCE:0");
-	}
-	
-	@Test
 	public void testRecurrentToNonRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
-		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(
-				"Jean Dupont <jdupont@obm.linagora.com>, Pierre Dupond <pdupond@obm.linagora.com>");
+		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
+
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		after.setRecurrence(new EventRecurrence());
+		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
-		eventChangeMailer.notifyNeedActionUpdateUsers(obmUser, before.getAttendees(), before, after, Locale.FRENCH, TIMEZONE, ics, accessToken);
+		eventChangeMailer.notifyNeedActionUpdateUsers(
+				obmUser, before.getAttendees(),
+				before, after,
+				getLocale(), TIMEZONE,
+				ics, accessToken);
+		
 		verify(mailService);
+		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		checkRawMessage(parts, "From: Obm User <user@test>",
-				"To: Jean Dupont <jdupont@obm.linagora.com>",
-				"Subject: =?UTF-8?Q?Mise_=C3=A0_jour_d'un_=C3=A9v=C3=A9nement_de_Jack_de_Li?=\r\n =?UTF-8?Q?nagora_sur_OBM_:_A_random_recurrent_event?="
-				);
-		checkPlainMessage(parts, 
-				"RENDEZ-VOUS MODIFIÉ !",
-				"du 23 janv. 2012 12:00",
-				"au 23 janv. 2012 13:00",
-				"Le rendez-vous A random recurrent event", 
-				"lieu : A random location"
-				);
-		checkHtmlMessage(parts, 
-				"Invitation à un évènement : mise à jour",
-				"du 23 janv. 2012 12:00",
-				"au 23 janv. 2012 13:00",
-				"lieu : A random location",
-				"Du 23 janv. 2012 12:00",
-				"Au 23 janv. 2012 13:00",
-				"Sujet A random recurrent event", 
-				"Lieu A random location", 
-				"Organisateur Jack de Linagora"
-				);
-		checkIcs(parts, 
-				"BEGIN:VCALENDAR",
-				"CALSCALE:GREGORIAN",
-				"VERSION:2.0",
-				"METHOD:REQUEST",
-				"BEGIN:VEVENT",
-				"DTSTART:20120123T110000Z",
-				"DURATION:PT1H",
-				"SUMMARY:A random recurrent event",
-				"ORGANIZER;CN=Jack de Linagora:mailto:jdlinagora@obm.linagora.com",
-				"UID:1234567890",
-				"X-OBM-DOMAIN:test.tlse.lng",
-				"X-OBM-DOMAIN-UUID:ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6",
-				"CREATED:20090608T142253Z",
-				"LAST-MODIFIED:20090608T142315Z",
-				"SEQUENCE:0");
+		checkRawMessage(parts, getRawMessageWithSubject(getUpdateEventSubject()));
+		checkPlainMessage(parts, getRecurrentToNonRecurrentUpdatePlainMessage());
+		checkHtmlMessage(parts, getRecurrentToNonRecurrentUpdateHtmlMessage());
+		icsToCheck.add("METHOD:REQUEST");
+		icsToCheck.add("DTSTART:20101108T100000Z");
+		checkIcs(parts, icsToCheck);
 	}
 
 }

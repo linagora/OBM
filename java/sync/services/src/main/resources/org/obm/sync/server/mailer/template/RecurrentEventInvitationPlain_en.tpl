@@ -1,25 +1,27 @@
 This email was automatically sent by OBM
 ------------------------------------------------------------------
-NEW RECURRENT APPOINTMENT
+NEW RECURRENT APPOINTMENT !
 ------------------------------------------------------------------
 
-You are invited to participate to this appointment
+You are invited to attend this appointment :
 
-from       : ${start}
+from          : ${start?date}
 
-to         : ${recurrenceEnd}
+to            : ${recurrenceEnd}
 
-time       : ${startTime?string.short} - ${endTime?string.short}
+time          : ${startTime?string.short} - ${endTime?string.short}
 
-recurrence : ${recurrenceKind}  
+recurrence    : ${recurrenceKind}  
 
-subject    : ${subject}
+subject       : ${subject}
 
-location   : ${location}
+location      : ${location}
 
-organizer  : ${organizer}
+organizer     : ${organizer}
 
-created by : ${creator}
+created by    : ${creator}
+
+attendee(s)   : ${attendees}
 
 
 :: To accept this appointment : 

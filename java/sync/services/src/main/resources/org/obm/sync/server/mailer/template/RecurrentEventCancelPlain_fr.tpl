@@ -3,21 +3,22 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS RÉCURRENT ANNULÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous suivant a été annulé
+Le rendez-vous suivant a été annulé :
 
-du           : ${start}
+du            : ${start?date}
 
-au           : ${recurrenceEnd}
+au            : ${recurrenceEnd}
 
-heure        : ${startTime?string.short} - ${endTime?string.short}
+heure         : ${startTime?string.short} - ${endTime?string.short}
 
-recurrence   : ${recurrenceKind}
+recurrence    : ${recurrenceKind}
 
-sujet        : ${subject}
+sujet         : ${subject}
 
-lieu         : ${location}
+lieu          : ${location}
 
-organisateur : ${organizer}
+organisateur  : ${organizer}
 
-créé par     : ${creator}
+créé par      : ${creator}
 
+participant(s): ${attendees}

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Calendar;
@@ -76,6 +78,7 @@ public class TemplateTest {
 			put("organizer", "Matthieu Baechler").
 			put("creator", "Emmanuel Surleau").
 			put("host", "obm.matthieu.lng").
+			put("attendees", "attendee").
 			put("calendarId", 12).build();
 		return datamodel;
 	}
@@ -101,26 +104,29 @@ public class TemplateTest {
 		Template template = retrieveEventInvitationTemplate(new Locale("fr"));
 		ImmutableMap<Object, Object> datamodel = buildDatamodel();
 		String message = applyTemplate(template, datamodel);
-		Assert.assertThat(message, StringContains.containsString("sujet           : test event"));
-		Assert.assertThat(message, StringContains.containsString("lieu            : Lyon"));
-		Assert.assertThat(message, StringContains.containsString("organisateur    : Matthieu Baechler"));
-		Assert.assertThat(message, StringContains.containsString("créé par        : Emmanuel Surleau"));
-		Assert.assertThat(message, StringContains.containsString("du              : 11 sept. 2001 09:12"));
-		Assert.assertThat(message, StringContains.containsString("au              : 11 sept. 2001 19:12"));
+		assertThat(message)
+			.contains("sujet         : test event")
+			.contains("lieu          : Lyon")
+			.contains("organisateur  : Matthieu Baechler")
+			.contains("créé par      : Emmanuel Surleau")
+			.contains("du            : 11 sept. 2001 09:12")
+			.contains("au            : 11 sept. 2001 19:12")
+			.contains("participant(s): attendee");
 	}
 
 	@Test
-	@Ignore("bug with datetime_format")
 	public void testEn() throws IOException, TemplateException {
 		Template template = retrieveEventInvitationTemplate(new Locale("en"));
 		ImmutableMap<Object, Object> datamodel = buildDatamodel();
 		String message = applyTemplate(template, datamodel);
-		Assert.assertThat(message, StringContains.containsString("subject      : test event"));
-		Assert.assertThat(message, StringContains.containsString("location     : Lyon"));
-		Assert.assertThat(message, StringContains.containsString("organizer    : Matthieu Baechler"));
-		Assert.assertThat(message, StringContains.containsString("creator      : Emmanuel Surleau"));
-		Assert.assertThat(message, StringContains.containsString("from         : Sep 11, 2001 9:12 AM"));
-		Assert.assertThat(message, StringContains.containsString("to           : Sep 11, 2001 7:12 PM"));
+		assertThat(message)
+			.contains("subject       : test event")
+			.contains("location      : Lyon")
+			.contains("organizer     : Matthieu Baechler")
+			.contains("created by    : Emmanuel Surleau")
+			.contains("from          : Sep 11, 2001 9:12 AM")
+			.contains("to            : Sep 11, 2001 7:12 PM")
+			.contains("attendee(s)   : attendee");
 	}
 	
 	@Test
@@ -130,8 +136,9 @@ public class TemplateTest {
 		Template template = cfg.getTemplate("Nested.tpl", Locale.FRENCH);
 		ImmutableMap<Object, Object> datamodel = ImmutableMap.of((Object)"top", (Object)"one", "sub", ImmutableMap.of("message", "two"));
 		String message = applyTemplate(template, datamodel);
-		Assert.assertThat(message, StringContains.containsString("Normal variable : one"));
-		Assert.assertThat(message, StringContains.containsString("Nested variable : two"));
+		assertThat(message)
+			.contains("Normal variable : one")
+			.contains("Nested variable : two");
 	}
 
 }

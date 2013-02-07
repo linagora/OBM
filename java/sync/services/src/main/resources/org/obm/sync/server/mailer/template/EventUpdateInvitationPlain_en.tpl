@@ -3,22 +3,21 @@ This email was automatically sent by OBM
 APPOINTMENT UPDATED !
 ------------------------------------------------------------------
 
-The appointment ${old.subject}, initially scheduled from ${old.start?string.medium_short} to ${old.end?string.medium_short}, (location : ${old.location}),
-was updated :
+The appointment ${old.subject}, initially scheduled from ${old.start?string.medium_short} to ${old.end?string.medium_short}, (location : ${old.location}), was updated :
 
-from        : ${new.start?string.medium_short}
+from          : ${new.start?string.medium_short}
 
-to          : ${new.end?string.medium_short}
+to            : ${new.end?string.medium_short}
 
-subject     : ${new.subject}
+subject       : ${new.subject}
 
-location    : ${new.location}
+location      : ${new.location}
 
-organizer   : ${new.organizer}
+organizer     : ${new.organizer}
 
-created by  : ${new.creator}
+created by    : ${new.creator}
 
-attendee(s) : ${new.attendees}
+attendee(s)   : ${new.attendees}
 
 
 :: To accept this update :

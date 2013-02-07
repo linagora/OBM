@@ -1,22 +1,24 @@
 This email was automatically sent by OBM
 ------------------------------------------------------------------
-RECURRENT APPOINTMENT DELETED !
+RECURRENT APPOINTMENT CANCELED !
 ------------------------------------------------------------------
 
-The next appointment ${subject} has been deleted.
+The following appointment ${subject} has been canceled :
 
-from            : ${start}
+from          : ${start?date}
 
-to              : ${recurrenceEnd}
+to            : ${recurrenceEnd}
 
-time            : ${startTime?string.short} - ${endTime?string.short}
+time          : ${startTime?string.short} - ${endTime?string.short}
 
-recurrence      : ${recurrenceKind}
+recurrence    : ${recurrenceKind}
 
-subject         : ${subject}
+subject       : ${subject}
 
-location        : ${location}
+location      : ${location}
 
-organizer       : ${organizer}
+organizer     : ${organizer}
 
-created by      : ${creator}
+created by    : ${creator}
+
+attendee(s)   : ${attendees}

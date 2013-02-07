@@ -1,21 +1,23 @@
 This email was automatically sent by OBM
 ------------------------------------------------------------------
-NEW APPOINTMENT
+NEW APPOINTMENT !
 ------------------------------------------------------------------
 
-You are invited to participate to this appointment
+You are invited to attend this appointment :
 
-from        : ${start?string.medium_short}
+from          : ${start?string.medium_short}
 
-to          : ${end?string.medium_short}
+to            : ${end?string.medium_short}
 
-subject     : ${subject}
+subject       : ${subject}
 
-location    : ${location}
+location      : ${location}
 
-organizer   : ${organizer}
+organizer     : ${organizer}
 
-created by  : ${creator}
+created by    : ${creator}
+
+attendee(s)   : ${attendees}
 
 
 :: To accept this appointment : 
