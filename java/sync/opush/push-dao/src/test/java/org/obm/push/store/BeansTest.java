@@ -29,37 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push.store;
 
-import java.math.BigDecimal;
-import java.util.Properties;
-
+import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.User;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-import com.google.common.testing.SerializableTester;
+import com.google.common.collect.ImmutableList;
 
-public class SerializableTest {
+@RunWith(SlowFilterRunner.class)
+public class BeansTest {
 
-	@Test
-	public void unsynchronizedItemDaoEhcacheImplKey() {
-		UnsynchronizedItemDaoEhcacheImpl.Key key = new UnsynchronizedItemDaoEhcacheImpl.Key(
-				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
-				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), BigDecimal.valueOf(12)),
-				12, UnsynchronizedItemType.ADD);
-		SerializableTester.reserializeAndAssert(key);
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
-
+	
 	@Test
-	public void monitoredCollectionDaoEhcacheImplKey() {
-		Key key = new MonitoredCollectionDaoEhcacheImpl.Key(
-				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
-				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), BigDecimal.valueOf(12)));
-		
-		SerializableTester.reserializeAndAssert(key);
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(MonitoredCollectionDaoEhcacheImpl.Key.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
 	}
+	
 }

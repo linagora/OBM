@@ -60,7 +60,7 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager objectStoreManager;
@@ -92,7 +92,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		Assert.assertNotNull(syncCollections);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testSimplePut() {
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
 		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
@@ -101,7 +101,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		containsCollectionWithId(syncCollections, 1);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testPutNewItems() {
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(2, 3));
