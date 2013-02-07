@@ -124,6 +124,7 @@ public class MoveItemsHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		greenMail.stop();
 		Files.delete(configuration.dataDir);
 	}
 

@@ -37,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import net.sf.ehcache.CacheManager;
-
 import org.mortbay.component.LifeCycle;
 import org.mortbay.component.LifeCycle.Listener;
 import org.mortbay.jetty.Connector;
@@ -55,6 +53,7 @@ import bitronix.tm.TransactionManagerServices;
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -80,8 +79,8 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	}
 
 	@Provides @Singleton
-	protected OpushServer buildOpushServer() {
-		return new OpushServer();
+	protected OpushServer buildOpushServer(Injector injector) {
+		return new OpushServer(injector);
 	}
 	
 	public static class OpushServer {
@@ -93,7 +92,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 		private final SelectChannelConnector selectChannelConnector;
 		private final CountDownLatch serverStartedLatch = new CountDownLatch(WAIT_TO_BE_STARTED_LATCH_COUNT);
 
-		public OpushServer() {
+		public OpushServer(Injector injector) {
 			server = new Server();
 			server.setThreadPool(new QueuedThreadPool(2));
 			selectChannelConnector = new SelectChannelConnector();
@@ -102,20 +101,21 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/");
 			root.addLifeCycleListener(buildServerStartedListener());
-			root.addEventListener(buildTransactionManagerListener());
+			root.addEventListener(buildTransactionManagerListener(injector));
 		}
 
-		private ServletContextListener buildTransactionManagerListener() {
+		private ServletContextListener buildTransactionManagerListener(final Injector injector) {
 			return new ServletContextListener() {
-				
+
 				@Override
 				public void contextInitialized(ServletContextEvent sce) {
 				}
-				
+
 				@Override
 				public void contextDestroyed(ServletContextEvent sce) {
-			    	CacheManager.getInstance().shutdown();
-			    	TransactionManagerServices.getTransactionManager().shutdown();
+					injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
+					injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
+					TransactionManagerServices.getTransactionManager().shutdown();
 				}
 			};
 		}

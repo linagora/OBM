@@ -40,12 +40,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.ehcache.CacheManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 /**
  * A reusable servlet {@link Filter} able to reject and throttle requests based on some business logic.
@@ -56,11 +59,14 @@ public class QoSFilter implements Filter {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final QoSRequestHandler handler;
 	private final QoSContinuationSupport continuationSupport;
+	private final CacheManager cacheManager;
 
 	@Inject
-	@VisibleForTesting QoSFilter(QoSRequestHandler handler, QoSContinuationSupport continuationSupport) {
+	@VisibleForTesting QoSFilter(QoSRequestHandler handler, QoSContinuationSupport continuationSupport, 
+			@Named(QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager) {
 		this.handler = handler;
 		this.continuationSupport = continuationSupport;
+		this.cacheManager = cacheManager;
 	}
 
 	@Override
@@ -122,6 +128,7 @@ public class QoSFilter implements Filter {
 	
 	@Override
 	public void destroy() {
+		cacheManager.shutdown();
 	}
 
 }

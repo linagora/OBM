@@ -32,11 +32,6 @@ package org.obm.servlet.filter.qos.util.server;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import net.sf.ehcache.CacheManager;
-
 import org.eclipse.jetty.continuation.ContinuationFilter;
 import org.mortbay.component.LifeCycle;
 import org.mortbay.component.LifeCycle.Listener;
@@ -74,7 +69,6 @@ public class QoSFilterTestModule extends ServletModule {
 		root.addFilter(GuiceFilter.class, "/*", 0);
 		root.addServlet(DefaultServlet.class, "/");
 		root.addLifeCycleListener(buildServerStartedListener());
-		root.addEventListener(buildTransactionManagerListener());
 		return new EmbeddedServer() {
 			
 			@Override
@@ -112,20 +106,6 @@ public class QoSFilterTestModule extends ServletModule {
 					return port;
 				}
 				throw new IllegalStateException("Could not get server's listening port. Received port is " + port);
-			}
-		};
-	}
-
-	private ServletContextListener buildTransactionManagerListener() {
-		return new ServletContextListener() {
-			
-			@Override
-			public void contextInitialized(ServletContextEvent sce) {
-			}
-			
-			@Override
-			public void contextDestroyed(ServletContextEvent sce) {
-				CacheManager.getInstance().shutdown();
 			}
 		};
 	}

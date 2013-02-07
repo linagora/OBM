@@ -37,8 +37,6 @@ import java.util.TimeZone;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import net.sf.ehcache.CacheManager;
-
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +51,12 @@ import com.google.inject.spi.Message;
 public class GuiceServletContextListener implements ServletContextListener { 
 
 	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
+	private Injector injector;
 	
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 
 		try {
-			Injector injector = createInjector();
+			injector = createInjector();
 			if (injector == null) { 
 				failStartup("Could not create injector: createInjector() returned null"); 
 			} 
@@ -78,7 +77,8 @@ public class GuiceServletContextListener implements ServletContextListener {
     }
     
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	CacheManager.getInstance().shutdown();
+    	injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
+    	injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
     	TransactionManagerServices.getTransactionManager().shutdown();
     }
     

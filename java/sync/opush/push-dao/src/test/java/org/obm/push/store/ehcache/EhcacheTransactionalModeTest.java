@@ -118,7 +118,7 @@ public class EhcacheTransactionalModeTest {
 
 	@Before
 	public void init() {
-		this.manager = CacheManager.create();
+		this.manager = new CacheManager();
 	    this.xaCache = new Cache(
 	            new CacheConfiguration(XA_CACHE_NAME, 1000)
 	                .transactionalMode(CacheConfiguration.TransactionalMode.XA));
