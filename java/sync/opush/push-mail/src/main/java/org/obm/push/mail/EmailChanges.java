@@ -254,7 +254,7 @@ public class EmailChanges implements Serializable {
 					FluentIterable.from(additions).transform(new EntryProducer(EmailPartitionEntry.Type.ADD)),
 					FluentIterable.from(changes).transform(new EntryProducer(EmailPartitionEntry.Type.CHANGE)),
 					FluentIterable.from(deletions).transform(new EntryProducer(EmailPartitionEntry.Type.DELETION)))
-					).toSortedImmutableList(new Comparator<EmailPartitionEntry>() {
+					).toSortedList(new Comparator<EmailPartitionEntry>() {
 
 						@Override
 						public int compare(EmailPartitionEntry o1, EmailPartitionEntry o2) {

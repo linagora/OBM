@@ -52,9 +52,10 @@ import org.obm.push.store.ehcache.ObjectStoreManager;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.base.Function;
-import com.google.common.collect.DiscreteDomains;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Ranges;
+import com.google.common.collect.Range;
 import com.google.inject.Inject;
 
 import cucumber.api.java.After;
@@ -176,13 +177,13 @@ public class WindowingStepdefs {
 	private EmailChanges generateEmails(long start, long number) {
 		return EmailChanges.builder()
 				.additions(
-					FluentIterable.from(Ranges.closedOpen(start, start + number).asSet(DiscreteDomains.longs()))
+					FluentIterable.from(ContiguousSet.create(Range.closedOpen(start, start + number), DiscreteDomain.longs()))
 						.transform(new Function<Long, Email>() {
 							@Override
 							public Email apply(Long uid) {
 								return Email.builder().uid(uid).build();
 							}
-						}).toImmutableSet())
+						}).toSet())
 				.build();
 	}
 	
