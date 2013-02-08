@@ -110,6 +110,8 @@ public class CalendarDaoJdbcImplTest {
 	@Inject
 	private IMocksControl mocksControl;
 	@Inject
+	private UserDao userDao;
+	@Inject
 	private CalendarDaoJdbcImpl calendarDaoJdbcImpl;
 	@Inject
 	private DatabaseConnectionProvider dbcp;

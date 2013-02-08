@@ -400,7 +400,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Event oldEvent = fetchReferenceEvent(token, serverId, eventExtId, collectionPath);
 			EventObmId eventId = getEventId(oldEvent);
 			
-			EventObmId newEventId = chooseBackendChange(udr, msEvent, collectionPath, token, eventExtId, oldEvent, eventId);
+			EventObmId newEventId = chooseBackendChange(udr, msEvent, collectionPath, token, eventExtId, oldEvent, eventId, clientId);
 			
 			return getServerIdFor(collectionId, newEventId);
 		} catch (org.obm.sync.NotAllowedException e) {
@@ -424,7 +424,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private EventObmId chooseBackendChange(UserDataRequest udr, MSEvent msEvent,
 			CollectionPath collectionPath, AccessToken token,
-			EventExtId eventExtId, Event oldEvent, final EventObmId eventId)
+			EventExtId eventExtId, Event oldEvent, final EventObmId eventId, String clientId)
 			throws org.obm.sync.NotAllowedException, ServerFault {
 		
 		if (isParticipationChangeUpdate(collectionPath, oldEvent)) {
@@ -434,7 +434,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			updateEvent(token, udr, collectionPath, oldEvent, eventExtId, msEvent);
 			return eventId;
 		} else {
-			return createEvent(udr, token, collectionPath, oldEvent, msEvent, eventExtId);
+			return createEvent(udr, token, collectionPath, oldEvent, msEvent, eventExtId, clientId);
 		}
 	}
 
@@ -488,14 +488,14 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private EventObmId createEvent(UserDataRequest udr, AccessToken token,
-			CollectionPath collectionPath, Event oldEvent, MSEvent msEvent, EventExtId eventExtId)
+			CollectionPath collectionPath, Event oldEvent, MSEvent msEvent, EventExtId eventExtId, String clientId)
 			throws ServerFault, DaoException, org.obm.sync.NotAllowedException {
 		
 		boolean isInternal = eventConverter.isInternalEvent(oldEvent, eventExtId);
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
 		assignExtId(udr, msEvent, eventExtId, event);
 		try { 
-			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, null);
+			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, getHashClientId(udr, clientId));
 		} catch (EventAlreadyExistException e) {
 			return getEventIdFromExtId(token, collectionPath, event);
 		}

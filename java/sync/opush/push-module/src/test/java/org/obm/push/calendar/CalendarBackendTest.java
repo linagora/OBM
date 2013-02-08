@@ -655,7 +655,7 @@ public class CalendarBackendTest {
 		expect(eventConverter.convert(user, oldEvent, creatingMSEvent, eventIsResolvedAsInternal))
 			.andReturn(creatingEvent).once();
 
-		expect(calendarClient.createEvent(token, "test@test", creatingEvent, true, null))
+		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(creatingEvent), eq(true), anyObject(String.class)))
 			.andReturn(new EventObmId(createdObmId));
 		
 		mockControl.replay();
@@ -698,7 +698,7 @@ public class CalendarBackendTest {
 		eventService.trackEventExtIdMSEventUidTranslation(generatedEventExtID, creatingMSEvent.getUid(), device);
 		expectLastCall();
 		
-		expect(calendarClient.createEvent(token, "test@test", creatingEvent, true, null))
+		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(creatingEvent), eq(true), anyObject(String.class)))
 			.andReturn(new EventObmId(createdObmId));
 		
 		mockControl.replay();
@@ -1229,7 +1229,7 @@ public class CalendarBackendTest {
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(null).once();
 	
-		expect(calendarClient.createEvent(token, "test@test", event, true, null))
+		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(event), eq(true), anyObject(String.class)))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 
 		expect(eventConverter.isInternalEvent(null, eventExtId)).andReturn(false).once();
@@ -1273,7 +1273,7 @@ public class CalendarBackendTest {
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(null).once();
 	
-		expect(calendarClient.createEvent(token, "test@test", event, true, null))
+		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(event), eq(true), anyObject(String.class)))
 			.andThrow(new EventAlreadyExistException("Already exist")).once();
 
 		expect(calendarClient.getEventObmIdFromExtId(token, "test@test", eventExtId))
