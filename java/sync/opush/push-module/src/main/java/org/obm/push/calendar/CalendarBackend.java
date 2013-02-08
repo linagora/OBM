@@ -270,7 +270,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ConversionException, HierarchyChangedException {
 
-		return backendWindowingService.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, new BackendChangesProvider() {
+		return backendWindowingService.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, newSyncKey, new BackendChangesProvider() {
 			
 			@Override
 			public DataDelta getAllChanges() {

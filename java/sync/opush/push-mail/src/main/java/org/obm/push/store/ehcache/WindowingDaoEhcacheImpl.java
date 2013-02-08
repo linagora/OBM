@@ -112,10 +112,19 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 	}
 	
 	@Override
-	public void pushPendingElements(WindowingIndexKey indexKey, EmailChanges partition) {
-		pushNextChunk(indexKey, partition, getWindowingIndex(indexKey).nextToBeStored());
+	public void pushNextRequestPendingElements(WindowingIndexKey indexKey, SyncKey syncKey, EmailChanges partition) {
+		WindowingIndex windowingIndex = getWindowingIndex(indexKey);
+		if (partition.hasChanges()) {
+			pushNextChunk(indexKey, partition, windowingIndex.nextToBeStored(syncKey));
+		} else if (windowingHasDataRemaining(windowingIndex)) {
+			indexStore.put(new Element(indexKey, windowingIndex.nextSyncKey(syncKey)));
+		}
 	}
 	
+	private boolean windowingHasDataRemaining(WindowingIndex windowingIndex) {
+		return windowingIndex != null;
+	}
+
 	@Override
 	public void pushPendingElements(WindowingIndexKey indexKey, SyncKey syncKey, EmailChanges partition) {
 		pushNextChunk(indexKey, partition, nextToBeStored(indexKey, syncKey));
@@ -126,7 +135,7 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 		if (windowingIndex == null) {
 			return new WindowingIndex(0, syncKey);
 		} else {
-			return windowingIndex.nextToBeStored();
+			return windowingIndex.nextToBeStored(syncKey);
 		}
 	}
 
@@ -215,7 +224,7 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 			this.index = index;
 			this.syncKey = syncKey;
 		}
-		
+
 		public int getIndex() {
 			return index;
 		}
@@ -247,8 +256,8 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 				.toString();
 		}
 
-		public WindowingIndex nextToBeStored() {
-			return new WindowingIndex(index +1, syncKey);
+		public WindowingIndex nextToBeStored(SyncKey nextSyncKey) {
+			return new WindowingIndex(index +1, nextSyncKey);
 		}
 		
 		public WindowingIndex nextToBeRetrieved() {
@@ -257,6 +266,10 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 			} else {
 				return null;
 			}
+		}
+		
+		public Serializable nextSyncKey(SyncKey newSyncKey) {
+			return new WindowingIndex(index , newSyncKey);
 		}
 	}
 }

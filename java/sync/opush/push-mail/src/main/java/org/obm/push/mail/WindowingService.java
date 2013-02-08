@@ -36,7 +36,7 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 
 public interface WindowingService {
 
-	EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize);
+	EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize, SyncKey newSyncKey);
 	
 	void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges changes, int windowSize);
 

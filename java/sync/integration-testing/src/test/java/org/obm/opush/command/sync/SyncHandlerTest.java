@@ -523,7 +523,7 @@ public class SyncHandlerTest {
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
 		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(secondRequestSyncState).times(2);
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(),
-				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).once();
+				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).times(2);
 		collectionDao.resetCollection(user.device, collectionId);
 		expectLastCall();
 		

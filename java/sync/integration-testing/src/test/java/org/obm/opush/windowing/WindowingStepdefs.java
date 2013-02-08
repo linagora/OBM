@@ -122,10 +122,17 @@ public class WindowingStepdefs {
 	@When("user ask for the first (\\d+) elements")
 	public void retrieveFirstElements(int elements) {
 		userGenerateANewSyncKey();
-		startToRetrieveElements();
 		windowingService.hasPendingElements(windowingIndexKey, syncKey);
 		windowingService.pushPendingElements(windowingIndexKey, syncKey, inbox, elements);
 		this.elementsLeft = inbox.sumOfChanges();
+		retrieveNextElements(elements);
+	}
+	
+	@When("user ask for the next (\\d+) elements")
+	public void retrieveNextElements(int elements) {
+		windowingService.hasPendingElements(windowingIndexKey, syncKey);
+		startToRetrieveElements();
+		userGenerateANewSyncKey();
 		retrieveElements(elements);
 	}
 
@@ -133,24 +140,19 @@ public class WindowingStepdefs {
 		syncKey = new SyncKey(UUID.randomUUID().toString());
 	}
 	
-	@When("user ask for the next (\\d+) elements")
-	public void retrieveNextElements(int elements) {
-		startToRetrieveElements();
-		retrieveElements(elements);
-	}
-	
 	@When("user ask repeatedly for (\\d+) elements")
 	public void retreiveUntilPendingElementIsEmpty(int elements) {
 		startToRetrieveElements();
 		while (this.elementsLeft > 0) {
 			retrieveElements(elements);
+			userGenerateANewSyncKey();
 			retreivingChangesSum += retrievedElements.sumOfChanges();
 			retreivingChangesIteration++;
 		}
 	}
 
 	private void retrieveElements(int elements) {
-		retrievedElements = windowingService.popNextPendingElements(windowingIndexKey, elements);
+		retrievedElements = windowingService.popNextPendingElements(windowingIndexKey, elements, syncKey);
 		this.elementsLeft -= retrievedElements.sumOfChanges();
 	}
 	
@@ -162,7 +164,7 @@ public class WindowingStepdefs {
 	@Then("there is (\\d+) elements left in store")
 	public void assertElementsInStore(int elements) {
 		assertThat(windowingService.hasPendingElements(windowingIndexKey, syncKey)).isEqualTo(elements > 0);
-		EmailChanges pendingChanges = windowingService.popNextPendingElements(windowingIndexKey, Integer.MAX_VALUE);
+		EmailChanges pendingChanges = windowingService.popNextPendingElements(windowingIndexKey, Integer.MAX_VALUE, syncKey);
 		assertThat(pendingChanges).isEqualTo(generateEmails(elements));
 	}
 	

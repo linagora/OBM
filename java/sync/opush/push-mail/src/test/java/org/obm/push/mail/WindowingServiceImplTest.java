@@ -73,35 +73,49 @@ public class WindowingServiceImplTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void popNextPendingElementsNullKey() {
 		WindowingIndexKey key = null;
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = 12;
 
-		testee.popNextPendingElements(key, expectedSize);
+		testee.popNextPendingElements(key, expectedSize, syncKey);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void popNextPendingElementsZeroExpectedSize() {
 		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = 0;
-		testee.popNextPendingElements(key, expectedSize);
+		testee.popNextPendingElements(key, expectedSize, syncKey);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void popNextPendingElementsNegativeExpectedSize() {
 		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = -5;
-		testee.popNextPendingElements(key, expectedSize);
+		testee.popNextPendingElements(key, expectedSize, syncKey);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void popNextPendingElementsNullSyncKey() {
+		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = null;
+		int expectedSize = 45;
+		testee.popNextPendingElements(key, expectedSize, syncKey);
 	}
 	
 	@Test
 	public void popNextPendingElementsEmpty() {
 		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = 12;
 
 		expect(windowingDao.consumingChunksIterable(key))
 			.andReturn(ImmutableList.<EmailChanges>of()).once();
+		windowingDao.pushNextRequestPendingElements(key, syncKey, EmailChanges.empty());
+		expectLastCall();
 
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize, syncKey);
 		control.verify();
 
 		assertThat(elements.sumOfChanges()).isEqualTo(0);
@@ -110,6 +124,7 @@ public class WindowingServiceImplTest {
 	@Test
 	public void popNextPendingElementsFewElements() {
 		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = 12;
 
 		expect(windowingDao.consumingChunksIterable(key))
@@ -117,9 +132,11 @@ public class WindowingServiceImplTest {
 					EmailChanges.builder().addition(Email.builder().uid(1).build()).build(),
 					EmailChanges.builder().addition(Email.builder().uid(2).build()).build()))
 			.once();
+		windowingDao.pushNextRequestPendingElements(key, syncKey, EmailChanges.empty());
+		expectLastCall();
 	
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize, syncKey);
 		control.verify();
 
 		assertThat(elements.sumOfChanges()).isEqualTo(2);
@@ -128,6 +145,7 @@ public class WindowingServiceImplTest {
 	@Test
 	public void popNextPendingElementsEnoughElements() {
 		WindowingIndexKey key = new WindowingIndexKey(user, deviceId, collectionId);
+		SyncKey syncKey = new SyncKey("123");
 		int expectedSize = 2;
 
 		expect(windowingDao.consumingChunksIterable(key))
@@ -141,7 +159,7 @@ public class WindowingServiceImplTest {
 					EmailChanges.builder().addition(Email.builder().uid(5).build()).build()))
 			.once();
 
-		windowingDao.pushPendingElements(key, EmailChanges.builder()
+		windowingDao.pushNextRequestPendingElements(key, syncKey, EmailChanges.builder()
 				.addition(
 					Email.builder().uid(2).build(),
 					Email.builder().uid(1).build())
@@ -149,7 +167,7 @@ public class WindowingServiceImplTest {
 		expectLastCall();
 		
 		control.replay();
-		EmailChanges elements = testee.popNextPendingElements(key, expectedSize);
+		EmailChanges elements = testee.popNextPendingElements(key, expectedSize, syncKey);
 		control.verify();
 		
 		assertThat(elements.sumOfChanges()).isEqualTo(2);

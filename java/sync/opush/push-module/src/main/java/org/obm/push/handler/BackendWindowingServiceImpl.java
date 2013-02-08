@@ -61,15 +61,16 @@ public class BackendWindowingServiceImpl implements BackendWindowingService {
 	
 	@Override
 	public DataDelta windowedChanges(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection,
-			SyncClientCommands clientCommands, BackendChangesProvider backendChangesProvider) {
+			SyncClientCommands clientCommands, SyncKey newSyncKey, BackendChangesProvider backendChangesProvider) {
 		Preconditions.checkNotNull(udr, "UserDataRequest is required");
 		Preconditions.checkNotNull(itemSyncState, "itemSyncState is required");
 		Preconditions.checkNotNull(collection, "collection is required");
 		Preconditions.checkNotNull(clientCommands, "clientCommands is required");
+		Preconditions.checkNotNull(newSyncKey, "newSyncKey is required");
 		Preconditions.checkNotNull(backendChangesProvider, "backendChangesProvider is required");
 		
 		if (collectionHasPendingResponse(udr, collection)) {
-			return continueWindowing(udr, itemSyncState, collection, clientCommands);
+			return continueWindowing(udr, itemSyncState, collection, clientCommands, newSyncKey);
 		} else {
 			return getBackendChanges(udr, backendChangesProvider, collection, clientCommands);
 		}
@@ -81,10 +82,11 @@ public class BackendWindowingServiceImpl implements BackendWindowingService {
 		return windowing(udr, collection, clientCommands, backendChangesProvider.getAllChanges());
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection, SyncClientCommands clientCommands) {
-		SyncKey treatmentSyncKey = collection.getSyncKey();
+	private DataDelta continueWindowing(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection,
+			SyncClientCommands clientCommands, SyncKey newSyncKey) {
+		
 		Date lastSync = itemSyncState.getSyncDate();
-		return windowing(udr, collection, clientCommands, DataDelta.newEmptyDelta(lastSync, treatmentSyncKey));
+		return windowing(udr, collection, clientCommands, DataDelta.newEmptyDelta(lastSync, newSyncKey));
 	}
 
 	private boolean collectionHasPendingResponse(UserDataRequest udr, AnalysedSyncCollection collection) {

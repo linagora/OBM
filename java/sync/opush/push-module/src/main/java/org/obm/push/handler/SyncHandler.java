@@ -240,11 +240,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuationService.suspend(udr, continuation, syncRequest.getWaitInSecond());
 	}
 
-	private ItemSyncState doUpdates(UserDataRequest udr, AnalysedSyncCollection request,	SyncClientCommands clientCommands, 
-			SyncCollectionResponse.Builder responseBuilder, ItemSyncState syncState) throws DaoException, CollectionNotFoundException, 
+	private ItemSyncState doUpdates(UserDataRequest udr, AnalysedSyncCollection request, SyncClientCommands clientCommands, 
+			SyncCollectionResponse.Builder responseBuilder, ItemSyncState syncState, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException, InvalidServerId {
 
-		DataDelta delta = contentsExporter.getChanged(udr, syncState, request, clientCommands, syncKeyFactory.randomSyncKey());
+		DataDelta delta = contentsExporter.getChanged(udr, syncState, request, clientCommands, newSyncKey);
 
 		responseBuilder
 			.responses(SyncCollectionCommands.Response.builder()
@@ -441,26 +441,24 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			return null;
 		} else {
 			Date syncDate = null;
-			SyncKey treatmentSyncKey = null;
+			SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
 			if (request.getFetchIds().isEmpty()) {
-				ItemSyncState itemSyncState = doUpdates(udr, request, clientCommands, builder, st);
+				ItemSyncState itemSyncState = doUpdates(udr, request, clientCommands, builder, st, newSyncKey);
 				syncDate = itemSyncState.getSyncDate();
-				treatmentSyncKey = itemSyncState.getSyncKey();
 			} else {
-				treatmentSyncKey = syncKeyFactory.randomSyncKey();
 				syncDate = st.getSyncDate();
 				builder.responses(
 						SyncCollectionCommands.Response.builder()
-							.fetchs(identifyNewItems(contentsExporter.fetch(udr, st, request, treatmentSyncKey), st))
+							.fetchs(identifyNewItems(contentsExporter.fetch(udr, st, request, newSyncKey), st))
 							.build());
 			}
 			
-			builder.syncKey(treatmentSyncKey)
+			builder.syncKey(newSyncKey)
 				.status(SyncStatus.OK);
 			
 			return ItemSyncState.builder()
 					.syncDate(syncDate)
-					.syncKey(treatmentSyncKey)
+					.syncKey(newSyncKey)
 					.build();
 		}
 	}

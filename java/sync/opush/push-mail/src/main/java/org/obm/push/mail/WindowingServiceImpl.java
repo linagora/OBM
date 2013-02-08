@@ -58,26 +58,25 @@ public class WindowingServiceImpl implements WindowingService {
 	}
 
 	@Override
-	public EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize) {
+	public EmailChanges popNextPendingElements(WindowingIndexKey key, int maxSize, SyncKey newSyncKey) {
 		Preconditions.checkArgument(key != null);
 		Preconditions.checkArgument(maxSize > 0);
+		Preconditions.checkArgument(newSyncKey != null);
 
 		logger.info("retrieve a maximum of {} changes for key {}", maxSize, key);
 		
 		EmailChanges changes = getEnoughChunks(key, maxSize);
-		return splitToFitWindowSize(key, changes, maxSize);
+		Splitter splittedToFitWindowSize = splitToFitWindowSize(changes, maxSize);
+		windowingDao.pushNextRequestPendingElements(key, newSyncKey, splittedToFitWindowSize.getLeft());
+		return splittedToFitWindowSize.getFit();
 	}
 
-	private EmailChanges splitToFitWindowSize(WindowingIndexKey key, EmailChanges changes, int maxSize) {
+	private Splitter splitToFitWindowSize(EmailChanges changes, int maxSize) {
 		Splitter parts = changes.splitToFit(maxSize);
 
 		logger.info("a chunk has been splitted, fit:{} and left:{}", parts.getFit(), parts.getLeft());
 		
-		if (parts.getLeft().hasChanges()) {
-			windowingDao.pushPendingElements(key, parts.getLeft());
-		}
-		
-		return parts.getFit();
+		return parts;
 	}
 
 	private EmailChanges getEnoughChunks(WindowingIndexKey key, int maxSize) {

@@ -66,22 +66,27 @@ public class WindowingDaoEhcacheImplTest {
 		new WindowingIndex(-1, SyncKey.INITIAL_FOLDER_SYNC_KEY);
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void testNextToBeStoredWhenSyncKeyIsNull() {
+		new WindowingIndex(0, new SyncKey("123")).nextToBeStored(null);
+	}
+	
 	@Test
 	public void testNextToBeStoredWhenIndexIsZero() {
-		assertThat(new WindowingIndex(0, new SyncKey("123")).nextToBeStored())
-			.isEqualTo(new WindowingIndex(1, new SyncKey("123")));
+		assertThat(new WindowingIndex(0, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
+			.isEqualTo(new WindowingIndex(1, new SyncKey("456")));
 	}
 	
 	@Test
 	public void testNextToBeStoredWhenIndexIsOne() {
-		assertThat(new WindowingIndex(1, new SyncKey("123")).nextToBeStored())
-			.isEqualTo(new WindowingIndex(2, new SyncKey("123")));
+		assertThat(new WindowingIndex(1, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
+			.isEqualTo(new WindowingIndex(2, new SyncKey("456")));
 	}
 
 	@Test
 	public void testNextToBeStoredWhenIndexIsTenThousand() {
-		assertThat(new WindowingIndex(10000, new SyncKey("123")).nextToBeStored())
-			.isEqualTo(new WindowingIndex(10001, new SyncKey("123")));
+		assertThat(new WindowingIndex(10000, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
+			.isEqualTo(new WindowingIndex(10001, new SyncKey("456")));
 	}
 
 	@Test

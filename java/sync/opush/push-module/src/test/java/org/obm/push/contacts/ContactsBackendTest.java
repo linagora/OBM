@@ -52,6 +52,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
+import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Credentials;
@@ -67,6 +68,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.service.ClientIdService;
@@ -153,6 +155,38 @@ public class ContactsBackendTest {
 	public void testGetPIMDataType() {
 		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null, null);
 		assertThat(contactsBackend.getPIMDataType()).isEqualTo(PIMDataType.CONTACTS);
+	}
+
+	@Test
+	public void testGetChanges() throws Exception {
+		int collectionId = 1;
+		Date currentDate = DateUtils.getCurrentDate();
+		SyncKey newSyncKey = new SyncKey("789");
+		ItemSyncState lastKnownState = ItemSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890a"))
+				.build();
+
+		List<AddressBook> books = ImmutableList.of(newAddressBookObject("folder", collectionId, false));
+		
+		expectLoginBehavior(token);
+		expectListAllBooks(token, books);
+		expectBuildCollectionPath("folder", collectionId);
+
+		ContactChanges contactChanges = new ContactChanges(ImmutableList.<Contact> of(), ImmutableSet.<Integer> of(), currentDate);
+		expect(bookClient.listContactsChanged(token, currentDate, collectionId)).andReturn(contactChanges).once();
+		expectMappingServiceCollectionIdBehavior(books);
+		
+		mocks.replay();
+		DataDelta dataDelta = contactsBackend.getAllChanges(userDataRequest, lastKnownState, collectionId, newSyncKey);
+		mocks.verify();
+
+		assertThat(dataDelta).isEqualTo(DataDelta.builder()
+				.changes(ImmutableList.<ItemChange>of())
+				.deletions(ImmutableList.<ItemDeletion>of())
+				.syncDate(currentDate)
+				.syncKey(newSyncKey)
+				.build());
 	}
 
 	@Test

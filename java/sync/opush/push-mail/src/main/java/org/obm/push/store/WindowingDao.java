@@ -39,7 +39,7 @@ public interface WindowingDao {
 	
 	Iterable<EmailChanges> consumingChunksIterable(WindowingIndexKey key);
 
-	void pushPendingElements(WindowingIndexKey key, EmailChanges partition);
+	void pushNextRequestPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges partition);
 	
 	void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges partition);
 
