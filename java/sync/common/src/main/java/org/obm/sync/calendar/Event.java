@@ -327,6 +327,14 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		this.meetingStatus = meetingStatus;
 	}
 
+	public Integer getEntityId() {
+		return entityId;
+	}
+	
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+	
 	@Override
 	public Event clone() {
 		Event event = new Event();

@@ -43,6 +43,8 @@ import static org.obm.DateUtils.date;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,6 +61,7 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.UserAttendee;
@@ -160,8 +163,6 @@ public class CalendarDaoJdbcImplTest {
 		ps.addBatch();
 		expectLastCall().times(1); // Because the two attendees have the same entityId
 		
-		expect(ps.executeBatch()).andReturn(new int[0]);
-		
 		expectgetJDBCObjects();
 		expectPreparedStatementDatabaseObjectsCalls(connection, ps);
 		
@@ -186,7 +187,7 @@ public class CalendarDaoJdbcImplTest {
 		ps.setInt(anyInt(), anyInt());
 		expectLastCall().anyTimes();
 		
-		ps.setString(anyInt(), isA(String.class));
+		ps.setString(anyInt(), anyObject(String.class));
 		expectLastCall().anyTimes();
 		
 		ps.setObject(anyInt(), anyObject());
@@ -194,11 +195,87 @@ public class CalendarDaoJdbcImplTest {
 		
 		ps.setBoolean(anyInt(), anyBoolean());
 		expectLastCall().anyTimes();
+
+		ps.setNull(anyInt(), anyInt());
+		expectLastCall().anyTimes();
 		
 		ps.close();
 		expectLastCall().anyTimes();
 		
+		expect(ps.executeBatch())
+			.andReturn(new int[0]).anyTimes();
+
+		expect(ps.executeUpdate())
+			.andReturn(1).anyTimes();
+	
+		expect(ps.getConnection())
+			.andReturn(connection).anyTimes();
+		
 		connection.close();
 		expectLastCall().anyTimes();
+		
+		expect(connection.createStatement())
+			.andReturn(ps).anyTimes();
+	}
+
+	@Test
+	public void testCreateEventSetsEntityId() throws Exception {
+		Event event = new Event();
+		event.setExtId(new EventExtId("1"));
+		ObmUser user = ToolBox.getDefaultObmUser();
+		Connection connection = mocksControl.createMock(Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		AccessToken token = ToolBox.mockAccessToken(user.getLogin(), user.getDomain(), mocksControl);
+		
+		expect(dbcp.getConnection())
+			.andReturn(connection).once();
+		
+		String email = "user@test.org";
+		expect(userDao.userIdFromEmail(connection, email, user.getDomain().getId()))
+			.andReturn(1).once();
+		
+		int obmId = 1;
+		event.setUid(new EventObmId(obmId));
+		
+		ps.addBatch();
+		expectLastCall().anyTimes();
+		
+		expectgetJDBCObjects();
+		expectPreparedStatementDatabaseObjectsCalls(connection, ps);
+		
+		int expectedEntityId = 531;
+		expectLastInsertId(ps, obmId);
+		expectLinkEntity(ps, expectedEntityId);
+		
+		mocksControl.replay();
+		
+		Event createdEvent = calendarDaoJdbcImpl.createEvent(token, email, event, true);
+		
+		mocksControl.verify();
+		assertThat(createdEvent.getEntityId()).isEqualTo(expectedEntityId);
+	}
+
+	private void expectLastInsertId(PreparedStatement ps, int obmId) throws SQLException {
+		ResultSet resultSet = mocksControl.createMock(ResultSet.class);
+		expect(ps.executeQuery(anyObject(String.class)))
+			.andReturn(resultSet).once();
+		expect(resultSet.next())
+			.andReturn(true).once();
+		expect(resultSet.getInt(1))
+			.andReturn(obmId).once();
+		resultSet.close();
+		expectLastCall();
+	}
+
+	private void expectLinkEntity(PreparedStatement ps, Integer entityId) throws SQLException {
+		ResultSet resultSet = mocksControl.createMock(ResultSet.class);
+		expect(ps.executeQuery(anyObject(String.class)))
+			.andReturn(resultSet).once();
+		expect(resultSet.next())
+			.andReturn(true).once();
+		expect(resultSet.getInt(1))
+			.andReturn(entityId).once();
+		resultSet.close();
+		expectLastCall();
 	}
 }

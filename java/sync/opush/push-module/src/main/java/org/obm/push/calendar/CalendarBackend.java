@@ -36,12 +36,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.push.backend.BackendWindowingService;
+import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
-import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.FolderSyncState;
@@ -495,7 +495,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
 		assignExtId(udr, msEvent, eventExtId, event);
 		try { 
-			return calendarClient.createEvent(token, collectionPath.backendName(), event, true);
+			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, null);
 		} catch (EventAlreadyExistException e) {
 			return getEventIdFromExtId(token, collectionPath, event);
 		}
@@ -600,7 +600,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			if (previousEvent == null) {
 				try {
 					logger.info("createOrModifyInvitationEvent : create new event {}", newEvent.getObmId());
-					EventObmId id = calendarClient.createEvent(at, collectionPath.backendName(), newEvent, isInternal);
+					EventObmId id = calendarClient.createEvent(at, collectionPath.backendName(), newEvent, isInternal, null);
 					return calendarClient.getEventFromId(at, collectionPath.backendName(), id);
 				} catch (EventAlreadyExistException e) {
 					throw new UnexpectedObmSyncServerException("it's not possible because getEventFromExtId == null");

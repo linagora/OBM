@@ -110,7 +110,7 @@ public class AbstractEventSyncClientTest {
 		expect(responder.execute(eq(token), eq("/calendar/createEvent"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 		
-		client.createEvent(token, CALENDAR, event, false);
+		client.createEvent(token, CALENDAR, event, false, null);
 	}
 	
 	@Test(expected=NotAllowedException.class)
@@ -409,7 +409,7 @@ public class AbstractEventSyncClientTest {
 		expect(responder.execute(eq(token), eq("/calendar/importICalendar"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 		
-		client.importICalendar(token, CALENDAR, ics);
+		client.importICalendar(token, CALENDAR, ics, null);
 	}
 	
 	@Test(expected=NotAllowedException.class)

@@ -125,11 +125,19 @@ public interface ICalendar {
 			boolean updateAttendees, boolean notification) throws ServerFault, NotAllowedException;
 
 	/**
-	 * FIXME: needs work
+	 * Creates an event
+	 * 
+	 * @param clientId
+	 *            a SHA1, when this method is called many times with the same value for clientId,
+	 *            only one event must be created.
+	 *            Other calls returns the event created on first call. (idempotence)
+	 *            This param is not mandatory, it must have a size of 40 characters when not null
+	 *            
 	 * @throws EventAlreadyExistException 
 	 */
 	EventObmId createEvent(AccessToken token, String calendar, Event event,
-			boolean notification) throws ServerFault, EventAlreadyExistException, NotAllowedException;
+			boolean notification, String clientId) 
+					throws ServerFault, EventAlreadyExistException, NotAllowedException;
 
 	/**
 	 * return every changes made to calendar since lastSync date for events into
@@ -318,7 +326,7 @@ public interface ICalendar {
 	 * 
 	 * Return ImportICalendarException if import fails
 	 */
-	int importICalendar(AccessToken token, String calendar, String ics)
+	int importICalendar(AccessToken token, String calendar, String ics, String clientId)
 			throws ImportICalendarException, ServerFault, NotAllowedException;
 
 	/**

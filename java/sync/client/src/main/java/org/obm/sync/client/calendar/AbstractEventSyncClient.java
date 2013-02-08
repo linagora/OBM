@@ -89,7 +89,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification) throws ServerFault, EventAlreadyExistException, NotAllowedException {
+	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, EventAlreadyExistException, NotAllowedException {
 		Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		try {
@@ -98,6 +98,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 			throw new IllegalArgumentException(e);
 		}
 		params.put("notification", String.valueOf(notification));
+		params.put("clientId", clientId);
 		Document doc = execute(token, type + "/createEvent", params);
 		exceptionFactory.checkCreateEventException(doc);
 		return new EventObmId(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
@@ -488,11 +489,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 	
 	@Override
-	public int importICalendar(final AccessToken token, final String calendar, final String ics) 
+	public int importICalendar(final AccessToken token, final String calendar, final String ics, String clientId) 
 			throws ServerFault, NotAllowedException {
 		final Multimap<String, String> params = initParams(token);
 		params.put("calendar", calendar);
 		params.put("ics", ics);
+		params.put("clientId", clientId);
 		
 		final Document doc = execute(token, type + "/importICalendar", params);
 		exceptionFactory.checkNotAllowedException(doc);

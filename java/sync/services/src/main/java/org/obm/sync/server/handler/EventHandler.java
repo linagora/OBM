@@ -197,7 +197,7 @@ public class EventHandler extends SecureSyncHandler {
 		} else if (method.equals("changeParticipationState")) {
 			return changeParticipationState(at, request, responder);
 		} else if (method.equals("importICalendar")) {
-			return importICalendar(at, request, responder);
+			return importICalendar(at, request, responder, null);
 		} else if (method.equals("purge")) {
 			return purge(at, request, responder);
 		}
@@ -395,7 +395,7 @@ public class EventHandler extends SecureSyncHandler {
 	private String createEvent(
 			AccessToken at, Request request, XmlResponder responder)
 		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException, NotAllowedException {
-		EventObmId ev = binding.createEvent(at,	getCalendar(request), getEvent(request), getNotificationOption(request));
+		EventObmId ev = binding.createEvent(at,	getCalendar(request), getEvent(request), getNotificationOption(request), getClientId(request));
 		return responder.sendInt(ev.getObmId());
 	}
 	
@@ -414,6 +414,10 @@ public class EventHandler extends SecureSyncHandler {
 		return true;
 	}
 	
+	private String getClientId(Request request) {
+		return request.getParameter("clientId");
+	}
+
 	private List<Event> getEvents(Request request) throws SAXException,
 			IOException, FactoryConfigurationError {
 		Document doc = DOMUtils.parse(p(request, "events"));
@@ -540,11 +544,13 @@ public class EventHandler extends SecureSyncHandler {
 	}
 	
 	private String importICalendar(final AccessToken token, final Request request,
-			XmlResponder responder) throws ImportICalendarException, ServerFault, NotAllowedException {
+			XmlResponder responder, String clientId) 
+				throws ImportICalendarException, ServerFault, NotAllowedException {
+		
 		final String calendar = request.getParameter("calendar");
 		final String ics = request.getParameter("ics");
 		
-		int countEvent = binding.importICalendar(token, calendar, ics);
+		int countEvent = binding.importICalendar(token, calendar, ics, clientId);
 		return responder.sendInt(countEvent);
 	}
 	
