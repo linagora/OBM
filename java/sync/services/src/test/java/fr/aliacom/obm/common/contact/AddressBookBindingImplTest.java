@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.SQLException;
@@ -41,12 +45,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DateUtils;
+import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
@@ -57,6 +64,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -78,7 +86,7 @@ public class AddressBookBindingImplTest {
 	}
 	
 	private ObmHelper mockHelper() throws SQLException {
-		ObmHelper helper = EasyMock.createMock(ObmHelper.class);
+		ObmHelper helper = createMock(ObmHelper.class);
 		expect(helper.getConnection()).andReturn(null);
 		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
@@ -139,7 +147,7 @@ public class AddressBookBindingImplTest {
 		
 		ObmHelper helper = mockHelper();
 
-		ContactDao contactDao = EasyMock.createMock(ContactDao.class);
+		ContactDao contactDao = createMock(ContactDao.class);
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
 		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
 		
@@ -154,24 +162,24 @@ public class AddressBookBindingImplTest {
 		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
-		UserDao userDao = EasyMock.createMock(UserDao.class);
+		UserDao userDao = createMock(UserDao.class);
 		expect(userDao.findUpdatedUsers(timestamp, token)).andReturn(userUpdates).once();
 
-		ObmSyncConfigurationService configuration = EasyMock.createMock(ObmSyncConfigurationService.class);
+		ObmSyncConfigurationService configuration = createMock(ObmSyncConfigurationService.class);
 		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
 
-		ContactConfiguration contactConfiguration = EasyMock.createMock(ContactConfiguration.class);
+		ContactConfiguration contactConfiguration = createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1);
 		expect(contactConfiguration.getAddressBookUsersName()).andReturn("users");
 		
 		Object[] mocks = { helper, contactDao, userDao, configuration, contactConfiguration };
-		EasyMock.replay(mocks);
+		replay(mocks);
 
 		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, userDao, null, helper, 
-				configuration, contactConfiguration);
+				configuration, contactConfiguration, null);
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
-		EasyMock.verify(mocks);
+		verify(mocks);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact, newUser);
 		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3, 5, 7, 8);
@@ -217,7 +225,7 @@ public class AddressBookBindingImplTest {
 
 		ObmHelper helper = mockHelper();
 
-		ContactDao contactDao = EasyMock.createMock(ContactDao.class);
+		ContactDao contactDao = createMock(ContactDao.class);
 		
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
 		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
@@ -231,22 +239,89 @@ public class AddressBookBindingImplTest {
 		helper.cleanup(null, null, null);
 		expect(helper.selectNow(null)).andReturn(new Date());
 		
-		ObmSyncConfigurationService configuration = EasyMock.createMock(ObmSyncConfigurationService.class);
+		ObmSyncConfigurationService configuration = createMock(ObmSyncConfigurationService.class);
 		expect(
 				configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
 
 		Object[] mocks = { helper, contactDao, configuration };
-		EasyMock.replay(mocks);
+		replay(mocks);
 
 		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, helper,
-				configuration, null);
+				configuration, null, null);
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
-		EasyMock.verify(mocks);
+		verify(mocks);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact);
 		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3);
 		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2);
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
+	}
+	
+	@Test
+	public void testCreateContact() throws Exception {
+		Integer addressBookId = 1;
+		Contact contact = new Contact();
+		String clientId = "6547";
+
+		IMocksControl control = EasyMock.createControl();
+		
+		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
+		expect(contactConfiguration.getAddressBookUserId())
+			.andReturn(2).once();
+		
+		Integer entityId = 984;
+		Contact expectedContact = new Contact();
+		expectedContact.setEntityId(entityId);
+		
+		ContactDao contactDao = control.createMock(ContactDao.class);
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId))
+			.andReturn(expectedContact).once();
+		
+		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
+		expect(commitedOperationDao.findAsContact(token, clientId))
+			.andReturn(null).once();
+		commitedOperationDao.store(token,
+				CommitedElement.builder()
+					.clientId(clientId)
+					.entityId(entityId)
+					.kind(Kind.VCONTACT)
+					.build());
+		expectLastCall().once();
+		
+		control.replay();
+		
+		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, null,
+				null, contactConfiguration , commitedOperationDao);
+		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
+		
+		control.verify();
+		assertThat(createdContact).isEqualTo(expectedContact);
+	}
+	
+	@Test
+	public void testCreateContactAlreadyCommited() throws Exception {
+		Integer addressBookId = 1;
+		Contact contact = new Contact();
+		String clientId = "6547";
+
+		IMocksControl control = EasyMock.createControl();
+		
+		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
+		expect(contactConfiguration.getAddressBookUserId())
+			.andReturn(2).once();
+		
+		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
+		expect(commitedOperationDao.findAsContact(token, clientId))
+			.andReturn(contact).once();
+		
+		control.replay();
+		
+		AddressBookBindingImpl binding = new AddressBookBindingImpl(null, null, null, null,
+				null, contactConfiguration , commitedOperationDao);
+		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
+		
+		control.verify();
+		assertThat(createdContact).isEqualTo(contact);
 	}
 }

@@ -91,7 +91,7 @@ public interface IAddressBook {
 	 *            This param is not mandatory, it must have a size of 40 characters when not null
 	 *            
 	 */
-	Contact createContact(AccessToken token, Integer addressBook, Contact contact) 
+	Contact createContact(AccessToken token, Integer addressBook, Contact contact, String clientId) 
 			throws ServerFault, NoPermissionException;
 
 	/**

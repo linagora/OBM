@@ -46,6 +46,8 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.DateUtils;
+import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -70,6 +72,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
+import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -89,16 +92,19 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ContactMerger contactMerger;
 	private final ObmSyncConfigurationService configuration;
 	private final ContactConfiguration contactConfiguration;
+	private final CommitedOperationDao commitedOperationDao;
 
 	@Inject
 	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
-			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration) {
+			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration,
+			CommitedOperationDao commitedOperationDao) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
 		this.obmHelper = obmHelper;
 		this.configuration = configuration;
 		this.contactConfiguration = contactConfiguration;
+		this.commitedOperationDao = commitedOperationDao;
 	}
 
 	@Override
@@ -202,15 +208,27 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 	@Override
 	@Transactional
-	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
+	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
 			throws ServerFault, NoPermissionException {
 		
 		try {
 			if (isUsersOBMAddressBook(addressBookId)) {
 				throw new NoPermissionException("no permission to add a contact to address book users.");
-			} else {
-				return contactDao.createContactInAddressBook(token, contact, addressBookId);
 			}
+			
+			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
+			if (commitedContact != null) {
+				return commitedContact;
+			}
+			
+			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
+			commitedOperationDao.store(token, 
+					CommitedElement.builder()
+						.clientId(clientId)
+						.entityId(createdContact.getEntityId())
+						.kind(Kind.VCONTACT)
+						.build());
+			return createdContact;
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());
 		}

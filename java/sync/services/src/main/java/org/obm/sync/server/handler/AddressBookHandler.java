@@ -183,7 +183,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 		try {
 			Integer addressBookId = getBookId(request);	
 			Contact contact = getContactFromParams(request);
-			Contact ret = binding.createContact(at, addressBookId, contact);
+			String clientId = getClientId(request);
+			Contact ret = binding.createContact(at, addressBookId, contact, clientId);
 			responder.sendContact(ret);
 		} catch (SAXException e) {
 			throw new ServerFault(e);
@@ -199,6 +200,10 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return bip.parseContact(p(request, "contact"));
 	}
 	
+	private String getClientId(Request request) {
+		return request.getParameter("clientId");
+	}
+
     private void listContactsChanged(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
 		Date lastSync = getLastSyncFromRequest(request);
 		String addressBookId = p(request, "bookId");

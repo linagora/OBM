@@ -80,12 +80,13 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
-	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact) 
+	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
 			throws ServerFault, NoPermissionException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
 		params.put("contact", biw.getContactAsString(contact));
+		params.put("clientId", clientId);
 		Document doc = execute(token, "/book/createContact", params);
 		exceptionFactory.checkCreateContactException(doc);
 		return respParser.parseContact(doc.getDocumentElement());
