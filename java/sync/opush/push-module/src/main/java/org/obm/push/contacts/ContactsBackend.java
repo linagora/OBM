@@ -391,7 +391,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 				convertedContact.setUid(contactId);
 				modifyContact(udr, addressBookId, convertedContact);
 			} else {
-				Contact createdContact = createContact(udr, addressBookId, new ContactConverter().contact(contact));
+				Contact createdContact = createContact(udr, addressBookId, new ContactConverter().contact(contact), clientId);
 				contactId = createdContact.getUid();
 			}
 
@@ -418,12 +418,12 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 	
-	private Contact createContact(UserDataRequest udr, Integer addressBookId, Contact contact) 
+	private Contact createContact(UserDataRequest udr, Integer addressBookId, Contact contact, String clientId) 
 			throws UnexpectedObmSyncServerException, NoPermissionException {
 		
 		AccessToken token = login(udr);
 		try {
-			return bookClient.createContact(token, addressBookId, contact, null);
+			return bookClient.createContact(token, addressBookId, contact, getHashClientId(udr, clientId));
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {

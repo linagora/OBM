@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.contacts;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -223,6 +225,46 @@ public class ContactsBackendTest {
 
 		mocks.replay();
 		String newServerId = contactsBackend.createOrUpdate(userDataRequest, targetcontactCollectionUid, serverIdAsString, clientId, msContact);
+		mocks.verify();
+		
+		assertThat(newServerId).isEqualTo(serverIdAsString);
+	}
+	
+	@Test
+	public void testCreateOrUpdateCreatesContact() throws Exception {
+		int otherContactCollectionUid = 1;
+		int targetcontactCollectionUid = 2;
+		int serverId = 215;
+		String clientId = "1";
+
+		List<AddressBook> books = ImmutableList.of(
+				newAddressBookObject("folder", otherContactCollectionUid, false),
+				newAddressBookObject("folder_1", targetcontactCollectionUid, false));
+		
+		expectLoginBehavior(token);
+		expectListAllBooks(token,books);
+		expectBuildCollectionPath("folder", otherContactCollectionUid);
+		expectBuildCollectionPath("folder_1", targetcontactCollectionUid);
+		
+		MSContact msContact = new MSContact();
+		
+		Contact contact = newContactObject(serverId);
+		Contact convertedContact = new ContactConverter().contact(msContact);
+		expect(bookClient.createContact(eq(token), eq(targetcontactCollectionUid), eq(convertedContact), anyObject(String.class)))
+			.andReturn(contact).once();
+		
+		expectMappingServiceCollectionIdBehavior(books);
+		
+		String serverIdAsString = String.valueOf(serverId);
+		expect(mappingService.getItemIdFromServerId(null))
+			.andReturn(null).once();
+		expect(mappingService.getServerIdFor(targetcontactCollectionUid, serverIdAsString))
+			.andReturn(serverIdAsString);
+
+		mocks.replay();
+		
+		String newServerId = contactsBackend.createOrUpdate(userDataRequest, targetcontactCollectionUid, null, clientId, msContact);
+		
 		mocks.verify();
 		
 		assertThat(newServerId).isEqualTo(serverIdAsString);
