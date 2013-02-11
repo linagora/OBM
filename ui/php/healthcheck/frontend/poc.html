@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<head>
+	<title>OBM Health Check</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/healthcheck.css" rel="stylesheet">
+    <link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
+</head>
+<body>
+
+<script src="assets/js/jquery.js"></script>
+<script src="assets/js/bootstrap.js"></script>
+   
+<div class="container">
+	<div class="page-header">
+          <h1>Health Check OBM <button class="btn btn-success btn-large" type="button"><strong>Start Checking OBM</strong></button> </h1>
+
+	</div>
+
+	<div class="progress progress-danger progress-striped active">
+    	<div class="bar" style="width: 40%;"><span class="label label-important">IMAP</span></div>
+    </div>
+
+    <div class="alert alert-error">
+	    <button type="button" class="close" data-dismiss="alert">&times;</button>
+	    <strong>IMAP Error:</strong> java.lang.IllegalStateException: Could not get server's listening port. Received port is -1	at org.obm.opush.ActiveSyncServletModule$OpushServer.getLocalPort(ActiveSyncServletModule.java:175)
+    </div>
+
+	<div class="row-fluid">
+		<div class="span12">   
+			<table class="table table-striped">
+				<tr class="success">
+					<td>PHP</td>
+					<td>Version x.x</td>
+					<td> 	<span class="label label-success">Success</span>  </td>
+					<td>
+					<div class="progress progress-success">
+							<div class="bar" style="width: 100%"></div>
+					</div>
+					</td>
+				</tr>
+				<tr class="success">
+					<td>BDD</td>
+					<td>Version x.x</td>
+					<td> 	<span class="label label-success">Success</span>  </td>
+					<td>
+          				<div class="progress progress-success">
+							<div class="bar" style="width: 100%"></div>
+						</div>
+          			</td>
+				</tr>
+				<tr class="success">
+					<td>OBM-SYNC</td>
+					<td>Version x.x</td>
+					<td> 	<span class="label label-success">Success</span>  </td>
+					<td>
+          				<div class="progress progress-success">
+							<div class="bar" style="width: 100%"></div>
+						</div>
+          			</td>
+				</tr>
+				<tr class="warning">
+					<td>OPUSH</td>
+					<td>Version x.x</td>
+					<td>
+						<div class="btn-group">
+		                <button data-toggle="dropdown" class="btn btn-small dropdown-toggle btn-warning"><strong>Warning</strong> <span class="caret"></span></button>
+		                <ul class="dropdown-menu">
+		                  <li><a href="#">Continue</a></li>
+		                  <li><a href="#">Relaunch check</a></li>
+		                </ul>
+		              </div>
+          			</td>
+          			<td>
+          				<div class="progress progress-warning">
+							<div class="bar" style="width: 80%"></div>
+						</div>
+          			</td>
+				</tr>
+				<tr class="error">
+					<td>IMAP</td>
+					<td>Version x.x</td>
+					<td> <span class="label label-important"> Errors ! </span></td>
+					<td>
+					<div class="progress progress-danger">
+							<div class="bar" style="width: 50%"></div>
+					</div>
+					</td>
+				</tr>
+				<tr class="info">
+					<td>SMTP</td>
+					<td>Version x.x</td>
+					<td> <span class="label label-info">Not launched</span> </td>
+					<td>
+					<div class="progress progress-info">
+							<div class="bar" style="width: 3%"></div>
+					</div>
+					</td>
+				</tr>
+				<tr class="info">
+					<td>JETTY</td>
+					<td>Version x.x</td>
+					<td> <span class="label label-info">Not launched</span> </td>
+					<td>
+					<div class="progress progress-info">
+							<div class="bar" style="width: 3%"></div>
+					</div>
+					</td>
+				</tr>
+				<tr class="info">
+					<td>SOLR</td>
+					<td>Version x.x</td>
+					<td> <span class="label label-info">Not launched</span> </td>
+					<td>
+					<div class="progress progress-info">
+							<div class="bar" style="width: 3%"></div>
+					</div>
+					</td>
+				</tr>
+   			</table>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+		<div class="span12 terminal"> 
+			<p>
+				root@obm-ui: curl https://www.google.com/accounts/ClientLogin \ <br/>
+				--data-urlencode Email=brad.gushue@example.com --data-urlencode Passwd=new+foundland \ <br/>
+				-d accountType=GOOGLE \ <br/>
+				-d source=Google-cURL-Example \ <br/>
+				-d service=lh2 <br/>
+			</p>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
