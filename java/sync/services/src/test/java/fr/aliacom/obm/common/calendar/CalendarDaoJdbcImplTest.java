@@ -109,8 +109,6 @@ public class CalendarDaoJdbcImplTest {
 	@Inject
 	private CalendarDaoJdbcImpl calendarDaoJdbcImpl;
 	@Inject
-	private UserDao userDao;
-	@Inject
 	private DatabaseConnectionProvider dbcp;
 	
 	@Test
