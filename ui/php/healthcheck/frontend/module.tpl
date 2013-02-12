@@ -1,7 +1,10 @@
-<div class="accordion-group module-visible">
-	<div class="accordion-heading test-info">
-		<a class="accordion-toggle" data-toggle="collapse" data-parent="#modules" href="#{{id}}-inner">
-			{{name}}<span class="label label-info pull-right" id="{{id}}-status">Running</span>
+<div class="accordion-group visibility-hidden" id="{{id}}-header">
+	<div class="accordion-heading test-info module" id="{{id}}">
+		<a class="accordion-toggle" data-toggle="collapse" data-parent="#{{id}}" href="#{{id}}-inner">
+			{{name}}
+			<span class="label label-info pull-right">Running</span> 
+			<span class="label label-success pull-right">Success</span> 
+			<span class="label label-error pull-right">Error</span>
 		</a>
 	</div>
 	<div id="{{id}}-inner" class="accordion-body collapse">
@@ -9,10 +12,13 @@
 			<div class="accordion" id="{{name}}-tests">
 				{{description}}
 				{{#checks}}
-				<div class="accordion-group">
-					<div class="accordion-heading test-info">
+				<div class="accordion-group visibility-hidden" id="{{id}}-header">
+					<div class="accordion-heading test-info check" id="{{id}}">
 						<a class="accordion-toggle" data-toggle="collapse" data-parent="#{{id}}" href="#{{id}}-test">
-						{{name}}<span class="label label-info pull-right" id="{{id}}-status">Running</span>
+						{{name}}
+						<span class="label label-info pull-right">Running</span> 
+						<span class="label label-success pull-right">Success</span> 
+						<span class="label label-error pull-right">Error</span>
 						</a>
 					</div>
 					<div id="{{id}}-test" class="accordion-body collapse">

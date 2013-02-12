@@ -11,10 +11,26 @@
 	background-color:#F2DEDE;
 }
 
-.module-visible{
+.visibility-visible{
 	display: block;
 }
 
-.module-hidden{
+.visibility-hidden{
 	display: none;
 }
+
+.module > a > span.label {
+	display: none;
+}
+
+.module.test-info > a > span.label-info { display: inline; }
+.module.test-error > a > span.label-error { display: inline; }
+.module.test-success > a > span.label-success { display: inline; }
+
+.check > a > span.label {
+	display: none;
+}
+
+.check.test-info > a > span.label-info { display: inline; }
+.check.test-error > a > span.label-error { display: inline; }
+.check.test-success > a > span.label-success { display: inline; }
