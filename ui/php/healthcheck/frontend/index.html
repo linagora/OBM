@@ -10,10 +10,11 @@
 <script src="assets/js/jquery.js"></script>
 <script src="assets/js/bootstrap.js"></script>
 <script src="assets/js/frontend.js"></script>
+<script src="assets/js/mustache.js"></script>
 <div class="container">
 	<div id="header" class="page-header">
 		<h1>Health Check OBM 
-			<button class="btn btn-success btn-large" type="button" onclick="test()"><strong>Start Checking OBM</strong></button>
+			<button class="btn btn-success btn-large" type="button" onclick="addModule()"><strong>Start Checking OBM</strong></button>
 		</h1>
 	</div>
 
@@ -30,9 +31,8 @@
 		<div class="bar" style="width: 0%;" id="progress-bar"></div>
 	</div>
 
-	<div class="accordion" id="modules">
+	<div class="accordion" id="modules-list">
 
-		
 	</div>
 </div>
 </body>
