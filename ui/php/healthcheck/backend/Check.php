@@ -30,11 +30,7 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-interface Check extends Named {
-  
-  public function getDocUrl();
-  
-  public function getParentId();
+interface Check {
   
   public function execute();
   

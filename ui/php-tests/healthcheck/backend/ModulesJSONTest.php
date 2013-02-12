@@ -30,8 +30,10 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-interface FileFinder {
+class ModulesJSONTest extends PHPUnit_Framework_TestCase {
   
-  function findFilesMatchingPattern($dir, $pattern);
+  public function testJSONValidity() {
+    $this->assertNotNull(json_decode(file_get_contents("../../../php/healthcheck/backend/modules.json")));
+  }
   
 }

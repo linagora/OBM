@@ -30,11 +30,11 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-require_once 'finder/GlobFileFinder.php';
+require_once 'IncludeCheckLoader.php';
 
 class Service {
   
-  private $fileFinder;
+  private $checkLoader;
   
   function route($path) {
     $pathExploded = explode("/", $path);
@@ -58,17 +58,7 @@ class Service {
   }
   
   function getAvailableChecks() {
-    if (!isset($this->fileFinder)) {
-      $this->fileFinder = new GlobFileFinder();
-    }
-    
-    $return = array();
-  
-    foreach (glob("checks/*.php") as $filename) {
-      $return[] = $filename;
-    }
-  
-    return $return;
+    return file_get_contents(dirname(__FILE__) . "/modules.json");
   }
   
   function executeCheck($id = null) {
@@ -76,15 +66,21 @@ class Service {
       throw new InvalidArgumentException("ExecuteCheck needs a check identifier");
     }
     
-    include "checks/$id.php";
+    if (!isset($this->checkLoader)) {
+      $this->checkLoader = new IncludeCheckLoader();
+    }
+    
+    $check = $this->checkLoader->load($id);
+    
+    if (!isset($check)) {
+      throw new InvalidArgumentException("Check '$id' doesn't exists");
+    }
   
-    $check = new $id();
-  
-    return $check->execute();
+    return json_encode($check->execute());
   }
   
-  function setFileFinder($finder) {
-    $this->fileFinder = $finder;
+  function setCheckLoader($loader) {
+    $this->checkLoader = $loader;
   }
   
 }

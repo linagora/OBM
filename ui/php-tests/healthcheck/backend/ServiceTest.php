@@ -30,7 +30,9 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-require '../../../php/healthcheck/backend/Service.php';
+require dirname(__FILE__) . '/../../../php/healthcheck/backend/Service.php';
+require dirname(__FILE__) . '/../../../php/healthcheck/backend/CheckResult.php';
+require dirname(__FILE__) . '/../../../php/healthcheck/backend/CheckStatus.php';
 
 class ServiceTest extends PHPUnit_Framework_TestCase {
 
@@ -69,24 +71,41 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
   /**
    * @expectedException InvalidArgumentException
    */
-  public function testExecuteCheckWithNoCheck() {
+  public function testExecuteCheckWithNoId() {
     $service = new Service();
     $service->executeCheck(null);
   }
 
   public function testGetAvailableChecks() {
     $service = new Service();
-    $finder = $this->getMock('FileFinder', array('findFilesMatchingPattern'));
-    $finder->expects($this->once())->method('findFilesMatchingPattern')->will($this->returnValueMap(
-        array(
-            "checks/php/PHPEnvironmentCheck.php",
-            "checks/php/PHPModule.php",
-            "checks/obm-sync/ObmSyncModule.php"
-        )
-    ));
-    $service->setFileFinder($finder);
+    
+    $this->assertNotNull(json_decode($service->getAvailableChecks()));
+  }
+  
+  public function testExecuteCheck() {
+    $service = new Service();
+    $expectedResult = new CheckResult(CheckStatus::OK, array("TestMessage"));
+    $loader = $this->getMock('CheckLoader', array("load"));
+    $check = $this->getMock('Check', array("execute"));
+    $loader->expects($this->once())->method("load")->with("identifier")->will($this->returnValue($check));
+    $check->expects($this->once())->method("execute")->will($this->returnValue($expectedResult));
 
-    $service->getAvailableChecks();
+    $service->setCheckLoader($loader);
+    $checkResult = $service->executeCheck("identifier");
+    
+    $this->assertNotNull(json_decode($checkResult));
+  }
+  
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testExecuteCheckWithNonExistentCheck() {
+    $service = new Service();
+    $loader = $this->getMock('CheckLoader', array("load"));
+    $loader->expects($this->once())->method("load")->with("non-existent")->will($this->returnValue(null));
+  
+    $service->setCheckLoader($loader);
+    $checkResult = $service->executeCheck("non-existent");
   }
 
 }

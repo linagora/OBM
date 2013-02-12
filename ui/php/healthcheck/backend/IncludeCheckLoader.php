@@ -30,16 +30,20 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once '../../Module.php';
+require_once 'CheckLoader.php';
 
-class ObmSyncModule implements Module {
+class IncludeCheckLoader implements CheckLoader {
   
-  function getName() {
-    return "OBM-Sync";
-  }
-  
-  function getDescription() {
-    return "Checks that obm-sync service is up and running.";
+  function load($id) {
+    $filename = dirname(__FILE__) ."/checks/$id.php";
+    
+    if (!file_exists($filename)) {
+      return null;
+    }
+    
+    include $filename;
+    
+    return new $id();
   }
   
 }

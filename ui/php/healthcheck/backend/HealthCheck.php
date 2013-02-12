@@ -30,11 +30,15 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
+require 'Service.php';
+
 try {
   $service = new Service();
   $result = $service->route($_SERVER["PATH_INFO"]);
 
-  echo json_encode($value);
-} catch (Exceptionn $e) {
+  header('Content-type: application/json');
+  
+  echo $result;
+} catch (Exception $e) {
   header('HTTP/1.1 400 ' . $e->getMessage());
 }

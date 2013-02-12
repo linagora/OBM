@@ -30,15 +30,8 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once 'FileFinder.php';
-
-class GlobFileFinder implements FileFinder {
+interface CheckLoader {
   
-  function findFilesMatchingPattern($dir, $pattern) {
-    $directory = new RecursiveDirectoryIterator($dir);
-    $iterator = new RecursiveIteratorIterator($directory);
-    
-    return new RegexIterator($iterator, $pattern, RecursiveRegexIterator::GET_MATCH);
-  }
+  function load($id);
   
 }

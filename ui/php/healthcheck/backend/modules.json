@@ -1,0 +1,34 @@
+{
+    "modules": [
+        { 
+            "id": "php",
+            "name": "PHP Module",
+            "description": "Checks PHP environment",
+            "url": null,
+            "checks": [
+                {
+                    "id": "PhpEnvironmentCheck",
+                    "name": "PHP Environment Check",
+                    "description": "Checks the version of PHP as well as the presence of a number of mandatory modules (PHP-Curl, etc.).",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
+                }
+            ]
+        },
+        {
+            "id": "database",
+            "name": "Database Module",
+            "description": "Checks the database environment",
+            "url": null,
+            "checks": [
+                {
+                    "id": "DBConnectioncheck",
+                    "name": "Database connection Check",
+                    "description": "Check that the database system is up and running by opening a connection.",
+                    "url": "http://obm.org",
+                    "parentId": null
+                }
+            ]
+        }
+    ]
+}
