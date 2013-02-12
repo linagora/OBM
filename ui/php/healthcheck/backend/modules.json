@@ -16,6 +16,21 @@
             ]
         },
         {
+            "id": "configuration",
+            "name": "Configuration Module",
+            "description": "Checks various OBM configuration files for correctness",
+            "url": null,
+            "checks": [
+                {
+                    "id": "ConfigurationReadableCheck",
+                    "name": "Readability Check",
+                    "description": "Checks that OBM configuration files are readable on the UI server.",
+                    "url": "http://obm.org/wiki/configuration-1",
+                    "parentId": null
+                }
+            ]
+        },
+        {
             "id": "database",
             "name": "Database Module",
             "description": "Checks the database environment",

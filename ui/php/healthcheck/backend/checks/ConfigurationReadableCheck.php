@@ -30,10 +30,24 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-class ModulesJSONTest extends PHPUnit_Framework_TestCase {
+require_once 'Check.php';
+require_once 'CheckResult.php';
+require_once 'CheckStatus.php';
+
+class ConfigurationReadableCheck implements Check {
   
-  public function testJSONValidity() {
-    $this->assertNotNull(json_decode(file_get_contents(dirname(__FILE__) . "/../../../php/healthcheck/backend/modules.json")));
+  function execute() {
+    $files = array("../../../conf/obm_conf.ini", "../../../conf/obm_conf.inc");
+    
+    foreach ($files as $f) {
+      $file = realpath($f);
+      
+      if (!is_readable($file)) {
+        return new CheckResult(CheckStatus::ERROR, array("File '$file' isn't readable by the web server"));
+      }
+    }
+    
+    return new CheckResult(CheckStatus::OK);
   }
   
 }
