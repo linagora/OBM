@@ -10,3 +10,11 @@
 .test-error{
 	background-color:#F2DEDE;
 }
+
+.module-visible{
+	display: block;
+}
+
+.module-hidden{
+	display: none;
+}

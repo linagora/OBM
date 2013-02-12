@@ -4,7 +4,7 @@
 		{{test-name}}<span class="label label-info pull-right" id="{{test-name}}-status">Running</span>
 		</a>
 	</div>
-	<div id="{{test-name}}-test" class="accordion-body collapse in">
+	<div id="{{test-name}}-test" class="accordion-body collapse">
 		<div class="accordion-inner">
 		<p>{{testDescription}}</p>
 		<span class="pull-right" id="{{test-name}}-button">

@@ -40,7 +40,7 @@ $.obm.getTestTemplate = function(callback) {
 
 $.obm.getCheckList = function(callback) {
 	$.ajax({
-		url: "check.php/getAvailableChecks",
+		url: "/healthcheck/backend/HealthCheck.php/getAvailableChecks",
 		error: function(jqXhr) {
 			var status = jqXhr.status;
 			if ( status == 0 ) {
@@ -96,26 +96,25 @@ $.obm.bootstrap(
 	function(err, checkList, moduleTemplate, testTemplate) {
 		if ( err ) {
 			// code pour dire à l'utilisateur que ça merde
+			alert( "Error "+err );
 			return ;
 		}
-
-
-
+		$.obm.addModules(checkList, moduleTemplate, testTemplate);
 	}
-	);
+);
 
-function addModule(){
-	var moduletest = {
-		moduleName: "PHP",
-		testsList: "Liste de Test"
-	};
+$.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
+	console.log(checkList);
+	for( var index in checkList.modules){
+		var output = Mustache.render(moduleTemplate, checkList.modules[index]);
+		$("#modules-list").append(output);
+	}
+};
 
-	$.ajax({
-		url: "module.tpl",
-		success: function(code_html, statut){
-			var output = Mustache.render(code_html, moduletest);
-			$("#modules-list").html(output);
-			$("#progress-bar").css({width: "10%"});
-		}
-	});
+$.obm.statusModule = function(moduleId, moduleStatus) {
+	moduleId.removeClass("test-info test-warning test-error test-sucess").addClass(moduleStatus);
+};
+
+$.obm.statusCheck = function(checkId, checkStatus) {
+	checkId.removeClass("test-info test-warning test-error test-sucess").addClass(checkStatus);
 };
