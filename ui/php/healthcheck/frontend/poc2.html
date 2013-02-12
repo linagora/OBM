@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<head>
+	<title>OBM Health Check</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="assets/css/healthcheck.css" rel="stylesheet">
+</head>
+<body>
+<script src="assets/js/jquery.js"></script>
+<script src="assets/js/bootstrap.js"></script>
+<script src="assets/js/frontend.js"></script>
+<div class="container">
+	<div id="header" class="page-header">
+		<h1>Health Check OBM 
+			<button class="btn btn-success btn-large" type="button"><strong>Start Checking OBM</strong></button>
+		</h1>
+	</div>
+
+	<div class="alert alert-info" id="introduction">
+		<h2>
+			How Health Check works:
+		</h2>
+		<p> 
+			Vestibulum fermentum varius dapibus. Cras consequat purus vitae nunc dapibus congue. Sed metus ligula, fringilla sed scelerisque quis, convallis non urna. Pellentesque feugiat urna eu ante dapibus non consequat libero tempus. Mauris pharetra pellentesque dolor, ut varius urna condimentum et. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque gravida vulputate venenatis. Ut nec rutrum ante. Phasellus sodales nisi vitae felis placerat pharetra. Quisque cursus, est a auctor hendrerit, est nulla iaculis dui, at pharetra justo nisl vel nulla. Donec feugiat dignissim lorem, nec molestie mauris euismod et. Nunc gravida lorem vel purus venenatis sagittis. Etiam euismod pretium blandit. 
+		</p>
+	</div>
+
+	<div class="progress progress-info progress-striped active">
+		<div class="bar" style="width: 40%;"><strong>%</strong></div>
+	</div>
+
+	<div class="accordion" id="modules">
+
+		<div class="accordion-group">
+			<div class="accordion-heading test-success">
+				<a class="accordion-toggle" data-toggle="collapse" data-parent="#modules" href="#module1">
+				PHP<span class="label label-success pull-right">Success</span>
+				</a>
+			</div>
+			<div id="module1" class="accordion-body collapse">
+				<div class="accordion-inner">
+					<div class="accordion" id="checktests">
+
+						<div class="accordion-group">
+							<div class="accordion-heading test-success">
+								<a class="accordion-toggle" data-toggle="collapse" data-parent="#checktests" href="#collapse1">
+								TEST #1 PHP OK<span class="label label-success pull-right">Success</span>
+								</a>
+							</div>
+							<div id="collapse1" class="accordion-body collapse">
+								<div class="accordion-inner">
+								<p>Curabitur vel nibh ut augue auctor bibendum. Aliquam varius bibendum molestie. Ut consectetur imperdiet metus, a malesuada urna aliquet ac. Pellentesque turpis elit, tristique rhoncus laoreet in, pellentesque tempus diam.</p>
+								<span class="pull-right">					
+									<button class="btn btn-info btn-small" type="button">Documentation</button>
+								</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="accordion-group">
+							<div class="accordion-heading test-warning">
+								<a class="accordion-toggle" data-toggle="collapse" data-parent="#checktests" href="#collapse2">
+								TEST #2 <span class="label label-warning pull-right">Running</span>
+								</a>
+							</div>
+							<div id="collapse2" class="accordion-body collapse in test-warning">
+								<div class="accordion-inner">
+									Description of test 2
+									<span class="pull-right">					
+										<button class="btn btn-warning btn-small" type="button">Restart Test</button>
+										<button class="btn btn-danger btn-small" type="button">Ignore and Continue</button>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</body>
+</html>

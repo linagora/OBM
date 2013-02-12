@@ -1,7 +1,12 @@
-.terminal{
-	background-color:#333333;
-	color: #FAFAFA;
-	font-family: monospace;
-	padding: 5px;
-	border-radius: 5px;
+.test-success{
+	background-color:#DFF0D8;
+}
+.test-info{
+	background-color:#D9EDF7;
+}
+.test-warning{
+	background-color:#FCF8E3;
+}
+.test-error{
+	background-color:#F2DEDE;
 }
