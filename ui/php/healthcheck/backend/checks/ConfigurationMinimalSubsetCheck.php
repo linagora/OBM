@@ -30,24 +30,41 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once 'CheckLoader.php';
+global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
 
-class IncludeCheckLoader implements CheckLoader {
+$path = "../..";
+$obminclude = getenv("OBM_INCLUDE_VAR");
+
+if ($obminclude == "") {
+  $obminclude = "obminclude";
+}
+
+require_once "$obminclude/global.inc";
+require_once 'Check.php';
+require_once 'CheckResult.php';
+require_once 'CheckStatus.php';
+
+class ConfigurationMinimalSubsetCheck implements Check {
   
-  function load($id) {
-    $filename = dirname(__FILE__) ."/checks/$id.php";
+  function execute() {
+    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
     
-    if (!file_exists($filename)) {
-      return null;
+    $list = array(
+        "obmdb_host" => $obmdb_host,
+        "obmdb_dbtype" => $obmdb_dbtype,
+        "obmdb_db" => $obmdb_db,
+        "obmdb_user" => $obmdb_user,
+        "obmdb_password" => $obmdb_password,
+    );
+    $messages = array();
+    
+    foreach ($list as $var => $value) {
+      if (empty($value)) {
+        $messages[] = "Variable '$var' in obm_conf.ini is required.";
+      }
     }
     
-    include $filename;
-    
-    if (!class_exists($id)) {
-      return null;
-    }
-    
-    return new $id();
+    return new CheckResult(empty($messages) ? CheckStatus::OK : CheckStatus::ERROR, $messages);
   }
   
 }

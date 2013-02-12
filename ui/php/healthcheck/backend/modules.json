@@ -27,6 +27,13 @@
                     "description": "Checks that OBM configuration files are readable on the UI server.",
                     "url": "http://obm.org/wiki/configuration-1",
                     "parentId": null
+                },
+                {
+                    "id": "ConfigurationMinimalSubsetCheck",
+                    "name": "Minimal Subset Check",
+                    "description": "Checks that OBM configuration files contains the minimum required information.",
+                    "url": "http://obm.org/wiki/configuration-1",
+                    "parentId": null
                 }
             ]
         },
