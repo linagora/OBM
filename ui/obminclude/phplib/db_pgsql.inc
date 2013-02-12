@@ -57,16 +57,33 @@ class DB_Sql {
       $this->query($query);
   }
 
+  function test() {
+    $link = pg_connect($this->buildConnectionString());
+  
+    if (!$link) {
+      throw new Exception("Couldn't connect to database at '$this->Host' using login '$this->User'");
+    }
+  
+    @pg_close($link);
+  
+    return true;
+  }
+  
+  function buildConnectionString() {
+    $cstr = "dbname=".$this->Database.
+      $this->ifadd($this->Host, "host=").
+      $this->ifadd($this->Port, "port=").
+      $this->ifadd($this->User, "user=").
+      $this->ifadd($this->Password, "password=");
+    
+    return $cstr;
+  }
+  
   function connect() {
     if ( 0 == $this->Link_ID ) {
-      $cstr = "dbname=".$this->Database.
-	$this->ifadd($this->Host, "host=").
-	$this->ifadd($this->Port, "port=").
-	$this->ifadd($this->User, "user=").
-	$this->ifadd($this->Password, "password=");
-      $this->Link_ID=pg_connect($cstr);
+      $this->Link_ID=pg_connect($this->buildConnectionString());
       if (!$this->Link_ID) {
-	$this->halt("Link-ID == false, connect failed");
+	    $this->halt("Link-ID == false, connect failed");
       }
     }
   }
@@ -296,11 +313,6 @@ class DB_Sql {
   }
   
   function halt($msg) {
-    printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
-    printf("<b>PostgreSQL Error</b>: %s (%s)<br>\n",
-      $this->Errno,
-      $this->Error);
-    // die("Session halted.");
   }
 
   function table_names() {

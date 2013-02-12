@@ -22,7 +22,7 @@
             "url": null,
             "checks": [
                 {
-                    "id": "DBConnectioncheck",
+                    "id": "DBConnectionCheck",
                     "name": "Database connection Check",
                     "description": "Check that the database system is up and running by opening a connection.",
                     "url": "http://obm.org",

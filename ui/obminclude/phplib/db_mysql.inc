@@ -63,6 +63,22 @@ class DB_Sql {
   function query_id() {
     return $this->Query_ID;
   }
+  
+  function test() {
+    $link = @mysql_pconnect($this->Host, $this->User, $this->Password);
+    
+    if (!$link) {
+      throw new Exception("Couldn't connect to database at '$this->Host' using login '$this->User'");
+    }
+    
+    if (!@mysql_select_db($this->Database, $link)) {
+      throw new Exception("The database '$this->Database' doesn't exist");
+    }
+    
+    @mysql_close($link);
+    
+    return true;
+  }
 
   /* public: connection management */
   function connect($Database = "", $Host = "", $User = "", $Password = "") {
@@ -79,7 +95,7 @@ class DB_Sql {
     /* establish connection, select database */
     if ( 0 == $this->Link_ID ) {
     
-      $this->Link_ID=mysql_pconnect($Host, $User, $Password);
+      $this->Link_ID=@mysql_pconnect($Host, $User, $Password);
       if (!$this->Link_ID) {
         $this->halt("pconnect($Host, $User, \$Password) failed.");
         return 0;
@@ -389,16 +405,9 @@ class DB_Sql {
       return;
 
     $this->haltmsg($msg);
-
-    if ($this->Halt_On_Error != "report")
-      die("Session halted.");
   }
 
   function haltmsg($msg) {
-    printf("</td></tr></table><b>Database error:</b> %s<br>\n", $msg);
-    printf("<b>MySQL Error</b>: %s (%s)<br>\n",
-      $this->Errno,
-      $this->Error);
   }
 
   function table_names() {
