@@ -30,18 +30,11 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-class CheckResult {
-  
-  /**
-   * One of CheckStatus::OK, WARN or ERROR
-   */
-  public $status;
-  
-  public $messages;
-  
-  public function __construct($status, $messages = null) {
-    $this->status = $status;
-    $this->messages = $messages;
-  }
-  
+try {
+  $service = new Service();
+  $result = $service->route($_SERVER["PATH_INFO"]);
+
+  echo json_encode($value);
+} catch (Exceptionn $e) {
+  header('HTTP/1.1 400 ' . $e->getMessage());
 }

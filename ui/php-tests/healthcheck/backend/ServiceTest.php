@@ -30,18 +30,63 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-class CheckResult {
-  
+require '../../../php/healthcheck/backend/Service.php';
+
+class ServiceTest extends PHPUnit_Framework_TestCase {
+
   /**
-   * One of CheckStatus::OK, WARN or ERROR
+   * @expectedException InvalidArgumentException
    */
-  public $status;
-  
-  public $messages;
-  
-  public function __construct($status, $messages = null) {
-    $this->status = $status;
-    $this->messages = $messages;
+  public function testRouteWithUnsupportedMethod() {
+    $service = new Service();
+
+    $service->route("/unknown");
   }
-  
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testRouteWithEmptyMethod() {
+    $service = new Service();
+
+    $service->route("/");
+  }
+
+  public function testRouteWithGetAvailableServices() {
+    $service = $this->getMock('Service', array('getAvailableChecks'));
+    $service->expects($this->once())->method("getAvailableChecks")->with();
+
+    $service->route("/getAvailableChecks");
+  }
+
+  public function testRouteWithExecuteCheck() {
+    $service = $this->getMock('Service', array('executeCheck'));
+    $service->expects($this->once())->method("executeCheck")->with($this->equalTo("test"));
+
+    $service->route("/executeCheck/test");
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testExecuteCheckWithNoCheck() {
+    $service = new Service();
+    $service->executeCheck(null);
+  }
+
+  public function testGetAvailableChecks() {
+    $service = new Service();
+    $finder = $this->getMock('FileFinder', array('findFilesMatchingPattern'));
+    $finder->expects($this->once())->method('findFilesMatchingPattern')->will($this->returnValueMap(
+        array(
+            "checks/php/PHPEnvironmentCheck.php",
+            "checks/php/PHPModule.php",
+            "checks/obm-sync/ObmSyncModule.php"
+        )
+    ));
+    $service->setFileFinder($finder);
+
+    $service->getAvailableChecks();
+  }
+
 }
