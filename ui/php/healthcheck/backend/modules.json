@@ -2,14 +2,14 @@
     "modules": [
         { 
             "id": "php",
-            "name": "PHP Module",
+            "name": "PHP Environment",
             "description": "Checks PHP environment",
             "url": null,
             "checks": [
                 {
-                    "id": "PhpEnvironmentCheck",
-                    "name": "PHP Environment Check",
-                    "description": "Checks the version of PHP as well as the presence of a number of mandatory modules (PHP-Curl, etc.).",
+                    "id": "PhpVersionCheck",
+                    "name": "PHP Version Check",
+                    "description": "Checks the version of PHP.",
                     "url": "http://obm.org/wiki/obm-ui",
                     "parentId": null
                 }

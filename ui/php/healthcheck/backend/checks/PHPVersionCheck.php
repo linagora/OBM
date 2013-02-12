@@ -30,14 +30,26 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-require_once 'Check.php';
-require_once 'CheckResult.php';
-require_once 'CheckStatus.php';
+require_once dirname(__FILE__) . '/../Check.php';
+require_once dirname(__FILE__) . '/../CheckResult.php';
+require_once dirname(__FILE__) . '/../CheckStatus.php';
 
-class PHPEnvironmentCheck implements Check {
-  
+class PHPVersionCheck implements Check {
+
   public function execute() {
-    return new CheckResult(CheckStatus::OK);
+    if($this->checkVersion(phpversion())) {
+      return new CheckResult(CheckStatus::OK);
+    }
+
+    return new CheckResult(CheckStatus::ERROR,
+        "Your version of PHP is not valid" . phpVersion()
+        . "You must upgrade it to the last available version.");
+  }
+
+  public function checkVersion($version) {
+    $versionExploded = explode("-", $version);
+    $phpVersion = $versionExploded[0];
+    return !($phpVersion >= "5.3.2" && $phpVersion <= '5.3.6');
   }
 
 }
