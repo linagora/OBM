@@ -49,6 +49,13 @@
                     "description": "Check that the database system is up and running by opening a connection.",
                     "url": "http://obm.org",
                     "parentId": null
+                },
+                {
+                    "id": "DBDomainExistsCheck",
+                    "name": "Domain Presence Check",
+                    "description": "Checks that at least one user domain is created in OBM.",
+                    "url": "http://obm.org/wiki/getting-started",
+                    "parentId": null
                 }
             ]
         }
