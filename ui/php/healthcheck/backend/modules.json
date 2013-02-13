@@ -16,7 +16,14 @@
                 {
                     "id": "ModulesStatus",
                     "name": "PHP Modules Check",
-                    "description": "Check the presence of a number of mandatory modules (PHP-Curl, etc.)",
+                    "description": "Checks the presence of a number of mandatory modules (PHP-Curl, etc.)",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
+                },
+                {
+                    "id": "ConfigurationStatus",
+                    "name": "PHP Configuration Check",
+                    "description": "Checks PHP configuration for correctness and possible flaws.",
                     "url": "http://obm.org/wiki/obm-ui",
                     "parentId": null
                 }
