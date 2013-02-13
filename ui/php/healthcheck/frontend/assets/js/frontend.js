@@ -93,6 +93,8 @@ $(document).ready( function(){
 	});
 });
 
+$.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
+
 $.obm.runChecks = function(checkList) {
   var modulesStatus = {};
   checkList.modules.forEach(function(module) {
@@ -114,18 +116,18 @@ $.obm.runChecks = function(checkList) {
   var checkCompleteCallback = function(flatCheck, checkResult) {
     var moduleStatus = modulesStatus[flatCheck.moduleId];
     moduleStatus.checksDone++;
-    if ( checkResult.code == 0 ) {
-      $.obm.setStatus(flatCheck.checkId, "success");
-    } else if ( checkResult.code == 1 ) {
-      $.obm.setStatus(flatCheck.checkId, "warning");
-      moduleStatus.status = "warning";
-    } else {
-      $.obm.setStatus(flatCheck.checkId, "error");
-      moduleStatus.status = "error";
-    }
+    moduleStatus.status = $.obm.codeToStatus[checkResult.code];
+    
+    $.obm.setStatus(flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
+    $.obm.displayCheckInfo(flatCheck.checkId, checkResult.code, checkResult.messages);
     
     if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
       $.obm.setStatus(flatCheck.moduleId, moduleStatus.status);
+      if ( moduleStatus.status == "success" ) {
+	$.obm.closeModuleContainer(flatCheck.moduleId);
+      } else {
+	$.obm.openCheckContainer(flatCheck.checkId);
+      }
     }
   };
   
@@ -146,6 +148,12 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 	}
 };
 
+$.obm.displayCheckInfo = function(id, code, messages) {
+	$("#"+id+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
+	if (messages) {
+	      $("#"+id+"-info").html(messages.join("<br/>"));
+	}
+};
 $.obm.displayItem = function(id) {
 	$("#"+id+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
 };
@@ -153,6 +161,13 @@ $.obm.displayItem = function(id) {
 $.obm.setStatus = function(id, status) {
 	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
+
+$.obm.closeModuleContainer = function(id) {
+  $("#"+id+"-inner").removeClass("in");
+}
+$.obm.openCheckContainer = function(id) {
+  $("#"+id+"-test").addClass("in");
+}
 
 $.obm.setAlert = function(status, message) {
 	// To Do: Add Alert after progress bar, before #modules-list http://twitter.github.com/bootstrap/components.html#alerts
