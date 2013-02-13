@@ -185,7 +185,7 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
   var htmlId = $.obm.htmlId(moduleId, checkId);
   $("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
   if (messages) {
-	$("#"+htmlId+"-info").html(messages.join("<br/>"));
+	$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
   }
 };
 
