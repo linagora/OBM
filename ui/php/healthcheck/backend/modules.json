@@ -24,7 +24,7 @@
         },
         {
             "id": "configuration",
-            "name": "Configuration Module",
+            "name": "Configuration",
             "description": "Checks various OBM configuration files for correctness",
             "url": null,
             "checks": [
@@ -46,7 +46,7 @@
         },
         {
             "id": "database",
-            "name": "Database Module",
+            "name": "Database",
             "description": "Checks the database environment",
             "url": null,
             "checks": [
@@ -68,7 +68,7 @@
         },
         {
             "id": "obm-sync",
-            "name": "OBM-Sync Module",
+            "name": "OBM-Sync",
             "description": "Checks the OBM-Sync (synchronisation server) service",
             "url": "/obm-sync/services/",
             "checks": [
@@ -90,14 +90,14 @@
         },
         {
             "id": "obm-locator",
-            "name": "OBM-Locator Module",
+            "name": "OBM-Locator",
             "description": "Checks the OBM-Locator service",
             "url": null,
             "checks": [
                 {
                     "id": "ConnectionStatus",
                     "name": "OBM-Locator Connection Check",
-                    "description": "Check that the obm-sync servers are up and running.",
+                    "description": "Check that the obm-locator servers are up and running.",
                     "url": null,
                     "parentId": null
                 }
