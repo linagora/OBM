@@ -30,24 +30,41 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once 'Check.php';
-require_once 'CheckResult.php';
-require_once 'CheckStatus.php';
+global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
 
-class ConfigurationReadableCheck implements Check {
+$path = "../..";
+$obminclude = getenv("OBM_INCLUDE_VAR");
+
+if ($obminclude == "") {
+  $obminclude = "obminclude";
+}
+
+require_once "$obminclude/global.inc";
+require_once dirname(__FILE__) . '/../../Check.php';
+require_once dirname(__FILE__) . '/../../CheckResult.php';
+require_once dirname(__FILE__) . '/../../CheckStatus.php';
+
+class MinimalSubsetStatus implements Check {
   
   function execute() {
-    $files = array("../../../conf/obm_conf.ini", "../../../conf/obm_conf.inc");
+    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
     
-    foreach ($files as $f) {
-      $file = realpath($f);
-      
-      if (!is_readable($file)) {
-        return new CheckResult(CheckStatus::ERROR, array("File '$file' isn't readable by the web server"));
+    $list = array(
+        "obmdb_host" => $obmdb_host,
+        "obmdb_dbtype" => $obmdb_dbtype,
+        "obmdb_db" => $obmdb_db,
+        "obmdb_user" => $obmdb_user,
+        "obmdb_password" => $obmdb_password,
+    );
+    $messages = array();
+    
+    foreach ($list as $var => $value) {
+      if (empty($value)) {
+        $messages[] = "Variable '$var' in obm_conf.ini is required.";
       }
     }
     
-    return new CheckResult(CheckStatus::OK);
+    return new CheckResult(empty($messages) ? CheckStatus::OK : CheckStatus::ERROR, $messages);
   }
   
 }

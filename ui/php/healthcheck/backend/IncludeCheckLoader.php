@@ -34,14 +34,14 @@ require_once 'CheckLoader.php';
 
 class IncludeCheckLoader implements CheckLoader {
   
-  function load($id) {
-    $filename = dirname(__FILE__) ."/checks/$id.php";
+  function load($module, $id) {
+    $filename = dirname(__FILE__) ."/checks/$module/$id.php";
     
     if (!file_exists($filename)) {
       return null;
     }
     
-    include $filename;
+    require_once $filename;
     
     if (!class_exists($id)) {
       return null;

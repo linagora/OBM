@@ -40,11 +40,11 @@ if ($obminclude == "") {
 }
 
 require_once "$obminclude/global.inc";
-require_once dirname(__FILE__) . '/../Check.php';
-require_once dirname(__FILE__) . '/../CheckResult.php';
-require_once dirname(__FILE__) . '/../CheckStatus.php';
+require_once dirname(__FILE__) . '/../../Check.php';
+require_once dirname(__FILE__) . '/../../CheckResult.php';
+require_once dirname(__FILE__) . '/../../CheckStatus.php';
 
-class DBDomainExistsCheck implements Check {
+class DomainExistsStatus implements Check {
   
   function execute() {
     $found = false;

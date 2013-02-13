@@ -38,30 +38,26 @@ class Service {
   
   function route($path) {
     $pathExploded = explode("/", $path);
+    $pathExploded = array_slice($pathExploded, 1);
     $pathLength = count($pathExploded);
+    $module = $pathLength > 0 ? $pathExploded[0] : null;
+    
+    if (empty($module)) {
+      return $this->getAvailableChecks();
+    }
     
     if ($pathLength < 2) {
-      throw new InvalidArgumentException("A method should be defined in the URL (e.g.: /method/parameters)");
+      throw new InvalidArgumentException("Invalid test URL, expecting '/<module>/<test>'");
     }
     
-    $method = $pathExploded[1];
-    
-    if (method_exists($this, $method)) {
-      if ($pathLength == 3) {
-        return $this->$method($pathExploded[2]);
-      }
-      
-      return $this->$method();
-    }
-    
-    throw new InvalidArgumentException("Unsupported method '$path'");
+    return $this->executeCheck($module, $pathExploded[1]);
   }
   
   function getAvailableChecks() {
     return file_get_contents(dirname(__FILE__) . "/modules.json");
   }
   
-  function executeCheck($id = null) {
+  function executeCheck($module, $id = null) {
     if (!isset($id)) {
       throw new InvalidArgumentException("ExecuteCheck needs a check identifier");
     }
@@ -70,10 +66,10 @@ class Service {
       $this->checkLoader = new IncludeCheckLoader();
     }
     
-    $check = $this->checkLoader->load($id);
+    $check = $this->checkLoader->load($module, $id);
     
     if (!isset($check)) {
-      throw new InvalidArgumentException("Check '$id' doesn't exists");
+      throw new InvalidArgumentException("Check '$id' doesn't exist for module '$module'");
     }
   
     return json_encode($check->execute());

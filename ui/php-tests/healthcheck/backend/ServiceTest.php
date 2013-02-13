@@ -39,41 +39,40 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
   /**
    * @expectedException InvalidArgumentException
    */
-  public function testRouteWithUnsupportedMethod() {
+  public function testRouteWithUnsupportedModule() {
     $service = new Service();
 
     $service->route("/unknown");
   }
-
+  
   /**
    * @expectedException InvalidArgumentException
    */
-  public function testRouteWithEmptyMethod() {
+  public function testRouteWithOnlyModule() {
     $service = new Service();
+  
+    $service->route("/php");
+  }
+  
+  public function testRouteWithNoPathInfo() {
+    $service = $this->getMock('Service', array('getAvailableChecks'));
+    $service->expects($this->once())->method("getAvailableChecks")->with();
+  
+    $service->route("");
+  }
+
+  public function testRouteWithEmptyPathInfo() {
+    $service = $this->getMock('Service', array('getAvailableChecks'));
+    $service->expects($this->once())->method("getAvailableChecks")->with();
 
     $service->route("/");
   }
 
-  public function testRouteWithGetAvailableServices() {
-    $service = $this->getMock('Service', array('getAvailableChecks'));
-    $service->expects($this->once())->method("getAvailableChecks")->with();
-
-    $service->route("/getAvailableChecks");
-  }
-
   public function testRouteWithExecuteCheck() {
     $service = $this->getMock('Service', array('executeCheck'));
-    $service->expects($this->once())->method("executeCheck")->with($this->equalTo("test"));
+    $service->expects($this->once())->method("executeCheck")->with($this->equalTo("database"), $this->equalTo("test"));
 
-    $service->route("/executeCheck/test");
-  }
-
-  /**
-   * @expectedException InvalidArgumentException
-   */
-  public function testExecuteCheckWithNoId() {
-    $service = new Service();
-    $service->executeCheck(null);
+    $service->route("/database/test");
   }
 
   public function testGetAvailableChecks() {
@@ -87,11 +86,11 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
     $expectedResult = new CheckResult(CheckStatus::OK, array("TestMessage"));
     $loader = $this->getMock('CheckLoader', array("load"));
     $check = $this->getMock('Check', array("execute"));
-    $loader->expects($this->once())->method("load")->with("identifier")->will($this->returnValue($check));
+    $loader->expects($this->once())->method("load")->with("database", "identifier")->will($this->returnValue($check));
     $check->expects($this->once())->method("execute")->will($this->returnValue($expectedResult));
 
     $service->setCheckLoader($loader);
-    $checkResult = $service->executeCheck("identifier");
+    $checkResult = $service->executeCheck("database", "identifier");
     
     $this->assertNotNull(json_decode($checkResult));
   }
@@ -102,10 +101,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
   public function testExecuteCheckWithNonExistentCheck() {
     $service = new Service();
     $loader = $this->getMock('CheckLoader', array("load"));
-    $loader->expects($this->once())->method("load")->with("non-existent")->will($this->returnValue(null));
+    $loader->expects($this->once())->method("load")->with("database", "non-existent")->will($this->returnValue(null));
   
     $service->setCheckLoader($loader);
-    $checkResult = $service->executeCheck("non-existent");
+    $checkResult = $service->executeCheck("database", "non-existent");
   }
 
 }

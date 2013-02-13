@@ -30,26 +30,49 @@
 * applicable to the OBM software.
 * ***** END LICENSE BLOCK ***** */
 
-require_once dirname(__FILE__) . '/../Check.php';
-require_once dirname(__FILE__) . '/../CheckResult.php';
-require_once dirname(__FILE__) . '/../CheckStatus.php';
+require_once dirname(__FILE__) . '/../../Check.php';
+require_once dirname(__FILE__) . '/../../CheckResult.php';
+require_once dirname(__FILE__) . '/../../CheckStatus.php';
 
-class PHPVersionCheck implements Check {
+class ModulesStatus implements Check {
+  private $messages = null;
 
   public function execute() {
-    if($this->checkVersion(phpversion())) {
-      return new CheckResult(CheckStatus::OK);
+    $phpNeededModules = array(
+        "gd"      => array("status" => CheckStatus::ERROR,
+                           "desc" => ""),
+        "curl"    => array("status" => CheckStatus::ERROR,
+                           "desc" => ""),
+        "apc"     => array("status" => CheckStatus::ERROR,
+                           "desc" => ""),
+        "imagick" => array("status" => CheckStatus::WARNING,
+                           "desc" => "You will not be able to generate PDF with OBM.")
+    );
+
+    $loadedModules = get_loaded_extensions();
+
+    return $this->checkModules($phpNeededModules, $loadedModules);
+  }
+
+  function checkModules($neededModules, $loadedModules) {
+    $checkStatus = CheckStatus::OK;
+    
+    if(!in_array("pgsql", $loadedModules) && !in_array("mysql", $loadedModules)) {
+      $checkStatus = CheckStatus::ERROR;
+      $this->appendMessage("The database PHP module is not loaded or installed. OBM will not work.");
     }
-
-    return new CheckResult(CheckStatus::ERROR,
-        "Your version of PHP is not valid" . phpVersion()
-        . "You must upgrade it to the last available version.");
+    
+    foreach ($neededModules as $module => $value) {
+      if(!in_array($module, $loadedModules)) {
+        $checkStatus = ($checkStatus == CheckStatus::ERROR) ? $checkStatus : $value["status"];
+        $this->appendMessage("The PHP module $module is not loaded or installed. " . $value["desc"]);
+      }
+    }
+    
+    return new CheckResult($checkStatus, $this->messages);
   }
-
-  public function checkVersion($version) {
-    $versionExploded = explode("-", $version);
-    $phpVersion = $versionExploded[0];
-    return !($phpVersion >= "5.3.2" && $phpVersion <= '5.3.6');
+  
+  function appendMessage($message) {
+    $this->messages[] = $message;
   }
-
 }

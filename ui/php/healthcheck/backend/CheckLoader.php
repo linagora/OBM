@@ -32,6 +32,6 @@
  
 interface CheckLoader {
   
-  function load($id);
+  function load($module, $id);
   
 }
