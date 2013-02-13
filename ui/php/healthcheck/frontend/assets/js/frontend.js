@@ -69,6 +69,7 @@ $.obm.bootstrap = function(callback) {
 
 $(document).ready( function(){
 	$("#startCheckButton").click( function(){
+		$(this).attr("disabled","true");
 		$.obm.bootstrap(
 			function(err, checkList, moduleTemplate) {
 				if ( err ) {
@@ -81,6 +82,12 @@ $(document).ready( function(){
 			}
 		);
 	});
+	$("#restartCheckButton").click(function() {
+	  window.location.replace(window.location.pathname+"?autostart=true");
+	});
+	if ( $.getQuery().autostart == "true" ) {
+	  $("#startCheckButton").click();
+	}
 });
 
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
@@ -149,6 +156,7 @@ $.obm.callbacks = {
   buildEndCallback: function() {
     return function() {
       alert("Tests completed");
+      $("#restartCheckButton").removeClass("visibility-hidden");
     };
   }
 };
