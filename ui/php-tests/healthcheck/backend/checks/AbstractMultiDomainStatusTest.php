@@ -30,56 +30,49 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once dirname(__FILE__) . '/../Check.php';
-require_once dirname(__FILE__) . '/../CheckResult.php';
-require_once dirname(__FILE__) . '/../CheckStatus.php';
+require_once dirname(__FILE__) . '/../../../../php/healthcheck/backend/checks/AbstractMultiDomainStatus.php';
 
-abstract class AbstractMultiDomainStatus implements Check {
+class AbstractMultiDomainStatusTest extends PHPUnit_Framework_TestCase {
   
-  public function execute() {
-    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
+  public function testComputeCheckResultOK() {
+    $check = $this->getMockForAbstractClass('AbstractMultiDomainStatus');
+    $list = array();
     
-    $path = "../..";
-    $obminclude = getenv("OBM_INCLUDE_VAR");
+    $list[] = new CheckResult(CheckStatus::OK);
+    $list[] = new CheckResult(CheckStatus::OK);
     
-    if ($obminclude == "") {
-      $obminclude = "obminclude";
-    }
+    $computedResult = $check->computeCheckResult($list);
     
-    require_once "$obminclude/global.inc";
-    
-    $results = array();
-    $domains = of_domain_get_list();
-    
-    foreach ($domains as $domain) {
-      if (!$domain["global"]) {
-        $results[] = $this->executeForDomain($domain);
-      }
-    }
-    
-    return $this->computeCheckResult($results);
+    $this->assertEquals(CheckStatus::OK, $computedResult->status);
+    $this->assertEquals(null, $computedResult->messages);
   }
   
-  function computeCheckResult($list) {
-    $result = new CheckResult(CheckStatus::OK);
-    
-    foreach ($list as $r) {
-      if ($r->status > $result->status) {
-        $result->status = $r->status;
-      }
-      
-      if (is_array($r->messages)) {
-        if (!is_array($result->messages)) {
-          $result->messages = array();  
-        }
-        
-        $result->messages = array_merge($result->messages, $r->messages);
-      }
-    }
-    
-    return $result;
+  public function testComputeCheckResultWithOneWarning() {
+    $check = $this->getMockForAbstractClass('AbstractMultiDomainStatus');
+    $list = array();
+  
+    $list[] = new CheckResult(CheckStatus::OK);
+    $list[] = new CheckResult(CheckStatus::OK);
+    $list[] = new CheckResult(CheckStatus::WARNING, array("Warning"));
+  
+    $computedResult = $check->computeCheckResult($list);
+  
+    $this->assertEquals(CheckStatus::WARNING, $computedResult->status);
+    $this->assertEquals(array("Warning"), $computedResult->messages);
   }
   
-  protected abstract function executeForDomain($domain);
+  public function testComputeCheckResultWithOneErrorAndOneWarning() {
+    $check = $this->getMockForAbstractClass('AbstractMultiDomainStatus');
+    $list = array();
+  
+    $list[] = new CheckResult(CheckStatus::OK);
+    $list[] = new CheckResult(CheckStatus::ERROR, array("Error"));
+    $list[] = new CheckResult(CheckStatus::WARNING, array("Warning"));
+  
+    $computedResult = $check->computeCheckResult($list);
+  
+    $this->assertEquals(CheckStatus::ERROR, $computedResult->status);
+    $this->assertEquals(array("Error", "Warning"), $computedResult->messages);
+  }
   
 }

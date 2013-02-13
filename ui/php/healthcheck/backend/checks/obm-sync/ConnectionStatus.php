@@ -30,56 +30,31 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once dirname(__FILE__) . '/../Check.php';
-require_once dirname(__FILE__) . '/../CheckResult.php';
-require_once dirname(__FILE__) . '/../CheckStatus.php';
+require_once dirname(__FILE__) . '/../AbstractMultiDomainStatus.php';
 
-abstract class AbstractMultiDomainStatus implements Check {
+class ConnectionStatus extends AbstractMultiDomainStatus {
   
-  public function execute() {
-    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
-    
-    $path = "../..";
-    $obminclude = getenv("OBM_INCLUDE_VAR");
-    
-    if ($obminclude == "") {
-      $obminclude = "obminclude";
-    }
-    
-    require_once "$obminclude/global.inc";
-    
-    $results = array();
-    $domains = of_domain_get_list();
-    
-    foreach ($domains as $domain) {
-      if (!$domain["global"]) {
-        $results[] = $this->executeForDomain($domain);
-      }
-    }
-    
-    return $this->computeCheckResult($results);
-  }
+  const SYNC_URL = "http://%HOST%:8080/obm-sync/services";
   
-  function computeCheckResult($list) {
-    $result = new CheckResult(CheckStatus::OK);
+  public function executeForDomain($domain) {
+    $servers = of_domain_get_domain_syncserver($domain["id"]);
     
-    foreach ($list as $r) {
-      if ($r->status > $result->status) {
-        $result->status = $r->status;
+    foreach ($servers as $server) {
+      $host = $server[0];      
+      $url = str_replace("%HOST%", $host["ip"], ConnectionStatus::SYNC_URL);
+      
+      $curl = curl_init($url);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+      
+      $success = curl_exec($curl);
+      curl_close($curl);
+      
+      if ($success) {
+        return new CheckResult(CheckStatus::OK);
       }
       
-      if (is_array($r->messages)) {
-        if (!is_array($result->messages)) {
-          $result->messages = array();  
-        }
-        
-        $result->messages = array_merge($result->messages, $r->messages);
-      }
+      return new CheckResult(CheckStatus::WARNING, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' isn't reachable"));
     }
-    
-    return $result;
   }
-  
-  protected abstract function executeForDomain($domain);
   
 }
