@@ -34,22 +34,43 @@ require_once dirname(__FILE__) . '/../AbstractMultiDomainStatus.php';
 
 class ConnectionStatus extends AbstractMultiDomainStatus {
   
-  const SYNC_URL = "http://%HOST%:8080/obm-sync/services";
+  const LOCATOR_URL = "http://%HOST%:8084/obm-locator/location/host/%SERVICE%/%PROPERTY%/%DOMAIN%";
   
   public function executeForDomain($domain) {
-    $servers = of_domain_get_domain_syncserver($domain["id"]);
+    global $obmdb_host;
     
-    foreach ($servers as $server) {
-      $host = $server[0];      
-      $url = str_replace("%HOST%", $host["ip"], ConnectionStatus::SYNC_URL);
-      $curl = CheckHelper::curlGet($url);
-      
-      if ($curl["code"] == 200) {
-        return new CheckResult(CheckStatus::OK);
+    $locatorProperties = array(
+        array("mail" => "imap"),
+        array("mail" => "smtp_in"),
+        array("mail" => "smtp_out"),
+        array("mail" => "imap_frontend"),
+        array("sync" => "obm_sync"),
+        array("solr" => "contact"),
+        array("solr" => "event"),
+        array("backup_ftp" => "root")
+    );
+    
+    $domainName = $domain["name"];
+    $url = str_replace("%HOST%", $obmdb_host, ConnectionStatus::LOCATOR_URL);
+    $url = str_replace("%DOMAIN%", $domainName, $url);
+    
+    foreach ($locatorProperties as $locatorProperty) {
+      foreach ($locatorProperty as $service => $value) {
+        $url = str_replace("%SERVICE%", $service, $url);
+        $url = str_replace("%PROPERTY%", $value, $url);
+        $curl = CheckHelper::curlGet($url);
+        
+        if ($curl["code"] == 200) {
+          return new CheckResult(CheckStatus::OK);
+        }
+        
+        if ($curl["code"] != 404) {
+          return new CheckResult(CheckStatus::ERROR, array("OBM-Locator at '" . $obmdb_host . "' for domain '" . $domainName . "' isn't reachable"));
+        }
       }
-      
-      return new CheckResult(CheckStatus::WARNING, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' isn't reachable"));
     }
+    
+    return new CheckResult(CheckStatus::WARNING, array("Failed to retrieve any host location from obm-locator at '" . $obmdb_host . "' for domain '" . $domainName . "' (tried " . count($locatorProperties) . " services). Is your domain correctly set up?"));
   }
   
 }

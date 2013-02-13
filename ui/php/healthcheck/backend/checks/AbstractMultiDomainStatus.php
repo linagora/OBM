@@ -33,6 +33,7 @@
 require_once dirname(__FILE__) . '/../Check.php';
 require_once dirname(__FILE__) . '/../CheckResult.php';
 require_once dirname(__FILE__) . '/../CheckStatus.php';
+require_once dirname(__FILE__) . '/CheckHelper.php';
 
 abstract class AbstractMultiDomainStatus implements Check {
   

@@ -87,6 +87,21 @@
                     "parentId": null
                 }
             ]
+        },
+        {
+            "id": "obm-locator",
+            "name": "OBM-Locator Module",
+            "description": "Checks the OBM-Locator service",
+            "url": null,
+            "checks": [
+                {
+                    "id": "ConnectionStatus",
+                    "name": "OBM-Locator Connection Check",
+                    "description": "Check that the obm-sync servers are up and running.",
+                    "url": null,
+                    "parentId": null
+                }
+            ]
         }
     ]
 }

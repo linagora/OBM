@@ -30,26 +30,18 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once dirname(__FILE__) . '/../AbstractMultiDomainStatus.php';
-
-class ConnectionStatus extends AbstractMultiDomainStatus {
+class CheckHelper {
   
-  const SYNC_URL = "http://%HOST%:8080/obm-sync/services";
-  
-  public function executeForDomain($domain) {
-    $servers = of_domain_get_domain_syncserver($domain["id"]);
+  public static function curlGet($url) {
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     
-    foreach ($servers as $server) {
-      $host = $server[0];      
-      $url = str_replace("%HOST%", $host["ip"], ConnectionStatus::SYNC_URL);
-      $curl = CheckHelper::curlGet($url);
-      
-      if ($curl["code"] == 200) {
-        return new CheckResult(CheckStatus::OK);
-      }
-      
-      return new CheckResult(CheckStatus::WARNING, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' isn't reachable"));
-    }
+    $success = curl_exec($curl);
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    
+    curl_close($curl);
+    
+    return array("success" => $success, "code" => $code);
   }
   
 }
