@@ -96,6 +96,11 @@ $(document).ready( function(){
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
 
 $.obm.runChecks = function(checkList) {
+  require(["checkScheduler", "progressBar"], function(checkScheduler, progressBar) {
+    $.obm.realRunChecks(checkList, checkScheduler, progressBar);
+  });
+}
+$.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
   var modulesStatus = {};
   checkList.modules.forEach(function(module) {
     modulesStatus[module.id] = {
@@ -116,6 +121,7 @@ $.obm.runChecks = function(checkList) {
   var checkCompleteCallback = function(flatCheck, checkResult) {
     var moduleStatus = modulesStatus[flatCheck.moduleId];
     moduleStatus.checksDone++;
+    progressBarInstance.increment();
     moduleStatus.status = $.obm.codeToStatus[checkResult.code];
     
     $.obm.setStatus(flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
@@ -136,7 +142,8 @@ $.obm.runChecks = function(checkList) {
   };
   
   var scheduler = new checkScheduler(checkList, urlBuilder);
-  scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+  var checksCount = scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+  var progressBarInstance = new progressBar(checksCount);
   
 };
 
@@ -171,8 +178,4 @@ $.obm.openCheckContainer = function(id) {
 
 $.obm.setAlert = function(status, message) {
 	// To Do: Add Alert after progress bar, before #modules-list http://twitter.github.com/bootstrap/components.html#alerts
-};
-
-$.obm.updateProgressBar = function(pourcent) {
-	// To Do: $("#progress-bar").css('width', x+"%");
 };

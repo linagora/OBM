@@ -11,9 +11,10 @@
 <script src="assets/js/bootstrap.js"></script>
 <script src="assets/js/frontend.js"></script>
 <script src="assets/js/mustache.js"></script>
-<script src="assets/js/checkScheduler.js"></script>
-<script src="assets/js/checkRunner.js"></script>
-<script src="assets/js/checkResult.js"></script>
+<script src="assets/js/require.js"></script>
+<script>
+require.config({baseUrl: "assets/js"});
+</script>
 <div class="container">
 	<div id="header" class="page-header">
 		<h1>Health Check OBM 
