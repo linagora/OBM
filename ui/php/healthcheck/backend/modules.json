@@ -65,6 +65,21 @@
                     "parentId": null
                 }
             ]
+        },
+        {
+            "id": "obm-sync",
+            "name": "OBM-Sync Module",
+            "description": "Checks the OBM-Sync (synchronisation server) service",
+            "url": "/obm-sync/services/",
+            "checks": [
+                {
+                    "id": "HostInDatabaseStatus",
+                    "name": "OBM-Sync Database Definition Check",
+                    "description": "Check that the database contains the proper mappings between domains and obm-sync hosts.",
+                    "url": "http://obm.org",
+                    "parentId": null
+                }
+            ]
         }
     ]
 }
