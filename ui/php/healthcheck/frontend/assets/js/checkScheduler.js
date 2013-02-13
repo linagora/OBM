@@ -1,5 +1,6 @@
-define(["checkRunner"], function(checkRunner) {
-  
+define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
+  var startTopic = pubsub.topic("checkScheduler:start");
+  var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
   function checkScheduler ( availableChecks, urlBuilder ) {
     this.availableChecks = availableChecks;
     this.urlBuilder = urlBuilder;
@@ -29,13 +30,14 @@ define(["checkRunner"], function(checkRunner) {
       var runner = new checkRunner(nextCheck, urlBuilder);
       runner.run(function(result) {
 	checkCompleteCallback(nextCheck, result);
+	endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
 	if ( result.code == 2 ) {
 	  return endCallback();
 	}
 	runOneCheck();
       });
     };
-    
+    startTopic.publish({checksCount: checksCount});
     runOneCheck();
     return checksCount;
   };

@@ -4,7 +4,8 @@
 			{{name}}
 			<span class="label label-info pull-right">Running</span> 
 			<span class="label label-success pull-right">Success</span> 
-			<span class="label label-error pull-right">Error</span>
+			<span class="label label-important pull-right">Error</span>
+			<span class="label label-warning pull-right">Warning</span>
 		</a>
 	</div>
 	<div id="{{id}}-inner" class="accordion-body collapse in">
@@ -18,7 +19,8 @@
 						{{name}}
 						<span class="label label-info pull-right">Running</span> 
 						<span class="label label-success pull-right">Success</span> 
-						<span class="label label-error pull-right">Error</span>
+						<span class="label label-important pull-right">Error</span>
+						<span class="label label-warning pull-right">Warning</span>
 						</a>
 					</div>
 					<div id="{{htmlId}}-test" class="accordion-body collapse">

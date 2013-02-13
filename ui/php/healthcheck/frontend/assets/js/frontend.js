@@ -86,11 +86,12 @@ $(document).ready( function(){
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
 
 $.obm.runChecks = function(checkList) {
-  require(["checkScheduler", "progressBar"], function(checkScheduler, progressBar) {
-    $.obm.realRunChecks(checkList, checkScheduler, progressBar);
+  require(["checkScheduler", "progressBar", "pubsub"], function(checkScheduler, progressBar, pubsub) {
+    $.obm.realRunChecks(checkList, checkScheduler, progressBar, pubsub);
   });
-}
-$.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
+};
+
+$.obm.realRunChecks = function(checkList, checkScheduler, progressBar, pubsub) {
   var modulesStatus = {};
   checkList.modules.forEach(function(module) {
     modulesStatus[module.id] = {
@@ -99,42 +100,57 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
       status: "success"
     };
   });
-  var urlBuilder = function(flatCheck) {
-    return "/healthcheck/backend/HealthCheck.php/"+flatCheck.moduleId+"/" + flatCheck.checkId;
-  };
+  var startTopic = pubsub.topic("checkScheduler:start");
+  var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
+  var progressBarInstance = new progressBar();
+  startTopic.subscribe(function(data) { progressBarInstance.setElementCount(data.checksCount); });
+  endOfCheckTopic.subscribe(function(data) { progressBarInstance.increment(); });
   
-  var checkStartCallback = function(flatCheck) {
-    $.obm.showModuleContainer(flatCheck.moduleId);
-    $.obm.showCheckContainer(flatCheck.moduleId, flatCheck.checkId);
-  };
+  var endCallback = $.obm.callbacks.buildEndCallback();
+  var checkStartCallback = $.obm.callbacks.buildCheckStartCallback();
+  var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
+  var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder());
+  scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+
   
-  var checkCompleteCallback = function(flatCheck, checkResult) {
-    var moduleStatus = modulesStatus[flatCheck.moduleId];
-    moduleStatus.checksDone++;
-    progressBarInstance.increment();
-    moduleStatus.status = $.obm.codeToStatus[checkResult.code];
-    
-    $.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
-    $.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
-    
-    if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
-      $.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
-      if ( moduleStatus.status == "success" ) {
-	$.obm.closeModuleContainer(flatCheck.moduleId);
-      } else {
-	$.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
+};
+
+$.obm.callbacks = {
+  buildUrlBuilder: function() {
+    return function(flatCheck) {
+      return "/healthcheck/backend/HealthCheck.php/"+flatCheck.moduleId+"/" + flatCheck.checkId;
+    };
+  },
+  buildCheckStartCallback: function() {
+    return function(flatCheck) {
+      $.obm.showModuleContainer(flatCheck.moduleId);
+      $.obm.showCheckContainer(flatCheck.moduleId, flatCheck.checkId);
+    };
+  },
+  buildCheckCompleteCallback: function(modulesStatus) {
+    return function(flatCheck, checkResult) {
+      var moduleStatus = modulesStatus[flatCheck.moduleId];
+      moduleStatus.checksDone++;
+      moduleStatus.status = $.obm.codeToStatus[checkResult.code];
+      
+      $.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
+      $.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
+      
+      if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
+	$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
+	if ( moduleStatus.status == "success" ) {
+	  $.obm.closeModuleContainer(flatCheck.moduleId);
+	} else {
+	  $.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
+	}
       }
-    }
-  };
-  
-  var endCallback = function() {
-    alert("Tests compmleted");
-  };
-  
-  var scheduler = new checkScheduler(checkList, urlBuilder);
-  var checksCount = scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
-  var progressBarInstance = new progressBar(checksCount);
-  
+    };
+  },
+  buildEndCallback: function() {
+    return function() {
+      alert("Tests completed");
+    };
+  }
 };
 
 $.obm.htmlId = function(moduleId, checkId) {

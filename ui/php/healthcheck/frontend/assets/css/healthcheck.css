@@ -24,13 +24,15 @@
 }
 
 .module.test-info > a > span.label-info { display: inline; }
-.module.test-error > a > span.label-error { display: inline; }
+.module.test-error > a > span.label-important { display: inline; }
 .module.test-success > a > span.label-success { display: inline; }
+.module.test-warning > a > span.label-warning { display: inline; }
 
 .check > a > span.label {
 	display: none;
 }
 
 .check.test-info > a > span.label-info { display: inline; }
-.check.test-error > a > span.label-error { display: inline; }
+.check.test-error > a > span.label-important { display: inline; }
 .check.test-success > a > span.label-success { display: inline; }
+.check.test-warning > a > span.label-warning { display: inline; }
