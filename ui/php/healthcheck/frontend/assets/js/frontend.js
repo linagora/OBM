@@ -25,15 +25,19 @@ $.obm.getModuleTemplate = function(callback) {
 $.obm.getCheckList = function(callback) {
 	$.ajax({
 		url: "/healthcheck/backend/HealthCheck.php/",
-		error: function(jqXhr) {
+		error: function(jqXhr, errorType) {
 			var status = jqXhr.status;
-			if ( status == 0 ) {
+			if ( status == 0 || errorType) {
 				status = 500;
 			}
 			callback(status);
 		},
 		success: function(checkList){
-			callback(null,checkList);
+			if ($.isPlainObject(checkList)) {
+				callback(null,checkList);
+			} else {
+				callback(500);
+			}
 		}
 	});
 };
@@ -51,7 +55,7 @@ $.obm.bootstrap = function(callback) {
 
 	$.obm.getModuleTemplate(function(err,html) {
 		if ( err ) {
-			callback(err);
+			return callback("Fail to get the template");
 		}
 		moduleTemplate = html;
 		actionDone++;
@@ -59,7 +63,7 @@ $.obm.bootstrap = function(callback) {
 	});
 	$.obm.getCheckList(function(err,json) {
 		if ( err ) {
-			callback(err);
+			return callback("Fail to get the check list");
 		}
 		checkList = json;
 		actionDone++;
@@ -73,8 +77,7 @@ $(document).ready( function(){
 		$.obm.bootstrap(
 			function(err, checkList, moduleTemplate) {
 				if ( err ) {
-					// code pour dire à l'utilisateur que ça merde
-					alert( "Error "+err );
+					alert( "Error: "+err );
 					return ;
 				}
 				$.obm.addModules(checkList, moduleTemplate);

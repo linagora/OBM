@@ -14,7 +14,11 @@ define(["checkResult"], function(checkResult) {
 	return callback(new checkResult(2, xhr.statusText));
       },
       success: function(result) {
-	return callback(new checkResult(result.status, result.messages));
+	if ($.isPlainObject(result)) {
+	  return callback(new checkResult(result.status, result.messages));
+	} else {
+	  return callback(new checkResult(2, ["Server response is not in expected format"]));
+	}
       }
     });
     
