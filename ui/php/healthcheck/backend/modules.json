@@ -12,6 +12,13 @@
                     "description": "Checks the version of PHP.",
                     "url": "http://obm.org/wiki/obm-ui",
                     "parentId": null
+                },
+                {
+                    "id": "PhpModulesCheck",
+                    "name": "PHP Modules Check",
+                    "description": "Check the presence of a number of mandatory modules (PHP-Curl, etc.)",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
                 }
             ]
         },
