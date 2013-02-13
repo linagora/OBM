@@ -67,20 +67,20 @@ $.obm.bootstrap = function(callback) {
 	});
 }
 
-function startCheck(){
-	$.obm.bootstrap(
-		function(err, checkList, moduleTemplate) {
-			if ( err ) {
-				// code pour dire à l'utilisateur que ça merde
-				alert( "Error "+err );
-				return ;
-			}
-			$.obm.addModules(checkList, moduleTemplate);
-		}
-	);
-}
-
 $(document).ready( function(){
+	$("#startCheckButton").click( function(){
+		$.obm.bootstrap(
+			function(err, checkList, moduleTemplate) {
+				if ( err ) {
+					// code pour dire à l'utilisateur que ça merde
+					alert( "Error "+err );
+					return ;
+				}
+				$.obm.addModules(checkList, moduleTemplate);
+			}
+		);
+	});
+
 	$("#showButton").click( function(){
 		$.obm.displayItem("php");
 		$.obm.displayItem("PhpEnvironmentCheck");
@@ -105,4 +105,12 @@ $.obm.displayItem = function(id) {
 
 $.obm.setStatus = function(id, status) {
 	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
+};
+
+$.obm.setAlert = function(status, message) {
+	// To Do: Add Alert after progress bar, before #modules-list http://twitter.github.com/bootstrap/components.html#alerts
+};
+
+$.obm.updateProgressBar = function(pourcent) {
+	// To Do: $("#progress-bar").css('width', x+"%");
 };

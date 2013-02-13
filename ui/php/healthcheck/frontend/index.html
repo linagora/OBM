@@ -14,18 +14,36 @@
 <div class="container">
 	<div id="header" class="page-header">
 		<h1>Health Check OBM 
-			<button class="btn btn-success btn-large" type="button" onclick="startCheck()"><strong>Start Checking OBM</strong></button>
+			<button class="btn btn-success btn-large" type="button" id="startCheckButton"><strong>Start Checking OBM</strong></button>
 			<button class="btn btn-info btn-small" type="button"  id="showButton"><strong>Show PHP module</strong></button>
 			<button class="btn btn-success btn-small" type="button" id="successButton"><strong>Set Success PHP Module</strong></button>
 		</h1>
 	</div>
 
 	<div class="alert alert-info" id="introduction">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
 		<h2>
 			How Health Check works:
 		</h2>
-		<p> 
-			Vestibulum fermentum varius dapibus. Cras consequat purus vitae nunc dapibus congue. Sed metus ligula, fringilla sed scelerisque quis, convallis non urna. Pellentesque feugiat urna eu ante dapibus non consequat libero tempus. Mauris pharetra pellentesque dolor, ut varius urna condimentum et. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque gravida vulputate venenatis. Ut nec rutrum ante. Phasellus sodales nisi vitae felis placerat pharetra. Quisque cursus, est a auctor hendrerit, est nulla iaculis dui, at pharetra justo nisl vel nulla. Donec feugiat dignissim lorem, nec molestie mauris euismod et. Nunc gravida lorem vel purus venenatis sagittis. Etiam euismod pretium blandit. 
+		<p>
+			Welcome in OBM Health check System
+		</p><p>
+			This is the right place after having installed OBM or after an upgrade.
+		</p><p>
+			Pre-conditions :
+			<ul>
+				<li> a network access to your OBM servers</li>
+				<li> a domain created</li>
+				<li> nothing is required in your browser</li>
+				<li> nothing already installed on your OBM server is required</li>
+			</ul>
+		</p>
+		<h3>How to use it :</h3>
+		<p>
+			First, click on "Start Checking OBM". A list of available checks will be returned and launched automatically. For example, system service status will be tested, access to service will be tested, Database integrity will be checked...and many more. <br/>
+			Most of the time, you will have a success returned. But in case of an error returned, you will have the ability to ignore and continue with others OBM health check or just restart the test. A description of a reason why the error occurs will be displayed to you in order to help you to fix it.
+		</p><p>
+			Just click on "Start" and let the powerful OBM health check guide you !
 		</p>
 	</div>
 
