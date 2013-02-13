@@ -81,16 +81,6 @@ $(document).ready( function(){
 			}
 		);
 	});
-
-	$("#showButton").click( function(){
-		$.obm.displayItem("php");
-		$.obm.displayItem("PhpEnvironmentCheck");
-	});
-
-	$("#successButton").click( function(){
-		$.obm.setStatus("php", "success");
-		$.obm.setStatus("PhpEnvironmentCheck", "success");
-	});
 });
 
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
@@ -114,8 +104,8 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
   };
   
   var checkStartCallback = function(flatCheck) {
-    $.obm.displayItem(flatCheck.moduleId);
-    $.obm.displayItem(flatCheck.checkId);
+    $.obm.showModuleContainer(flatCheck.moduleId);
+    $.obm.showCheckContainer(flatCheck.moduleId, flatCheck.checkId);
   };
   
   var checkCompleteCallback = function(flatCheck, checkResult) {
@@ -124,15 +114,15 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
     progressBarInstance.increment();
     moduleStatus.status = $.obm.codeToStatus[checkResult.code];
     
-    $.obm.setStatus(flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
-    $.obm.displayCheckInfo(flatCheck.checkId, checkResult.code, checkResult.messages);
+    $.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
+    $.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
     
     if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
-      $.obm.setStatus(flatCheck.moduleId, moduleStatus.status);
+      $.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
       if ( moduleStatus.status == "success" ) {
 	$.obm.closeModuleContainer(flatCheck.moduleId);
       } else {
-	$.obm.openCheckContainer(flatCheck.checkId);
+	$.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
       }
     }
   };
@@ -147,33 +137,56 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar) {
   
 };
 
+$.obm.htmlId = function(moduleId, checkId) {
+  return moduleId+"-"+checkId;
+};
 
 $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
-	for( var index in checkList.modules){
-		var output = Mustache.render(moduleTemplate, checkList.modules[index]);
-		$("#modules-list").append(output);
-	}
+    var counter = 0;
+    checkList.modules.forEach(function(module) {
+      module.checks.forEach(function(check) {
+	check.htmlId = module.id+"-"+check.id;
+      });
+    });
+    for( var index in checkList.modules){
+      var output = Mustache.render(moduleTemplate, checkList.modules[index]);
+      $("#modules-list").append(output);
+    }
 };
 
-$.obm.displayCheckInfo = function(id, code, messages) {
-	$("#"+id+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
-	if (messages) {
-	      $("#"+id+"-info").html(messages.join("<br/>"));
-	}
+$.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
+  var htmlId = $.obm.htmlId(moduleId, checkId);
+  $("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
+  if (messages) {
+	$("#"+htmlId+"-info").html(messages.join("<br/>"));
+  }
 };
-$.obm.displayItem = function(id) {
+
+$.obm.showModuleContainer = function(id) {
 	$("#"+id+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
 };
 
-$.obm.setStatus = function(id, status) {
+$.obm.showCheckContainer = function(moduleId, checkId) {
+  var htmlId = $.obm.htmlId(moduleId, checkId);
+  $("#"+htmlId+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
+};
+
+$.obm.setModuleStatus = function(id, status) {
 	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
+};
+
+$.obm.setCheckStatus = function(moduleId, checkId, status) {
+  var htmlId = $.obm.htmlId(moduleId, checkId);
+  $("#"+htmlId).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
 
 $.obm.closeModuleContainer = function(id) {
   $("#"+id+"-inner").removeClass("in");
 }
-$.obm.openCheckContainer = function(id) {
-  $("#"+id+"-test").addClass("in");
+
+$.obm.openCheckContainer = function(moduleId, checkId) {
+  var htmlId = $.obm.htmlId(moduleId, checkId);
+  $("#"+htmlId+"-test").addClass("in");
 }
 
 $.obm.setAlert = function(status, message) {
