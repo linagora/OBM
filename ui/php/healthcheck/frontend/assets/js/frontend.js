@@ -24,7 +24,7 @@ $.obm.getModuleTemplate = function(callback) {
 
 $.obm.getCheckList = function(callback) {
 	$.ajax({
-		url: "/healthcheck/backend/HealthCheck.php/getAvailableChecks",
+		url: "/healthcheck/backend/HealthCheck.php/",
 		error: function(jqXhr) {
 			var status = jqXhr.status;
 			if ( status == 0 ) {
@@ -77,6 +77,7 @@ $(document).ready( function(){
 					return ;
 				}
 				$.obm.addModules(checkList, moduleTemplate);
+				$.obm.runChecks(checkList);
 			}
 		);
 	});
@@ -92,6 +93,52 @@ $(document).ready( function(){
 	});
 });
 
+$.obm.runChecks = function(checkList) {
+  var modulesStatus = {};
+  checkList.modules.forEach(function(module) {
+    modulesStatus[module.id] = {
+      checksCount: module.checks.length,
+      checksDone: 0,
+      status: "success"
+    };
+  });
+  var urlBuilder = function(flatCheck) {
+    return "/healthcheck/backend/HealthCheck.php/"+flatCheck.moduleId+"/" + flatCheck.checkId;
+  };
+  
+  var checkStartCallback = function(flatCheck) {
+    $.obm.displayItem(flatCheck.moduleId);
+    $.obm.displayItem(flatCheck.checkId);
+  };
+  
+  var checkCompleteCallback = function(flatCheck, checkResult) {
+    var moduleStatus = modulesStatus[flatCheck.moduleId];
+    moduleStatus.checksDone++;
+    if ( checkResult.code == 0 ) {
+      $.obm.setStatus(flatCheck.checkId, "success");
+    } else if ( checkResult.code == 1 ) {
+      $.obm.setStatus(flatCheck.checkId, "warning");
+      moduleStatus.status = "warning";
+    } else {
+      $.obm.setStatus(flatCheck.checkId, "error");
+      moduleStatus.status = "error";
+    }
+    
+    if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
+      $.obm.setStatus(flatCheck.moduleId, moduleStatus.status);
+    }
+  };
+  
+  var endCallback = function() {
+    alert("Tests compmleted");
+  };
+  
+  var scheduler = new checkScheduler(checkList, urlBuilder);
+  scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+  
+};
+
+
 $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 	for( var index in checkList.modules){
 		var output = Mustache.render(moduleTemplate, checkList.modules[index]);
@@ -100,7 +147,7 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 };
 
 $.obm.displayItem = function(id) {
-	$("#"+id+"-header").toggleClass('visibility-hidden visibility-visible');
+	$("#"+id+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
 };
 
 $.obm.setStatus = function(id, status) {

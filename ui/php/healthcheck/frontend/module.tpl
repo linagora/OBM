@@ -7,7 +7,7 @@
 			<span class="label label-error pull-right">Error</span>
 		</a>
 	</div>
-	<div id="{{id}}-inner" class="accordion-body collapse">
+	<div id="{{id}}-inner" class="accordion-body">
 		<div class="accordion-inner">
 			<div class="accordion" id="{{name}}-tests">
 				{{description}}
