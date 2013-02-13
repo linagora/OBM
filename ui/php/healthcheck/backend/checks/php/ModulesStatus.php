@@ -42,11 +42,11 @@ class ModulesStatus implements Check {
         "gd"      => array("status" => CheckStatus::ERROR,
                            "desc" => ""),
         "curl"    => array("status" => CheckStatus::ERROR,
-                           "desc" => ""),
-        "apc"     => array("status" => CheckStatus::ERROR,
-                           "desc" => ""),
+                           "desc" => "You will not be able to communicate with OBM-Satellite and OBM-Sync."),
+        "apc"     => array("status" => CheckStatus::WARNING,
+                           "desc" => "You will not be able to generate PDF with Zend framework."),
         "imagick" => array("status" => CheckStatus::WARNING,
-                           "desc" => "You will not be able to generate PDF with OBM.")
+                           "desc" => "You will not be able to generate image in PDF with OBM.")
     );
 
     $loadedModules = get_loaded_extensions();
