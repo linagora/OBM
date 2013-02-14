@@ -33,6 +33,7 @@ package org.obm.opush.command.prov;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
@@ -41,7 +42,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -107,11 +107,11 @@ public class ProvisionHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
-		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
-		Assertions.assertThat(provisionResponse.getPolicyKey()).isEqualTo(nextPolicyKeyGenerated);
-		Assertions.assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.SUCCESS);
-		Assertions.assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
-		Assertions.assertThat(provisionResponse.hasPolicyData()).isTrue();
+		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
+		assertThat(provisionResponse.getPolicyKey()).isEqualTo(nextPolicyKeyGenerated);
+		assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.SUCCESS);
+		assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
+		assertThat(provisionResponse.hasPolicyData()).isTrue();
 	}
 
 	@Test
@@ -125,11 +125,11 @@ public class ProvisionHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(userRegistredPolicyKey);
 
-		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
-		Assertions.assertThat(provisionResponse.getPolicyKey()).isEqualTo(nextPolicyKeyGenerated);
-		Assertions.assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.SUCCESS);
-		Assertions.assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
-		Assertions.assertThat(provisionResponse.hasPolicyData()).isFalse();
+		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
+		assertThat(provisionResponse.getPolicyKey()).isEqualTo(nextPolicyKeyGenerated);
+		assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.SUCCESS);
+		assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
+		assertThat(provisionResponse.hasPolicyData()).isFalse();
 	}
 
 	@Test
@@ -144,11 +144,11 @@ public class ProvisionHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(acknowledgingPolicyKey);
 
-		Assertions.assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
-		Assertions.assertThat(provisionResponse.getPolicyKey()).isNull();
-		Assertions.assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
-		Assertions.assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
-		Assertions.assertThat(provisionResponse.hasPolicyData()).isFalse();
+		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
+		assertThat(provisionResponse.getPolicyKey()).isNull();
+		assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
+		assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
+		assertThat(provisionResponse.hasPolicyData()).isFalse();
 	}
 
 	private void mockStepTwoNeeds(long nextPolicyKeyGenerated, long userRegistredPolicyKey)
