@@ -36,3 +36,9 @@
 .check.test-error > a > span.label-important { display: inline; }
 .check.test-success > a > span.label-success { display: inline; }
 .check.test-warning > a > span.label-warning { display: inline; }
+
+.healthcheck-bar{
+	margin-bottom:0;
+	margin-top:10px;
+	background:#DDD;
+}
