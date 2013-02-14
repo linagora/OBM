@@ -259,8 +259,8 @@ $.obm.updateProgressBarColor = function(code) {
 }
 
 $.obm.endColorProgressBar = function() {
-	var errors = $("##badge-errors").text();
-	var warnings = $("##badge-warnings").text();
+	var errors = $("#badge-errors").text();
+	var warnings = $("#badge-warnings").text();
 
 	if( errors > 0){
 		$.obm.updateProgressBarColor(2);
