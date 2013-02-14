@@ -16,14 +16,31 @@
 <script>
 require.config({baseUrl: "assets/js"});
 </script>
-<div class="container">
-	<div id="header" class="page-header">
-		<h1>Health Check OBM 
-			<button class="btn btn-success btn-large" type="button" id="startCheckButton"><strong>Start Checking OBM</strong></button>
-			<button class="btn btn-success btn-large visibility-hidden" type="button" id="restartCheckButton"><strong>restart Checking OBM</strong></button>
-		</h1>
-	</div>
 
+<div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container-fluid">
+			<a href="index.html" class="brand">Health Check OBM</a>
+			<div class="nav-collapse collapse">
+				<ul class="nav">
+					<li><a href="#" id="startCheckButton"><i class="icon-play"></i> Start</a></li>
+					<li id="restartWrapper" style="display:none;"><a href="#" id="restartCheckButton"><i class="icon-refresh"></i> Restart</a></li>
+					<li><a href="#" id="pauseCheckButton"><i class="icon-pause"></i> Pause</a></li>
+					<li id="resumeWrapper" style="display:none;"><a href="#" id="resumeCheckButton"><i class="icon-play"></i> Resume</a></li>
+					<li style="margin-top:8px;" class="pull-right">
+						<span class="badge badge-warning" id="badge-warnings">0</span> <span class="badge badge-important" id="badge-errors">0</span>
+					</li>
+				</ul>
+			</div>
+			<!--/.nav-collapse -->
+			<div class="progress progress-info progress-striped active" style="margin-bottom:0;margin-top:10px;">
+				<div class="bar" style="width: 0%;" id="progress-bar"></div>
+			</div>
+
+		</div>
+	</div>
+</div>
+<div class="container-fluid" style="margin-top:50px">
 	<div class="alert alert-info" id="introduction">
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
 		<h2>
@@ -50,13 +67,7 @@ require.config({baseUrl: "assets/js"});
 			Just click on "Start" and let the powerful OBM health check guide you !
 		</p>
 	</div>
-
-	<div class="progress progress-info progress-striped active">
-		<div class="bar" style="width: 0%;" id="progress-bar"></div>
-	</div>
-
 	<div class="accordion" id="modules-list">
-
 	</div>
 </div>
 </body>

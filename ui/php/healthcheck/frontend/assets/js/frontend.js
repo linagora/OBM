@@ -73,7 +73,8 @@ $.obm.bootstrap = function(callback) {
 
 $(document).ready( function(){
 	$("#startCheckButton").click( function(){
-		$(this).attr("disabled","true");
+		$.obm.hideStartButton(this);
+		$("#introduction").addClass("visibility-hidden");
 		$.obm.bootstrap(
 			function(err, checkList, moduleTemplate) {
 				if ( err ) {
@@ -88,6 +89,14 @@ $(document).ready( function(){
 	$("#restartCheckButton").click(function() {
 	  window.location.replace(window.location.pathname+"?autostart=true");
 	});
+
+	$("#pauseCheckButton").click(function() {
+		$.obm.togglePauseButton(this);
+	});
+	$("#resumeCheckButton").click(function() {
+		$.obm.togglePauseButton($("#pauseCheckButton"));
+	});
+
 	if ( $.getQuery().autostart == "true" ) {
 	  $("#startCheckButton").click();
 	}
@@ -121,8 +130,6 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar, pubsub) {
   var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
   var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder());
   scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
-
-  
 };
 
 $.obm.callbacks = {
@@ -158,7 +165,6 @@ $.obm.callbacks = {
   },
   buildEndCallback: function() {
     return function() {
-      alert("Tests completed");
       $("#restartCheckButton").removeClass("visibility-hidden");
     };
   }
@@ -185,8 +191,18 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
   var htmlId = $.obm.htmlId(moduleId, checkId);
   $("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
   if (messages) {
+  	$.obm.updateBadges(code);
 	$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
   }
+};
+
+$.obm.updateBadges = function(code) {
+	var badgeName = {"1" : "#badge-warnings", "2" : "#badge-errors" };
+	if (code > 0){
+		var value = $(badgeName[code]).text();
+		value++;
+		$(badgeName[code]).html(value);
+	}
 };
 
 $.obm.showModuleContainer = function(id) {
@@ -209,6 +225,22 @@ $.obm.setCheckStatus = function(moduleId, checkId, status) {
 
 $.obm.closeModuleContainer = function(id) {
   $("#"+id+"-inner").removeClass("in");
+}
+
+$.obm.hideStartButton = function(startBtn) {
+	if ( $(startBtn).css("display") != "none" ){
+		$(startBtn).css("display","none");
+		$("#restartWrapper").css("display","block");
+	}
+}
+$.obm.togglePauseButton = function(pauseBtn) {
+	if ( $(pauseBtn).css("display") != "none" ){
+		$(pauseBtn).css("display","none");
+		$("#resumeWrapper").css("display","block");
+	} else {
+		$(pauseBtn).css("display","block");
+		$("#resumeWrapper").css("display","none");
+	}
 }
 
 $.obm.openCheckContainer = function(moduleId, checkId) {

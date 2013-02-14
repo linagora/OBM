@@ -11,7 +11,7 @@ define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
     availableChecks.modules.forEach(function(module) {
       var moduleId = module.id;
       module.checks.forEach(function(check) {
-	flatChecks.push( {moduleId: moduleId, checkId: check.id} );
+        flatChecks.push( {moduleId: moduleId, checkId: check.id} );
       });
     });
     return flatChecks;
@@ -23,18 +23,18 @@ define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
     var urlBuilder = this.urlBuilder;
     var runOneCheck = function() {
       if ( flatChecks.length == 0 ) {
-	return endCallback();
+        return endCallback();
       }
       var nextCheck = flatChecks.shift();
       checkStartCallback(nextCheck);
       var runner = new checkRunner(nextCheck, urlBuilder);
       runner.run(function(result) {
-	checkCompleteCallback(nextCheck, result);
-	endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
-	if ( result.code == 2 ) {
-	  return endCallback();
-	}
-	runOneCheck();
+        checkCompleteCallback(nextCheck, result);
+        endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
+        if ( result.code == 2 ) {
+          return endCallback();
+        }
+        runOneCheck();
       });
     };
     startTopic.publish({checksCount: checksCount});
