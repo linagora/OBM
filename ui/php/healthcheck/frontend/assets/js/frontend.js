@@ -105,95 +105,97 @@ $(document).ready( function(){
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
 
 $.obm.runChecks = function(checkList) {
-  require(["checkScheduler", "progressBar", "pubsub"], function(checkScheduler, progressBar, pubsub) {
-    $.obm.realRunChecks(checkList, checkScheduler, progressBar, pubsub);
-  });
+	require(["checkScheduler", "progressBar", "pubsub"], function(checkScheduler, progressBar, pubsub) {
+		$.obm.realRunChecks(checkList, checkScheduler, progressBar, pubsub);
+	});
 };
 
 $.obm.realRunChecks = function(checkList, checkScheduler, progressBar, pubsub) {
-  var modulesStatus = {};
-  checkList.modules.forEach(function(module) {
-    modulesStatus[module.id] = {
-      checksCount: module.checks.length,
-      checksDone: 0,
-      status: "success"
-    };
-  });
-  var startTopic = pubsub.topic("checkScheduler:start");
-  var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
-  var progressBarInstance = new progressBar();
-  startTopic.subscribe(function(data) { progressBarInstance.setElementCount(data.checksCount); });
-  endOfCheckTopic.subscribe(function(data) { progressBarInstance.increment(); });
-  
-  var endCallback = $.obm.callbacks.buildEndCallback();
-  var checkStartCallback = $.obm.callbacks.buildCheckStartCallback();
-  var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
-  var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder());
-  scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+	var modulesStatus = {};
+	checkList.modules.forEach(function(module) {
+	modulesStatus[module.id] = {
+		checksCount: module.checks.length,
+		checksDone: 0,
+		status: "success"
+		};
+	});
+	var startTopic = pubsub.topic("checkScheduler:start");
+	var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
+	var progressBarInstance = new progressBar();
+	startTopic.subscribe(function(data) { progressBarInstance.setElementCount(data.checksCount); });
+	endOfCheckTopic.subscribe(function(data) { progressBarInstance.increment(); });
+
+	var endCallback = $.obm.callbacks.buildEndCallback();
+	var checkStartCallback = $.obm.callbacks.buildCheckStartCallback();
+	var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
+	var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder());
+	scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
 };
 
 $.obm.callbacks = {
-  buildUrlBuilder: function() {
-    return function(flatCheck) {
-      return "/healthcheck/backend/HealthCheck.php/"+flatCheck.moduleId+"/" + flatCheck.checkId;
-    };
-  },
-  buildCheckStartCallback: function() {
-    return function(flatCheck) {
-      $.obm.showModuleContainer(flatCheck.moduleId);
-      $.obm.showCheckContainer(flatCheck.moduleId, flatCheck.checkId);
-    };
-  },
-  buildCheckCompleteCallback: function(modulesStatus) {
-    return function(flatCheck, checkResult) {
-      var moduleStatus = modulesStatus[flatCheck.moduleId];
-      moduleStatus.checksDone++;
-      moduleStatus.status = $.obm.codeToStatus[checkResult.code];
-      
-      $.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
-      $.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
-      
-      if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
-	$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
-	if ( moduleStatus.status == "success" ) {
-	  $.obm.closeModuleContainer(flatCheck.moduleId);
-	} else {
-	  $.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
+	buildUrlBuilder: function() {
+		return function(flatCheck) {
+			return "/healthcheck/backend/HealthCheck.php/"+flatCheck.moduleId+"/" + flatCheck.checkId;
+		};
+	},
+	buildCheckStartCallback: function() {
+		return function(flatCheck) {
+			$.obm.showModuleContainer(flatCheck.moduleId);
+			$.obm.showCheckContainer(flatCheck.moduleId, flatCheck.checkId);
+		};
+	},
+	buildCheckCompleteCallback: function(modulesStatus) {
+		return function(flatCheck, checkResult) {
+			var moduleStatus = modulesStatus[flatCheck.moduleId];
+			moduleStatus.checksDone++;
+			moduleStatus.status = $.obm.codeToStatus[checkResult.code];
+
+			$.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
+			$.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
+
+			if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
+				$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
+					if ( moduleStatus.status == "success" ) {
+						$.obm.closeModuleContainer(flatCheck.moduleId);
+					} else {
+						$.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
+					}
+				}
+			};
+		},
+		buildEndCallback: function() {
+			return function() {
+				$("#restartCheckButton").removeClass("visibility-hidden");
+				$("#progress-bar-color").removeClass("progress-striped");
+		};
 	}
-      }
-    };
-  },
-  buildEndCallback: function() {
-    return function() {
-      $("#restartCheckButton").removeClass("visibility-hidden");
-    };
-  }
 };
 
 $.obm.htmlId = function(moduleId, checkId) {
-  return moduleId+"-"+checkId;
+	return moduleId+"-"+checkId;
 };
 
 $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
-    var counter = 0;
-    checkList.modules.forEach(function(module) {
-      module.checks.forEach(function(check) {
-	check.htmlId = module.id+"-"+check.id;
-      });
-    });
-    for( var index in checkList.modules){
-      var output = Mustache.render(moduleTemplate, checkList.modules[index]);
-      $("#modules-list").append(output);
-    }
+	var counter = 0;
+	checkList.modules.forEach(function(module) {
+		module.checks.forEach(function(check) {
+			check.htmlId = module.id+"-"+check.id;
+		});
+	});
+	for( var index in checkList.modules){
+		var output = Mustache.render(moduleTemplate, checkList.modules[index]);
+		$("#modules-list").append(output);
+	}
 };
 
 $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
-  var htmlId = $.obm.htmlId(moduleId, checkId);
-  $("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
-  if (messages) {
-  	$.obm.updateBadges(code);
-	$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
-  }
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+		$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
+	if (messages) {
+		$.obm.updateBadges(code);
+		$.obm.updateProgressBarColor(code);
+		$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
+	}
 };
 
 $.obm.updateBadges = function(code) {
@@ -210,8 +212,8 @@ $.obm.showModuleContainer = function(id) {
 };
 
 $.obm.showCheckContainer = function(moduleId, checkId) {
-  var htmlId = $.obm.htmlId(moduleId, checkId);
-  $("#"+htmlId+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+	$("#"+htmlId+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
 };
 
 $.obm.setModuleStatus = function(id, status) {
@@ -219,12 +221,12 @@ $.obm.setModuleStatus = function(id, status) {
 };
 
 $.obm.setCheckStatus = function(moduleId, checkId, status) {
-  var htmlId = $.obm.htmlId(moduleId, checkId);
-  $("#"+htmlId).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+	$("#"+htmlId).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
 
 $.obm.closeModuleContainer = function(id) {
-  $("#"+id+"-inner").removeClass("in");
+	$("#"+id+"-inner").removeClass("in");
 }
 
 $.obm.hideStartButton = function(startBtn) {
@@ -244,8 +246,13 @@ $.obm.togglePauseButton = function(pauseBtn) {
 }
 
 $.obm.openCheckContainer = function(moduleId, checkId) {
-  var htmlId = $.obm.htmlId(moduleId, checkId);
-  $("#"+htmlId+"-test").addClass("in");
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+	$("#"+htmlId+"-test").addClass("in");
+}
+
+$.obm.updateProgressBarColor = function(code) {
+	var colorClass = (code == 2 ) ? "progress-danger" : "progress-" + $.obm.codeToStatus[code] ;
+	$("#progress-bar-color").removeClass("progress-info progress-warning progress-error progress-success").addClass(colorClass);
 }
 
 $.obm.setAlert = function(status, message) {
