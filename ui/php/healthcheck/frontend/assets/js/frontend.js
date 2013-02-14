@@ -167,6 +167,7 @@ $.obm.callbacks = {
 			return function() {
 				$("#restartCheckButton").removeClass("visibility-hidden");
 				$("#progress-bar-color").removeClass("progress-striped");
+				$.obm.endColorProgressBar();
 		};
 	}
 };
@@ -193,7 +194,9 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 		$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
 	if (messages) {
 		$.obm.updateBadges(code);
-		$.obm.updateProgressBarColor(code);
+		if(code > 0) {
+			$.obm.updateProgressBarColor(code);
+		}
 		$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
 	}
 };
@@ -255,6 +258,15 @@ $.obm.updateProgressBarColor = function(code) {
 	$("#progress-bar-color").removeClass("progress-info progress-warning progress-error progress-success").addClass(colorClass);
 }
 
-$.obm.setAlert = function(status, message) {
-	// To Do: Add Alert after progress bar, before #modules-list http://twitter.github.com/bootstrap/components.html#alerts
-};
+$.obm.endColorProgressBar = function() {
+	var errors = $("##badge-errors").text();
+	var warnings = $("##badge-warnings").text();
+
+	if( errors > 0){
+		$.obm.updateProgressBarColor(2);
+	}else if(warnings > 0){
+		$.obm.updateProgressBarColor(1);
+	}else{
+		$.obm.updateProgressBarColor(0);
+	}
+}
