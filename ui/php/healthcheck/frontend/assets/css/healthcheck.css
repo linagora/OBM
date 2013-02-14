@@ -42,3 +42,10 @@
 	margin-top:10px;
 	background:#DDD;
 }
+.nav li{
+	margin-left:2px;
+}
+.nav button{
+	color:#FFF;
+	text-shadow:0 -1px #777;
+}

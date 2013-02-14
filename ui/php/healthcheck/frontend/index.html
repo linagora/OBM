@@ -23,11 +23,11 @@ require.config({baseUrl: "assets/js"});
 			<a href="index.html" class="brand">Health Check OBM</a>
 			<div class="nav-collapse collapse">
 				<ul class="nav">
-					<li><a href="#" id="startCheckButton"><i class="icon-play"></i> Start</a></li>
-					<li id="restartWrapper" style="display:none;"><a href="#" id="restartCheckButton"><i class="icon-refresh"></i> Restart</a></li>
-					<li><a href="#" id="pauseCheckButton"><i class="icon-pause"></i> Pause</a></li>
-					<li id="resumeWrapper" style="display:none;"><a href="#" id="resumeCheckButton"><i class="icon-play"></i> Resume</a></li>
-					<li style="margin-top:8px;" class="pull-right">
+					<li><button id="startCheckButton" class="btn btn-success"><i class="icon-play"></i> Start</button></li>
+					<li id="restartWrapper" style="display:none;"><button id="restartCheckButton" class="btn btn-success"><i class="icon-refresh"></i> Restart</button></li>
+					<li><button id="pauseCheckButton" class="btn btn-warning"><i class="icon-pause"></i> Pause</button></li>
+					<li id="resumeWrapper" style="display:none;"><button id="resumeCheckButton" class="btn btn-warning"><i class="icon-play"></i> Resume</button></li>
+					<li style="margin-top:8px;margin-left:10px;">
 						<span class="badge badge-warning" id="badge-warnings">0</span> <span class="badge badge-important" id="badge-errors">0</span>
 					</li>
 				</ul>
