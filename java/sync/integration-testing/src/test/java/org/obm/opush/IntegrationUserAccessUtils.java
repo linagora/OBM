@@ -41,6 +41,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
+import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
@@ -84,7 +85,7 @@ public class IntegrationUserAccessUtils {
 				.andReturn(
 						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties(), user.deviceProtocolVersion))
 						.anyTimes();
-		expect(deviceDao.getPolicyKey(user.user, user.deviceId)).andReturn(0l).anyTimes();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED)).andReturn(0l).anyTimes();
 	}
 	
 	

@@ -51,6 +51,7 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
+import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
@@ -111,11 +112,11 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		if (isInitialProvisionRequest(policyKey)) {
 			provisionResponseBuilder
 				.policy(backend.getDevicePolicy(udr))
-				.policyKey(allocateNewPolicyKey(udr))
+				.policyKey(retrievePendingPolicyKey(udr))
 				.policyStatus(ProvisionPolicyStatus.SUCCESS);
-		} else if (isCurrentPolicyKey(udr, policyKey)) {
+		} else if (isPendingPolicyKey(udr, policyKey)) {
 			provisionResponseBuilder
-				.policyKey(allocateNewPolicyKey(udr))
+				.policyKey(allocateNewPolicyKey(udr, PolicyStatus.ACCEPTED))
 				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else {
 			provisionResponseBuilder
@@ -129,13 +130,22 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		return policyKey == null || policyKey == INITIAL_POLICYKEY;
 	}
 
-	private boolean isCurrentPolicyKey(UserDataRequest bs, long policyKey) throws DaoException {
-		Long actualPolicyKey = deviceDao.getPolicyKey(bs.getUser(), bs.getDevId());
+	private boolean isPendingPolicyKey(UserDataRequest udr, long policyKey) throws DaoException {
+		Long actualPolicyKey = deviceDao.getPolicyKey(udr.getUser(), udr.getDevId(), PolicyStatus.PENDING);
 		return Objects.equal(actualPolicyKey, policyKey);
 	}
 
-	private long allocateNewPolicyKey(UserDataRequest udr) throws DaoException {
+	private Long retrievePendingPolicyKey(UserDataRequest udr) {
+		Long actualPolicyKey = deviceDao.getPolicyKey(udr.getUser(), udr.getDevId(), PolicyStatus.PENDING);
+		if (actualPolicyKey == null) {
+			return deviceDao.allocateNewPolicyKey(udr.getUser(), udr.getDevId(), PolicyStatus.PENDING);
+		} else {
+			return actualPolicyKey;
+		}
+	}
+	
+	private long allocateNewPolicyKey(UserDataRequest udr, PolicyStatus status) throws DaoException {
 		deviceDao.removePolicyKey(udr.getUser(), udr.getDevice());
-		return deviceDao.allocateNewPolicyKey(udr.getUser(), udr.getDevId());
+		return deviceDao.allocateNewPolicyKey(udr.getUser(), udr.getDevId(), status);
 	}
 }

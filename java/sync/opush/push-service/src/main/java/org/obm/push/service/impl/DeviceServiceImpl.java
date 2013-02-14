@@ -40,6 +40,7 @@ import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.DeviceService;
 import org.obm.push.store.DeviceDao;
+import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,7 @@ public class DeviceServiceImpl implements DeviceService {
 
 	@Override
 	public Long getPolicyKey(User user, DeviceId deviceId) throws DaoException {
-		return deviceDao.getPolicyKey(user, deviceId);
+		return deviceDao.getPolicyKey(user, deviceId, PolicyStatus.ACCEPTED);
 	}
 	
 }

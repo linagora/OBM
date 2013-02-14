@@ -51,7 +51,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
-
+	
 	private Factory deviceFactory;
 
 	@Inject
@@ -152,8 +152,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Long getPolicyKey(User user, DeviceId deviceId) throws DaoException {
-
+	public Long getPolicyKey(User user, DeviceId deviceId, PolicyStatus status) {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -164,10 +163,13 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device ON device_id=id "
 					+ "WHERE identifier=? AND userobm_login=? AND domain_name=? "
-					+ "AND policy IS NOT NULL");
-			ps.setString(1, deviceId.getDeviceId());
-			ps.setString(2, user.getLogin());
-			ps.setString(3, user.getDomain());
+					+ "AND policy IS NOT NULL "
+					+ "AND pending_accept=?");
+			int index = 1;
+			ps.setString(index++, deviceId.getDeviceId());
+			ps.setString(index++, user.getLogin());
+			ps.setString(index++, user.getDomain());
+			ps.setBoolean(index++, policyStatusToPendingAccept(status));
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				return rs.getLong("policy");
@@ -179,9 +181,19 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		}
 		return null;
 	}
+	
+	private boolean policyStatusToPendingAccept(PolicyStatus policyStatus) {
+		switch (policyStatus) {
+		case ACCEPTED:
+			return false;
+		case PENDING:
+			return true;
+		}
+		throw new IllegalArgumentException();
+	}
 
 	@Override
-	public long allocateNewPolicyKey(User user, DeviceId deviceId) throws DaoException {
+	public long allocateNewPolicyKey(User user, DeviceId deviceId, PolicyStatus status) throws DaoException {
 
 		long newPolicyKeyId = allocateNewPolicyKey();
 		
@@ -190,16 +202,18 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		ResultSet rs = null;
 		try {
 			con = dbcp.getConnection();
-			ps = con.prepareStatement("INSERT INTO opush_sync_perms (policy, device_id, owner) "
-					+ "SELECT ?, id, owner FROM opush_device "
+			ps = con.prepareStatement("INSERT INTO opush_sync_perms (policy, device_id, owner, pending_accept) "
+					+ "SELECT ?, id, owner, ? FROM opush_device "
 					+ "INNER JOIN UserObm ON owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "WHERE userobm_login=? AND domain_name=? AND identifier=?");
 
-			ps.setLong(1, newPolicyKeyId);
-			ps.setString(2, user.getLogin());
-			ps.setString(3, user.getDomain());
-			ps.setString(4, deviceId.getDeviceId());
+			int index = 1;
+			ps.setLong(index++, newPolicyKeyId);
+			ps.setBoolean(index++, policyStatusToPendingAccept(status));
+			ps.setString(index++, user.getLogin());
+			ps.setString(index++, user.getDomain());
+			ps.setString(index++, deviceId.getDeviceId());
 			int newRowCount = ps.executeUpdate();
 			if (newRowCount == 1) {
 				return newPolicyKeyId;

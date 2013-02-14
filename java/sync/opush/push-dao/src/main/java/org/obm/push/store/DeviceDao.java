@@ -40,6 +40,11 @@ import org.obm.push.exception.DaoException;
 
 public interface DeviceDao {
 	
+	public enum PolicyStatus {
+		PENDING,
+		ACCEPTED
+	}
+	
 	/**
 	 * Returns <code>true</code> if the device is authorized to synchronize.
 	 */
@@ -51,9 +56,9 @@ public interface DeviceDao {
 	void registerNewDevice(User user, DeviceId deviceId,
 			String deviceType) throws DaoException;
 
-	Long getPolicyKey(User user, DeviceId deviceId) throws DaoException;
-
-	long allocateNewPolicyKey(User user, DeviceId deviceId) throws DaoException;
+	Long getPolicyKey(User user, DeviceId deviceId, PolicyStatus policyStatus) throws DaoException;
+	
+	long allocateNewPolicyKey(User user, DeviceId deviceId, PolicyStatus policyStatus) throws DaoException;
 
 	void removePolicyKey(User user, Device device) throws DaoException;
 

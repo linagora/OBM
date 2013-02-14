@@ -36,10 +36,11 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
-import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+import static org.obm.opush.IntegrationUserAccessUtils.expectUserLoginFromOpush;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
@@ -56,14 +57,17 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.AbstractOpushEnv;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
+import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProvisionResponse;
 
@@ -100,11 +104,16 @@ public class ProvisionHandlerTest {
 	@Test
 	public void testFirstProvisionSendPolicy() throws Exception {
 		long nextPolicyKeyGenerated = 115l;
-		mockProvisionNeeds(nextPolicyKeyGenerated, singleUserFixture.jaures);
-		
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -113,16 +122,77 @@ public class ProvisionHandlerTest {
 		assertThat(provisionResponse.getPolicyType()).isEqualTo("MS-EAS-Provisioning-WBXML");
 		assertThat(provisionResponse.hasPolicyData()).isTrue();
 	}
-
+	
 	@Test
-	public void testSecondProvisionDoesntSendPolicy() throws Exception {
-		long nextPolicyKeyGenerated = 16510l;
-		long userRegistredPolicyKey = 5410l;
-		mockStepTwoNeeds(nextPolicyKeyGenerated, userRegistredPolicyKey);
+	public void testFirstProvisionIsIdempotent() throws Exception {
+		long nextPolicyKeyGenerated = 115l;
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+		
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		mocksControl.replay();
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		ProvisionResponse provisionResponse1 = opClient.provisionStepOne();
+		ProvisionResponse provisionResponse2 = opClient.provisionStepOne();
+
+		assertThat(provisionResponse1).isNotNull().isEqualTo(provisionResponse2).isEqualsToByComparingFields(provisionResponse2);
+	}
+
+	@Test
+	public void acknowledgeIsAllowedOnlyOnPendingPolicyKey() throws Exception {
+		long pendingPolicyKey = 123l;
+		long acknowledgedPolicyKey = 321l;
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+		
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(pendingPolicyKey).once();
+		deviceDao.removePolicyKey(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(pendingPolicyKey).once();
+		deviceDao.removePolicyKey(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED)).andReturn(acknowledgedPolicyKey).once();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		mocksControl.replay();
+		
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		opClient.provisionStepOne();
+		opClient.provisionStepTwo(pendingPolicyKey);
+		ProvisionResponse provisionResponse3 = opClient.provisionStepTwo(acknowledgedPolicyKey);
+
+		assertThat(provisionResponse3).isNotNull();
+		assertThat(provisionResponse3.getPolicyStatus())
+			.isEqualTo(ProvisionPolicyStatus.THE_CLIENT_IS_ACKNOWLEDGING_THE_WRONG_POLICY_KEY);
+	}
+	
+	@Test
+	public void testSecondProvisionDoesntSendPolicy() throws Exception {
+		OpushUser user = singleUserFixture.jaures;
+		long userRegistredPolicyKey = 5410l;
+		long nextPolicyKeyGenerated = 16510l;
+		
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(userRegistredPolicyKey).once();
+		deviceDao.removePolicyKey(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED)).andReturn(nextPolicyKeyGenerated);
+		
+		mockProvisionNeeds(user);
+		
+		mocksControl.replay();
+		opushServer.start();
+  
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(userRegistredPolicyKey);
 
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -134,14 +204,19 @@ public class ProvisionHandlerTest {
 
 	@Test
 	public void testSecondProvisionSentCorrectStatusWhenNotExpectedPolicyKey() throws Exception {
-		long policyKeyGenerated = 16510l;
+		OpushUser user = singleUserFixture.jaures;
 		long userRegistredPolicyKey = 4015l;
 		long acknowledgingPolicyKey = 5410l;
-		mockStepTwoNeeds(policyKeyGenerated, userRegistredPolicyKey);
+
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(userRegistredPolicyKey).once();
 		
+		mockProvisionNeeds(user);
+
+		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(acknowledgingPolicyKey);
 
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -151,28 +226,21 @@ public class ProvisionHandlerTest {
 		assertThat(provisionResponse.hasPolicyData()).isFalse();
 	}
 
-	private void mockStepTwoNeeds(long nextPolicyKeyGenerated, long userRegistredPolicyKey)
+	private void mockProvisionNeeds(OpushUser user)
 			throws DaoException, AuthFault, CollectionNotFoundException {
 		
-		OpushUser user = singleUserFixture.jaures;
-
-		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		expect(deviceDao.getPolicyKey(user.user, user.deviceId)).andReturn(userRegistredPolicyKey).once();
+		LoginService loginService = classToInstanceMap.get(LoginService.class);
+		expectUserLoginFromOpush(loginService, user);
 		
-		mockProvisionNeeds(nextPolicyKeyGenerated, user);
-	}
-
-	private void mockProvisionNeeds(long nextPolicyKeyGenerated, OpushUser user)
-			throws DaoException, AuthFault, CollectionNotFoundException {
-		
-		mockUsersAccess(classToInstanceMap, Sets.newHashSet(user));
 		expectUserCollectionsNeverChange(classToInstanceMap.get(CollectionDao.class), fakeTestUsers, Sets.<Integer>newHashSet());
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId)).andReturn(nextPolicyKeyGenerated).once();
-		deviceDao.removePolicyKey(user.user, user.device);
-		expectLastCall().once();
-		
-		mocksControl.replay();
+		expect(deviceDao.getDevice(user.user, 
+				user.deviceId, 
+				user.userAgent,
+				user.deviceProtocolVersion))
+			.andReturn(
+				new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties(), user.deviceProtocolVersion))
+			.anyTimes();
 	}
 }
