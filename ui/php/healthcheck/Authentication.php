@@ -30,17 +30,16 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-require_once 'Authentication.php';
+function verifyAuthentication($iniPath) {
+  $auth_ini = parse_ini_file($iniPath);
+  
+  return $_SERVER['PHP_AUTH_USER'] == $auth_ini['login'] && $_SERVER['PHP_AUTH_PW'] == $auth_ini['password'];
+}
 
-$iniPath = "../../conf/healthcheck.ini";
-$auth_ini = parse_ini_file($iniPath);
-
-if (array_key_exists('login', $auth_ini) && array_key_exists('password', $auth_ini)) {
-  if (verifyAuthentication($iniPath)) {
-    include 'index.html';
-  } else {
-    unauthorized();
+function unauthorized() {
+  if (!isset($_SERVER['PHP_AUTH_USER'])) {
+    header('WWW-Authenticate: Basic realm="Health Check OBM"');
   }
-} else {
-  header("Location: generatePassword.php");
+  
+  header('HTTP/1.0 401 Unauthorized');
 }
