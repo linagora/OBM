@@ -33,7 +33,9 @@
 $auth_ini = parse_ini_file("../../conf/healthcheck.ini");
 
 if (array_key_exists('login', $auth_ini) && array_key_exists('password', $auth_ini)) {
+  include 'index.html';
   
+  exit();
 }
 
 header("Location: generatePassword.php");
