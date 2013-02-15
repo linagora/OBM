@@ -43,9 +43,40 @@
 	background:#DDD;
 }
 .nav li{
-	margin-left:2px;
+	margin-left:5px;
 }
 .nav button{
 	color:#FFF;
 	text-shadow:0 -1px #777;
+}
+.form-inline{
+	margin:5px 0 0 0;
+}
+
+#password-ok{
+	display: none;
+}
+
+#password-nok{
+	display: none;
+}
+
+#startCheckButton{
+	display: none;
+}
+
+#restartWrapper{
+	display: none;
+}
+
+#pauseCheckButton{
+	display: none;
+}
+
+#resumeWrapper{
+	display: none;
+}
+
+#submitLogin{
+	margin-top:0;	
 }

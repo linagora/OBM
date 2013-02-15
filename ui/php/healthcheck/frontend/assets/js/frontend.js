@@ -25,6 +25,8 @@ $.obm.getModuleTemplate = function(callback) {
 $.obm.getCheckList = function(callback) {
 	$.ajax({
 		url: "/healthcheck/backend/HealthCheck.php/",
+		username : "admin",
+		password : "0000",
 		error: function(jqXhr, errorType) {
 			var status = jqXhr.status;
 			if ( status == 0 || errorType) {
@@ -41,6 +43,33 @@ $.obm.getCheckList = function(callback) {
 		}
 	});
 };
+
+$.obm.checklogin = function(callback) {
+	var md5Login = $("input#login").val();
+	var md5Pass = $("input#password").val();
+
+	var checkList = null;
+
+	$.ajax({
+		url: "/healthcheck/backend/HealthCheck.php/",
+		username : md5Login,
+		password : md5Pass,
+		error: function(jqXhr, errorType) {
+			var status = jqXhr.status;
+			if ( status == 0 || errorType) {
+				status = 500;
+			}
+			callback(status);
+		},
+		success: function(checkList){
+			if ($.isPlainObject(checkList)) {
+				callback(null,checkList);
+			} else {
+				callback(401);
+			}
+		}
+	});
+}
 
 $.obm.bootstrap = function(callback) {
 	var actionDone=0, actionCount=2;
@@ -74,7 +103,10 @@ $.obm.bootstrap = function(callback) {
 $(document).ready( function(){
 	$("#startCheckButton").click( function(){
 		$.obm.hideStartButton(this);
-		$("#introduction").addClass("visibility-hidden");
+		$.obm.displayObject("#pauseCheckButton");
+		$("#introduction").fadeOut('100', function() {
+			$.obm.hideObject("#introduction");
+		});
 		$.obm.bootstrap(
 			function(err, checkList, moduleTemplate) {
 				if ( err ) {
@@ -86,13 +118,32 @@ $(document).ready( function(){
 			}
 		);
 	});
+
 	$("#restartCheckButton").click(function() {
 	  window.location.replace(window.location.pathname+"?autostart=true");
+	});
+
+	$("#submitLogin").click(function() {
+		if( $("#login").val() == '' || $("#password").val() == '') {
+			alert("You don't have login or Password in login form.");
+		} else {
+			$.obm.checklogin( function( err, checkList ){
+				if ( err ) {
+					alert( "Error: " + err );
+					return ;
+				} else {
+					$.obm.hideObject("#loginForm");
+					$.obm.displayObject("#startCheckButton");
+					$("#startCheckButton").click();
+				}
+			});
+		}
 	});
 
 	$("#pauseCheckButton").click(function() {
 		$.obm.togglePauseButton(this);
 	});
+
 	$("#resumeCheckButton").click(function() {
 		$.obm.togglePauseButton($("#pauseCheckButton"));
 	});
@@ -165,7 +216,7 @@ $.obm.callbacks = {
 		},
 		buildEndCallback: function() {
 			return function() {
-				$("#restartCheckButton").removeClass("visibility-hidden");
+				$.obm.displayObject("#restartCheckButton");
 				$("#progress-bar-color").removeClass("progress-striped");
 				$.obm.endColorProgressBar();
 		};
@@ -234,18 +285,26 @@ $.obm.closeModuleContainer = function(id) {
 
 $.obm.hideStartButton = function(startBtn) {
 	if ( $(startBtn).css("display") != "none" ){
-		$(startBtn).css("display","none");
-		$("#restartWrapper").css("display","block");
+		$.obm.hideObject(startBtn);
+		$.obm.displayObject("#restartWrapper");
 	}
 }
 $.obm.togglePauseButton = function(pauseBtn) {
 	if ( $(pauseBtn).css("display") != "none" ){
-		$(pauseBtn).css("display","none");
-		$("#resumeWrapper").css("display","block");
+		$.obm.hideObject(pauseBtn);
+		$.obm.displayObject("#resumeWrapper");
 	} else {
-		$(pauseBtn).css("display","block");
-		$("#resumeWrapper").css("display","none");
+		$.obm.displayObject(pauseBtn);
+		$.obm.hideObject("#resumeWrapper");
 	}
+}
+
+$.obm.displayObject = function(object) {
+	$(object).css("display","block");
+}
+
+$.obm.hideObject = function(object) {
+	$(object).css("display","none");
 }
 
 $.obm.openCheckContainer = function(moduleId, checkId) {

@@ -32,13 +32,26 @@
 
 require 'Service.php';
 
-try {
-  $service = new Service();
-  $result = $service->route($_SERVER["PATH_INFO"]);
+if (!isset($_SERVER['PHP_AUTH_USER'])) {
+    header('WWW-Authenticate: Basic realm="Health Check OBM"');
+    header('HTTP/1.0 401 Unauthorized');
 
-  header('Content-type: application/json');
-  
-  echo $result;
-} catch (Exception $e) {
-  header('HTTP/1.1 400 ' . $e->getMessage());
+    exit;
+} else {
+	$auth_ini = parse_ini_file("../../../conf/healthcheck.ini");
+
+	if( md5($_SERVER['PHP_AUTH_USER']) != md5($auth_ini['login']) || md5($_SERVER['PHP_AUTH_PW']) != md5($auth_ini['password']) ){
+		header('HTTP/1.0 401 Unauthorized');
+	} else {
+		try {
+			$service = new Service();
+			$result = $service->route($_SERVER["PATH_INFO"]);
+
+			header('Content-type: application/json');
+
+			echo $result;
+		} catch (Exception $e) {
+			header('HTTP/1.1 400 ' . $e->getMessage());
+		}
+	}
 }

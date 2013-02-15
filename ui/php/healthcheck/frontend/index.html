@@ -23,11 +23,18 @@ require.config({baseUrl: "assets/js"});
 			<a href="index.html" class="brand">Health Check OBM</a>
 			<div class="nav-collapse collapse">
 				<ul class="nav">
-					<li><button id="startCheckButton" class="btn btn-success"><i class="icon-play"></i> Start</button></li>
-					<li id="restartWrapper" style="display:none;"><button id="restartCheckButton" class="btn btn-success"><i class="icon-refresh"></i> Restart</button></li>
+					<li id="loginForm">
+						<form class="form-inline">
+							<input id="login" type="text" class="input-small" placeholder="Login">
+							<input id="password" type="password" class="input-small" placeholder="Password">
+							<button id="submitLogin" type="submit" class="btn btn-success">ok</button>
+						</form>
+					</li>
+					<li><button id="startCheckButton" class="btn btn-success"><i class="icon-play"></i> Start Tests</button></li>
+					<li id="restartWrapper"><button id="restartCheckButton" class="btn btn-success"><i class="icon-refresh"></i> Restart</button></li>
 					<li><button id="pauseCheckButton" class="btn btn-warning"><i class="icon-pause"></i> Pause</button></li>
-					<li id="resumeWrapper" style="display:none;"><button id="resumeCheckButton" class="btn btn-warning"><i class="icon-play"></i> Resume</button></li>
-					<li style="margin-top:8px;margin-left:10px;">
+					<li id="resumeWrapper"><button id="resumeCheckButton" class="btn btn-warning"><i class="icon-play"></i> Resume</button></li>
+					<li style="margin-top:10px;margin-left:10px;">
 						<span class="badge badge-warning" id="badge-warnings">0</span> <span class="badge badge-important" id="badge-errors">0</span>
 					</li>
 				</ul>
@@ -36,7 +43,6 @@ require.config({baseUrl: "assets/js"});
 			<div id="progress-bar-color" class="progress progress-info progress-striped active healthcheck-bar">
 				<div class="bar" style="width: 0%;" id="progress-bar"></div>
 			</div>
-
 		</div>
 	</div>
 </div>
@@ -59,13 +65,21 @@ require.config({baseUrl: "assets/js"});
 				<li> nothing already installed on your OBM server is required</li>
 			</ul>
 		</p>
-		<h3>How to use it :</h3>
-		<p>
-			First, click on "Start Checking OBM". A list of available checks will be returned and launched automatically. For example, system service status will be tested, access to service will be tested, Database integrity will be checked...and many more. <br/>
-			Most of the time, you will have a success returned. But in case of an error returned, you will have the ability to ignore and continue with others OBM health check or just restart the test. A description of a reason why the error occurs will be displayed to you in order to help you to fix it.
-		</p><p>
-			Just click on "Start" and let the powerful OBM health check guide you !
-		</p>
+		<span id="password-nok" class="alert-danger">
+			<h3>It's your first access to Health Check OBM:</h3>
+			<p>
+				Please complete this form. A health check would be generate.
+			</p>
+		</span>
+		<span id="password-ok">
+			<h3>How to use it :</h3>
+			<p>
+				First, click on "Start Checking OBM". A list of available checks will be returned and launched automatically. For example, system service status will be tested, access to service will be tested, Database integrity will be checked...and many more. <br/>
+				Most of the time, you will have a success returned. But in case of an error returned, you will have the ability to ignore and continue with others OBM health check or just restart the test. A description of a reason why the error occurs will be displayed to you in order to help you to fix it.
+			</p><p>
+				Just click on "Start" and let the powerful OBM health check guide you !
+			</p>
+		</span>
 	</div>
 	<div class="accordion" id="modules-list">
 	</div>
