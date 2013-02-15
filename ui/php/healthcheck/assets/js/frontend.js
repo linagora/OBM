@@ -25,8 +25,6 @@ $.obm.getModuleTemplate = function(callback) {
 $.obm.getCheckList = function(callback) {
 	$.ajax({
 		url: "/healthcheck/backend/HealthCheck.php/",
-		username : "admin",
-		password : "0000",
 		error: function(jqXhr, errorType) {
 			var status = jqXhr.status;
 			if ( status == 0 || errorType) {
@@ -43,33 +41,6 @@ $.obm.getCheckList = function(callback) {
 		}
 	});
 };
-
-$.obm.checklogin = function(callback) {
-	var md5Login = $("input#login").val();
-	var md5Pass = $("input#password").val();
-
-	var checkList = null;
-
-	$.ajax({
-		url: "/healthcheck/backend/HealthCheck.php/",
-		username : md5Login,
-		password : md5Pass,
-		error: function(jqXhr, errorType) {
-			var status = jqXhr.status;
-			if ( status == 0 || errorType) {
-				status = 500;
-			}
-			callback(status);
-		},
-		success: function(checkList){
-			if ($.isPlainObject(checkList)) {
-				callback(null,checkList);
-			} else {
-				callback(401);
-			}
-		}
-	});
-}
 
 $.obm.bootstrap = function(callback) {
 	var actionDone=0, actionCount=2;
@@ -121,23 +92,6 @@ $(document).ready( function(){
 
 	$("#restartCheckButton").click(function() {
 	  window.location.replace(window.location.pathname+"?autostart=true");
-	});
-
-	$("#submitLogin").click(function() {
-		if( $("#login").val() == '' || $("#password").val() == '') {
-			alert("You don't have login or Password in login form.");
-		} else {
-			$.obm.checklogin( function( err, checkList ){
-				if ( err ) {
-					alert( "Error: " + err );
-					return ;
-				} else {
-					$.obm.hideObject("#loginForm");
-					$.obm.displayObject("#startCheckButton");
-					$("#startCheckButton").click();
-				}
-			});
-		}
 	});
 
 	$("#pauseCheckButton").click(function() {
