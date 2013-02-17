@@ -33,7 +33,7 @@
 require 'Service.php';
 require_once '../Authentication.php';
 
-if (verifyAuthentication("../../../conf/healthcheck.ini")) {
+if (Authentication::isConfigured() && Authentication::verify()) {
   try {
     $service = new Service();
     $result = $service->route($_SERVER["PATH_INFO"]);
@@ -45,5 +45,5 @@ if (verifyAuthentication("../../../conf/healthcheck.ini")) {
     header('HTTP/1.1 400 ' . $e->getMessage());
   }
 } else {
-  unauthorized();
+  Authentication::unauthorized();
 }

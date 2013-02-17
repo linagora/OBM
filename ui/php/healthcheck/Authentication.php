@@ -29,17 +29,38 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
- 
-function verifyAuthentication($iniPath) {
-  $auth_ini = parse_ini_file($iniPath);
-  
-  return $_SERVER['PHP_AUTH_USER'] == $auth_ini['login'] && $_SERVER['PHP_AUTH_PW'] == $auth_ini['password'];
-}
 
-function unauthorized() {
-  if (!isset($_SERVER['PHP_AUTH_USER'])) {
-    header('WWW-Authenticate: Basic realm="Health Check OBM"');
+class Authentication {
+  
+  private static function parseFile() {
+    return parse_ini_file(dirname(__FILE__) . "/../../conf/healthcheck.ini", true);
   }
   
-  header('HTTP/1.0 401 Unauthorized');
+  public static function isConfigured() {
+    $ini = self::parseFile();
+    
+    if (array_key_exists('authentication', $ini)) {
+      $auth = $ini['authentication'];
+      
+      return array_key_exists('login', $auth) && array_key_exists('password', $auth);
+    }
+  
+    return false;
+  }
+  
+  public static function verify() {
+    $ini = self::parseFile();
+    $auth = $ini['authentication'];
+    
+    return $_SERVER['PHP_AUTH_USER'] == $auth['login'] && $_SERVER['PHP_AUTH_PW'] == $auth['password'];
+  }
+
+  public static function unauthorized() {
+    if (!isset($_SERVER['PHP_AUTH_USER'])) {
+      header('WWW-Authenticate: Basic realm="OBM Health Check"');
+    }
+    
+    header('HTTP/1.0 401 Unauthorized');
+  }
+  
 }

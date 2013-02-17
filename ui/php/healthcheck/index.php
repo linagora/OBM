@@ -32,14 +32,11 @@
  
 require_once 'Authentication.php';
 
-$iniPath = "../../conf/healthcheck.ini";
-$auth_ini = parse_ini_file($iniPath);
-
-if (array_key_exists('login', $auth_ini) && array_key_exists('password', $auth_ini)) {
-  if (verifyAuthentication($iniPath)) {
+if (Authentication::isConfigured()) {
+  if (Authentication::verify()) {
     include 'index.html';
   } else {
-    unauthorized();
+    Authentication::unauthorized();
   }
 } else {
   header("Location: generatePassword.php");
