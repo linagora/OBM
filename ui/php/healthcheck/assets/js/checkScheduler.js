@@ -31,9 +31,6 @@ define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
       runner.run(function(result) {
         checkCompleteCallback(nextCheck, result);
         endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
-        if ( result.code == 2 ) {
-          return endCallback();
-        }
         runOneCheck();
       });
     };
