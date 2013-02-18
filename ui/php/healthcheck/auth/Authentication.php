@@ -29,15 +29,50 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
- 
-require_once 'auth/Authentication.php';
 
-if (Authentication::isConfigured()) {
-  if (Authentication::verify()) {
-    include 'index.html';
-  } else {
-    Authentication::unauthorized();
+require_once dirname(__FILE__) . '/Sha1Hasher.php';
+
+class Authentication {
+
+  private static $hasher;
+
+  public static function getHasher() {
+    if (!isset(self::$hasher)) {
+      self::$hasher = new Sha1Hasher();
+    }
+
+    return self::$hasher;
   }
-} else {
-  header("Location: generatePassword.php");
+
+  private static function parseFile() {
+    return parse_ini_file(dirname(__FILE__) . "/../../../conf/healthcheck.ini", true);
+  }
+  
+  public static function isConfigured() {
+    $ini = self::parseFile();
+    
+    if (array_key_exists('authentication', $ini)) {
+      $auth = $ini['authentication'];
+      
+      return array_key_exists('login', $auth) && array_key_exists('password', $auth);
+    }
+  
+    return false;
+  }
+  
+  public static function verify() {
+    $ini = self::parseFile();
+    $auth = $ini['authentication'];
+    
+    return $_SERVER['PHP_AUTH_USER'] == $auth['login'] && self::getHasher()->hash($_SERVER['PHP_AUTH_PW']) == $auth['password'];
+  }
+
+  public static function unauthorized() {
+    if (!isset($_SERVER['PHP_AUTH_USER'])) {
+      header('WWW-Authenticate: Basic realm="OBM Health Check"');
+    }
+    
+    header('HTTP/1.0 401 Unauthorized');
+  }
+  
 }

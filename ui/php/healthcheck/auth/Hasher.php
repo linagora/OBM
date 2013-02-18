@@ -29,15 +29,9 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
- 
-require_once 'auth/Authentication.php';
 
-if (Authentication::isConfigured()) {
-  if (Authentication::verify()) {
-    include 'index.html';
-  } else {
-    Authentication::unauthorized();
-  }
-} else {
-  header("Location: generatePassword.php");
+interface Hasher {
+
+	function hash($str);
+
 }

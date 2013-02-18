@@ -31,7 +31,7 @@
 * ***** END LICENSE BLOCK ***** */
 
 require 'Service.php';
-require_once '../Authentication.php';
+require_once '../auth/Authentication.php';
 
 if (Authentication::isConfigured() && Authentication::verify()) {
   try {
