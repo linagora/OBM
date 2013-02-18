@@ -75,8 +75,6 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
@@ -98,6 +96,8 @@ import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;

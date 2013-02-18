@@ -42,10 +42,10 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.DefaultOpushModule;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.OptionsResponse;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 

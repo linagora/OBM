@@ -75,8 +75,6 @@ import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -86,6 +84,8 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;

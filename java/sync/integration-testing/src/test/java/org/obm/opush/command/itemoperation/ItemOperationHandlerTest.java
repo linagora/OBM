@@ -57,14 +57,14 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.ItemOperationFetchResponse;
 import org.obm.sync.push.client.ItemOperationResponse;
 import org.obm.sync.push.client.OPClient;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.Iterables;

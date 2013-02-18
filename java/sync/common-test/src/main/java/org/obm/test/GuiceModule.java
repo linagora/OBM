@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.test;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

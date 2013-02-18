@@ -68,8 +68,8 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;

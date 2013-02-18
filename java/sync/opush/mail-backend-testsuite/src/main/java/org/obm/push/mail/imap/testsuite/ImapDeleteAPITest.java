@@ -52,7 +52,7 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;

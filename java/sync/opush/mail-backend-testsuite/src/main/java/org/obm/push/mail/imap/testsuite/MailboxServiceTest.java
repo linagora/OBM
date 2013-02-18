@@ -62,8 +62,8 @@ import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.utils.DateUtils;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;

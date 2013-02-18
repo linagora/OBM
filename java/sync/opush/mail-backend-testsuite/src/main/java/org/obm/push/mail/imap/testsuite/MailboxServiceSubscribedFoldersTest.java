@@ -50,7 +50,7 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;

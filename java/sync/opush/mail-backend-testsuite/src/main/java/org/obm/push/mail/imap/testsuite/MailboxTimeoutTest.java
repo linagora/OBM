@@ -48,7 +48,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.base.Stopwatch;
 import com.google.inject.Inject;

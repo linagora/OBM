@@ -56,14 +56,14 @@ import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.bean.MoveItemsStatus;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.MoveItemsResponse.MoveResult;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;

@@ -29,12 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.java.mail.testsuite;
+package org.obm.test;
 
-import org.obm.push.java.mail.MailEnvModule;
-import org.obm.test.GuiceModule;
+import org.junit.runners.model.InitializationError;
+import org.obm.filter.SlowFilterRunner;
 
-@GuiceModule(MailEnvModule.class)
-public class MailboxServiceTest extends
-		org.obm.push.mail.imap.testsuite.MailboxServiceTest {
+import com.google.inject.Guice;
+import com.google.inject.Module;
+
+public class SlowGuiceRunner extends SlowFilterRunner {
+	
+	public SlowGuiceRunner(Class<?> klass) throws InitializationError {
+        super(klass);
+	}
+	
+	@Override
+	protected Object createTest() throws Exception {
+	        GuiceModule moduleAnnotation = getTestClass().getJavaClass().getAnnotation(GuiceModule.class);
+	        Class<? extends Module> module = moduleAnnotation.value();
+	        Object testInstance = super.createTest();
+	        Guice.createInjector(module.newInstance()).injectMembers(testInstance);
+	        return testInstance;
+	}
 }

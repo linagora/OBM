@@ -67,9 +67,9 @@ import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.IMimePart;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

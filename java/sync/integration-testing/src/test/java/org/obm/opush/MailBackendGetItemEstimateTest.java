@@ -66,8 +66,6 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
@@ -78,6 +76,8 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;

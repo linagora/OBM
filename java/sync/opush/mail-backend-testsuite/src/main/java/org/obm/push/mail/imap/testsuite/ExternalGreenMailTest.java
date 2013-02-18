@@ -56,8 +56,8 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
-import org.obm.push.mail.imap.GuiceModule;
-import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
