@@ -34,7 +34,7 @@ require_once 'auth/Authentication.php';
 
 if (Authentication::isConfigured()) {
   if (Authentication::verify()) {
-    include 'index.html';
+    include 'frontend.html';
   } else {
     Authentication::unauthorized();
   }
