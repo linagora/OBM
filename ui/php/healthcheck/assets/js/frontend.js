@@ -113,6 +113,7 @@ $(document).ready( function(){
 					return ;
 				}
 				$.obm.addModules(checkList, moduleTemplate);
+				$.obm.bindRetryCheckButton();
 				$.obm.runChecks(checkList);
 			}
 		);
@@ -136,6 +137,30 @@ $(document).ready( function(){
 });
 
 $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
+
+$.obm.bindRetryCheckButton = function(){
+	$(".retryButton").click(function() {
+		$.obm.relaunchCheck( $(this).data('module'), $(this).data('check') );
+	});
+};
+
+$.obm.relaunchCheck = function(moduleId, checkId) {
+	var flatCheck = {moduleId: moduleId, checkId: checkId};
+	var urlBuilder = $.obm.callbacks.buildUrlBuilder();
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+
+	$.obm.removeCheckInBadge(htmlId);
+	$("#"+htmlId+"-info").removeClass('visibility-visible').addClass('visibility-hidden');
+	$.obm.setCheckStatus(moduleId, checkId, "info");
+	$.obm.progressBarRunnning();
+
+	require(["checkRunner"], function(checkRunner) {
+		var runner = new checkRunner(flatCheck, urlBuilder);
+		runner.run(function(result) {
+			$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
+	    });
+	});
+};
 
 $.obm.runChecks = function(checkList) {
 	require(["checkScheduler", "progressBar", "pubsub"], function(checkScheduler, progressBar, pubsub) {
@@ -199,7 +224,6 @@ $.obm.callbacks = {
 		buildEndCallback: function() {
 			return function() {
 				$.obm.displayObject("#restartCheckButton");
-				$("#progress-bar-color").removeClass("progress-striped");
 				$.obm.endColorProgressBar();
 		};
 	}
@@ -214,6 +238,7 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 	checkList.modules.forEach(function(module) {
 		module.checks.forEach(function(check) {
 			check.htmlId = module.id+"-"+check.id;
+			check.referentModule = module.id;
 		});
 	});
 	for( var index in checkList.modules){
@@ -224,37 +249,79 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 
 $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
-		$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
+
 	if (messages) {
 		$.obm.updateBadges(code);
 		if(code > 0) {
 			$.obm.updateProgressBarColor(code);
 		}
-		$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
+		if(messages.length > 0){
+			$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
+			$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
+		}
 	}
+};
+
+$.obm.updateAfterRelaunchCheck = function(moduleId, checkId, code, messages) {
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+
+	$.obm.setCheckStatus(moduleId, checkId, $.obm.codeToStatus[code]);
+	$.obm.displayCheckInfo(moduleId, checkId, code, messages);
+	$.obm.updateModule(htmlId, moduleId);
+	$.obm.endColorProgressBar();
 };
 
 $.obm.updateBadges = function(code) {
 	var badgeName = {"1" : "#badge-warnings", "2" : "#badge-errors" };
+	var value = $(badgeName[code]).text();
 	if (code > 0){
-		var value = $(badgeName[code]).text();
 		value++;
 		$(badgeName[code]).html(value);
 	}
 };
 
+$.obm.removeCheckInBadge = function (htmlId){
+	var errors = $("#badge-errors").text();
+	var warnings = $("#badge-warnings").text();
+
+	if( $("#"+htmlId).hasClass("test-error") && errors > 0 ){
+		errors--;
+		$("#badge-errors").html(errors);
+	} else if( $("#"+htmlId).hasClass("test-warning") && warnings > 0 ){
+		warnings--;
+		$("#badge-warnings").html(warnings);
+	}
+}
+
 $.obm.showModuleContainer = function(id) {
-	$("#"+id+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
+	$.obm.displayObject( $("#"+id+"-header") );
 };
 
 $.obm.showCheckContainer = function(moduleId, checkId) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
-	$("#"+htmlId+"-header").removeClass('visibility-hidden').addClass('visibility-visible');
+	$.obm.displayObject( $("#"+htmlId+"-header") );
 };
+
+$.obm.closeCheckContainer = function(id) {
+	$("#"+id+"-test").removeClass("in");
+}
 
 $.obm.setModuleStatus = function(id, status) {
 	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
+
+$.obm.updateModule = function(htmlId, moduleId){
+	var warnings = $("#"+htmlId+"-header").children().hasClass("test-warning");
+	var errors = $("#"+htmlId+"-header").children().hasClass("test-error");
+
+	if( errors ) {
+		$.obm.setModuleStatus(moduleId, "error");
+	} else if( warnings ) {
+		$.obm.setModuleStatus(moduleId, "warning");
+	} else {
+		$.obm.setModuleStatus(moduleId, "success");
+	}
+}
 
 $.obm.setCheckStatus = function(moduleId, checkId, status) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
@@ -299,9 +366,16 @@ $.obm.updateProgressBarColor = function(code) {
 	$("#progress-bar-color").removeClass("progress-info progress-warning progress-error progress-success").addClass(colorClass);
 }
 
+$.obm.progressBarRunnning = function(){
+	$("#progress-bar-color").addClass("progress-striped");
+	$("#progress-bar-color").removeClass("progress-info progress-warning progress-error progress-success").addClass("progress-info");
+}
+
 $.obm.endColorProgressBar = function() {
 	var errors = $("#badge-errors").text();
 	var warnings = $("#badge-warnings").text();
+
+	$("#progress-bar-color").removeClass("progress-striped");
 
 	if( errors > 0){
 		$.obm.updateProgressBarColor(2);

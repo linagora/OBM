@@ -10,7 +10,7 @@
 	</div>
 	<div id="{{id}}-inner" class="accordion-body collapse in">
 		<div class="accordion-inner">
-			<div class="accordion" id="{{name}}-tests">
+			<div class="accordion" id="{{id}}-tests">
 				{{description}}
 				{{#checks}}
 				<div class="accordion-group visibility-hidden" id="{{htmlId}}-header">
@@ -28,6 +28,9 @@
 						<p>{{description}}</p>
 		  				<p id="{{htmlId}}-info" class="visibility-hidden"></p>
 						<span class="pull-right" id="{{htmlId}}-button">
+							<a class="btn btn-warning btn-small retryButton" type="button" data-module="{{referentModule}}" data-check="{{id}}">
+								Relaunch Test
+							</a>
 							<a class="btn btn-info btn-small" type="button" href="{{url}}">Documentation</a>
 						</span>
 						</div>
