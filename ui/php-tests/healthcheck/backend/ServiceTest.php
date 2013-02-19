@@ -45,25 +45,23 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
     $service->route("/unknown");
   }
   
-  /**
-   * @expectedException InvalidArgumentException
-   */
   public function testRouteWithOnlyModule() {
-    $service = new Service();
+    $service = $this->getMock('Service', array('getModuleChecks'));
+    $service->expects($this->once())->method("getModuleChecks")->with($this->equalTo("php"));
   
     $service->route("/php");
   }
   
   public function testRouteWithNoPathInfo() {
-    $service = $this->getMock('Service', array('getAvailableChecks'));
-    $service->expects($this->once())->method("getAvailableChecks")->with();
+    $service = $this->getMock('Service', array('getAvailableModules'));
+    $service->expects($this->once())->method("getAvailableModules")->with();
   
     $service->route("");
   }
 
   public function testRouteWithEmptyPathInfo() {
-    $service = $this->getMock('Service', array('getAvailableChecks'));
-    $service->expects($this->once())->method("getAvailableChecks")->with();
+    $service = $this->getMock('Service', array('getAvailableModules'));
+    $service->expects($this->once())->method("getAvailableModules")->with();
 
     $service->route("/");
   }
@@ -75,10 +73,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
     $service->route("/database/test");
   }
 
-  public function testGetAvailableChecks() {
+  public function testGetAvailableModules() {
     $service = new Service();
     
-    $this->assertNotNull(json_decode($service->getAvailableChecks()));
+    $this->assertNotNull(json_decode($service->getAvailableModules()));
   }
   
   public function testExecuteCheck() {

@@ -1,0 +1,18 @@
+{
+    "checks": [
+        {
+            "id": "HostInDatabaseStatus",
+            "name": "OBM-Sync Database Definition Check",
+            "description": "Check that the database contains the proper mappings between domains and obm-sync hosts.",
+            "url": "http://obm.org/wiki/getting-started",
+            "parentId": null
+        },
+        {
+            "id": "ConnectionStatus",
+            "name": "OBM-Sync Connection Check",
+            "description": "Check that the obm-sync servers are up and running.",
+            "url": "http://obm.org/wiki/configuration-0",
+            "parentId": null
+        }
+    ]
+}

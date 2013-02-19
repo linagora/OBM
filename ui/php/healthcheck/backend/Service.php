@@ -43,17 +43,31 @@ class Service {
     $module = $pathLength > 0 ? $pathExploded[0] : null;
     
     if (empty($module)) {
-      return $this->getAvailableChecks();
+      return $this->getAvailableModules();
     }
     
-    if ($pathLength < 2) {
-      throw new InvalidArgumentException("Invalid test URL, expecting '/<module>/<test>'");
+    if ($pathLength < 1) {
+      throw new InvalidArgumentException("Invalid URL, expecting '/<module>' or '/<module>/<test>'");
+    }
+
+    if ($pathLength == 1 || empty($pathExploded[1])) {
+      return $this->getModuleChecks($module);
     }
     
     return $this->executeCheck($module, $pathExploded[1]);
   }
+
+  function getModuleChecks($module) {
+    $file = dirname(__FILE__) . "/checks/$module/checks.json";
+
+    if ( !file_exists($file) ) {
+      throw new InvalidArgumentException("Unknown module $module ");
+    }
+
+    return file_get_contents($file);
+  }
   
-  function getAvailableChecks() {
+  function getAvailableModules() {
     return file_get_contents(dirname(__FILE__) . "/modules.json");
   }
   

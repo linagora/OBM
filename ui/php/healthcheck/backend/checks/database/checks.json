@@ -1,0 +1,18 @@
+{
+    "checks": [
+        {
+            "id": "ConnectionStatus",
+            "name": "Database connection Check",
+            "description": "Check that the database system is up and running by opening a connection.",
+            "url": "http://obm.org",
+            "parentId": null
+        },
+        {
+            "id": "DomainExistsStatus",
+            "name": "Domain Presence Check",
+            "description": "Checks that at least one user domain is created in OBM.",
+            "url": "http://obm.org/wiki/getting-started",
+            "parentId": null
+        }
+    ]
+}

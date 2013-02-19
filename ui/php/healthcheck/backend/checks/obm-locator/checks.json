@@ -1,0 +1,11 @@
+{
+    "checks": [
+        {
+            "id": "ConnectionStatus",
+            "name": "OBM-Locator Connection Check",
+            "description": "Check that the obm-locator servers are up and running.",
+            "url": null,
+            "parentId": null
+        }
+    ]
+}

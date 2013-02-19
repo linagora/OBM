@@ -1,0 +1,25 @@
+{
+    "checks": [
+                {
+                    "id": "VersionStatus",
+                    "name": "PHP Version Check",
+                    "description": "Checks the version of PHP.",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
+                },
+                {
+                    "id": "ModulesStatus",
+                    "name": "PHP Modules Check",
+                    "description": "Checks the presence of a number of mandatory modules (PHP-Curl, etc.)",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
+                },
+                {
+                    "id": "ConfigurationStatus",
+                    "name": "PHP Configuration Check",
+                    "description": "Checks PHP configuration for correctness and possible flaws.",
+                    "url": "http://obm.org/wiki/obm-ui",
+                    "parentId": null
+                }
+            ]
+}

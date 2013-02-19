@@ -32,12 +32,40 @@ $.obm.getCheckList = function(callback) {
 			}
 			callback(status);
 		},
-		success: function(checkList){
-			if ($.isPlainObject(checkList)) {
-				callback(null,checkList);
+		success: function(mList){
+			if ($.isPlainObject(mList)) {
+				var count = mList.modules.length;
+
+				mList.modules.forEach(function (module) {
+					$.obm.getChecksByModule(module, function (err) {
+						count--;
+
+						if (err) {
+							callback(err);
+						} else if (count <= 0) {
+							callback(null, mList);
+						}
+					})
+				});
 			} else {
 				callback(500);
 			}
+		}
+	});
+};
+
+$.obm.getChecksByModule = function(module, callback) {
+	$.ajax({
+		url: "/healthcheck/backend/HealthCheck.php/" + module.id,
+		error: function(jqXhr) {
+			callback(jqXhr.status);
+		},
+		success: function(checkList){
+			if ($.isPlainObject(checkList)) {
+				module.checks = checkList.checks;
+			}
+
+			callback(null);
 		}
 	});
 };
