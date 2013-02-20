@@ -52,4 +52,25 @@ public class CommitedOperationDaoJdbcImplTest {
 		Contact contact = commitedOperationDaoJdbcImpl.findAsContact(null, null);
 		assertThat(contact).isNull();
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testCheckClientIdFormatBadLength() {
+		String clientId = "123";
+		CommitedOperationDaoJdbcImpl commitedOperationDaoJdbcImpl = new CommitedOperationDaoJdbcImpl(null, null, null);
+		commitedOperationDaoJdbcImpl.checkClientIdFormat(clientId);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testCheckClientIdFormatNotInBase64() {
+		String clientId = "abcdefghijabcdefghijabcdefghijabcdefghi@";
+		CommitedOperationDaoJdbcImpl commitedOperationDaoJdbcImpl = new CommitedOperationDaoJdbcImpl(null, null, null);
+		commitedOperationDaoJdbcImpl.checkClientIdFormat(clientId);
+	}
+	
+	@Test
+	public void testCheckClientIdFormat() {
+		String clientId = "abcdefghijabcdefghijabcdefghijabcdefghij";
+		CommitedOperationDaoJdbcImpl commitedOperationDaoJdbcImpl = new CommitedOperationDaoJdbcImpl(null, null, null);
+		commitedOperationDaoJdbcImpl.checkClientIdFormat(clientId);
+	}
 }
