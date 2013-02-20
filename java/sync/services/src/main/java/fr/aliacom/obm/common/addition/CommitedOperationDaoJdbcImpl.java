@@ -95,6 +95,10 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 	@Override
 	public Event findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault {
 		
+		if (clientId == null) {
+			return null;
+		}
+		
 		String q = "SELECT e.evententity_event_id FROM CommitedOperation a "
 				+ "INNER JOIN EventEntity e ON a.commitedoperation_entity_id=evententity_entity_id "
 				+ "WHERE commitedoperation_hash_client_id = ? AND commitedoperation_kind = ?";
@@ -129,6 +133,10 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 
 	@Override
 	public Contact findAsContact(AccessToken token, String clientId) throws SQLException {
+		
+		if (clientId == null) {
+			return null;
+		}
 		
 		String q = "SELECT c.contactentity_contact_id FROM CommitedOperation a "
 				+ "INNER JOIN ContactEntity c ON a.commitedoperation_entity_id=contactentity_entity_id "
