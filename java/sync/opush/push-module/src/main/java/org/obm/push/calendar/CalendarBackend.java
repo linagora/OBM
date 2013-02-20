@@ -278,7 +278,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		
 		CollectionPath collectionPath = buildCollectionPath(udr, collection.getCollectionId());
 		AccessToken token = login(udr);
-
+		
+		DataDelta delta = null;
 		ItemSyncState newState = state.newWindowedSyncState(collection.getOptions().getFilterType());
 
 		try {
@@ -294,15 +295,15 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 			
-			DataDelta delta = 
-					buildDataDelta(udr, collection.getCollectionId(), token, changes, newSyncKey);
+			delta = buildDataDelta(udr, collection.getCollectionId(), token, changes, newSyncKey);
 			
 			logger.info("getContentChanges( {}, lastSync = {} ) => {}",
 				new Object[]{collectionPath.backendName(), newState.getSyncDate(), delta.statistics()});
 			
 			return delta;
 		} catch (org.obm.sync.NotAllowedException e) {
-			throw new HierarchyChangedException(e);
+			logger.warn(e.getMessage(), e);
+			return delta;
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {
@@ -404,7 +405,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			
 			return getServerIdFor(collectionId, newEventId);
 		} catch (org.obm.sync.NotAllowedException e) {
-			throw new HierarchyChangedException(e);
+			logger.warn(e.getMessage(), e);
+			throw new ItemNotFoundException(e);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} catch (EventNotFoundException e) {
@@ -551,7 +553,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			} catch (EventNotFoundException e) {
 				throw new ItemNotFoundException(e);
 			} catch (org.obm.sync.NotAllowedException e) {
-				logger.error(e.getMessage(), e);
+				logger.warn(e.getMessage(), e);
+				throw new ItemNotFoundException(e);
 			} finally {
 				logout(token);
 			}
@@ -573,7 +576,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 			return getServerIdFor(collectionId, obmEvent.getObmId());
 		} catch (org.obm.sync.NotAllowedException e) {
-			throw new HierarchyChangedException(e);
+			logger.warn(e.getMessage(), e);
+			throw new ItemNotFoundException(e);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
@@ -671,7 +675,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 					ret.add(ic);
 				}
 			} catch (org.obm.sync.NotAllowedException e) {
-				throw new HierarchyChangedException(e);
+				logger.warn(e.getMessage(), e);
 			} catch (EventNotFoundException e) {
 				logger.error("event from serverId {} not found.", serverId);
 			} catch (ServerFault e1) {
