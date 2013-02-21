@@ -123,14 +123,6 @@ $(document).ready( function(){
 	  window.location.replace(window.location.pathname+"?autostart=true");
 	});
 
-	$("#pauseCheckButton").click(function() {
-		$.obm.togglePauseButton(this);
-	});
-
-	$("#resumeCheckButton").click(function() {
-		$.obm.togglePauseButton($("#pauseCheckButton"));
-	});
-
 	if ( $.getQuery().autostart == "true" ) {
 	  $("#startCheckButton").click();
 	}
@@ -213,9 +205,22 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar, pubsub) {
 	var endCallback = $.obm.callbacks.buildEndCallback();
 	var checkStartCallback = $.obm.callbacks.buildCheckStartCallback();
 	var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
-	var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder());
-	scheduler.runChecks(checkStartCallback, checkCompleteCallback, endCallback);
+	var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder(), checkStartCallback, checkCompleteCallback, endCallback);
+	$.obm.bindAdvancedButton(scheduler);
+	scheduler.runChecks();
 };
+
+$.obm.bindAdvancedButton = function(scheduler, checkStartCallback, checkCompleteCallback, endCallback){
+	$("#pauseCheckButton").click(function() {
+		$.obm.togglePauseButton(this);
+		scheduler.pauseChecks();
+	});
+
+	$("#resumeCheckButton").click(function() {
+		$.obm.togglePauseButton($("#pauseCheckButton"));
+		scheduler.resumeChecks();
+	});
+}
 
 $.obm.callbacks = {
 	buildUrlBuilder: function() {
