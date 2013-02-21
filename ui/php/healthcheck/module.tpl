@@ -27,9 +27,9 @@
 						<div class="accordion-inner">
 						<p>{{description}}</p>
 		  				<p id="{{htmlId}}-info" class="visibility-hidden"></p>
-						<span class="pull-right" id="{{htmlId}}-button">
-							<a class="btn btn-warning btn-small retryButton" type="button" data-module="{{referentModule}}" data-check="{{id}}">
-								Relaunch Test
+						<span class="pull-right spanCheckButton" id="{{htmlId}}-button">
+							<a class="btn btn-warning btn-small retryButton" type="button" data-module="{{referentModule}}" data-check="{{id}}" data-external="{{external}}">
+								Relaunch this Test
 							</a>
 							<a class="btn btn-info btn-small" type="button" href="{{url}}">Documentation</a>
 						</span>

@@ -140,8 +140,18 @@ $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
 
 $.obm.bindRetryCheckButton = function(){
 	$(".retryButton").click(function() {
-		$.obm.relaunchCheck( $(this).data('module'), $(this).data('check') );
+		$.obm.isExternalCheck( $(this).data('module'), $(this).data('check'), $(this).data('external') );
 	});
+};
+
+$.obm.isExternalCheck = function(moduleId, checkId, moduleUrl) {
+	if( checkId == "ExternalAccess" ){
+		if( moduleUrl != ""){
+			$.obm.relaunchExternalCheck( moduleId, checkId, moduleUrl );
+		}
+	} else {
+		$.obm.relaunchCheck( moduleId, checkId );
+	}
 };
 
 $.obm.relaunchCheck = function(moduleId, checkId) {
@@ -156,6 +166,23 @@ $.obm.relaunchCheck = function(moduleId, checkId) {
 
 	require(["checkRunner"], function(checkRunner) {
 		var runner = new checkRunner(flatCheck, urlBuilder);
+		runner.run(function(result) {
+			$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
+	    });
+	});
+};
+
+$.obm.relaunchExternalCheck = function(moduleId, checkId, moduleUrl) {
+	var flatCheck = {moduleId: moduleId, checkId: checkId, moduleUrl: moduleUrl };
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+
+	$.obm.removeCheckInBadge(htmlId);
+	$("#"+htmlId+"-info").removeClass('visibility-visible').addClass('visibility-hidden');
+	$.obm.setCheckStatus(moduleId, checkId, "info");
+	$.obm.progressBarRunnning();
+
+	require(["checkExternal"], function(checkExternal) {
+		var runner = new checkExternal(flatCheck, moduleUrl);
 		runner.run(function(result) {
 			$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
 	    });
@@ -211,14 +238,19 @@ $.obm.callbacks = {
 			$.obm.setCheckStatus(flatCheck.moduleId, flatCheck.checkId, $.obm.codeToStatus[checkResult.code]);
 			$.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
 
-			if ( moduleStatus.status == "error" || moduleStatus.checksCount == moduleStatus.checksDone ) {
+			if( moduleStatus.status == "error"){
 				$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
-					if ( moduleStatus.status == "success" ) {
-						$.obm.closeModuleContainer(flatCheck.moduleId);
-					} else {
-						$.obm.openCheckContainer(flatCheck.moduleId,flatCheck.checkId);
-					}
+				$.obm.openCheckContainer(flatCheck.moduleId, flatCheck.checkId);
+			} else if( moduleStatus.status == "warning" ) {
+				if( !$("#"+flatCheck.moduleId).hasClass("test-error") ){
+					$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
 				}
+				$.obm.openCheckContainer(flatCheck.moduleId, flatCheck.checkId);
+			}
+
+			if ( moduleStatus.checksCount == moduleStatus.checksDone ){
+				$.obm.updateModule( $.obm.htmlId(flatCheck.moduleId, flatCheck.checkId), flatCheck.moduleId, flatCheck.checkId);
+			}
 			};
 		},
 		buildEndCallback: function() {
@@ -236,9 +268,13 @@ $.obm.htmlId = function(moduleId, checkId) {
 $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 	var counter = 0;
 	checkList.modules.forEach(function(module) {
+		if(module.url){
+			$.obm.insertExternalCheck(module);
+		};
 		module.checks.forEach(function(check) {
 			check.htmlId = module.id+"-"+check.id;
 			check.referentModule = module.id;
+			check.external = module.url;
 		});
 	});
 	for( var index in checkList.modules){
@@ -246,6 +282,18 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 		$("#modules-list").append(output);
 	}
 };
+
+$.obm.insertExternalCheck = function(module){
+	module.checks.unshift(
+		{
+			"id": "ExternalAccess",
+			"name": "External Access to " + module.name,
+			"description": "Check access to " + module.name + " module ( " + module.url + " ) from this browser.",
+			"url": "http://obm.org",
+			"parentId": null
+		}
+	);
+}
 
 $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
@@ -257,7 +305,7 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 		}
 		if(messages.length > 0){
 			$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
-			$("#"+htmlId+"-info").html("<strong>Messages:</strong><br/>" + messages.join("<br/>"));
+			$("#"+htmlId+"-info").html( "<strong>Messages:</strong><br/>" + messages.join("<br/>") );
 		}
 	}
 };
@@ -267,7 +315,7 @@ $.obm.updateAfterRelaunchCheck = function(moduleId, checkId, code, messages) {
 
 	$.obm.setCheckStatus(moduleId, checkId, $.obm.codeToStatus[code]);
 	$.obm.displayCheckInfo(moduleId, checkId, code, messages);
-	$.obm.updateModule(htmlId, moduleId);
+	$.obm.updateModule(htmlId, moduleId, checkId);
 	$.obm.endColorProgressBar();
 };
 
@@ -310,9 +358,9 @@ $.obm.setModuleStatus = function(id, status) {
 	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
 
-$.obm.updateModule = function(htmlId, moduleId){
-	var warnings = $("#"+htmlId+"-header").children().hasClass("test-warning");
-	var errors = $("#"+htmlId+"-header").children().hasClass("test-error");
+$.obm.updateModule = function(htmlId, moduleId, checkId){
+	var warnings = $("#"+moduleId+"-header").children().hasClass("test-warning");
+	var errors = $("#"+moduleId+"-header").children().hasClass("test-error");
 
 	if( errors ) {
 		$.obm.setModuleStatus(moduleId, "error");
@@ -320,6 +368,7 @@ $.obm.updateModule = function(htmlId, moduleId){
 		$.obm.setModuleStatus(moduleId, "warning");
 	} else {
 		$.obm.setModuleStatus(moduleId, "success");
+		$.obm.closeModuleContainer(moduleId);
 	}
 }
 

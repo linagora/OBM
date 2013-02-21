@@ -68,3 +68,29 @@
 #submitLogin{
 	margin-top:0;	
 }
+
+.codingMe{
+	font-family: monospace, sans-serif;
+	background-color: #333;
+	color: #FAFAFA;
+	border-radius: 5px;
+}
+
+.spanCheckButton{
+	margin-bottom: 15px;
+}
+
+.accordion-heading a{
+	font-family: Verdana, sans-serif;
+	color:#555;
+	text-decoration:none;
+}
+
+.accordion-heading a:hover{
+	color:#000;
+	text-decoration:none;
+}
+
+.container-fluid{
+	color:#333;
+}

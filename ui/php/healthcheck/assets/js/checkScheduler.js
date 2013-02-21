@@ -1,4 +1,4 @@
-define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
+define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub, checkExternal) {
   var startTopic = pubsub.topic("checkScheduler:start");
   var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
   function checkScheduler ( availableChecks, urlBuilder ) {
@@ -11,7 +11,11 @@ define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
     availableChecks.modules.forEach(function(module) {
       var moduleId = module.id;
       module.checks.forEach(function(check) {
-        flatChecks.push( {moduleId: moduleId, checkId: check.id} );
+        if ( check.id == "ExternalAccess") {
+          flatChecks.push( {moduleId: moduleId, checkId: check.id, moduleUrl: module.url} );
+        } else {
+          flatChecks.push( {moduleId: moduleId, checkId: check.id} );
+        }
       });
     });
     return flatChecks;
@@ -27,7 +31,12 @@ define(["checkRunner", "pubsub"], function(checkRunner, pubsub) {
       }
       var nextCheck = flatChecks.shift();
       checkStartCallback(nextCheck);
-      var runner = new checkRunner(nextCheck, urlBuilder);
+
+      if( nextCheck.moduleUrl ){
+        var runner = new checkExternal(nextCheck);
+      } else {
+        var runner = new checkRunner(nextCheck, urlBuilder);
+      }
       runner.run(function(result) {
         checkCompleteCallback(nextCheck, result);
         endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
