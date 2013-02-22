@@ -226,17 +226,22 @@ $.obm.callbacks = {
 			$.obm.displayCheckInfo(flatCheck.moduleId, flatCheck.checkId, checkResult.code, checkResult.messages);
 
 			if( moduleStatus.status == "error"){
-				$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
+              require(["frontEndModules"], function(frontEndModules) {
+                frontEndModules.module(flatCheck.moduleId).setStatus(moduleStatus.status);
+              });
 				$.obm.openCheckContainer(flatCheck.moduleId, flatCheck.checkId);
 			} else if( moduleStatus.status == "warning" ) {
 				if( !$("#"+flatCheck.moduleId).hasClass("test-error") ){
-					$.obm.setModuleStatus(flatCheck.moduleId, moduleStatus.status);
+                    require(["frontEndModules"], function(frontEndModules) {
+                      frontEndModules.module(flatCheck.moduleId).setStatus(moduleStatus.status);
+                    });
+					
 				}
 				$.obm.openCheckContainer(flatCheck.moduleId, flatCheck.checkId);
 			}
 
 			if ( moduleStatus.checksCount == moduleStatus.checksDone ){
-				$.obm.updateModule( $.obm.htmlId(flatCheck.moduleId, flatCheck.checkId), flatCheck.moduleId, flatCheck.checkId);
+				$.obm.updateModule( flatCheck.moduleId );
 			}
 			};
 		},
@@ -306,7 +311,7 @@ $.obm.updateAfterRelaunchCheck = function(moduleId, checkId, code, messages) {
 
 	$.obm.setCheckStatus(moduleId, checkId, $.obm.codeToStatus[code]);
 	$.obm.displayCheckInfo(moduleId, checkId, code, messages);
-	$.obm.updateModule(htmlId, moduleId, checkId);
+	$.obm.updateModule(moduleId);
 	$.obm.endColorProgressBar();
 };
 
@@ -335,32 +340,16 @@ $.obm.closeCheckContainer = function(id) {
 	$("#"+id+"-test").removeClass("in");
 }
 
-$.obm.setModuleStatus = function(id, status) {
-	$("#"+id).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
-};
-
-$.obm.updateModule = function(htmlId, moduleId, checkId){
-	var warnings = $("#"+moduleId+"-header").children().hasClass("test-warning");
-	var errors = $("#"+moduleId+"-header").children().hasClass("test-error");
-
-	if( errors ) {
-		$.obm.setModuleStatus(moduleId, "error");
-	} else if( warnings ) {
-		$.obm.setModuleStatus(moduleId, "warning");
-	} else {
-		$.obm.setModuleStatus(moduleId, "success");
-		$.obm.closeModuleContainer(moduleId);
-	}
+$.obm.updateModule = function(moduleId){
+  require(["frontEndModules"], function(frontEndModules) {
+    frontEndModules.module(moduleId).updateWidgetFromChecksStatus();
+  });
 }
 
 $.obm.setCheckStatus = function(moduleId, checkId, status) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
 	$("#"+htmlId).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
 };
-
-$.obm.closeModuleContainer = function(id) {
-	$("#"+id+"-inner").removeClass("in");
-}
 
 $.obm.hideStartButton = function(startBtn) {
 	if ( $(startBtn).css("display") != "none" ){
