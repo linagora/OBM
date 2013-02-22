@@ -1,4 +1,4 @@
-define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub, checkExternal) {
+define(["checkRunner", "pubsub", "externalCheckRunner"], function(checkRunner, pubsub, externalCheckRunner) {
   var startTopic = pubsub.topic("checkScheduler:start");
   var endOfCheckTopic = pubsub.topic("checkScheduler:endOfCheck");
   function checkScheduler ( availableChecks, urlBuilder, checkStartCallback, checkCompleteCallback,  endCallback) {
@@ -53,7 +53,7 @@ define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub,
     this.checkStartCallback(nextCheck);
 
     if( nextCheck.moduleUrl ){
-      var runner = new checkExternal(nextCheck);
+      var runner = new externalCheckRunner(nextCheck);
     } else {
       var runner = new checkRunner(nextCheck, this.urlBuilder);
     }

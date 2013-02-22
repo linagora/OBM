@@ -1,10 +1,10 @@
 define(["checkResult"], function(checkResult) {
   
-  function checkExternal ( flatCheck ) {
+  function externalCheckRunner ( flatCheck ) {
     this.flatCheck = flatCheck;
   };
 
-  checkExternal.prototype.run = function(callback) {    
+  externalCheckRunner.prototype.run = function(callback) {    
     $.ajax({
       url: this.flatCheck.moduleUrl,
       type: "GET",
@@ -27,8 +27,8 @@ define(["checkResult"], function(checkResult) {
     });
   };
 
-  checkExternal.prototype.flatCheck = null;
-  checkExternal.prototype.url = null;
+  externalCheckRunner.prototype.flatCheck = null;
+  externalCheckRunner.prototype.url = null;
   
-  return checkExternal;
+  return externalCheckRunner;
 });

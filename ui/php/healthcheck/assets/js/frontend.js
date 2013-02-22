@@ -132,53 +132,35 @@ $.obm.codeToStatus = {0: "success", 1: "warning", 2: "error"};
 
 $.obm.bindRetryCheckButton = function(){
 	$(".retryButton").click(function() {
-		$.obm.isExternalCheck( $(this).data('module'), $(this).data('check'), $(this).data('external') );
+		$.obm.relaunchCheck( $(this).data('module'), $(this).data('check'), $(this).data('external') );
 	});
 };
 
-$.obm.isExternalCheck = function(moduleId, checkId, moduleUrl) {
-	if( checkId == "ExternalAccess" ){
-		if( moduleUrl != ""){
-			$.obm.relaunchExternalCheck( moduleId, checkId, moduleUrl );
-		}
-	} else {
-		$.obm.relaunchCheck( moduleId, checkId );
+$.obm.relaunchCheck = function(moduleId, checkId, moduleUrl) {
+	var flatCheck = ( moduleUrl != "") ? {moduleId: moduleId, checkId: checkId} : {moduleId: moduleId, checkId: checkId, moduleUrl: moduleUrl };
+	var urlBuilder = ( moduleUrl != "") ? "" : $.obm.callbacks.buildUrlBuilder();
+	var htmlId = $.obm.htmlId(moduleId, checkId);
+
+	$.obm.removeCheckInBadge(htmlId);
+	$("#"+htmlId+"-info").removeClass('visibility-visible').addClass('visibility-hidden');
+	$.obm.setCheckStatus(moduleId, checkId, "info");
+	$.obm.progressBarRunnning();
+
+	if( moduleUrl != ""){
+		require(["externalCheckRunner"], function(externalCheckRunner) {
+			var runner = new externalCheckRunner(flatCheck, moduleUrl);
+			runner.run(function(result) {
+				$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
+			});
+		});
+	} else{
+		require(["checkRunner"], function(checkRunner) {
+			var runner = new checkRunner(flatCheck, urlBuilder);
+			runner.run(function(result) {
+				$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
+			});
+		});
 	}
-};
-
-$.obm.relaunchCheck = function(moduleId, checkId) {
-	var flatCheck = {moduleId: moduleId, checkId: checkId};
-	var urlBuilder = $.obm.callbacks.buildUrlBuilder();
-	var htmlId = $.obm.htmlId(moduleId, checkId);
-
-	$.obm.removeCheckInBadge(htmlId);
-	$("#"+htmlId+"-info").removeClass('visibility-visible').addClass('visibility-hidden');
-	$.obm.setCheckStatus(moduleId, checkId, "info");
-	$.obm.progressBarRunnning();
-
-	require(["checkRunner"], function(checkRunner) {
-		var runner = new checkRunner(flatCheck, urlBuilder);
-		runner.run(function(result) {
-			$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
-	    });
-	});
-};
-
-$.obm.relaunchExternalCheck = function(moduleId, checkId, moduleUrl) {
-	var flatCheck = {moduleId: moduleId, checkId: checkId, moduleUrl: moduleUrl };
-	var htmlId = $.obm.htmlId(moduleId, checkId);
-
-	$.obm.removeCheckInBadge(htmlId);
-	$("#"+htmlId+"-info").removeClass('visibility-visible').addClass('visibility-hidden');
-	$.obm.setCheckStatus(moduleId, checkId, "info");
-	$.obm.progressBarRunnning();
-
-	require(["checkExternal"], function(checkExternal) {
-		var runner = new checkExternal(flatCheck, moduleUrl);
-		runner.run(function(result) {
-			$.obm.updateAfterRelaunchCheck(moduleId, checkId, result.code, result.messages);
-	    });
-	});
 };
 
 $.obm.runChecks = function(checkList) {
