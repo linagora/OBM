@@ -1,10 +1,15 @@
 define([], function() {
   
+  var getHtmlId = function(moduleId, checkId) {
+    return moduleId+"-"+checkId;
+  };
+  
   var modules = {};
   
   var frontEndModule = function(id) {
     var widget = $("#"+id+"-header");
     var checksWidgets = widget.children(".accordion-body").children().children().children();
+    
     this.setStatus = function(status) {
       widget.children(".accordion-heading").removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
     };
@@ -25,6 +30,11 @@ define([], function() {
     this.closeContainer = function() {
       $("#"+id+"-inner").removeClass("in");
     };
+    
+    this.setCheckStatus = function(checkId, status) {
+      $("#"+getHtmlId(id, checkId)).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
+    };
+    
   };
   
   
