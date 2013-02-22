@@ -288,7 +288,9 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
 
 	if (messages) {
-		$.obm.updateBadges(code);
+        require(["badges"], function(badges) {
+          badges.increment(code);
+        });
 		if(code > 0) {
 			$.obm.updateProgressBarColor(code);
 		}
@@ -308,26 +310,16 @@ $.obm.updateAfterRelaunchCheck = function(moduleId, checkId, code, messages) {
 	$.obm.endColorProgressBar();
 };
 
-$.obm.updateBadges = function(code) {
-	var badgeName = {"1" : "#badge-warnings", "2" : "#badge-errors" };
-	var value = $(badgeName[code]).text();
-	if (code > 0){
-		value++;
-		$(badgeName[code]).html(value);
-	}
-};
-
 $.obm.removeCheckInBadge = function (htmlId){
-	var errors = $("#badge-errors").text();
-	var warnings = $("#badge-warnings").text();
-
-	if( $("#"+htmlId).hasClass("test-error") && errors > 0 ){
-		errors--;
-		$("#badge-errors").html(errors);
-	} else if( $("#"+htmlId).hasClass("test-warning") && warnings > 0 ){
-		warnings--;
-		$("#badge-warnings").html(warnings);
+  var inError = $("#"+htmlId).hasClass("test-error"),
+      inWarning = $("#"+htmlId).hasClass("test-warning");
+  require(["badges"], function(badges) {
+	if( inError ){
+      badges.decrementError();
+	} else if( inWarning ){
+      badges.decrementWarning();
 	}
+  });
 }
 
 $.obm.showModuleContainer = function(id) {
