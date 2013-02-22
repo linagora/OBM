@@ -2549,6 +2549,16 @@ $mobile_devices
 }
 
 
+function create_hidden_input($name, $value) {
+  $patterns = array('"','<','>');
+  $replacements = array("&quot;","&lt;","&gt;");
+  return "<input type=\"hidden\" name=\""
+        .str_replace($patterns,$replacements,$name)
+        ."\" value=\""
+        .str_replace($patterns,$replacements,$value)
+        ."\" />\n";
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the context about a user insertion or update
 // When similar users exists we show these and ask confirmation
@@ -2562,72 +2572,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   global $l_check_sameuser, $l_confirm, $l_back;
   global $display, $c_yes, $c_no;
 
-  // infos
-  $login = $user['login'];
-  $passwd = $user['passwd'];
-  $profile = $user['profile'];
-  $hidden = $user['hidden'];
-  $kind = $user['kind'];
-  $lname = $user['lastname'];
-  $fname = $user['firstname'];
-  $title = $user['title'];
-  $datebegin = $user['datebegin'];
-  $dateexp = $user['dateexp'];
-  $email = $user['email'];
-  $desc = $user['desc'];
-  $archive = $user['archive'];
-  $domain_id = $user['domain_id'];
-  $delegation = $user['delegation'];
-  $delegation_target = $user['delegation_target'];
-
-  // coord
-  $phone = $user['phone'];
-  $phone2 = $user['phone2'];
-  $mobile = $user['mobile'];
-  $fax = $user['fax'];
-  $fax2 = $user['fax2'];
-  $company = $user['company'];
-  $direction = $user['direction'];
-  $service = $user['service'];
-  $ad1 = $user['ad1'];
-  $ad2 = $user['ad2'];
-  $ad3 = $user['ad3'];
-  $zip = $user['zip'];
-  $town = $user['town'];
-  $cdx = $user['cdx'];
-  $country = $user['country'];
-
-  // web
-  $host_name = $user['host_name'];
-  $host_id = $user['host_id'];
-  $web_perms = $user['web_perms'];
-  $web_list = $user['web_list'];
-  $web_all = $user['web_all'];
-
-  // mail
-  $mail_perms = $user['mail_perms'];
-  $mail_ext_perms = $user['mail_ext_perms'];
-  $mail_server_id = $user['mail_server_id'];
-  $mail_quota = $user['mail_quota'];
-
-  // mail nomad
-  $nomade_perms = $user['nomade_perms'];
-  $nomade_enable = $user['nomade_enable'];
-  $nomade_local_copy = $user['nomade_local_copy'];
-  $nomad_email = $user['email_nomade'];
-
-  // vacation
-  $vacation_enable = $user['vacation_enable'];
-  $vacation_message = $user['vacation_message'];
-  $vacation_datebegin = $user['vacation_datebegin'];
-  $vacation_dateend = $user['vacation_dateend'];
-  
-  // samba
-  $smb_perms = $user['smb_perms'];
-  $smb_home = $user['smb_home'];
-  $smb_home_drive = $user['smb_home_drive'];
-  $smb_logon = $user['smb_logon'];
-
   $display['msg'] .= display_warn_msg($l_check_sameuser);
   while ($usr_q->next_record()) {
     $id = $usr_q->f('userobm_id');
@@ -2638,66 +2582,22 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
         </li>";
   }
 
-  $hidden_fields = "
-  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
-  <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
-  <input type=\"hidden\" name=\"sel_profile\" value=\"$profile\" />
-  <input type=\"hidden\" name=\"tf_kind\" value=\"$kind\" />
-  <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
-  <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
-  <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
-  <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
-  <input type=\"hidden\" name=\"tf_dateexp\" value=\"$dateexp\" />
-  <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-  <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
-  <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
-  <input type=\"hidden\" name=\"cba_hidden\" value=\"$hidden\" />
-  <input type=\"hidden\" name=\"sel_domain_id\" value=\"$domain_id\" />
-  <input type=\"hidden\" name=\"delegation\" value=\"$delegation\" />
-  <input type=\"hidden\" name=\"delegation_target\" value=\"$delegation_target\" />
-
-  <input type=\"hidden\" name=\"phone\" value=\"$phone\" />
-  <input type=\"hidden\" name=\"phone2\" value=\"$phone2\" />
-  <input type=\"hidden\" name=\"mobile\" value=\"$mobile\" />
-  <input type=\"hidden\" name=\"fax\" value=\"$fax\" />
-  <input type=\"hidden\" name=\"fax2\" value=\"$fax2\" />
-  <input type=\"hidden\" name=\"company\" value=\"$company\" />
-  <input type=\"hidden\" name=\"direction\" value=\"$direction\" />
-  <input type=\"hidden\" name=\"service\" value=\"$service\" />
-  <input type=\"hidden\" name=\"ad1\" value=\"$ad1\" />
-  <input type=\"hidden\" name=\"ad2\" value=\"$ad2\" />
-  <input type=\"hidden\" name=\"ad3\" value=\"$ad3\" />
-  <input type=\"hidden\" name=\"zip\" value=\"$zip\" />
-  <input type=\"hidden\" name=\"town\" value=\"$town\" />
-  <input type=\"hidden\" name=\"cdx\" value=\"$cdx\" />
-  <input type=\"hidden\" name=\"country\" value=\"$country\" />
-
-  <input type=\"hidden\" name=\"host_name\" value=\"$host_name\" />
-  <input type=\"hidden\" name=\"host_id\" value=\"$host_id\" />
-  <input type=\"hidden\" name=\"web_perms\" value=\"$web_perms\" />
-  <input type=\"hidden\" name=\"web_list\" value=\"$web_list\" />
-  <input type=\"hidden\" name=\"web_all\" value=\"$web_all\" />
-
-  <input type=\"hidden\" name=\"mail_perms\" value=\"$mail_perms\" />
-  <input type=\"hidden\" name=\"mail_ext_perms\" value=\"$mail_ext_perms\" />
-  <input type=\"hidden\" name=\"mail_server_id\" value=\"$mail_server_id\" />
-  <input type=\"hidden\" name=\"mail_quota\" value=\"$mail_quota\" />
-
-  <input type=\"hidden\" name=\"nomade_perms\" value=\"$nomade_perms\" />
-  <input type=\"hidden\" name=\"nomade_enable\" value=\"$nomade_enable\" />
-  <input type=\"hidden\" name=\"nomade_local_copy\" value=\"$nomade_local_copy\" />
-  <input type=\"hidden\" name=\"email_nomade\" value=\"$nomad_email\" />
-
-  <input type=\"hidden\" name=\"vacation_enable\" value=\"$vacation_enable\" />
-  <input type=\"hidden\" name=\"vacation_message\" value=\"$vacation_message\" />
-  <input type=\"hidden\" name=\"vacation_datebegin\" value=\"$vacation_datebegin\" />
-  <input type=\"hidden\" name=\"vacation_dateend\" value=\"$vacation_dateend\" />
-
-  <input type=\"hidden\" name=\"smb_perms\" value=\"$smb_perms\" />
-  <input type=\"hidden\" name=\"smb_home\" value=\"$smb_home\" />
-  <input type=\"hidden\" name=\"smb_home_drive\" value=\"$smb_home_drive\" />
-  <input type=\"hidden\" name=\"smb_logon\" value=\"$smb_logon\" />
-";
+  $hidden_fields = "";
+  foreach ( $_POST as $form_key => $form_value) {
+    if ( $form_key != "action" ) {
+      if ( is_array($form_value) ) {
+        $form_key.="[]";
+        if ( !count($form_value) ) {
+          $form_value[] = "";
+        }
+        foreach ( $form_value as $form_array_value ) {
+          $hidden_fields.= create_hidden_input($form_key, $form_array_value);
+        }
+      } else {
+        $hidden_fields.= create_hidden_input($form_key, $form_value);
+      }
+    }
+  }
 
   $block = "
   <div class=\"detail\">
