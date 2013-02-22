@@ -137,7 +137,7 @@ $.obm.bindRetryCheckButton = function(){
 };
 
 $.obm.relaunchCheck = function(moduleId, checkId, moduleUrl) {
-	var flatCheck = ( moduleUrl != "") ? {moduleId: moduleId, checkId: checkId} : {moduleId: moduleId, checkId: checkId, moduleUrl: moduleUrl };
+	var flatCheck = ( moduleUrl != "") ? {moduleId: moduleId, checkId: checkId, moduleUrl: moduleUrl} : {moduleId: moduleId, checkId: checkId };
 	var urlBuilder = ( moduleUrl != "") ? "" : $.obm.callbacks.buildUrlBuilder();
 	var htmlId = $.obm.htmlId(moduleId, checkId);
 
@@ -243,7 +243,9 @@ $.obm.callbacks = {
 		buildEndCallback: function() {
 			return function() {
 				$.obm.displayObject("#restartCheckButton");
+				$.obm.hideObject("#pauseCheckButton");
 				$.obm.endColorProgressBar();
+
 		};
 	}
 };
