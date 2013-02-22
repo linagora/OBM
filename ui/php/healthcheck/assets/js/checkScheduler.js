@@ -5,7 +5,7 @@ define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub,
     this.availableChecks = availableChecks;
     this.urlBuilder = urlBuilder;
     this.flatChecks = this.flattenChecks(availableChecks);
-    this.pauseStatusChecks = false;
+    this.isPaused = false;
     this.checkStartCallback = checkStartCallback;
     this.checkCompleteCallback = checkCompleteCallback;
     this.endCallback = endCallback;
@@ -37,11 +37,11 @@ define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub,
   };
 
   checkScheduler.prototype.pauseChecks = function() {
-    this.pauseStatusChecks = true;
+    this.isPaused = true;
   };
 
   checkScheduler.prototype.resumeChecks = function() {
-    this.pauseStatusChecks = false;
+    this.isPaused = false;
     this.runOneCheck(this.flatChecks);
   };
 
@@ -62,7 +62,7 @@ define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub,
     runner.run(function(result) {
       self.checkCompleteCallback(nextCheck, result);
       endOfCheckTopic.publish({module: nextCheck.moduleId, check: nextCheck.checkId, result: result});
-      if ( !self.pauseStatusChecks ){
+      if ( !self.isPaused ){
         self.runOneCheck(self.flatChecks);
       }
     });
@@ -71,6 +71,10 @@ define(["checkRunner", "pubsub", "checkExternal"], function(checkRunner, pubsub,
   checkScheduler.prototype.availableChecks = null;
   checkScheduler.prototype.urlBuilder = null;
   checkScheduler.prototype.flatChecks = null;
+  checkScheduler.prototype.isPaused =false
+  checkScheduler.prototype.checkStartCallback = null;
+  checkScheduler.prototype.checkCompleteCallback = null;
+  checkScheduler.prototype.endCallback = null;
   
   return checkScheduler;
 });

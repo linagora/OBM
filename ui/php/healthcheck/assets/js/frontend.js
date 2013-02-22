@@ -206,11 +206,11 @@ $.obm.realRunChecks = function(checkList, checkScheduler, progressBar, pubsub) {
 	var checkStartCallback = $.obm.callbacks.buildCheckStartCallback();
 	var checkCompleteCallback = $.obm.callbacks.buildCheckCompleteCallback(modulesStatus);
 	var scheduler = new checkScheduler(checkList, $.obm.callbacks.buildUrlBuilder(), checkStartCallback, checkCompleteCallback, endCallback);
-	$.obm.bindAdvancedButton(scheduler);
+	$.obm.bindPauseResumeButton(scheduler);
 	scheduler.runChecks();
 };
 
-$.obm.bindAdvancedButton = function(scheduler, checkStartCallback, checkCompleteCallback, endCallback){
+$.obm.bindPauseResumeButton = function(scheduler){
 	$("#pauseCheckButton").click(function() {
 		$.obm.togglePauseButton(this);
 		scheduler.pauseChecks();
