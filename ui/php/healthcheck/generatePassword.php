@@ -74,7 +74,9 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 			},
 			success: function(response){
 				$("#configurationFile").addClass("showConfig");
-				$("#configurationFile").html(response);
+				$("#configurationFile")
+					.html("; content of the /etc/obm/healthcheck.ini file<BR>")
+					.append(response);
 			}
 		});
 	};
@@ -129,9 +131,11 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 		</h2>
 		<h3>It's your first access to Health Check OBM:</h3>
 		<p>
-			To use OBM healthcheck you need a <strong>unique user and password</strong> in a configuration file <strong>heathcheck.ini</strong> in <strong>/etc/obm</strong> you <strong>must be created</strong>. <br/><br/>
-			So please complete this form to generate your login and hashed password to paste in <strong>heathcheck.ini</strong>.
+			To use OBM healthcheck you need a <strong>unique user and password</strong> in a configuration file. <br/><br/>
+			So please complete this form to generate your login and hashed password and paste the result in a file <strong>/etc/obm/heathcheck.ini</strong> on your Apache web server.
 		</p>
+		<p>
+			When you're done, <a href="index.php" class="btn">Click here to access the healthcheck</a>.
 	</div>
 
 	<div class="span3 alert alert-info">
@@ -139,8 +143,8 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 		<form id="formSubmit" class="form">
 			<fieldset class="pull-right">
 				<input id="login" type="text" class="input" placeholder="Login">
-				<input id="password" type="text" class="input" placeholder="Password">
-				<input id="passwordConfirm" type="text" class="input" placeholder="Verify Password"><span id="validator">&times;</span>
+				<input id="password" type="password" class="input" placeholder="Password">
+				<input id="passwordConfirm" type="password" class="input" placeholder="Verify Password"><span id="validator">&times;</span>
 				<br/>
 				<button id="submitFormButton" type="submit" class="btn">Hash my password</button>
 			</fieldset>
