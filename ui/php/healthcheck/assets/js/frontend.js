@@ -102,9 +102,9 @@ $.obm.bootstrap = function(callback) {
 $(document).ready( function(){
 	$("#startCheckButton").click( function(){
 		$.obm.hideStartButton(this);
-		$.obm.displayObject("#pauseCheckButton");
+		$("#pauseCheckButton").show();
 		$("#introduction").fadeOut('100', function() {
-			$.obm.hideObject("#introduction");
+			$("#introduction").hide();
 		});
 		$.obm.bootstrap(
 			function(err, checkList, moduleTemplate) {
@@ -242,8 +242,8 @@ $.obm.callbacks = {
 		},
 		buildEndCallback: function() {
 			return function() {
-				$.obm.displayObject("#restartCheckButton");
-				$.obm.hideObject("#pauseCheckButton");
+				$("#pauseCheckButton").hide();
+				$("#restartCheckButton").show();
 				$.obm.endColorProgressBar();
 
 		};
@@ -331,12 +331,12 @@ $.obm.removeCheckInBadge = function (htmlId){
 }
 
 $.obm.showModuleContainer = function(id) {
-	$.obm.displayObject( $("#"+id+"-header") );
+	$("#"+id+"-header").show();
 };
 
 $.obm.showCheckContainer = function(moduleId, checkId) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
-	$.obm.displayObject( $("#"+htmlId+"-header") );
+	$("#"+htmlId+"-header").show();
 };
 
 $.obm.closeCheckContainer = function(id) {
@@ -372,26 +372,18 @@ $.obm.closeModuleContainer = function(id) {
 
 $.obm.hideStartButton = function(startBtn) {
 	if ( $(startBtn).css("display") != "none" ){
-		$.obm.hideObject(startBtn);
-		$.obm.displayObject("#restartWrapper");
+		$(startBtn).hide();
+		$("#restartWrapper").show();
 	}
 }
 $.obm.togglePauseButton = function(pauseBtn) {
 	if ( $(pauseBtn).css("display") != "none" ){
-		$.obm.hideObject(pauseBtn);
-		$.obm.displayObject("#resumeWrapper");
+		$(pauseBtn).hide();
+		$("#resumeWrapper").show();
 	} else {
-		$.obm.displayObject(pauseBtn);
-		$.obm.hideObject("#resumeWrapper");
+		pauseBtn.show();
+		$("#resumeWrapper").hide();
 	}
-}
-
-$.obm.displayObject = function(object) {
-	$(object).css("display","block");
-}
-
-$.obm.hideObject = function(object) {
-	$(object).css("display","none");
 }
 
 $.obm.openCheckContainer = function(moduleId, checkId) {
