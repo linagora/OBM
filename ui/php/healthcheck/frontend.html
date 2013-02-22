@@ -19,15 +19,15 @@ require.config({baseUrl: "assets/js"});
 
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
-		<div class="container-fluid">
-			<a href="index.php" class="brand">Health Check OBM</a>
+		<div class="container-fluid fluid-navbar">
+			<a href="index.php" class="brand"><img src="assets/img/logo_obm_org.png" alt="OBM" class="OBMLogo"/>Health Check</a>
 			<div class="nav-collapse collapse">
 				<ul class="nav">
 					<li><button id="startCheckButton" class="btn btn-success"><i class="icon-play"></i> Start Tests</button></li>
 					<li id="restartWrapper"><button id="restartCheckButton" class="btn btn-success"><i class="icon-refresh"></i> Restart</button></li>
 					<li><button id="pauseCheckButton" class="btn btn-warning"><i class="icon-pause"></i> Pause</button></li>
 					<li id="resumeWrapper"><button id="resumeCheckButton" class="btn btn-warning"><i class="icon-play"></i> Resume</button></li>
-					<li style="margin-top:10px;margin-left:10px;">
+					<li class="badgesLi">
 						<span class="badge badge-warning" id="badge-warnings">0</span> <span class="badge badge-important" id="badge-errors">0</span>
 					</li>
 				</ul>
@@ -39,7 +39,9 @@ require.config({baseUrl: "assets/js"});
 		</div>
 	</div>
 </div>
-<div class="container-fluid" style="margin-top:50px">
+<div class="container-fluid mainContainer">
+	<div class="accordion" id="modules-list">
+	</div>
 	<div class="alert alert-info" id="introduction">
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
 		<h2>
@@ -65,8 +67,6 @@ require.config({baseUrl: "assets/js"});
 		</p><p>
 			Just click on "Start" and let the powerful OBM health check guide you !
 		</p>
-	</div>
-	<div class="accordion" id="modules-list">
 	</div>
 </div>
 </body>

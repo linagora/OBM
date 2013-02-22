@@ -1,3 +1,31 @@
+body{
+	background-color: #FAFAFA;
+	background: url("../img/pattern.png") top left repeat;
+}
+.accordion{
+	background-color: #FAFAFA;
+}
+
+.OBMLogo{
+	width:110px;
+	text-align: center;
+	position: absolute;
+	top:-3px;
+	left:0;
+	line-height: 45px;
+}
+
+.fluid-navbar{
+	margin-left:95px;
+}
+.mainContainer{
+	margin-top:65px;
+}
+
+.badgesLi{
+	margin-top:9px;
+}
+
 .test-success{
 	background-color:#DFF0D8;
 }
