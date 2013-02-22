@@ -347,8 +347,9 @@ $.obm.updateModule = function(moduleId){
 }
 
 $.obm.setCheckStatus = function(moduleId, checkId, status) {
-	var htmlId = $.obm.htmlId(moduleId, checkId);
-	$("#"+htmlId).removeClass("test-info test-warning test-error test-success").addClass("test-"+status);
+  require(["frontEndModules"], function(frontEndModules) {
+    frontEndModules.module(moduleId).setCheckStatus(checkId, status);
+  });
 };
 
 $.obm.hideStartButton = function(startBtn) {
