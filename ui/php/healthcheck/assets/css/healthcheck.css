@@ -18,12 +18,26 @@ body{
 .fluid-navbar{
 	margin-left:95px;
 }
-.mainContainer{
+
+@media screen and (min-width: 980px) {
+  .mainContainer{
 	margin-top:65px;
+  }
 }
+
+@media screen and (max-width: 360px) {
+  .accordion-toggle {
+    overflow: hidden;
+  }
+}
+
 
 .badgesLi{
 	margin-top:9px;
+}
+
+.badge{
+	padding:4px 6px 4px 6px;
 }
 
 .test-success{
