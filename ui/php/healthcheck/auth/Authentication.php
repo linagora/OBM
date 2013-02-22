@@ -45,7 +45,11 @@ class Authentication {
   }
 
   private static function parseFile() {
-    return parse_ini_file(dirname(__FILE__) . "/../../../conf/healthcheck.ini", true);
+    $iniFile = dirname(__FILE__) . "/../../../conf/healthcheck.ini";
+    if ( !is_file($iniFile) ) {
+      return array();
+    }
+    return parse_ini_file($iniFile, true);
   }
   
   public static function isConfigured() {
