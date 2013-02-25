@@ -504,9 +504,10 @@ Obm.UserPattern.Form = new Class ({
           var field = this.fields[attr];
           if (field && ((!field.changed()) || (field.empty()))) {
             if (attr == 'login' ) {
-              attributes[attr] = attributes[attr].replace(/(\s+)/g,'-');
+              field.setValue(attributes[attr].replace(/(\s+)/g,'-'));
+            } else {
+              field.setValue(attributes[attr]);
             }
-            field.setValue(attributes[attr].trim());
           } 
       }
       /* mail block specific */
