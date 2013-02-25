@@ -506,7 +506,11 @@ Obm.UserPattern.Form = new Class ({
             if (attr == 'login' ) {
               field.setValue(attributes[attr].replace(/(\s+)/g,'-'));
             } else {
-              field.setValue(attributes[attr]);
+              var attribute = attributes[attr];
+              if ( typeof attribute === 'string' ) {
+                attribute = attribute.trim();
+              }
+              field.setValue(attribute);
             }
           } 
       }
