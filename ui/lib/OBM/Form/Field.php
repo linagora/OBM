@@ -192,11 +192,11 @@ class OBM_Form_Field extends Stato_Webflow_Forms_Form {
   }
 
 
-  public function buildQuery($params = array()) {
+  public function buildQuery($params = array(), $obm_q = null) {
     if (is_array($this->fields)) {
       foreach($this->fields as $field => $options) {
         $fieldname = $this->buildFieldName($field);
-        $value = $params[$fieldname];
+        $value = $obm_q ? $obm_q->escape($params[$fieldname]) : $params[$fieldname];
         if (!empty($value)) { 
           $join .= " LEFT JOIN field custom$field ON custom$field.entity_id=userentity_entity_id";
           $where .= " AND (custom$field.value #LIKE '$value%' AND custom$field.field='$field')";

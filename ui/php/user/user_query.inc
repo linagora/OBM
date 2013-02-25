@@ -55,38 +55,40 @@ require_once($obminclude . '/of/of_session.inc');
 function run_query_user_search($user, $strongest_profile_level=null, $user_can_manage_peers=null) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
+  
+  $obm_q = new DB_OBM;
 
   $sql_order_dir = $user['sql_order_dir'];
   $sql_order_field = $user['sql_order_field'];
 
   $filter_entity = $user['filter_entity'];
   $filter_pattern = $user['filter_pattern'];
-  $login = sql_search_text_parse($user['login']);
   $profile = $user['profile'];
   $domain_id = $user['domain_id'];
-  $cname = sql_search_text_parse($user['commonname']);
-  $lname = sql_search_text_parse($user['lastname']);
-  $fname = sql_search_text_parse($user['firstname']);
+  
+  $login = sql_search_text_parse($obm_q->escape($user['login']));
+  $cname = sql_search_text_parse($obm_q->escape($user['commonname']));
+  $lname = sql_search_text_parse($obm_q->escape($user['lastname']));
+  $fname = sql_search_text_parse($obm_q->escape($user['firstname']));
   $delegation = sql_search_text_parse($user['delegation']);
-  $email = sql_search_text_parse($user['email']);
-  $desc = sql_search_text_parse($user['desc']);
-  $group = sql_search_text_parse($user['group']);
+  $email = sql_search_text_parse($obm_q->escape($user['email']));
+  $desc = sql_search_text_parse($obm_q->escape($user['desc']));
+  $group = sql_search_text_parse($obm_q->escape($user['group']));
   $archive = $user['archive'];
-  $nomade = $user['nomade'];
-  $phone = $user['phone'];
-  $fax = $user['fax'];
+  $nomade = $obm_q->escape($user['nomade']);
+  $phone = $obm_q->escape($user['phone']);
+  $fax = $obm_q->escape($user['fax']);
   $exp = $user['exp'];
   $exp_op = $user['exp_op'];
   $delegation_target = $user['delegation_target'];
-  $quota = $user['quota'];
-  $quota_op = $user['quota_op'];
-  $mail_server_host_name = $user['host_name'];
+  $quota = $obm_q->escape($user['quota']);
+  $quota_op = $obm_q->escape($user['quota_op']);
+  $mail_server_host_name = $obm_q->escape($user['host_name']);
   $date_begin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : '');
-  $title = $user['title'];
-  $direction = $user['direction'];
-  $service = $user['service'];
+  $title = $obm_q->escape($user['title']);
+  $direction = $obm_q->escape($user['direction']);
+  $service = $obm_q->escape($user['service']);
 
-  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
@@ -331,7 +333,7 @@ function run_query_user_search($user, $strongest_profile_level=null, $user_can_m
 
   // User custom fields
   $customFields = new OBM_Form_Field('user');
-  $custom = $customFields->buildQuery($user);
+  $custom = $customFields->buildQuery($user, $obm_q);
   if ($custom != '') {
     $where .= $custom['where'];
     $join_custom = $custom['join'];
