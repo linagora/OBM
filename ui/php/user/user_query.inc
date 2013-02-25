@@ -1007,6 +1007,9 @@ function run_query_user_update($u_id, $user) {
   // Delegation handling
   $q_delegation = of_delegation_query_update_clause('userobm_delegation', $user['delegation']);
 
+  // Update group create by user Delegation
+  update_private_groups_delegation($u_id, $user['delegation']);
+
   // Coord
   $phone = $user['phone'];
   $phone2 = $user['phone2'];
@@ -3119,6 +3122,17 @@ function check_user_can_backup($user_id) {
   $obm_q->query($query);
 
   return ($obm_q->num_rows()==1);
+}
+
+function update_private_groups_delegation($userid, $delegation){
+  // Delegation handling
+  $q_delegation = of_delegation_query_update_clause('group_delegation', stripslashes($delegation));
+
+  $query = "UPDATE UGroup SET group_timeupdate=NOW() $q_delegation WHERE group_usercreate='$userid' AND group_privacy='1'";
+
+  display_debug_msg($query, $cdg_sql, 'update_private_groups_delegation()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
 }
 
 ?>
