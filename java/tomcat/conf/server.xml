@@ -10,7 +10,7 @@
 
   <Service name="Catalina">
     
-    <Connector port="8080" maxHttpHeaderSize="8192"
+    <Connector port="8080" maxHttpHeaderSize="8192" maxPostSize="10485760"
 	       protocol="org.apache.coyote.http11.Http11NioProtocol"
 	       URIEncoding="UTF-8"
 	       maxThreads="400"
