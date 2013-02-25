@@ -716,7 +716,8 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     extension: null,                  // obm needs
     resultValue: null,		// obm needs
     name: null,
-    noresult: false
+    noresult: false,
+    strict: false
   },
   
   initialize: function(getUrlFunc, selectedBox, inputField, options) {
