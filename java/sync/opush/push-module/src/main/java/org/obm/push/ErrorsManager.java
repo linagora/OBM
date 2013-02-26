@@ -91,7 +91,7 @@ public class ErrorsManager implements IErrorsManager {
 	public void sendMailHandlerError(UserDataRequest udr, byte[] errorMail, Throwable error) {
 		String subject = "OPUSH - Error lors de l'envoi de mail";
 		StringBuilder body = new StringBuilder();
-		body.append("Le mail en pièce jointe n'a pas pu être envoyé. Si ce problème ce reproduit veuillez contacter votre administrateur\r\n\r\n");
+		body.append("Le mail en pièce jointe n'a pas pu être envoyé. Si ce problème se reproduit veuillez contacter votre administrateur\r\n\r\n");
 		body.append("Source de l'erreur: \r\n");
 		body.append(error.toString());
 		body.append("\r\n");
