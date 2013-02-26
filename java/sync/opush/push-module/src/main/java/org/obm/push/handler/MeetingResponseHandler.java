@@ -65,6 +65,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -199,10 +200,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		return calendarBackend.handleMeetingResponse(udr, email, userResponse);
 	}
 
-	private void deleteInvitationEmail(UserDataRequest udr, MeetingResponse item) {
+	@VisibleForTesting void deleteInvitationEmail(UserDataRequest udr, MeetingResponse item) {
 
 		try {
-			contentsImporter.importMessageDeletion(udr, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), false);
+			contentsImporter.importMessageDeletion(udr, PIMDataType.EMAIL, item.getCollectionId(), item.getReqId(), true);
 		} catch (ItemNotFoundException e) {
 			logger.warn(e.getMessage(), e);
 		} catch (UnexpectedObmSyncServerException e) {
