@@ -29,20 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.protocol.data;
 
-import org.obm.push.bean.Sync;
+public class MissingRequestParameterException extends Exception {
 
-public class PartialSyncRequest {
-
-	private final Sync sync;
-	
-	public PartialSyncRequest(Sync sync) {
-		this.sync = sync;
-	}
-	
-	public Sync getSync() {
-		return sync;
-	}
-	
 }

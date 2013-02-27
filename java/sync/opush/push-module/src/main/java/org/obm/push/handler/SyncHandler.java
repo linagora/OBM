@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.ContinuationService;
@@ -45,14 +45,16 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.Sync;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -86,7 +88,6 @@ import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
-import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DateService;
@@ -100,6 +101,8 @@ import org.w3c.dom.Document;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -203,20 +206,19 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		responder.sendWBXMLResponse("AirSync", document);
 	}
 	
-	private void registerWaitingSync(IContinuation continuation, UserDataRequest udr, Sync sync) 
+	private void registerWaitingSync(IContinuation continuation, UserDataRequest udr, Sync syncRequest) 
 			throws CollectionNotFoundException, WaitIntervalOutOfRangeException, DaoException, CollectionPathException, WaitSyncFolderLimitException {
 		
 		if (!enablePush) {
 			throw new WaitSyncFolderLimitException(0);
 		}
 		
-		if (sync.getWaitInSecond() > 3540) {
+		if (syncRequest.getWaitInSecond() > 3540) {
 			throw new WaitIntervalOutOfRangeException();
 		}
 		
-		for (SyncCollection sc: sync.getCollections()) {
+		for (AnalysedSyncCollection sc: syncRequest.getCollections()) {
 			String collectionPath = collectionDao.getCollectionPath(sc.getCollectionId());
-			sc.setCollectionPath(collectionPath);
 			PIMDataType dataClass = collectionPathHelper.recognizePIMDataType(collectionPath);
 			if (dataClass == PIMDataType.EMAIL) {
 				backend.startEmailMonitoring(udr, sc.getCollectionId());
@@ -227,25 +229,27 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuation.error(SyncStatus.NEED_RETRY.asSpecificationValue());
 		
 		continuation.setLastContinuationHandler(this);
-		monitoredCollectionService.put(udr.getCredentials(), udr.getDevice(), sync.getCollections());
-		CollectionChangeListener l = new CollectionChangeListener(udr,
-				continuation, sync.getCollections());
+		monitoredCollectionService.put(udr.getCredentials(), udr.getDevice(), syncRequest.getCollections());
+		CollectionChangeListener l = new CollectionChangeListener(udr, continuation, syncRequest.getCollections());
 		IListenerRegistration reg = backend.addChangeListener(l);
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
 		
-		continuationService.suspend(udr, continuation, sync.getWaitInSecond());
+		continuationService.suspend(udr, continuation, syncRequest.getWaitInSecond());
 	}
 
-	private ItemSyncState doUpdates(UserDataRequest udr, SyncCollection c,	SyncClientCommands clientCommands, 
-			SyncCollectionResponse syncCollectionResponse) throws DaoException, CollectionNotFoundException, 
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
+	private ItemSyncState doUpdates(UserDataRequest udr, AnalysedSyncCollection request,	SyncClientCommands clientCommands, 
+			SyncCollectionResponse.Builder responseBuilder, ItemSyncState syncState) throws DaoException, CollectionNotFoundException, 
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException, InvalidServerId {
 
-		DataDelta delta = contentsExporter.getChanged(udr, c, clientCommands, syncKeyFactory.randomSyncKey());
+		DataDelta delta = contentsExporter.getChanged(udr, syncState, request, clientCommands, syncKeyFactory.randomSyncKey());
 
-		syncCollectionResponse.setItemChanges(delta.getChanges());
-		syncCollectionResponse.setItemChangesDeletion(delta.getDeletions());
-		c.setMoreAvailable(delta.hasMoreAvailable());
+		responseBuilder
+			.responses(SyncCollectionCommands.Response.builder()
+					.changes(identifyNewItems(delta.getChanges(), syncState))
+					.deletions(delta.getDeletions())
+					.build())
+			.moreAvailable(delta.hasMoreAvailable());
 		
 		return ItemSyncState.builder()
 				.syncKey(delta.getSyncKey())
@@ -253,38 +257,47 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				.build();
 	}
 
-	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync sync) throws CollectionNotFoundException, DaoException, 
+	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync syncRequest) throws CollectionNotFoundException, DaoException, 
 		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
 		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 
-		for (SyncCollection collection : sync.getCollectionsValidToProcess()) {
+		for (AnalysedSyncCollection collection : collectionsValidToProcess(syncRequest.getCollections())) {
 
-			// get our sync state for this collection
+			// we don't merge modifications on unknown collections
 			ItemSyncState collectionState = stMachine.getItemSyncState(collection.getSyncKey());
-
 			if (collectionState != null) {
-				collection.setItemSyncState(collectionState);
 				clientCommandsBuilder.merge(processClientModification(udr, collection));
-			} else {
-				ItemSyncState syncState = ItemSyncState.builder()
-						.syncDate(dateService.getEpochPlusOneSecondDate())
-						.syncKey(collection.getSyncKey())
-						.build();
-				collection.setItemSyncState(syncState);
 			}
 		}
 		return clientCommandsBuilder.build();
 	}
 	
-	@VisibleForTesting SyncClientCommands processClientModification(UserDataRequest udr, SyncCollection collection)
+	private Set<AnalysedSyncCollection> collectionsValidToProcess(Set<AnalysedSyncCollection> collections) {
+		return FluentIterable
+				.from(collections)
+				.filter(new Predicate<AnalysedSyncCollection>() {
+
+					@Override
+					public boolean apply(AnalysedSyncCollection input) {
+						return isDataTypeKnown(input.getDataType());
+					}
+				}).toSet();
+	}
+
+	private boolean isDataTypeKnown(PIMDataType dataType) {
+		return dataType != PIMDataType.UNKNOWN;
+	}
+
+	@VisibleForTesting SyncClientCommands processClientModification(UserDataRequest udr, AnalysedSyncCollection collection)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 
 		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
-		for (SyncCollectionChange change: collection.getChanges()) {
+		SyncCollectionCommands.Response commands = collection.getCommands();
+		for (SyncCollectionCommand.Response change: commands.getCommands()) {
 			try {
-				switch (change.getCommand()) {
+				switch (change.getType()) {
 				case FETCH:
 					break;
 				case MODIFY:
@@ -305,28 +318,28 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return clientCommandsBuilder.build();
 	}
 
-	private Update updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
+	private Update updateServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
 		return new SyncClientCommands.Update(contentsImporter.importMessageChange(
-				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
+				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));
 	}
 
-	private Add addServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
+	private Add addServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
 		return new SyncClientCommands.Add(change.getClientId(), contentsImporter.importMessageChange(
-				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
+				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));
 	}
 	
-	private Deletion deleteServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
+	private Deletion deleteServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change)
 			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		String serverId = change.getServerId();
-		contentsImporter.importMessageDeletion(udr, change.getType(), collection.getCollectionId(), serverId,
+		contentsImporter.importMessageDeletion(udr, collection.getDataType(), collection.getCollectionId(), serverId,
 				collection.getOptions().isDeletesAsMoves());
 		return new SyncClientCommands.Deletion(serverId);
 	}
@@ -369,112 +382,120 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	public SyncResponse doTheJob(UserDataRequest udr, Collection<SyncCollection> changedFolders, 
+	public SyncResponse doTheJob(UserDataRequest udr, Collection<AnalysedSyncCollection> changedFolders, 
 			SyncClientCommands clientCommands, IContinuation continuation) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, HierarchyChangedException {
 
-		List<SyncCollectionResponse> syncCollectionResponses = new ArrayList<SyncResponse.SyncCollectionResponse>();
-		for (SyncCollection c : changedFolders) {
-			SyncCollectionResponse syncCollectionResponse = computeSyncState(udr, clientCommands, c);
-			syncCollectionResponses.add(syncCollectionResponse);
+		SyncResponse.Builder builder = SyncResponse.builder();
+		
+		for (AnalysedSyncCollection c : changedFolders) {
+			builder.addResponse(computeSyncState(udr, clientCommands, c));
 		}
 		logger.info("Resp for requestId = {}", continuation.getReqId());
-		return new SyncResponse(syncCollectionResponses, clientCommands);
+		return builder.build();
 	}
 	
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
-			SyncClientCommands clientCommands, SyncCollection syncCollection)
+			SyncClientCommands clientCommands, AnalysedSyncCollection syncCollectionRequest)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, HierarchyChangedException {
 
-		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
-		if (syncCollection.getStatus() != SyncStatus.OK) {
-			handleErrorSync(syncCollection, syncCollectionResponse);
-		} else if (SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncCollection.getSyncKey())) {
-			handleInitialSync(udr, syncCollection, syncCollectionResponse);
-		} else {
-			try {
-				handleDataSync(udr, clientCommands, syncCollection, syncCollectionResponse);
-			} catch (FilterTypeChangedException e) {
-				syncCollectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
+		PIMDataType dataType = syncCollectionRequest.getDataType();
+		SyncCollectionResponse.Builder builder = SyncCollectionResponse.builder()
+				.collectionId(syncCollectionRequest.getCollectionId())
+				.dataType(dataType);
+			
+		ItemSyncState newItemSyncState = null;
+		if (syncCollectionRequest.getStatus() != SyncStatus.OK) {
+			builder.status(syncCollectionRequest.getStatus());
+		} else if (isDataTypeKnown(dataType)) {
+			if (SyncKey.INITIAL_FOLDER_SYNC_KEY.equals(syncCollectionRequest.getSyncKey())) {
+				handleInitialSync(udr, syncCollectionRequest, builder);
+			} else {
+				try {
+					newItemSyncState = handleDataSync(udr, clientCommands, syncCollectionRequest, builder);
+				} catch (FilterTypeChangedException e) {
+					builder.status(SyncStatus.INVALID_SYNC_KEY);
+				}
 			}
+		} else {
+			builder.status(SyncStatus.OBJECT_NOT_FOUND);
 		}
+		
+		SyncCollectionResponse syncCollectionResponse = builder.build();
+		allocateSyncStateIfNew(udr, syncCollectionRequest, syncCollectionResponse, newItemSyncState);
 		return syncCollectionResponse;
 	}
 
-	@VisibleForTesting void handleErrorSync(SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) {
-		if (syncCollection.getStatus() == SyncStatus.OBJECT_NOT_FOUND) {
-			syncCollectionResponse.setCollectionValidity(false);
-		}
-	}
-
-	private void handleDataSync(UserDataRequest udr, SyncClientCommands clientCommands, SyncCollection syncCollection,
-			SyncCollectionResponse syncCollectionResponse) throws CollectionNotFoundException, DaoException, 
+	private ItemSyncState handleDataSync(UserDataRequest udr, SyncClientCommands clientCommands, AnalysedSyncCollection request,
+			SyncCollectionResponse.Builder builder) throws CollectionNotFoundException, DaoException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, InvalidServerId, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
-		syncCollectionResponse.setCollectionValidity(true);
-		
-		ItemSyncState st = stMachine.getItemSyncState(syncCollection.getSyncKey());
+		ItemSyncState st = stMachine.getItemSyncState(request.getSyncKey());
 		if (st == null) {
-			syncCollectionResponse.getSyncCollection().setStatus(SyncStatus.INVALID_SYNC_KEY);
-		} else if (syncCollection.isValidToProcess()) {
-			syncCollection.setItemSyncState(st);
+			builder.status(SyncStatus.INVALID_SYNC_KEY);
+			return null;
+		} else {
 			Date syncDate = null;
 			SyncKey treatmentSyncKey = null;
-			if (syncCollection.getFetchIds().isEmpty()) {
-				ItemSyncState itemSyncState = doUpdates(udr, syncCollection, clientCommands, syncCollectionResponse);
+			if (request.getFetchIds().isEmpty()) {
+				ItemSyncState itemSyncState = doUpdates(udr, request, clientCommands, builder, st);
 				syncDate = itemSyncState.getSyncDate();
 				treatmentSyncKey = itemSyncState.getSyncKey();
 			} else {
 				treatmentSyncKey = syncKeyFactory.randomSyncKey();
 				syncDate = st.getSyncDate();
-				syncCollectionResponse.setItemChanges(
-						contentsExporter.fetch(udr, syncCollection, treatmentSyncKey));
+				builder.responses(
+						SyncCollectionCommands.Response.builder()
+							.fetchs(identifyNewItems(contentsExporter.fetch(udr, st, request, treatmentSyncKey), st))
+							.build());
 			}
 			
-			identifyNewItems(syncCollectionResponse, st);
-			allocateSyncStateIfNew(udr, syncCollection, syncCollectionResponse, syncDate, treatmentSyncKey);
-			syncCollectionResponse.setNewSyncKey(treatmentSyncKey);
+			builder.syncKey(treatmentSyncKey)
+				.status(SyncStatus.OK);
+			
+			return ItemSyncState.builder()
+					.syncDate(syncDate)
+					.syncKey(treatmentSyncKey)
+					.build();
 		}
 	}
 
-	private void allocateSyncStateIfNew(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse, Date syncDate, SyncKey treatmentSyncKey) 
+	private void allocateSyncStateIfNew(UserDataRequest udr, AnalysedSyncCollection request, SyncCollectionResponse syncCollectionResponse, ItemSyncState itemSyncState) 
 				throws DaoException, InvalidServerId {
 
-		if (!Objects.equal(syncCollection.getSyncKey(), treatmentSyncKey)) {
-			stMachine.allocateNewSyncState(udr, syncCollection.getCollectionId(), syncDate, 
-					syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion(), treatmentSyncKey);
+		if (itemSyncState != null && !Objects.equal(request.getSyncKey(), itemSyncState.getSyncKey())) {
+			stMachine.allocateNewSyncState(udr, request.getCollectionId(), itemSyncState.getSyncDate(), 
+					syncCollectionResponse.getItemChanges(), syncCollectionResponse.getItemChangesDeletion(), itemSyncState.getSyncKey());
 		}
 	}
 
-	private void handleInitialSync(UserDataRequest udr, SyncCollection syncCollection, SyncCollectionResponse syncCollectionResponse) 
+	private void handleInitialSync(UserDataRequest udr, AnalysedSyncCollection syncCollectionRequest, SyncCollectionResponse.Builder builder) 
 			throws DaoException, InvalidServerId {
 		
-		backend.resetCollection(udr, syncCollection.getCollectionId());
-		syncCollectionResponse.setCollectionValidity(true);
+		backend.resetCollection(udr, syncCollectionRequest.getCollectionId());
 		List<ItemChange> changed = ImmutableList.of();
 		List<ItemDeletion> deleted = ImmutableList.of();
 		SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
 		stMachine.allocateNewSyncState(udr, 
-				syncCollection.getCollectionId(), 
+				syncCollectionRequest.getCollectionId(), 
 				dateService.getEpochPlusOneSecondDate(), 
 				changed,
 				deleted,
 				newSyncKey);
-		syncCollectionResponse.setNewSyncKey(newSyncKey);
+		builder.syncKey(newSyncKey)
+			.status(SyncStatus.OK);
 	}
 
-	private void identifyNewItems(
-			SyncCollectionResponse syncCollectionResponse, ItemSyncState st)
+	private List<ItemChange> identifyNewItems(List<ItemChange> itemChanges, ItemSyncState st)
 			throws DaoException, InvalidServerId {
 
-		if (!PIMDataType.EMAIL.equals(syncCollectionResponse.getSyncCollection().getDataType())) {
-			for (ItemChange change: syncCollectionResponse.getItemChanges()) {
-				boolean isItemAddition = st.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
-						!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
-				change.setNew(isItemAddition);
-			}
+		for (ItemChange change: itemChanges) {
+			boolean isItemAddition = st.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY) || 
+					!itemTrackingDao.isServerIdSynced(st, new ServerId(change.getServerId()));
+			change.setNew(isItemAddition);
 		}
+		return itemChanges;
 	}
 	
 	private void sendError(Device device, Responder responder, SyncStatus errorStatus,
@@ -501,5 +522,4 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			logger.error(e.getMessage(), e);
 		}
 	}
-	
 }

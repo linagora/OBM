@@ -66,9 +66,10 @@ import org.obm.opush.env.Configuration;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
@@ -222,8 +223,9 @@ public class GetItemEstimateHandlerTest {
 		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporterBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyObject(ItemSyncState.class),
-				anyObject(SyncCollection.class)))
+				anyObject(PIMDataType.class),
+				anyObject(AnalysedSyncCollection.class),
+				anyObject(ItemSyncState.class)))
 			.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 }

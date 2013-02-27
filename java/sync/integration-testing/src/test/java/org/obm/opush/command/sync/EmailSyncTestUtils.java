@@ -47,11 +47,13 @@ import java.util.Set;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
@@ -66,7 +68,6 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.SyncResponse;
-import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -95,6 +96,13 @@ public class EmailSyncTestUtils {
 		assertThat(collection.getItemChangesDeletion()).isEmpty();
 	}
 
+	public static void checkMailFolderHasFetchItems(SyncResponse response, String serverId, ItemChange... changes) {
+		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
+		List<ItemChange> itemChanges = collection.getItemFetchs();
+		assertThat(itemChanges).containsOnly(changes);
+		assertThat(collection.getItemChangesDeletion()).isEmpty();
+	}
+
 	public static void checkMailFolderHasDeleteItems(SyncResponse response, String serverId, ItemDeletion... deletes) {
 		SyncCollectionResponse collection = getCollectionWithId(response, serverId);
 		assertThat(collection.getItemChanges()).isEmpty();
@@ -110,7 +118,7 @@ public class EmailSyncTestUtils {
 
 	public static SyncCollectionResponse getCollectionWithId(SyncResponse response, String serverId) {
 		for (SyncCollectionResponse collection : response.getCollectionResponses()) {
-			if (serverId.equals(String.valueOf(collection.getSyncCollection().getCollectionId()))) {
+			if (serverId.equals(String.valueOf(collection.getCollectionId()))) {
 				return collection;
 			}
 		}
@@ -196,7 +204,7 @@ public class EmailSyncTestUtils {
 		syncedCollectionDao.put(
 				anyObject(Credentials.class), 
 				anyObject(Device.class),
-				anyObject(SyncCollection.class));
+				anyObject(AnalysedSyncCollection.class));
 		expectLastCall().once().anyTimes();
 	}
 	
@@ -234,16 +242,18 @@ public class EmailSyncTestUtils {
 			FilterTypeChangedException, HierarchyChangedException {
 
 		expect(contentsExporter.getChanged(
-				anyObject(UserDataRequest.class), 
-				anyObject(SyncCollection.class),
+				anyObject(UserDataRequest.class),
+				anyObject(ItemSyncState.class),
+				anyObject(AnalysedSyncCollection.class),
 				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
 				.andReturn(delta).once();
 		
 		expect(contentsExporter.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
-				anyObject(ItemSyncState.class),
-				anyObject(SyncCollection.class)))
+				anyObject(PIMDataType.class),
+				anyObject(AnalysedSyncCollection.class),
+				anyObject(ItemSyncState.class)))
 			.andReturn(delta.getItemEstimateSize()).anyTimes();
 	}
 

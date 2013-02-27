@@ -35,9 +35,9 @@ import java.io.Serializable;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.store.SyncedCollectionDao;
 
 import com.google.common.base.Objects;
@@ -58,17 +58,17 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 	}
 
 	@Override
-	public void put(Credentials credentials, Device device, SyncCollection collection) {
+	public void put(Credentials credentials, Device device, AnalysedSyncCollection collection) {
 		Key key = buildKey(credentials, device, collection.getCollectionId());
 		store.put( new Element(key, collection) );
 	}
 	
 	@Override
-	public SyncCollection get(Credentials credentials, Device device, Integer collectionId) {
+	public AnalysedSyncCollection get(Credentials credentials, Device device, Integer collectionId) {
 		Key key = buildKey(credentials, device, collectionId);
 		Element element = store.get(key);
 		if (element != null) {
-			return (SyncCollection) element.getValue();
+			return (AnalysedSyncCollection) element.getValue();
 		} else {
 			return null;
 		}

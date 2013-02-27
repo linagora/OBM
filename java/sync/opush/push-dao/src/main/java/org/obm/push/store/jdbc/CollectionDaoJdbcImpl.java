@@ -47,7 +47,6 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -448,7 +447,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	private ChangedCollections getCalendarChangedCollectionsFromResultSet(ResultSet rs,
 			Date lastSync) throws SQLException {
-		Set<SyncCollection> changed = Sets.newHashSet();
+		Set<String> changed = Sets.newHashSet();
 		Date dbDate = lastSync;
 		while (rs.next()) {
 			final String email = getEmail(rs);
@@ -463,8 +462,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			}
 			colPath.append(email);
 			
-			SyncCollection path = getSyncCollection(colPath.toString());
-			changed.add(path);
+			changed.add(colPath.toString());
 		}
 		return new ChangedCollections(dbDate, changed);
 	}
@@ -477,7 +475,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 	
 	private ChangedCollections getContactChangedCollectionsFromResultSet(ResultSet rs,
 			Date lastSync) throws SQLException {
-		Set<SyncCollection> changed = Sets.newHashSet();
+		Set<String> changed = Sets.newHashSet();
 		Date dbDate = lastSync;
 		while (rs.next()) {
 			final String email = getEmail(rs);
@@ -486,8 +484,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			StringBuilder colPath = getBaseCollectionPath(email);
 			colPath.append("contacts");
 			
-			SyncCollection path = getSyncCollection(colPath.toString());
-			changed.add(path);
+			changed.add(colPath.toString());
 		}
 		return new ChangedCollections(dbDate, changed);
 	}
@@ -505,9 +502,4 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		colName.append("\\");
 		return colName;
 	}	
-	
-	private SyncCollection getSyncCollection(String collectionPath){
-		return new SyncCollection(0, collectionPath);
-	}
-
 }

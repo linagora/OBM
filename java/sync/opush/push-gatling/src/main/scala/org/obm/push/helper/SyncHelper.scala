@@ -37,14 +37,14 @@ import org.obm.push.bean.PIMDataType._
 import org.obm.push.bean.ms.MSEmail
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest
 import scala.collection.mutable.MutableList
-import org.obm.push.bean.SyncCollectionChange
 import org.obm.push.bean.MSEvent
+import org.obm.push.bean.SyncCollectionCommand
 
 object SyncHelper {
 	
 	def findChangesWithMeetingRequest(syncResponse: SyncResponse) = {
 		findChangesWithEmailData(syncResponse)
-			.filter(_.getData().asInstanceOf[MSEmail].getMeetingRequest() != null)
+			.filter(_.getApplicationData().asInstanceOf[MSEmail].getMeetingRequest() != null)
 	}
 	
 	def findChangesWithEmailData(syncResponse: SyncResponse) = {
@@ -54,7 +54,7 @@ object SyncHelper {
 	def findEventChanges(syncResponse: SyncResponse, serverId: String) = {
 		findChangesWithServerId(syncResponse, serverId)
 			.filter(changeHasCalendarData(_))
-			.map(_.getData().asInstanceOf[MSEvent])
+			.map(_.getApplicationData().asInstanceOf[MSEvent])
 	}
 	
 	def findChangesWithServerId(syncResponse: SyncResponse, serverId: String) = {
@@ -63,12 +63,12 @@ object SyncHelper {
 	
 	def findChanges(syncResponse: SyncResponse) = {
 		syncResponse.getCollectionResponses()
-			.flatMap(_.getSyncCollection().getChanges())
+			.flatMap(_.getResponses().getCommands())
 	}
 	
-	def changeHasCalendarData(change: SyncCollectionChange) = 
-		change.getType() == CALENDAR && change.getData() != null
+	def changeHasCalendarData(change: SyncCollectionCommand.Response) = 
+		change.getType() == CALENDAR && change.getApplicationData() != null
 	
-	def changeHasEmailData(change: SyncCollectionChange) = 
-		change.getType() == EMAIL && change.getData() != null
+	def changeHasEmailData(change: SyncCollectionCommand.Response) = 
+		change.getType() == EMAIL && change.getApplicationData() != null
 }

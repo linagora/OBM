@@ -66,7 +66,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponseStatus;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
@@ -369,7 +368,7 @@ public class MeetingResponseHandlerTest {
 				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
 		
-		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<SyncCollection>of());
+		ChangedCollections noChangeCollections = new ChangedCollections(dateFirstSyncFromASSpecs, ImmutableSet.<String>of());
 		expect(collectionDao.getContactChangedCollections(dateFirstSyncFromASSpecs)).andReturn(noChangeCollections).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(dateFirstSyncFromASSpecs)).andReturn(noChangeCollections).anyTimes();
 	}

@@ -40,6 +40,7 @@ import java.nio.charset.Charset;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.utils.SerializableInputStream;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 
 public class MSEmailBody implements Serializable {
@@ -86,6 +87,7 @@ public class MSEmailBody implements Serializable {
 		}
 		
 		public MSEmailBody build() {
+			Charset charset = Objects.firstNonNull(this.charset, Charsets.UTF_8);
 			return new MSEmailBody(mimeData, bodyType, estimatedDataSize, charset, truncated);
 		}
 	}

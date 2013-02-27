@@ -34,43 +34,58 @@ package org.obm.push.protocol.bean;
 import java.util.Set;
 
 import org.obm.push.bean.PingStatus;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
 public class PingResponse {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private PingStatus pingStatus;
-		private Set<SyncCollection> syncCollections;
+		private ImmutableSet.Builder<SyncCollectionResponse> syncCollectionBuilder;
 		
-		public Builder() {}
+		private Builder() {
+			super();
+			syncCollectionBuilder = ImmutableSet.builder();
+		}
 		
 		public Builder pingStatus(PingStatus pingStatus) {
 			this.pingStatus = pingStatus;
 			return this;
 		}
 		
-		public Builder syncCollections(Set<SyncCollection> syncCollections) {
-			this.syncCollections = syncCollections;
+		public Builder syncCollections(Set<SyncCollectionResponse> syncCollections) {
+			if (syncCollections != null) {
+				syncCollectionBuilder.addAll(syncCollections);
+			}
 			return this;
 		}
-
+		
+		public Builder add(SyncCollectionResponse syncCollectionResponse) {
+			syncCollectionBuilder.add(syncCollectionResponse);
+			return this;
+		}
+		
 		public PingResponse build() {
 			return new PingResponse(
-					this.pingStatus, this.syncCollections);
+					this.pingStatus, syncCollectionBuilder.build());
 		}
 	}
 	
 	private final PingStatus pingStatus;
-	private final Set<SyncCollection> syncCollections;
+	private final Set<SyncCollectionResponse> syncCollections;
 	
-	private PingResponse( PingStatus pingStatus, Set<SyncCollection> syncCollections) {
+	private PingResponse( PingStatus pingStatus, Set<SyncCollectionResponse> syncCollections) {
 		this.syncCollections = syncCollections;
 		this.pingStatus = pingStatus;
 	}
 
-	public Set<SyncCollection> getSyncCollections() {
+	public Set<SyncCollectionResponse> getSyncCollections() {
 		return syncCollections;
 	}
 	

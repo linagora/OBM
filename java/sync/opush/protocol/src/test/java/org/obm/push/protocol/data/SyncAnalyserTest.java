@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -52,9 +53,10 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.Sync;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -143,7 +145,7 @@ public class SyncAnalyserTest {
 				.truncationSize(5120)
 				.build()
 			));
-		SyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
+		AnalysedSyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
 		
 		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
 		syncedCollectionDao.put(udr.getCredentials(), device, requestSyncCollectionToStore);
@@ -167,7 +169,7 @@ public class SyncAnalyserTest {
 		SyncCollectionOptions requestOptionsToStore = new SyncCollectionOptions();
 		requestOptionsToStore.setFilterType(FilterType.THREE_DAYS_BACK);
 
-		SyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
+		AnalysedSyncCollection requestSyncCollectionToStore = buildRequestCollectionWithOptions(requestOptionsToStore, "0");
 		
 		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
 		syncedCollectionDao.put(udr.getCredentials(), device, requestSyncCollectionToStore);
@@ -191,7 +193,7 @@ public class SyncAnalyserTest {
 		toStoreOptions.setMimeSupport(null);
 		toStoreOptions.setMimeTruncation(null);
 		toStoreOptions.setTruncation(SyncCollectionOptions.SYNC_TRUNCATION_ALL);
-		SyncCollection toStoreSyncCollection = buildRequestCollectionWithOptions(toStoreOptions, "156");
+		AnalysedSyncCollection toStoreSyncCollection = buildRequestCollectionWithOptions(toStoreOptions, "156");
 
 		Document requestWithoutOptions = buildRequestWithoutOptions("156");
 		
@@ -245,8 +247,8 @@ public class SyncAnalyserTest {
 				.truncationSize(5120)
 				.build()
 			));
-		SyncCollection firstSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "0");
-		SyncCollection secondSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "156");
+		AnalysedSyncCollection firstSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "0");
+		AnalysedSyncCollection secondSyncCollectionToStore = buildRequestCollectionWithOptions(firstRequestOptionsToStore, "156");
 		
 		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
 		syncedCollectionDao.put(udr.getCredentials(), device, firstSyncCollectionToStore);
@@ -277,12 +279,15 @@ public class SyncAnalyserTest {
 				.bodyType(MSEmailBodyType.PlainText)
 				.build()
 			));
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(collectionId);
-		syncCollection.setCollectionPath(collectionPath);
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setOptions(syncCollectionOptions);
-		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+			.collectionId(collectionId)
+			.collectionPath(collectionPath)
+			.dataType(PIMDataType.EMAIL)
+			.options(syncCollectionOptions)
+			.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+			.status(SyncStatus.OK)
+			.commands(SyncCollectionCommands.Response.builder().build())
+			.build();
 		
 		Document firstDoc = buildRequestWithOptions("0",
 				"<Options>" +
@@ -322,12 +327,15 @@ public class SyncAnalyserTest {
 				.truncationSize(1000)
 				.build()
 			));
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(collectionId);
-		syncCollection.setCollectionPath(collectionPath);
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setOptions(syncCollectionOptions);
-		syncCollection.setSyncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY);
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+				.collectionId(collectionId)
+				.collectionPath(collectionPath)
+				.dataType(PIMDataType.EMAIL)
+				.options(syncCollectionOptions)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.status(SyncStatus.OK)
+				.commands(SyncCollectionCommands.Response.builder().build())
+				.build();
 		
 		expect(syncedCollectionDao.get(udr.getCredentials(), device, collectionId)).andReturn(null).once();
 		syncedCollectionDao.put(udr.getCredentials(), device, syncCollection);
@@ -356,11 +364,14 @@ public class SyncAnalyserTest {
 	
 	@Test
 	public void testRequestWithSameDataClassThanRecognizedDataType() throws Exception {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(collectionId);
-		syncCollection.setCollectionPath(collectionPath);
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setSyncKey(new SyncKey("1234"));
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+				.collectionId(collectionId)
+				.collectionPath(collectionPath)
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(new SyncKey("1234"))
+				.status(SyncStatus.OK)
+				.commands(SyncCollectionCommands.Response.builder().build())
+				.build();
 
 		Document requestWithoutOptions = DOMUtils.parse(
 				"<Sync>" +
@@ -410,14 +421,16 @@ public class SyncAnalyserTest {
 		}
 	}
 	
-	private SyncCollection buildRequestCollectionWithOptions(SyncCollectionOptions options, String syncKey) {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setCollectionId(collectionId);
-		syncCollection.setCollectionPath(collectionPath);
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(new SyncKey(syncKey));
-		return syncCollection;
+	private AnalysedSyncCollection buildRequestCollectionWithOptions(SyncCollectionOptions options, String syncKey) {
+		return AnalysedSyncCollection.builder()
+			.collectionId(collectionId)
+			.collectionPath(collectionPath)
+			.dataType(PIMDataType.EMAIL)
+			.options(options)
+			.syncKey(new SyncKey(syncKey))
+			.status(SyncStatus.OK)
+			.commands(SyncCollectionCommands.Response.builder().build())
+			.build();
 	}
 
 	private Document buildRequestWithoutOptions(String syncKey) throws Exception {

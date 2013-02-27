@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.SyncCollection;
 
 public interface SyncedCollectionDao {
 	
-	SyncCollection get(Credentials credentials, Device device, Integer collectionId);
+	AnalysedSyncCollection get(Credentials credentials, Device device, Integer collectionId);
 	
-	void put(Credentials credentials, Device device, SyncCollection collection);
+	void put(Credentials credentials, Device device, AnalysedSyncCollection collection);
 }

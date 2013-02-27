@@ -40,6 +40,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.PushPublishAndSubscribe;
+import org.obm.push.state.IStateMachine;
 import org.obm.push.store.CollectionDao;
 
 import com.google.inject.Inject;
@@ -53,28 +54,30 @@ public class ContactsMonitoringThread extends MonitoringThread {
 		private final PushPublishAndSubscribe.Factory pubSubFactory;
 		private final ContactsBackend contactsBackend;
 		private final IContentsExporter contentsExporter;
+		private final IStateMachine stateMachine;
 
 		@Inject
 		private Factory(CollectionDao collectionDao, ContactsBackend contactsBackend,
-				PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+				PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter, IStateMachine stateMachine) {
 			this.collectionDao = collectionDao;
 			this.contactsBackend = contactsBackend;
 			this.pubSubFactory = pubSubFactory;
 			this.contentsExporter = contentsExporter;
+			this.stateMachine = stateMachine;
 		}
 
 		public ContactsMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
 			return new ContactsMonitoringThread(freqMs, ccls,
-					this.collectionDao, this.contactsBackend, pubSubFactory, contentsExporter);
+					this.collectionDao, this.contactsBackend, pubSubFactory, contentsExporter, stateMachine);
 		}
 	}
 	
 	private ContactsMonitoringThread(long freqMs, Set<ICollectionChangeListener> ccls, CollectionDao collectionDao, 
-			ContactsBackend contactsBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+			ContactsBackend contactsBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter, IStateMachine stateMachine) {
 		
-		super(freqMs, ccls, collectionDao, contactsBackend, pubSubFactory, contentsExporter);
+		super(freqMs, ccls, collectionDao, contactsBackend, pubSubFactory, contentsExporter, stateMachine);
 	}
 
 	@Override

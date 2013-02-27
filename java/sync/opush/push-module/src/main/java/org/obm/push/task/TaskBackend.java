@@ -36,11 +36,11 @@ import java.util.List;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -77,14 +77,16 @@ public class TaskBackend implements PIMBackend {
 	}
 	
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException {
 		return DataDelta.newEmptyDelta(new Date(), newSyncKey);
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws CollectionNotFoundException, 
-			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException {
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
+			SyncCollectionOptions collectionOptions) 
+		throws CollectionNotFoundException, ProcessingEmailException, 
+			DaoException, UnexpectedObmSyncServerException {
 		return 0;
 	}
 	

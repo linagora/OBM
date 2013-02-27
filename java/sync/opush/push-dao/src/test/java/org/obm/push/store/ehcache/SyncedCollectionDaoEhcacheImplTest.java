@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
-
-import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -46,10 +46,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
@@ -84,36 +85,37 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	
 	@Test
 	public void get() {
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		Assert.assertNull(syncCollection);
+		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
+		assertThat(syncCollection).isNull();
 	}
 	
 	@Test
 	public void put() {
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildCollection(1));
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(syncCollection);
-		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
+		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildCollection(1, SyncKey.INITIAL_FOLDER_SYNC_KEY));
+		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
+		assertThat(syncCollection).isNotNull();
+		assertThat(syncCollection.getCollectionId()).isEqualTo(1);
 	}
 	
 	@Test
 	public void putUpdatedCollection() {
-		SyncCollection col = buildCollection(1);
-		col.setCollectionPath("PATH1");
+		SyncKey expectedSyncKey = new SyncKey("123");
+		AnalysedSyncCollection col = buildCollection(1, SyncKey.INITIAL_FOLDER_SYNC_KEY);
 		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
-		col.setCollectionPath("PATH1CHANGE");
+		col = buildCollection(1, expectedSyncKey);
 		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
 		
-		SyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		Assert.assertNotNull(syncCollection);
-		Assert.assertEquals(new Integer(1), syncCollection.getCollectionId());
-		Assert.assertEquals("PATH1CHANGE", syncCollection.getCollectionPath());
+		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
+		assertThat(syncCollection).isNotNull();
+		assertThat(syncCollection.getCollectionId()).isEqualTo(1);
+		assertThat(syncCollection.getSyncKey()).isEqualTo(expectedSyncKey);
 	}
 
-	private SyncCollection buildCollection(Integer id) {
-		SyncCollection col = new SyncCollection();
-		col.setCollectionId(id);
-		return col;
+	private AnalysedSyncCollection buildCollection(Integer id, SyncKey syncKey) {
+		return AnalysedSyncCollection.builder()
+				.collectionId(id)
+				.syncKey(syncKey)
+				.build();
 	}
 	
 	private Device getFakeDeviceId(){

@@ -33,24 +33,22 @@ package org.obm.push.protocol.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.SyncCollectionRequest;
+import org.obm.push.bean.SyncDefaultValues;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 
-import com.google.common.collect.Lists;
-
 @RunWith(SlowFilterRunner.class)
-public class SyncRequestTest {
+public class SyncRequestTest implements SyncDefaultValues {
 
 	@Test
 	public void testBuilderWaitIsNotRequired() {
 		SyncRequest syncRequest = SyncRequest.builder().build();
 		
-		assertThat(syncRequest.getWaitInMinute()).isNull();
+		assertThat(syncRequest.getWaitInMinute()).isEqualTo(DEFAULT_WAIT);
 	}
 
 	@Test(expected=ASRequestIntegerFieldException.class)
@@ -94,7 +92,7 @@ public class SyncRequestTest {
 	public void testBuilderWindowSizeIsNotRequired() {
 		SyncRequest syncRequest = SyncRequest.builder().build();
 		
-		assertThat(syncRequest.getWindowSize()).isNull();
+		assertThat(syncRequest.getWindowSize()).isEqualTo(DEFAULT_WINDOW_SIZE);
 	}
 
 	@Test(expected=ASRequestIntegerFieldException.class)
@@ -123,12 +121,31 @@ public class SyncRequestTest {
 
 	@Test
 	public void testBuilderCollectionsNonEmpty() {
-		List<SyncCollectionRequest> collections = Lists.newArrayList(SyncCollectionRequest.builder()
-				.id(1)
-				.syncKey(new SyncKey("1234"))
-				.build());
-		SyncRequest syncRequest = SyncRequest.builder().collections(collections).build();
+		SyncRequest syncRequest = SyncRequest.builder()
+				.addCollection(SyncCollectionRequest.builder()
+						.collectionId(1)
+						.syncKey(new SyncKey("1234"))
+						.build())
+				.build();
 		
 		assertThat(syncRequest.getCollections()).hasSize(1);
+	}
+	
+	@Test
+	public void testWaitNullIsZero() {
+		SyncRequest syncRequest = SyncRequest.builder().waitInMinute(null).build();
+		assertThat(syncRequest.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testWaitZeroIsZero() {
+		SyncRequest syncRequest = SyncRequest.builder().waitInMinute(0).build();
+		assertThat(syncRequest.getWaitInSecond()).isEqualTo(0);
+	}
+
+	@Test
+	public void testWaitMinutesToSeconds() {
+		SyncRequest syncRequest = SyncRequest.builder().waitInMinute(1).build();
+		assertThat(syncRequest.getWaitInSecond()).isEqualTo(60);
 	}
 }

@@ -40,7 +40,7 @@ import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.MonitoringService;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
@@ -52,6 +52,7 @@ import org.obm.push.impl.PushNotificationImpl;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.service.PushNotification;
 import org.obm.push.service.PushPublishAndSubscribe;
+import org.obm.push.state.IStateMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,8 +69,8 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 		}
 		
 		@Override
-		public PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter contentsExporter) {
-			return new PushPublishAndSubscribeImpl(backend, contentsExporter);
+		public PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter contentsExporter, IStateMachine iStateMachine) {
+			return new PushPublishAndSubscribeImpl(backend, contentsExporter, iStateMachine);
 		}
 
 	}
@@ -78,10 +79,12 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 	private final PIMBackend backend;
 	private MonitoringService monitoringService;
 	private final IContentsExporter iContentsExporter;
+	private final IStateMachine iStateMachine;
 
-	public PushPublishAndSubscribeImpl(PIMBackend backend, IContentsExporter contentsExporter) {
+	public PushPublishAndSubscribeImpl(PIMBackend backend, IContentsExporter contentsExporter, IStateMachine iStateMachine) {
 		this.backend = backend;
 		this.iContentsExporter = contentsExporter;
+		this.iStateMachine = iStateMachine;
 	}
 
 
@@ -101,16 +104,17 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 		synchronized (ccls) {
 			for (final ICollectionChangeListener ccl : ccls) {
 
-				final Collection<SyncCollection> monitoredCollections = ccl
+				final Collection<AnalysedSyncCollection> monitoredCollections = ccl
 						.getMonitoredCollections();
 
 				final UserDataRequest userDataRequest = ccl.getSession();
-				for (SyncCollection syncCollection : monitoredCollections) {
+				for (AnalysedSyncCollection syncCollection : monitoredCollections) {
 
 					if (syncCollection.getDataType().equals(backend.getPIMDataType())) {
 						try {
 							int count = iContentsExporter.getItemEstimateSize(
-									userDataRequest, backend.getPIMDataType(), syncCollection);
+									userDataRequest, backend.getPIMDataType(), syncCollection,
+									iStateMachine.getItemSyncState(syncCollection.getSyncKey()));
 
 							if (count > 0) {
 								addPushNotification(pushNotifyList, ccl);

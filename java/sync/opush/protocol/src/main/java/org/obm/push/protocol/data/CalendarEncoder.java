@@ -53,6 +53,7 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Strings;
@@ -189,6 +190,13 @@ public class CalendarEncoder extends Encoder {
 
 	}
 
+	public Element encodedApplicationData(Device device, IApplicationData data, boolean isResponse) {
+		Document doc = DOMUtils.createDoc(null, null);
+		Element root = doc.getDocumentElement();
+		encode(device, root, data, isResponse);
+		return root;
+	}
+	
 	private void encodeCategories(Element p, List<String> categories) {
 		if (categories != null && !categories.isEmpty()) {
 			Element ce = DOMUtils.createElement(p, ASCalendar.CATEGORIES.asASValue());

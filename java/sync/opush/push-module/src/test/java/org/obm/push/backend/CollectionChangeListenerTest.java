@@ -31,19 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.ChangedCollections;
-import com.google.common.collect.ImmutableSet;
-
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.bean.ChangedCollections;
+import org.obm.push.bean.SyncKey;
+
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
 public class CollectionChangeListenerTest {
@@ -51,21 +51,46 @@ public class CollectionChangeListenerTest {
 	@Test
 	public void testMonitorOf() {
 		String matchString = "mypath";
-		Set<SyncCollection> monitored = ImmutableSet.of(new SyncCollection(1, matchString), new SyncCollection(2, "dontmatch"));
-		Set<SyncCollection> notify = ImmutableSet.of(new SyncCollection(0, matchString));
+		
+		Set<AnalysedSyncCollection> monitored = ImmutableSet.of(
+				AnalysedSyncCollection.builder()
+					.collectionId(1)
+					.collectionPath(matchString)
+					.syncKey(new SyncKey("1"))
+					.build(),
+				AnalysedSyncCollection.builder()
+					.collectionId(2)
+					.collectionPath("another")
+					.syncKey(new SyncKey("2"))
+					.build());
+		Set<String> notify = ImmutableSet.of(matchString);
+		
 		CollectionChangeListener collectionChangeListener = new CollectionChangeListener(null, null, monitored);
 		ChangedCollections changed = new ChangedCollections(new Date(), notify);
 		boolean result = collectionChangeListener.monitorOneOf(changed);
-		assertTrue(result);
+		
+		assertThat(result).isTrue();
 	}
 
 	@Test
 	public void testMonitorOfDontMatch() {
-		ImmutableSet<SyncCollection> monitored = ImmutableSet.of(new SyncCollection(1, "mypath"), new SyncCollection(2, "dontmatch"));
-		ImmutableSet<SyncCollection> notify = ImmutableSet.of(new SyncCollection(0, "anotherpath"));
+		Set<AnalysedSyncCollection> monitored = ImmutableSet.of(
+				AnalysedSyncCollection.builder()
+					.collectionId(1)
+					.collectionPath("an")
+					.syncKey(new SyncKey("1"))
+					.build(),
+				AnalysedSyncCollection.builder()
+					.collectionId(2)
+					.collectionPath("other")
+					.syncKey(new SyncKey("2"))
+					.build());
+		Set<String> notify = ImmutableSet.of("anotherString");
+		
 		CollectionChangeListener collectionChangeListener = new CollectionChangeListener(null, null, monitored);
 		ChangedCollections changed = new ChangedCollections(new Date(), notify);
 		boolean result = collectionChangeListener.monitorOneOf(changed);
-		assertTrue(!result);
+		
+		assertThat(result).isFalse();
 	}
 }

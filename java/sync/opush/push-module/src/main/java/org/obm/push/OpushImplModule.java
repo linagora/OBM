@@ -76,6 +76,8 @@ import org.obm.push.service.impl.DeviceServiceImpl;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.service.impl.MappingServiceImpl;
 import org.obm.push.service.impl.PushPublishAndSubscribeImpl;
+import org.obm.push.state.IStateMachine;
+import org.obm.push.state.StateMachine;
 import org.obm.push.store.DaoModule;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -125,6 +127,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
+		bind(IStateMachine.class).to(StateMachine.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);

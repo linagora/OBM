@@ -38,11 +38,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.client.SyncClientCommands;
-import org.obm.push.bean.change.client.SyncClientCommands.SyncClientCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -54,7 +53,6 @@ import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
 import org.obm.push.protocol.bean.SyncResponse;
-import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.data.SyncAnalyser;
 import org.obm.push.protocol.data.SyncDecoder;
@@ -65,11 +63,10 @@ import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncResponse>{
+public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncResponse> {
 
 	@Singleton
 	public static class Factory {
@@ -99,7 +96,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 	private final EncoderFactory encoderFactory;
 	private final UserDataRequest udr;
 
-	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser,
+	@VisibleForTesting SyncProtocol(SyncDecoder syncDecoder, SyncAnalyser syncAnalyser, 
 			SyncEncoder syncEncoder, EncoderFactory encoderFactory, UserDataRequest udr) {
 		this.syncDecoder = syncDecoder;
 		this.syncAnalyser = syncAnalyser;
@@ -124,7 +121,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		
 		return new AnalysedSyncRequest( syncAnalyser.analyseSync(userDataRequest, syncRequest) );
 	}
-
+	
 	@Override
 	public Document encodeResponse(SyncResponse syncResponse) throws ProtocolException {
 		try {
@@ -135,34 +132,35 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 			for (SyncCollectionResponse collectionResponse: syncResponse.getCollectionResponses()) {
 
 				final Element ce = DOMUtils.createElement(cols, "Collection");
-				if (collectionResponse.getSyncCollection().getDataClass() != null) {
-					DOMUtils.createElementAndText(ce, "Class", collectionResponse.getSyncCollection().getDataClass());
+				if (collectionResponse.getDataClass() != null) {
+					DOMUtils.createElementAndText(ce, "Class", collectionResponse.getDataClass());
 				}
 				
-				SyncStatus status = collectionResponse.getSyncCollection().getStatus();
-				if (!collectionResponse.collectionValidity()) {
-					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-					DOMUtils.createElementAndText(ce, "Status", SyncStatus.OBJECT_NOT_FOUND.asSpecificationValue());
-				} else if (status != SyncStatus.OK) {
-					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-					DOMUtils.createElementAndText(ce, "Status", collectionResponse.getSyncCollection().getStatus().asSpecificationValue());
+				SyncStatus status = collectionResponse.getStatus();
+				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getCollectionId());
+				DOMUtils.createElementAndText(ce, "Status", status.asSpecificationValue());
+				
+				if (status != SyncStatus.OK) {
 					if (status == SyncStatus.INVALID_SYNC_KEY) {
 						DOMUtils.createElementAndText(ce, "SyncKey", "0");
 					}
 				} else {
 					Element sk = DOMUtils.createElement(ce, "SyncKey");
-					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getSyncCollection().getCollectionId().toString());
-					DOMUtils.createElementAndText(ce, "Status", SyncStatus.OK.asSpecificationValue());
 	
-					if (!collectionResponse.getSyncCollection().getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
-						if (collectionResponse.getSyncCollection().getFetchIds().isEmpty()) {
-							buildUpdateItemChange(collectionResponse, syncResponse.getClientCommands(), ce);
+					if (!collectionResponse.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
+						if (collectionResponse.isMoreAvailable()) {
+							// MoreAvailable has to be before Commands
+							DOMUtils.createElement(ce, "MoreAvailable");
+						}
+
+						if (collectionResponse.getFetchIds().isEmpty()) {
+							buildUpdateItemChange(collectionResponse, syncResponse.getProcessedClientIds(), ce);
 						} else {
 							buildFetchItemChange(collectionResponse, ce);
 						}
 					}
 					
-					sk.setTextContent(collectionResponse.getAllocateNewSyncKey().getSyncKey());
+					sk.setTextContent(collectionResponse.getSyncKey().getSyncKey());
 				}
 			}
 			return reply;
@@ -193,36 +191,28 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 	private void buildFetchItemChange(SyncCollectionResponse c, Element ce) throws IOException {
 		
 		Element commands = DOMUtils.createElement(ce, "Responses");
-		for (ItemChange ic : c.getItemChanges()) {
+		for (ItemChange ic : c.getItemFetchs()) {
 			Element add = DOMUtils.createElement(commands, "Fetch");
 			DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
-			DOMUtils.createElementAndText(add, "Status",
-					SyncStatus.OK.asSpecificationValue());
-			c.getSyncCollection().getOptions().initTruncation();
+			DOMUtils.createElementAndText(add, "Status", c.getStatus().asSpecificationValue());
 			serializeChange(add, ic);
 		}
 	}
 	
 	private void serializeChange(Element col, ItemChange ic) throws IOException {
-		if (encoderFactory != null && ic.getData() != null) {
+		if (ic.getData() != null) {
 			Element apData = DOMUtils.createElement(col, "ApplicationData");
 			encoderFactory.encode(udr.getDevice(), apData, ic.getData(), true);
 		}
 	}
 	
-	private void buildUpdateItemChange(SyncCollectionResponse c, SyncClientCommands syncClientCommands, 
+	private void buildUpdateItemChange(SyncCollectionResponse c, Map<String, String> processedClientIds, 
 			Element ce) throws IOException {
 		
-		Element responses = DOMUtils.createElement(ce, "Responses");
-		if (c.getSyncCollection().isMoreAvailable()) {
-			// MoreAvailable has to be before Commands
-			DOMUtils.createElement(ce, "MoreAvailable");
-		}
 		
+		Element responses = DOMUtils.createElement(ce, "Responses");
 		Element commands = DOMUtils.createElement(ce, "Commands");
 		
-		Map<String, String> processedClientIds = buildProcessedClientIds(syncClientCommands);
-
 		List<ItemDeletion> itemChangesDeletion = c.getItemChangesDeletion();
 		for (ItemDeletion deletion: itemChangesDeletion) {
 			serializeDeletion(commands, deletion);
@@ -230,16 +220,15 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		}
 		
 		for (ItemChange ic : c.getItemChanges()) {
-			if (itemChangeIsClientAddAck(syncClientCommands, ic)) {
-				SyncClientCommands.Add clientAdd = syncClientCommands.getAddWithServerId(ic.getServerId()).get();
-				Element add = DOMUtils.createElement(responses, clientAdd.syncCommand().asSpecificationValue());
-				DOMUtils.createElementAndText(add, "ClientId", clientAdd.clientId);
+			String clientId = processedClientIds.get(ic.getServerId());
+			if (itemChangeIsClientAddAck(clientId)) {
+				Element add = DOMUtils.createElement(responses, "Add");
+				DOMUtils.createElementAndText(add, "ClientId", clientId);
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
 			
-			} else if (itemChangeIsClientChangeAck(syncClientCommands, ic)) {
-				SyncClientCommand command = syncClientCommands.getChange(ic.getServerId());
-				Element add = DOMUtils.createElement(responses, command.syncCommand().asSpecificationValue());
+			} else if (itemChangeIsClientChangeAck(processedClientIds, ic)) {
+				Element add = DOMUtils.createElement(responses, "Change");
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
 			} else { // New change done on server
@@ -258,7 +247,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 				processedClientIds.entrySet());
 		for (Entry<String, String> entry : entries) {
 			if (entry.getKey() != null) {
-				if (entry.getKey().startsWith(c.getSyncCollection().getCollectionId().toString())) {
+				if (entry.getKey().startsWith(String.valueOf(c.getCollectionId()))) {
 					Element add = null;
 					if (entry.getValue() != null) {
 						add = DOMUtils.createElement(responses, "Add");
@@ -277,23 +266,12 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 				}
 			}
 		}
-		if (responses.getChildNodes().getLength() == 0) {
-			responses.getParentNode().removeChild(responses);
-		}
 		if (commands.getChildNodes().getLength() == 0) {
 			commands.getParentNode().removeChild(commands);
 		}
-	}
-
-	private Map<String, String> buildProcessedClientIds(SyncClientCommands syncClientCommands) {
-		Map<String, String> processedClientIds = Maps.newHashMap();
-		for (SyncClientCommands.Add add : syncClientCommands.getAdds()) {
-			processedClientIds.put(add.serverId, add.clientId);
+		if (responses.getChildNodes().getLength() == 0) {
+			responses.getParentNode().removeChild(responses);
 		}
-		for (SyncClientCommands.Change change : syncClientCommands.getChanges()) {
-			processedClientIds.put(change.serverId, null);
-		}
-		return processedClientIds;
 	}
 
 	private String selectCommandName(ItemChange itemChange) {
@@ -304,12 +282,13 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		}
 	}
 
-	private boolean itemChangeIsClientChangeAck(SyncClientCommands syncClientCommands, ItemChange itemChange) {
-		return syncClientCommands.hasChangeWithServerId(itemChange.getServerId());
+	private boolean itemChangeIsClientChangeAck(
+			Map<String, String> processedClientIds, ItemChange ic) {
+		return processedClientIds.keySet().contains(ic.getServerId());
 	}
 
-	private boolean itemChangeIsClientAddAck(SyncClientCommands syncClientCommands, ItemChange itemChange) {
-		return syncClientCommands.hasAddWithServerId(itemChange.getServerId());
+	private boolean itemChangeIsClientAddAck(String clientId) {
+		return clientId != null;
 	}
 	
 	private static void serializeDeletion(Element commands, ItemDeletion deletion) {

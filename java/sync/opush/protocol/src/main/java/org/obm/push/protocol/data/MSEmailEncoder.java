@@ -47,6 +47,7 @@ import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.SerializableInputStream;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -108,6 +109,13 @@ public class MSEmailEncoder {
 		
 		DOMUtils.createElementAndText(parent, ASEmail.CPID.asASValue(), CPID_DEFAULT);
 		DOMUtils.createElementAndText(parent, ASAirs.NATIVE_TYPE.asASValue(), msEmail.getBody().getBodyType().asXmlValue());
+	}
+
+	public Element encodedApplicationData(IApplicationData data) throws IOException {
+		Document doc = DOMUtils.createDoc(null, null);
+		Element root = doc.getDocumentElement();
+		encode(root, data);
+		return root;
 	}
 
 	private void serializeBody(Element parent, MSEmailBody body) throws IOException {

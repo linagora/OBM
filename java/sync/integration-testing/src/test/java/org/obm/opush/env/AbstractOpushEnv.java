@@ -42,7 +42,6 @@ import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -147,7 +146,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 		try {
 			Date initialSyncDate = new Date(0);
 			Date newSyncDate = DateUtils.date("1988-05-27T04:38:01");
-			ChangedCollections noChange = new ChangedCollections(newSyncDate, Collections.<SyncCollection>emptySet());
+			ChangedCollections noChange = new ChangedCollections(newSyncDate, Collections.<String>emptySet());
 
 			CollectionDao collectionDao = mockMap.get(CollectionDao.class);
 			expect(collectionDao.getContactChangedCollections(initialSyncDate)).andReturn(noChange).once();

@@ -39,11 +39,11 @@ import com.google.common.base.Objects;
 public class ChangedCollections {
 
 	private final Date lastSync;
-	private final Set<SyncCollection> changes;
+	private final Set<String> changedCollectionIds;
 	
-	public ChangedCollections(Date lastSync, Set<SyncCollection> changed) {
+	public ChangedCollections(Date lastSync, Set<String> changedCollectionIds) {
 		this.lastSync = lastSync;
-		this.changes = changed;
+		this.changedCollectionIds = changedCollectionIds;
 	}
 	
 	public Date getLastSync() {
@@ -51,16 +51,16 @@ public class ChangedCollections {
 	}
 
 	public boolean hasChanges() {
-		return !changes.isEmpty();
+		return !changedCollectionIds.isEmpty();
 	}
 	
-	public Set<SyncCollection> getChanges() {
-		return changes;
+	public Set<String> getChanges() {
+		return changedCollectionIds;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(lastSync, changes);
+		return Objects.hashCode(lastSync, changedCollectionIds);
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class ChangedCollections {
 		if (object instanceof ChangedCollections) {
 			ChangedCollections that = (ChangedCollections) object;
 			return Objects.equal(this.lastSync, that.lastSync)
-				&& Objects.equal(this.changes, that.changes);
+				&& Objects.equal(this.changedCollectionIds, that.changedCollectionIds);
 		}
 		return false;
 	}

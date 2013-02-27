@@ -39,6 +39,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
 import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
@@ -168,6 +169,13 @@ public class ContactEncoder {
 			}
 		}
 		// DOMUtils.createElement(parent, "Contacts:Picture");
+	}
+
+	public Element encodedApplicationData(Device device, IApplicationData data) {
+		Document doc = DOMUtils.createDoc(null, null);
+		Element root = doc.getDocumentElement();
+		encode(device, root, data);
+		return root;
 	}
 
 	private void e(Element p, String name, String val) {

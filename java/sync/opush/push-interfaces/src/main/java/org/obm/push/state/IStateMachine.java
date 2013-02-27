@@ -29,28 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.state;
 
-import org.obm.push.bean.MSEvent
-import org.obm.push.context.User
-import org.obm.push.helper.SyncHelper
-import org.obm.push.wbxml.WBXMLTools
+import java.util.Collection;
+import java.util.Date;
 
-import com.excilys.ebi.gatling.core.Predef.Session
+import org.obm.push.bean.Device;
+import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.activesync.InvalidServerId;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 
-class ModifyInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
-		extends AbstractInvitationCommand(invitation, wbTools) {
-
-	override val collectionCommandName = "Change"
-	override def clientId(s: Session) = null
-	override def serverId(s: Session) = invitation.userKey.sessionHelper.findPendingInvitation(s).get.serverId
-		
-	override def buildEventInvitation(session: Session, organizer: User, attendees: Iterable[User]) = {
-		val syncResponse = invitation.userKey.sessionHelper.findLastSync(session).get
-		val eventServerId = invitation.userKey.sessionHelper.findPendingInvitation(session).get.serverId
-		val event = SyncHelper.findChangesWithServerId(syncResponse, eventServerId).head.getApplicationData().asInstanceOf[MSEvent]
-		event.setStartTime(invitation.startTime)
-		event.setEndTime(invitation.endTime)
-		event
-	}
+public interface IStateMachine {
+	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
+	
+	ItemSyncState getItemSyncState(SyncKey syncKey) throws DaoException;
+	
+	FolderSyncState getFolderSyncState(SyncKey syncKey) throws DaoException, InvalidSyncKeyException;
+	
+	FolderSyncState allocateNewFolderSyncState(UserDataRequest udr) throws DaoException;
+	
+	void allocateNewSyncState(UserDataRequest udr, Integer collectionId, Date lastSync, 
+		Collection<ItemChange> changes, Collection<ItemDeletion> deletedItems, SyncKey newSyncKey) 
+				throws DaoException, InvalidServerId;
 }

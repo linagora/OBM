@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -83,12 +82,18 @@ public class SerializableTest {
 	
 	@Test
 	public void testSyncCollection() throws IOException {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.addChange(new SyncCollectionChange("serverId", "clientId", SyncCommand.ADD, new MSContact(), PIMDataType.CALENDAR));
-		syncCollection.setItemSyncState(ItemSyncState.builder()
-				.syncDate(new Date())
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
 				.syncKey(new SyncKey("key"))
-				.build());
+				.commands(SyncCollectionCommands.Request.builder()
+						.addCommand(SyncCollectionCommand.Request.builder()
+								.serverId("serverId")
+								.clientId("clientId")
+								.commandType(SyncCommand.ADD)
+								.applicationData(null)
+								.build())
+						.build())
+				.build();
 		objectOutputStream.writeObject(syncCollection);
 	}
 	

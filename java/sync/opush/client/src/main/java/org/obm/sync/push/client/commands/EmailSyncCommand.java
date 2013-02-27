@@ -35,6 +35,7 @@ import java.io.IOException;
 
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
@@ -43,16 +44,16 @@ import org.xml.sax.SAXException;
 
 public class EmailSyncCommand extends Sync {
 
-	public EmailSyncCommand(final SyncKey syncKey, final String collectionId,
+	public EmailSyncCommand(final SyncDecoder decoder, final SyncKey syncKey, final String collectionId,
 			final FilterType filterType, final int windowSize) throws SAXException, IOException {
-		this("EmailSyncRequest.xml", syncKey, collectionId, filterType, windowSize);
+		this(decoder, "EmailSyncRequest.xml", syncKey, collectionId, filterType, windowSize);
 	}
 	
-	protected EmailSyncCommand(String templateName, final SyncKey syncKey, final String collectionId,
+	protected EmailSyncCommand(SyncDecoder decoder, String templateName, final SyncKey syncKey, final String collectionId,
 			final FilterType filterType, final int windowSize)
 			throws SAXException, IOException {
 
-		super(new TemplateDocument(templateName) {
+		super(decoder, new TemplateDocument(templateName) {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {

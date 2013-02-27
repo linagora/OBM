@@ -47,9 +47,12 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.StoreName;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
@@ -240,18 +243,24 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			
 			List<BodyPreference> bodyPreferences = bodyPreferencesFromBodyType(type);
 
-			SyncCollection syncCollection = new SyncCollection(dataType, ImmutableList.of(serverId), bodyPreferences);
-			syncCollection.setCollectionId(collectionId);
-			syncCollection.setCollectionPath(collectionPath);
-			syncCollection.setOptions(new SyncCollectionOptions(bodyPreferences));
-			
-			List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollection);
+			SyncCollectionResponse syncCollectionResponse = SyncCollectionResponse.builder()
+					.dataType(dataType)
+					.collectionId(collectionId)
+					.responses(SyncCollectionCommands.Response.builder()
+							.addCommand(SyncCollectionCommand.Response.builder()
+									.commandType(SyncCommand.FETCH)
+									.serverId(serverId)
+									.build())
+							.build())
+					.build();
+				
+			List<ItemChange> itemChanges = contentsExporter.fetch(udr, syncCollectionResponse, new SyncCollectionOptions(bodyPreferences));
 			
 			if (itemChanges.isEmpty()) {
 				fetchResult.setStatus(ItemOperationsStatus.DOCUMENT_LIBRARY_NOT_FOUND);
 			} else {
 				fetchResult.setItemChange(itemChanges.get(0));
-				fetchResult.setSyncCollection(syncCollection);
+				fetchResult.setSyncCollection(syncCollectionResponse);
 				fetchResult.setStatus(ItemOperationsStatus.SUCCESS);
 			}
 		} catch (CollectionNotFoundException e) {

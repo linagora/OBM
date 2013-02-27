@@ -43,12 +43,12 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -84,13 +84,16 @@ public class ContentsExporterTest {
 	@Test
 	public void testGetChangedOnBackend() throws Exception {
 		int collectionId = 15;
-		SyncCollection syncCollection = new SyncCollection(collectionId, "obm:\\\\test@test\\email\\INBOX");
-		syncCollection.setDataType(PIMDataType.EMAIL);
-		syncCollection.setItemSyncState(ItemSyncState.builder()
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+				.collectionId(collectionId)
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(new SyncKey("123"))
+				.build();
+		ItemSyncState syncState = ItemSyncState.builder()
 				.syncDate(date("2012-05-04T11:22:53"))
 				.syncKey(new SyncKey("123"))
 				.id(5)
-				.build());
+				.build();
 		SyncClientCommands clientCommands = SyncClientCommands.empty();
 
 		PIMBackend emailBackend = mocks.createMock(PIMBackend.class);
@@ -98,11 +101,11 @@ public class ContentsExporterTest {
 
 		SyncKey allocatedSyncKey = new SyncKey("456");
 		DataDelta backendDataDelta = DataDelta.newEmptyDelta(date("2012-05-04T12:22:53"), allocatedSyncKey);
-		expect(emailBackend.getChanged(udr, syncCollection, clientCommands, allocatedSyncKey))
+		expect(emailBackend.getChanged(udr, syncState, syncCollection, clientCommands, allocatedSyncKey))
 			.andReturn(backendDataDelta);
 		
 		mocks.replay();
-		DataDelta dataDelta = testee.getChanged(udr, syncCollection, clientCommands, allocatedSyncKey);
+		DataDelta dataDelta = testee.getChanged(udr, syncState, syncCollection, clientCommands, allocatedSyncKey);
 		mocks.verify();
 		
 		assertThat(dataDelta.getSyncDate()).isEqualTo(date("2012-05-04T12:22:53"));

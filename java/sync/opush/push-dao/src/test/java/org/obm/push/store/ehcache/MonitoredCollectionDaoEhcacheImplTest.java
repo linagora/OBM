@@ -48,10 +48,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
@@ -88,14 +89,14 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	
 	@Test
 	public void testList() {
-		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
+		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 	}
 	
 	@Test
 	public void testSimplePut() {
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
-		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
+		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 		Assert.assertEquals(1, syncCollections.size());
 		containsCollectionWithId(syncCollections, 1);
@@ -106,7 +107,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
 		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(2, 3));
 
-		Collection<SyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
+		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
 		Assert.assertNotNull(syncCollections);
 		Assert.assertEquals(2, syncCollections.size());
 		containsCollectionWithId(syncCollections, 2);
@@ -115,22 +116,23 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	}
 	
 	private void containsCollectionWithId(
-			Collection<SyncCollection> syncCollections, Integer id) {
-		boolean find = false;
-		for(SyncCollection col : syncCollections){
-			if(col.getCollectionId().equals(id)){
-				find = true;
-			}
+		Collection<AnalysedSyncCollection> syncCollections, Integer id) {
+	boolean find = false;
+	for(AnalysedSyncCollection col : syncCollections){
+		if(col.getCollectionId() == id){
+			find = true;
 		}
-		Assert.assertTrue(find);
 	}
+	Assert.assertTrue(find);
+}
 
-	private Set<SyncCollection> buildListCollection(Integer... ids) {
-		Set<SyncCollection> cols = Sets.newHashSet();
+	private Set<AnalysedSyncCollection> buildListCollection(Integer... ids) {
+		Set<AnalysedSyncCollection> cols = Sets.newHashSet();
 		for(Integer id : ids){
-			SyncCollection col = new SyncCollection();
-			col.setCollectionId(id);
-			cols.add(col);
+			cols.add(AnalysedSyncCollection.builder()
+					.collectionId(id)
+					.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+					.build());
 		}
 		return cols;
 	}

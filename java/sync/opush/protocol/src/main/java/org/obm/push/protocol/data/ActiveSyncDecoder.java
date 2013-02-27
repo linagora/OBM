@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import org.obm.push.bean.SyncDefaultValues;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.utils.DOMUtils;
@@ -41,7 +42,7 @@ import org.w3c.dom.Element;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
 
-public class ActiveSyncDecoder {
+public class ActiveSyncDecoder implements SyncDefaultValues {
 
 	private static final Logger logger = LoggerFactory.getLogger(ActiveSyncDecoder.class);
 	

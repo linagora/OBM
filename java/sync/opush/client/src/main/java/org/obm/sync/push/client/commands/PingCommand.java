@@ -45,7 +45,9 @@ import org.xml.sax.SAXException;
 
 public class PingCommand extends AbstractCommand<PingResponse> {
 	
-	public PingCommand(final String collectionId, final long hearbeat) throws SAXException, IOException {
+	private final PingProtocol pingProtocol;
+
+	public PingCommand(PingProtocol pingProtocol, final String collectionId, final long hearbeat) throws SAXException, IOException {
 		super(NS.Ping, "Ping", new TemplateDocument("PingRequest.xml") {
 
 			@Override
@@ -55,11 +57,12 @@ public class PingCommand extends AbstractCommand<PingResponse> {
 				Element hearbeatElement = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.HEARTBEAT_INTERVAL.getName());
 				hearbeatElement.setTextContent(String.valueOf(hearbeat));
 			}});
+		this.pingProtocol = pingProtocol;
 	}
 
 	@Override
 	protected PingResponse parseResponse(Document document) {
-		return new PingProtocol().decodeResponse(document);
+		return pingProtocol.decodeResponse(document);
 	}
 
 }

@@ -33,22 +33,26 @@ package org.obm.push.protocol.data;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.MSContact;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionRequest;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
 import org.obm.push.protocol.bean.SyncResponse;
-import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,6 +62,8 @@ import com.google.common.collect.Iterables;
 @RunWith(SlowFilterRunner.class)
 public class SyncDecoderTest {
 
+	public static final int DEFAULT_WINDOW_SIZE = 100;
+	
 	@Test(expected=ASRequestIntegerFieldException.class)
 	public void testGetWaitWhenNotANumber() throws Exception {
 		Document request = DOMUtils.parse(
@@ -342,7 +348,7 @@ public class SyncDecoderTest {
 		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 
 		assertThat(collection.getSyncKey()).isEqualTo(new SyncKey("ddcf2e35-9834-49de-96ff-09979c7e2aa0"));
-		assertThat(collection.getId()).isEqualTo(2);
+		assertThat(collection.getCollectionId()).isEqualTo(2);
 		assertThat(collection.getDataClass()).isEqualTo("Email");
 		assertThat(collection.getWindowSize()).isEqualTo(150);
 	}
@@ -397,7 +403,7 @@ public class SyncDecoderTest {
 		
 		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
-		assertThat(collection.getDataClass()).isEqualTo("Music");
+		assertThat(collection.getDataClass()).isNull();
 	}
 
 	@Test
@@ -431,8 +437,8 @@ public class SyncDecoderTest {
 		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
 		
 		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
-		assertThat(collectionResponse.getSyncCollection().getDataClass()).isNull();
-		assertThat(collectionResponse.getSyncCollection().getDataType()).isNull();
+		assertThat(collectionResponse.getDataClass()).isNull();
+		assertThat(collectionResponse.getDataType()).isNull();
 	}
 
 	@Test
@@ -452,8 +458,8 @@ public class SyncDecoderTest {
 		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
 		
 		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
-		assertThat(collectionResponse.getSyncCollection().getDataClass()).isNull();
-		assertThat(collectionResponse.getSyncCollection().getDataType()).isEqualTo(PIMDataType.UNKNOWN);
+		assertThat(collectionResponse.getDataClass()).isNull();
+		assertThat(collectionResponse.getDataType()).isEqualTo(PIMDataType.UNKNOWN);
 	}
 
 	@Test
@@ -473,8 +479,8 @@ public class SyncDecoderTest {
 		SyncResponse response = new SyncDecoder(null).decodeSyncResponse(request);
 		
 		SyncCollectionResponse collectionResponse = Iterables.getOnlyElement(response.getCollectionResponses());
-		assertThat(collectionResponse.getSyncCollection().getDataClass()).isEqualTo("Email");
-		assertThat(collectionResponse.getSyncCollection().getDataType()).isEqualTo(PIMDataType.EMAIL);
+		assertThat(collectionResponse.getDataClass()).isEqualTo("Email");
+		assertThat(collectionResponse.getDataType()).isEqualTo(PIMDataType.EMAIL);
 	}
 
 	@Test
@@ -488,7 +494,7 @@ public class SyncDecoderTest {
 		
 		SyncCollectionRequest collection = new SyncDecoder(null).getCollection(request.getDocumentElement());
 		
-		assertThat(collection.getWindowSize()).isNull();
+		assertThat(collection.getWindowSize()).isEqualTo(DEFAULT_WINDOW_SIZE);
 	}
 
 	@Test
@@ -691,29 +697,35 @@ public class SyncDecoderTest {
 		Element changeElement = DOMUtils.getUniqueElement(request, "Change");
 		Element changeDataElement = DOMUtils.getUniqueElement(changeElement, "ApplicationData");
 		
-		assertThat(collection.getCommands().getFetchIds()).containsOnly("56");
-		assertThat(collection.getCommands().getCommands()).containsOnly(
-				SyncCollectionRequestCommand.builder()
+		assertThat(collection.getCommands().getCommandsForType(SyncCommand.FETCH)).containsOnly(
+				SyncCollectionCommand.Request.builder().name("Fetch").serverId("56").build());
+		List<SyncCollectionCommand.Request> commands = collection.getCommands().getCommands();
+		assertThat(commands).containsOnly(
+				SyncCollectionCommand.Request.builder()
 					.name("Add").serverId("12").clientId("120").applicationData(addDataElement).build(),
-				SyncCollectionRequestCommand.builder()
+				SyncCollectionCommand.Request.builder()
 					.name("Change").serverId("35").clientId("350").applicationData(changeDataElement).build(),
-				SyncCollectionRequestCommand.builder().name("Fetch").serverId("56").build(),
-				SyncCollectionRequestCommand.builder().name("Delete").serverId("79").build());
+				SyncCollectionCommand.Request.builder().name("Fetch").serverId("56").build(),
+				SyncCollectionCommand.Request.builder().name("Delete").serverId("79").build());
 	}
 
 	@Test
 	public void testCollectionCommandsServerIdIsNotRequired() throws Exception {
 		Document request = DOMUtils.parse(
-						"<Name>" +
+						"<Add>" +
 							"<ClientId>120</ClientId>" +
 							"<ApplicationData>" +
 								"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
 								"<FileAs>Dobney, JoLynn Julie</FileAs>" +
 								"<FirstName>JoLynn</FirstName>" +
 							"</ApplicationData>" +
-						"</Name>");
+						"</Add>");
+		MSContact contact = new MSContact();
+		contact.setEmail1Address("opush@obm.org");
+		contact.setFileAs("Dobney, JoLynn Julie");
+		contact.setFirstName("JoLynn");
 		
-		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionCommand.Request command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getServerId()).isNull();
 	}
@@ -721,16 +733,20 @@ public class SyncDecoderTest {
 	@Test
 	public void testCollectionCommandsClientIdIsNotRequired() throws Exception {
 		Document request = DOMUtils.parse(
-						"<Name>" +
+						"<Add>" +
 							"<ServerId>12</ServerId>" +
 							"<ApplicationData>" +
 								"<Email1Address>\"opush@obm.org\"&lt;opush@obm.org&gt;</Email1Address>" +
 								"<FileAs>Dobney, JoLynn Julie</FileAs>" +
 								"<FirstName>JoLynn</FirstName>" +
 							"</ApplicationData>" +
-						"</Name>");
+						"</Add>");
+		MSContact contact = new MSContact();
+		contact.setEmail1Address("opush@obm.org");
+		contact.setFileAs("Dobney, JoLynn Julie");
+		contact.setFirstName("JoLynn");
 		
-		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionCommand.Request command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getClientId()).isNull();
 	}
@@ -738,12 +754,12 @@ public class SyncDecoderTest {
 	@Test
 	public void testCollectionCommandsApplicationDataIsNotRequired() throws Exception {
 		Document request = DOMUtils.parse(
-						"<Name>" +
+						"<Add>" +
 							"<ServerId>12</ServerId>" +
 							"<ClientId>120</ClientId>" +
-						"</Name>");
+						"</Add>");
 		
-		SyncCollectionRequestCommand command = new SyncDecoder(null).getCommand(request.getDocumentElement());
+		SyncCollectionCommand.Request command = new SyncDecoder(null).getCommand(request.getDocumentElement());
 		
 		assertThat(command.getApplicationData()).isNull();
 	}

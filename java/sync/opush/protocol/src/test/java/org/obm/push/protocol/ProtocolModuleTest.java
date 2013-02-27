@@ -33,6 +33,8 @@ package org.obm.push.protocol;
 
 import org.easymock.EasyMock;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneEncoder;
 
 import com.google.inject.AbstractModule;
 
@@ -42,5 +44,7 @@ public class ProtocolModuleTest extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(EmailConfiguration.class).toInstance(EasyMock.createMock(EmailConfiguration.class));
+		bind(TimeZoneConverter.class).toInstance(EasyMock.createMock(TimeZoneConverter.class));
+		bind(TimeZoneEncoder.class).toInstance(EasyMock.createMock(TimeZoneEncoder.class));
 	}
 }

@@ -37,10 +37,8 @@ import java.util.Set;
 import org.joda.time.Minutes;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public class Sync {
 
@@ -50,14 +48,14 @@ public class Sync {
 	
 	public static class Builder {
 
-		private final Map<Integer, SyncCollection> collections;
+		private final Map<Integer, AnalysedSyncCollection> collections;
 		private Integer waitInMinutes;
 		
 		public Builder() {
 			collections = Maps.newHashMap();
 		}
 		
-		public Builder addCollection(SyncCollection collection) {
+		public Builder addCollection(AnalysedSyncCollection collection) {
 			collections.put(collection.getCollectionId(), collection);
 			return this;
 		}
@@ -76,10 +74,10 @@ public class Sync {
 		}
 	}
 	
-	private final Map<Integer, SyncCollection> collections;
+	private final Map<Integer, AnalysedSyncCollection> collections;
 	private final int waitInSecond;
 	
-	private Sync(Map<Integer, SyncCollection> collections, int waitInSecond) {
+	private Sync(Map<Integer, AnalysedSyncCollection> collections, int waitInSecond) {
 		this.collections = collections;
 		this.waitInSecond = waitInSecond;
 	}
@@ -88,21 +86,11 @@ public class Sync {
 		return waitInSecond;
 	}
 	
-	public Set<SyncCollection> getCollections() {
+	public Set<AnalysedSyncCollection> getCollections() {
 		return ImmutableSet.copyOf(collections.values());
 	}
-
-	public Set<SyncCollection> getCollectionsValidToProcess() {
-		return Sets.filter(getCollections(), new Predicate<SyncCollection>() {
-
-			@Override
-			public boolean apply(SyncCollection input) {
-				return input.isValidToProcess();
-			}
-		});
-	}
 	
-	public SyncCollection getCollection(Integer collectionId) {
+	public AnalysedSyncCollection getCollection(Integer collectionId) {
 		return collections.get(collectionId);
 	}
 	

@@ -35,6 +35,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionResponse;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
@@ -56,11 +60,9 @@ import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.SearchRequest;
 import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.protocol.request.SendEmailSyncRequest;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
 import com.google.common.collect.ImmutableList;
 
@@ -86,7 +88,6 @@ public class BeansTest {
 					.add(FolderSyncResponse.class)
 					.add(ProvisionRequest.class)
 					.add(ProvisionResponse.class)
-					.add(Estimate.class)
 					.add(GetItemEstimateRequest.class)
 					.add(GetItemEstimateResponse.class)
 					.add(MeetingHandlerRequest.class)
@@ -99,12 +100,26 @@ public class BeansTest {
 					.add(SearchResponse.class)
 					.add(SyncRequest.class)
 					.add(AnalysedSyncRequest.class)
-					.add(SyncCollectionRequest.class)
-					.add(SyncCollectionRequestCommand.class)
-					.add(SyncCollectionRequestCommands.class)
 					.add(SendEmailSyncRequest.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+		
+		EqualsVerifierBuilder.builder()
+		.equalsVerifiers(ImmutableList.<Class<?>>of(Estimate.class))
+		.prefabValue(SyncCollectionResponse.class,
+				SyncCollectionResponse.builder()
+					.collectionId(1)
+					.dataType(PIMDataType.EMAIL)
+					.status(SyncStatus.OK)
+					.syncKey(new SyncKey("123"))
+					.build(),
+				SyncCollectionResponse.builder()
+					.collectionId(2)
+					.dataType(PIMDataType.EMAIL)
+					.status(SyncStatus.OK)
+					.syncKey(new SyncKey("456"))
+					.build())
+		.verify();
 	}
 	
 }

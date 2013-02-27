@@ -47,10 +47,12 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Folder;
@@ -128,44 +130,44 @@ public abstract class OPClient {
 		return run(new FolderSync(key));
 	}
 
-	public SyncResponse initialSync(Folder... folders) throws Exception {
-		return run(new Sync(folders));
+	public SyncResponse initialSync(SyncDecoder decoder, Folder... folders) throws Exception {
+		return run(new Sync(decoder, folders));
 	}
 	
-	public SyncResponse partialSync() throws Exception {
-		return run(new PartialSyncCommand());
+	public SyncResponse partialSync(SyncDecoder decoder) throws Exception {
+		return run(new PartialSyncCommand(decoder));
 	}
 
-	public SyncResponse syncEmail(SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
-		return run(new EmailSyncCommand(key, collectionId, filterType, windowSize));
+	public SyncResponse syncEmail(SyncDecoder decoder, SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommand(decoder, key, collectionId, filterType, windowSize));
 	}
 
-	public SyncResponse syncEmailWithWait(SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
-		return run(new EmailSyncCommandWithWait(key, collectionId, filterType, windowSize));
+	public SyncResponse syncEmailWithWait(SyncDecoder decoder, SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommandWithWait(decoder, key, collectionId, filterType, windowSize));
 	}
 	
-	public SyncResponse syncWithCommand(SyncKey key, String collectionId, SyncCommand command, String serverId) throws Exception {
-		return run(new SyncWithCommand(key, collectionId, command, serverId));
+	public SyncResponse syncWithCommand(SyncDecoder decoder, SyncKey key, String collectionId, SyncCommand command, String serverId) throws Exception {
+		return run(new SyncWithCommand(decoder, key, collectionId, command, serverId));
 	}
 
-	public SyncResponse syncWithoutOptions(SyncKey key, String collectionId) throws Exception {
-		return run(new EmailSyncNoOptionsCommand(key, collectionId));
+	public SyncResponse syncWithoutOptions(SyncDecoder decoder, SyncKey key, String collectionId) throws Exception {
+		return run(new EmailSyncNoOptionsCommand(decoder, key, collectionId));
 	}
 	
-	public SyncResponse syncEmail(SyncKey key, int collectionId, FilterType filterType, int windowSize) throws Exception {
-		return run(new EmailSyncCommand(key, String.valueOf(collectionId), filterType, windowSize));
+	public SyncResponse syncEmail(SyncDecoder decoder, SyncKey key, int collectionId, FilterType filterType, int windowSize) throws Exception {
+		return run(new EmailSyncCommand(decoder, key, String.valueOf(collectionId), filterType, windowSize));
 	}
 	
-	public SyncResponse sync(DocumentProvider template) throws Exception {
-		return run(new Sync(template));
+	public SyncResponse sync(SyncDecoder decoder, DocumentProvider template) throws Exception {
+		return run(new Sync(decoder, template));
 	}
 	
-	public SyncResponse sync(SyncKey syncKey, int collectionId, PIMDataType type) throws Exception {
-		return run(new SimpleSyncCommand(syncKey, collectionId, type));
+	public SyncResponse sync(SyncDecoder decoder, SyncKey syncKey, int collectionId, PIMDataType type) throws Exception {
+		return run(new SimpleSyncCommand(decoder, syncKey, collectionId, type));
 	}
 
-	public SyncResponse deleteEmail(SyncKey key, int collectionId, String uid) throws Exception {
-		return run(new EmailDeleteSyncRequest(key, collectionId, uid));
+	public SyncResponse deleteEmail(SyncDecoder decoder, SyncKey key, int collectionId, String uid) throws Exception {
+		return run(new EmailDeleteSyncRequest(decoder, key, collectionId, uid));
 	}
 	
 	public ProvisionResponse provisionStepOne() throws Exception {
@@ -200,8 +202,8 @@ public abstract class OPClient {
 		return run(new MeetingResponseCommand(collectionId, serverId));
 	}
 
-	public PingResponse ping(String inboxCollectionIdAsString, long hearbeat) throws Exception {
-		return run(new PingCommand(inboxCollectionIdAsString, hearbeat));
+	public PingResponse ping(PingProtocol pingProtocol, String inboxCollectionIdAsString, long hearbeat) throws Exception {
+		return run(new PingCommand(pingProtocol, inboxCollectionIdAsString, hearbeat));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)

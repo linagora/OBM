@@ -29,35 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.FilterType;
-import org.obm.push.bean.SyncCollectionOptions;
-import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncCollectionRequest.Builder;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
-import org.obm.push.protocol.bean.SyncCollectionRequest.Builder;
-
-import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
 public class SyncCollectionRequestTest {
 
+	private static final int DEFAULT_WINDOW_SIZE = 100;
+	
 	@Test(expected=ASRequestIntegerFieldException.class)
 	public void testBuilderIdIsRequired() {
-		builderWithRequirement().id(null).build();
+		builderWithRequirement().collectionId(null).build();
 	}
 
 	@Test
 	public void testBuilderIdValid() {
-		SyncCollectionRequest syncRequestCollection = builderWithRequirement().id(135).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().collectionId(135).build();
 		
-		assertThat(syncRequestCollection.getId()).isEqualTo(135);
+		assertThat(syncRequestCollection.getCollectionId()).isEqualTo(135);
 	}
 	
 	@Test(expected=ASRequestStringFieldException.class)
@@ -74,14 +71,14 @@ public class SyncCollectionRequestTest {
 	
 	@Test
 	public void testBuilderDataClassIsNotRequired() {
-		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataClass(null).build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataType(null).build();
 		
 		assertThat(syncRequestCollection.getDataClass()).isNull();
 	}
 
 	@Test
 	public void testBuilderDataClassValid() {
-		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataClass("Email").build();
+		SyncCollectionRequest syncRequestCollection = builderWithRequirement().dataType(PIMDataType.EMAIL).build();
 		
 		assertThat(syncRequestCollection.getDataClass()).isEqualTo("Email");
 	}
@@ -90,7 +87,7 @@ public class SyncCollectionRequestTest {
 	public void testBuilderWindowSizeIsNotRequired() {
 		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(null).build();
 		
-		assertThat(syncRequestCollection.getWindowSize()).isNull();
+		assertThat(syncRequestCollection.getWindowSize()).isEqualTo(DEFAULT_WINDOW_SIZE);
 	}
 
 	@Test
@@ -98,20 +95,6 @@ public class SyncCollectionRequestTest {
 		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(5).build();
 		
 		assertThat(syncRequestCollection.getWindowSize()).isEqualTo(5);
-	}
-	
-	@Test
-	public void testHasWindowSizeWhenNull() {
-		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(null).build();
-		
-		assertThat(syncRequestCollection.hasWindowSize()).isFalse();
-	}
-
-	@Test
-	public void testHasWindowSizeWhenValid() {
-		SyncCollectionRequest syncRequestCollection = builderWithRequirement().windowSize(5).build();
-		
-		assertThat(syncRequestCollection.hasWindowSize()).isTrue();
 	}
 	
 	@Test
@@ -157,10 +140,8 @@ public class SyncCollectionRequestTest {
 
 	@Test
 	public void testBuilderCommandsValid() {
-		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
-			.fetchIds(ImmutableList.of("1234"))
-			.commands(ImmutableList.of(
-					SyncCollectionRequestCommand.builder().serverId("100").name("Delete").build()))
+		SyncCollectionCommands.Request commands = SyncCollectionCommands.Request.builder()
+			.addCommand(SyncCollectionCommand.Request.builder().serverId("100").name("Delete").build())
 			.build();
 		
 		SyncCollectionRequest syncRequestCollection = builderWithRequirement().commands(commands).build();
@@ -170,7 +151,7 @@ public class SyncCollectionRequestTest {
 
 	private Builder builderWithRequirement() {
 		return SyncCollectionRequest.builder()
-			.id(140)
+			.collectionId(140)
 			.syncKey(new SyncKey("1234"));
 	}
 }

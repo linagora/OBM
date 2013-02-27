@@ -57,6 +57,7 @@ import org.obm.push.backend.OpushBackend;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Address;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
@@ -67,7 +68,6 @@ import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -287,11 +287,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws ProcessingEmailException, 
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
+			SyncCollectionOptions options) throws ProcessingEmailException, 
 			CollectionNotFoundException, DaoException, FilterTypeChangedException {
 		
-		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state,
-				collection.getCollectionId(), collection.getOptions());
+		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, state, collectionId, options);
 		return syncData.getEmailChanges().sumOfChanges();
 	}
 
@@ -300,28 +300,28 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	 * exists for the given syncKey and the snapshot.filterType != options.filterType
 	 */
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState syncState, AnalysedSyncCollection syncCollection, 
+			SyncClientCommands clientCommands, SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException, FilterTypeChangedException {
 
 		try {
-			SyncKey requestSyncKey = collection.getSyncKey();
-			WindowingIndexKey key = new WindowingIndexKey(udr.getUser(), udr.getDevId(), collection.getCollectionId());
+			SyncKey requestSyncKey = syncCollection.getSyncKey();
+			WindowingIndexKey key = new WindowingIndexKey(udr.getUser(), udr.getDevId(), syncCollection.getCollectionId());
 			
 			if (windowingService.hasPendingElements(key, requestSyncKey)) {
-				return continueWindowing(udr, collection, key, collection.getItemSyncState().getSyncDate(), requestSyncKey);
+				return continueWindowing(udr, syncCollection, key, syncState.getSyncDate(), requestSyncKey);
 			} else {
-				return startWindowing(udr, collection, key, newSyncKey);
+				return startWindowing(udr, syncState, syncCollection, key, newSyncKey);
 			}
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
 
-	private DataDelta startWindowing(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key, SyncKey newSyncKey)
+	private DataDelta startWindowing(UserDataRequest udr, ItemSyncState syncState, AnalysedSyncCollection collection, WindowingIndexKey key, SyncKey newSyncKey)
 			throws EmailViewPartsFetcherException {
 		
 		Integer collectionId = collection.getCollectionId();
-		ItemSyncState syncState = collection.getItemSyncState();
 		SyncCollectionOptions options = collection.getOptions();
 		
 		MailBackendSyncData syncData = mailBackendSyncDataFactory.create(udr, syncState, collectionId, options);
@@ -335,7 +335,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		}
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key,
+	private DataDelta continueWindowing(UserDataRequest udr, AnalysedSyncCollection collection, WindowingIndexKey key,
 			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey)
 		throws DaoException, EmailViewPartsFetcherException {
 		
@@ -343,12 +343,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		return fetchChanges(udr, collection, key, dataDelaSyncDate, dataDeltaSyncKey, pendingChanges);
 	}
 
-	private DataDelta fetchChanges(UserDataRequest udr, SyncCollection collection, WindowingIndexKey key,
+	private DataDelta fetchChanges(UserDataRequest udr, AnalysedSyncCollection collection, WindowingIndexKey key,
 			Date dataDelaSyncDate, SyncKey dataDeltaSyncKey, EmailChanges pendingChanges)
 		throws EmailViewPartsFetcherException {
 		
-		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collection.getCollectionId(),
-				collection.getCollectionPath(), collection.getOptions().getBodyPreferences(), pendingChanges);
+		int collectionId = collection.getCollectionId();
+		MSEmailChanges serverItemChanges = emailChangesFetcher.fetch(udr, collectionId,
+				mappingService.getCollectionPathFor(collectionId), collection.getOptions().getBodyPreferences(), pendingChanges);
 		
 		return DataDelta.builder()
 				.changes(serverItemChanges.getItemChanges())

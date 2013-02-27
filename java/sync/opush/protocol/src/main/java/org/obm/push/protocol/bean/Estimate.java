@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
 
 import com.google.common.base.Objects;
 
@@ -42,12 +42,12 @@ public class Estimate {
 	}
 	
 	public static class Builder {
-		private SyncCollection collection;
+		private SyncCollectionResponse collection;
 		private int estimate;
 		
 		private Builder() {}
 		
-		public Builder collection(SyncCollection collection) {
+		public Builder collection(SyncCollectionResponse collection) {
 			this.collection = collection;
 			return this;
 		}
@@ -62,15 +62,15 @@ public class Estimate {
 		}
 	}
 
-	private final SyncCollection collection;
+	private final SyncCollectionResponse collection;
 	private final int estimate;
 
-	private Estimate(SyncCollection collection, int estimate) {
+	private Estimate(SyncCollectionResponse collection, int estimate) {
 		this.collection = collection;
 		this.estimate = estimate;
 	}
 	
-	public SyncCollection getCollection() {
+	public SyncCollectionResponse getCollection() {
 		return collection;
 	}
 	

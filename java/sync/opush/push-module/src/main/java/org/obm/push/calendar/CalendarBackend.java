@@ -43,6 +43,7 @@ import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.PathsToCollections.Builder;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
@@ -52,7 +53,6 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -251,36 +251,39 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection collection) throws CollectionNotFoundException, 
-			DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
+				SyncCollectionOptions collectionOptions) 
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, 
+				ConversionException, HierarchyChangedException {
 		
-		DataDelta dataDelta = getAllChanges(udr, state, collection, state.getSyncKey());
+		DataDelta dataDelta = getAllChanges(udr, state, collectionId, collectionOptions, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
+	public DataDelta getChanged(final UserDataRequest udr, final ItemSyncState itemSyncState, final AnalysedSyncCollection syncCollection, 
 			SyncClientCommands clientCommands, final SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ConversionException, HierarchyChangedException {
 
-		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
+		return backendWindowingService.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, new BackendChangesProvider() {
 			
 			@Override
 			public DataDelta getAllChanges() {
-				return CalendarBackend.this.getAllChanges(udr, collection.getItemSyncState(), collection, newSyncKey);
+				return CalendarBackend.this.getAllChanges(udr, itemSyncState, syncCollection.getCollectionId(), 
+						syncCollection.getOptions(), newSyncKey);
 			}
 		});
 	}
 
 	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, ItemSyncState state,
-			SyncCollection collection, SyncKey newSyncKey) {
+			Integer collectionId, SyncCollectionOptions collectionOptions, SyncKey newSyncKey) {
 		
-		CollectionPath collectionPath = buildCollectionPath(udr, collection.getCollectionId());
+		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		AccessToken token = login(udr);
 		
 		DataDelta delta = null;
-		ItemSyncState newState = state.newWindowedSyncState(collection.getOptions().getFilterType());
+		ItemSyncState newState = state.newWindowedSyncState(collectionOptions.getFilterType());
 
 		try {
 			
@@ -295,7 +298,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			logger.info("Event changes [ {} ]", changes.getUpdated().size());
 			logger.info("Event changes LastSync [ {} ]", changes.getLastSync().toString());
 			
-			delta = buildDataDelta(udr, collection.getCollectionId(), token, changes, newSyncKey);
+			delta = buildDataDelta(udr, collectionId, token, changes, newSyncKey);
 			
 			logger.info("getContentChanges( {}, lastSync = {} ) => {}",
 				new Object[]{collectionPath.backendName(), newState.getSyncDate(), delta.statistics()});

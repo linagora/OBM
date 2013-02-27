@@ -31,14 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.util.List;
+import java.util.Set;
 
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionRequest;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +59,7 @@ public class SyncEncoder extends ActiveSyncDecoder {
 		
 		appendPartial(root, request);
 		appendWait(root, request);
-		appendWindowSize(root, request);
+		appendWindowSize(root, request.getWindowSize());
 		appendCollections(root, request);
 		return doc;
 	}
@@ -72,12 +72,15 @@ public class SyncEncoder extends ActiveSyncDecoder {
 		appendInteger(root, SyncRequestFields.WAIT, request.getWaitInMinute());
 	}
 	
-	private void appendWindowSize(Element root, SyncRequest request) {
-		appendInteger(root, SyncRequestFields.WINDOW_SIZE, request.getWindowSize());
+	private void appendWindowSize(Element root, int windowSize) {
+		if (windowSize != DEFAULT_WINDOW_SIZE) {
+			appendInteger(root, SyncRequestFields.WINDOW_SIZE, windowSize);
+		}
 	}
 
 	private void appendCollections(Element root, SyncRequest request) {
-		List<SyncCollectionRequest> requestCollections = request.getCollections();
+			
+		Set<SyncCollectionRequest> requestCollections = request.getCollections();
 		if (requestCollections != null && !requestCollections.isEmpty()) {
 			Element collections = DOMUtils.createElement(root, SyncRequestFields.COLLECTIONS.getName());
 			for (SyncCollectionRequest collection : requestCollections) {
@@ -87,11 +90,12 @@ public class SyncEncoder extends ActiveSyncDecoder {
 	}
 	
 	private void appendCollection(Element collections, SyncCollectionRequest collection) {
+			
 		Element collectionEl = DOMUtils.createElement(collections, SyncRequestFields.COLLECTION.getName());
 		appendString(collectionEl, SyncRequestFields.DATA_CLASS, collection.getDataClass());
 		appendString(collectionEl, SyncRequestFields.SYNC_KEY, collection.getSyncKey().getSyncKey());
-		appendInteger(collectionEl, SyncRequestFields.COLLECTION_ID, collection.getId());
-		appendInteger(collectionEl, SyncRequestFields.WINDOW_SIZE, collection.getWindowSize());
+		appendInteger(collectionEl, SyncRequestFields.COLLECTION_ID, collection.getCollectionId());
+		appendWindowSize(collectionEl, collection.getWindowSize());
 		appendOptions(collectionEl, collection.getOptions());
 		appendCommands(collectionEl, collection.getCommands());
 	}
@@ -121,18 +125,19 @@ public class SyncEncoder extends ActiveSyncDecoder {
 		appendBoolean(bodyPreferenceEl, SyncRequestFields.ALL_OR_NONE, bodyPreference.isAllOrNone());
 	}
 	
-	private void appendCommands(Element collectionElement, SyncCollectionRequestCommands commands) {
+	private void appendCommands(Element collectionElement, SyncCollectionCommands.Request commands) {
+			
 		if (commands == null) {
 			return;
 		}
 		Element commandsElement = DOMUtils.createElement(collectionElement, SyncRequestFields.COMMANDS.getName());
-		for (SyncCollectionRequestCommand command : commands.getCommands()) {
+		for (SyncCollectionCommand.Request command : commands.getCommands()) {
 			appendCommand(commandsElement, command);
 		}
 	}
 
-	private void appendCommand(Element commandsElement, SyncCollectionRequestCommand command) {
-		Element commandElement = DOMUtils.createElement(commandsElement, command.getName());
+	private void appendCommand(Element commandsElement, SyncCollectionCommand.Request command) {
+		Element commandElement = DOMUtils.createElement(commandsElement, command.getType().asSpecificationValue());
 		appendString(commandElement, SyncRequestFields.SERVER_ID, command.getServerId());
 		appendString(commandElement, SyncRequestFields.CLIENT_ID, command.getClientId());
 		if (command.getApplicationData() != null) {

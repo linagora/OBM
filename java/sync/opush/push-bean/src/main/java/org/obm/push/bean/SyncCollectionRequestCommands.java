@@ -31,67 +31,73 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.io.Serializable;
-
-import org.obm.push.bean.change.SyncCommand;
+import java.util.List;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
+public class SyncCollectionRequestCommands {
 
-public class SyncCollectionChange implements Serializable {
-
-	private static final long serialVersionUID = -3115614124120167390L;
+	public static Builder builder() {
+		return new Builder();
+	}
 	
-	private String serverId;
-	private String clientId;
-	private SyncCommand command;
-	private PIMDataType type;
-	private IApplicationData data;
+	public static class Builder {
+		
+		private List<String> fetchIds;
+		private List<SyncCollectionRequestCommand> commands;
+
+		private Builder() {}
+		
+		public Builder fetchIds(List<String> fetchIds) {
+			this.fetchIds = fetchIds;
+			return this;
+		}
+		
+		public Builder commands(List<SyncCollectionRequestCommand> commands) {
+			this.commands = commands;
+			return this;
+		}
+		
+		public SyncCollectionRequestCommands build() {
+			if (fetchIds == null) {
+				fetchIds = ImmutableList.of();
+			}
+			if (commands == null) {
+				commands = ImmutableList.of();
+			}
+			
+			return new SyncCollectionRequestCommands(fetchIds, commands);
+		}
+	}
 	
-	public SyncCollectionChange(String serverId, String clientId,
-			SyncCommand command, IApplicationData data, PIMDataType type) {
-		super();
-		this.serverId = serverId;
-		this.clientId = clientId;
-		this.command = command;
-		this.data = data;
-		this.type = type;
+	private final List<String> fetchIds;
+	private final List<SyncCollectionRequestCommand> commands;
+	
+	private SyncCollectionRequestCommands(List<String> fetchIds, List<SyncCollectionRequestCommand> commands) {
+		this.fetchIds = fetchIds;
+		this.commands = commands;
 	}
 
-	public String getServerId() {
-		return serverId;
+	public List<String> getFetchIds() {
+		return fetchIds;
 	}
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public SyncCommand getCommand() {
-		return command;
-	}
-
-	public IApplicationData getData() {
-		return data;
-	}
-
-	public PIMDataType getType() {
-		return type;
+	
+	public List<SyncCollectionRequestCommand> getCommands() {
+		return commands;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(serverId, clientId, command, type, data);
+		return Objects.hashCode(fetchIds, commands);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncCollectionChange) {
-			SyncCollectionChange that = (SyncCollectionChange) object;
-			return Objects.equal(this.serverId, that.serverId)
-				&& Objects.equal(this.clientId, that.clientId)
-				&& Objects.equal(this.command, that.command)
-				&& Objects.equal(this.type, that.type)
-				&& Objects.equal(this.data, that.data);
+		if (object instanceof SyncCollectionRequestCommands) {
+			SyncCollectionRequestCommands that = (SyncCollectionRequestCommands) object;
+			return Objects.equal(this.fetchIds, that.fetchIds)
+				&& Objects.equal(this.commands, that.commands);
 		}
 		return false;
 	}
@@ -99,11 +105,8 @@ public class SyncCollectionChange implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("serverId", serverId)
-			.add("clientId", clientId)
-			.add("command", command)
-			.add("type", type)
-			.add("data", data)
+			.add("fetchIds", fetchIds)
+			.add("commands", commands)
 			.toString();
 	}
 	

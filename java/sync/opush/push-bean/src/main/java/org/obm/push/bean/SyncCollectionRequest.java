@@ -29,35 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean;
 
-import org.obm.push.bean.SyncCollectionOptions;
-import org.obm.push.bean.SyncKey;
+import java.io.Serializable;
+
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 
-public class SyncCollectionRequest {
+public class SyncCollectionRequest extends SyncCollection<SyncCollectionCommands.Request> implements SyncDefaultValues, Serializable {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-
-		private Integer id;
+		private PIMDataType dataType;
 		private SyncKey syncKey;
-		private String dataClass;
+		private Integer collectionId;
+		private Boolean deletesAsMoves;
+		private Boolean changes;
 		private Integer windowSize;
 		private SyncCollectionOptions options;
-		private SyncCollectionRequestCommands commands;
+		private SyncCollectionCommands.Request commands;
 
-		private Builder() {}
+		private Builder() {
+			options = new SyncCollectionOptions();
+		}
 		
-		public Builder id(Integer id) {
-			this.id = id;
+		public Builder dataType(PIMDataType dataType) {
+			this.dataType = dataType;
 			return this;
 		}
 		
@@ -66,8 +68,18 @@ public class SyncCollectionRequest {
 			return this;
 		}
 		
-		public Builder dataClass(String dataClass) {
-			this.dataClass = dataClass;
+		public Builder collectionId(Integer collectionId) {
+			this.collectionId = collectionId;
+			return this;
+		}
+		
+		public Builder deletesAsMoves(Boolean deletesAsMoves) {
+			this.deletesAsMoves = deletesAsMoves;
+			return this;
+		}
+		
+		public Builder changes(Boolean changes) {
+			this.changes = changes;
 			return this;
 		}
 		
@@ -81,101 +93,92 @@ public class SyncCollectionRequest {
 			return this;
 		}
 		
-		public Builder commands(SyncCollectionRequestCommands commands) {
+		public Builder commands(SyncCollectionCommands.Request commands) {
 			this.commands = commands;
 			return this;
 		}
 		
-		public SyncCollectionRequest build() {
-			if (id == null) {
+		private void checkSyncCollectionCommonElements() {
+			if (collectionId == null) {
 				throw new ASRequestIntegerFieldException("Collection id field is required");
 			}
-			if (syncKey == null || Strings.isNullOrEmpty(syncKey.getSyncKey())) {
-				throw new ASRequestStringFieldException("Collection SyncKey field is required");
+			if (syncKey == null) {
+				throw new ASRequestStringFieldException("Sync Key field is required");
 			}
+		}
+		
+		public SyncCollectionRequest build() {
+			checkSyncCollectionCommonElements();
 			
-			return new SyncCollectionRequest(id, syncKey, dataClass, windowSize, options, commands);
+			if (windowSize == null) {
+				windowSize = DEFAULT_WINDOW_SIZE;
+			}
+			return new SyncCollectionRequest(dataType, syncKey, collectionId, 
+					deletesAsMoves, changes, windowSize, options, commands);
 		}
 
 	}
 	
-	private final int id;
-	private final SyncKey syncKey;
-	private final String dataClass;
-	private final Integer windowSize;
+	private final Boolean deletesAsMoves;
+	private final Boolean changes;
+	private final int windowSize;
 	private final SyncCollectionOptions options;
-	private final SyncCollectionRequestCommands commands;
 	
-	protected SyncCollectionRequest(int id, SyncKey syncKey, String dataClass, Integer windowSize,
-			SyncCollectionOptions options, SyncCollectionRequestCommands commands) {
-		this.id = id;
-		this.syncKey = syncKey;
-		this.dataClass = dataClass;
+	protected SyncCollectionRequest(PIMDataType dataType, SyncKey syncKey, int collectionId,
+			Boolean deletesAsMoves, Boolean changes, Integer windowSize, 
+			SyncCollectionOptions options, SyncCollectionCommands.Request commands) {
+		super(dataType, syncKey, collectionId, commands);
+		this.deletesAsMoves = deletesAsMoves;
+		this.changes = changes;
 		this.windowSize = windowSize;
 		this.options = options;
-		this.commands = commands;
 	}
 	
-	public int getId() {
-		return id;
+	public Boolean getDeletesAsMoves() {
+		return deletesAsMoves;
 	}
 
-	public String getDataClass() {
-		return dataClass;
+	public Boolean isChanges() {
+		return changes;
 	}
 
-	public SyncKey getSyncKey() {
-		return syncKey;
-	}
-
-	public Integer getWindowSize() {
+	public int getWindowSize() {
 		return windowSize;
-	}
-	
-	public boolean hasWindowSize() {
-		return windowSize != null;
 	}
 
 	public SyncCollectionOptions getOptions() {
 		return options;
 	}
-	
+
 	public boolean hasOptions() {
 		return options != null;
 	}
-	
-	public SyncCollectionRequestCommands getCommands() {
-		return commands;
-	}
 
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(id, syncKey, dataClass, windowSize, options, commands);
+	protected int hashCodeImpl() {
+		return Objects.hashCode(deletesAsMoves, changes, windowSize, options);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	protected boolean equalsImpl(SyncCollection<?> object) {
 		if (object instanceof SyncCollectionRequest) {
 			SyncCollectionRequest that = (SyncCollectionRequest) object;
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.syncKey, that.syncKey)
-				&& Objects.equal(this.dataClass, that.dataClass)
+			return Objects.equal(this.deletesAsMoves, that.deletesAsMoves)
+				&& Objects.equal(this.changes, that.changes)
 				&& Objects.equal(this.windowSize, that.windowSize)
-				&& Objects.equal(this.options, that.options)
-				&& Objects.equal(this.commands, that.commands);
+				&& Objects.equal(this.options, that.options);
 		}
 		return false;
 	}
 
+
 	@Override
-	public String toString() {
+	protected String toStringImpl() {
 		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("syncKey", syncKey)
-			.add("dataClass", dataClass)
+			.add("deletesAsMoves", deletesAsMoves)
+			.add("changes", changes)
 			.add("windowSize", windowSize)
 			.add("options", options)
-			.add("commands", commands)
 			.toString();
 	}
 }

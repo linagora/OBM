@@ -29,8 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.bean;
 
-public class MissingRequestParameterException extends Exception {
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+
+import com.google.common.collect.ImmutableList;
+
+@RunWith(SlowFilterRunner.class)
+public class SyncCollectionRequestCommandsTest {
+
+	@Test
+	public void testBuilderFetchIdsIsNotRequired() {
+		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
+			.fetchIds(null).build();
+		
+		assertThat(commands.getFetchIds()).isEmpty();
+	}
+
+	@Test
+	public void testBuilderFetchIdsValid() {
+		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
+			.fetchIds(ImmutableList.of("1234", "5678")).build();
+		
+		assertThat(commands.getFetchIds()).containsOnly("1234", "5678");
+	}
+
+	@Test
+	public void testBuilderCommandsIsNotRequired() {
+		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
+			.commands(null).build();
+		
+		assertThat(commands.getCommands()).isEmpty();
+	}
+
+	@Test
+	public void testBuilderCommandsValid() {
+		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
+			.commands(ImmutableList.of(
+					SyncCollectionRequestCommand.builder().name("Delete").serverId("3").build(),
+					SyncCollectionRequestCommand.builder().name("Fetch").serverId("8").build())).build();
+		
+		assertThat(commands.getCommands()).containsOnly(
+				SyncCollectionRequestCommand.builder().name("Delete").serverId("3").build(),
+				SyncCollectionRequestCommand.builder().name("Fetch").serverId("8").build());
+	}
+	
 }

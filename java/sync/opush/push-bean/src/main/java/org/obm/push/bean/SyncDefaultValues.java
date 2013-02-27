@@ -29,28 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.command
+package org.obm.push.bean;
 
-import org.obm.push.bean.MSEvent
-import org.obm.push.context.User
-import org.obm.push.helper.SyncHelper
-import org.obm.push.wbxml.WBXMLTools
-
-import com.excilys.ebi.gatling.core.Predef.Session
-
-class ModifyInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
-		extends AbstractInvitationCommand(invitation, wbTools) {
-
-	override val collectionCommandName = "Change"
-	override def clientId(s: Session) = null
-	override def serverId(s: Session) = invitation.userKey.sessionHelper.findPendingInvitation(s).get.serverId
-		
-	override def buildEventInvitation(session: Session, organizer: User, attendees: Iterable[User]) = {
-		val syncResponse = invitation.userKey.sessionHelper.findLastSync(session).get
-		val eventServerId = invitation.userKey.sessionHelper.findPendingInvitation(session).get.serverId
-		val event = SyncHelper.findChangesWithServerId(syncResponse, eventServerId).head.getApplicationData().asInstanceOf[MSEvent]
-		event.setStartTime(invitation.startTime)
-		event.setEndTime(invitation.endTime)
-		event
-	}
+public interface SyncDefaultValues {
+	public static final int DEFAULT_WAIT = 0;
+	public static final int DEFAULT_WINDOW_SIZE = 100;
 }

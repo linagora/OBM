@@ -53,7 +53,9 @@ public enum SyncRequestFields implements ActiveSyncFields {
 	COMMANDS("Commands"),
 	SERVER_ID("ServerId"),
 	CLIENT_ID("ClientId"),
-	APPLICATION_DATA("ApplicationData");
+	APPLICATION_DATA("ApplicationData"),
+	DELETES_AS_MOVES("DeletesAsMoves"),
+	GET_CHANGES("GetChanges");
 	
 	private final String name;
 

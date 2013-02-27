@@ -33,9 +33,9 @@ package org.obm.push.backend;
 
 import java.util.Set;
 
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 
 /**
  * This interface is used in the push process to wait for changes.
@@ -44,7 +44,7 @@ import org.obm.push.bean.SyncCollection;
  */
 public interface ICollectionChangeListener {
 
-	Set<SyncCollection> getMonitoredCollections();
+	Set<AnalysedSyncCollection> getMonitoredCollections();
 
 	UserDataRequest getSession();
 

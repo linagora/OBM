@@ -61,7 +61,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class StateMachine {
+public class StateMachine implements IStateMachine {
 
 	private static final Logger logger = LoggerFactory.getLogger(StateMachine.class);
 	

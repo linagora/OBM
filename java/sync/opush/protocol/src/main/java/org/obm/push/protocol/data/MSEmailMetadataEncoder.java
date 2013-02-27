@@ -34,6 +34,7 @@ package org.obm.push.protocol.data;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ms.MSEmailMetadata;
 import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -50,4 +51,10 @@ public class MSEmailMetadataEncoder {
 		DOMUtils.createElementAndText(parent, ASEmail.READ.asASValue(), msEmail.isRead());
 	}
 
+	public Element encodedApplicationData(IApplicationData data) {
+		Document doc = DOMUtils.createDoc(null, null);
+		Element root = doc.getDocumentElement();
+		encode(root, data);
+		return root;
+	}
 }

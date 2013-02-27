@@ -54,7 +54,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 	}
 
 	@Override
-	public long findLastHearbeat(Device device) throws DaoException {
+	public Long findLastHearbeat(Device device) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		
 		Connection con = null;
@@ -75,7 +75,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 		} finally {
 			JDBCUtils.cleanup(con, ps, null);
 		}
-		return 0L;
+		return null;
 	}
 
 	@Override

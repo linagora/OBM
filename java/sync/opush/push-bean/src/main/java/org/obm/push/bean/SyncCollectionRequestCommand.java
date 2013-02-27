@@ -29,14 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean;
 
-import java.util.List;
+import org.w3c.dom.Element;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 
-public class SyncCollectionRequestCommands {
+public class SyncCollectionRequestCommand {
 
 	public static Builder builder() {
 		return new Builder();
@@ -44,60 +43,79 @@ public class SyncCollectionRequestCommands {
 	
 	public static class Builder {
 		
-		private List<String> fetchIds;
-		private List<SyncCollectionRequestCommand> commands;
+		private String name;
+		private String serverId;
+		private String clientId;
+		private Element data;
 
 		private Builder() {}
 		
-		public Builder fetchIds(List<String> fetchIds) {
-			this.fetchIds = fetchIds;
+		public Builder name(String name) {
+			this.name = name;
 			return this;
 		}
 		
-		public Builder commands(List<SyncCollectionRequestCommand> commands) {
-			this.commands = commands;
+		public Builder serverId(String serverId) {
+			this.serverId = serverId;
+			return this;
+		}
+
+		public Builder clientId(String clientId) {
+			this.clientId = clientId;
+			return this;
+		}
+
+		public Builder applicationData(Element data) {
+			this.data = data;
 			return this;
 		}
 		
-		public SyncCollectionRequestCommands build() {
-			if (fetchIds == null) {
-				fetchIds = ImmutableList.of();
-			}
-			if (commands == null) {
-				commands = ImmutableList.of();
-			}
-			
-			return new SyncCollectionRequestCommands(fetchIds, commands);
+		public SyncCollectionRequestCommand build() {
+			return new SyncCollectionRequestCommand(name, serverId, clientId, data);
 		}
 	}
 	
-	private final List<String> fetchIds;
-	private final List<SyncCollectionRequestCommand> commands;
+	private final String name;
+	private final String serverId;
+	private final String clientId;
+	private final Element data;
 	
-	private SyncCollectionRequestCommands(List<String> fetchIds, List<SyncCollectionRequestCommand> commands) {
-		this.fetchIds = fetchIds;
-		this.commands = commands;
+	private SyncCollectionRequestCommand(String name, String serverId, String clientId, Element data) {
+		this.name = name;
+		this.serverId = serverId;
+		this.clientId = clientId;
+		this.data = data;
 	}
 
-	public List<String> getFetchIds() {
-		return fetchIds;
+	public String getName() {
+		return name;
 	}
-	
-	public List<SyncCollectionRequestCommand> getCommands() {
-		return commands;
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public Element getApplicationData() {
+		return data;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(fetchIds, commands);
+		return Objects.hashCode(name, serverId, clientId, data);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncCollectionRequestCommands) {
-			SyncCollectionRequestCommands that = (SyncCollectionRequestCommands) object;
-			return Objects.equal(this.fetchIds, that.fetchIds)
-				&& Objects.equal(this.commands, that.commands);
+		if (object instanceof SyncCollectionRequestCommand) {
+			SyncCollectionRequestCommand that = (SyncCollectionRequestCommand) object;
+			return Objects.equal(this.name, that.name)
+				&& Objects.equal(this.serverId, that.serverId)
+				&& Objects.equal(this.clientId, that.clientId)
+				&& Objects.equal(this.data, that.data);
 		}
 		return false;
 	}
@@ -105,9 +123,10 @@ public class SyncCollectionRequestCommands {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("fetchIds", fetchIds)
-			.add("commands", commands)
+			.add("name", name)
+			.add("serverId", serverId)
+			.add("clientId", clientId)
+			.add("data", data)
 			.toString();
 	}
-	
 }

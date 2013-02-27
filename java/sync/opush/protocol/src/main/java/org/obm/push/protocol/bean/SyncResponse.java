@@ -32,72 +32,63 @@
 package org.obm.push.protocol.bean;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncStatus;
-import org.obm.push.bean.change.client.SyncClientCommands;
-import org.obm.push.bean.change.item.ItemChange;
-import org.obm.push.bean.change.item.ItemDeletion;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 public class SyncResponse {
 
-	public static class SyncCollectionResponse {
-		private final SyncCollection syncCollection;
-		private List<ItemChange> itemChanges;
-		private List<ItemDeletion> itemChangesDeletion;
-		private boolean collectionValidity;
-		private SyncKey allocateNewSyncKey;
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
 		
-		public SyncCollectionResponse(SyncCollection syncCollection) {
-			this.syncCollection = syncCollection;
+		private ImmutableList.Builder<SyncCollectionResponse> responsesBuilder;
+		private Map<String, String> processedClientIds;
+		private SyncStatus status;
+		
+		private Builder() {
+			this.responsesBuilder = ImmutableList.builder();
+			this.processedClientIds = Maps.newHashMap();
 		}
-
-		public SyncCollection getSyncCollection() {
-			return syncCollection;
+		
+		public Builder addResponse(SyncCollectionResponse response) {
+			responsesBuilder.add(response);
+			return this;
 		}
-		public void setCollectionValidity(boolean collectionValidity) {
-			this.collectionValidity = collectionValidity;
+		
+		// TODO
+//		public Builder addAllProcessedClientIds(Map<String, String> processedClientIds) {
+//			processedClientIds.putAll(processedClientIds);
+//			return this;
+//		}
+		
+		public Builder status(SyncStatus status) {
+			this.status = status;
+			return this;
 		}
-		public boolean collectionValidity() {
-			return collectionValidity;
-		}
-		public void setItemChanges(List<ItemChange> itemChanges) {
-			this.itemChanges = itemChanges;
-		}
-		public List<ItemChange> getItemChanges() {
-			return itemChanges;
-		}
-		public void setNewSyncKey(SyncKey allocateNewSyncKey) {
-			this.allocateNewSyncKey = allocateNewSyncKey;
-		}
-		public SyncKey getAllocateNewSyncKey() {
-			return allocateNewSyncKey;
-		}
-		public void setItemChangesDeletion(List<ItemDeletion> itemChangesDeletion) {
-			this.itemChangesDeletion = itemChangesDeletion;
-		}
-		public List<ItemDeletion> getItemChangesDeletion() {
-			return itemChangesDeletion;
-		}
-		public boolean isValid() {
-			return collectionValidity;
+		
+		public SyncResponse build() {
+			SyncStatus status = Objects.firstNonNull(this.status, SyncStatus.OK);
+			return new SyncResponse(responsesBuilder.build(), 
+					processedClientIds, status);
 		}
 	}
 	
 	private final Collection<SyncCollectionResponse> collectionResponses;
-	private final SyncClientCommands clientCommands;
+	private final Map<String, String> processedClientIds;
 	private final SyncStatus status;
 	
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, SyncClientCommands clientCommands) {
-		this(collectionResponses, clientCommands, SyncStatus.OK);
-	}
-
-	public SyncResponse(Collection<SyncCollectionResponse> collectionResponses, SyncClientCommands clientCommands,
+	private SyncResponse(Collection<SyncCollectionResponse> collectionResponses, Map<String, String> processedClientIds,
 			SyncStatus status) {
 		this.collectionResponses = collectionResponses;
-		this.clientCommands = clientCommands;
+		this.processedClientIds = processedClientIds;
 		this.status = status;
 	}
 
@@ -105,8 +96,8 @@ public class SyncResponse {
 		return collectionResponses;
 	}
 	
-	public SyncClientCommands getClientCommands() {
-		return clientCommands;
+	public Map<String, String> getProcessedClientIds() {
+		return processedClientIds;
 	}
 
 	public SyncStatus getStatus() {

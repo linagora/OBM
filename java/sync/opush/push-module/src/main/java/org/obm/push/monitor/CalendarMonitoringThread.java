@@ -40,6 +40,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.PushPublishAndSubscribe;
+import org.obm.push.state.IStateMachine;
 import org.obm.push.store.CollectionDao;
 
 import com.google.inject.Inject;
@@ -54,29 +55,31 @@ public class CalendarMonitoringThread extends MonitoringThread {
 		private final org.obm.push.service.PushPublishAndSubscribe.Factory pubSubFactory;
 		private final CalendarBackend calendarBackend;
 		private final IContentsExporter contentsExporter;
+		private final IStateMachine stateMachine;
 
 		@Inject
 		private Factory(CollectionDao collectionDao, CalendarBackend calendarBackend,
-				PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+				PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter, IStateMachine stateMachine) {
 			this.collectionDao = collectionDao;
 			this.calendarBackend = calendarBackend;
 			this.pubSubFactory = pubSubFactory;
 			this.contentsExporter = contentsExporter;
+			this.stateMachine = stateMachine;
 		}
 
 		public CalendarMonitoringThread createClient(long freqMs,
 				Set<ICollectionChangeListener> ccls) {
 			
 			return new CalendarMonitoringThread(freqMs, ccls,
-					this.collectionDao, this.calendarBackend, pubSubFactory, contentsExporter);
+					this.collectionDao, this.calendarBackend, pubSubFactory, contentsExporter, stateMachine);
 		}
 	}
 
 	private CalendarMonitoringThread(long freqMs,
 			Set<ICollectionChangeListener> ccls,
 			CollectionDao collectionDao, CalendarBackend calendarBackend,
-			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
-		super(freqMs, ccls, collectionDao, calendarBackend, pubSubFactory, contentsExporter);
+			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter, IStateMachine stateMachine) {
+		super(freqMs, ccls, collectionDao, calendarBackend, pubSubFactory, contentsExporter, stateMachine);
 	}
 
 	@Override

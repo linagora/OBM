@@ -58,15 +58,17 @@ import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
@@ -98,6 +100,7 @@ public class MailBackendGetItemEstimateTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject SyncDecoder decoder;
 	
 	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
@@ -139,11 +142,13 @@ public class MailBackendGetItemEstimateTest {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		SyncCollection syncCollection = new SyncCollection(inboxCollectionId, inboxCollectionPath);
 		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
-			.andReturn(syncCollection).anyTimes();
-		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(SyncCollection.class));
+		.andReturn(AnalysedSyncCollection.builder()
+				.collectionId(inboxCollectionId)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build()).anyTimes();
+	
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
 		expectLastCall().anyTimes();
 	}
 
@@ -205,8 +210,8 @@ public class MailBackendGetItemEstimateTest {
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
-		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
-		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, inboxCollectionId);
 
@@ -251,8 +256,8 @@ public class MailBackendGetItemEstimateTest {
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
-		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
-		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, FilterType.ONE_MONTHS_BACK, inboxCollectionId);
 
@@ -297,8 +302,8 @@ public class MailBackendGetItemEstimateTest {
 		opushServer.start();
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
-		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
-		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 
 		sendTwoEmailsToImapServer();
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(lastSyncKey, inboxCollectionId);
@@ -316,6 +321,8 @@ public class MailBackendGetItemEstimateTest {
 	}
 
 	private void expectInitialSyncWithTwoMails(SyncKey initialSyncKey, SyncKey firstAllocatedSyncKey, SyncKey secondAllocatedSyncKey) throws Exception {
+		String emailId1 = ":1";
+		String emailId2 = ":2";
 		int allocatedStateId = 3;
 		int allocatedStateId2 = 4;
 		
@@ -332,10 +339,13 @@ public class MailBackendGetItemEstimateTest {
 				.syncKey(secondAllocatedSyncKey)
 				.id(allocatedStateId2)
 				.build();
-		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).once();
 		expect(dateService.getCurrentDate()).andReturn(allocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, allocatedState);
+		
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
 	}
 
 	private void expectUnsynchronizedItemToNeverHavePendingAdds() {

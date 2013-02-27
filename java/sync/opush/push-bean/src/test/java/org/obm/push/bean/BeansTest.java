@@ -41,6 +41,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponse;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
@@ -55,6 +56,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -94,9 +96,8 @@ public class BeansTest {
 					.add(SearchResult.class)
 					.add(ServerId.class)
 					.add(Sync.class)
-					.add(SyncCollection.class)
-					.add(SyncCollectionChange.class)
 					.add(SyncCollectionOptions.class)
+					.add(SyncCollectionCommand.class)
 					.add(ItemSyncState.class)
 					.add(MSEventUid.class)
 					.add(User.class)
@@ -121,6 +122,25 @@ public class BeansTest {
 					.add(DataDelta.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+		
+		EqualsVerifierBuilder.builder()
+		.equalsVerifiers(ImmutableList.<Class<?>>of(SyncCollectionCommands.class))
+		.prefabValue(ImmutableListMultimap.class, 
+				ImmutableListMultimap.<SyncCommand, SyncCollectionCommand> of(
+						SyncCommand.ADD,
+						SyncCollectionCommand.Request.builder()
+							.clientId("1")
+							.commandType(SyncCommand.ADD)
+							.serverId("2")
+							.build()), 
+				ImmutableListMultimap.<SyncCommand, SyncCollectionCommand> of(
+						SyncCommand.CHANGE,
+						SyncCollectionCommand.Request.builder()
+							.clientId("3")
+							.commandType(SyncCommand.CHANGE)
+							.serverId("4")
+							.build())) 
+		.verify();
 	}
 	
 	@Test

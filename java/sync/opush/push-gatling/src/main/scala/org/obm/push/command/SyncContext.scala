@@ -70,8 +70,8 @@ class SyncContext(
 	private[this] def nextSyncKeyInResponse(session: Session, syncResponse: SyncResponse): SyncKey = {
 		val collectionId = this.findCollectionId(session, folderType)
 		for (collection <- syncResponse.getCollectionResponses()
-			if collection.getSyncCollection().getCollectionId() == collectionId) {
-				return collection.getAllocateNewSyncKey()
+			if collection.getCollectionId() == collectionId) {
+				return collection.getSyncKey()
 		}
 		throw new NoSuchElementException(
 				"Cannot find collection:{%d} in response:{%s}".format(collectionId, syncResponse))

@@ -41,7 +41,9 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionRequest;
+import org.obm.push.bean.SyncCollectionResponse;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.utils.DOMUtils;
@@ -56,7 +58,7 @@ public class PingProtocolTest {
 	
 	@Before
 	public void init() {
-		pingProtocol = new PingProtocol();
+		pingProtocol = new PingProtocol(null);
 	}
 	
 	@Test
@@ -121,33 +123,38 @@ public class PingProtocolTest {
 					"</Folders>" +
 				"</Ping>");
 
-		SyncCollection syncCollection1 = new SyncCollection();
-		syncCollection1.setCollectionId(1);
-		syncCollection1.setDataType(PIMDataType.CALENDAR);
-		SyncCollection syncCollection2 = new SyncCollection();
-		syncCollection2.setCollectionId(4);
-		syncCollection2.setDataType(PIMDataType.CONTACTS);
-		
-		assertThat(new PingProtocol().decodeRequest(document)).isEqualTo(new PingRequest.Builder()
-			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
-			.heartbeatInterval(null)
-			.build());
+		assertThat(pingProtocol.decodeRequest(document)).isEqualTo(PingRequest.builder()
+				.syncCollections(ImmutableSet.of(
+					SyncCollectionRequest.builder()
+						.collectionId(1)
+						.dataType(PIMDataType.CALENDAR)
+						.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+						.build(),
+					SyncCollectionRequest.builder()
+						.collectionId(4)
+						.dataType(PIMDataType.CONTACTS)
+						.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+						.build()))
+				.heartbeatInterval(null)
+				.build());
 	}
 	
 	@Test
 	public void encodeNoChangesWithFolders() throws TransformerException {
-		SyncCollection syncCollection1 = new SyncCollection();
-		syncCollection1.setCollectionId(1);
-		syncCollection1.setDataType(PIMDataType.CALENDAR);
-		
-		SyncCollection syncCollection2 = new SyncCollection();
-		syncCollection2.setCollectionId(4);
-		syncCollection2.setDataType(PIMDataType.CONTACTS);
-
-		PingResponse pingResponse = new PingResponse.Builder()
-			.syncCollections(ImmutableSet.of(syncCollection1,syncCollection2))
-			.pingStatus(PingStatus.NO_CHANGES)
-			.build();
+		PingResponse pingResponse = PingResponse.builder()
+				.syncCollections(ImmutableSet.of(
+					SyncCollectionResponse.builder()
+						.collectionId(1)
+						.dataType(PIMDataType.CALENDAR)
+						.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+						.build(),
+					SyncCollectionResponse.builder()
+						.collectionId(4)
+						.dataType(PIMDataType.CONTACTS)
+						.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+						.build()))
+				.pingStatus(PingStatus.NO_CHANGES)
+				.build();
 		
 		assertThat(DOMUtils.serialize(pingProtocol.encodeResponse(pingResponse))).isEqualTo(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -162,8 +169,8 @@ public class PingProtocolTest {
 	
 	@Test
 	public void encodeChangesWithoutFolder() throws TransformerException {
-		PingResponse pingResponse = new PingResponse.Builder()
-			.syncCollections(ImmutableSet.<SyncCollection>of())
+		PingResponse pingResponse = PingResponse.builder()
+			.syncCollections(ImmutableSet.<SyncCollectionResponse>of())
 			.pingStatus(PingStatus.CHANGES_OCCURED)
 			.build();
 		
@@ -194,18 +201,23 @@ public class PingProtocolTest {
 					"</Folders>" +
 				"</Ping>");
 
-		SyncCollection syncCollection1 = new SyncCollection();
-		syncCollection1.setCollectionId(1);
-		syncCollection1.setDataType(null);
-		SyncCollection syncCollection2 = new SyncCollection();
-		syncCollection2.setCollectionId(2);
-		syncCollection2.setDataType(PIMDataType.UNKNOWN);
-		SyncCollection syncCollection3 = new SyncCollection();
-		syncCollection3.setCollectionId(3);
-		syncCollection3.setDataType(PIMDataType.CONTACTS);
+		PingRequest decoded = pingProtocol.decodeRequest(document);
 		
-		PingRequest decoded = new PingProtocol().decodeRequest(document);
-		
-		assertThat(decoded.getSyncCollections()).containsOnly(syncCollection1, syncCollection2, syncCollection3);
+		assertThat(decoded.getSyncCollections()).containsOnly(
+			SyncCollectionRequest.builder()
+				.collectionId(1)
+				.dataType(null)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build(), 
+			SyncCollectionRequest.builder()
+				.collectionId(2)
+				.dataType(PIMDataType.UNKNOWN)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build(), 
+			SyncCollectionRequest.builder()
+				.collectionId(3)
+				.dataType(PIMDataType.CONTACTS)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build());
 	}
 }

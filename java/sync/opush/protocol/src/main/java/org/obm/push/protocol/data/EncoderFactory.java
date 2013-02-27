@@ -92,5 +92,28 @@ public class EncoderFactory {
 			}
 		}
 	}
-
+	
+	public Element encodedApplicationData(Device device, IApplicationData data, boolean isResponse) throws IOException {
+		
+		if (data != null) {
+			switch (data.getType()) {
+			case CALENDAR:
+				return calendarProvider.get().encodedApplicationData(device, data, isResponse);
+			case CONTACTS:
+				return contactProvider.get().encodedApplicationData(device, data);
+			case TASKS:
+				return taskEncoder.get().encodedApplicationData(device, data);
+			case EMAIL:
+				if (data instanceof MSEmail) {
+					return emailEncoder.get().encodedApplicationData(data);
+				} else if (data instanceof MSEmailMetadata) {
+					return emailMetadataEncoder.get().encodedApplicationData(data);
+				}
+				throw null;
+			default:
+				throw new IllegalArgumentException();
+			}
+		}
+		return null;
+	}
 }

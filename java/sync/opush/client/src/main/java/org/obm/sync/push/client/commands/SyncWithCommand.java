@@ -35,6 +35,7 @@ import java.io.IOException;
 
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.protocol.data.SyncRequestFields;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
@@ -44,10 +45,10 @@ import org.xml.sax.SAXException;
 
 public class SyncWithCommand extends Sync {
 
-	public SyncWithCommand(final SyncKey syncKey, final String collectionId, final SyncCommand command,
+	public SyncWithCommand(final SyncDecoder decoder, final SyncKey syncKey, final String collectionId, final SyncCommand command,
 			final String serverId) throws SAXException, IOException {
 		
-		super(new TemplateDocument("SyncWithCommandRequest.xml") {
+		super(decoder, new TemplateDocument("SyncWithCommandRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {

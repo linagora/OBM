@@ -36,9 +36,11 @@ import java.util.List;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
@@ -66,55 +68,49 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection,
+	public DataDelta getChanged(UserDataRequest udr, ItemSyncState syncState, AnalysedSyncCollection syncCollection,
 			SyncClientCommands clientCommands, SyncKey newSyncKey) 
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getChanged(udr, syncCollection, clientCommands, newSyncKey);
+		return backend.getChanged(udr, syncState,
+				syncCollection, clientCommands, newSyncKey);
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, DaoException, 
+	public List<ItemChange> fetch(UserDataRequest udr, SyncCollectionResponse syncCollection, SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, DaoException, 
 			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollection.getOptions());
+		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollectionOptions);
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, DaoException, 
+	public List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, DaoException, 
 			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollection.getOptions(), syncCollection.getItemSyncState(), newSyncKey);
+		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollection.getOptions(), itemSyncState, newSyncKey);
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection) 
+	public int getItemEstimateSize(UserDataRequest udr, AnalysedSyncCollection syncCollection, ItemSyncState itemSyncState) 
 					throws CollectionNotFoundException, ProcessingEmailException, DaoException,
 					UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), syncCollection);
+		return backend.getItemEstimateSize(udr, itemSyncState, 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
-			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
-		
-		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.getItemEstimateSize(udr, state, syncCollection);
-	}
-
-	@Override
-	public int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
+	public int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, AnalysedSyncCollection syncCollection, ItemSyncState itemSyncState) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
 			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
 		PIMBackend backend = backends.getBackend(pimDataType);
-		return backend.getItemEstimateSize(udr, syncCollection.getItemSyncState(), syncCollection);
+		return backend.getItemEstimateSize(udr, itemSyncState, 
+				syncCollection.getCollectionId(), syncCollection.getOptions());
 	}
 }

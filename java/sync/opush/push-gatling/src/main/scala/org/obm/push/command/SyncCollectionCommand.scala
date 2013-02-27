@@ -44,16 +44,16 @@ import com.google.common.base.Strings
 import org.obm.push.helper.SyncHelper
 import org.obm.push.bean.SyncKey
 import org.obm.push.bean.change.SyncCommand
-import org.obm.push.protocol.bean.SyncCollectionRequest
+import org.obm.push.bean.SyncCollectionRequest
 
 class SyncCollectionCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractSyncCommand(syncContext, wbTools) {
 
-	def buildSyncCollectionRequests(session: Session) = {
-		List(SyncCollectionRequest.builder()
-				.id(syncContext.findCollectionId(session))
+	def buildSyncCollectionRequest(session: Session) = {
+		SyncCollectionRequest.builder()
+				.collectionId(syncContext.findCollectionId(session))
 				.syncKey(syncContext.nextSyncKey(session))
-				.build())
+				.build()
 	}
 	
 }
@@ -71,7 +71,7 @@ object SyncCollectionCommand {
 		def apply(value: Option[SyncResponse], session: Session) = {
 			val hasCollectionWithInvalidSyncKey = value.get
 					.getCollectionResponses()
-					.find(c => !isValidSyncKey(c.getAllocateNewSyncKey()))
+					.find(c => !isValidSyncKey(c.getSyncKey()))
 					.isDefined
 			if (!hasCollectionWithInvalidSyncKey) Success(value)
 			else Failure("Invalid SyncKey in response")
@@ -109,8 +109,8 @@ object SyncCollectionCommand {
 		def apply(value: Option[SyncResponse], session: Session) = {
 			val hasAddChange = value.get
 					.getCollectionResponses()
-					.flatMap(_.getSyncCollection().getChanges())
-					.find(_.getCommand() == commandType)
+					.flatMap(_.getResponses().getCommands())
+					.find(_.getType() == commandType)
 					.isDefined
 			if (hasAddChange) Success(value) 
 			else Failure("No %s in response".format(commandType.asSpecificationValue()))

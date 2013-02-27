@@ -40,13 +40,14 @@ import javax.naming.NoPermissionException;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.BackendWindowingService;
+import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
-import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.PathsToCollections.Builder;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -54,7 +55,6 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -274,42 +274,43 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	@Override
-	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) throws CollectionNotFoundException, 
-			DaoException, UnexpectedObmSyncServerException {
-		
-		DataDelta dataDelta = getAllChanges(udr, state, syncCollection, state.getSyncKey());
+	public int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, Integer collectionId, 
+		SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
+		DaoException, UnexpectedObmSyncServerException {
+	
+		DataDelta dataDelta = getAllChanges(udr, state, collectionId, state.getSyncKey());
 		return dataDelta.getItemEstimateSize();
 	}
 	
 	@Override
-	public DataDelta getChanged(final UserDataRequest udr, final SyncCollection collection,
+	public DataDelta getChanged(final UserDataRequest udr, final ItemSyncState itemSyncState, final AnalysedSyncCollection syncCollection, 
 			final SyncClientCommands clientCommands, final SyncKey newSyncKey)
 		throws UnexpectedObmSyncServerException, DaoException, CollectionNotFoundException {
 
-		return backendWindowingService.windowedChanges(udr, collection, clientCommands, new BackendChangesProvider() {
+		return backendWindowingService.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, new BackendChangesProvider() {
 			
 			@Override
 			public DataDelta getAllChanges() {
-				return ContactsBackend.this.getAllChanges(udr, collection.getItemSyncState(), collection, newSyncKey);
+				return ContactsBackend.this.getAllChanges(udr, itemSyncState, syncCollection.getCollectionId(), newSyncKey);
 			}
 		});
 	}
 	
 	@VisibleForTesting DataDelta getAllChanges(UserDataRequest udr, ItemSyncState state,
-			SyncCollection collection, SyncKey newSyncKey) {
+			Integer collectionId, SyncKey newSyncKey) {
 		
-		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collection.getCollectionId());
+		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
 		ContactChanges contactChanges = listContactsChanged(udr, state.getSyncDate(), addressBookId);
 		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
-			addUpd.add(convertContactToItemChange(collection.getCollectionId(), contact));
+			addUpd.add(convertContactToItemChange(collectionId, contact));
 		}
 		
 		List<ItemDeletion> deletions = new LinkedList<ItemDeletion>();
 		for (Integer remove : contactChanges.getRemoved()) {
 			deletions.add(ItemDeletion.builder()
-					.serverId(ServerId.buildServerIdString(collection.getCollectionId(), remove))
+					.serverId(ServerId.buildServerIdString(collectionId, remove))
 					.build());
 		}
 		

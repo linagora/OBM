@@ -33,7 +33,7 @@ package org.obm.push.protocol.bean;
 
 import java.util.Collection;
 
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.AnalysedSyncCollection;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -45,18 +45,18 @@ public class GetItemEstimateRequest {
 	}
 	
 	public static class Builder {
-		private Collection<SyncCollection> syncCollections;
+		private Collection<AnalysedSyncCollection> syncCollections;
 		
 		private Builder() {
 			this.syncCollections = Lists.newArrayList();
 		}
 		
-		public Builder syncCollections(Collection<SyncCollection> syncCollections) {
+		public Builder syncCollections(Collection<AnalysedSyncCollection> syncCollections) {
 			this.syncCollections = syncCollections;
 			return this;
 		}
 		
-		public Builder add(SyncCollection syncCollection) {
+		public Builder add(AnalysedSyncCollection syncCollection) {
 			this.syncCollections.add(syncCollection);
 			return this;
 		}
@@ -66,13 +66,13 @@ public class GetItemEstimateRequest {
 		}
 	}
 	
-	private final Collection<SyncCollection> syncCollections;
+	private final Collection<AnalysedSyncCollection> syncCollections;
 
-	private GetItemEstimateRequest(Collection<SyncCollection> syncCollections) {
+	private GetItemEstimateRequest(Collection<AnalysedSyncCollection> syncCollections) {
 		this.syncCollections = syncCollections;
 	}
 
-	public Collection<SyncCollection> getSyncCollections() {
+	public Collection<AnalysedSyncCollection> getSyncCollections() {
 		return syncCollections;
 	}
 	

@@ -36,7 +36,8 @@ import java.util.List;
 
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
@@ -59,38 +60,39 @@ public class BackendWindowingServiceImpl implements BackendWindowingService {
 	}
 	
 	@Override
-	public DataDelta windowedChanges(UserDataRequest udr, SyncCollection collection,
+	public DataDelta windowedChanges(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection,
 			SyncClientCommands clientCommands, BackendChangesProvider backendChangesProvider) {
 		Preconditions.checkNotNull(udr, "UserDataRequest is required");
+		Preconditions.checkNotNull(itemSyncState, "itemSyncState is required");
 		Preconditions.checkNotNull(collection, "collection is required");
 		Preconditions.checkNotNull(clientCommands, "clientCommands is required");
 		Preconditions.checkNotNull(backendChangesProvider, "backendChangesProvider is required");
 		
 		if (collectionHasPendingResponse(udr, collection)) {
-			return continueWindowing(udr, collection, clientCommands);
+			return continueWindowing(udr, itemSyncState, collection, clientCommands);
 		} else {
 			return getBackendChanges(udr, backendChangesProvider, collection, clientCommands);
 		}
 	}
 
 	private DataDelta getBackendChanges(UserDataRequest udr, BackendChangesProvider backendChangesProvider,
-			SyncCollection collection, SyncClientCommands clientCommands) {
+		AnalysedSyncCollection collection, SyncClientCommands clientCommands) {
 
 		return windowing(udr, collection, clientCommands, backendChangesProvider.getAllChanges());
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands) {
+	private DataDelta continueWindowing(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection, SyncClientCommands clientCommands) {
 		SyncKey treatmentSyncKey = collection.getSyncKey();
-		Date lastSync = collection.getItemSyncState().getSyncDate();
+		Date lastSync = itemSyncState.getSyncDate();
 		return windowing(udr, collection, clientCommands, DataDelta.newEmptyDelta(lastSync, treatmentSyncKey));
 	}
 
-	private boolean collectionHasPendingResponse(UserDataRequest udr, SyncCollection collection) {
+	private boolean collectionHasPendingResponse(UserDataRequest udr, AnalysedSyncCollection collection) {
 		return responseWindowingService.hasPendingResponse(udr.getCredentials(), udr.getDevice(), collection.getCollectionId());
 	}
 
 
-	private DataDelta windowing(UserDataRequest udr, SyncCollection collection,
+	private DataDelta windowing(UserDataRequest udr, AnalysedSyncCollection collection,
 			SyncClientCommands clientCommands, DataDelta delta) {
 		
 		List<ItemChange> changes = responseWindowingService.windowChanges(collection, delta, udr, clientCommands);

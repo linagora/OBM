@@ -37,11 +37,12 @@ import java.util.Set;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.state.IStateMachine;
 
 public interface PushPublishAndSubscribe {
 
 	public interface Factory {
-		PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter iContentsExporter);
+		PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter iContentsExporter, IStateMachine iStateMachine);
 	}
 	
 	LinkedList<PushNotification> listPushNotification(

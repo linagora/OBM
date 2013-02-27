@@ -33,38 +33,53 @@ package org.obm.push.protocol.bean;
 
 import java.util.Set;
 
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionRequest;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
 public class PingRequest {
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
 	public static class Builder {
 		private Long heartbeatInterval;
-		private Set<SyncCollection> syncCollections;
+		private ImmutableSet.Builder<SyncCollectionRequest> syncCollectionBuilder;
 		
-		public Builder() {}
+		private Builder() {
+			super();
+			syncCollectionBuilder = ImmutableSet.builder();
+		}
 		
 		public Builder heartbeatInterval(Long heartbeatInterval) {
 			this.heartbeatInterval = heartbeatInterval;
 			return this;
 		}
+
+		public Builder syncCollections(Set<SyncCollectionRequest> syncCollectionRequests) {
+			if (syncCollectionRequests != null) {
+				syncCollectionBuilder.addAll(syncCollectionRequests);
+			}
+			return this;
+		}
 		
-		public Builder syncCollections(Set<SyncCollection> syncCollections) {
-			this.syncCollections = syncCollections;
+		public Builder add(SyncCollectionRequest syncCollectionRequest) {
+			syncCollectionBuilder.add(syncCollectionRequest);
 			return this;
 		}
 		
 		public PingRequest build() {
 			return new PingRequest(
-					this.heartbeatInterval, this.syncCollections);
+					this.heartbeatInterval, this.syncCollectionBuilder.build());
 		}
 	}
 	
-	private Long heartbeatInterval;
-	private Set<SyncCollection> syncCollections;
+	private final Long heartbeatInterval;
+	private final Set<SyncCollectionRequest> syncCollections;
 
-	private PingRequest(Long heartbeatInterval, Set<SyncCollection> syncCollections) {
+	private PingRequest(Long heartbeatInterval, Set<SyncCollectionRequest> syncCollections) {
 		this.heartbeatInterval = heartbeatInterval;
 		this.syncCollections = syncCollections;
 	}
@@ -73,18 +88,10 @@ public class PingRequest {
 		return heartbeatInterval;
 	}
 
-	public void setHeartbeatInterval(Long heartbeatInterval) {
-		this.heartbeatInterval = heartbeatInterval;
-	}
-
-	public Set<SyncCollection> getSyncCollections() {
+	public Set<SyncCollectionRequest> getSyncCollections() {
 		return syncCollections;
 	}
 
-	public void setSyncCollections(Set<SyncCollection> syncCollections) {
-		this.syncCollections = syncCollections;
-	}
-	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(heartbeatInterval, syncCollections);

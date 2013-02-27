@@ -37,10 +37,12 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -145,14 +147,17 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		
 
 		GetItemEstimateResponse.Builder getItemEstimateResponseBuilder = GetItemEstimateResponse.builder();
-		for (SyncCollection syncCollection: request.getSyncCollections()) {
+		for (AnalysedSyncCollection syncCollection: request.getSyncCollections()) {
 			
 			Integer collectionId = syncCollection.getCollectionId();
 			String collectionPath = collectionDao.getCollectionPath(collectionId);
 			try {
-				syncCollection.setCollectionPath(collectionPath);
-				syncCollection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath) );
-				getItemEstimateResponseBuilder.add(computeEstimate(udr, syncCollection));
+				PIMDataType dataType = collectionPathHelper.recognizePIMDataType(collectionPath);
+				SyncCollectionResponse.Builder builder = SyncCollectionResponse.builder()
+						.collectionId(collectionId)
+						.dataType(dataType)
+						.status(SyncStatus.OK);
+				getItemEstimateResponseBuilder.add(computeEstimate(udr, syncCollection, dataType, builder));
 			} catch (CollectionPathException e) {
 				throw new CollectionNotFoundException("Collection path {" + collectionPath + "} not found.");
 			}			
@@ -161,35 +166,35 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 		return getItemEstimateResponseBuilder.build();
 	}
 	
-	@VisibleForTesting Estimate computeEstimate(UserDataRequest udr, SyncCollection syncCollection) throws DaoException, InvalidSyncKeyException,
+	@VisibleForTesting Estimate computeEstimate(UserDataRequest udr, AnalysedSyncCollection request, PIMDataType dataType, SyncCollectionResponse.Builder builder) throws DaoException, InvalidSyncKeyException,
 		CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 		
-		SyncKey syncKey = syncCollection.getSyncKey();
+		SyncKey syncKey = request.getSyncKey();
 		ItemSyncState state = stMachine.getItemSyncState(syncKey);
 		if (state == null) {
-			throw new InvalidSyncKeyException(syncCollection.getCollectionId(), syncKey);
+			throw new InvalidSyncKeyException(request.getCollectionId(), syncKey);
 		}
 		
 		int unSynchronizedItemNb, count;
 		try {
-			unSynchronizedItemNb = listItemToAddSize(udr, syncCollection);
-			count = contentsExporter.getItemEstimateSize(udr, state, syncCollection);
+			unSynchronizedItemNb = listItemToAddSize(udr, request.getCollectionId());
+			count = contentsExporter.getItemEstimateSize(udr, dataType, request, state);
 		} catch (FilterTypeChangedException e) {
-			syncCollection.setStatus(SyncStatus.INVALID_SYNC_KEY);
+			builder.status(SyncStatus.INVALID_SYNC_KEY);
 			return Estimate.builder()
-					.collection(syncCollection)
+					.collection(builder.build())
 					.build();
 		}
 	
 		return Estimate.builder()
-				.collection(syncCollection)
+				.collection(builder.build())
 				.estimate(count + unSynchronizedItemNb)
 				.build();
 	}
 
-	private int listItemToAddSize(UserDataRequest udr, SyncCollection syncCollection) {
+	private int listItemToAddSize(UserDataRequest udr, int collectionId) {
 		Collection<ItemChange> listItemToAdd = unSynchronizedItemCache.listItemsToAdd(udr.getCredentials(), 
-				udr.getDevice(), syncCollection.getCollectionId());
+				udr.getDevice(), collectionId);
 		return listItemToAdd.size();
 	}
 

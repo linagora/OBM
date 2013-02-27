@@ -43,6 +43,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;
 import org.obm.push.service.PushNotification;
 import org.obm.push.service.PushPublishAndSubscribe;
+import org.obm.push.state.IStateMachine;
 import org.obm.push.store.CollectionDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,10 +64,11 @@ public abstract class MonitoringThread implements Runnable {
 	protected MonitoringThread(long freqMillisec,
 			Set<ICollectionChangeListener> ccls,
 			CollectionDao collectionDao, PIMBackend backend,
-			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+			PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter,
+			IStateMachine stateMachine) {
 		super();
 		
-		this.pushPublishAndSubscribe = pubSubFactory.create(backend, contentsExporter);
+		this.pushPublishAndSubscribe = pubSubFactory.create(backend, contentsExporter, stateMachine);
 		this.freqMillisec = freqMillisec;
 		this.stopped = false;
 		this.ccls = ccls;

@@ -34,6 +34,7 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
@@ -42,10 +43,10 @@ import org.xml.sax.SAXException;
 
 public class EmailSyncNoOptionsCommand extends Sync {
 
-	public EmailSyncNoOptionsCommand(final SyncKey syncKey, final String collectionId)
+	public EmailSyncNoOptionsCommand(final SyncDecoder decoder, final SyncKey syncKey, final String collectionId)
 			throws SAXException, IOException {
 		
-		super(new TemplateDocument("EmailSyncRequest.xml") {
+		super(decoder, new TemplateDocument("EmailSyncRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {

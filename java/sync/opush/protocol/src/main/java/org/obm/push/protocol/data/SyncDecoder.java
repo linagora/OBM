@@ -32,33 +32,26 @@
 package org.obm.push.protocol.data;
 
 import java.util.List;
-import java.util.Set;
 
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionRequest;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.SyncCommand;
-import org.obm.push.bean.change.client.SyncClientCommands;
-import org.obm.push.bean.change.item.ItemChange;
-import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.protocol.bean.SyncRequest;
-import org.obm.push.protocol.bean.SyncRequest.Builder;
-import org.obm.push.protocol.bean.SyncCollectionRequest;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommand;
-import org.obm.push.protocol.bean.SyncCollectionRequestCommands;
 import org.obm.push.protocol.bean.SyncResponse;
-import org.obm.push.protocol.bean.SyncResponse.SyncCollectionResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -83,19 +76,17 @@ public class SyncDecoder extends ActiveSyncDecoder {
 
 	public SyncRequest decodeSync(Document doc) 
 			throws PartialException, ProtocolException, DaoException, CollectionPathException {
-		Builder requestBuilder = SyncRequest.builder();
 		Element root = doc.getDocumentElement();
 		
-		requestBuilder.waitInMinute(getWait(root));
-		requestBuilder.partial(isPartial(root));
-		requestBuilder.windowSize(getWindowSize(root));
+		SyncRequest.Builder requestBuilder = SyncRequest.builder()
+				.waitInMinute(getWait(root))
+				.partial(isPartial(root))
+				.windowSize(getWindowSize(root));
 		
-		List<SyncCollectionRequest> syncRequestCollections = Lists.newArrayList();
 		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			syncRequestCollections.add(getCollection((Element)collectionNodes.item(i)));
+			requestBuilder.addCollection(getCollection((Element)collectionNodes.item(i)));
 		}
-		requestBuilder.collections(syncRequestCollections);
 		
 		return requestBuilder.build();
 	}
@@ -114,9 +105,10 @@ public class SyncDecoder extends ActiveSyncDecoder {
 
 	@VisibleForTesting SyncCollectionRequest getCollection(Element collection) {
 		return SyncCollectionRequest.builder()
-			.id(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
+			.dataType(PIMDataType.fromSpecificationValue(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS)))
 			.syncKey(syncKey(uniqueStringFieldValue(collection, SyncRequestFields.SYNC_KEY)))
-			.dataClass(uniqueStringFieldValue(collection, SyncRequestFields.DATA_CLASS))
+			.collectionId(uniqueIntegerFieldValue(collection, SyncRequestFields.COLLECTION_ID))
+			.deletesAsMoves(uniqueBooleanFieldValue(collection, SyncRequestFields.DELETES_AS_MOVES))
 			.windowSize(uniqueIntegerFieldValue(collection, SyncRequestFields.WINDOW_SIZE))
 			.options(getOptions(DOMUtils.getUniqueElement(collection, SyncRequestFields.OPTIONS.getName())))
 			.commands(getCommands(DOMUtils.getUniqueElement(collection, SyncRequestFields.COMMANDS.getName())))
@@ -151,33 +143,27 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return options;
 	}
 
-	@VisibleForTesting SyncCollectionRequestCommands getCommands(Element commandsElement) {
-		if (commandsElement == null) {
-			return null;
-		}
-
-		List<String> fetchIds = Lists.newArrayList();
-		List<SyncCollectionRequestCommand> commands = Lists.newArrayList();
-		
-		NodeList collectionNodes = commandsElement.getChildNodes();
-		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			SyncCollectionRequestCommand command = getCommand((Element)collectionNodes.item(i));
-			commands.add(command);
-			if (command.getName().equals("Fetch")) {
-				fetchIds.add(command.getServerId());
+	@VisibleForTesting SyncCollectionCommands.Request getCommands(Element commandsElement) {
+		SyncCollectionCommands.Request.Builder builder = SyncCollectionCommands.Request.builder();
+		if (commandsElement != null) {
+			NodeList collectionNodes = commandsElement.getChildNodes();
+			for (int i = 0; i < collectionNodes.getLength(); i++) {
+				SyncCollectionCommand.Request command = getCommand((Element)collectionNodes.item(i));
+				builder.addCommand(command);
 			}
 		}
-		
-		return SyncCollectionRequestCommands.builder().commands(commands).fetchIds(fetchIds).build();
+		return builder.build();
 	}
 	
-	@VisibleForTesting SyncCollectionRequestCommand getCommand(Element commandElement) {
-		return SyncCollectionRequestCommand.builder()
-			.name(commandElement.getNodeName())
-			.serverId(uniqueStringFieldValue(commandElement, SyncRequestFields.SERVER_ID))
-			.clientId(uniqueStringFieldValue(commandElement, SyncRequestFields.CLIENT_ID))
-			.applicationData(DOMUtils.getUniqueElement(commandElement, SyncRequestFields.APPLICATION_DATA.getName()))
-			.build();
+	@VisibleForTesting SyncCollectionCommand.Request getCommand(Element commandElement) {
+		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(commandElement.getNodeName());
+		
+		return SyncCollectionCommand.Request.builder()
+			.commandType(syncCommand)
+ 			.serverId(uniqueStringFieldValue(commandElement, SyncRequestFields.SERVER_ID))
+ 			.clientId(uniqueStringFieldValue(commandElement, SyncRequestFields.CLIENT_ID))
+ 			.applicationData(DOMUtils.getUniqueElement(commandElement, SyncRequestFields.APPLICATION_DATA.getName()))
+ 			.build();
 	}
 
 	@VisibleForTesting List<BodyPreference> getBodyPreferences(Element optionElement) {
@@ -210,39 +196,29 @@ public class SyncDecoder extends ActiveSyncDecoder {
 	public SyncResponse decodeSyncResponse(Document responseDocument) {
 		Element root = responseDocument.getDocumentElement();
 		
-		SyncStatus status = getCollectionStatus(root);
-		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
-		List<SyncCollectionResponse> responseCollections = Lists.newArrayList();
+		SyncResponse.Builder builder = SyncResponse.builder()
+				.status(getCollectionStatus(root));
+		
 		NodeList collectionNodes = root.getElementsByTagName(SyncRequestFields.COLLECTION.getName());
 		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			ProcessedSyncCollectionResponse collection = buildCollectionResponse((Element)collectionNodes.item(i));
-			responseCollections.add(collection.getSyncCollectionResponse());
-			clientCommandsBuilder.merge(collection.getClientCommands());
+			builder.addResponse(buildCollectionResponse((Element)collectionNodes.item(i)));
 		}
 		
-		return new SyncResponse(responseCollections, clientCommandsBuilder.build(), status);
+		return builder.build();
 	}
 
-	private ProcessedSyncCollectionResponse buildCollectionResponse(Element collectionEl) {
-		SyncCollection syncCollection = new SyncCollection();
-
-		syncCollection.setSyncKey(syncKey(uniqueStringFieldValue(collectionEl, SyncResponseFields.SYNC_KEY)));
-		syncCollection.setCollectionId(uniqueIntegerFieldValue(collectionEl, SyncResponseFields.COLLECTION_ID));
-		syncCollection.setStatus(getCollectionStatus(collectionEl));
-		syncCollection.setMoreAvailable(getMoreAvailable(collectionEl));
-		syncCollection.setDataType(dataType(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS)));
-		
-		SyncClientCommands clientCommands = appendResponsesAndClientCommands(syncCollection, collectionEl);
-		appendCommands(syncCollection, collectionEl);
-		
-		SyncCollectionResponse syncCollectionResponse = new SyncCollectionResponse(syncCollection);
-		syncCollectionResponse.setNewSyncKey(syncCollection.getSyncKey());
-		syncCollectionResponse.setCollectionValidity(true);
-		syncCollectionResponse.setItemChanges(identifyChanges(syncCollection.getChanges()));
-		syncCollectionResponse.setItemChangesDeletion(identifyDeletions(syncCollection.getChanges()));
-		
-		return new ProcessedSyncCollectionResponse(syncCollectionResponse, clientCommands);
-	}
+	private SyncCollectionResponse buildCollectionResponse(Element collectionEl) {
+		PIMDataType dataType = dataType(uniqueStringFieldValue(collectionEl, SyncResponseFields.DATA_CLASS));
+		SyncCollectionResponse.Builder syncCollectionBuilder = SyncCollectionResponse
+				.builder()
+				.dataType(dataType)
+				.syncKey(new SyncKey(uniqueStringFieldValue(collectionEl, SyncResponseFields.SYNC_KEY)))
+				.collectionId(uniqueIntegerFieldValue(collectionEl, SyncResponseFields.COLLECTION_ID))
+				.status(getCollectionStatus(collectionEl))
+				.moreAvailable(getMoreAvailable(collectionEl))
+				.responses(appendCommands(dataType, collectionEl));
+		return syncCollectionBuilder.build();
+ 	}
 	
 	private PIMDataType dataType(String dataClass) {
 		return PIMDataType.recognizeDataType(dataClass);
@@ -261,107 +237,50 @@ public class SyncDecoder extends ActiveSyncDecoder {
 		return Objects.firstNonNull(moreAvailable, false);
 	}
 
-	private SyncClientCommands appendResponsesAndClientCommands(SyncCollection syncCollection, Element collectionEl) {
-		Element responsesEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.RESPONSES.getName());
-		if (responsesEl == null) {
-			return SyncClientCommands.empty();
-		}
-
-		List<String> fetchIds = Lists.newArrayList();
-		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
-		NodeList collectionNodes = responsesEl.getChildNodes();
-		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			SyncCollectionChange change = buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType());
-			syncCollection.addChange(change);
-			if (SyncCommand.FETCH.equals(change.getCommand())) {
-				fetchIds.add(change.getServerId());
-			}
-			if (SyncCommand.ADD.equals(change.getCommand())) {
-				clientCommandsBuilder.putAdd(new SyncClientCommands.Add(change.getClientId(), change.getServerId()));
-			} else {
-				clientCommandsBuilder.putChange(new SyncClientCommands.Update(change.getServerId()));
-			}
-		}
-		syncCollection.setFetchIds(fetchIds);
-		return clientCommandsBuilder.build();
-	}
-
-	private void appendCommands(SyncCollection syncCollection, Element collectionEl) {
+	private SyncCollectionCommands.Response appendCommands(PIMDataType dataType, Element collectionEl) {
+		SyncCollectionCommands.Response.Builder builder = SyncCollectionCommands.Response.builder();
 		Element commandsEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.COMMANDS.getName());
-		if (commandsEl == null) {
-			return;
+		if (commandsEl != null) {
+			NodeList collectionNodes = commandsEl.getChildNodes();
+			for (int i = 0; i < collectionNodes.getLength(); i++) {
+				builder.addCommand(getCommand((Element)collectionNodes.item(i), dataType));
+			}
 		}
 		
-		NodeList collectionNodes = commandsEl.getChildNodes();
-		for (int i = 0; i < collectionNodes.getLength(); i++) {
-			syncCollection.addChange(buildChangeFromCommandElement((Element)collectionNodes.item(i), syncCollection.getDataType()));
+		Element responsesEl = DOMUtils.getUniqueElement(collectionEl, SyncResponseFields.RESPONSES.getName());
+		if (responsesEl != null) {
+			NodeList collectionNodes = responsesEl.getChildNodes();
+			for (int i = 0; i < collectionNodes.getLength(); i++) {
+				builder.addCommand(getCommand((Element)collectionNodes.item(i), dataType));
+			}
 		}
+		return builder.build();	 		
 	}
 
-	private SyncCollectionChange buildChangeFromCommandElement(Element commandElement, PIMDataType dataType) {
-		SyncCollectionRequestCommand command = getCommand(commandElement);
-
-		IApplicationData applicationData = getCommandApplicationData(command, dataType);
+	@VisibleForTesting SyncCollectionCommand.Response getCommand(Element commandElement, PIMDataType dataType) {
+		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(commandElement.getNodeName());
+		Element applicationDataElement = DOMUtils.getUniqueElement(commandElement, SyncRequestFields.APPLICATION_DATA.getName());
+		IApplicationData applicationData = decodeApplicationData(applicationDataElement, dataType, syncCommand);
 		
-		SyncCommand syncCommand = SyncCommand.fromSpecificationValue(command.getName());
-		SyncCollectionChange change = new SyncCollectionChange(
-				command.getServerId(), command.getClientId(), syncCommand, applicationData, dataType);
-		return change;
+		return SyncCollectionCommand.Response.builder()
+			.commandType(syncCommand)
+ 			.serverId(uniqueStringFieldValue(commandElement, SyncRequestFields.SERVER_ID))
+ 			.clientId(uniqueStringFieldValue(commandElement, SyncRequestFields.CLIENT_ID))
+ 			.applicationData(applicationData)
+ 			.build();
 	}
 
-	private IApplicationData getCommandApplicationData(SyncCollectionRequestCommand command, PIMDataType dataType) {
-		if (decoderFactory != null && dataType != null && command.getApplicationData() != null) {
-			return decoderFactory.decode(command.getApplicationData(), dataType);
+	private IApplicationData decodeApplicationData(Element applicationData, PIMDataType dataType, SyncCommand syncCommand) {
+		if (syncCommand != SyncCommand.ADD && syncCommand != SyncCommand.CHANGE) {
+			return null;
+ 		}
+		if (dataType != null) {
+			IApplicationData data = decoderFactory.decode(applicationData, dataType);
+			if (data == null && syncCommand.requireApplicationData()) {
+				throw new ProtocolException("No decodable " + dataType + " data for " + applicationData);
+			}
+			return data;
 		}
 		return null;
-	}
-
-	private List<ItemChange> identifyChanges(Set<SyncCollectionChange> changes) {
-		List<ItemChange> itemChanges = Lists.newArrayList();
-		for (SyncCollectionChange change : changes) {
-			if (!SyncCommand.DELETE.equals(change.getCommand())) {
-				ItemChange itemChange = new ItemChange(change.getServerId());
-				itemChange.setNew(isNewChange(change));
-				itemChange.setData(change.getData());
-				itemChanges.add(itemChange);
-			}
-		}
-		return itemChanges;
-	}
-
-	private boolean isNewChange(SyncCollectionChange change) {
-		return SyncCommand.ADD.equals(change.getCommand());
-	}
-
-	private List<ItemDeletion> identifyDeletions(Set<SyncCollectionChange> changes) {
-		List<ItemDeletion> deletions = Lists.newArrayList();
-		for (SyncCollectionChange change : changes) {
-			if (SyncCommand.DELETE.equals(change.getCommand())) {
-				deletions.add(ItemDeletion.builder().serverId(change.getServerId()).build());
-			}
-		}
-		return deletions;
-	}
-	
-	private static class ProcessedSyncCollectionResponse {
-		
-		private final SyncCollectionResponse syncCollectionResponse;
-		private final SyncClientCommands clientCommands;
-
-		public ProcessedSyncCollectionResponse(
-				SyncCollectionResponse syncCollectionResponse,
-				SyncClientCommands clientCommands) {
-			
-			this.syncCollectionResponse = syncCollectionResponse;
-			this.clientCommands = clientCommands;
-		}
-
-		public SyncCollectionResponse getSyncCollectionResponse() {
-			return syncCollectionResponse;
-		}
-
-		public SyncClientCommands getClientCommands() {
-			return clientCommands;
-		}
-	}
+ 	}
 }

@@ -42,12 +42,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ContentsImporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -60,7 +62,6 @@ public class SyncHandlerTest {
 	private User user;
 	private Device device;
 	private UserDataRequest udr;
-	private String inboxPath;
 
 	private IMocksControl mocks;
 	private ContentsImporter contentsImporter;
@@ -71,7 +72,6 @@ public class SyncHandlerTest {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
-		inboxPath = "obm:\\\\test@test\\email\\INBOX";
 
 		mocks = createControl();
 		contentsImporter = mocks.createMock(ContentsImporter.class);
@@ -82,8 +82,16 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testProcessModificationForFetch() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.FETCH, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.commandType(SyncCommand.FETCH)
+								.build())
+						.build())
+				.build();
 
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
@@ -95,8 +103,17 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testProcessModificationForFetchWithClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.FETCH, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId("1234")
+								.commandType(SyncCommand.FETCH)
+								.build())
+						.build())
+				.build();
 
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
@@ -108,8 +125,16 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testProcessModificationForModify() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.MODIFY, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.commandType(SyncCommand.MODIFY)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
@@ -123,8 +148,17 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testProcessModificationForModifyWithClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.MODIFY, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId("1234")
+								.commandType(SyncCommand.MODIFY)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
@@ -138,8 +172,16 @@ public class SyncHandlerTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testProcessModificationForAddNoClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.ADD, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.commandType(SyncCommand.ADD)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
@@ -149,8 +191,17 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testProcessModificationForAddWithClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.ADD, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId("1234")
+								.commandType(SyncCommand.ADD)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
@@ -164,8 +215,17 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testProcessModificationForAddWithOnlyClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange(null, "1234", SyncCommand.ADD, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId(null)
+								.clientId("1234")
+								.commandType(SyncCommand.ADD)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, null, "1234", null)).andReturn("15:3");
 		
@@ -179,8 +239,18 @@ public class SyncHandlerTest {
 	
 	@Test
 	public void testProcessModificationForDelete() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.DELETE, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId(null)
+								.commandType(SyncCommand.DELETE)
+								.build())
+						.build())
+				.build();
 
 		contentsImporter.importMessageDeletion(udr, PIMDataType.EMAIL, 15, "15:2", true);
 		expectLastCall();
@@ -188,15 +258,25 @@ public class SyncHandlerTest {
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-		
+
 		assertThat(clientCommands.getAdds()).isEmpty();
 		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Deletion("15:2"));
 	}
 	
 	@Test
 	public void testProcessModificationForDeleteWithClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.DELETE, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId("1234")
+								.commandType(SyncCommand.DELETE)
+								.build())
+						.build())
+				.build();
 
 		contentsImporter.importMessageDeletion(udr, PIMDataType.EMAIL, 15, "15:2", true);
 		expectLastCall();
@@ -204,45 +284,72 @@ public class SyncHandlerTest {
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-		
+
 		assertThat(clientCommands.getAdds()).isEmpty();
 		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Deletion("15:2"));
 	}
 
 	@Test
 	public void testProcessModificationForChange() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", null, SyncCommand.CHANGE, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId(null)
+								.commandType(SyncCommand.CHANGE)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", null, null)).andReturn("15:3");
 		
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-		
+
 		assertThat(clientCommands.getAdds()).isEmpty();
 		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 
 	@Test
 	public void testProcessModificationForChangeWithClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange("15:2", "1234", SyncCommand.CHANGE, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId("15:2")
+								.clientId("1234")
+								.commandType(SyncCommand.CHANGE)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, "15:2", "1234", null)).andReturn("15:3");
 		
 		mocks.replay();
 		SyncClientCommands clientCommands = testee.processClientModification(udr, collection);
 		mocks.verify();
-		
+
 		assertThat(clientCommands.getAdds()).isEmpty();
 		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 	
 	@Test
 	public void testProcessModificationForChangeWithOnlyClientId() throws Exception {
-		SyncCollection collection = new SyncCollection(15, inboxPath);
-		collection.addChange(new SyncCollectionChange(null, "1234", SyncCommand.CHANGE, null, PIMDataType.EMAIL));
+		AnalysedSyncCollection collection = AnalysedSyncCollection.builder()
+				.collectionId(15)
+				.syncKey(new SyncKey("123"))
+				.commands(SyncCollectionCommands.Response.builder()
+						.addCommand(SyncCollectionCommand.Response.builder()
+								.serverId(null)
+								.clientId("1234")
+								.commandType(SyncCommand.CHANGE)
+								.build())
+						.build())
+				.build();
 
 		expect(contentsImporter.importMessageChange(udr, 15, null, "1234", null)).andReturn("15:3");
 		

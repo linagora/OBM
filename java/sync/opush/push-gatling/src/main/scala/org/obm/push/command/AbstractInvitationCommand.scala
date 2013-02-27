@@ -33,36 +33,35 @@ package org.obm.push.command
 
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.JavaConversions.collectionAsScalaIterable
+
 import org.obm.push.bean.MSEvent
+import org.obm.push.bean.SyncCollectionCommands
+import org.obm.push.bean.SyncCollectionRequest
 import org.obm.push.checks.Check
 import org.obm.push.context.User
 import org.obm.push.encoder.GatlingEncoders.calendarEncoder
 import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.utils.DOMUtils
 import org.obm.push.wbxml.WBXMLTools
+
 import com.excilys.ebi.gatling.core.Predef.Session
-import org.obm.push.protocol.bean.SyncCollectionRequest
-import org.obm.push.protocol.bean.SyncCollectionRequestCommands
-import com.google.common.collect.ImmutableList
-import org.obm.push.protocol.bean.SyncCollectionRequestCommand
 
 abstract class AbstractInvitationCommand(invitation: InvitationContext, wbTools: WBXMLTools)
 		extends AbstractSyncCommand(invitation, wbTools) {
 
-	override def buildSyncCollectionRequests(session: Session) = {
-		List(SyncCollectionRequest.builder()
-				.id(invitation.findCollectionId(session))
+	override def buildSyncCollectionRequest(session: Session) = {
+		SyncCollectionRequest.builder()
+				.collectionId(invitation.findCollectionId(session))
 				.syncKey(invitation.nextSyncKey(session))
-				.commands(SyncCollectionRequestCommands.builder()
-					.commands(ImmutableList.of(
-						SyncCollectionRequestCommand.builder()
+				.commands(SyncCollectionCommands.Request.builder()
+					.addCommand(org.obm.push.bean.SyncCollectionCommand.Request.builder()
 							.name(collectionCommandName)
 							.clientId(clientId(session))
 							.serverId(serverId(session))
 							.applicationData(buildInvitationData(session))
-							.build()))
+							.build())
 					.build())
-				.build())
+				.build()
 	}
 	
 	def buildInvitationData(session: Session) = {
@@ -72,7 +71,7 @@ abstract class AbstractInvitationCommand(invitation: InvitationContext, wbTools:
 		val event = buildEventInvitation(session, organizer, attendees)
 		val parent = DOMUtils.createDoc(null, "ApplicationData").getDocumentElement()
 		calendarEncoder.encode(organizer.device, parent, event, true)
-		parent
+		event
 	}
 	
 	val collectionCommandName: String

@@ -33,9 +33,11 @@ package org.obm.push.backend;
 
 import java.util.List;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
@@ -50,26 +52,22 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 
 public interface IContentsExporter {
 
-	DataDelta getChanged(UserDataRequest udr, SyncCollection syncCollection, SyncClientCommands clientCommands,
-			SyncKey newSyncKey)
+	DataDelta getChanged(UserDataRequest udr, ItemSyncState syncState, AnalysedSyncCollection syncCollection, 
+			SyncClientCommands clientCommands, SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
-	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection) throws CollectionNotFoundException, 
+	List<ItemChange> fetch(UserDataRequest udr, SyncCollectionResponse syncCollection, SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 	
-	List<ItemChange> fetch(UserDataRequest udr, SyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, 
+	List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 
-	int getItemEstimateSize(UserDataRequest udr, SyncCollection syncCollection)
+	int getItemEstimateSize(UserDataRequest udr, AnalysedSyncCollection syncCollection, ItemSyncState itemSyncState)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 
-	int getItemEstimateSize(UserDataRequest udr, ItemSyncState state, SyncCollection syncCollection) 
-			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
-			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
-
-	int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, SyncCollection syncCollection) 
+	int getItemEstimateSize(UserDataRequest udr, PIMDataType pimDataType, AnalysedSyncCollection syncCollection, ItemSyncState itemSyncState) 
 			throws CollectionNotFoundException, ProcessingEmailException, DaoException, 
 			UnexpectedObmSyncServerException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 }

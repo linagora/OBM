@@ -37,8 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
 import org.obm.push.protocol.bean.GetItemEstimateResponse;
 import org.obm.push.utils.DOMUtils;
@@ -119,7 +119,7 @@ public class GetItemEstimateProtocolTest {
 		
 		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
 
-		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		AnalysedSyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
 		assertThat(syncCollection.getDataType()).isNull();
 		assertThat(syncCollection.getDataClass()).isNull();
 	}
@@ -137,7 +137,7 @@ public class GetItemEstimateProtocolTest {
 		
 		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
 
-		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		AnalysedSyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
 		assertThat(syncCollection.getDataType()).isEqualTo(PIMDataType.UNKNOWN);
 		assertThat(syncCollection.getDataClass()).isNull();
 	}
@@ -155,7 +155,7 @@ public class GetItemEstimateProtocolTest {
 		
 		GetItemEstimateRequest request = getItemEstimateProtocol.decodeRequest(DOMUtils.parse(initialDocument));
 
-		SyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
+		AnalysedSyncCollection syncCollection = Iterables.getOnlyElement(request.getSyncCollections());
 		assertThat(syncCollection.getDataType()).isEqualTo(PIMDataType.EMAIL);
 		assertThat(syncCollection.getDataClass()).isEqualTo("Email");
 	}

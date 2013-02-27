@@ -35,22 +35,25 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.UserDataRequest;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 public class CollectionChangeListener implements
 		ICollectionChangeListener {
 
 	private UserDataRequest udr;
-	private Set<SyncCollection> monitoredCollections;
+	private Set<AnalysedSyncCollection> monitoredCollections;
 	private IContinuation continuation;
 
 	public CollectionChangeListener(UserDataRequest udr,
-			IContinuation c, Set<SyncCollection> monitoredCollections) {
+			IContinuation c, 
+			Set<AnalysedSyncCollection> monitoredCollections) {
 		this.udr = udr;
 		this.monitoredCollections = monitoredCollections;
 		this.continuation = c;
@@ -62,7 +65,7 @@ public class CollectionChangeListener implements
 	}
 
 	@Override
-	public Set<SyncCollection> getMonitoredCollections() {
+	public Set<AnalysedSyncCollection> getMonitoredCollections() {
 		return monitoredCollections;
 	}
 
@@ -77,18 +80,25 @@ public class CollectionChangeListener implements
 
 	@Override
 	public boolean monitorOneOf(ChangedCollections changedCollections) {
-		TreeSet<SyncCollection> collectionPathSet = convertSetToComparePath(changedCollections);
-		return !Sets.intersection(getMonitoredCollections(), collectionPathSet).isEmpty();
+		TreeSet<String> collectionPathSet = convertSetToComparePath(changedCollections);
+		return !Sets.intersection(
+				Sets.newHashSet(Iterables.transform(getMonitoredCollections(), new Function<AnalysedSyncCollection, String>() {
+					@Override
+					public String apply(AnalysedSyncCollection input) {
+						return input.getCollectionPath();
+					}
+				}))
+				, collectionPathSet).isEmpty();
 	}
 
-	private TreeSet<SyncCollection> convertSetToComparePath(ChangedCollections changedCollections) {
+	private TreeSet<String> convertSetToComparePath(ChangedCollections changedCollections) {
 		
-		TreeSet<SyncCollection> collectionPathSet = Sets.newTreeSet(new Comparator<SyncCollection>() {
+		TreeSet<String> collectionPathSet = Sets.newTreeSet(new Comparator<String>() {
 
 			@Override
-			public int compare(SyncCollection o1, SyncCollection o2) {
+			public int compare(String o1, String o2) {
 				return ComparisonChain.start()
-						.compare(o1.getCollectionPath(), o2.getCollectionPath())
+						.compare(o1, o2)
 						.result();
 			}
 		});

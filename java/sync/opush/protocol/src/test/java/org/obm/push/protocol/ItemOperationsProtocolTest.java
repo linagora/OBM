@@ -58,7 +58,8 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -146,7 +147,10 @@ public class ItemOperationsProtocolTest {
 		FetchItemResult fetchItemResult = new FetchItemResult();
 		fetchItemResult.setServerId(fetchItemResultServerId);
 		fetchItemResult.setStatus(ItemOperationsStatus.SUCCESS);
-		fetchItemResult.setSyncCollection(new SyncCollection(1, "obm:\\\\login@domain\\email\\INBOX"));
+		fetchItemResult.setSyncCollection(SyncCollectionResponse.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build());
 		fetchItemResult.setItemChange(null);
 		
 		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
@@ -187,7 +191,10 @@ public class ItemOperationsProtocolTest {
 		FetchItemResult fetchItemResult = new FetchItemResult();
 		fetchItemResult.setServerId(fetchItemResultServerId);
 		fetchItemResult.setStatus(ItemOperationsStatus.SUCCESS);
-		fetchItemResult.setSyncCollection(new SyncCollection(1, "obm:\\\\login@domain\\email\\INBOX"));
+		fetchItemResult.setSyncCollection(SyncCollectionResponse.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build());
 		fetchItemResult.setItemChange(itemChange);
 		
 		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
@@ -229,7 +236,10 @@ public class ItemOperationsProtocolTest {
 		FetchItemResult fetchItemResult = new FetchItemResult();
 		fetchItemResult.setServerId(fetchItemResultServerId);
 		fetchItemResult.setStatus(ItemOperationsStatus.SERVER_ERROR);
-		fetchItemResult.setSyncCollection(new SyncCollection(1, "obm:\\\\login@domain\\email\\INBOX"));
+		fetchItemResult.setSyncCollection(SyncCollectionResponse.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build());
 		fetchItemResult.setItemChange(itemChange);
 		
 		MailboxFetchResult mailboxFetchResult = new MailboxFetchResult();
@@ -262,7 +272,10 @@ public class ItemOperationsProtocolTest {
 		FetchItemResult fetchItemResult = new FetchItemResult();
 		fetchItemResult.setServerId("1:2");
 		fetchItemResult.setStatus(ItemOperationsStatus.SUCCESS);
-		fetchItemResult.setSyncCollection(new SyncCollection(1, "obm:\\\\login@domain\\email\\INBOX"));
+		fetchItemResult.setSyncCollection(SyncCollectionResponse.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build());
 		
 		EmptyFolderContentsResult emptyFolderContentsResult = new EmptyFolderContentsResult();
 		emptyFolderContentsResult.setCollectionId(1);

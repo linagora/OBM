@@ -36,9 +36,9 @@ import java.util.Set;
 
 import net.sf.ehcache.Element;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.store.MonitoredCollectionDao;
 
 import com.google.common.base.Objects;
@@ -60,25 +60,25 @@ public class MonitoredCollectionDaoEhcacheImpl extends AbstractEhcacheDao implem
 	}
 	
 	@Override
-	public Set<SyncCollection> list(Credentials credentials, Device device) {
+	public Set<AnalysedSyncCollection> list(Credentials credentials, Device device) {
 		Key key = buildKey(credentials, device);
 		Element element = store.get(key);
 		if (element != null) {
-			return (Set<SyncCollection>) element.getValue();
+			return (Set<AnalysedSyncCollection>) element.getValue();
 		} else {
-			return ImmutableSet.<SyncCollection>of();
+			return ImmutableSet.<AnalysedSyncCollection>of();
 		}
 	}
 
 	@Override
 	public void put(Credentials credentials, Device device,
-			Set<SyncCollection> collections) {
+			Set<AnalysedSyncCollection> collections) {
 		Key key = buildKey(credentials, device);
 		remove(key);
 		add(key, collections);
 	}
 	
-	private void add(Key key, Set<SyncCollection> collections) {
+	private void add(Key key, Set<AnalysedSyncCollection> collections) {
 		store.put( new Element(key, collections) );
 	}
 	

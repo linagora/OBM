@@ -42,6 +42,7 @@ import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.MSTask;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;
@@ -81,6 +82,13 @@ public class TaskEncoder extends Encoder {
 			s(p, "Tasks:ReminderSet", ta.getReminderSet());
 		}
 		encodeBody(device, p, ta);
+	}
+
+	public Element encodedApplicationData(Device device, IApplicationData data) {
+		Document doc = DOMUtils.createDoc(null, null);
+		Element root = doc.getDocumentElement();
+		encode(device, root, data);
+		return root;
 	}
 
 	private void encodeRecurrence(Element p, MSTask task) {

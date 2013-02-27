@@ -67,7 +67,6 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -528,10 +527,8 @@ public class CalendarBackendTest {
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		SyncCollection collection = new SyncCollection(collectionId, rootCalendarPath);
-		collection.setOptions(syncCollectionOptions);
 		
-		int itemEstimateSize = calendarBackend.getItemEstimateSize(userDataRequest, lastKnownState, collection);
+		int itemEstimateSize = calendarBackend.getItemEstimateSize(userDataRequest, lastKnownState, collectionId, syncCollectionOptions);
 		
 		mockControl.verify();
 		
@@ -540,7 +537,6 @@ public class CalendarBackendTest {
 	
 	@Test 
 	public void testGetChanged() throws Exception {
-		int windowSize = 10;
 		Date currentDate = DateUtils.getCurrentDate();
 		SyncKey syncKey = new SyncKey("1234567890a");
 		ItemSyncState lastKnownState = ItemSyncState.builder()
@@ -573,12 +569,8 @@ public class CalendarBackendTest {
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		SyncCollection collection = new SyncCollection(collectionId, rootCalendarPath);
-		collection.setItemSyncState(lastKnownState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
 		
-		DataDelta dataDelta = calendarBackend.getAllChanges(userDataRequest, lastKnownState, collection, syncKey);
+		DataDelta dataDelta = calendarBackend.getAllChanges(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
 		
 		mockControl.verify();
 		
@@ -1101,7 +1093,6 @@ public class CalendarBackendTest {
 	
 	@Test 
 	public void testGetAllChangesThrowsHierarchyChangedException() throws Exception {
-		int windowSize = 10;
 		Date currentDate = DateUtils.getCurrentDate();
 		SyncKey syncKey = new SyncKey("1234567890a");
 		ItemSyncState lastKnownState = ItemSyncState.builder()
@@ -1127,12 +1118,8 @@ public class CalendarBackendTest {
 		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
 		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
 		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		SyncCollection collection = new SyncCollection(collectionId, rootCalendarPath);
-		collection.setItemSyncState(lastKnownState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
 		
-		DataDelta allChanges = calendarBackend.getAllChanges(userDataRequest, lastKnownState, collection, syncKey);
+		DataDelta allChanges = calendarBackend.getAllChanges(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
 		assertThat(allChanges).isNull();
 	}
 	

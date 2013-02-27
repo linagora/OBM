@@ -45,12 +45,12 @@ import java.util.Properties;
 
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.item.ItemChange;
@@ -122,14 +122,14 @@ public class IntegrationTestUtils {
 				.syncKey(new SyncKey("sync state"))
 				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).anyTimes();
-		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<SyncCollection>of());
+		ChangedCollections changed = new ChangedCollections(lastSync, ImmutableSet.<String>of());
 		expect(collectionDao.getContactChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(anyObject(Date.class))).andReturn(changed).anyTimes();
 
 		int otherCollectionId = anyInt();
 		for (OpushUser opushUser: users) {
 			for (Integer unchangedCollectionId : unchangedCollectionsIds) {
-				String collectionPath = IntegrationTestUtils.buildCalendarCollectionPath(opushUser);  
+				String collectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(opushUser);  
 				expect(collectionDao.getCollectionPath(unchangedCollectionId)).andReturn(collectionPath).anyTimes();
 			}
 			expect(collectionDao.getCollectionPath(otherCollectionId)).andThrow(new CollectionNotFoundException()).anyTimes();
@@ -210,7 +210,7 @@ public class IntegrationTestUtils {
 	}
 	
 	public static void expectContentExporterFetching(IContentsExporter iContentsExporter, UserDataRequest userDataRequest, List<ItemChange> itemChanges) throws Exception {
-		expect(iContentsExporter.fetch(eq(userDataRequest), anyObject(SyncCollection.class), anyObject(SyncKey.class)))
+		expect(iContentsExporter.fetch(eq(userDataRequest), anyObject(ItemSyncState.class), anyObject(AnalysedSyncCollection.class), anyObject(SyncKey.class)))
 			.andReturn(itemChanges);
 	}
 }

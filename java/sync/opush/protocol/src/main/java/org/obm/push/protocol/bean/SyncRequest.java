@@ -31,14 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import java.util.List;
+import java.util.Set;
 
+import org.joda.time.Minutes;
+import org.joda.time.Seconds;
+import org.obm.push.bean.SyncCollectionRequest;
+import org.obm.push.bean.SyncDefaultValues;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
-public class SyncRequest {
+public class SyncRequest implements SyncDefaultValues {
 
 	public static Builder builder() {
 		return new Builder();
@@ -49,9 +54,11 @@ public class SyncRequest {
 		private Integer waitInMinute;
 		private Boolean partial;
 		private Integer windowSize;
-		private List<SyncCollectionRequest> collections;
+		private Set<SyncCollectionRequest> collections;
 
-		private Builder() {}
+		private Builder() {
+			this.collections = Sets.newHashSet();
+		}
 		
 		public Builder waitInMinute(Integer waitInMinute) {
 			this.waitInMinute = waitInMinute;
@@ -68,8 +75,8 @@ public class SyncRequest {
 			return this;
 		}
 
-		public Builder collections(List<SyncCollectionRequest> collections) {
-			this.collections = collections;
+		public Builder addCollection(SyncCollectionRequest collection) {
+			collections.add(collection);
 			return this;
 		}
 
@@ -78,10 +85,17 @@ public class SyncRequest {
 			assertWindowSize();
 			
 			if (collections == null) {
-				collections = ImmutableList.of();
+				collections = ImmutableSet.of();
+			}
+			if (waitInMinute == null) {
+				waitInMinute = DEFAULT_WAIT;
+			}
+			if (windowSize == null) {
+				windowSize = DEFAULT_WINDOW_SIZE;
 			}
 
-			return new SyncRequest(waitInMinute, partial, windowSize, collections);
+			return new SyncRequest(Minutes.minutes(waitInMinute).toStandardSeconds().getSeconds(), 
+					partial, windowSize, collections);
 		}
 
 		private void assertWait() {
@@ -97,45 +111,49 @@ public class SyncRequest {
 		}
 	}
 	
-	private final Integer waitInMinute;
+	private final int waitInSecond;
 	private final Boolean partial;
-	private final Integer windowSize;
-	private final List<SyncCollectionRequest> collections;
+	private final int windowSize;
+	private final Set<SyncCollectionRequest> collections;
 	
-	protected SyncRequest(Integer waitInMinute, Boolean partial, Integer windowSize,
-			List<SyncCollectionRequest> collections) {
-		this.waitInMinute = waitInMinute;
+	protected SyncRequest(int waitInSecond, Boolean partial, int windowSize,
+			Set<SyncCollectionRequest> collections) {
+		this.waitInSecond = waitInSecond;
 		this.partial = partial;
 		this.windowSize = windowSize;
 		this.collections = collections;
 	}
 	
-	public Integer getWaitInMinute() {
-		return waitInMinute;
+	public int getWaitInSecond() {
+		return waitInSecond;
+	}
+	
+	public int getWaitInMinute() {
+		return Seconds.seconds(waitInSecond).toStandardMinutes().getMinutes();
 	}
 	
 	public Boolean isPartial() {
 		return partial;
 	}
 	
-	public List<SyncCollectionRequest> getCollections() {
+	public Set<SyncCollectionRequest> getCollections() {
 		return collections;
 	}
 
-	public Integer getWindowSize() {
+	public int getWindowSize() {
 		return windowSize;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(waitInMinute, partial, windowSize, collections);
+		return Objects.hashCode(waitInSecond, partial, windowSize, collections);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof SyncRequest) {
 			SyncRequest that = (SyncRequest) object;
-			return Objects.equal(this.waitInMinute, that.waitInMinute)
+			return Objects.equal(this.waitInSecond, that.waitInSecond)
 				&& Objects.equal(this.partial, that.partial)
 				&& Objects.equal(this.windowSize, that.windowSize)
 				&& Objects.equal(this.collections, that.collections);
@@ -146,7 +164,7 @@ public class SyncRequest {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("waitInMinute", waitInMinute)
+			.add("waitInSecond", waitInSecond)
 			.add("partial", partial)
 			.add("windowSize", windowSize)
 			.add("collections", collections)

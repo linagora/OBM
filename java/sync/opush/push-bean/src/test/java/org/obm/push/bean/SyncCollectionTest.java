@@ -41,79 +41,66 @@ import org.obm.filter.SlowFilterRunner;
 public class SyncCollectionTest {
 
 	@Test
-	public void testIsValidToProcessWithNullStatus() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setStatus(null);
-		
-		assertThat(syncCollection.isValidToProcess()).isTrue();
-	}
-
-	@Test
-	public void testIsValidToProcessWithNullOK() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setStatus(SyncStatus.OK);
-		
-		assertThat(syncCollection.isValidToProcess()).isTrue();
-	}
-
-	@Test
-	public void testIsValidToProcessWithNullObjectNotFound() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setStatus(SyncStatus.OBJECT_NOT_FOUND);
-		
-		assertThat(syncCollection.isValidToProcess()).isFalse();
-	}
-
-	@Test
-	public void testIsValidToProcessWithNullPartialRequest() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setStatus(SyncStatus.PARTIAL_REQUEST);
-		
-		assertThat(syncCollection.isValidToProcess()).isFalse();
-	}
-
-	@Test
 	public void testDataClassForNullDataType() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setDataType(null);
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build();
 		
 		assertThat(syncCollection.getDataClass()).isNull();
 	}
 
 	@Test
 	public void testDataClassForUnknownDataType() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setDataType(PIMDataType.UNKNOWN);
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.dataType(PIMDataType.UNKNOWN)
+				.build();
 		
 		assertThat(syncCollection.getDataClass()).isNull();
 	}
 
 	@Test
 	public void testDataClassForEmailDataType() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setDataType(PIMDataType.EMAIL);
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.dataType(PIMDataType.EMAIL)
+				.build();
 		
 		assertThat(syncCollection.getDataClass()).isEqualTo("Email");
 	}
 
 	@Test
 	public void testDataClassForCalendarDataType() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setDataType(PIMDataType.CALENDAR);
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.dataType(PIMDataType.CALENDAR)
+				.build();
 		
 		assertThat(syncCollection.getDataClass()).isEqualTo("Calendar");
 	}
 
 	@Test
 	public void testDataClassForContactDataType() {
-		SyncCollection syncCollection = new SyncCollection();
-		syncCollection.setDataType(PIMDataType.CONTACTS);
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.dataType(PIMDataType.CONTACTS)
+				.build();
 		
 		assertThat(syncCollection.getDataClass()).isEqualTo("Contacts");
 	}
 
 	@Test
 	public void testDataClassForDefaultDataType() {
-		assertThat(new SyncCollection().getDataClass()).isNull();
+		SyncCollectionRequest syncCollection = SyncCollectionRequest.builder()
+				.collectionId(1)
+				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
+				.build();
+		
+		assertThat(syncCollection.getDataClass()).isNull();
 	}
 }

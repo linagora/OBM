@@ -29,53 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.bean;
+package org.obm.push.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemDeletion;
 
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class)
-public class SyncCollectionRequestCommandsTest {
-
-	@Test
-	public void testBuilderFetchIdsIsNotRequired() {
-		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
-			.fetchIds(null).build();
-		
-		assertThat(commands.getFetchIds()).isEmpty();
-	}
-
-	@Test
-	public void testBuilderFetchIdsValid() {
-		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
-			.fetchIds(ImmutableList.of("1234", "5678")).build();
-		
-		assertThat(commands.getFetchIds()).containsOnly("1234", "5678");
-	}
+public class SyncCollectionCommandsTest {
 
 	@Test
 	public void testBuilderCommandsIsNotRequired() {
-		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
-			.commands(null).build();
+		SyncCollectionCommands.Request commands = SyncCollectionCommands.Request.builder()
+			.build();
 		
 		assertThat(commands.getCommands()).isEmpty();
 	}
 
 	@Test
 	public void testBuilderCommandsValid() {
-		SyncCollectionRequestCommands commands = SyncCollectionRequestCommands.builder()
-			.commands(ImmutableList.of(
-					SyncCollectionRequestCommand.builder().name("Delete").serverId("3").build(),
-					SyncCollectionRequestCommand.builder().name("Fetch").serverId("8").build())).build();
+		SyncCollectionCommands.Request commands = SyncCollectionCommands.Request.builder()
+			.addCommand(SyncCollectionCommand.Request.builder().name("Delete").serverId("3").build())
+			.addCommand(SyncCollectionCommand.Request.builder().name("Fetch").serverId("8").build())
+			.build();
 		
 		assertThat(commands.getCommands()).containsOnly(
-				SyncCollectionRequestCommand.builder().name("Delete").serverId("3").build(),
-				SyncCollectionRequestCommand.builder().name("Fetch").serverId("8").build());
+				SyncCollectionCommand.Request.builder().name("Delete").serverId("3").build(),
+				SyncCollectionCommand.Request.builder().name("Fetch").serverId("8").build());
 	}
 	
+	@Test
+	public void testChangesAndDeletions() {
+		ImmutableList<ItemChange> changes = ImmutableList.<ItemChange> of(new ItemChange("123"));
+		ImmutableList<ItemDeletion> deletions = ImmutableList.<ItemDeletion> of(ItemDeletion.builder().serverId("234").build());
+		SyncCollectionCommands.Response commands = SyncCollectionCommands.Response.builder()
+				.changes(changes)
+				.deletions(deletions)
+				.build();
+				
+		assertThat(commands.getCommandsForType(SyncCommand.CHANGE)).containsOnly(SyncCollectionCommand.Response.builder()
+				.commandType(SyncCommand.CHANGE)
+				.serverId("123")
+				.build());
+		assertThat(commands.getCommandsForType(SyncCommand.DELETE)).containsOnly(SyncCollectionCommand.Response.builder()
+				.commandType(SyncCommand.DELETE)
+				.serverId("234")
+				.build());
+	}
 }

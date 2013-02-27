@@ -36,9 +36,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.obm.push.backend.DataDelta;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ASItem;
@@ -79,7 +79,7 @@ public class ResponseWindowingService {
 			this.changesMergePolicy = changesMergePolicy;
 		}
 		
-		List<T> window(SyncCollection c, List<T> newChanges, SyncClientCommands clientCommands) {
+		List<T> window(AnalysedSyncCollection c, List<T> newChanges, SyncClientCommands clientCommands) {
 		
 			List<T> changes = listChanges(newChanges);
 			
@@ -104,7 +104,7 @@ public class ResponseWindowingService {
 		}
 		
 		private List<T> handleChangesOverflow(
-				SyncCollection c, SyncClientCommands clientCommands, List<T> changes) {
+				AnalysedSyncCollection c, SyncClientCommands clientCommands, List<T> changes) {
 			
 			logWindowingInformation(c, changes);
 
@@ -120,7 +120,7 @@ public class ResponseWindowingService {
 							Iterables.limit(changesFromServer, numberOfChangesFromServerToInclude)));
 		}
 		
-		private void logWindowingInformation(SyncCollection c, List<T> changes) {
+		private void logWindowingInformation(AnalysedSyncCollection c, List<T> changes) {
 			int overflow = changes.size() - c.getWindowSize();
 			logger.info("Should send {} change(s)", changes.size());
 			logger.info("WindowsSize value is {} , {} change(s) will not be sent", c.getWindowSize(), overflow);
@@ -167,7 +167,7 @@ public class ResponseWindowingService {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	public DataDelta windowedResponse(UserDataRequest udr, SyncCollection c, DataDelta delta, SyncClientCommands clientCommands) {
+	public DataDelta windowedResponse(UserDataRequest udr, AnalysedSyncCollection c, DataDelta delta, SyncClientCommands clientCommands) {
 		return DataDelta.builder()
 				.changes(windowChanges(c, delta, udr, clientCommands))
 				.deletions(windowDeletions(c, delta, udr, clientCommands))
@@ -177,7 +177,7 @@ public class ResponseWindowingService {
 				.build();
 	}
 	
-	@VisibleForTesting List<ItemChange> windowChanges(SyncCollection c, DataDelta delta,
+	@VisibleForTesting List<ItemChange> windowChanges(AnalysedSyncCollection c, DataDelta delta,
 			UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		Preconditions.checkNotNull(delta);
 		Preconditions.checkNotNull(c);
@@ -210,7 +210,7 @@ public class ResponseWindowingService {
 		}).window(c, delta.getChanges(), clientCommands);
 	}
 
-	@VisibleForTesting List<ItemDeletion> windowDeletions(final SyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
+	@VisibleForTesting List<ItemDeletion> windowDeletions(final AnalysedSyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
 		final Credentials credentials = userDataRequest.getCredentials();
 		final Device device = userDataRequest.getDevice();
 		final Integer collectionId = c.getCollectionId();

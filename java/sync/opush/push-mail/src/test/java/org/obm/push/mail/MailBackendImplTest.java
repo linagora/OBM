@@ -48,18 +48,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -160,11 +161,13 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 		
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setItemSyncState(syncState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
-		collection.setSyncKey(syncKey);
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(syncCollectionOptions)
+				.build();
 		
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expectSnapshotDaoRecordOneSnapshot(newSyncKey, uidNext, syncCollectionOptions, actualEmailsInServer);
@@ -177,7 +180,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, collection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta actual = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 		
 		assertThat(actual.getDeletions()).isEmpty();
@@ -204,11 +207,13 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setItemSyncState(syncState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
-		collection.setSyncKey(syncKey);
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(syncCollectionOptions)
+				.build();
 		
 		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
 		expect(windowingService.hasPendingElements(windowingKey, syncKey)).andReturn(false);
@@ -218,7 +223,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(syncCollectionOptions.getBodyPreferences(), emailChanges, itemChanges);
 		
 		control.replay();
-		DataDelta actual = testee.getChanged(udr, collection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta actual = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 
 		assertThat(actual.getDeletions()).isEmpty();
@@ -292,12 +297,14 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setItemSyncState(syncState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
-		collection.setSyncKey(syncKey);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(syncCollectionOptions)
+				.build();
+		
 		expect(windowingService.hasPendingElements(windowingKey, syncKey)).andReturn(false);
 		expect(windowingService.hasPendingElements(windowingKey, newSyncKey)).andReturn(false);
 		expectMailBackendSyncData(currentUIDNext, syncCollectionOptions, existingSnapshot, previousEmailsInServer, fetchedEmails, emailChanges, fromDate, syncState);
@@ -305,7 +312,7 @@ public class MailBackendImplTest {
 		expectServerItemChanges(bodyPreferences, emailChanges, modifiedEmail, newEmail, deletedEmail);
 		
 		control.replay();
-		testee.getChanged(udr, collection, SyncClientCommands.empty(), newSyncKey);
+		testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		
 		control.verify();
 	}
@@ -359,13 +366,10 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setOptions(syncCollectionOptions);
-		
 		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
 		
 		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collection);
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(0);
@@ -385,9 +389,6 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 		
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setOptions(syncCollectionOptions);
-
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		Email email2 = Email.builder().uid(546).read(true).date(date("2012-12-12T23:59:00")).build();
 		
@@ -398,7 +399,7 @@ public class MailBackendImplTest {
 		expectMailBackendSyncData(uidNext, syncCollectionOptions, null, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
 		
 		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collection);
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(2);
@@ -432,13 +433,10 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 		
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setOptions(syncCollectionOptions);
-		
 		expectMailBackendSyncData(uidNext, syncCollectionOptions, snapshot, emailsInServer, emailsInServer, emailChanges, fromDate, syncState);
 		
 		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collection);
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(0);
@@ -480,13 +478,10 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build();
 
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setOptions(syncCollectionOptions);
-		
 		expectMailBackendSyncData(uidNext, syncCollectionOptions, snapshot, previousEmailsInServer, actualEmailsInServer, emailChanges, fromDate, syncState);
 		
 		control.replay();
-		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collection);
+		int itemEstimateSize = testee.getItemEstimateSize(udr, syncState, collectionId, syncCollectionOptions);
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(3);
@@ -520,12 +515,14 @@ public class MailBackendImplTest {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(previousSyncKey);
-		syncCollection.setItemSyncState(syncState);
-		syncCollection.setWindowSize(windowSize);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(previousSyncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(options)
+				.build();
+		
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		Email email2 = Email.builder().uid(546).read(true).date(date("2012-12-12T23:59:00")).build();
 		Set<Email> previousEmails = ImmutableSet.of();
@@ -559,7 +556,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(options.getBodyPreferences(), fittingChanges, itemChanges);
 		
 		control.replay();
-		DataDelta windowedChanges = testee.getChanged(udr, syncCollection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta windowedChanges = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 		
 		assertThat(windowedChanges).isEqualTo(DataDelta.builder()
@@ -582,12 +579,14 @@ public class MailBackendImplTest {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(previousSyncKey);
-		syncCollection.setItemSyncState(syncState);
-		syncCollection.setWindowSize(windowSize);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(previousSyncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(options)
+				.build();
+		
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		Email email2 = Email.builder().uid(546).read(true).date(date("2012-12-12T23:59:00")).build();
 		Set<Email> previousEmails = ImmutableSet.of();
@@ -622,7 +621,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(options.getBodyPreferences(), fittingChanges, itemChanges);
 		
 		control.replay();
-		DataDelta windowedChanges = testee.getChanged(udr, syncCollection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta windowedChanges = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 		
 
@@ -645,12 +644,14 @@ public class MailBackendImplTest {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(previousSyncKey);
-		syncCollection.setItemSyncState(syncState);
-		syncCollection.setWindowSize(windowSize);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(previousSyncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(options)
+				.build();
+		
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		Email email2 = Email.builder().uid(546).read(true).date(date("2012-12-12T23:59:00")).build();
 		Set<Email> actualEmails = ImmutableSet.of(email1, email2);
@@ -671,7 +672,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(options.getBodyPreferences(), fittingChanges, itemChanges);
 		
 		control.replay();
-		DataDelta windowedChanges = testee.getChanged(udr, syncCollection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta windowedChanges = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 		
 		assertThat(windowedChanges).isEqualTo(DataDelta.builder()
@@ -693,12 +694,14 @@ public class MailBackendImplTest {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(previousSyncKey);
-		syncCollection.setItemSyncState(syncState);
-		syncCollection.setWindowSize(windowSize);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(previousSyncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(options)
+				.build();
+		
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		EmailChanges fittingChanges = EmailChanges.builder().additions(ImmutableSet.of(email1)).build();
 
@@ -714,7 +717,7 @@ public class MailBackendImplTest {
 		expectBuildItemChangesByFetchingMSEmailsData(options.getBodyPreferences(), fittingChanges, itemChanges);
 		
 		control.replay();
-		DataDelta windowedChanges = testee.getChanged(udr, syncCollection, SyncClientCommands.empty(), newSyncKey);
+		DataDelta windowedChanges = testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		control.verify();
 
 		assertThat(windowedChanges).isEqualTo(DataDelta.builder()
@@ -736,12 +739,14 @@ public class MailBackendImplTest {
 		SyncCollectionOptions options = new SyncCollectionOptions();
 		options.setFilterType(FilterType.ALL_ITEMS);
 		options.setBodyPreferences(ImmutableList.<BodyPreference>of());
-		SyncCollection syncCollection = new SyncCollection(collectionId, collectionPath);
-		syncCollection.setOptions(options);
-		syncCollection.setSyncKey(previousSyncKey);
-		syncCollection.setItemSyncState(syncState);
-		syncCollection.setWindowSize(windowSize);
-
+		AnalysedSyncCollection syncCollectionRequest = AnalysedSyncCollection.builder()
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(previousSyncKey)
+				.collectionId(collectionId)
+				.windowSize(windowSize)
+				.options(options)
+				.build();
+		
 		Email email1 = Email.builder().uid(245).read(false).date(date("2004-12-14T22:00:00")).build();
 		EmailChanges fittingChanges = EmailChanges.builder().additions(ImmutableSet.of(email1)).build();
 
@@ -753,7 +758,7 @@ public class MailBackendImplTest {
 		
 		control.replay();
 		try {
-			testee.getChanged(udr, syncCollection, SyncClientCommands.empty(), newSyncKey);
+			testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		} catch (ProcessingEmailException e) {
 			control.verify();
 			throw e;

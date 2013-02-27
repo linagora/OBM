@@ -33,14 +33,15 @@ package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
 
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class PartialSyncCommand extends Sync {
 
-	public PartialSyncCommand() throws SAXException, IOException {
-		super(new TemplateDocument("PartialSyncRequest.xml") {
+	public PartialSyncCommand(final SyncDecoder decoder) throws SAXException, IOException {
+		super(decoder, new TemplateDocument("PartialSyncRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {

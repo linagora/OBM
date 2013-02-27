@@ -31,13 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
 
 public interface BackendWindowingService {
 	
-	DataDelta windowedChanges(UserDataRequest udr, SyncCollection collection, 
+	DataDelta windowedChanges(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection, 
 			SyncClientCommands clientCommands, BackendChangesProvider backendChangesProvider);
 	
 	public interface BackendChangesProvider {

@@ -34,6 +34,7 @@ package org.obm.sync.push.client.commands;
 import java.io.IOException;
 
 import org.obm.push.bean.SyncKey;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
@@ -42,10 +43,10 @@ import org.xml.sax.SAXException;
 
 public class EmailDeleteSyncRequest extends Sync {
 
-	public EmailDeleteSyncRequest(final SyncKey syncKey, final int collectionId, final String serverId)
+	public EmailDeleteSyncRequest(final SyncDecoder decoder, final SyncKey syncKey, final int collectionId, final String serverId)
 			throws SAXException, IOException {
 		
-		super(new TemplateDocument("EmailDeleteSyncRequest.xml") {
+		super(decoder, new TemplateDocument("EmailDeleteSyncRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {

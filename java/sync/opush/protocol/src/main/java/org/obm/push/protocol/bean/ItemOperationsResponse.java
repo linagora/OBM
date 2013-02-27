@@ -32,7 +32,7 @@
 package org.obm.push.protocol.bean;
 
 import org.obm.push.bean.ItemOperationsStatus;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.change.item.ItemChange;
 
 public class ItemOperationsResponse {
@@ -91,7 +91,7 @@ public class ItemOperationsResponse {
 		public static class FetchItemResult {
 			private ItemChange itemChange;
 			private ItemOperationsStatus status;
-			private SyncCollection syncCollection;
+			private SyncCollectionResponse syncCollection;
 			private String serverId;
 			
 			public ItemChange getItemChange() {
@@ -110,11 +110,11 @@ public class ItemOperationsResponse {
 				this.status = status;
 			}
 			
-			public SyncCollection getSyncCollection() {
+			public SyncCollectionResponse getSyncCollection() {
 				return syncCollection;
 			}
 			
-			public void setSyncCollection(SyncCollection syncCollection) {
+			public void setSyncCollection(SyncCollectionResponse syncCollection) {
 				this.syncCollection = syncCollection;
 			}
 

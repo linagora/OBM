@@ -56,6 +56,7 @@ import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
@@ -66,7 +67,6 @@ import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -77,10 +77,12 @@ import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.bean.SyncResponse;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
@@ -118,6 +120,8 @@ public class MailBackendImapTimeoutTest {
 	@Inject ContactsBackend contactsBackend;
 	@Inject TaskBackend taskBackend;
 	@Inject CalendarBackend calendarBackend;
+	@Inject SyncDecoder syncDecoder;
+	@Inject PingProtocol pingProtocol;
 	
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
@@ -166,14 +170,24 @@ public class MailBackendImapTimeoutTest {
 		expect(collectionDao.getCollectionPath(trashCollectionId)).andReturn(trashCollectionPath).anyTimes();
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		SyncCollection syncCollection = new SyncCollection(inboxCollectionId, inboxCollectionPath);
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+				.collectionId(inboxCollectionId)
+				.collectionPath(inboxCollectionIdAsString)
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(new SyncKey("123"))
+				.build();
 		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
 			.andReturn(syncCollection).anyTimes();
-		SyncCollection trashCollection = new SyncCollection(trashCollectionId, trashCollectionPath);
+		AnalysedSyncCollection trashCollection = AnalysedSyncCollection.builder()
+				.collectionId(trashCollectionId)
+				.collectionPath(trashCollectionPath)
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(new SyncKey("456"))
+				.build();
 		expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
 			.andReturn(trashCollection).anyTimes();
 		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(SyncCollection.class));
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
 		expectLastCall().anyTimes();
 	}
 
@@ -207,7 +221,7 @@ public class MailBackendImapTimeoutTest {
 				.id(allocatedStateId2)
 				.build();
 		
-		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).once();
 		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
 		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState);
@@ -216,9 +230,9 @@ public class MailBackendImapTimeoutTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+		opClient.syncEmail(syncDecoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 		greenMail.lockGreenmailAndReleaseAfter(20);
-		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
+		SyncResponse syncResponse = opClient.syncEmail(syncDecoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 
 		mocksControl.verify();
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
@@ -399,7 +413,7 @@ public class MailBackendImapTimeoutTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		greenMail.lockGreenmailAndReleaseAfter(20);
-		PingResponse pingResponse = opClient.ping(inboxCollectionIdAsString, hearbeat);
+		PingResponse pingResponse = opClient.ping(pingProtocol, inboxCollectionIdAsString, hearbeat);
 		
 		mocksControl.verify();
 		assertThat(pingResponse.getPingStatus()).isEqualTo(PingStatus.SERVER_ERROR);

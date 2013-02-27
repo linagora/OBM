@@ -44,11 +44,13 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ContentsExporter;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -98,21 +100,25 @@ public class GetItemEstimateHandlerTest {
 				.syncDate(DateUtils.getCurrentDate())
 				.build();
 		
-		SyncCollection syncCollection = new SyncCollection(collectionId, "INBOX");
-		syncCollection.setSyncKey(syncKey);
+		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
+				.collectionId(collectionId)
+				.dataType(PIMDataType.EMAIL)
+				.syncKey(syncKey)
+				.build();
 
 		expect(stMachine.getItemSyncState(syncKey))
 			.andReturn(syncState);
-		expect(contentsExporter.getItemEstimateSize(udr, syncState, syncCollection))
+		expect(contentsExporter.getItemEstimateSize(udr, PIMDataType.EMAIL, syncCollection, syncState))
 			.andThrow(new FilterTypeChangedException(collectionId, FilterType.THREE_DAYS_BACK, FilterType.ONE_MONTHS_BACK));
 		expect(unSynchronizedItemCache.listItemsToAdd(null, device, collectionId))
 			.andReturn(Collections.EMPTY_SET);
 		
 		control.replay();
-		Estimate estimate = testee.computeEstimate(udr, syncCollection);
+		SyncCollectionResponse.Builder builder = SyncCollectionResponse.builder()
+				.collectionId(collectionId);
+		Estimate estimate = testee.computeEstimate(udr, syncCollection, PIMDataType.EMAIL, builder);
 		control.verify();
 		
 		assertThat(estimate.getCollection().getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
 	}
-
 }

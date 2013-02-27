@@ -41,7 +41,7 @@ import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.Predef.matcherCheckBuilderToCheckBuilder
-import org.obm.push.protocol.bean.SyncCollectionRequest
+import org.obm.push.bean.SyncCollectionRequest
 
 abstract class AbstractSyncCommand(syncContext: SyncContext, wbTools: WBXMLTools)
 	extends AbstractActiveSyncCommand(syncContext.userKey) {
@@ -63,14 +63,14 @@ abstract class AbstractSyncCommand(syncContext: SyncContext, wbTools: WBXMLTools
 
 	def buildSyncRequest(session: Session): Array[Byte] = {
 		val request = SyncRequest.builder()
-			.collections(buildSyncCollectionRequests(session))
+			.addCollection(buildSyncCollectionRequest(session))
 			.build()
 		
 		val requestDoc = syncEncoder.encodeSync(request)
 		wbTools.toWbxml(syncNamespace, requestDoc)
 	}
 	
-	def buildSyncCollectionRequests(session: Session): List[SyncCollectionRequest]
+	def buildSyncCollectionRequest(session: Session): SyncCollectionRequest
 	
 	def toSyncResponse(response: Array[Byte]): SyncResponse = {
 		val responseDoc = wbTools.toXml(response)

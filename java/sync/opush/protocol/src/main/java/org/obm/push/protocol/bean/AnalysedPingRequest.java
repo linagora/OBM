@@ -31,91 +31,81 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
-import org.w3c.dom.Element;
+import java.io.Serializable;
+import java.util.Set;
+
+import org.obm.push.bean.AnalysedSyncCollection;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
-public class SyncCollectionRequestCommand {
+public class AnalysedPingRequest implements Serializable {
 
+	private static final long serialVersionUID = -3115614124120167390L;
+	
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
+		private Long heartbeatInterval;
+		private ImmutableSet.Builder<AnalysedSyncCollection> syncCollectionBuilder;
 		
-		private String name;
-		private String serverId;
-		private String clientId;
-		private Element data;
-
-		private Builder() {}
-		
-		public Builder name(String name) {
-			this.name = name;
-			return this;
+		private Builder() {
+			super();
+			syncCollectionBuilder = ImmutableSet.builder();
 		}
 		
-		public Builder serverId(String serverId) {
-			this.serverId = serverId;
+		public Builder heartbeatInterval(Long heartbeatInterval) {
+			this.heartbeatInterval = heartbeatInterval;
 			return this;
 		}
 
-		public Builder clientId(String clientId) {
-			this.clientId = clientId;
-			return this;
-		}
-
-		public Builder applicationData(Element data) {
-			this.data = data;
+		public Builder syncCollections(Set<AnalysedSyncCollection> syncCollectionRequests) {
+			if (syncCollectionRequests != null) {
+				syncCollectionBuilder.addAll(syncCollectionRequests);
+			}
 			return this;
 		}
 		
-		public SyncCollectionRequestCommand build() {
-			return new SyncCollectionRequestCommand(name, serverId, clientId, data);
+		public Builder add(AnalysedSyncCollection syncCollectionRequest) {
+			syncCollectionBuilder.add(syncCollectionRequest);
+			return this;
+		}
+		
+		public AnalysedPingRequest build() {
+			return new AnalysedPingRequest(
+					this.heartbeatInterval, this.syncCollectionBuilder.build());
 		}
 	}
 	
-	private final String name;
-	private final String serverId;
-	private final String clientId;
-	private final Element data;
+	private final Long heartbeatInterval;
+	private final Set<AnalysedSyncCollection> syncCollections;
+
+	private AnalysedPingRequest(Long heartbeatInterval, Set<AnalysedSyncCollection> syncCollections) {
+		this.heartbeatInterval = heartbeatInterval;
+		this.syncCollections = syncCollections;
+	}
 	
-	private SyncCollectionRequestCommand(String name, String serverId, String clientId, Element data) {
-		this.name = name;
-		this.serverId = serverId;
-		this.clientId = clientId;
-		this.data = data;
+	public Long getHeartbeatInterval() {
+		return heartbeatInterval;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public String getServerId() {
-		return serverId;
-	}
-
-	public String getClientId() {
-		return clientId;
-	}
-
-	public Element getApplicationData() {
-		return data;
+	public Set<AnalysedSyncCollection> getSyncCollections() {
+		return syncCollections;
 	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(name, serverId, clientId, data);
+		return Objects.hashCode(heartbeatInterval, syncCollections);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncCollectionRequestCommand) {
-			SyncCollectionRequestCommand that = (SyncCollectionRequestCommand) object;
-			return Objects.equal(this.name, that.name)
-				&& Objects.equal(this.serverId, that.serverId)
-				&& Objects.equal(this.clientId, that.clientId)
-				&& Objects.equal(this.data, that.data);
+		if (object instanceof AnalysedPingRequest) {
+			AnalysedPingRequest that = (AnalysedPingRequest) object;
+			return Objects.equal(this.heartbeatInterval, that.heartbeatInterval)
+				&& Objects.equal(this.syncCollections, that.syncCollections);
 		}
 		return false;
 	}
@@ -123,10 +113,8 @@ public class SyncCollectionRequestCommand {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("name", name)
-			.add("serverId", serverId)
-			.add("clientId", clientId)
-			.add("data", data)
+			.add("heartbeatInterval", heartbeatInterval)
+			.add("syncCollections", syncCollections)
 			.toString();
 	}
 }

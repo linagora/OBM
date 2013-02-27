@@ -37,7 +37,7 @@ import org.obm.push.exception.DaoException;
 
 public interface HearbeatDao {
 
-	long findLastHearbeat(Device device) throws DaoException;
+	Long findLastHearbeat(Device device) throws DaoException;
 
 	void updateLastHearbeat(Device device, long hearbeat) throws DaoException;
 

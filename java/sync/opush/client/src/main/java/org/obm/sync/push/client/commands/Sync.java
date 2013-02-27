@@ -48,8 +48,10 @@ import org.xml.sax.SAXException;
  */
 public class Sync extends AbstractCommand<SyncResponse> {
 
-	public Sync(final Folder... folders) throws SAXException, IOException {
-		this(new TemplateDocument("SyncRequest.xml") {
+	private final SyncDecoder decoder;
+
+	public Sync(final SyncDecoder decoder, final Folder... folders) throws SAXException, IOException {
+		this(decoder, new TemplateDocument("SyncRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {
@@ -63,13 +65,13 @@ public class Sync extends AbstractCommand<SyncResponse> {
 		});
 	}
 
-	public Sync(DocumentProvider documentProvider) {
+	public Sync(SyncDecoder decoder, DocumentProvider documentProvider) {
 		super(NS.AirSync, "Sync", documentProvider);
+		this.decoder = decoder;
 	}
 
 	@Override
 	protected SyncResponse parseResponse(Document responseDocument) {
-		SyncDecoder decoder = new SyncDecoder(null) {};
 		return decoder.decodeSyncResponse(responseDocument);
 	}
 

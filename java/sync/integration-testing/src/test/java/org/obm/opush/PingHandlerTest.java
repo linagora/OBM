@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
@@ -76,7 +75,7 @@ import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
@@ -367,7 +366,6 @@ public class PingHandlerTest {
 		Date dateFirstSyncFromASSpecs = new Date(0);
 		Date dateWhenChangesAppear = new Date();
 		int collectionNoChangeIterationCount = noChangeIterationCount;
-		int collectionIdWhereChangesAppear = 1234;
 
 		expectCollectionDaoUnchangeForXIteration(collectionDao, dateFirstSyncFromASSpecs, collectionNoChangeIterationCount);
 
@@ -383,7 +381,7 @@ public class PingHandlerTest {
 			expect(collectionDao.getCollectionPath(anyInt())).andReturn(collectionPathWhereChangesAppear).anyTimes();
 
 			ChangedCollections hasChangesCollections = buildSyncCollectionWithChanges(
-					dateWhenChangesAppear, collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
+					dateWhenChangesAppear, collectionPathWhereChangesAppear);
 			expect(collectionDao.getCalendarChangedCollections(dateFirstSyncFromASSpecs)).andReturn(hasChangesCollections).once();
 		}
 	}
@@ -395,7 +393,7 @@ public class PingHandlerTest {
 				.syncDate(DateUtils.getCurrentDate())
 				.build();
 		expect(collectionDao.lastKnownState(anyObject(Device.class), anyInt())).andReturn(syncState).times(noChangeIterationCount);
-		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<SyncCollection>of());
+		ChangedCollections noChangeCollections = new ChangedCollections(activeSyncSpecFirstSyncDate, ImmutableSet.<String>of());
 		expect(collectionDao.getContactChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).anyTimes();
 		expect(collectionDao.getCalendarChangedCollections(activeSyncSpecFirstSyncDate)).andReturn(noChangeCollections).times(noChangeIterationCount);
 	}
@@ -408,7 +406,8 @@ public class PingHandlerTest {
 		expect(calendarBackend.getItemEstimateSize(
 				anyObject(UserDataRequest.class), 
 				anyObject(ItemSyncState.class),
-				anyObject(SyncCollection.class)))
+				anyObject(Integer.class),
+				anyObject(SyncCollectionOptions.class)))
 			.andReturn(1).times(2);
 	}
 
@@ -418,9 +417,10 @@ public class PingHandlerTest {
 		
 		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR).anyTimes();
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(UserDataRequest.class),  
+				anyObject(UserDataRequest.class), 
 				anyObject(ItemSyncState.class),
-				anyObject(SyncCollection.class)))
+				anyObject(Integer.class),
+				anyObject(SyncCollectionOptions.class)))
 			.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
 	}
 
@@ -429,9 +429,10 @@ public class PingHandlerTest {
 			ConversionException, HierarchyChangedException {
 		
 		expect(calendarBackend.getItemEstimateSize(
-				anyObject(UserDataRequest.class),  
+				anyObject(UserDataRequest.class), 
 				anyObject(ItemSyncState.class),
-				anyObject(SyncCollection.class)))
+				anyObject(Integer.class),
+				anyObject(SyncCollectionOptions.class)))
 			.andReturn(0).anyTimes();
 	}
 
@@ -452,9 +453,8 @@ public class PingHandlerTest {
 	}
 	
 	private ChangedCollections buildSyncCollectionWithChanges(Date dateWhenChangesAppear, 
-			int collectionIdWhereChangesAppear, String collectionPathWhereChangesAppear) {
-		SyncCollection calendarCollection = new SyncCollection(collectionIdWhereChangesAppear, collectionPathWhereChangesAppear);
-		ChangedCollections calendarHasChangeCollections = new ChangedCollections(dateWhenChangesAppear , ImmutableSet.<SyncCollection>of(calendarCollection));
+			String collectionPathWhereChangesAppear) {
+		ChangedCollections calendarHasChangeCollections = new ChangedCollections(dateWhenChangesAppear , ImmutableSet.<String>of(collectionPathWhereChangesAppear));
 		return calendarHasChangeCollections;
 	}
 

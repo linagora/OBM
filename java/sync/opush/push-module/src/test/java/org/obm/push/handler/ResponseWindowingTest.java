@@ -44,9 +44,9 @@ import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.push.OpushUser;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.bean.SyncCollection;
-import org.obm.push.bean.change.client.SyncClientCommands;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -408,10 +408,12 @@ public class ResponseWindowingTest {
 		return changes;
 	}
 	
-	private SyncCollection syncCollection(int windowSize) {
-		SyncCollection syncCollection = new SyncCollection(1, "path");
-		syncCollection.setWindowSize(windowSize);
-		return syncCollection;
+	private AnalysedSyncCollection syncCollection(int windowSize) {
+		return AnalysedSyncCollection.builder()
+				.collectionId(1)
+				.syncKey(new SyncKey("123"))
+				.windowSize(windowSize)
+				.build();
 	}
 	
 }

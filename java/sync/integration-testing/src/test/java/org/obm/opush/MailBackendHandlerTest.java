@@ -60,12 +60,12 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ServerId;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
@@ -77,6 +77,7 @@ import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -115,6 +116,7 @@ public class MailBackendHandlerTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject SyncDecoder decoder;
 	
 	private ServerSetup smtpServerSetup;
 	private String mailbox;
@@ -145,9 +147,10 @@ public class MailBackendHandlerTest {
 		SyncKey syncEmailSyncKey = new SyncKey("1");
 		int serverId = 1234;
 		String syncEmailId = ":2";
+		SyncKey syncKey = new SyncKey("sync state");
 		ItemSyncState syncState = ItemSyncState.builder()
 				.syncDate(DateUtils.getCurrentDate())
-				.syncKey(new SyncKey("sync state"))
+				.syncKey(syncKey)
 				.build();
 		DataDelta delta = DataDelta.builder()
 			.changes(new ItemChangesBuilder()
@@ -160,9 +163,9 @@ public class MailBackendHandlerTest {
 			.build();
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
-		mockDao(serverId, syncState);
+		mockDao(serverId, syncState, 1);
 		
-		bindCollectionIdToPath(serverId);
+		bindCollectionIdToPath(serverId, syncKey);
 		bindChangedToDelta(delta);
 		
 		mocksControl.replay();
@@ -173,7 +176,7 @@ public class MailBackendHandlerTest {
 		greenMail.waitForIncomingEmail(2);
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		opClient.deleteEmail(syncEmailSyncKey, serverId, serverId + syncEmailId);
+		opClient.deleteEmail(decoder, syncEmailSyncKey, serverId, serverId + syncEmailId);
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_TRASH_NAME, 1);
@@ -184,36 +187,43 @@ public class MailBackendHandlerTest {
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(1);
 	}
 
-	private void bindCollectionIdToPath(int syncEmailCollectionId) {
+	private void bindCollectionIdToPath(int syncEmailCollectionId, SyncKey syncKey) {
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		SyncCollection syncCollection = new SyncCollection(syncEmailCollectionId, IntegrationTestUtils.buildEmailInboxCollectionPath(singleUserFixture.jaures));
 		expect(syncedCollectionDao.get(user.credentials, user.device, syncEmailCollectionId))
-			.andReturn(syncCollection).anyTimes();
+		.andReturn(AnalysedSyncCollection.builder()
+				.collectionId(syncEmailCollectionId)
+				.syncKey(syncKey)
+				.build()).anyTimes();
 		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(SyncCollection.class));
+		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
 		expectLastCall().anyTimes();
 	}
 
 	private void bindChangedToDelta(DataDelta delta) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
-				anyObject(UserDataRequest.class), 
-				anyObject(SyncCollection.class), 
+				anyObject(UserDataRequest.class),
+				anyObject(ItemSyncState.class),
+				anyObject(AnalysedSyncCollection.class), 
 				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
 			.andReturn(delta).once();
 	}
 
-	private void mockDao(int serverId, ItemSyncState syncState) throws Exception {
+	private void mockDao(int serverId, ItemSyncState syncState, Integer collectionId) throws Exception {
 		mockUnsynchronizedItemDao(serverId);
-		mockSyncedCollectionDaoToReturnSyncCollection(serverId);
+		mockSyncedCollectionDaoToReturnSyncCollection(serverId, collectionId, syncState.getSyncKey());
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
 	}
 	
-	private void mockSyncedCollectionDaoToReturnSyncCollection(int serverId) {
+	private void mockSyncedCollectionDaoToReturnSyncCollection(int serverId, Integer collectionId, SyncKey syncKey) {
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(user.credentials, user.device, serverId)).andReturn(new SyncCollection());
+		expect(syncedCollectionDao.get(user.credentials, user.device, serverId))
+		.andReturn(AnalysedSyncCollection.builder()
+				.collectionId(collectionId)
+				.syncKey(syncKey)
+				.build());
 	}
 
 	private void mockUnsynchronizedItemDao(int serverId) {

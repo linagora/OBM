@@ -50,6 +50,7 @@ import org.obm.push.monitor.EmailMonitoringThread;
 import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.service.PushPublishAndSubscribe.Factory;
 import org.obm.push.service.impl.MappingService;
+import org.obm.push.state.IStateMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,12 +68,14 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	private final Factory pubSubFactory;
 	private final MailBackend mailBackend;
 	private final IContentsExporter contentsExporter;
+	private final IStateMachine stateMachine;
 	
 	
 	@Inject
 	private ImapMonitoringImpl(LinagoraImapClientProvider imapClientProvider,
 			MappingService mappingService, MailboxService emailManager,
-			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter) {
+			MailBackend mailBackend, PushPublishAndSubscribe.Factory pubSubFactory, IContentsExporter contentsExporter,
+			IStateMachine stateMachine) {
 		this.mailBackend = mailBackend;
 		this.pubSubFactory = pubSubFactory;
 		this.contentsExporter = contentsExporter;
@@ -81,7 +84,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 		this.emailManager = emailManager;
 		this.imapClientProvider = imapClientProvider;
 		this.mappingService = mappingService;
-
+		this.stateMachine = stateMachine;
 	}
 	
 	private class Manager implements PushMonitoringManager {
@@ -91,7 +94,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 
 		public Manager(Set<ICollectionChangeListener> registeredListeners) {
 			this.registeredListeners = registeredListeners;
-			pushPublishAndSubscribe = pubSubFactory.create(mailBackend, contentsExporter);
+			pushPublishAndSubscribe = pubSubFactory.create(mailBackend, contentsExporter, stateMachine);
 		}
 		
 		@Override

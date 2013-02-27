@@ -40,17 +40,15 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PingStatus;
-import org.obm.push.bean.SyncCollection;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.FolderSyncRequiredException;
-import org.obm.push.exception.MissingRequestParameterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
@@ -60,14 +58,14 @@ import org.obm.push.impl.Responder;
 import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.PingProtocol;
+import org.obm.push.protocol.bean.AnalysedPingRequest;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.data.EncoderFactory;
+import org.obm.push.protocol.data.MissingRequestParameterException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.HearbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
@@ -80,14 +78,9 @@ import com.google.inject.name.Named;
 @Singleton
 public class PingHandler extends WbxmlRequestHandler implements IContinuationHandler {
 	
-	private static final int MIN_SANE_HEARTBEAT_VALUE = 5;
-	
 	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final PingProtocol protocol;
-	private final HearbeatDao hearbeatDao;
-	private final CollectionPathHelper collectionPathHelper;
 	private final ContinuationService continuationService;
-	private final DateService dateService;
 	private final boolean enablePush;
 
 	@Inject
@@ -95,20 +88,15 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			PingProtocol pingProtocol, MonitoredCollectionDao monitoredCollectionDao,
-			CollectionDao collectionDao, HearbeatDao hearbeatDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
-			ContinuationService continuationService,
-			DateService dateService, @Named("enable-push") boolean enablePush) {
+			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper, ContinuationService continuationService,
+			@Named("enable-push") boolean enablePush) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.protocol = pingProtocol;
-		this.hearbeatDao = hearbeatDao;
-		this.collectionPathHelper = collectionPathHelper;
 		this.continuationService = continuationService;
-		this.dateService = dateService;
 		this.enablePush = enablePush;
 	}
 
@@ -117,7 +105,9 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			Document doc, ActiveSyncRequest request, Responder responder) {
 		try {
 			PingRequest pingRequest = protocol.decodeRequest(doc);
-			doTheJob(continuation, udr, pingRequest);
+			AnalysedPingRequest analyzedPingRequest = protocol.analyzeRequest(udr, pingRequest);
+			
+			doTheJob(continuation, udr, analyzedPingRequest);
 
 		} catch (MissingRequestParameterException e) {
 			sendError(udr.getDevice(), responder, PingStatus.MISSING_REQUEST_PARAMS);
@@ -135,77 +125,30 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		}
 	}
 
-	private void doTheJob(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) 
-			throws MissingRequestParameterException, DaoException, CollectionNotFoundException, CollectionPathException {
+	private void doTheJob(IContinuation continuation, UserDataRequest udr, AnalysedPingRequest pingRequest) 
+			throws DaoException, CollectionNotFoundException, CollectionPathException {
 		
 		continuationService.cancel(udr.getDevice(), PingStatus.NO_CHANGES.asSpecificationValue());
-		checkHeartbeatInterval(udr, pingRequest);
-		checkSyncCollections(udr, pingRequest);
 		startEmailMonitoringThreadIfNeeded(udr, pingRequest);
+		monitoreCollection(udr, pingRequest);
 		suspendContinuation(continuation, udr, pingRequest);
 	}
 
-	private void checkHeartbeatInterval(UserDataRequest udr, PingRequest pingRequest) 
-			throws DaoException, MissingRequestParameterException {
-		
-		if (pingRequest.getHeartbeatInterval() == null) {
-			Long heartbeatInterval = hearbeatDao.findLastHearbeat(udr.getDevice());
-			if (heartbeatInterval == null) {
-				throw new MissingRequestParameterException();
-			}
-			pingRequest.setHeartbeatInterval(heartbeatInterval);
-		} else {
-			long heartbeatInterval = Math.max(MIN_SANE_HEARTBEAT_VALUE, pingRequest.getHeartbeatInterval());
-			pingRequest.setHeartbeatInterval(heartbeatInterval);
-			hearbeatDao.updateLastHearbeat(udr.getDevice(), pingRequest.getHeartbeatInterval());
-		}
-	}
-	
-	private void checkSyncCollections(UserDataRequest udr, PingRequest pingRequest)
-			throws MissingRequestParameterException, CollectionNotFoundException, DaoException, CollectionPathException {
-		
-		Set<SyncCollection> syncCollections = pingRequest.getSyncCollections();
-		if (syncCollections == null || syncCollections.isEmpty()) {
-			Set<SyncCollection> lastMonitoredCollection = monitoredCollectionDao.list(udr.getCredentials(), udr.getDevice());
-			if (lastMonitoredCollection.isEmpty()) {
-				throw new MissingRequestParameterException();
-			}
-			pingRequest.setSyncCollections(lastMonitoredCollection);
-		} else {
-			monitoredCollectionDao.put(udr.getCredentials(), udr.getDevice(), syncCollections);
-		}
-		loadSyncKeys(udr, pingRequest.getSyncCollections());
+	private void monitoreCollection(UserDataRequest udr, AnalysedPingRequest pingRequest) {
+		monitoredCollectionDao.put(udr.getCredentials(), udr.getDevice(), pingRequest.getSyncCollections());
 	}
 
-	private void loadSyncKeys(UserDataRequest udr, Set<SyncCollection> syncCollections) 
-			throws CollectionNotFoundException, DaoException, CollectionPathException {
+	private void startEmailMonitoringThreadIfNeeded(UserDataRequest udr, AnalysedPingRequest pingRequest) 
+			throws CollectionNotFoundException, DaoException {
 		
-		for (SyncCollection collection: syncCollections) {
-			String collectionPath = collectionDao.getCollectionPath(collection.getCollectionId());
-			collection.setCollectionPath(collectionPath);
-			collection.setDataType(collectionPathHelper.recognizePIMDataType(collectionPath));
-			ItemSyncState lastKnownState = stMachine.lastKnownState(udr.getDevice(), collection.getCollectionId());
-			if (lastKnownState != null) {
-				collection.setItemSyncState(lastKnownState);
-			} else {
-				collection.setItemSyncState(ItemSyncState.builder()
-						.syncDate(dateService.getEpochPlusOneSecondDate())
-						.syncKey(collection.getSyncKey())
-						.build());
-			}
-		}
-	}
-
-	private void startEmailMonitoringThreadIfNeeded(UserDataRequest udr,
-			PingRequest pingRequest) throws CollectionNotFoundException, DaoException {
-		for (SyncCollection syncCollection: pingRequest.getSyncCollections()) {
+		for (AnalysedSyncCollection syncCollection: pingRequest.getSyncCollections()) {
 			if ("email".equalsIgnoreCase(syncCollection.getDataClass())) {
 				backend.startEmailMonitoring(udr, syncCollection.getCollectionId());
 			}
 		}
 	}
 
-	private void suspendContinuation(IContinuation continuation, UserDataRequest udr, PingRequest pingRequest) {
+	private void suspendContinuation(IContinuation continuation, UserDataRequest udr, AnalysedPingRequest pingRequest) {
 		
 		continuation.setLastContinuationHandler(this);
 		CollectionChangeListener l = new CollectionChangeListener(udr, continuation, pingRequest.getSyncCollections());
@@ -267,27 +210,27 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 		if (!enablePush) {
 			// Lie to the phone, try to convince it a new sync is required
 			// Return empty collections since CHANGES_OCCURED is a global scope status, see MS-ASCMD 2.2.2.8
-			return new PingResponse.Builder()
-				.syncCollections(ImmutableSet.<SyncCollection>of())
-				.pingStatus(PingStatus.CHANGES_OCCURED)
-				.build();
+			return PingResponse.builder()
+					.syncCollections(ImmutableSet.<SyncCollectionResponse>of())
+					.pingStatus(PingStatus.CHANGES_OCCURED)
+					.build();
 		}
 		
 		if (sendHierarchyChange) {
 			throw new FolderSyncRequiredException();
 		}
 		
-		final Set<SyncCollection> changes = backend.getChangesSyncCollections(continuation.getCollectionChangeListener());
+		final Set<SyncCollectionResponse> changes = backend.getChangesSyncCollections(continuation.getCollectionChangeListener());
 		if (changes.isEmpty()) {
-			return new PingResponse.Builder()
-						.syncCollections(changes)
-						.pingStatus(PingStatus.NO_CHANGES)
-						.build();
+			return PingResponse.builder()
+				.syncCollections(changes)
+				.pingStatus(PingStatus.NO_CHANGES)
+				.build();
 		} else {
-			return new PingResponse.Builder()
-			.syncCollections(changes)
-			.pingStatus(PingStatus.CHANGES_OCCURED)
-			.build();
+			return PingResponse.builder()
+				.syncCollections(changes)
+				.pingStatus(PingStatus.CHANGES_OCCURED)
+				.build();
 		}
 	}
 

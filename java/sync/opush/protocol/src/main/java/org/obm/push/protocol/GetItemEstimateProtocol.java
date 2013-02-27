@@ -33,11 +33,12 @@ package org.obm.push.protocol;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
+import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -68,16 +69,16 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 			final Element fid = DOMUtils.getUniqueElement(ce, "CollectionId");
 			final String collectionId = fid.getTextContent();
 	
-			final SyncCollection sc = new SyncCollection();
-			sc.setDataType(PIMDataType.recognizeDataType(dataClass));
-			sc.setSyncKey(syncKey);
-			sc.setOptions(buildOptions(filterType));
 			try {
-				sc.setCollectionId(Integer.valueOf(collectionId));
+				getItemEstimateRequestBuilder.add(AnalysedSyncCollection.builder()
+						.dataType(PIMDataType.recognizeDataType(dataClass))
+						.syncKey(syncKey)
+						.options(buildOptions(filterType))
+						.collectionId(Integer.valueOf(collectionId))
+						.build());
 			} catch (NumberFormatException e) {
 				throw new CollectionNotFoundException(e);
 			}
-			getItemEstimateRequestBuilder.add(sc);
 		}
 		return getItemEstimateRequestBuilder
 			.build();
@@ -102,12 +103,13 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 			
 			Element collection = DOMUtils.getUniqueElement(response, "Collection");
 			Integer collectionId = Integer.valueOf(DOMUtils.getElementText(collection, "CollectionId"));
-			SyncCollection syncCollection = new SyncCollection();
-			syncCollection.setCollectionId(collectionId);
+			SyncCollectionResponse.Builder builder = SyncCollectionResponse.builder()
+				.collectionId(collectionId)
+				.status(SyncStatus.fromSpecificationValue(DOMUtils.getElementText(response, "Status")));
 			
 			int estimateSize = Integer.valueOf(DOMUtils.getElementText(collection, "Estimate"));
 			getItemEstimateResponseBuilder.add(Estimate.builder()
-					.collection(syncCollection)
+					.collection(builder.build())
 					.estimate(estimateSize)
 					.build());
 		}
@@ -151,9 +153,8 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		}
 	}
 	
-	private void createCollectionIdElement(SyncCollection syncCollection, Element collectionElement) {
-		DOMUtils.createElementAndText(collectionElement, "CollectionId",
-				syncCollection.getCollectionId().toString());
+	private void createCollectionIdElement(SyncCollectionResponse syncCollection, Element collectionElement) {
+		DOMUtils.createElementAndText(collectionElement, "CollectionId", syncCollection.getCollectionId());
 	}
 
 	private void createEstimateElement(int estimate, Element collectionElement) {
@@ -166,7 +167,7 @@ public class GetItemEstimateProtocol implements ActiveSyncProtocol<GetItemEstima
 		Document ret = DOMUtils.createDoc(null, "GetItemEstimate");
 		Element giee = ret.getDocumentElement();
 
-		for (SyncCollection syncCollection : request.getSyncCollections()) {
+		for (AnalysedSyncCollection syncCollection : request.getSyncCollections()) {
 			Element collection = DOMUtils.createElement(giee, "Collection");
 			if (!Strings.isNullOrEmpty(syncCollection.getDataClass())) {
 				DOMUtils.createElementAndText(collection, "Class", syncCollection.getDataClass());

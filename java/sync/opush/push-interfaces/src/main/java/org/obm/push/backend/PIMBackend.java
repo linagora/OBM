@@ -33,11 +33,11 @@ package org.obm.push.backend;
 
 import java.util.List;
 
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -84,13 +84,14 @@ public interface PIMBackend {
 		throws ProcessingEmailException, CollectionNotFoundException, 
 			DaoException, UnexpectedObmSyncServerException, ConversionException;
 
-	DataDelta getChanged(UserDataRequest udr, SyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey)
+	DataDelta getChanged(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection, SyncClientCommands clientCommands, SyncKey newSyncKey)
 		throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException;
 	
-	int getItemEstimateSize(UserDataRequest udr, ItemSyncState syncState, SyncCollection syncCollection) throws CollectionNotFoundException, 
-			ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
-			FilterTypeChangedException, HierarchyChangedException;
+	int getItemEstimateSize(UserDataRequest udr, ItemSyncState syncState, Integer collectionId, 
+		SyncCollectionOptions collectionOptions) throws CollectionNotFoundException, 
+		ProcessingEmailException, DaoException, UnexpectedObmSyncServerException, ConversionException,
+		FilterTypeChangedException, HierarchyChangedException;
 
 	HierarchyCollectionChanges getHierarchyChanges(UserDataRequest userDataRequest, FolderSyncState lastKnownState, FolderSyncState outgoingSyncState)
 			throws DaoException, InvalidSyncKeyException;

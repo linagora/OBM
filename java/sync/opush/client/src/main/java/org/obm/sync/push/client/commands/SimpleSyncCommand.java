@@ -35,6 +35,7 @@ import java.io.IOException;
 
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.w3c.dom.Document;
@@ -43,10 +44,10 @@ import org.xml.sax.SAXException;
 
 public class SimpleSyncCommand extends Sync {
 
-	public SimpleSyncCommand(final SyncKey syncKey, final int collectionId, final PIMDataType type)
+	public SimpleSyncCommand(final SyncDecoder decoder, final SyncKey syncKey, final int collectionId, final PIMDataType type)
 			throws SAXException, IOException {
 
-		super(new TemplateDocument("SimpleSyncRequest.xml") {
+		super(decoder, new TemplateDocument("SimpleSyncRequest.xml") {
 			
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {
