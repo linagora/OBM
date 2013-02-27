@@ -222,12 +222,15 @@ public class AddressBookBindingImpl implements IAddressBook {
 			}
 			
 			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
-			commitedOperationDao.store(token, 
-					CommitedElement.builder()
-						.clientId(clientId)
-						.entityId(createdContact.getEntityId())
-						.kind(Kind.VCONTACT)
-						.build());
+			Integer entityId = createdContact.getEntityId();
+			if (clientId != null && entityId != null) {
+				commitedOperationDao.store(token, 
+						CommitedElement.builder()
+							.clientId(clientId)
+							.entityId(entityId)
+							.kind(Kind.VCONTACT)
+							.build());
+			}
 			return createdContact;
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());

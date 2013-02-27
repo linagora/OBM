@@ -324,4 +324,37 @@ public class AddressBookBindingImplTest {
 		control.verify();
 		assertThat(createdContact).isEqualTo(contact);
 	}
+	
+	@Test
+	public void testCreateContactWhenNullClientId() throws Exception {
+		Integer addressBookId = 1;
+		Contact contact = new Contact();
+
+		IMocksControl control = EasyMock.createControl();
+		
+		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
+		expect(contactConfiguration.getAddressBookUserId())
+			.andReturn(2).once();
+		
+		Integer entityId = 984;
+		Contact expectedContact = new Contact();
+		expectedContact.setEntityId(entityId);
+		
+		ContactDao contactDao = control.createMock(ContactDao.class);
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId))
+			.andReturn(expectedContact).once();
+		
+		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
+		expect(commitedOperationDao.findAsContact(token, null))
+			.andReturn(null).once();
+		
+		control.replay();
+		
+		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, null,
+				null, contactConfiguration , commitedOperationDao);
+		Contact createdContact = binding.createContact(token, addressBookId, contact, null);
+		
+		control.verify();
+		assertThat(createdContact).isEqualTo(expectedContact);
+	}
 }
