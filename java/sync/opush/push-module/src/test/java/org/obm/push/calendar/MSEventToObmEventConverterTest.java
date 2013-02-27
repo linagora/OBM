@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1410,6 +1411,7 @@ public class MSEventToObmEventConverterTest {
 				.withRecurrence(simpleRecurrence(RecurrenceType.DAILY))
 				.withExceptions(Lists.newArrayList(msEventException))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.withTimeZone(DateTimeZone.UTC.toTimeZone())
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -1417,7 +1419,7 @@ public class MSEventToObmEventConverterTest {
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
 		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		assertThat(exceptions).hasSize(1);
-		assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
+		assertThat(exceptions).containsOnly(date("2004-10-11T00:00:00Z"));
 		assertThat(eventExceptions).isEmpty();
 	}
 

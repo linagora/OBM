@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 import org.fest.assertions.api.Assertions;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +48,7 @@ import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
@@ -72,6 +74,126 @@ public class MSEventToObmEventConverterRecurrenceTest {
 		String mailbox = "user@domain";
 	    user = User.Factory.create()
 				.createUser(mailbox, mailbox, null);
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenMightAndGMT() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("GMT");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T00:00:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-10T00:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenNightlyAndGMT() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("GMT");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T23:50:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-10T00:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenMightAndTurkeyWhenWinterTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("Turkey");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T00:00:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-09T22:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenNightlyAndTurkeyWhenWinterTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("Turkey");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T23:50:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-10T22:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenMightAndTurkeyWhenSummerTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("Turkey");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-05-10T00:00:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-05-09T21:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenNightlyAndTurkeyWhenSummerTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("Turkey");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-05-10T23:50:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-05-10T21:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenMightAndLosAngelesWhenWinterTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("America/Los_Angeles");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T00:00:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-09T08:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenNightlyAndLosAngelesWhenWinterTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("America/Los_Angeles");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-01-10T23:50:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-01-10T08:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenMightAndLosAngelesWhenSummerTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("America/Los_Angeles");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-05-10T00:00:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-05-09T07:00:00+00"));
+	}
+
+	@Test
+	public void testConvertDeletedExcetionWhenNightlyAndLosAngelesWhenSummerTz() throws ConversionException {
+		DateTimeZone timeZone = DateTimeZone.forID("America/Los_Angeles");
+		EventRecurrence recurrence = new EventRecurrence();
+		MSEventException msEventException = new MSEventException();
+		msEventException.setExceptionStartTime(date("2004-05-10T23:50:00+00"));
+		
+		converter.addDeletedExceptionToRecurrence(recurrence, msEventException, timeZone);
+
+		assertThat(recurrence.getExceptions()).containsOnly(date("2004-05-10T07:00:00+00"));
 	}
 
 	@Test(expected=ConversionException.class)

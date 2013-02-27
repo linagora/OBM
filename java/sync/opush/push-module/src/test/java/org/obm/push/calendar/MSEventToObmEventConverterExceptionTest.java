@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -458,6 +459,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(msEventException))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.withTimeZone(DateTimeZone.UTC.toTimeZone())
 				.build();
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
@@ -465,7 +467,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
 		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		assertThat(exceptions).hasSize(1);
-		assertThat(exceptions).containsOnly(msEventException.getExceptionStartTime());
+		assertThat(exceptions).containsOnly(date("2004-10-11T00:00:00Z"));
 		assertThat(eventExceptions).isEmpty();
 	}
 
@@ -1236,7 +1238,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		assertThat(Iterables.getOnlyElement(convertedExceptions).getRecurrenceId())
 			.isEqualTo(msEventException.getExceptionStartTime());
 		assertThat(convertedExceptionsDeleted).hasSize(1);
-		assertThat(convertedExceptionsDeleted).containsOnly(date("2004-10-12T12:15:10Z"));
+		assertThat(convertedExceptionsDeleted).containsOnly(date("2004-10-12T00:00:00Z"));
 	}
 	
 	@Test(expected=ConversionException.class)
@@ -1352,6 +1354,34 @@ public class MSEventToObmEventConverterExceptionTest {
 		convertToOBMEvent(msEvent);
 	}
 
+	@Test(expected=ConversionException.class)
+	public void testConvertWhenExistRegularAndDeletedExceptionsAtSameDateReverseOrder() throws ConversionException {
+		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
+		MSEventException msEventExceptionDeleted = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(true)
+				.build();
+
+		MSEventException msEventException = new MSEventExceptionBuilder()
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+				.withDtStamp(date("2004-12-11T11:15:10Z"))
+				.withStartTime(date("2004-12-11T11:15:10Z"))
+				.withEndTime(date("2004-12-12T11:15:10Z"))
+				.withExceptionStartTime(exceptionRecurrenceId)
+				.withSubject("Any Subject")
+				.withDeleted(false)
+				.build();
+		
+		MSEvent msEvent = makeMSEventWithException(msEventException, msEventExceptionDeleted);
+		
+		convertToOBMEvent(msEvent);
+	}
+	
 	@Test
 	public void testConvertWhenDuplicateDeletedExceptions() throws ConversionException {
 		Date exceptionRecurrenceId = date("2004-10-11T12:15:10Z");
@@ -1370,7 +1400,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		
 		Event obmEvent = convertToOBMEvent(msEvent);
 		
-		assertThat(obmEvent.getRecurrence().getExceptions()).hasSize(1).containsOnly(exceptionRecurrenceId);
+		assertThat(obmEvent.getRecurrence().getExceptions()).hasSize(1).containsOnly(date("2004-10-11T00:00:00Z"));
 	}
 
 	@Test
@@ -1404,6 +1434,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withRecurrence(simpleDailyRecurrence())
 				.withExceptions(Lists.newArrayList(exceptions))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+				.withTimeZone(DateTimeZone.UTC.toTimeZone())
 				.build();
 
 		return msEvent;
