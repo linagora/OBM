@@ -36,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -140,7 +142,7 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 		
 		EventRecurrence recurrence = event.getRecurrence();
 		for (Date excp : recurrence.getExceptions()) {
-			MSEventException e = deletionException(excp);
+			MSEventException e = deletionException(event, excp);
 			ret.add(e);
 		}
 
@@ -151,13 +153,23 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 		return ret;
 	}
 
-	private MSEventException deletionException(Date excp) {
+	@VisibleForTesting MSEventException deletionException(Event event, Date excp) {
 		MSEventException e = new MSEventException();
 		e.setDeleted(true);
-		e.setExceptionStartTime(excp);
+		e.setExceptionStartTime(buildOccurrenceDateTime(event, excp).toDate());
 		return e;
 	}
-	
+
+	private DateTime buildOccurrenceDateTime(Event event, Date excp) {
+		DateTimeZone eventTimeZone = DateTimeZone.forID(event.getTimezoneName());
+		DateTime tzEventDataTime = new DateTime(event.getStartDate(), eventTimeZone);
+		
+		return new DateTime(excp, DateTimeZone.UTC)
+				.withZone(eventTimeZone)
+				.withMillisOfDay(tzEventDataTime.getMillisOfDay())
+				.withZone(DateTimeZone.UTC);
+	}
+
 	private MSEventException convertException(Event exception) {
 		MSEventException msEventException = new MSEventException();
 		fillEventCommonProperties(exception, msEventException);
