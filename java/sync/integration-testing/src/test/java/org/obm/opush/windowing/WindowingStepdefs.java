@@ -33,12 +33,15 @@ package org.obm.opush.windowing;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.File;
 import java.util.UUID;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
+import org.fest.util.Files;
+import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -66,6 +69,9 @@ import cucumber.api.java.en.When;
 
 public class WindowingStepdefs {
 
+	@Inject
+	private ConfigurationService configurationService;
+	
 	private final WindowingService windowingService;
 	private final TransactionManager tm;
 	private final ObjectStoreManager storeManager;
@@ -104,6 +110,8 @@ public class WindowingStepdefs {
 	public void shutdown() throws IllegalStateException, SecurityException, SystemException {
 		tm.rollback();
 		storeManager.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
+		Files.delete(new File(configurationService.getDataDirectory()));
 	}
 	
 	@Given("user has (\\d+) elements in INBOX")

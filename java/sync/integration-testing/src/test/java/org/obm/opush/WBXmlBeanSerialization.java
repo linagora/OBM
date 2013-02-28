@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.DateUtils;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
@@ -53,6 +55,7 @@ import org.w3c.dom.Document;
 
 import com.google.common.base.Charsets;
 
+@RunWith(SlowFilterRunner.class)
 public class WBXmlBeanSerialization {
 
 

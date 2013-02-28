@@ -107,6 +107,9 @@
  					<version>${plugin.surefire.version}</version>
 					<configuration>
 						<redirectTestOutputToFile>true</redirectTestOutputToFile>
+						<includes>
+							<include>**/*.java</include>
+						</includes>
 					</configuration>
 					<executions>
 						<execution>

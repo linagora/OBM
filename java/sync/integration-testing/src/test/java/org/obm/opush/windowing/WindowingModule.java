@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.windowing;
 
-
-
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.ConfigurationService;
@@ -46,6 +44,7 @@ import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -69,6 +68,7 @@ public class WindowingModule extends AbstractModule {
 	protected ConfigurationService configuration() {
 		Configuration configuration = new Configuration();
 		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
+		configuration.dataDir = Files.createTempDir();
 		return new StaticConfigurationService(configuration);
 	}
 

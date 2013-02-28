@@ -31,18 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.command.parser;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.minig.imap.command.parser.HeadersParser;
 
 import com.google.common.collect.Sets;
 
-public class HeadersParserTests {
+public class HeadersParserTest {
 
 
 	private Map<String, String> parseStringAsHeaders(String data) throws IOException {
@@ -53,36 +54,36 @@ public class HeadersParserTests {
 	public void testParsingBasicHeaders() throws IOException {
 		String data = "headername: headervalue";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"headername"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"headervalue"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("headername");
+		assertThat(headers.values()).containsOnly("headervalue");
 	}
 	
 	@Test
 	public void testParsingBasicHeadersKeyCaseInsensitive() throws IOException {
 		String data = "headerName: headervalue";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"headername"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"headervalue"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("headername");
+		assertThat(headers.values()).containsOnly("headervalue");
 	}
 
 	@Test
 	public void testParsingBasicHeadersValueCaseSensitive() throws IOException {
 		String data = "headername: headerValue";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"headername"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"headerValue"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("headername");
+		assertThat(headers.values()).containsOnly("headerValue");
 	}
 	
 	@Test
 	public void testParsingHeadersValueContainsColon() throws IOException {
 		String data = "headername: header:Value";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"headername"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"header:Value"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("headername");
+		assertThat(headers.values()).containsOnly("header:Value");
 	}
 
 	@Test
@@ -98,9 +99,9 @@ public class HeadersParserTests {
 		String headerName = sb.toString();
 		String data = headerName + ": headerValue";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {headerName.toLowerCase()}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"headerValue"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly(headerName.toLowerCase());
+		assertThat(headers.values()).containsOnly("headerValue");
 	}
 
 	
@@ -108,9 +109,9 @@ public class HeadersParserTests {
 	public void testParsingHeadersRFC822Ch311Ex1() throws IOException {
 		String data = "To:  \"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"to"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("to");
+		assertThat(headers.values()).containsOnly("\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN");
 	}
 	
 	@Test
@@ -118,9 +119,9 @@ public class HeadersParserTests {
 		String data = "To:  \"Joe & J. Harvey\" <ddd @Org>,\n" +
 				"        JJV @ BBN";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"to"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("to");
+		assertThat(headers.values()).containsOnly("\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN");
 	}
 	
 	@Test
@@ -128,9 +129,9 @@ public class HeadersParserTests {
 		String data = "To:  \"Joe & J. Harvey\" <ddd @Org>,\n" +
 				"\tJJV @ BBN";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"to"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("to");
+		assertThat(headers.values()).containsOnly("\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN");
 	}
 	
 	@Test
@@ -138,9 +139,9 @@ public class HeadersParserTests {
 		String data = "To:  \"Joe & J. Harvey\" <ddd @Org>,\r" +
 				"        JJV @ BBN";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"to"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("to");
+		assertThat(headers.values()).containsOnly("\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN");
 	}
 	
 	@Test
@@ -148,16 +149,15 @@ public class HeadersParserTests {
 		String data = "To:  \"Joe & J. Harvey\" <ddd @Org>,\r\n" +
 				"        JJV @ BBN";
 		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(1, headers.size());
-		Assert.assertArrayEquals(new String[] {"to"}, headers.keySet().toArray());
-		Assert.assertArrayEquals(new String[] {"\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN"}, headers.values().toArray());
+		assertThat(headers.size()).isEqualTo(1);
+		assertThat(headers.keySet()).containsOnly("to");
+		assertThat(headers.values()).containsOnly("\"Joe & J. Harvey\" <ddd @Org>, JJV @ BBN");
 	}
 	
-	@Test
+	@Test(expected=IllegalStateException.class)
 	public void testParsingHeadersWithEmptyLine() throws IOException {
 		String data = "		";
-		Map<String, String> headers = parseStringAsHeaders(data);
-		Assert.assertEquals(0, headers.size());
+		parseStringAsHeaders(data);
 	}
 	
 }
