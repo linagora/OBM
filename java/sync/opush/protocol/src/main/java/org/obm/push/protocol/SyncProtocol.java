@@ -42,6 +42,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
+import org.obm.push.bean.change.client.SyncClientCommands.SyncClientCommand;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -220,22 +221,25 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		
 		Element commands = DOMUtils.createElement(ce, "Commands");
 		
+		Map<String, String> processedClientIds = buildProcessedClientIds(syncClientCommands);
+
 		List<ItemDeletion> itemChangesDeletion = c.getItemChangesDeletion();
 		for (ItemDeletion deletion: itemChangesDeletion) {
 			serializeDeletion(commands, deletion);
+			processedClientIds.remove(deletion.getServerId());
 		}
 		
-		Map<String, String> processedClientIds = buildProcessedClientIds(syncClientCommands);
 		for (ItemChange ic : c.getItemChanges()) {
 			if (itemChangeIsClientAddAck(syncClientCommands, ic)) {
 				SyncClientCommands.Add clientAdd = syncClientCommands.getAddWithServerId(ic.getServerId()).get();
-				Element add = DOMUtils.createElement(responses, "Add");
+				Element add = DOMUtils.createElement(responses, clientAdd.syncCommand().asSpecificationValue());
 				DOMUtils.createElementAndText(add, "ClientId", clientAdd.clientId);
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
 			
 			} else if (itemChangeIsClientChangeAck(syncClientCommands, ic)) {
-				Element add = DOMUtils.createElement(responses, "Change");
+				SyncClientCommand command = syncClientCommands.getChange(ic.getServerId());
+				Element add = DOMUtils.createElement(responses, command.syncCommand().asSpecificationValue());
 				DOMUtils.createElementAndText(add, "ServerId", ic.getServerId());
 				DOMUtils.createElementAndText(add, "Status", SyncStatus.OK.asSpecificationValue());
 			} else { // New change done on server

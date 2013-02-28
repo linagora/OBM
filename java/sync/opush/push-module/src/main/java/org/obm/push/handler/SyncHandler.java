@@ -58,7 +58,8 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.client.SyncClientCommands.Add;
-import org.obm.push.bean.change.client.SyncClientCommands.Change;
+import org.obm.push.bean.change.client.SyncClientCommands.Deletion;
+import org.obm.push.bean.change.client.SyncClientCommands.Update;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
@@ -301,11 +302,11 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return clientCommandsBuilder.build();
 	}
 
-	private Change updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
+	private Update updateServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
 			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
 
-		return new SyncClientCommands.Change(contentsImporter.importMessageChange(
+		return new SyncClientCommands.Update(contentsImporter.importMessageChange(
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
 	}
 
@@ -317,14 +318,14 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getData()));
 	}
 	
-	private Change deleteServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
+	private Deletion deleteServerItem(UserDataRequest udr, SyncCollection collection, SyncCollectionChange change)
 			throws CollectionNotFoundException, DaoException,
 			UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, UnsupportedBackendFunctionException {
 
 		String serverId = change.getServerId();
 		contentsImporter.importMessageDeletion(udr, change.getType(), collection.getCollectionId(), serverId,
 				collection.getOptions().isDeletesAsMoves());
-		return new SyncClientCommands.Change(serverId);
+		return new SyncClientCommands.Deletion(serverId);
 	}
 
 	@Override

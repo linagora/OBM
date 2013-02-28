@@ -118,7 +118,6 @@ public class BeansTest {
 					.add(MoveItem.class)
 					.add(SyncClientCommands.class)
 					.add(SyncClientCommands.Add.class)
-					.add(SyncClientCommands.Change.class)
 					.add(DataDelta.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
@@ -140,6 +139,8 @@ public class BeansTest {
 	@Test
 	public void testClassAsSubBeans() {
 		ImmutableList<Class<?>> list = ImmutableList.<Class<?>>builder()
+					.add(SyncClientCommands.Update.class)
+					.add(SyncClientCommands.Deletion.class)
 					.add(UidMSEmail.class)
 					.build();
 		

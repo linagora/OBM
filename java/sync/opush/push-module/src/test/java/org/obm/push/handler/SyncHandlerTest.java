@@ -118,7 +118,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 	
 	@Test
@@ -133,7 +133,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -190,7 +190,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:2"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Deletion("15:2"));
 	}
 	
 	@Test
@@ -206,7 +206,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:2"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Deletion("15:2"));
 	}
 
 	@Test
@@ -221,7 +221,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 
 	@Test
@@ -236,7 +236,7 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 	
 	@Test
@@ -251,6 +251,6 @@ public class SyncHandlerTest {
 		mocks.verify();
 		
 		assertThat(clientCommands.getAdds()).isEmpty();
-		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Change("15:3"));
+		assertThat(clientCommands.getChanges()).containsOnly(new SyncClientCommands.Update("15:3"));
 	}
 }

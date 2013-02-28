@@ -33,6 +33,8 @@ package org.obm.push.bean.change.client;
 
 import java.util.List;
 
+import org.obm.push.bean.change.SyncCommand;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -83,7 +85,11 @@ public class SyncClientCommands {
 		}
 	}
 
-	public static class Change {
+	public static interface SyncClientCommand {
+		SyncCommand syncCommand();
+	}
+	
+	public static abstract class Change implements SyncClientCommand {
 		
 		public final String serverId;
 
@@ -91,18 +97,10 @@ public class SyncClientCommands {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(serverId), "serverId is required");
 			this.serverId = serverId;
 		}
-
+		
 		@Override
 		public final int hashCode(){
 			return Objects.hashCode(serverId);
-		}
-		
-		@Override
-		public final boolean equals(Object object){
-			if (object instanceof Change) {
-				return Objects.equal(this.serverId, ((Change)object).serverId);
-			}
-			return false;
 		}
 
 		@Override
@@ -110,8 +108,48 @@ public class SyncClientCommands {
 			return Objects.toStringHelper(this).add("serverId", serverId).toString();
 		}
 	}
+	
+	public static class Update extends Change {
 
-	public static class Add {
+		public Update(String serverId) {
+			super(serverId);
+		}
+
+		@Override
+		public SyncCommand syncCommand() {
+			return SyncCommand.CHANGE;
+		}
+
+		@Override
+		public final boolean equals(Object obj){
+			if (obj instanceof Update) {
+				return Objects.equal(this.serverId, ((Update)obj).serverId);
+			}
+			return false;
+		}
+	}
+	
+	public static class Deletion extends Change {
+
+		public Deletion(String serverId) {
+			super(serverId);
+		}
+
+		@Override
+		public SyncCommand syncCommand() {
+			return SyncCommand.DELETE;
+		}
+
+		@Override
+		public final boolean equals(Object obj){
+			if (obj instanceof Deletion) {
+				return Objects.equal(this.serverId, ((Deletion)obj).serverId);
+			}
+			return false;
+		}
+	}
+
+	public static class Add implements SyncClientCommand {
 		
 		public final String serverId;
 		public final String clientId;
@@ -121,6 +159,11 @@ public class SyncClientCommands {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(serverId), "serverId is required");
 			this.clientId = clientId;
 			this.serverId = serverId;
+		}
+
+		@Override
+		public SyncCommand syncCommand() {
+			return SyncCommand.ADD;
 		}
 
 		@Override
@@ -172,11 +215,25 @@ public class SyncClientCommands {
 	}
 
 	public boolean hasChangeWithServerId(String serverId) {
-		return changes.contains(new Change(serverId));
+		return changes.contains(new Update(serverId));
 	}
 
 	public boolean hasAddWithServerId(final String serverId) {
 		return getAddWithServerId(serverId).isPresent();
+	}
+
+	public Change getChange(String serverId) {
+		return getChangeWithServerId(serverId).get();
+	}
+
+	public Optional<Change> getChangeWithServerId(final String serverId) {
+		return FluentIterable.from(changes).firstMatch(new Predicate<Change>() {
+			
+				@Override
+				public boolean apply(Change input) {
+					return serverId.equals(input.serverId);
+				}
+			});
 	}
 
 	public Optional<Add> getAddWithServerId(final String serverId) {

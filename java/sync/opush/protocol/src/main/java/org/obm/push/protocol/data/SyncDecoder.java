@@ -279,7 +279,7 @@ public class SyncDecoder extends ActiveSyncDecoder {
 			if (SyncCommand.ADD.equals(change.getCommand())) {
 				clientCommandsBuilder.putAdd(new SyncClientCommands.Add(change.getClientId(), change.getServerId()));
 			} else {
-				clientCommandsBuilder.putChange(new SyncClientCommands.Change(change.getServerId()));
+				clientCommandsBuilder.putChange(new SyncClientCommands.Update(change.getServerId()));
 			}
 		}
 		syncCollection.setFetchIds(fetchIds);

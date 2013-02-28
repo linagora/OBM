@@ -353,7 +353,7 @@ public class ResponseWindowingTest {
 	private SyncClientCommands clientCommands(DataDelta deltasWithOffset) {
 		SyncClientCommands.Builder builder = SyncClientCommands.builder();
 		for (ItemChange change: deltasWithOffset.getChanges()) {
-			builder.putChange(new SyncClientCommands.Change(change.getServerId()));
+			builder.putChange(new SyncClientCommands.Update(change.getServerId()));
 		}
 		return builder.build();
 	}

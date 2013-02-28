@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.change.client.SyncClientCommands.Add;
-import org.obm.push.bean.change.client.SyncClientCommands.Change;
+import org.obm.push.bean.change.client.SyncClientCommands.Update;
 
 @SuppressWarnings("unused")
 @RunWith(SlowFilterRunner.class)
@@ -45,17 +45,17 @@ public class SyncClientCommandsTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testChangeWhenNull() {
-		new Change(null);
+		new Update(null);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testChangeWhenEmpty() {
-		new Change("");
+		new Update("");
 	}
 
 	@Test
 	public void testChangeWhenOk() {
-		Change actual = new Change("123");
+		Update actual = new Update("123");
 		assertThat(actual.serverId).isEqualTo("123");
 	}
 
@@ -125,42 +125,42 @@ public class SyncClientCommandsTest {
 	@Test
 	public void testMergeChangesEmpty() {
 		SyncClientCommands root = SyncClientCommands.builder()
-				.putChange(new Change("98:7"))
-				.putChange(new Change("98:6"))
+				.putChange(new Update("98:7"))
+				.putChange(new Update("98:6"))
 				.merge(SyncClientCommands.empty())
 				.build();
 		
 		assertThat(root.getAdds()).isEmpty();
-		assertThat(root.getChanges()).containsOnly(new Change("98:7"), new Change("98:6"));
+		assertThat(root.getChanges()).containsOnly(new Update("98:7"), new Update("98:6"));
 	}
 
 	@Test
 	public void testMergeChanges() {
 		SyncClientCommands root = SyncClientCommands.builder()
-				.putChange(new Change("98:7"))
-				.putChange(new Change("98:6"))
+				.putChange(new Update("98:7"))
+				.putChange(new Update("98:6"))
 				.merge(SyncClientCommands.builder()
-						.putChange(new Change("98:5"))
-						.putChange(new Change("98:4"))
+						.putChange(new Update("98:5"))
+						.putChange(new Update("98:4"))
 						.build())
 				.build();
 		
 		assertThat(root.getAdds()).isEmpty();
 		assertThat(root.getChanges()).containsOnly(
-				new Change("98:7"),
-				new Change("98:6"),
-				new Change("98:5"),
-				new Change("98:4"));
+				new Update("98:7"),
+				new Update("98:6"),
+				new Update("98:5"),
+				new Update("98:4"));
 	}
 
 	@Test
 	public void testMergeAddsAndChanges() {
 		SyncClientCommands root = SyncClientCommands.builder()
 				.putAdd(new Add("1234", "98:7"))
-				.putChange(new Change("98:7"))
+				.putChange(new Update("98:7"))
 				.merge(SyncClientCommands.builder()
 						.putAdd(new Add("1235", "98:6"))
-						.putChange(new Change("98:5"))
+						.putChange(new Update("98:5"))
 						.build())
 				.build();
 		
@@ -168,8 +168,8 @@ public class SyncClientCommandsTest {
 				new Add("1234", "98:7"),
 				new Add("1235", "98:6"));
 		assertThat(root.getChanges()).containsOnly(
-				new Change("98:7"),
-				new Change("98:5"));
+				new Update("98:7"),
+				new Update("98:5"));
 	}
 
 	@Test
@@ -196,8 +196,8 @@ public class SyncClientCommandsTest {
 	@Test
 	public void testSumOfCommandsWhenTwoChange() {
 		SyncClientCommands actual = SyncClientCommands.builder()
-				.putChange(new Change("98:7"))
-				.putChange(new Change("98:6"))
+				.putChange(new Update("98:7"))
+				.putChange(new Update("98:6"))
 				.build();
 		assertThat(actual.sumOfCommands()).isEqualTo(2);
 	}
@@ -207,8 +207,8 @@ public class SyncClientCommandsTest {
 		SyncClientCommands actual = SyncClientCommands.builder()
 				.putAdd(new Add("123", "98:7"))
 				.putAdd(new Add("456", "98:6"))
-				.putChange(new Change("98:7"))
-				.putChange(new Change("98:6"))
+				.putChange(new Update("98:7"))
+				.putChange(new Update("98:6"))
 				.build();
 		assertThat(actual.sumOfCommands()).isEqualTo(4);
 	}
@@ -241,7 +241,7 @@ public class SyncClientCommandsTest {
 	public void testHasCommandWithServerIdDontMatch() {
 		SyncClientCommands actual = SyncClientCommands.builder()
 				.putAdd(new Add("123", "98:7"))
-				.putChange(new Change("7:97"))
+				.putChange(new Update("7:97"))
 				.build();
 		assertThat(actual.hasCommandWithServerId("7:98")).isFalse();
 	}
@@ -250,7 +250,7 @@ public class SyncClientCommandsTest {
 	public void testHasCommandWithServerIdMatchAddClientId() {
 		SyncClientCommands actual = SyncClientCommands.builder()
 				.putAdd(new Add("123", "98:7"))
-				.putChange(new Change("7:97"))
+				.putChange(new Update("7:97"))
 				.build();
 		assertThat(actual.hasCommandWithServerId("123")).isFalse();
 	}
@@ -259,7 +259,7 @@ public class SyncClientCommandsTest {
 	public void testHasCommandWithServerIdMatchAddServerId() {
 		SyncClientCommands actual = SyncClientCommands.builder()
 				.putAdd(new Add("123", "98:7"))
-				.putChange(new Change("7:97"))
+				.putChange(new Update("7:97"))
 				.build();
 		assertThat(actual.hasCommandWithServerId("98:7")).isTrue();
 	}
@@ -268,7 +268,7 @@ public class SyncClientCommandsTest {
 	public void testHasCommandWithServerIdMatchChangeServerId() {
 		SyncClientCommands actual = SyncClientCommands.builder()
 				.putAdd(new Add("123", "98:7"))
-				.putChange(new Change("7:97"))
+				.putChange(new Update("7:97"))
 				.build();
 		assertThat(actual.hasCommandWithServerId("7:97")).isTrue();
 	}
