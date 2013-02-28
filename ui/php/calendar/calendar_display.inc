@@ -5915,23 +5915,11 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
-    if (is_array($res['entity'])) {
-      foreach ($res['entity'] as $r_id => $r_ent) {
-        $r_name = $r_ent['label'];
-        $sel_id = "data-resource-$r_id";
-        $div_id = "sel_resource_id-$sel_id";
-        $dis_sel_resource .= "
-          <div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
-          <img src=\"$ico_delete\"  alt=\"[Delete]\" />
-          </a>
-          $r_name
-          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
-          </div>";
-      }
-    }
 
-    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+    $resource_complete = "
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_resource_id', 'resource', {filter_entity:'Resource'});";
+
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource";
     $resource_add_button = "
       <a href=\"javascript: return false;\"
       onclick=\"popup('$url_resource','');
@@ -5946,27 +5934,16 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       $resource_add_button
       </th>
      <td id=\"sel_resource_id\">
-      <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
-       $dis_sel_resource
+      <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
      </td>
-    </tr>";
+    </tr>
+      <script type=\"text/javascript\">
+    obm.initialize.chain(function () {
+      $resource_complete
+    });
+  </script>
+    ";
   
-    if (is_array($res_grp['entity'])) {
-      foreach ($res_grp['entity'] as $rg_id => $rg_ent) {
-        $rg_name = $rg_ent['label'];
-        $sel_id = "data-resourcegroup-$r_id";
-        $div_id = "sel_resource_group_id-$sel_id";
-        $dis_sel_resource_group .= "
-          <div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_resource_group_id');\">
-          <img src=\"$ico_delete\" alt=\"[Delete]\" />
-          </a>
-          $r_name
-          <input value=\"$sel_id\" name=\"sel_resource_group_id[]\" type=\"hidden\" />
-          </div>";
-      }
-    }
-
     $url_resource_group = "$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id";
     $rgroup_add_button = "
       <a href=\"javascript: return false;\"
@@ -5984,11 +5961,9 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       <td id=\"sel_resource_group_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"resourcegroupSearch\" autocomplete=\"off\" />
 
-       $dis_sel_resource_group
      </td>
      </tr>";
     $resource_js = "
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
       new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourcegroupSearch');  
       ";
     $dis_block_resource = "
