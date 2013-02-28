@@ -115,6 +115,6 @@ public class SnapshotTest {
 		assertThat(snapshot.getCollectionId()).isEqualTo(collectionId);
 		assertThat(snapshot.getUidNext()).isEqualTo(uidNext);
 		assertThat(snapshot.getEmails()).containsExactly(email, email2);
-		assertThat(snapshot.getMessageSet().asDiscreteValues()).containsOnly(uidNext, emailUID, emailUID2);
+		assertThat(snapshot.getMessageSet().asDiscreteValues()).containsOnly(emailUID, emailUID2);
 	}
 }

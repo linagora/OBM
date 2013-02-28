@@ -61,6 +61,6 @@ public class MessageSetUtilsTest {
 				.build();
 		MessageSet messageSet = MessageSetUtils.computeEmailsUID(snapshot, 3);
 		Iterable<Long> asDiscreteValues = messageSet.asDiscreteValues();
-		assertThat(asDiscreteValues).containsOnly(1L, 2L, 3L);
+		assertThat(asDiscreteValues).containsOnly(1L, 2L);
 	}
 }

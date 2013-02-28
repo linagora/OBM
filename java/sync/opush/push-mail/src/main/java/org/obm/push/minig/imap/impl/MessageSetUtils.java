@@ -35,6 +35,7 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Range;
 
 public final class MessageSetUtils {
 	private MessageSetUtils() {}
@@ -43,7 +44,7 @@ public final class MessageSetUtils {
 		Preconditions.checkNotNull(snapshot, "snapshot can't be null");
 		
 		return MessageSet.from(snapshot.getMessageSet())
-			.extendTo(currentUIDNext)
+			.add(Range.closedOpen(snapshot.getUidNext(), currentUIDNext))
 			.build();
 	}
 }

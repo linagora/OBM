@@ -138,15 +138,6 @@ public class MessageSetTest {
 	}
 	
 	@Test
-	public void messageSetBuilderExtendTo() {
-		MessageSet firstSet = MessageSet.builder().add(Range.closed(1l, 5l)).add(Range.closed(7l, 8l))
-				.extendTo(10l)
-				.build();
-		assertThat(firstSet.rangeNumber()).isEqualTo(2);
-		assertThat(firstSet.asDiscreteValues()).containsExactly(1l, 2l, 3l, 4l, 5l, 7l, 8l, 9l, 10l);
-	}
-	
-	@Test
 	public void messageSetIsEmptyBuiltWithNothing() {
 		MessageSet set = MessageSet.builder().build();
 		assertThat(set.isEmpty()).isTrue();

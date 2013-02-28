@@ -136,7 +136,6 @@ public class Snapshot implements Serializable {
 
 	private MessageSet generateMessageSet() {
 		MessageSet.Builder builder = MessageSet.builder();
-		builder.add(uidNext);
 		for (Email email : emails) {
 			builder.add(email.getUid());
 		}

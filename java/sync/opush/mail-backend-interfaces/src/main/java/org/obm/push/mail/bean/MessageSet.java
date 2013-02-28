@@ -104,12 +104,8 @@ public class MessageSet implements Serializable, Iterable<Long> {
 			return this;
 		}
 		
-		public Builder extendTo(long value) {
-			return add(Range.closed(ranges.last().upperEndpoint(), value)); 
-		}
-		
 		public Builder add(Range<Long> value) {
-			Optional<Range<Long>> connectedRange = findRangeConnecterOrContiguousTo(value);
+			Optional<Range<Long>> connectedRange = findRangeConnectedOrContiguousTo(value);
 			if (connectedRange.isPresent()) {
 				replaceWithSpanningRange(connectedRange.get(), value);
 			} else {
@@ -130,7 +126,7 @@ public class MessageSet implements Serializable, Iterable<Long> {
 			add(connectedRange.span(other));
 		}
 
-		private Optional<Range<Long>> findRangeConnecterOrContiguousTo(Range<Long> other) {
+		private Optional<Range<Long>> findRangeConnectedOrContiguousTo(Range<Long> other) {
 			for (Range<Long> range: ranges) {
 				if (range.isConnected(other) ||isContiguous(other, range)) {
 					return Optional.of(range);
