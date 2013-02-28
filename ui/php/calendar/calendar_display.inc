@@ -4126,7 +4126,7 @@ function dis_calendar_quick_form($calendar_entity) {
       $user_entities[$key] = $val;
     }
   }
-
+  $logged_user_is_displayed = true;
   // add the current logged user to the list of selectable calendars if he's not already present
   if ( ! array_key_exists($user_id, $user_entities) ) {
     $session_user_infos = get_user_info($user_id);
@@ -4136,14 +4136,28 @@ function dis_calendar_quick_form($calendar_entity) {
       "type" => "user",
       "id" => $user_id
     );
+    $logged_user_is_displayed = false;
   }
 
   if( sizeof($user_entities) > 1 ){
     $entity_view.="<select id=\"calendarViewEntity\">";
+    $one_calendar_display = ( sizeof($user_entities) == 2 ) ? true : false;
+    $multiple_calendar_displayed = (sizeof($user_entities) > 2);
+
     foreach($user_entities as $user){
+      $logged_user = ($user_id == $user['id']);
+
       if(OBM_Acl::canWrite($user_id, 'calendar',array($user['id']))) {
-        $entity_view.="<option id='calendarViewEntity$user[id]' value='$user[id]'>$user[name]</option>";
+
+        $selected = '';
+        if ( ( $logged_user && ( $logged_user_is_displayed || $multiple_calendar_displayed ) ) 
+          || ( !$logged_user && !$logged_user_is_displayed && $one_calendar_display ) ) {
+          $selected = 'selected=\"selected\"';
+        }
+
+        $entity_view.= "<option id='calendarViewEntity$user[id]' value='$user[id]' $selected>$user[name]</option>";
       }
+
     }
     $entity_view.="</select>";
     $entity_view.="<input id='calendarKindEntity' type='hidden' value='user' />";

@@ -2559,9 +2559,6 @@ Obm.CalendarQuickForm = new Class({
     this.detailButton.setStyle('display','none');
     if (this.entityList) {
       this.entityList.setStyle('display','');
-      try {
-      $('calendarViewEntity'+obm.vars.consts.obm_uid).set('selected', 'selected');
-      } catch(e) {}
     }
 
     if (!this.eventData.all_day) {
