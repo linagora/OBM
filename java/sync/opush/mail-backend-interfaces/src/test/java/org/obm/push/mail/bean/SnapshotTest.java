@@ -37,9 +37,13 @@ import org.junit.Test;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.exception.activesync.InvalidServerId;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
+import org.obm.push.mail.bean.Snapshot.Builder;
 import org.obm.push.utils.DateUtils;
+
+import com.google.common.collect.ImmutableList;
 
 public class SnapshotTest {
 	
@@ -116,5 +120,138 @@ public class SnapshotTest {
 		assertThat(snapshot.getUidNext()).isEqualTo(uidNext);
 		assertThat(snapshot.getEmails()).containsExactly(email, email2);
 		assertThat(snapshot.getMessageSet().asDiscreteValues()).containsOnly(emailUID, emailUID2);
+	}
+	
+	@Test
+	public void testContainsAllEmptyArgument() {
+		
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(ImmutableList.<String>of())).isTrue();
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testContainsAllNullArgument() {
+		
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(null)).isTrue();
+	}
+	
+	@Test(expected=InvalidServerId.class)
+	public void testContainsAllInvalidArgument() {
+		
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		snapshot.containsAllIds(ImmutableList.<String>of("evil value"));
+	}
+	
+	@Test
+	public void testContainsAllMatchElement() {
+		
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(ImmutableList.of("1:1"))).isTrue();
+	}
+	
+	@Test
+	public void testContainsAllMatchElement2() {
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(2)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(3)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(4)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(223)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(ImmutableList.of("1:1", "1:2", "1:3", "1:4", "1:223"))).isTrue();
+	}
+	
+	@Test
+	public void testContainsAllDontMatchElement() {
+		
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(ImmutableList.of("1:2"))).isFalse();
+	}
+	
+	@Test
+	public void testContainsAllDontMatchElement2() {
+		Snapshot snapshot = defaultSnapshotBuilder()
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(2)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(3)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.addEmail(Email.builder()
+						.uid(4)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.build())
+				.build();
+		assertThat(snapshot.containsAllIds(ImmutableList.of("1:1", "1:2", "1:3", "1:4", "1:5"))).isFalse();
+	}
+	
+	private Builder defaultSnapshotBuilder() {
+		return Snapshot.builder()
+				.deviceId(new DeviceId("deviceId"))
+				.filterType(FilterType.ONE_DAY_BACK)
+				.syncKey(new SyncKey("syncKey"))
+				.collectionId(1)
+				.uidNext(2);
 	}
 }

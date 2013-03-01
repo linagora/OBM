@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.exception.activesync;
 
-public class InvalidServerId extends Exception {
+public class InvalidServerId extends RuntimeException {
 
 	public InvalidServerId(String message) {
 		super(message);

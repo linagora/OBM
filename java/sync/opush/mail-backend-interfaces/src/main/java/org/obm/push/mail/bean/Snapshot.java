@@ -33,10 +33,14 @@ package org.obm.push.mail.bean;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.exception.activesync.InvalidServerId;
+import org.obm.push.exception.activesync.ProtocolException;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -142,6 +146,21 @@ public class Snapshot implements Serializable {
 		return builder.build();
 	}
 
+	public boolean containsAllIds(List<String> serverIds) throws InvalidServerId {
+		Preconditions.checkNotNull(serverIds);
+		for (String serverId: serverIds) {
+			Integer mailUid = new ServerId(serverId).getItemId();
+			if (mailUid == null) {
+				throw new ProtocolException(String.format("ServerId '%s' must reference an Item", serverId));
+			}
+			if (!messageSet.contains(mailUid)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	
 	public DeviceId getDeviceId() {
 		return deviceId;
 	}
