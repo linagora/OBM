@@ -33,7 +33,7 @@ package org.obm.push.exception.activesync;
 
 import org.obm.push.bean.SyncKey;
 
-public class InvalidSyncKeyException extends Exception {
+public class InvalidSyncKeyException extends RuntimeException {
 
 	private final Integer collectionId;
 	private final SyncKey syncKey;

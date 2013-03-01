@@ -70,6 +70,7 @@ import org.obm.push.exception.WaitIntervalOutOfRangeException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.InvalidServerId;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.PartialException;
@@ -189,6 +190,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		} catch (ItemNotFoundException e) {
 			//This case is specific to email sync race-condition
 			sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY, continuation, e);
+		} catch (InvalidSyncKeyException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
 		}
 	}
 
@@ -357,6 +360,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (HierarchyChangedException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.HIERARCHY_CHANGED, continuation, e);
+		} catch (InvalidSyncKeyException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
 		}
 	}
 

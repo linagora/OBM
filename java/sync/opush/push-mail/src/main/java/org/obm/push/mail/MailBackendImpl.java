@@ -87,6 +87,7 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -832,8 +833,15 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
 			throws ProcessingEmailException {
 
+		Snapshot snapshot = snapshotService.getSnapshot(udr.getDevId(), previousItemSyncState.getSyncKey(), collectionId);
+		if (snapshot == null) {
+			throw new InvalidSyncKeyException(previousItemSyncState.getSyncKey());
+		}
+		if (!snapshot.containsAllIds(itemIds)) {
+			throw new ItemNotFoundException();
+		}
 		List<ItemChange> fetchs = fetch(udr, collectionId, itemIds, collectionOptions);
-		snapshotService.actualizeSnapshot(udr.getDevId(), previousItemSyncState.getSyncKey(), collectionId, newSyncKey);
+		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(snapshot, newSyncKey));
 		return fetchs;
 	}
 }

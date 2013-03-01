@@ -58,6 +58,7 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -68,11 +69,13 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
+import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
@@ -186,7 +189,15 @@ public class MailboxBackendTest {
 				.build();
 
 		SyncKey newSyncKey = new SyncKey("456");
-		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
+		Snapshot existingSnapshot = Snapshot.builder()
+			.addEmail(Email.builder().uid(itemId).build())
+			.collectionId(collectionId)
+			.deviceId(device.getDevId())
+			.syncKey(previousSyncKey)
+			.filterType(FilterType.ALL_ITEMS).build();
+		expect(snapshotService.getSnapshot(device.getDevId(), previousSyncKey, collectionId))
+			.andReturn(existingSnapshot);
+		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(existingSnapshot, newSyncKey));
 		expectLastCall();
 		
 		mocks.replay();		
@@ -290,7 +301,15 @@ public class MailboxBackendTest {
 				.build();
 
 		SyncKey newSyncKey = new SyncKey("456");
-		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
+		Snapshot existingSnapshot = Snapshot.builder()
+				.addEmail(Email.builder().uid(itemId).build())
+				.collectionId(collectionId)
+				.deviceId(device.getDevId())
+				.syncKey(previousSyncKey)
+				.filterType(FilterType.ALL_ITEMS).build();
+		expect(snapshotService.getSnapshot(device.getDevId(), previousSyncKey, collectionId))
+				.andReturn(existingSnapshot);
+		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(existingSnapshot, newSyncKey));
 		expectLastCall();
 		
 		mocks.replay();

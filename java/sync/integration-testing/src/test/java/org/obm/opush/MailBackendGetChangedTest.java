@@ -221,6 +221,55 @@ public class MailBackendGetChangedTest {
 	}
 
 	@Test
+	public void fetchWithNoSnapshot() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		int allocatedStateId = 3;
+		int allocatedStateId2 = 4;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(allocatedStateId)
+				.build();
+		ItemSyncState allocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(allocatedStateId2)
+				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
+		expect(collectionDao.findItemStateForKey(firstAllocatedSyncKey)).andReturn(allocatedState).times(2);
+
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		SyncResponse firstSyncResponse = opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		SyncResponse syncResponse = opClient.syncWithCommand(firstAllocatedSyncKey, inboxCollectionIdAsString, SyncCommand.FETCH, inboxCollectionIdAsString + ":1");
+		mocksControl.verify();
+
+		SyncCollectionResponse firstInboxResponse = getCollectionWithId(firstSyncResponse, inboxCollectionIdAsString);
+		
+		assertThat(firstInboxResponse.getItemChanges()).isEmpty();
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.INVALID_SYNC_KEY);
+
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(0);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(0);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(0);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
+	}
+	
+	@Test
 	public void testInitialGetChangedWithSnapshotNoChanges() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
 		SyncKey firstAllocatedSyncKey = new SyncKey("456");
