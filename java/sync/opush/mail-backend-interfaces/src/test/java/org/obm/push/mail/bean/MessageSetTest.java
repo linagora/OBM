@@ -160,4 +160,32 @@ public class MessageSetTest {
 		MessageSet set = MessageSet.builder().add(1l).build();
 		assertThat(set.isEmpty()).isFalse();
 	}
+	
+	@Test
+	public void emptyMessageSetContainsNothing() {
+		MessageSet empty = MessageSet.empty();
+		assertThat(empty.contains(123)).isFalse();
+	}
+	
+	@Test
+	public void singletonMessageSetContainsItsOnlyElement() {
+		MessageSet singleton = MessageSet.singleton(1);
+		assertThat(singleton.contains(1)).isTrue();
+		assertThat(singleton.contains(2)).isFalse();
+	}
+	
+	@Test
+	public void complexSetContainsMessageSetContainsMatchingElements() {
+		MessageSet complex = MessageSet.builder().add(Range.closed(1l, 3l)).add(Range.closed(10l, 20l)).build();
+		assertThat(complex.contains(1)).isTrue();
+		assertThat(complex.contains(2)).isTrue();
+		assertThat(complex.contains(3)).isTrue();
+		assertThat(complex.contains(4)).isFalse();
+		assertThat(complex.contains(7)).isFalse();
+		assertThat(complex.contains(10)).isTrue();
+		assertThat(complex.contains(11)).isTrue();
+		assertThat(complex.contains(20)).isTrue();
+		assertThat(complex.contains(21)).isFalse();
+		assertThat(complex.contains(Integer.MAX_VALUE + 2)).isFalse();
+	}
 }

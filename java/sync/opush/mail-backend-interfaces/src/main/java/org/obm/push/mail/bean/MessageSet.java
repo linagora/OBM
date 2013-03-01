@@ -160,6 +160,15 @@ public class MessageSet implements Serializable, Iterable<Long> {
 		return ranges.isEmpty();
 	}
 	
+	public boolean contains(long uid) {
+		for (Range<Long> range: ranges) {
+			if (range.contains(uid)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public Iterable<Long> asDiscreteValues() {
 		return Iterables.concat(Iterables.transform(ranges, new Function<Range<Long>, Set<Long>>() {
 			@Override
