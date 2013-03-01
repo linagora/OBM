@@ -397,13 +397,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 
-	private Event eventFromCursor(Calendar cal, ResultSet evrs)
+	@VisibleForTesting Event eventFromCursor(Calendar cal, ResultSet evrs)
 			throws SQLException {
 		Event e = new Event();
 		int id = evrs.getInt("event_id");
 		e.setUid(new EventObmId(id));
 		e.setTimeUpdate(JDBCUtils.getDate(evrs, "event_timeupdate"));
 		e.setTimeCreate(JDBCUtils.getDate(evrs, "event_timecreate"));
+		e.setTimezoneName(evrs.getString("event_timezone"));
 		e.setType(EventType.valueOf(evrs.getString("event_type")));
 		e.setExtId(new EventExtId(evrs.getString("event_ext_id")));
 		e.setOpacity(EventOpacity.getValueOf(evrs.getString("event_opacity")));
@@ -418,24 +419,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setAllday(evrs.getBoolean("event_allday"));
 		e.setDescription(evrs.getString("event_description"));
 		e.setSequence(evrs.getInt("event_sequence"));
+		e.setRecurrence(eventRecurrenceFromCursor(cal, evrs));
 
-		EventRecurrence er = new EventRecurrence();
-		er.setKind(RecurrenceKind.valueOf(evrs.getString("event_repeatkind")));
-		er.setDays(new RecurrenceDaysParser().parse(evrs.getString("event_repeatdays")));
-		er.setFrequence(evrs.getInt("event_repeatfrequence"));
-		if (evrs.getTimestamp("event_endrepeat") != null) {
-			cal.setTimeInMillis(evrs.getTimestamp("event_endrepeat").getTime());
-			er.setEnd(cal.getTime());			
-		}
-		e.setRecurrence(er);
-
+		String domainName = evrs.getString("domain_name");
 		e.setOwner(evrs.getString("owner"));
-		e.setOwnerEmail( getUserObmEmail(evrs, evrs.getString("domain_name")) );
+		e.setOwnerEmail( getUserObmEmail(evrs, domainName) );
 		e.setOwnerDisplayName(getOwnerDisplayName(evrs));
-		e.setCreatorEmail(getCreatorObmEmail(evrs, evrs.getString("domain_name")));
+		e.setCreatorEmail(getCreatorObmEmail(evrs, domainName));
 		e.setCreatorDisplayName(getCreatorDisplayName(evrs));
-		if (evrs.getTimestamp("recurrence_id") != null) {
-			cal.setTimeInMillis(evrs.getTimestamp("recurrence_id").getTime());
+		Timestamp recurrenceId = evrs.getTimestamp("recurrence_id");
+		if (recurrenceId != null) {
+			cal.setTimeInMillis(recurrenceId.getTime());
 			e.setRecurrenceId(cal.getTime());
 		}
 		return e;
@@ -2660,8 +2654,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		er.setKind(RecurrenceKind.valueOf(evrs.getString("event_repeatkind")));
 		er.setDays(new RecurrenceDaysParser().parse(evrs.getString("event_repeatdays")));
 		er.setFrequence(evrs.getInt("event_repeatfrequence"));
-		if (evrs.getTimestamp("event_endrepeat") != null) {
-			cal.setTimeInMillis(evrs.getTimestamp("event_endrepeat").getTime());
+		Timestamp endRepeat = evrs.getTimestamp("event_endrepeat");
+		if (endRepeat != null) {
+			cal.setTimeInMillis(endRepeat.getTime());
 			er.setEnd(cal.getTime());
 		}
 		return er;

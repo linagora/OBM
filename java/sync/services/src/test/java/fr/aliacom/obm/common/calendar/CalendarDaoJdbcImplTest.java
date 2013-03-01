@@ -45,12 +45,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.easymock.IMocksControl;
+import org.joda.time.DateTimeZone;
 import org.junit.Rule;
 import org.junit.Test;
 import org.obm.configuration.DatabaseConfiguration;
@@ -58,11 +61,19 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventOpacity;
+import org.obm.sync.calendar.EventPrivacy;
+import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.EventType;
+import org.obm.sync.calendar.RecurrenceDay;
+import org.obm.sync.calendar.RecurrenceDays;
+import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
@@ -255,6 +266,86 @@ public class CalendarDaoJdbcImplTest {
 		
 		mocksControl.verify();
 		assertThat(createdEvent.getEntityId()).isEqualTo(expectedEntityId);
+	}
+
+	@Test
+	public void testEventFromCursor() throws Exception {
+		TimeZone beforeDefaultTimeZone = TimeZone.getDefault();
+		TimeZone.setDefault(DateTimeZone.UTC.toTimeZone());
+		
+		ResultSet resultSet = mocksControl.createMock(ResultSet.class);
+		expect(resultSet.getInt("event_id")).andReturn(12);
+		expect(resultSet.getTimestamp("event_timecreate")).andReturn(Timestamp.valueOf("2012-05-04 11:50:01"));
+		expect(resultSet.getTimestamp("event_timeupdate")).andReturn(Timestamp.valueOf("2012-05-04 11:55:12"));
+		expect(resultSet.getString("event_timezone")).andReturn("America/San_Francisco");
+		expect(resultSet.getString("event_type")).andReturn("VEVENT");
+		expect(resultSet.getString("event_ext_id")).andReturn("abcd");
+		expect(resultSet.getString("event_opacity")).andReturn("TRANSPARENT");
+		expect(resultSet.getString("eventcategory1_label")).andReturn("category");
+		expect(resultSet.getString("event_title")).andReturn("title");
+		expect(resultSet.getString("event_location")).andReturn("location");
+		expect(resultSet.getTimestamp("event_date")).andReturn(Timestamp.valueOf("2012-06-12 12:02:03"));
+		expect(resultSet.getInt("event_duration")).andReturn(100);
+		expect(resultSet.getInt("event_priority")).andReturn(1);
+		expect(resultSet.getInt("event_privacy")).andReturn(1);
+		expect(resultSet.getBoolean("event_allday")).andReturn(false);
+		expect(resultSet.getString("event_description")).andReturn("desc");
+		expect(resultSet.getInt("event_sequence")).andReturn(5);
+		expect(resultSet.getString("owner")).andReturn("user@domain.org");
+		expect(resultSet.getString("domain_name")).andReturn("domain.org");
+		expect(resultSet.getString("userobm_email")).andReturn("useremail");
+		expect(resultSet.getString("ownerFirstName")).andReturn("first");
+		expect(resultSet.getString("ownerLastName")).andReturn("last");
+		expect(resultSet.getString("ownerCommonName")).andReturn("first last");
+		expect(resultSet.getString("creatorEmail")).andReturn("creator@domain.org");
+		expect(resultSet.getString("creatorFirstName")).andReturn("c first");
+		expect(resultSet.getString("creatorLastName")).andReturn("c last");
+		expect(resultSet.getString("creatorCommonName")).andReturn("c common");
+		
+		expect(resultSet.getString("event_repeatkind")).andReturn("daily");
+		expect(resultSet.getString("event_repeatdays")).andReturn("0101010");
+		expect(resultSet.getInt("event_repeatfrequence")).andReturn(2);
+		expect(resultSet.getTimestamp("event_endrepeat")).andReturn(Timestamp.valueOf("2013-06-12 12:02:03"));
+		expect(resultSet.getTimestamp("recurrence_id")).andReturn(Timestamp.valueOf("2013-06-13 12:02:03"));
+		
+		Event expectedEvent = new Event();
+		expectedEvent.setUid(new EventObmId(12));
+		expectedEvent.setTimeCreate(date("2012-05-04T11:50:01+00"));
+		expectedEvent.setTimeUpdate(date("2012-05-04T11:55:12+00"));
+		expectedEvent.setTimezoneName("America/San_Francisco");
+		expectedEvent.setType(EventType.VEVENT);
+		expectedEvent.setExtId(new EventExtId("abcd"));
+		expectedEvent.setOpacity(EventOpacity.TRANSPARENT);
+		expectedEvent.setCategory("category");
+		expectedEvent.setTitle("title");
+		expectedEvent.setLocation("location");
+		expectedEvent.setStartDate(date("2012-06-12T12:02:03+00"));
+		expectedEvent.setDuration(100);
+		expectedEvent.setPriority(1);
+		expectedEvent.setPrivacy(EventPrivacy.PRIVATE);
+		expectedEvent.setAllday(false);
+		expectedEvent.setDescription("desc");
+		expectedEvent.setSequence(5);
+		expectedEvent.setOwner("user@domain.org");
+		expectedEvent.setOwnerEmail("useremail@domain.org");
+		expectedEvent.setOwnerDisplayName("first last");
+		expectedEvent.setCreatorEmail("creator@domain.org");
+		expectedEvent.setCreatorDisplayName("c common");
+		expectedEvent.setRecurrenceId(date("2013-06-13T12:02:03+00"));
+
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday, RecurrenceDay.Friday));
+		recurrence.setFrequence(2);
+		recurrence.setEnd(date("2013-06-12T12:02:03+00"));			
+		expectedEvent.setRecurrence(recurrence);
+		
+		mocksControl.replay();
+		Event resultEvent = calendarDaoJdbcImpl.eventFromCursor(DateUtils.getCurrentGMTCalendar(), resultSet);
+		mocksControl.verify();
+		
+		assertThat(resultEvent).isEqualTo(expectedEvent);
+		TimeZone.setDefault(beforeDefaultTimeZone);
 	}
 
 	private void expectLastInsertId(PreparedStatement ps, int obmId) throws SQLException {
