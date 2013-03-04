@@ -275,7 +275,7 @@ function run_query_user_search($user, $strongest_profile_level=null, $user_can_m
   }
 
   // If a nomade indication has been specified, get it
-  if (isset($nomade)) {
+  if (trim($nomade) != '') {
     if ($nomade != '1') {
       if (trim($where) != '') $where .= ' AND';
       $where .= " userobm_nomade_enable = 0";
