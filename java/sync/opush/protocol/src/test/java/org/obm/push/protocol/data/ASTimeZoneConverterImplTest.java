@@ -41,7 +41,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
+import org.obm.push.utils.type.UnsignedShort;
 
 import com.google.common.collect.Maps;
 
@@ -65,6 +67,53 @@ public class ASTimeZoneConverterImplTest {
 		Assertions.assertThat(expectedTimeZone.getID()).isEqualTo(timeZone.getID());
 	}
 	
+	@Test
+	public void testConvertGS2LosAngelesTimeZone() {
+		TimeZone timeZone = TimeZone.getTimeZone("America/Los_Angeles");
+
+		TimeZone expectedTimeZone = asTimeZoneConverter.convert(gs2LosAngelesTimeZone());
+
+		Assertions.assertThat(expectedTimeZone.getID()).isEqualTo(timeZone.getID());
+	}
+
+	private ASTimeZone gs2LosAngelesTimeZone() {
+		return ASTimeZone.builder()
+			.bias(480)
+			.standardName("")
+			.standardDate(losAngelesWinterTime())
+			.standardBias(0)
+			.dayLightName("")
+			.dayLightDate(losAngelesSummerTime())
+			.dayLightBias(-60)
+			.build();
+	}
+	
+	private ASSystemTime losAngelesWinterTime() {
+		return ASSystemTime.builder()
+			.year(UnsignedShort.checkedCast(0))
+			.month(UnsignedShort.checkedCast(11))
+			.weekOfMonth(UnsignedShort.checkedCast(1))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.hour(UnsignedShort.checkedCast(2))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0))
+			.build();
+	}
+	
+	private ASSystemTime losAngelesSummerTime() {
+		return ASSystemTime.builder()
+			.year(UnsignedShort.checkedCast(0))
+			.month(UnsignedShort.checkedCast(3))
+			.weekOfMonth(UnsignedShort.checkedCast(2))
+			.dayOfWeek(UnsignedShort.checkedCast(0))
+			.hour(UnsignedShort.checkedCast(2))
+			.minute(UnsignedShort.checkedCast(0))
+			.second(UnsignedShort.checkedCast(0))
+			.milliseconds(UnsignedShort.checkedCast(0))
+			.build();
+	}
+
 	@Test
 	public void testConvertAllTimeZonePreferences() {
 		Map<String, TimeZone> map = Maps.newHashMap();

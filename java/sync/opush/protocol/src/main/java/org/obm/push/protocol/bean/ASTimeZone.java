@@ -186,4 +186,13 @@ public class ASTimeZone {
 			.add("dayLightBias", dayLightBias)
 			.toString();
 	}
+
+	public boolean equalsDiscardingNames(ASTimeZone asTimeZone) {
+		Preconditions.checkNotNull(asTimeZone, "asTimeZone is required");
+		return Objects.equal(this.bias, asTimeZone.bias)
+			&& Objects.equal(this.standardDate, asTimeZone.standardDate)
+			&& Objects.equal(this.standardBias, asTimeZone.standardBias)
+			&& Objects.equal(this.dayLightDate, asTimeZone.dayLightDate)
+			&& Objects.equal(this.dayLightBias, asTimeZone.dayLightBias);
+	}
 }

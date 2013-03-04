@@ -104,7 +104,7 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 		for (String availableID : availableIDs) {
 			TimeZone timeZone = TimeZone.getTimeZone(availableID);
 			ASTimeZone timeZoneConverted = timeZoneConverter.convert(timeZone, Locale.US);
-			if (timeZoneConverted.equals(asTimeZone)) {
+			if (timeZoneConverted.equalsDiscardingNames(asTimeZone)) {
 				return timeZone;
 			}
 		}
