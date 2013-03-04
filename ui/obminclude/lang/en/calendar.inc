@@ -115,7 +115,7 @@ $l_delete_default_view = "Delete default view";
 $l_view_label = "View label";
 $l_view_save = "Save view";
 $l_view_delete = "Delete view";
-$l_view_invalid = "Invalid view. No users or resources";
+$l_view_invalid = "This view is invalid, it cannot be displayed";
 
 $l_first_hour = "Starting hour";
 $l_last_hour = "End Hour";
