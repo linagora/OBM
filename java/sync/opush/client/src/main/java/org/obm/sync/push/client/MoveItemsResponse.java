@@ -51,25 +51,32 @@ public final class MoveItemsResponse {
 	}
 	
 	private final Iterable<MoveResult> moveResults;
+	public final MoveItemsStatus status;
 
-	public MoveItemsResponse(Iterable<MoveResult> moveResults) {
+	public MoveItemsResponse(Iterable<MoveResult> moveResults, MoveItemsStatus status) {
 		this.moveResults = moveResults;
+		this.status = status;
 	}
 
 	public Iterable<MoveResult> getMoveResults() {
 		return moveResults;
 	}
+	
+	public MoveItemsStatus getStatus() {
+		return status;
+	}
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(moveResults);
+		return Objects.hashCode(moveResults, status);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof MoveItemsResponse) {
 			MoveItemsResponse that = (MoveItemsResponse) object;
-			return Objects.equal(moveResults, that.moveResults);
+			return Objects.equal(moveResults, that.moveResults)
+				&& Objects.equal(status, that.status);
 		}
 		return false;
 	}
@@ -78,6 +85,7 @@ public final class MoveItemsResponse {
 	public String toString() {
 		return Objects.toStringHelper(this)
 				.add("moveResults", moveResults)
+				.add("status", status)
 				.toString();
 	}
 	

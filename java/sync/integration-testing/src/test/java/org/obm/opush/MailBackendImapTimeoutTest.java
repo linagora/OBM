@@ -61,6 +61,7 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MeetingResponseStatus;
+import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
@@ -85,8 +86,10 @@ import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.ItemOperationResponse;
+import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
+import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -329,6 +332,31 @@ public class MailBackendImapTimeoutTest {
 		
 		mocksControl.verify();
 		assertThat(meetingHandlerResponse.getItemChanges().iterator().next().getStatus()).isEqualTo(MeetingResponseStatus.SERVER_ERROR);
+	}
+
+	@Test
+	public void testMoveItemsHandler() throws Exception {
+		String emailId1 = ":1";
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		expect(collectionDao.getCollectionPath(inboxCollectionId))
+			.andReturn(inboxCollectionPath).anyTimes();
+		expect(collectionDao.getCollectionPath(trashCollectionId))
+			.andReturn(trashCollectionPath).anyTimes();
+		expect(collectionDao.getCollectionMapping(user.device, trashCollectionPath))
+			.andReturn(trashCollectionId).anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		MoveItemsResponse moveItemsResponse = opClient.moveItems(
+				new Move(inboxCollectionId + emailId1, inboxCollectionId, trashCollectionId));
+		
+		mocksControl.verify();
+		assertThat(moveItemsResponse.getStatus()).isEqualTo(MoveItemsStatus.SERVER_ERROR);
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,

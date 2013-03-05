@@ -45,6 +45,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
@@ -80,7 +81,8 @@ public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
 
 	@Override
 	protected MoveItemsResponse parseResponse(Document document) {
-		NodeList responses = document.getDocumentElement().getElementsByTagName("Response");
+		Element documentElement = document.getDocumentElement();
+		NodeList responses = documentElement.getElementsByTagName("Response");
 		
 		List<MoveResult> moveResults = Lists.newArrayList();
 		for (int i = 0 ; i < responses.getLength(); i++) {
@@ -92,7 +94,12 @@ public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
 			MoveItemsStatus status = MoveItemsStatus.fromSpecificationValue(statusAsString);
 			moveResults.add(new MoveResult(srcMsgId, dstMsgId, status));
 		}
-		return new MoveItemsResponse(moveResults);
+		
+		String status = DOMUtils.getElementText(documentElement, "Status");
+		if (Strings.isNullOrEmpty(status)) {
+			return new MoveItemsResponse(moveResults, null);
+		}
+		return new MoveItemsResponse(moveResults, MoveItemsStatus.fromSpecificationValue(status));
 	}
 
 }

@@ -49,6 +49,7 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.protocol.MoveItemsProtocol;
 import org.obm.push.protocol.bean.MoveItemsItem;
 import org.obm.push.protocol.bean.MoveItemsRequest;
@@ -115,6 +116,10 @@ public class MoveItemsHandler extends WbxmlRequestHandler {
 			sendResponse(responder, reply);
 
 		} catch (NoDocumentException e) {
+			logger.error(e.getMessage(), e);
+			sendResponse(responder, 
+					moveItemsProtocol.encodeErrorResponse(MoveItemsStatus.SERVER_ERROR));
+		} catch (ImapTimeoutException e) {
 			logger.error(e.getMessage(), e);
 			sendResponse(responder, 
 					moveItemsProtocol.encodeErrorResponse(MoveItemsStatus.SERVER_ERROR));
