@@ -82,10 +82,16 @@ public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest,
 		
 		Element fsr = doc.getDocumentElement();
 		
+		String statusAsString = DOMUtils.getUniqueElement(fsr, "Status").getTextContent();
+		FolderSyncStatus status = FolderSyncStatus.fromSpecificationValue(statusAsString);
+		if (!status.equals(FolderSyncStatus.OK)) {
+			return FolderSyncResponse.builder()
+					.status(status)
+					.build();
+		}
+		
 		Element sk = DOMUtils.getUniqueElement(fsr, "SyncKey");
 		String newSyncKey = sk.getTextContent();
-		
-		String status = DOMUtils.getUniqueElement(fsr, "Status").getTextContent();
 
 		Element changes = DOMUtils.getUniqueElement(fsr, "Changes");
 
@@ -117,7 +123,7 @@ public class FolderSyncProtocol implements ActiveSyncProtocol<FolderSyncRequest,
 			.build();
 		
 		return FolderSyncResponse.builder()
-			.status(FolderSyncStatus.fromSpecificationValue(status))
+			.status(status)
 			.newSyncKey(new SyncKey(newSyncKey))
 			.hierarchyItemsChanges(hierarchyItemsChanges)
 			.build();

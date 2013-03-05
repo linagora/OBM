@@ -55,18 +55,25 @@ import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.FolderSyncState;
+import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
+import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
@@ -95,6 +102,7 @@ public class MailBackendImapTimeoutTest {
 	@Inject CalendarBackend calendarBackend;
 	
 	private CollectionDao collectionDao;
+	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
 	private DateService dateService;
 
 	private GreenMailUser greenMailUser;
@@ -123,6 +131,7 @@ public class MailBackendImapTimeoutTest {
 		trashCollectionId = 1645;
 		
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
+		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
@@ -189,6 +198,59 @@ public class MailBackendImapTimeoutTest {
 
 		mocksControl.verify();
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
+	}
+	@Test
+	public void testFolderSyncHandler() throws Exception {
+		SyncKey syncKey = new SyncKey("123");
+		SyncKey secondSyncKey = new SyncKey("456");
+		int stateId = 3;
+		int stateId2 = 4;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, syncKey);
+		
+		FolderSyncState folderSyncState = FolderSyncState.builder()
+				.syncKey(syncKey)
+				.id(stateId)
+				.build();
+		FolderSyncState secondFolderSyncState = FolderSyncState.builder()
+				.syncKey(secondSyncKey)
+				.id(stateId2)
+				.build();
+		
+		expect(collectionDao.findFolderStateForKey(syncKey))
+			.andReturn(folderSyncState);
+		expect(collectionDao.allocateNewFolderSyncState(user.device, syncKey))
+			.andReturn(secondFolderSyncState).anyTimes();
+		expect(collectionDao.allocateNewFolderSyncState(user.device, secondSyncKey))
+			.andReturn(secondFolderSyncState).anyTimes();
+		
+		UserDataRequest udr = new UserDataRequest(user.credentials, "FolderSync", user.device);
+		expect(contactsBackend.getHierarchyChanges(udr, folderSyncState, secondFolderSyncState))
+			.andReturn(HierarchyCollectionChanges.builder().build()).anyTimes();
+		expect(taskBackend.getHierarchyChanges(udr, folderSyncState, secondFolderSyncState))
+			.andReturn(HierarchyCollectionChanges.builder().build()).anyTimes();
+		expect(calendarBackend.getHierarchyChanges(udr, folderSyncState, secondFolderSyncState))
+			.andReturn(HierarchyCollectionChanges.builder().build()).anyTimes();
+		expect(contactsBackend.getPIMDataType())
+			.andReturn(PIMDataType.CONTACTS).anyTimes();
+		expect(taskBackend.getPIMDataType())
+			.andReturn(PIMDataType.TASKS).anyTimes();
+		expect(calendarBackend.getPIMDataType())
+			.andReturn(PIMDataType.CALENDAR).anyTimes();
+		
+		folderSyncStateBackendMappingDao.createMapping(anyObject(PIMDataType.class), anyObject(FolderSyncState.class));
+		expectLastCall().anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		FolderSyncResponse folderSyncResponse = opClient.folderSync(syncKey);
+		
+		mocksControl.verify();
+		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.SERVER_ERROR);
 	}
 	
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,
