@@ -580,7 +580,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 		<dependency>
 			<groupId>greenmail</groupId>
 			<artifactId>greenmail</artifactId>
-			<version>1.3.1b-mbaechler-11</version>
+			<version>1.3.1b-mbaechler-13</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

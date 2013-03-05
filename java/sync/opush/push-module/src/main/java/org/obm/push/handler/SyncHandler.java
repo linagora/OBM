@@ -80,6 +80,7 @@ import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.exception.activesync.ServerErrorException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
@@ -193,7 +194,9 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.NEED_RETRY, continuation, e);
 		} catch (InvalidSyncKeyException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
-		}
+		} catch (ImapTimeoutException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
+		} 
 	}
 
 	private void sendResponse(Responder responder, Document document) {
