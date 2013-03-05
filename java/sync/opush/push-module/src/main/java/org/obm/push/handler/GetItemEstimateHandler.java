@@ -55,6 +55,7 @@ import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.Estimate;
@@ -123,6 +124,9 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		} catch (ConversionException e) {
 			logger.error(e.getMessage(), e);
+		} catch (ImapTimeoutException e) {
+			sendErrorResponse(responder, 
+					protocol.buildError(GetItemEstimateStatus.NEED_SYNC, null), e);
 		}
 	}
 

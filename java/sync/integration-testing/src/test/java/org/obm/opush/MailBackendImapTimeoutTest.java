@@ -57,6 +57,7 @@ import org.obm.opush.env.Configuration;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
+import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
@@ -64,6 +65,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
@@ -75,11 +77,14 @@ import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -103,6 +108,7 @@ public class MailBackendImapTimeoutTest {
 	
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
+	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private DateService dateService;
 
 	private GreenMailUser greenMailUser;
@@ -132,6 +138,7 @@ public class MailBackendImapTimeoutTest {
 		
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
+		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
@@ -251,6 +258,39 @@ public class MailBackendImapTimeoutTest {
 		
 		mocksControl.verify();
 		assertThat(folderSyncResponse.getStatus()).isEqualTo(FolderSyncStatus.SERVER_ERROR);
+	}
+	
+	@Test
+	public void testGetItemEstimateHandler() throws Exception {
+		SyncKey syncKey = new SyncKey("123");
+		int stateId = 3;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(syncKey)
+				.id(stateId)
+				.build();
+		
+		expect(collectionDao.findItemStateForKey(syncKey))
+			.andReturn(syncState);
+		
+		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
+			.andReturn(ImmutableList.<ItemChange> of());
+		
+		expect(dateService.getCurrentDate()).andReturn(syncState.getSyncDate());
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(syncKey, inboxCollectionId);
+		
+		mocksControl.verify();
+		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.NEED_SYNC);
 	}
 	
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,
