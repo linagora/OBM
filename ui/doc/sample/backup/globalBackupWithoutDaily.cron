@@ -1,0 +1,16 @@
+# This is an example of crontab to exploit the new parallelBackups system and backup deplacement system.
+# Trigger a manual global backup every saturday and every 1st day of the month.
+
+0 0 2-31 * 6  sh /usr/share/www/obm/cron/parallelBackups.sh -n 5
+0 0 1 * * sh /usr/share/www/obm/cron/parallelBackups.sh -n 5
+
+# Trigger the move of the global backup into 4 folders:
+# Weekly1, Weekl2, Monthly1 and Monthly2.
+# Weekly deplacement is done every Sunday.
+# Monthly deplacement is done every 2nd day of the month.
+# The special case of a Saturday 1st day of the month will trigger the script with appropriate parameter.
+
+0 0 2-31 * 7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/www/obm/cron/globalBackupWithoutDaily.sh -w > /var/log/obm-cron.log
+0 0 2 * 1-6     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/www/obm/cron/globalBackupWithoutDaily.sh -m > /var/log/obm-cron.log
+0 0 2 * 7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/www/obm/cron/globalBackupWithoutDaily.sh -mw > /var/log/obm-cron.log
+0 6 * * 1 sh /usr/share/www/obm/cron/globalBackupWithoutDaily.sh -check > /var/log/obm-cron.log

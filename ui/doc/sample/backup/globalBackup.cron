@@ -1,8 +1,8 @@
 # This crontab is an example to accomplish OBMFULL-3950
 # specification.
 
-*/10 2-4 2-31 * 1-5,7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -d > /var/log/obm-cron.log
-*/10 2-4 2-31 * 6     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -w > /var/log/obm-cron.log
-*/10 2-4 1 * 1-5,7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -m > /var/log/obm-cron.log
-*/10 2-4 1 * 6     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/backupAgricol.sh -mw > /var/log/obm-cron.log
-* 7 * * * sh /usr/share/obm/cron/backupAgricol.sh -check > /var/log/obm-cron.log
+*/10 2-4 2-31 * 1-5,7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/globalBackup.sh -d > /var/log/obm-cron.log
+*/10 2-4 2-31 * 6     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/globalBackup.sh -w > /var/log/obm-cron.log
+*/10 2-4 1 * 1-5,7     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/globalBackup.sh -m > /var/log/obm-cron.log
+*/10 2-4 1 * 6     [ -f /var/lib/obm/backup/successDailyBackup.txt ] && sh /usr/share/obm/cron/globalBackup.sh -mw > /var/log/obm-cron.log
+* 7 * * * sh /usr/share/obm/cron/globalBackup.sh -check > /var/log/obm-cron.log
