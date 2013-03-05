@@ -43,11 +43,13 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -63,6 +65,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
@@ -76,10 +79,13 @@ import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
+import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
+import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
@@ -116,6 +122,8 @@ public class MailBackendImapTimeoutTest {
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
 	private UnsynchronizedItemDao unsynchronizedItemDao;
+	private HearbeatDao hearbeatDao;
+	private MonitoredCollectionDao monitoredCollectionDao;
 	private DateService dateService;
 
 	private GreenMailUser greenMailUser;
@@ -146,6 +154,8 @@ public class MailBackendImapTimeoutTest {
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
 		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
+		hearbeatDao = classToInstanceMap.get(HearbeatDao.class);
+		monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
@@ -357,6 +367,42 @@ public class MailBackendImapTimeoutTest {
 		
 		mocksControl.verify();
 		assertThat(moveItemsResponse.getStatus()).isEqualTo(MoveItemsStatus.SERVER_ERROR);
+	}
+	
+	@Ignore("Waiting for push mode in order to be checked")
+	@Test
+	public void testPingHandler() throws Exception {
+		long hearbeat = 5;
+		SyncKey syncKey = new SyncKey("123");
+		int stateId = 3;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState syncState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(syncKey)
+				.id(stateId)
+				.build();
+		
+		hearbeatDao.updateLastHearbeat(user.device, hearbeat);
+		expectLastCall();
+		
+		monitoredCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Set.class));
+		expectLastCall();
+		
+		expect(collectionDao.lastKnownState(user.device, inboxCollectionId))
+			.andReturn(syncState);
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		PingResponse pingResponse = opClient.ping(inboxCollectionIdAsString, hearbeat);
+		
+		mocksControl.verify();
+		assertThat(pingResponse.getPingStatus()).isEqualTo(PingStatus.SERVER_ERROR);
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,

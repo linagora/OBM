@@ -11,7 +11,7 @@
  * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
  * the “Message sent thanks to OBM, Free Communication by Linagora” 
  * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * (notably e-mail and Ping requests), (ii) retain all hypertext links between 
  * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
  * from infringing Linagora intellectual property rights over its trademarks 
  * and commercial brands. Other Additional Terms apply, 
@@ -29,10 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.beans;
+package org.obm.sync.push.client.commands;
 
-public enum NS {
+import java.io.IOException;
 
-	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations, Move, MeetingResponse, Ping;
+import org.obm.push.protocol.PingProtocol;
+import org.obm.push.protocol.bean.PingResponse;
+import org.obm.push.protocol.data.PingRequestFields;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.NS;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+public class PingCommand extends AbstractCommand<PingResponse> {
 	
+	public PingCommand(final String collectionId, final long hearbeat) throws SAXException, IOException {
+		super(NS.Ping, "Ping", new TemplateDocument("PingRequest.xml") {
+
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.COLLECTION_ID.getName());
+				collection.setTextContent(collectionId);
+				Element hearbeatElement = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.HEARTBEAT_INTERVAL.getName());
+				hearbeatElement.setTextContent(String.valueOf(hearbeat));
+			}});
+	}
+
+	@Override
+	protected PingResponse parseResponse(Document document) {
+		return new PingProtocol().decodeResponse(document);
+	}
+
 }

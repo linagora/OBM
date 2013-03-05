@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Ping xmlns="Ping:" xmlns:AirSync="AirSync:" xmlns:AirSyncBase="AirSyncBase:">
+<HeartbeatInterval>470</HeartbeatInterval>
+<Folders>
+<Folder>
+<Id>colId</Id>
+<Class>Email</Class>
+</Folder>
+</Folders>
+</Ping>

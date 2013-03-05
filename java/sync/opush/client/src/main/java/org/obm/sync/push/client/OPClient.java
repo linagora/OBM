@@ -49,6 +49,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
+import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.beans.AccountInfos;
@@ -68,6 +69,7 @@ import org.obm.sync.push.client.commands.MoveItemsCommand;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 import org.obm.sync.push.client.commands.Options;
 import org.obm.sync.push.client.commands.PartialSyncCommand;
+import org.obm.sync.push.client.commands.PingCommand;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.SimpleSyncCommand;
@@ -197,6 +199,10 @@ public abstract class OPClient {
 	public MeetingHandlerResponse meetingResponse(String collectionId, String serverId) throws Exception {
 		return run(new MeetingResponseCommand(collectionId, serverId));
 	}
+
+	public PingResponse ping(String inboxCollectionIdAsString, long hearbeat) throws Exception {
+		return run(new PingCommand(inboxCollectionIdAsString, hearbeat));
+	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException {
@@ -243,5 +249,4 @@ public abstract class OPClient {
 	public void setProtocolVersion(ProtocolVersion protocolVersion) {
 		this.protocolVersion = protocolVersion;
 	}
-
 }

@@ -57,6 +57,7 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingRequest;
@@ -126,6 +127,9 @@ public class PingHandler extends WbxmlRequestHandler implements IContinuationHan
 			logger.error(e.getMessage(), e);
 			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
 		} catch (CollectionPathException e) {
+			logger.error(e.getMessage(), e);
+			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
+		} catch (ImapTimeoutException e) {
 			logger.error(e.getMessage(), e);
 			sendError(udr.getDevice(), responder, PingStatus.SERVER_ERROR);
 		}

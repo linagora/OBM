@@ -29,10 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.beans;
+package org.obm.push.protocol.data;
 
-public enum NS {
+public enum PingRequestFields implements ActiveSyncFields {
 
-	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations, Move, MeetingResponse, Ping;
+	COLLECTION_ID("Id"),
+	HEARTBEAT_INTERVAL("HeartbeatInterval");
+	
+	private final String name;
+
+	private PingRequestFields(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
 	
 }
