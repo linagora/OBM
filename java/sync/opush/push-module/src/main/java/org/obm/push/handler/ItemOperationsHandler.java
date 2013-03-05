@@ -63,6 +63,7 @@ import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
@@ -130,7 +131,9 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		} catch (ProtocolException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
-		} 
+		} catch (ImapTimeoutException e) {
+			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
+		}
 	}
 	
 	private void sendErrorResponse(Responder responder, ItemOperationsProtocol protocol,

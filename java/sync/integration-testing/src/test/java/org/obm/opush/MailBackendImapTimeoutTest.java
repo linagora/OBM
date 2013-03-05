@@ -58,6 +58,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
@@ -81,6 +82,7 @@ import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.push.client.ItemOperationResponse;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
@@ -293,6 +295,23 @@ public class MailBackendImapTimeoutTest {
 		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.NEED_SYNC);
 	}
 	
+	@Test
+	public void testItemOperationsHandler() throws Exception {
+		String emailId1 = ":1";
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		ItemOperationResponse itemOperationResponse = opClient.itemOperationFetch(inboxCollectionId, inboxCollectionId + emailId1);
+		
+		mocksControl.verify();
+		assertThat(itemOperationResponse.getStatus()).isEqualTo(ItemOperationsStatus.SERVER_ERROR);
+	}
+
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,
 			ItemSyncState allocatedState)
 					throws DaoException {

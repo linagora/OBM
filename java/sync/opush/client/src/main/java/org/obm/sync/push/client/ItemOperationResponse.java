@@ -31,30 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
+import org.obm.push.bean.ItemOperationsStatus;
+
 import com.google.common.base.Objects;
 
 public final class ItemOperationResponse {
 
 	private final Iterable<ItemOperationFetchResponse> fetchResponses;
+	private final ItemOperationsStatus status;
 
-	public ItemOperationResponse(Iterable<ItemOperationFetchResponse> fetchResponses) {
+	public ItemOperationResponse(Iterable<ItemOperationFetchResponse> fetchResponses, ItemOperationsStatus status) {
 		this.fetchResponses = fetchResponses;
+		this.status = status;
 	}
 
 	public Iterable<ItemOperationFetchResponse> getFetchResponses() {
 		return fetchResponses;
 	}
 
+	public ItemOperationsStatus getStatus() {
+		return status;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(fetchResponses);
+		return Objects.hashCode(fetchResponses, status);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof ItemOperationResponse) {
 			ItemOperationResponse that = (ItemOperationResponse) object;
-			return Objects.equal(fetchResponses, that.fetchResponses);
+			return Objects.equal(fetchResponses, that.fetchResponses)
+				&& Objects.equal(status, that.status);
 		}
 		return false;
 	}
@@ -63,6 +72,7 @@ public final class ItemOperationResponse {
 	public String toString() {
 		return Objects.toStringHelper(this)
 				.add("fetchResponses", fetchResponses)
+				.add("status", status)
 				.toString();
 	}
 	

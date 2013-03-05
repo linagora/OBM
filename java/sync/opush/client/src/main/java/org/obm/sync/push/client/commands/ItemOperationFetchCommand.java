@@ -46,6 +46,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResponse> {
@@ -86,7 +87,8 @@ public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResp
 
 	@Override
 	protected ItemOperationResponse parseResponse(Document document) {
-		NodeList fetchs = document.getDocumentElement().getElementsByTagName("Fetch");
+		Element documentElement = document.getDocumentElement();
+		NodeList fetchs = documentElement.getElementsByTagName("Fetch");
 		
 		List<ItemOperationFetchResponse> fetchResponses = Lists.newArrayList();
 		for (int i = 0 ; i < fetchs.getLength(); i++) {
@@ -97,7 +99,12 @@ public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResp
 			fetchResponses.add(new ItemOperationFetchResponse(
 					ItemOperationsStatus.fromSpecificationValue(statusAsString), serverId, data));
 		}
-		return new ItemOperationResponse(fetchResponses);
+		
+		String status = DOMUtils.getElementText(documentElement, "Status");
+		if (Strings.isNullOrEmpty(status)) {
+			return new ItemOperationResponse(fetchResponses, null);
+		}
+		return new ItemOperationResponse(fetchResponses, ItemOperationsStatus.fromSpecificationValue(status));
 	}
 
 }
