@@ -150,6 +150,8 @@ public class MSEmail implements IApplicationData, Serializable {
 
 	}
 	
+	private static final long serialVersionUID = 3353216715438634538L;
+	
 	@Override
 	public PIMDataType getType() {
 		return PIMDataType.EMAIL;

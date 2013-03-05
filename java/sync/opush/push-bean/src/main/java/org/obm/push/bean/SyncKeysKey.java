@@ -62,7 +62,9 @@ public class SyncKeysKey implements Serializable{
 			Preconditions.checkArgument(deviceId != null, "deviceId can't be null or empty");
 			return new SyncKeysKey(deviceId, collectionId);
 		}
-	}	
+	}
+	
+	private static final long serialVersionUID = -3997393511866512465L;
 	
 	private final DeviceId deviceId;
 	private final int collectionId;

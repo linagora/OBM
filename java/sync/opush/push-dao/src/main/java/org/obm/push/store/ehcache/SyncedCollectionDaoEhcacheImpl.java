@@ -80,6 +80,8 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 	
 	private static class Key implements Serializable {
 
+		private static final long serialVersionUID = -198187016420181169L;
+		
 		private final Credentials credentials;
 		private final int collectionId;
 		private final Device device;

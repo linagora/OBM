@@ -62,6 +62,8 @@ public class ItemDeletion implements ASItem, Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 3648319968154246612L;
+	
 	private final String serverId;
 
 	private ItemDeletion(String serverId) {

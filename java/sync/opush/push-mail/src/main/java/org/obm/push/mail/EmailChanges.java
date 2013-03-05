@@ -125,6 +125,8 @@ public class EmailChanges implements Serializable {
 
 	}
 	
+	private static final long serialVersionUID = 7053066531067862573L;
+	
 	private final Set<Email> deletions;
 	private final Set<Email> changes;
 	private final Set<Email> additions;

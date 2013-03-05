@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum UnsynchronizedItemType {
 
 	ADD,

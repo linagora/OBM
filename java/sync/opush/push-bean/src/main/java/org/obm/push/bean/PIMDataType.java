@@ -38,6 +38,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum PIMDataType implements DBEnum {
 
 	UNKNOWN("Unknown", "unknown"),

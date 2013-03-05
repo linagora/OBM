@@ -145,6 +145,8 @@ public class MessageSet implements Serializable, Iterable<Long> {
 			return new MessageSet(ranges);
 		}
 	}
+	
+	private static final long serialVersionUID = 522054719175842128L;
 
 	private final Set<Range<Long>> ranges;
 	

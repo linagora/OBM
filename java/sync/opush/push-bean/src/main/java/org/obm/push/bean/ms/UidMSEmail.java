@@ -73,6 +73,8 @@ public class UidMSEmail extends MSEmail implements Serializable, Indexed<Long> {
 
 	}
 	
+	private static final long serialVersionUID = 2772321034677507149L;
+	
 	@Override
 	public PIMDataType getType() {
 		return PIMDataType.EMAIL;

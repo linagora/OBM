@@ -40,6 +40,8 @@ import com.google.common.base.Objects;
 
 public class ItemChange implements ASItem, Serializable {
 	
+	private static final long serialVersionUID = 4575240618131116466L;
+	
 	private IApplicationData data;
 	private String serverId;
 	private boolean isNew;

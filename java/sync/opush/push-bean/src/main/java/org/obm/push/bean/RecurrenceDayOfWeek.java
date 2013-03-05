@@ -34,6 +34,9 @@ package org.obm.push.bean;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum RecurrenceDayOfWeek {
 	SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, ;
 

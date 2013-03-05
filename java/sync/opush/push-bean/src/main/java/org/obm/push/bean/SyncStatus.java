@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 /**
- * Possible values for the status element in Sync reponses
+ * This enum is serialized, take care of changes done there for older version compatibility
  */
 public enum SyncStatus {
 

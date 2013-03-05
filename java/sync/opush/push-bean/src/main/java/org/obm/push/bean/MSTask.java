@@ -38,6 +38,8 @@ import com.google.common.base.Objects;
 
 public class MSTask implements IApplicationData, Serializable {
 
+	private static final long serialVersionUID = -1618038440836867687L;
+	
 	@Override
 	public PIMDataType getType() {
 		return PIMDataType.TASKS;

@@ -72,7 +72,9 @@ public class SnapshotKey implements Serializable{
 			Preconditions.checkArgument(collectionId != null, "collectionId can't be null or empty");
 			return new SnapshotKey(syncKey, deviceId, collectionId);
 		}
-	}	
+	}
+	
+	private static final long serialVersionUID = 1978530090812057347L;
 	
 	private final SyncKey syncKey;
 	private final DeviceId deviceId;

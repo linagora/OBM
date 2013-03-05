@@ -36,6 +36,9 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum AttendeeStatus {
 	RESPONSE_UNKNOWN("0"),
 	TENTATIVE("2"),

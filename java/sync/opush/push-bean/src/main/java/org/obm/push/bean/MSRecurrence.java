@@ -40,6 +40,8 @@ import com.google.common.base.Objects;
 
 public class MSRecurrence implements Serializable {
 	
+	private static final long serialVersionUID = 8025103607638284568L;
+	
 	private Date until;
 	private RecurrenceType type;
 	private Integer weekOfMonth;

@@ -78,6 +78,8 @@ public class ItemSyncState implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 133407493947001047L;
+	
 	private final Date syncDate;
 	private final boolean syncFiltred;
 	private final SyncKey syncKey;

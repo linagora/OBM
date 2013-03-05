@@ -41,6 +41,8 @@ import com.google.common.collect.Lists;
 
 public class SyncCollectionOptions implements Serializable {
 	
+	private static final long serialVersionUID = 7306997586579565585L;
+	
 	public static final Integer SYNC_TRUNCATION_ALL = 9;
 	
 	private Integer truncation;

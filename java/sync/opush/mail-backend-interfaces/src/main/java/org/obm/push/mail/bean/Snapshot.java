@@ -120,6 +120,8 @@ public class Snapshot implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = -8674207692296869251L;
+	
 	private final DeviceId deviceId;
 	private final FilterType filterType;
 	private final SyncKey syncKey;

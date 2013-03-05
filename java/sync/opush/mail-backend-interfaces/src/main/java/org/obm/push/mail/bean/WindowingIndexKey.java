@@ -41,6 +41,8 @@ import com.google.common.base.Preconditions;
 
 public class WindowingIndexKey implements Serializable {
 	
+	private static final long serialVersionUID = 8820449234854614206L;
+	
 	private final User user;
 	private final DeviceId deviceId;
 	private final int collectionId;

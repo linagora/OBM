@@ -40,6 +40,8 @@ import com.google.common.base.Objects;
 
 public class MSEmailMetadata implements IApplicationData, Serializable {
 
+	private static final long serialVersionUID = -6299417181642731913L;
+	
 	@Override
 	public PIMDataType getType() {
 		return PIMDataType.EMAIL;

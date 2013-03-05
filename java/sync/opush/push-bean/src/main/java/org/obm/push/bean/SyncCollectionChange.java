@@ -40,6 +40,8 @@ import com.google.common.base.Objects;
 
 public class SyncCollectionChange implements Serializable {
 
+	private static final long serialVersionUID = -3115614124120167390L;
+	
 	private String serverId;
 	private String clientId;
 	private SyncCommand command;

@@ -35,7 +35,9 @@ import org.obm.push.exception.ConversionException;
 
 import com.google.common.base.Objects;
 
-
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum RecurrenceType {
 	DAILY(999), // 0
 	WEEKLY(99), // 1

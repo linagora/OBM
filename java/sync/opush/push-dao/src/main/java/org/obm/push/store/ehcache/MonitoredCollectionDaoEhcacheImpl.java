@@ -92,6 +92,8 @@ public class MonitoredCollectionDaoEhcacheImpl extends AbstractEhcacheDao implem
 
 	public static class Key implements Serializable {
 
+		private static final long serialVersionUID = 6720797597166718298L;
+		
 		private final Credentials credentials;
 		private final Device device;
 

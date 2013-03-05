@@ -37,7 +37,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
-
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum MSEmailBodyType {
 	
 	PlainText(1, "text/plain"), HTML(2, "text/html"), RTF(3, "text/rtf"), MIME(4, "message/rfc822");

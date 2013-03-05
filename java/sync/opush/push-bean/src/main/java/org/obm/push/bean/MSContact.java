@@ -42,6 +42,8 @@ import com.google.common.base.Objects;
 
 public class MSContact implements IApplicationData, Serializable {
 	
+	private static final long serialVersionUID = -4482842460309227921L;
+	
 	private String assistantName;
 	private String assistantPhoneNumber;
 	private String assistnamePhoneNumber;

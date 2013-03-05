@@ -37,6 +37,8 @@ import com.google.common.base.Objects;
 
 public class SyncKey implements Serializable {
 	
+	private static final long serialVersionUID = -6862413450080182711L;
+	
 	public static final SyncKey INITIAL_FOLDER_SYNC_KEY = new SyncKey("0"); 
 	
 	private final String syncKey;

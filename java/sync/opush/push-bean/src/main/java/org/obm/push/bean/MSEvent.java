@@ -43,6 +43,8 @@ import com.google.common.base.Objects;
 
 public class MSEvent implements IApplicationData, MSEventCommon, Serializable {
 	
+	private static final long serialVersionUID = 1025020118283566465L;
+	
 	private String location;
 	private String subject;
 	private String description;

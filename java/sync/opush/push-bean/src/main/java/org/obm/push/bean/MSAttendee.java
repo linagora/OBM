@@ -75,6 +75,8 @@ public class MSAttendee implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 6378209444148071792L;
+	
 	private String email;
 	private String name;
 	private AttendeeStatus attendeeStatus;

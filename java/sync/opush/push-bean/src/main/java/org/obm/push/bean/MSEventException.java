@@ -38,6 +38,8 @@ import com.google.common.base.Objects;
 
 public class MSEventException implements MSEventCommon, Serializable {
 
+	private static final long serialVersionUID = 7845798798936574053L;
+	
 	protected String location;
 	protected String subject;
 	protected String description;

@@ -67,6 +67,8 @@ public class User implements Serializable {
 		
 	}
 	
+	private static final long serialVersionUID = -3352107588631943099L;
+	
 	private final String login;
 	private final String domain;
 	

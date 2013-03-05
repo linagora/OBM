@@ -36,6 +36,9 @@ import java.io.Serializable;
 import com.google.common.base.Objects;
 
 public class DeviceId implements Serializable {
+	
+	private static final long serialVersionUID = -4097463369254130710L;
+	
 	private final String deviceId;
 
 	public DeviceId(String deviceId) {

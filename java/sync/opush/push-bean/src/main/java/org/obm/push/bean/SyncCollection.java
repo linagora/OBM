@@ -42,6 +42,8 @@ import com.google.common.collect.Lists;
 
 public class SyncCollection implements Serializable {
 	
+	private static final long serialVersionUID = -6717593719409450005L;
+	
 	private ItemSyncState itemSyncState;
 	private List<String> fetchIds;
 	private Integer collectionId;

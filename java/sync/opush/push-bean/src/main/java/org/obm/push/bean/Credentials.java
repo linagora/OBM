@@ -37,6 +37,8 @@ import com.google.common.base.Objects;
 
 public class Credentials implements Serializable {
 
+	private static final long serialVersionUID = -5303791394042961175L;
+	
 	private final User user;
 	private final String password;
 

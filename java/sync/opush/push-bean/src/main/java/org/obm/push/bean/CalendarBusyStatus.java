@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum CalendarBusyStatus {
 	FREE("0"), TENTATIVE("1"), BUSY("2"), UNAVAILABLE("3");
 	

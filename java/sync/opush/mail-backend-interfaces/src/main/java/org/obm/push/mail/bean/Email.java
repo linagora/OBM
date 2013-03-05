@@ -85,6 +85,9 @@ public class Email implements Indexed<Long>, Serializable {
 		}
 
 	}
+	
+	private static final long serialVersionUID = 9022743605981571920L;
+	
 	private final long uid;
 	private final boolean read;
 	private final boolean deleted;

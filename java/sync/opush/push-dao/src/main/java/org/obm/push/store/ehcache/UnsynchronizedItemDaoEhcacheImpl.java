@@ -130,6 +130,8 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 
 	@VisibleForTesting static class Key implements Serializable {
 
+		private static final long serialVersionUID = 3512553571924589754L;
+		
 		private final Credentials credentials;
 		private final int collectionId;
 		private final UnsynchronizedItemType unsynchronizedItemType;

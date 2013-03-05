@@ -74,6 +74,8 @@ public final class BodyPreference implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 6190091634662451745L;
+	
 	private final Integer truncationSize;
 	private final MSEmailBodyType type;
 	private final boolean allOrNone;
