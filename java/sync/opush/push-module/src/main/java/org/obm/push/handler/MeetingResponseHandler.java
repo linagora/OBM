@@ -53,6 +53,7 @@ import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
+import org.obm.push.mail.ImapTimeoutException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
@@ -151,47 +152,52 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	private ItemChangeMeetingResponse handleSingleResponse(UserDataRequest udr, MeetingResponse item) 
 			throws CollectionNotFoundException, ProcessingEmailException, ConversionException {
-		
-		MSEmail email = retrieveMailWithMeetingRequest(udr, item);
 	
-		MeetingResponseStatus status = null;
-		String calId = null;
-		if (email != null) {
-			try {
-				String serverId = handle(udr, email, item.getUserResponse());
-				status = MeetingResponseStatus.SUCCESS;
-				
-				if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
-					calId = serverId;
-				}
-				
-				deleteInvitationEmail(udr, item);
-				
-			} catch (ItemNotFoundException e) {
-				logger.error(e.getMessage(), e);
-				status = MeetingResponseStatus.SERVER_ERROR;
-			} catch (UnexpectedObmSyncServerException e) {
-				logger.error(e.getMessage(), e);
-				status = MeetingResponseStatus.SERVER_ERROR;
-			} catch (DaoException e) {
-				logger.error(e.getMessage(), e);
-				status = MeetingResponseStatus.SERVER_ERROR;
-			} catch (CollectionNotFoundException e) {
-				logger.error(e.getMessage(), e);
-				status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
-			} catch (HierarchyChangedException e) {
-				logger.error(e.getMessage(), e);
-				status = MeetingResponseStatus.SERVER_ERROR;
-			}		
-		} else {
-			status = MeetingResponseStatus.INVALID_MEETING_RREQUEST;
+		ItemChangeMeetingResponse.Builder builder = ItemChangeMeetingResponse.builder()
+				.reqId(item.getReqId());
+		try {
+			MSEmail email = retrieveMailWithMeetingRequest(udr, item);
+		
+			if (email != null) {
+				handleEmail(udr, item, email, builder);
+			} else {
+				builder.status(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
+			}
+		} catch (ImapTimeoutException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
 		}
 		
-		return ItemChangeMeetingResponse.builder()
-				.calId(calId)
-				.status(status)
-				.reqId(item.getReqId())
-				.build();
+		return builder.build();
+	}
+
+	private void handleEmail(UserDataRequest udr, MeetingResponse item, MSEmail email, ItemChangeMeetingResponse.Builder builder) {
+		try {
+			String serverId = handle(udr, email, item.getUserResponse());
+			builder.status(MeetingResponseStatus.SUCCESS);
+			
+			if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
+				builder.calId(serverId);
+			}
+			
+			deleteInvitationEmail(udr, item);
+			
+		} catch (ItemNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
+		} catch (UnexpectedObmSyncServerException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
+		} catch (DaoException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
+		} catch (CollectionNotFoundException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
+		} catch (HierarchyChangedException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
+		}
 	}
 
 	private String handle(UserDataRequest udr, MSEmail email, AttendeeStatus userResponse) 

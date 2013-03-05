@@ -48,6 +48,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.protocol.bean.FolderSyncResponse;
+import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.beans.AccountInfos;
@@ -58,11 +59,11 @@ import org.obm.sync.push.client.commands.DocumentProvider;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
 import org.obm.sync.push.client.commands.EmailSyncCommandWithWait;
-import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.obm.sync.push.client.commands.EmailSyncNoOptionsCommand;
 import org.obm.sync.push.client.commands.FolderSync;
 import org.obm.sync.push.client.commands.GetItemEstimateEmailFolderCommand;
 import org.obm.sync.push.client.commands.ItemOperationFetchCommand;
+import org.obm.sync.push.client.commands.MeetingResponseCommand;
 import org.obm.sync.push.client.commands.MoveItemsCommand;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 import org.obm.sync.push.client.commands.Options;
@@ -71,6 +72,7 @@ import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.SimpleSyncCommand;
 import org.obm.sync.push.client.commands.Sync;
+import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -190,6 +192,10 @@ public abstract class OPClient {
 
 	public MoveItemsResponse moveItems(Move...moves) throws Exception {
 		return run(new MoveItemsCommand(moves));
+	}
+	
+	public MeetingHandlerResponse meetingResponse(String collectionId, String serverId) throws Exception {
+		return run(new MeetingResponseCommand(collectionId, serverId));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)

@@ -29,10 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.beans;
+package org.obm.push.protocol.data;
 
-public enum NS {
+public enum MeetingRequestFields implements ActiveSyncFields {
 
-	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations, Move, MeetingResponse;
+	COLLECTION_ID("CollectionId"),
+	REQUEST_ID("ReqId");
+	
+	private final String name;
+
+	private MeetingRequestFields(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
 	
 }

@@ -60,6 +60,7 @@ import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncKey;
@@ -73,6 +74,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.bean.FolderSyncResponse;
+import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
@@ -310,6 +312,23 @@ public class MailBackendImapTimeoutTest {
 		
 		mocksControl.verify();
 		assertThat(itemOperationResponse.getStatus()).isEqualTo(ItemOperationsStatus.SERVER_ERROR);
+	}
+	
+	@Test
+	public void testMeetingResponseHandler() throws Exception {
+		String emailId1 = ":1";
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		greenMail.lockGreenmailAndReleaseAfter(20);
+		MeetingHandlerResponse meetingHandlerResponse = opClient.meetingResponse(inboxCollectionIdAsString, inboxCollectionId + emailId1);
+		
+		mocksControl.verify();
+		assertThat(meetingHandlerResponse.getItemChanges().iterator().next().getStatus()).isEqualTo(MeetingResponseStatus.SERVER_ERROR);
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey,

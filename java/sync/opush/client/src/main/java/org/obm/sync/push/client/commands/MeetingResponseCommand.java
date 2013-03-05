@@ -29,10 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.beans;
+package org.obm.sync.push.client.commands;
 
-public enum NS {
+import java.io.IOException;
 
-	FolderHierarchy, AirSync, GetItemEstimate, Provision, Autodiscover, ItemOperations, Move, MeetingResponse;
+import org.obm.push.protocol.MeetingProtocol;
+import org.obm.push.protocol.bean.MeetingHandlerResponse;
+import org.obm.push.protocol.data.MeetingRequestFields;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.beans.AccountInfos;
+import org.obm.sync.push.client.beans.NS;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+public class MeetingResponseCommand extends AbstractCommand<MeetingHandlerResponse> {
 	
+	public MeetingResponseCommand(final String collectionId, final String requestId) throws SAXException, IOException {
+		super(NS.MeetingResponse, "MeetingResponse", new TemplateDocument("MeetingResponseRequest.xml") {
+
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), MeetingRequestFields.COLLECTION_ID.getName());
+				collection.setTextContent(collectionId);
+				Element request = DOMUtils.getUniqueElement(document.getDocumentElement(), MeetingRequestFields.REQUEST_ID.getName());
+				request.setTextContent(requestId);
+			}});
+	}
+
+	@Override
+	protected MeetingHandlerResponse parseResponse(Document document) {
+		return new MeetingProtocol().decodeResponse(document);
+	}
+
 }

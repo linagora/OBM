@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MeetingResponse xmlns="MeetingResponse:" xmlns:AirSync="AirSync:" xmlns:AirSyncBase="AirSyncBase:">
+<Request>
+<UserResponse>1</UserResponse>
+<CollectionId>colId</CollectionId>
+<ReqId>reqId</ReqId>
+</Request>
+</MeetingResponse>
