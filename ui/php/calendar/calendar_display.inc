@@ -5931,9 +5931,9 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
 
     $resource_complete = "
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_resource_id', 'resource', {filter_entity:'Resource'});";
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_resource_id', 'resource', {filter_entity:'Resource', filter_pattern:'access'});";
 
-    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource";
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource&filter_pattern=access";
     $resource_add_button = "
       <a href=\"javascript: return false;\"
       onclick=\"popup('$url_resource','');
