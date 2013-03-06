@@ -52,7 +52,6 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
@@ -72,7 +71,6 @@ public abstract class MailboxMoveAPITest {
 	@Inject MailboxService mailboxService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
-	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject GreenMail greenMail;
 	private ServerSetup smtpServerSetup;
 	private String mailbox;

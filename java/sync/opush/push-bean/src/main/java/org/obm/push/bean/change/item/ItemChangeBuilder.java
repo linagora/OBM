@@ -40,7 +40,6 @@ public class ItemChangeBuilder implements Builder<ItemChange> {
 	
 	private ItemChange itemChange;
 	private boolean newIsDefined;
-	private boolean deletedIsDefined;
 	
 	public ItemChangeBuilder() {
 		itemChange = new ItemChange();
@@ -56,13 +55,6 @@ public class ItemChangeBuilder implements Builder<ItemChange> {
 		Preconditions.checkState(!newIsDefined, "new flag already defined");
 		itemChange.setNew(isNew);
 		this.newIsDefined = true;
-		return this;
-	}
-	
-	public ItemChangeBuilder withDeletedFlag(boolean isDeleted) {
-		Preconditions.checkState(!deletedIsDefined, "deleted flag already defined");
-		itemChange.setDeleted(isDeleted);
-		this.deletedIsDefined = true;
 		return this;
 	}
 	

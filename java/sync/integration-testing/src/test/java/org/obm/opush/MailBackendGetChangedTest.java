@@ -71,6 +71,8 @@ import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
+import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.GuiceModule;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -90,6 +92,8 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+import  org.obm.push.bean.Resource;
+
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetChangedTest {
@@ -102,6 +106,7 @@ public class MailBackendGetChangedTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject MailboxService mailboxService;
 	
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
@@ -398,6 +403,131 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
 
+	@Test
+	public void testInitialGetChangedNoSnapshotWithMarkAsDeleteMails() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		int allocatedStateId = 3;
+		int allocatedStateId2 = 4;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(allocatedStateId)
+				.build();
+		ItemSyncState currentAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(allocatedStateId2)
+				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
+
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		mailboxService.setDeletedFlag(user.userDataRequest, inboxCollectionPath, MessageSet.singleton(1l));
+		for (Resource resource : user.userDataRequest.getResources().values()) {
+			resource.close();
+		}
+		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		SyncResponse syncResponse = opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		mocksControl.verify();
+
+		SyncCollectionResponse secondInboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		assertThat(secondInboxResponse.getItemChangesDeletion()).isEmpty();
+		assertThat(secondInboxResponse.getItemChanges()).containsOnly(
+				new ItemChangeBuilder().serverId(inboxCollectionId + ":2").withNewFlag(true).build());
+		
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
+	}
+
+	@Test
+	public void testInitialGetChangedWithSnapshotWithMarkAsDeleteMails() throws Exception {
+		String emailUid = "1";
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("456");
+		SyncKey secondAllocatedSyncKey = new SyncKey("789");
+		SyncKey newAllocatedSyncKey = new SyncKey("1012");
+		int allocatedStateId = 3;
+		int allocatedStateId2 = 4;
+		int newAllocatedStateId = 5;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, secondAllocatedSyncKey, newAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(allocatedStateId)
+				.build();
+		ItemSyncState currentAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(allocatedStateId2)
+				.build();
+		ItemSyncState newAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T18:17:26"))
+				.syncKey(newAllocatedSyncKey)
+				.id(newAllocatedStateId)
+				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).times(2);
+		expect(dateService.getCurrentDate()).andReturn(currentAllocatedState.getSyncDate());
+		expect(dateService.getCurrentDate()).andReturn(newAllocatedState.getSyncDate());
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, inboxCollectionId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, currentAllocatedState, inboxCollectionId);
+		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
+
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		opClient.syncEmail(initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		opClient.syncEmail(firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		mailboxService.setDeletedFlag(user.userDataRequest, inboxCollectionPath, MessageSet.singleton(1l));
+		for (Resource resource : user.userDataRequest.getResources().values()) {
+			resource.close();
+		}
+		
+		SyncResponse syncResponse = opClient.syncEmail(secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
+		mocksControl.verify();
+
+		SyncCollectionResponse secondInboxResponse = getCollectionWithId(syncResponse, inboxCollectionIdAsString);
+		assertThat(secondInboxResponse.getItemChanges()).isEmpty();
+		assertThat(secondInboxResponse.getItemChangesDeletion()).containsOnly(
+				ItemDeletion.builder().serverId(inboxCollectionIdAsString + ":" + emailUid).build());
+		
+		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 2);
+		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
+		assertThat(imapConnectionCounter.loginCounter.get()).isEqualTo(3);
+		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(3);
+		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(3);
+		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
+	}
 
 	@Test
 	public void testGetChangedWithFilterTypeChange() throws Exception {
@@ -748,6 +878,8 @@ public class MailBackendGetChangedTest {
 		expectCollectionDaoPerformSync(secondAllocatedSyncKey, currentAllocatedState, newAllocatedState, inboxCollectionId);
 
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		itemTrackingDao.markAsDeleted(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
 		mocksControl.replay();

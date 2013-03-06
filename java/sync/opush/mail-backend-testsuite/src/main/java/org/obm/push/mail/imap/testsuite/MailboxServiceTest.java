@@ -244,13 +244,9 @@ public abstract class MailboxServiceTest {
 		mailboxService.setDeletedFlag(udr, mailBoxPath, MessageSet.singleton(email.getUid()));
 		
 		Collection<Email> emailsAfterSetDeletedFlag = mailboxService.fetchEmails(udr, mailBoxPath, MessageSet.singleton(email.getUid()));
-		Email deletedEmail = Iterables.getOnlyElement(emailsAfterSetDeletedFlag);
 		
 		assertThat(emails).isNotNull().hasSize(1);
-		assertThat(emailsAfterSetDeletedFlag).isNotNull().hasSize(1);
-		
-		assertThat(email.isDeleted()).isFalse();
-		assertThat(deletedEmail.isDeleted()).isTrue();
+		assertThat(emailsAfterSetDeletedFlag).isNotNull().isEmpty();
 	}
 	
 	@Test

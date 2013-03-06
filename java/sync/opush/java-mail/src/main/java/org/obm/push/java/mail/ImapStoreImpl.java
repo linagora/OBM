@@ -53,7 +53,6 @@ import org.obm.push.mail.exception.ImapCommandException;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.exception.ImapLogoutException;
 import org.obm.push.mail.imap.ImapCapability;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.OpushImapFolder;
@@ -74,16 +73,18 @@ public class ImapStoreImpl implements ImapStore {
 	public static class Factory implements ImapStore.Factory {
 		
 		private final EmailConfiguration emailConfiguration;
+		private final ImapMailBoxUtils imapMailBoxUtils;
 
 		@Inject
-		private Factory(EmailConfiguration emailConfiguration) {
+		private Factory(EmailConfiguration emailConfiguration, ImapMailBoxUtils imapMailBoxUtils) {
 			this.emailConfiguration = emailConfiguration;
+			this.imapMailBoxUtils = imapMailBoxUtils;
 			
 		}
 
 		@Override
 		public ImapStore create(Session session, IMAPStore store, MessageInputStreamProvider messageInputStreamProvider,
-				ImapMailBoxUtils imapMailBoxUtils, String userId, String password, String host) {
+				String userId, String password, String host) {
 			return new ImapStoreImpl(session, store, messageInputStreamProvider, imapMailBoxUtils, userId, password, host, emailConfiguration.imapPort());
 		}
 		

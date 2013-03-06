@@ -79,7 +79,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 		
-		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null, null);
+		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
 		
 		mocksControl.verify();
@@ -98,7 +98,7 @@ public class ImapClientProviderImplTest {
 
 		udr.putResource(IMAP_STORE_RESOURCE, imapStore);
 		
-		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null, null);
+		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore nullImapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, null);
 		
 		mocksControl.verify();
@@ -119,7 +119,7 @@ public class ImapClientProviderImplTest {
 
 		udr.putResource(IMAP_STORE_RESOURCE, expectedImapStore);
 		
-		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null, null);
+		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
 		
 		mocksControl.verify();
@@ -144,7 +144,7 @@ public class ImapClientProviderImplTest {
 
 		udr.putResource(IMAP_STORE_RESOURCE, expectedImapStore);
 		
-		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null, null);
+		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
 		
 		mocksControl.verify();

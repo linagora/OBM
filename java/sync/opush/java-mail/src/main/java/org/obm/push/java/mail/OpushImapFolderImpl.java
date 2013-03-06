@@ -56,7 +56,6 @@ import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.mail.imap.StreamedLiteral;

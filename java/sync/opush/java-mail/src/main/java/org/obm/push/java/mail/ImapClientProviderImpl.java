@@ -46,7 +46,6 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.exception.NoImapClientAvailableException;
 import org.obm.push.mail.imap.IMAPException;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapStore.Factory;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
@@ -69,7 +68,6 @@ public class ImapClientProviderImpl {
 	
 	private final Factory imapStoreFactory;
 	private final LocatorService locatorService;
-	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final MessageInputStreamProvider messageInputStreamProvider;
 	private final boolean loginWithDomain;
 	@VisibleForTesting final Session defaultSession;
@@ -77,11 +75,10 @@ public class ImapClientProviderImpl {
 	@Inject
 	@VisibleForTesting ImapClientProviderImpl(ImapStore.Factory imapStoreFactory,
 			EmailConfiguration emailConfiguration, LocatorService locatorService, 
-			ImapMailBoxUtils imapMailBoxUtils, MessageInputStreamProvider messageInputStreamProvider) {
+			MessageInputStreamProvider messageInputStreamProvider) {
 		
 		this.imapStoreFactory = imapStoreFactory;
 		this.locatorService = locatorService;
-		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.messageInputStreamProvider = messageInputStreamProvider;
 		this.loginWithDomain = emailConfiguration.loginWithDomain();
 		
@@ -184,7 +181,7 @@ public class ImapClientProviderImpl {
 					new Object[]{login, loginWithDomain});
 
 			IMAPStore store = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
-			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, imapMailBoxUtils, login, udr.getPassword(), imapHost);
+			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, login, udr.getPassword(), imapHost);
 		} catch (NoSuchProviderException e) {
 			throw new NoImapClientAvailableException(
 					"No client available for protocol : " + EmailConfiguration.IMAP_PROTOCOL, e);

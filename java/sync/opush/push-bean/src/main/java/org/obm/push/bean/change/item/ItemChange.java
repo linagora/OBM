@@ -45,21 +45,19 @@ public class ItemChange implements ASItem, Serializable {
 	private IApplicationData data;
 	private String serverId;
 	private boolean isNew;
-	private boolean deleted;
 
 	public ItemChange() {
 		this(null);
 	}
 	
 	public ItemChange(String serverId) {
-		this(serverId, false, false);
+		this(serverId, false);
 	}
 
-	public ItemChange(String serverId, boolean isNew, boolean deleted) {
+	public ItemChange(String serverId, boolean isNew) {
 		super();
 		this.serverId = serverId;
 		this.isNew = isNew;
-		this.deleted = deleted;
 	}
 	
 	@Override
@@ -87,14 +85,6 @@ public class ItemChange implements ASItem, Serializable {
 		this.isNew = isNew;
 	}
 
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
-
 	public boolean isMSEmail() {
 		if (getData() instanceof MSEmail) {
 			return true;
@@ -104,7 +94,7 @@ public class ItemChange implements ASItem, Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(serverId, isNew, deleted, data);
+		return Objects.hashCode(serverId, isNew, data);
 	}
 	
 	@Override
@@ -113,7 +103,6 @@ public class ItemChange implements ASItem, Serializable {
 			ItemChange that = (ItemChange) object;
 			return Objects.equal(this.serverId, that.serverId)
 				&& Objects.equal(this.isNew, that.isNew)
-				&& Objects.equal(this.deleted, that.deleted)
 				&& Objects.equal(this.data, that.data);
 		}
 		return false;
@@ -124,7 +113,6 @@ public class ItemChange implements ASItem, Serializable {
 		return Objects.toStringHelper(this)
 			.add("serverId", serverId)
 			.add("isNew", isNew)
-			.add("deleted", deleted)
 			.toString();
 	}
 }

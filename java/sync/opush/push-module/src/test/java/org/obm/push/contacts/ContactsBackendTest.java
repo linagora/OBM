@@ -324,7 +324,7 @@ public class ContactsBackendTest {
 		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, targetcontactCollectionUid, ImmutableList.of(serverId), null, null, null);
 		mocks.verify();
 		
-		ItemChange itemChange = new ItemChange(serverId, false, false);
+		ItemChange itemChange = new ItemChange(serverId, false);
 		itemChange.setData(new ContactConverter().convert(contact));
 		
 		assertThat(itemChanges).hasSize(1);

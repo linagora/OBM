@@ -56,7 +56,7 @@ public interface ImapStore extends Resource {
 
 	interface Factory {
 		ImapStore create(Session session, IMAPStore store, 
-				MessageInputStreamProvider messageInputStreamProvider, ImapMailBoxUtils imapMailBoxUtils,
+				MessageInputStreamProvider messageInputStreamProvider,
 				String userId, String password, String host);
 	}
 	

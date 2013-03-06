@@ -309,77 +309,6 @@ public class MailBackendImplTest {
 		
 		control.verify();
 	}
-	
-	@Test
-	public void testNotInitialDeletedMails() throws Exception {
-		int windowSize = 10;
-		SyncKey syncKey = new SyncKey("1234");
-		SyncKey newSyncKey = new SyncKey("5678");
-		ImmutableList<BodyPreference> bodyPreferences = ImmutableList.<BodyPreference>of();
-		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions();
-		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
-		syncCollectionOptions.setBodyPreferences(bodyPreferences);
-
-		long snapedEmailUID = 5;
-		Email snapedEmail = Email.builder()
-				.uid(snapedEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.answered(false)
-				.build();
-		Email modifiedEmail = Email.builder()
-				.uid(snapedEmailUID)
-				.date(date("2004-12-14T22:00:00"))
-				.read(false)
-				.deleted(true)
-				.answered(false)
-				.build();
-		
-		long previousUIDNext = 8;
-		long currentUIDNext = 10;
-
-		Set<Email> fetchedEmails = ImmutableSet.of(modifiedEmail);
-		Set<Email> previousEmailsInServer = ImmutableSet.of(snapedEmail);
-		
-		Date fromDate = syncCollectionOptions.getFilterType().getFilteredDateTodayAtMidnight();
-
-		Snapshot existingSnapshot = Snapshot.builder()
-			.emails(previousEmailsInServer)
-			.collectionId(collectionId)
-			.deviceId(device.getDevId())
-			.filterType(syncCollectionOptions.getFilterType())
-			.uidNext(previousUIDNext)
-			.syncKey(syncKey)
-			.build();
-		expectSnapshotDaoRecordOneSnapshot(newSyncKey, currentUIDNext, syncCollectionOptions, fetchedEmails);
-		
-		EmailChanges emailChanges = EmailChanges.builder()
-				.deletions(ImmutableSet.<Email> of(modifiedEmail))
-				.build();
-		ItemSyncState syncState = ItemSyncState.builder()
-				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
-				.syncKey(syncKey)
-				.build();
-		
-		SyncCollection collection = new SyncCollection(collectionId, collectionPath);
-		collection.setItemSyncState(syncState);
-		collection.setOptions(syncCollectionOptions);
-		collection.setWindowSize(windowSize);
-		collection.setSyncKey(syncKey);
-
-		expect(windowingService.hasPendingElements(windowingKey, syncKey)).andReturn(false);
-		expect(windowingService.hasPendingElements(windowingKey, newSyncKey)).andReturn(false);
-		expectMailBackendSyncData(currentUIDNext, syncCollectionOptions, existingSnapshot, previousEmailsInServer, fetchedEmails, emailChanges, fromDate, syncState);
-
-		expectServerItemDeletions(bodyPreferences, emailChanges, modifiedEmail);
-		
-		control.replay();
-		DataDelta dataDelta = testee.getChanged(udr, collection, SyncClientCommands.empty(), newSyncKey);
-		
-		control.verify();
-		assertThat(dataDelta.getChanges()).isEmpty();
-		assertThat(dataDelta.getDeletions()).hasSize(1);
-	}
 
 	private void expectServerItemChanges(ImmutableList<BodyPreference> bodyPreferences, EmailChanges emailChanges, Email modifiedEmail, Email newEmail, Email deletedEmail)
 			throws EmailViewPartsFetcherException, DaoException {
@@ -402,16 +331,6 @@ public class MailBackendImplTest {
 			.build();
 		ImmutableList<ItemChange> itemChanges = ImmutableList.<ItemChange> of(changeItemChange, newItemChange);
 		return itemChanges;
-	}
-
-	private void expectServerItemDeletions(ImmutableList<BodyPreference> bodyPreferences, EmailChanges emailChanges, Email deletedEmail)
-			throws EmailViewPartsFetcherException, DaoException {
-		
-		ImmutableList<ItemDeletion> itemDeletions = itemDeletions(deletedEmail);
-		expect(serverEmailChangesBuilder.fetch(udr, collectionId, collectionPath, bodyPreferences, emailChanges))
-			.andReturn(MSEmailChanges.builder()
-					.deletions(itemDeletions)
-					.build()).once();
 	}
 
 	private ImmutableList<ItemDeletion> itemDeletions(Email deletedEmail) {

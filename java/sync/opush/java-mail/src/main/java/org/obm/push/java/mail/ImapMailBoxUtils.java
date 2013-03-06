@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -142,24 +142,30 @@ public class ImapMailBoxUtils {
 	public Collection<FastFetch> buildFastFetchFromIMAPMessage(Map<Long, IMAPMessage> imapMessages) throws MailException {
 		Collection<FastFetch> fastFetchCollection = new ArrayList<FastFetch>();
 		for (Entry<Long, IMAPMessage> entry: imapMessages.entrySet()) {
-			FastFetch fastFetch = buildFastFetch(entry.getKey(), entry.getValue());
-			fastFetchCollection.add(fastFetch);
+			addIfNotDeletedEmail(fastFetchCollection, entry);
 		}
 		return fastFetchCollection;
 	}
 
-	private FastFetch buildFastFetch(long uid, IMAPMessage imapMessage) throws MailException {
+	private void addIfNotDeletedEmail(Collection<FastFetch> fastFetchCollection, Entry<Long, IMAPMessage> entry) {
 		try {
-			Set<Flag> buildFlagToIMAPMessageFlags = buildFlagToIMAPMessageFlags(imapMessage.getFlags());
-			Date receivedDate = imapMessage.getReceivedDate();
-			int size = imapMessage.getSize();
-			
-			FastFetch.Builder builder = FastFetch.builder();
-			builder.uid(uid).internalDate(receivedDate).flags(buildFlagToIMAPMessageFlags).size(size);
-			return builder.build();
+			if (!entry.getValue().getFlags().contains(Flags.Flag.DELETED)) {
+				FastFetch fastFetch = buildFastFetch(entry.getKey(), entry.getValue());
+				fastFetchCollection.add(fastFetch);
+			}
 		} catch (MessagingException ex) {
 			throw new MailException(ex);
 		}
+	}
+
+	private FastFetch buildFastFetch(long uid, IMAPMessage imapMessage) throws MessagingException {
+		Set<Flag> buildFlagToIMAPMessageFlags = buildFlagToIMAPMessageFlags(imapMessage.getFlags());
+		Date receivedDate = imapMessage.getReceivedDate();
+		int size = imapMessage.getSize();
+		
+		FastFetch.Builder builder = FastFetch.builder();
+		builder.uid(uid).internalDate(receivedDate).flags(buildFlagToIMAPMessageFlags).size(size);
+		return builder.build();
 	}
 
 	public Set<Flag> buildFlagToIMAPMessageFlags(Flags imapMessageFlags) {

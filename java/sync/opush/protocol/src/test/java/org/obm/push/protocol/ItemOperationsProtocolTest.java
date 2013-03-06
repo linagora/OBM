@@ -180,7 +180,7 @@ public class ItemOperationsProtocolTest {
 
 	@Test
 	public void testMailboxEncodingResponse() throws Exception {
-		ItemChange itemChange = new ItemChange("2", true, false);
+		ItemChange itemChange = new ItemChange("2", true);
 		itemChange.setData(msEmail("my message"));
 
 		String fetchItemResultServerId = "1:2";
@@ -222,7 +222,7 @@ public class ItemOperationsProtocolTest {
 
 	@Test
 	public void testMailboxServerErrorEncodingResponse() throws Exception {
-		ItemChange itemChange = new ItemChange("2", true, false);
+		ItemChange itemChange = new ItemChange("2", true);
 		itemChange.setData(msEmail("my message"));
 
 		String fetchItemResultServerId = "1:2";

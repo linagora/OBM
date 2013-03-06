@@ -47,7 +47,6 @@ public class Email implements Indexed<Long>, Serializable {
 	public static class Builder {
 		private long uid;
 		private boolean read;
-		private boolean deleted;
 		private Date date;
 		private boolean answered;
 		
@@ -65,11 +64,6 @@ public class Email implements Indexed<Long>, Serializable {
 			return this;
 		}
 		
-		public Builder deleted(boolean deleted) {
-			this.deleted = deleted;
-			return this;
-		}
-		
 		public Builder date(Date date) {
 			this.date = date;
 			return this;
@@ -81,7 +75,7 @@ public class Email implements Indexed<Long>, Serializable {
 		}
 		
 		public Email build() {
-			return new Email(uid, read, deleted, date, answered);
+			return new Email(uid, read, date, answered);
 		}
 
 	}
@@ -90,14 +84,12 @@ public class Email implements Indexed<Long>, Serializable {
 	
 	private final long uid;
 	private final boolean read;
-	private final boolean deleted;
 	private final Date date;
 	private boolean answered;
 	
-	private Email(long uid, boolean read, boolean deleted, Date date, boolean answered) {
+	private Email(long uid, boolean read, Date date, boolean answered) {
 		this.uid = uid;
 		this.read = read;
-		this.deleted = deleted;
 		this.date = date;
 		this.answered = answered;
 	}
@@ -115,10 +107,6 @@ public class Email implements Indexed<Long>, Serializable {
 		return read;
 	}
 	
-	public boolean isDeleted() {
-		return deleted;
-	}
-	
 	public Date getDate() {
 		return date;
 	}
@@ -133,7 +121,7 @@ public class Email implements Indexed<Long>, Serializable {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(uid, read, deleted, date, answered);
+		return Objects.hashCode(uid, read, date, answered);
 	}
 	
 	@Override
@@ -142,7 +130,6 @@ public class Email implements Indexed<Long>, Serializable {
 			Email that = (Email) object;
 			return Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.read, that.read)
-				&& Objects.equal(this.deleted, that.deleted)
 				&& Objects.equal(this.date, that.date)
 				&& Objects.equal(this.answered, that.answered);
 		}
@@ -154,7 +141,6 @@ public class Email implements Indexed<Long>, Serializable {
 		return Objects.toStringHelper(this)
 			.add("uid", uid)
 			.add("read", read)
-			.add("deleted", deleted)
 			.add("date", date)
 			.add("answered", answered)
 			.toString();

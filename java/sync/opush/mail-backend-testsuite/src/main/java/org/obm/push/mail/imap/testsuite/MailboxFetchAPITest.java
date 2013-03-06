@@ -66,7 +66,6 @@ import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.push.mail.mime.BodyParam;
@@ -88,7 +87,6 @@ public abstract class MailboxFetchAPITest {
 	
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
-	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject CollectionPathHelper collectionPathHelper;
 	
 	private ServerSetup smtpServerSetup;
@@ -198,6 +196,18 @@ public abstract class MailboxFetchAPITest {
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
 		assertThat(result).containsOnly(FastFetch.builder().internalDate(truncatedInternalDate).uid(1).answered().
 				size(messageContent.length()).build());
+	}
+
+	@Test
+	public void testFetchFastDeletedMessage() throws MailException, AddressException, MessagingException, UserException, ImapMessageNotFoundException {
+		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		Date internalDate = new Date(1234);
+		String messageContent = "message content";
+		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
+		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
+		mailboxService.setDeletedFlag(udr, inbox, MessageSet.singleton(1l));
+		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
+		assertThat(result).isEmpty();
 	}
 	
 	@Test

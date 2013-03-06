@@ -300,11 +300,7 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 		if (itemChange.isNew()) {
 			return "Add";
 		} else {
-			if (itemChange.isDeleted()) {
-				return "Delete";
-			} else {
-				return "Change";
-			}
+			return "Change";
 		}
 	}
 

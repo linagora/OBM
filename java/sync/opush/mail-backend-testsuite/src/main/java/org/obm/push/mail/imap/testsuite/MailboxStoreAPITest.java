@@ -55,7 +55,6 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.ThrowingInputStream;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
@@ -68,7 +67,6 @@ public abstract class MailboxStoreAPITest {
 	@Inject MailboxService mailboxService;
 
 	@Inject CollectionPathHelper collectionPathHelper;
-	@Inject ImapMailBoxUtils mailboxUtils;
 	@Inject GreenMail greenMail;
 	private String mailbox;
 	private String password;

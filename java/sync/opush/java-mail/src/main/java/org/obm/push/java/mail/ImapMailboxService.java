@@ -65,8 +65,8 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -79,7 +79,6 @@ import org.obm.push.mail.exception.ImapCommandException;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.ImapCapability;
-import org.obm.push.mail.imap.ImapMailBoxUtils;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.mail.mime.IMimePart;
@@ -90,9 +89,7 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -505,19 +502,7 @@ public class ImapMailboxService implements MailboxService {
 
 	@Override
 	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, messages);
-		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
-					@Override
-					public Email apply(FastFetch input) {
-						return Email.builder()
-								.uid(input.getUid())
-								.read(input.isRead())
-								.deleted(input.isDeleted())
-								.date(input.getInternalDate())
-								.build();
-					}
-				});
-		return emails;
+		return EmailFactory.listEmailFromFastFetch(fetchFast(udr, collectionPath, messages));
 	}
 	
 	@Override

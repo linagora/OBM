@@ -83,10 +83,10 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -470,19 +470,7 @@ public class LinagoraMailboxService implements MailboxService {
 
 	@Override
 	public Collection<Email> fetchEmails(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException {
-		Collection<FastFetch> fetch = fetchFast(udr, collectionPath, messages);
-		Collection<Email> emails = Collections2.transform(fetch, new Function<FastFetch, Email>() {
-					@Override
-					public Email apply(FastFetch input) {
-						return Email.builder()
-								.uid(input.getUid())
-								.read(input.isRead())
-								.deleted(input.isDeleted())
-								.date(input.getInternalDate())
-								.build();
-					}
-				});
-		return emails;	
+		return EmailFactory.listEmailFromFastFetch(fetchFast(udr, collectionPath, messages));
 	}
 	
 	@Override
@@ -520,7 +508,14 @@ public class LinagoraMailboxService implements MailboxService {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			store.select(extractMailboxNameFromCollectionPath(udr, collectionPath));
-			return store.uidFetchFast(messages);
+			return FluentIterable
+					.from(store.uidFetchFast(messages))
+					.filter(new Predicate<FastFetch>() {
+						@Override
+						public boolean apply(FastFetch input) {
+							return !input.isDeleted();
+						}
+					}).toImmutableList();
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

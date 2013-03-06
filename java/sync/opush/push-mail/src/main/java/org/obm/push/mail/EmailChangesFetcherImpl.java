@@ -111,7 +111,6 @@ public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 								.serverId(ServerId.buildServerIdString(collectionId, email.getUid()))
 								.withApplicationData(uidToMSEmailMap.get(email.getUid()))
 								.withNewFlag(true)
-								.withDeletedFlag(email.isDeleted())
 								.build();
 					}}
 				
@@ -130,7 +129,6 @@ public class EmailChangesFetcherImpl implements EmailChangesFetcher {
 								.serverId(ServerId.buildServerIdString(collectionId, email.getUid()))
 								.withApplicationData(new MSEmailMetadata(email.isRead()))
 								.withNewFlag(false)
-								.withDeletedFlag(email.isDeleted())
 								.build();
 					}}
 				

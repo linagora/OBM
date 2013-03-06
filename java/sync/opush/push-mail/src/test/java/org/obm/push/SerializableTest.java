@@ -48,11 +48,17 @@ public class SerializableTest {
 	@Test
 	public void testEmailChanges() {
 		SerializableTester.reserializeAndAssert(EmailChanges.builder()
+				.deletions(ImmutableSet.of(
+						Email.builder()
+						.date(date("2012-12-12T23:59:00"))
+						.answered(true)
+						.read(false)
+						.uid(10l)
+						.build()))
 				.additions(ImmutableSet.of(
 						Email.builder()
 						.date(date("2012-12-12T23:59:00"))
 						.answered(true)
-						.deleted(true)
 						.read(false)
 						.uid(15l)
 						.build()))
@@ -60,9 +66,8 @@ public class SerializableTest {
 						Email.builder()
 							.date(date("2012-12-12T23:59:00"))
 							.answered(true)
-							.deleted(true)
 							.read(false)
-							.uid(15l)
+							.uid(16l)
 							.build()))
 				.build());
 	}
