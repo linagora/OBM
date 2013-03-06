@@ -513,7 +513,6 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         element.addClass(\"selected\");
         var result = new Element('tr');
         result.setProperties({'id': tr_id});
-        result.injectInside(this.selectedBox);
         if (this.selectedBox.getChildren().length % 2 != 0) {
           result.addClass('pair');
         }
@@ -555,10 +554,12 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 
         new Element('td').adopt(
           new Element('a').setProperty('href', '#')
-                          .setProperty('onclick', 'select_all_perms(\''+tr_id+'\')').appendText('$l_select_all')          
+                          .addEvent('click', function() { select_all_perms(tr_id); })
+                          .appendText('$l_select_all')
         ).appendText('/').adopt(
           new Element('a').setProperty('href', '#')
-                          .setProperty('onclick', 'unselect_all_perms(\''+tr_id+'\')').appendText('$l_unselect_all')
+                          .addEvent('click', function() { unselect_all_perms(tr_id); })
+                          .appendText('$l_unselect_all')
         ).injectInside(result);
 
         new Element('td').addClass('cell_perms_access').adopt(
@@ -573,8 +574,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
                               .setProperty('name', accept_read+'[]')
                               .setProperty('value', id)
                               .setProperty('disabled', accept_read_disabled)
-			      .setProperty('onclick', 'apply_checked_access(this, \''+tr_id+'\')')
-                              .setProperty('onchange', 'apply_checked_access(this, \''+tr_id+'\')')
+                              .addEvent('click', function () { apply_checked_access(this, tr_id); })
         ).setStyle('visibility', accept_read_style).injectInside(result);
 
         new Element('td').addClass('cell_perms_write').adopt(
@@ -582,8 +582,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
                               .setProperty('name', accept_write+'[]')
                               .setProperty('value', id)
                               .setProperty('disabled', accept_write_disabled)
-                              .setProperty('onclick', 'apply_checked_read(this, \''+tr_id+'\')')
-                              .setProperty('onchange', 'apply_checked_read(this, \''+tr_id+'\')')
+                              .addEvent('click', function () { apply_checked_read(this, tr_id); })
         ).setStyle('visibility', accept_write_style).injectInside(result);
 
         new Element('td').adopt(
@@ -591,7 +590,8 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
                               .setProperty('name', accept_admin+'[]')
                               .setProperty('value', id)
         ).injectInside(result);
-
+        
+        result.injectInside(this.selectedBox);
       } else {
         this.inputField.blur();
         this.resetFunc();
