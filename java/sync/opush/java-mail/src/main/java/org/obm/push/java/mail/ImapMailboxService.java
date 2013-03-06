@@ -375,6 +375,11 @@ public class ImapMailboxService implements MailboxService {
 	public void setAnsweredFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException {
 		updateMailFlag(udr, collectionPath, messages, Flags.Flag.ANSWERED, true);
 	}
+	
+	@Override
+	public void setDeletedFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException {
+		updateMailFlag(udr, collectionPath, messages, Flags.Flag.DELETED, true);
+	}
 
 	@Override
 	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,

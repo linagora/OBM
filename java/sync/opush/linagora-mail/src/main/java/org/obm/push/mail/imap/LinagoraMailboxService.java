@@ -324,6 +324,11 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
+	public void setDeletedFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException {
+		updateMailFlag(udr, collectionPath, messages, Flag.DELETED, true);
+	}
+
+	@Override
 	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
 		

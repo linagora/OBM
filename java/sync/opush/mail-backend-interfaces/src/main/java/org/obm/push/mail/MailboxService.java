@@ -76,6 +76,8 @@ public interface MailboxService {
 
 	void setAnsweredFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException;
 
+	void setDeletedFlag(UserDataRequest udr, String collectionPath, MessageSet messages);
+	
 	void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
 			boolean saveInSent) throws SendEmailException, ProcessingEmailException, SmtpInvalidRcptException, StoreEmailException;
 

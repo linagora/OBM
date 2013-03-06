@@ -231,6 +231,29 @@ public abstract class MailboxServiceTest {
 	}
 
 	@Test
+	public void testSetDeletedFlag() throws Exception {
+		String mailBox = EmailConfiguration.IMAP_INBOX_NAME;
+		String mailBoxPath = testUtils.mailboxPath(mailBox);
+		Date date = DateUtils.getMidnightCalendar().getTime();
+		
+		GreenMailUtil.sendTextEmail(mailbox, "from@localhost.com", "subject", "body", smtpServerSetup);
+		greenMail.waitForIncomingEmail(1);
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, date);
+		
+		Email email = Iterables.getOnlyElement(emails);
+		mailboxService.setDeletedFlag(udr, mailBoxPath, MessageSet.singleton(email.getUid()));
+		
+		Collection<Email> emailsAfterSetDeletedFlag = mailboxService.fetchEmails(udr, mailBoxPath, MessageSet.singleton(email.getUid()));
+		Email deletedEmail = Iterables.getOnlyElement(emailsAfterSetDeletedFlag);
+		
+		assertThat(emails).isNotNull().hasSize(1);
+		assertThat(emailsAfterSetDeletedFlag).isNotNull().hasSize(1);
+		
+		assertThat(email.isDeleted()).isFalse();
+		assertThat(deletedEmail.isDeleted()).isTrue();
+	}
+	
+	@Test
 	public void testStoreInInbox() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
