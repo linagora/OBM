@@ -32,8 +32,11 @@
 package fr.aliacom.obm.common.domain;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 public class ObmDomain implements Serializable {
 
@@ -42,8 +45,10 @@ public class ObmDomain implements Serializable {
 		private int id;
 		private String name;
 		private String uuid;
+		private ImmutableSet.Builder<String> aliases;
 		
 		private Builder() {
+			aliases = ImmutableSet.builder();
 		}
 		
 		public Builder id(int id) {
@@ -61,8 +66,22 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 		
+		public Builder aliases(Iterable<String> aliases) {
+			Preconditions.checkNotNull(aliases);
+
+			this.aliases.addAll(aliases);
+			return this;
+		}
+		
+		public Builder alias(String alias) {
+			Preconditions.checkNotNull(alias);
+			
+			aliases.add(alias);
+			return this;
+		}
+		
 		public ObmDomain build() {
-			return new ObmDomain(id, name, uuid);
+			return new ObmDomain(id, name, uuid, aliases.build());
 		}
 		
 	}
@@ -74,11 +93,13 @@ public class ObmDomain implements Serializable {
 	private final int id;
 	private final String name;
 	private final String uuid;
+	private final Set<String> aliases;
 	
-	private ObmDomain(int id, String name, String uuid) {
+	private ObmDomain(int id, String name, String uuid, Set<String> aliases) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
+		this.aliases = aliases;
 	}
 
 	public String getName() {
@@ -91,6 +112,10 @@ public class ObmDomain implements Serializable {
 
 	public String getUuid() {
 		return uuid;
+	}
+
+	public Set<String> getAliases() {
+		return aliases;
 	}
 
 	@Override

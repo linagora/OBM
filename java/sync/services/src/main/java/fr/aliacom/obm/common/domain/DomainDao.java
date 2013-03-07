@@ -39,6 +39,8 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -61,18 +63,21 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_id, domain_uuid FROM Domain WHERE domain_name=?";
+		String uq = "SELECT domain_id, domain_uuid, domain_alias FROM Domain WHERE domain_name=?";
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
 			ps.setString(1, domainName);
 			rs = ps.executeQuery();
 			if (rs.next()) {
+				String aliases = rs.getString("domain_alias");
+				
 				return ObmDomain
 						.builder()
 						.id(rs.getInt("domain_id"))
 						.uuid(rs.getString("domain_uuid"))
 						.name(domainName)
+						.aliases(aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").split(aliases))
 						.build();
 			}
 		} catch (SQLException e) {
