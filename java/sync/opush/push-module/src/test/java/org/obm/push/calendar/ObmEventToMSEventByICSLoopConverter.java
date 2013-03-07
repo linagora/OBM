@@ -77,10 +77,13 @@ public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventCon
 	}
 
 	private Ical4jUser convertIcal4jUser(User user) {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setId(1);
-		obmDomain.setName(user.getDomain());
-		obmDomain.setUuid("83bff451-11b7-8f55-d06b-7013cb8a0531");
+		ObmDomain obmDomain = ObmDomain
+                				.builder()
+                				.id(1)
+                				.name(user.getDomain())
+                				.uuid("83bff451-11b7-8f55-d06b-7013cb8a0531")
+                				.build();
+		
 		return Ical4jUser.Factory.create().createIcal4jUser(user.getLoginAtDomain(), obmDomain);
 	}
 

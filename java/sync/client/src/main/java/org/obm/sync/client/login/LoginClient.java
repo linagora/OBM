@@ -134,19 +134,23 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	private ObmDomain getDomain(Element domain) {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName(DOMUtils.getElementText(domain));
-		obmDomain.setUuid(domain.getAttribute("uuid"));
-		return obmDomain;
+		return ObmDomain
+				.builder()
+				.uuid(domain.getAttribute("uuid"))
+				.name(DOMUtils.getElementText(domain))
+				.build();
 	}
 	
 	private AccessToken newAccessToken(String loginAtDomain, String origin) {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName(loginAtDomain.split("@", 2)[1]);
-
 		AccessToken token = new AccessToken(0, origin);
+		ObmDomain obmDomain = ObmDomain
+                				.builder()
+                				.name(loginAtDomain.split("@", 2)[1])
+                				.build();
+
 		token.setUserLogin(loginAtDomain.split("@", 2)[0]);
 		token.setDomain(obmDomain);
+		
 		return token;
 	}
 

@@ -29,7 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyBoolean;
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.getCurrentArguments;
+import static org.easymock.EasyMock.isA;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -238,13 +245,12 @@ public class LoginHandlerTest {
 			expect(domainService.findDomainByName(isA(String.class))).andAnswer(new IAnswer<ObmDomain>() {
 				@Override
 				public ObmDomain answer() throws Throwable {
-					ObmDomain domain = new ObmDomain();
-					
-					domain.setId(1);
-					domain.setName(String.valueOf(getCurrentArguments()[0]));
-					domain.setUuid("1234567890");
-					
-					return domain;
+					return ObmDomain
+            				.builder()
+            				.id(1)
+            				.name(String.valueOf(getCurrentArguments()[0]))
+        					.uuid("1234567890")
+            				.build();
 				}
 			}).anyTimes();
 			

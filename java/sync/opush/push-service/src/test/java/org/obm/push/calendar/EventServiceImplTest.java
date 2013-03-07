@@ -110,7 +110,7 @@ public class EventServiceImplTest {
 		CalendarDao calendarDao = mocksControl.createMock(CalendarDao.class);
 		expect(calendarDao.getMSEventUidFor(anyObject(EventExtId.class), anyObject(Device.class))).andReturn(new MSEventUid("uid"));
 		Factory factory = mocksControl.createMock(Ical4jUser.Factory.class);
-		expect(factory.createIcal4jUser("user@domain", null)).andReturn(Ical4jUser.Factory.create().createIcal4jUser("user@domain", new ObmDomain()));
+		expect(factory.createIcal4jUser("user@domain", null)).andReturn(Ical4jUser.Factory.create().createIcal4jUser("user@domain", ObmDomain.builder().build()));
 
 		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("abc"));
 		

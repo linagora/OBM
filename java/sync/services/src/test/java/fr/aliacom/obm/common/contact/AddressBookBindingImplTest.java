@@ -76,10 +76,13 @@ public class AddressBookBindingImplTest {
 
 	@Before
 	public void setUp() {
-		ObmDomain domain = new ObmDomain();
-		domain.setId(123);
-		domain.setName("obm.org");
-		domain.setUuid("01324-56789");
+		ObmDomain domain = ObmDomain
+							.builder()
+							.id(123)
+							.name("obm.org")
+							.uuid("01324-56789")
+							.build();
+		
 		token = new AccessToken(1, "");
 		token.setUserLogin("login");
 		token.setDomain(domain);

@@ -31,7 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.fest.assertions.api.Assertions;
@@ -158,8 +161,9 @@ public class HelperServiceImplTest {
 	}
 
 	private ObmDomain domainWithName(String domainName) {
-		ObmDomain domain = new ObmDomain();
-		domain.setName(domainName);
-		return domain;
+		return ObmDomain
+				.builder()
+				.name(domainName)
+				.build();
 	}
 }

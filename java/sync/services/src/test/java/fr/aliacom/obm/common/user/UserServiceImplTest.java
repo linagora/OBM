@@ -31,18 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
-import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expect;
+
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
-
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class UserServiceImplTest {
@@ -78,7 +76,7 @@ public class UserServiceImplTest {
 	public void testGetNullUserFromCalendar() throws FindException {
 		String domainName = "aDomain";
 		String calendar = "aCalendar";
-		ObmDomain obmDomain = new ObmDomain();
+		ObmDomain obmDomain = ObmDomain.builder().build();
 
 		DomainService domainService = EasyMock.createMock(DomainService.class);
 		expect(domainService.findDomainByName(domainName)).andReturn(obmDomain).once();
@@ -95,7 +93,7 @@ public class UserServiceImplTest {
 	public void testGetUserFromCalendar() throws FindException {
 		String userEmail = "User@domain";
 		String domainName = "domain";
-		ObmDomain obmDomain = new ObmDomain();
+		ObmDomain obmDomain = ObmDomain.builder().build();
 		ObmUser obmUser = new ObmUser();
 		obmUser.setEmail(userEmail);
 

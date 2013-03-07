@@ -37,47 +37,77 @@ import com.google.common.base.Objects;
 
 public class ObmDomain implements Serializable {
 
-	private int id;
-	private String name;
-	private String uuid;
+	public static class Builder {
+		
+		private int id;
+		private String name;
+		private String uuid;
+		
+		private Builder() {
+		}
+		
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder uuid(String uuid) {
+			this.uuid = uuid;
+			return this;
+		}
+		
+		public ObmDomain build() {
+			return new ObmDomain(id, name, uuid);
+		}
+		
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	private final int id;
+	private final String name;
+	private final String uuid;
+	
+	private ObmDomain(int id, String name, String uuid) {
+		this.id = id;
+		this.name = name;
+		this.uuid = uuid;
+	}
 
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public String getUuid() {
 		return uuid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(id, name, uuid);
 	}
 
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(id, name, uuid);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
+	public final boolean equals(Object object) {
 		if (object instanceof ObmDomain) {
 			ObmDomain that = (ObmDomain) object;
+			
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.name, that.name)
 				&& Objects.equal(this.uuid, that.uuid);
 		}
+		
 		return false;
 	}
 
@@ -89,5 +119,5 @@ public class ObmDomain implements Serializable {
 			.add("uuid", uuid)
 			.toString();
 	}
-	
+
 }

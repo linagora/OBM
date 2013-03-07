@@ -47,10 +47,11 @@ import fr.aliacom.obm.common.user.UserSettings;
 public class ServicesToolBox {
 
 	public static ObmDomain getDefaultObmDomain() {
-		ObmDomain obmDomain = new ObmDomain();
-		obmDomain.setName("test.tlse.lng");
-		obmDomain.setUuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		return obmDomain;
+		return ObmDomain
+				.builder()
+				.name("test.tlse.lng")
+				.uuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6")
+				.build();
 	}
 
 	public static ObmUser getDefaultObmUser(){

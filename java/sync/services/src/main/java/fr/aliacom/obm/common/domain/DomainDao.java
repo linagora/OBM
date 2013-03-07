@@ -68,11 +68,12 @@ public class DomainDao {
 			ps.setString(1, domainName);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				ObmDomain ret = new ObmDomain();
-				ret.setId(rs.getInt("domain_id"));
-				ret.setUuid(rs.getString("domain_uuid"));
-				ret.setName(domainName);
-				return ret;
+				return ObmDomain
+						.builder()
+						.id(rs.getInt("domain_id"))
+						.uuid(rs.getString("domain_uuid"))
+						.name(domainName)
+						.build();
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
