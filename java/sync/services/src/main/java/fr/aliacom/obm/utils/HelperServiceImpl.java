@@ -51,6 +51,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
@@ -103,7 +104,7 @@ public class HelperServiceImpl implements HelperService {
 	 */
 	@Override
 	public boolean canWriteOnCalendar(AccessToken accessToken, String email) {
-		if (isNotSameDomain(accessToken, email)) {
+		if (!isSameDomain(accessToken, email)) {
 			return false;
 		} else {
 			return canWriteOnCalendarFromUserLogin(accessToken, extractLogin(email));
@@ -117,12 +118,31 @@ public class HelperServiceImpl implements HelperService {
 		return helperDao.canWriteOnCalendar(accessToken, login);
 	}
 
-	@VisibleForTesting boolean isNotSameDomain(AccessToken accessToken, String email) {
+	@VisibleForTesting boolean isSameDomain(AccessToken accessToken, String email) {
 		String emailDomain = userService.getDomainNameFromEmail(email);
+		
 		if (emailDomain == null) {
-			return false;
+			return true;
 		}
-		return !accessToken.getDomain().getName().equalsIgnoreCase(emailDomain);
+		
+		ObmDomain domain = accessToken.getDomain();
+		boolean sameDomain = domain.getName().equalsIgnoreCase(emailDomain);
+		
+		if (sameDomain) {
+			return true;
+		}
+		
+		return isAliasOfDomain(domain, emailDomain);
+	}
+
+	private boolean isAliasOfDomain(ObmDomain domain, String emailDomain) {
+		for (String alias : domain.getAliases()) {
+			if (alias.equalsIgnoreCase(emailDomain)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**

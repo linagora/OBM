@@ -31,82 +31,119 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.createControl;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.Set;
+
+import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.date.DateProvider;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.common.user.UserServiceImpl;
 
 @RunWith(SlowFilterRunner.class)
 public class HelperServiceImplTest {
 
+	private static class Env extends AbstractModule {
+		private IMocksControl mocksControl = createControl();
+
+		@Override
+		protected void configure() {
+			bind(IMocksControl.class).toInstance(mocksControl);
+
+			bindWithMock(DomainService.class);
+			bindWithMock(DatabaseConnectionProvider.class);
+			bindWithMock(DateProvider.class);
+			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+			bind(UserService.class).to(UserServiceImpl.class);
+		}
+
+		private <T> void bindWithMock(Class<T> cls) {
+			bind(cls).toInstance(mocksControl.createMock(cls));
+		}
+	}
+
+	@Rule
+	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
+	
+	@Inject
+	private UserService userService;
+
+	private HelperServiceImpl helperService;
 	private AccessToken accessToken;
 
 	@Before
 	public void setUp() {
 		accessToken = new AccessToken(1, "o-push");
+		helperService = new HelperServiceImpl(null, null, userService);
 	}
 
 	@Test
 	public void testIsNotSameDomainWhenDifferent() {
 		accessToken.setDomain(domainWithName("otherdomain.org"));
 
-		String userEmail = "test@domain.org";
-		UserService userService = createStrictMock(UserService.class);
-		expect(userService.getDomainNameFromEmail(userEmail)).andReturn("domain.org").once();
-		replay(userService);
-
-		boolean isNotSameDomain = new HelperServiceImpl(null, null, userService)
-				.isNotSameDomain(accessToken, userEmail);
-
-		verify(userService);
-		
-		assertThat(isNotSameDomain).isTrue();
+		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isFalse();
 	}
 
 	@Test
-	public void testIsNotSameDomainWhenSame() {
+	public void testIsSameDomainWhenSame() {
 		accessToken.setDomain(domainWithName("domain.org"));
 
-		String userEmail = "test@domain.org";
-		UserService userService = createStrictMock(UserService.class);
-		expect(userService.getDomainNameFromEmail(userEmail)).andReturn("domain.org").once();
-		replay(userService);
+		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isTrue();
+	}
+	
+	@Test
+	public void testIsSameDomainWhenSameButCaseDiffers() {
+		accessToken.setDomain(domainWithName("DOmaiN.org"));
 
-		boolean isNotSameDomain = new HelperServiceImpl(null, null, userService)
-				.isNotSameDomain(accessToken, userEmail);
-
-		verify(userService);
-		
-		assertThat(isNotSameDomain).isFalse();
+		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isTrue();
 	}
 
 	@Test
 	public void testIsSameDomainWhenNoDomain() {
-		accessToken.setDomain(domainWithName("otherdomain.org"));
+		accessToken.setDomain(domainWithName("domain.org"));
 
-		String userLogin = "test";
-		UserService userService = createStrictMock(UserService.class);
-		expect(userService.getDomainNameFromEmail(userLogin)).andReturn(null).once();
-		replay(userService);
+		assertThat(helperService.isSameDomain(accessToken, "test")).isTrue();
+	}
+	
+	@Test
+	public void testIsSameDomainWhenDomainHasOneAlias(){
+		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("alias.org")));
 
-		boolean isNotSameDomain = new HelperServiceImpl(null, null, userService)
-				.isNotSameDomain(accessToken, userLogin);
-
-		verify(userService);
+		assertThat(helperService.isSameDomain(accessToken, "test@alias.org")).isTrue();
+	}
+	
+	@Test
+	public void testIsSameDomainWhenDomainHasMultipleAliases(){
+		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("alias.org", "alias2.org")));
 		
-		assertThat(isNotSameDomain).isFalse();
+		assertThat(helperService.isSameDomain(accessToken, "test@alias2.org")).isTrue();
+	}
+	
+	@Test
+	public void testIsSameDomainWhenDomainHasOneAliasButCaseDiffers(){
+		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("AliAs.org")));
+
+		assertThat(helperService.isSameDomain(accessToken, "test@alias.org")).isTrue();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -164,6 +201,14 @@ public class HelperServiceImplTest {
 		return ObmDomain
 				.builder()
 				.name(domainName)
+				.build();
+	}
+	
+	private ObmDomain domainWithAliases(String domainName, Set<String> aliases) {
+		return ObmDomain
+				.builder()
+				.name(domainName)
+				.aliases(aliases)
 				.build();
 	}
 }
