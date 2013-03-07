@@ -120,8 +120,8 @@ public abstract class OPClient {
 		return ret;
 	}
 
-	public void options() throws Exception {
-		run(new Options());
+	public OptionsResponse options() throws Exception {
+		return run(new Options());
 	}
 
 	public FolderSyncResponse folderSync(SyncKey key) throws Exception {

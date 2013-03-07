@@ -29,46 +29,47 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.opush;
+
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.obm.sync.push.client.IEasCommand;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.env.DefaultOpushModule;
+import org.obm.push.mail.imap.GuiceModule;
+import org.obm.push.mail.imap.SlowGuiceRunner;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.OptionsResponse;
-import org.obm.sync.push.client.beans.AccountInfos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
-public class Options implements IEasCommand<OptionsResponse> {
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(DefaultOpushModule.class)
+public class OptionsHandlerTest {
 
-	private static final Logger logger = LoggerFactory.getLogger(Options.class);
+	@Inject	SingleUserFixture user;
+	@Inject	OpushServer opushServer;
+	@Inject IMocksControl mocksControl;
+
+	@After
+	public void shutdown() throws Exception {
+		opushServer.stop();
+	}
 	
-	@Override
-	public OptionsResponse run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception {
-		OptionsMethod pm = new OptionsMethod(ai.getUrl() + "?User=" + ai.getLogin()
-				+ "&DeviceId=" + ai.getDevId().getDeviceId() + "&DeviceType=" + ai.getDevType());
-		pm.setRequestHeader("User-Agent", ai.getUserAgent());
-		pm.setRequestHeader("Authorization", ai.authValue());
-		synchronized (hc) {
-			try {
-				int ret = hc.executeMethod(pm);
-				if (ret != HttpStatus.SC_OK) {
-					logger.error("method failed:\n" + pm.getStatusLine()
-							+ "\n" + pm.getResponseBodyAsString());
-				}
-				Header[] hs = pm.getResponseHeaders();
-				for (Header h : hs) {
-					logger.info("resp head[" + h.getName() + "] => "+ h.getValue());
-				}
-				return new OptionsResponse(ImmutableSet.copyOf(hs));
-			} finally {
-				pm.releaseConnection();
-			}
-		}
+	@Test
+	public void testOptionsProtocolVersions() throws Exception {
+		mocksControl.replay();
+		opushServer.start();
+		
+		OPClient opClient = buildWBXMLOpushClient(user.jaures, opushServer.getPort());
+		OptionsResponse options = opClient.options();
+		
+		assertThat(options.getHeaders()).contains(new Header("MS-ASProtocolVersions", "12.0,12.1"));
 	}
 }

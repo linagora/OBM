@@ -77,7 +77,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private static final String MS_SERVER_ACTIVESYNC = "14.1";
-	private static final String MS_ASPROTOCOL_VERSIONS = "12.1";
+	private static final String MS_ASPROTOCOL_VERSIONS = "12.0,12.1";
 	
 	private Handlers handlers;
 	private SessionService sessionService;

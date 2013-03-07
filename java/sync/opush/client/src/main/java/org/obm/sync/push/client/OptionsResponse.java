@@ -29,46 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.sync.push.client;
 
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.obm.sync.push.client.IEasCommand;
-import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.OptionsResponse;
-import org.obm.sync.push.client.beans.AccountInfos;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.base.Objects;
 
-public class Options implements IEasCommand<OptionsResponse> {
+public class OptionsResponse {
+		
+	private final Iterable<Header> headers;
 
-	private static final Logger logger = LoggerFactory.getLogger(Options.class);
+	public OptionsResponse(Iterable<Header> headers) {
+		this.headers = headers;
+	}
+
+	public Iterable<Header> getHeaders() {
+		return headers;
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(headers);
+	}
 	
 	@Override
-	public OptionsResponse run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception {
-		OptionsMethod pm = new OptionsMethod(ai.getUrl() + "?User=" + ai.getLogin()
-				+ "&DeviceId=" + ai.getDevId().getDeviceId() + "&DeviceType=" + ai.getDevType());
-		pm.setRequestHeader("User-Agent", ai.getUserAgent());
-		pm.setRequestHeader("Authorization", ai.authValue());
-		synchronized (hc) {
-			try {
-				int ret = hc.executeMethod(pm);
-				if (ret != HttpStatus.SC_OK) {
-					logger.error("method failed:\n" + pm.getStatusLine()
-							+ "\n" + pm.getResponseBodyAsString());
-				}
-				Header[] hs = pm.getResponseHeaders();
-				for (Header h : hs) {
-					logger.info("resp head[" + h.getName() + "] => "+ h.getValue());
-				}
-				return new OptionsResponse(ImmutableSet.copyOf(hs));
-			} finally {
-				pm.releaseConnection();
-			}
+	public boolean equals(Object object){
+		if (object instanceof OptionsResponse) {
+			OptionsResponse that = (OptionsResponse) object;
+			return Objects.equal(headers, that.headers);
 		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("headers", headers)
+				.toString();
 	}
 }
