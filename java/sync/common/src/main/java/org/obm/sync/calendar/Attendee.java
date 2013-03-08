@@ -97,14 +97,14 @@ public abstract class Attendee implements Cloneable, Serializable {
 		protected abstract T createInstance();
 	}
 	
-	private Participation participation;
-	private String email;
-	private ParticipationRole participationRole;
-	private String displayName;
-	private int percent;
-	private boolean organizer;
-	private boolean canWriteOnCalendar;
-	private Integer entityId;
+	/* package */ Participation participation;
+	/* package */ String email;
+	/* package */ ParticipationRole participationRole;
+	/* package */ String displayName;
+	/* package */ int percent;
+	/* package */ boolean organizer;
+	/* package */ boolean canWriteOnCalendar;
+	/* package */ Integer entityId;
 	
 	public Attendee() {
 	}
