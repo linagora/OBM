@@ -130,7 +130,7 @@ public class Snapshot implements Serializable {
 	private final Collection<Email> emails;
 	private final MessageSet messageSet;
 	
-	private Snapshot(DeviceId deviceId, FilterType filterType, SyncKey syncKey, Integer collectionId, long uidNext, Collection<Email> emails) {
+	protected Snapshot(DeviceId deviceId, FilterType filterType, SyncKey syncKey, Integer collectionId, long uidNext, Collection<Email> emails) {
 		this.deviceId = deviceId;
 		this.filterType = filterType;
 		this.syncKey = syncKey;
@@ -140,7 +140,7 @@ public class Snapshot implements Serializable {
 		this.messageSet = generateMessageSet();
 	}
 
-	private MessageSet generateMessageSet() {
+	protected MessageSet generateMessageSet() {
 		MessageSet.Builder builder = MessageSet.builder();
 		for (Email email : emails) {
 			builder.add(email.getUid());
