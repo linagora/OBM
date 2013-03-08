@@ -40,12 +40,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.internal.matchers.StringContains;
+import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,8 +51,6 @@ import freemarker.template.SimpleDate;
 import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class TemplateTest {
