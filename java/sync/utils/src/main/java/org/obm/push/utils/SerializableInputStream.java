@@ -43,6 +43,8 @@ import com.google.common.io.ByteStreams;
 
 public class SerializableInputStream extends NoArgFilterInputStream implements Serializable {
 
+	private static final long serialVersionUID = -7731217728675119624L;
+	
 	public SerializableInputStream() {
 		super();
 	}

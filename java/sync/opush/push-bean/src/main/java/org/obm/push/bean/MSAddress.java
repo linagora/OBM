@@ -38,6 +38,8 @@ import com.google.common.base.Strings;
 
 public class MSAddress implements Serializable {
 	
+	private static final long serialVersionUID = 7029809664557900622L;
+	
 	private final String mail;
 	private final String displayName;
 

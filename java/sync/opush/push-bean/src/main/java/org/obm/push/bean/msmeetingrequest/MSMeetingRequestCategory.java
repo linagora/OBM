@@ -38,6 +38,8 @@ import com.google.common.base.Objects;
 
 public class MSMeetingRequestCategory implements Serializable {
 	
+	private  static final long serialVersionUID = -5737971365858507584L;
+	
 	private final String category;
 
 	public MSMeetingRequestCategory(String category) {

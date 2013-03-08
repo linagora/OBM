@@ -38,6 +38,8 @@ import com.google.common.base.Objects;
 
 public class MSEventExtId implements Serializable {
 
+	private static final long serialVersionUID = 8631575091464716793L;
+	
 	private final String uid;
 
 	public MSEventExtId(String uid) {

@@ -40,6 +40,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Lists;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum MSMeetingRequestRecurrenceDayOfWeek {
 	
 	SUNDAY(1), 

@@ -120,6 +120,8 @@ public class MSMeetingRequestRecurrence implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 5958868316016116823L;
+	
 	private final MSMeetingRequestRecurrenceType type;
 	private final Integer interval;
 	private final Date until;

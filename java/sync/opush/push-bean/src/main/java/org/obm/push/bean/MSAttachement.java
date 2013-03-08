@@ -37,6 +37,8 @@ import com.google.common.base.Objects;
 
 public class MSAttachement implements Serializable {
 	
+	private static final long serialVersionUID = 3716693847098628406L;
+	
 	private String displayName;
 	private String fileReference;
 	private MethodAttachment method;

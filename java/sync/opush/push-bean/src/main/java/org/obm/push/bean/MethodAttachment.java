@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+/**
+ * This enum is serialized, take care of changes done there for older version compatibility
+ */
 public enum MethodAttachment {
 	NormalAttachment, // 1
 	EmbeddedMessage, // 5

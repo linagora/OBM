@@ -128,6 +128,8 @@ public class MSEmailHeader implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = 556207964519799832L;
+	
 	private final List<MSAddress> from;
 	private final List<MSAddress> replyTo;
 	private final List<MSAddress> to;

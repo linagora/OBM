@@ -90,6 +90,8 @@ public class MSEmailBody implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = -1451600272523495944L;
+	
 	private SerializableInputStream mimeData;
 	private MSEmailBodyType bodyType;
 	private int estimatedDataSize;

@@ -211,6 +211,8 @@ public class MSMeetingRequest implements Serializable {
 		}
 	}
 	
+	private static final long serialVersionUID = -83338893389760406L;
+	
 	private final boolean allDayEvent;
 	private final Date startTime;
 	private final Date dtStamp;
