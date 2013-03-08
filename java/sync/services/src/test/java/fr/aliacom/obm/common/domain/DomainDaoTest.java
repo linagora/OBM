@@ -141,6 +141,10 @@ public class DomainDaoTest {
 		
 		expect(con.prepareStatement(isA(String.class))).andReturn(statement);
 		statement.setString(1, domainName);
+		statement.setString(2, domainName);
+		statement.setString(3, domainName + "\r\n%");
+		statement.setString(4, "%\r\n" + domainName + "\r\n%");
+		statement.setString(5, "%\r\n" + domainName);
 		expectLastCall();
 		expect(statement.executeQuery()).andReturn(rs);
 		expect(rs.next()).andReturn(true);

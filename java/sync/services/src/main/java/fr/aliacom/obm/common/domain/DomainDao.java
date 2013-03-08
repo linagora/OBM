@@ -63,11 +63,16 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_id, domain_uuid, domain_alias FROM Domain WHERE domain_name=?";
+		String uq = "SELECT domain_id, domain_uuid, domain_alias FROM Domain WHERE domain_name = ? "
+				+ " OR domain_alias = ? OR domain_alias LIKE ? OR domain_alias LIKE ? OR domain_alias LIKE ? ";
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
 			ps.setString(1, domainName);
+			ps.setString(2, domainName);
+			ps.setString(3, domainName + "\r\n%");
+			ps.setString(4, "%\r\n" + domainName + "\r\n%");
+			ps.setString(5, "%\r\n" + domainName);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				String aliases = rs.getString("domain_alias");
