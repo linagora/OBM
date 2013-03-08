@@ -83,7 +83,7 @@ public class SieveLoginTests extends SieveTestCase {
 		}
 	}
 
-	public void testLoginLogoutPerf() {
+	public void testLoginLogoutPerf() throws InterruptedException {
 		final int IT_COUNT = 10000;
 
 		for (int i = 0; i < 1000; i++) {

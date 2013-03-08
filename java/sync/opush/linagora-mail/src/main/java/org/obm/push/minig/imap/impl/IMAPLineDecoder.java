@@ -36,8 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.obm.push.utils.FileUtils;
@@ -62,9 +62,8 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 	}
 
 	@Override
-	public void decode(IoSession session, ByteBuffer in,
-			ProtocolDecoderOutput out) throws Exception {
-
+	public void decode(IoSession session, IoBuffer in, ProtocolDecoderOutput out)
+			throws Exception {
 		ImapLineContext lc = (ImapLineContext) session.getAttribute(CONTEXT);
 		if (lc == null) {
 			lc = new ImapLineContext();
@@ -83,7 +82,7 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 
 	private class ImapLineContext {
 
-		private final ByteBuffer buf;
+		private final IoBuffer buf;
 
 		private java.nio.ByteBuffer literalBuffer;
 		private int matchCount = 0;
@@ -91,11 +90,11 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 		private MinaIMAPMessage currentMessage;
 
 		private ImapLineContext() {
-			buf = ByteBuffer.allocate(80).setAutoExpand(true);
+			buf = IoBuffer.allocate(80).setAutoExpand(true);
 		}
 
 		public void dispose() {
-			buf.release();
+			buf.free();
 		}
 
 		public boolean bufferFollows(String line) {
@@ -128,7 +127,7 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 			return false;
 		}
 
-		private void decodeNormal(ByteBuffer in, ProtocolDecoderOutput out) {
+		private void decodeNormal(IoBuffer in, ProtocolDecoderOutput out) {
 
 			if (literalBuffer != null) {
 				// we are in a middle of a literal
@@ -193,7 +192,7 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 
 		}
 
-		public void appendBuffer(ByteBuffer in) {
+		public void appendBuffer(IoBuffer in) {
 			java.nio.ByteBuffer receivedBuffer = in.buf();
 
 			int arrivedDataSize = receivedBuffer.remaining();

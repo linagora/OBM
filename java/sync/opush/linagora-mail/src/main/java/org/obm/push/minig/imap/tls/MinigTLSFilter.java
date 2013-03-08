@@ -33,11 +33,11 @@ package org.obm.push.minig.imap.tls;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.mina.filter.SSLFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MinigTLSFilter extends SSLFilter {
+public class MinigTLSFilter extends SslFilter {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(MinigTLSFilter.class);

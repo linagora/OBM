@@ -35,8 +35,8 @@ package org.obm.push.minig.imap.command;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.session.IoSession;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.MailboxNameUTF7Converter;
 import org.obm.push.minig.imap.impl.TagProducer;
@@ -66,7 +66,7 @@ public abstract class Command<T> implements ICommand<T> {
 		imaplogger.info("C: {}", sent);
 		WriteFuture writeFuture = session.write(sent);
 		if (args.hasLiteralData()) {
-			writeFuture.join();
+			writeFuture.awaitUninterruptibly();
 			if (writeFuture.isWritten()) {
 				lock(lock);
 				writeFuture = session.write(args.getLiteralData());

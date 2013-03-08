@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.StoreClientImpl;
@@ -58,14 +57,14 @@ public class CountingStoreClient extends StoreClientImpl {
 		@Override
 		public CountingStoreClient create(String hostname, String login, String password) {
 			return new CountingStoreClient(counter, hostname, emailConfiguration.imapPort(),
-					login, password, super.createClientSupport(), super.createConnector());
+					login, password, super.createClientSupport());
 		}
 		
 	}
 	
 	private CountingStoreClient(ImapConnectionCounter counter, String hostname, int port,
-			String login, String password, ClientSupport clientSupport, SocketConnector connector) {
-		super(hostname, port, login, password, clientSupport, connector);
+			String login, String password, ClientSupport clientSupport) {
+		super(hostname, port, login, password, clientSupport);
 		this.counter = counter;
 	}
 	

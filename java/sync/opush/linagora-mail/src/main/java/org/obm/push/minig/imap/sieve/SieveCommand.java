@@ -34,7 +34,7 @@ package org.obm.push.minig.imap.sieve;
 
 import java.util.List;
 
-import org.apache.mina.common.IoSession;
+import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

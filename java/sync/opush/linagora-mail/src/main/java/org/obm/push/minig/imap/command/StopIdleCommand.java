@@ -35,8 +35,8 @@ package org.obm.push.minig.imap.command;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
+import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.session.IoSession;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.TagProducer;
 

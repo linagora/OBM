@@ -40,14 +40,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
 import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
@@ -87,13 +86,9 @@ public class StoreClientImpl implements StoreClient {
 		
 		public StoreClientImpl create(String hostname, String login, String password) {
 			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password,
-							createClientSupport(), createConnector());
+							createClientSupport());
 		}
-				
-		protected SocketConnector createConnector() {
-			return new SocketConnector();
-		}
-				
+
 		protected ClientSupport createClientSupport() {
 			IResponseCallback cb = new StoreClientCallback();
 			ClientHandler handler = new ClientHandler(cb);
@@ -112,16 +107,14 @@ public class StoreClientImpl implements StoreClient {
 	@VisibleForTesting String activeMailbox;
 
 	private final ClientSupport clientSupport;
-	private final SocketConnector connector;
 
 	protected StoreClientImpl(String hostname, int port, String login, String password,
-			ClientSupport clientSupport, SocketConnector connector) {
+			ClientSupport clientSupport) {
 		this.hostname = hostname;
 		this.port = port;
 		this.login = login;
 		this.password = password;
 		this.clientSupport = clientSupport;
-		this.connector = connector;
 	}
 
 	@Override
@@ -129,7 +122,7 @@ public class StoreClientImpl implements StoreClient {
 	public void login(Boolean activateTLS) throws IMAPException {
 		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
 		SocketAddress sa = new InetSocketAddress(hostname, port);
-		clientSupport.login(login, password, connector, sa, activateTLS);
+		clientSupport.login(login, password, sa, activateTLS);
 	}
 
 	@Override

@@ -45,15 +45,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLException;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoFuture;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.common.WriteFuture;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.IoFuture;
+import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.obm.push.mail.ImapTimeoutException;
-import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.InternalDate;
@@ -107,20 +107,21 @@ public class ClientSupport {
 
 	private final static Logger logger = LoggerFactory.getLogger(ClientSupport.class);
 	
-	private final IoHandler handler;
 	private final Integer imapTimeoutInMilliseconds;
 	private IoSession session;
 	private Semaphore lock;
 	private List<IMAPResponse> lastResponses;
 	private TagProducer tagsProducer;
 	private MinigTLSFilter sslFilter;
+	private NioSocketConnector socketConnector;
 
 	/**
 	 * @param imapTimeoutInMilliseconds null means no timeout
 	 */
 	public ClientSupport(IoHandler handler, Integer imapTimeoutInMilliseconds) {
+		this.socketConnector = new NioSocketConnector();
+		this.socketConnector.setHandler(handler);
 		this.lock = new Semaphore(1);
-		this.handler = handler;
 		this.tagsProducer = new TagProducer();
 		this.imapTimeoutInMilliseconds = imapTimeoutInMilliseconds;
 		this.lastResponses = Collections
@@ -142,8 +143,7 @@ public class ClientSupport {
 	}
 
 
-	public void login(String login, String password,
-			SocketConnector connector, SocketAddress address,
+	public void login(String login, String password, SocketAddress address,
 			Boolean activateTLS) throws IMAPException {
 		if (session != null && session.isConnected()) {
 			throw new IllegalStateException(
@@ -151,7 +151,8 @@ public class ClientSupport {
 		}
 
 		lock(); // waits for "* OK IMAP4rev1 server...
-		ConnectFuture cf = connector.connect(address, handler);
+		
+		ConnectFuture cf = socketConnector.connect(address);
 		join(cf);
 		if (!cf.isConnected()) {
 			lock.release();
@@ -178,10 +179,10 @@ public class ClientSupport {
 
 	private void join(IoFuture future) {
 		if (imapTimeoutInMilliseconds != null) {
-			boolean joinSuccess = future.join(imapTimeoutInMilliseconds);
+			boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
 			assertTimeout(joinSuccess);
 		} else {
-			future.join();
+			future.awaitUninterruptibly();
 		}
 	}
 
@@ -208,16 +209,17 @@ public class ClientSupport {
 		if (session != null) {
 			if (sslFilter != null) {
 				try {
-					sslFilter.stopSSL(session);
+					sslFilter.stopSsl(session);
 				} catch (SSLException e) {
 					logger.error("error stopping ssl", e);
 				} catch (IllegalStateException ei) {
 					logger.error("imap connection is already stop");
 				}
 			}
-			join(session.close());
+			join(session.close(false));
 			session = null;
 		}
+		socketConnector.dispose();
 	}
 
 	private <T> T run(ICommand<T> cmd) {

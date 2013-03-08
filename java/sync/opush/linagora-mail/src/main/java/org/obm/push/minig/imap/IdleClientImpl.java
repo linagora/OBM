@@ -34,7 +34,6 @@ package org.obm.push.minig.imap;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleClient;
@@ -85,8 +84,7 @@ public class IdleClientImpl implements IdleClient {
 	public void login(Boolean activateTLS) throws IMAPException {
 		logger.debug("login called");
 		SocketAddress sa = new InetSocketAddress(hostname, port);
-		SocketConnector connector = new SocketConnector();
-		cs.login(login, password, connector, sa, activateTLS);
+		cs.login(login, password, sa, activateTLS);
 	}
 
 	public void logout() {

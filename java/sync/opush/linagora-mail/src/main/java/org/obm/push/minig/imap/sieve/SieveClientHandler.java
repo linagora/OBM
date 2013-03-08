@@ -34,9 +34,9 @@ package org.obm.push.minig.imap.sieve;
 
 import java.util.ArrayList;
 
-import org.apache.mina.common.IoFilter;
-import org.apache.mina.common.IoHandlerAdapter;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.slf4j.Logger;

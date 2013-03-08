@@ -32,8 +32,8 @@
 
 package org.obm.push.minig.imap.sieve;
 
-import org.apache.mina.common.ByteBuffer;
-import org.apache.mina.common.IoSession;
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
@@ -52,7 +52,7 @@ public final class SieveCodecFactory implements ProtocolCodecFactory {
 	private ProtocolDecoder decoder = new ProtocolDecoderAdapter() {
 
 		@Override
-		public void decode(IoSession arg0, ByteBuffer arg1,
+		public void decode(IoSession arg0, IoBuffer arg1,
 				ProtocolDecoderOutput arg2) throws Exception {
 			java.nio.ByteBuffer received = arg1.buf();
 			java.nio.ByteBuffer copy = java.nio.ByteBuffer.allocate(received
@@ -75,18 +75,18 @@ public final class SieveCodecFactory implements ProtocolCodecFactory {
 		public void encode(IoSession arg0, Object arg1,
 				ProtocolEncoderOutput arg2) throws Exception {
 			byte[] raw = (byte[]) arg1;
-			ByteBuffer b = ByteBuffer.wrap(raw);
+			IoBuffer b = IoBuffer.wrap(raw);
 			arg2.write(b);
 		}
 	};
 
 	@Override
-	public ProtocolDecoder getDecoder() throws Exception {
+	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
 		return decoder;
 	}
-
+	
 	@Override
-	public ProtocolEncoder getEncoder() throws Exception {
+	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
 		return encoder;
 	}
 

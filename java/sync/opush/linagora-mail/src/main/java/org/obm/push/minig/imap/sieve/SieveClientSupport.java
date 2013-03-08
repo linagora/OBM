@@ -40,10 +40,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.mina.common.ConnectFuture;
-import org.apache.mina.common.IoHandler;
-import org.apache.mina.common.IoSession;
-import org.apache.mina.transport.socket.nio.SocketConnector;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoHandler;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.obm.push.minig.imap.sieve.commands.SieveActivate;
 import org.obm.push.minig.imap.sieve.commands.SieveAuthenticate;
 import org.obm.push.minig.imap.sieve.commands.SieveDeleteScript;
@@ -62,8 +62,10 @@ public class SieveClientSupport {
 	private IoSession session;
 	private List<SieveResponse> lastResponses;
 	private SieveAuthenticate authenticate;
+	private NioSocketConnector socketConnector;
 
 	public SieveClientSupport(String login, String password) {
+		this.socketConnector = new NioSocketConnector();
 		this.lock = new Semaphore(1);
 		this.lastResponses = new LinkedList<SieveResponse>();
 		this.authenticate = new SieveAuthenticate(login, password);
@@ -80,15 +82,16 @@ public class SieveClientSupport {
 		}
 	}
 
-	public boolean login(SocketConnector connector, SocketAddress sa,
-			IoHandler handler) {
+	public boolean login(SocketAddress sa, IoHandler handler) {
+		
 		if (session != null && session.isConnected()) {
 			throw new IllegalStateException(
 					"Already connected. Disconnect first.");
 		}
 
 		try {
-
+			socketConnector.setHandler(handler);
+			
 			// wait for
 			// "IMPLEMENTATION" "Cyrus timsieved v2.2.13-Debian-2.2.13-10"
 			// "SASL" "PLAIN"
@@ -98,8 +101,8 @@ public class SieveClientSupport {
 			// OK
 			lock();
 
-			ConnectFuture cf = connector.connect(sa, handler);
-			cf.join();
+			ConnectFuture cf = socketConnector.connect(sa);
+			cf.await();
 
 			if (!cf.isConnected()) {
 				return false;
@@ -115,9 +118,9 @@ public class SieveClientSupport {
 		}
 	}
 
-	public void logout() {
+	public void logout() throws InterruptedException {
 		if (session != null) {
-			session.close().join();
+			session.close(false).await();
 			session = null;
 		}
 	}

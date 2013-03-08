@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.impl;
 
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -45,12 +46,13 @@ public class IMAPCodecFactory implements ProtocolCodecFactory {
 	}
 
 	@Override
-	public ProtocolDecoder getDecoder() throws Exception {
+	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
 		return decoder;
 	}
-
+	
 	@Override
-	public ProtocolEncoder getEncoder() throws Exception {
+	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
 		return encoder;
 	}
+	
 }

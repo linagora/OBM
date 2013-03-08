@@ -58,8 +58,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.mina</groupId>
-			<artifactId>mina-filter-ssl</artifactId>
-			<version>1.1.7</version>
+			<artifactId>mina-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.parboiled</groupId>

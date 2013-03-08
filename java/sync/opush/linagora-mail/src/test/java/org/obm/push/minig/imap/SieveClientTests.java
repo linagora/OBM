@@ -74,7 +74,7 @@ public class SieveClientTests extends SieveTestCase {
 		sc.listscripts();
 	}
 
-	public void testListscriptsBenchmark() {
+	public void testListscriptsBenchmark() throws InterruptedException {
 		int COUNT = 1000;
 
 		sc.logout();
@@ -103,7 +103,7 @@ public class SieveClientTests extends SieveTestCase {
 		assertTrue(scripts.isEmpty());
 	}
 
-	protected void tearDown() {
+	protected void tearDown() throws InterruptedException {
 		sc.logout();
 		sc = null;
 	}

@@ -58,7 +58,7 @@ public class StoreClientImplTest {
 		int port = 12651;
 		mocks = createControl();
 		clientSupport = mocks.createMock(ClientSupport.class);
-		storeClientImpl = new StoreClientImpl(null, port, null, null, clientSupport, null);
+		storeClientImpl = new StoreClientImpl(null, port, null, null, clientSupport);
 	}
 
 	@Test

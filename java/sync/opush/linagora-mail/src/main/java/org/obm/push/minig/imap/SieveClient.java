@@ -37,7 +37,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
 
-import org.apache.mina.transport.socket.nio.SocketConnector;
 import org.obm.push.minig.imap.sieve.SieveClientHandler;
 import org.obm.push.minig.imap.sieve.SieveClientSupport;
 import org.obm.push.minig.imap.sieve.SieveScript;
@@ -74,12 +73,10 @@ public class SieveClient {
 		}
 		SieveClientHandler handler = new SieveClientHandler(cs);
 		SocketAddress sa = new InetSocketAddress(host, port);
-		SocketConnector connector = new SocketConnector();
-		boolean ret = false;
-		if (cs.login(connector, sa, handler)) {
-			ret = true;
+		if (cs.login(sa, handler)) {
+			return true;
 		}
-		return ret;
+		return false;
 	}
 
 	public List<SieveScript> listscripts() {
@@ -94,7 +91,7 @@ public class SieveClient {
 		cs.unauthenticate();
 	}
 	
-	public void logout() {
+	public void logout() throws InterruptedException {
 		cs.logout();
 	}
 
