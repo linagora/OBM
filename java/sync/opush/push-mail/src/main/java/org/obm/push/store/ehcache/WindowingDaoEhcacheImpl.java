@@ -167,6 +167,9 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 		}
 	}
 
+	public static ChunkKey chunkKey(WindowingIndexKey key, int index) {
+		return new ChunkKey(key, index);
+	}
 	@VisibleForTesting static class ChunkKey implements Serializable {
 		
 		private static final long serialVersionUID = -3718387421101858836L;
@@ -195,7 +198,10 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 		}		
 		
 	}
-	
+
+	public static WindowingIndex windowingIndex(int index, SyncKey syncKey) {
+		return new WindowingIndex(index, syncKey);
+	}
 	@VisibleForTesting static class WindowingIndex implements Serializable {
 		
 		private static final long serialVersionUID = -3833313956262343686L;

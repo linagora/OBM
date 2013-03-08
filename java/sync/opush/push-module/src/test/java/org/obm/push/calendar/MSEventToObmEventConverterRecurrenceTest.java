@@ -48,6 +48,7 @@ import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventBuilder;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceDayOfWeek;

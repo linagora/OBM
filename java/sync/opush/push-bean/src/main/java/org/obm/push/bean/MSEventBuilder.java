@@ -29,21 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.calendar;
+package org.obm.push.bean;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.obm.push.bean.CalendarBusyStatus;
-import org.obm.push.bean.CalendarMeetingStatus;
-import org.obm.push.bean.CalendarSensitivity;
-import org.obm.push.bean.MSAttendee;
-import org.obm.push.bean.MSEvent;
-import org.obm.push.bean.MSEventException;
-import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.MSRecurrence;
 
 public class MSEventBuilder {
 

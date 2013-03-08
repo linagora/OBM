@@ -41,13 +41,13 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
-import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
@@ -60,6 +60,7 @@ import org.obm.push.utils.SerializableInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.testing.SerializableTester;
 
 @RunWith(SlowFilterRunner.class)
@@ -89,6 +90,74 @@ public class SerializableTest {
 				.syncKey(new SyncKey("key"))
 				.build());
 		objectOutputStream.writeObject(syncCollection);
+	}
+	
+	@Test
+	public void testMSContact() throws Exception {
+		MSContact contact = new MSContact();
+		contact.setAssistantName("AssistantName");
+		contact.setAssistantPhoneNumber("AssistantTelephoneNumber");
+		contact.setAssistnamePhoneNumber("AssistnameTelephoneNumber");
+		contact.setBusiness2PhoneNumber("Business2TelephoneNumber");
+		contact.setBusinessPhoneNumber("BusinessTelephoneNumber");
+		contact.setWebPage("Webpage");
+		contact.setDepartment("Department");
+		contact.setEmail1Address("Email1Address");
+		contact.setEmail2Address("Email2Address");
+		contact.setEmail3Address("Email3Address");
+		contact.setBusinessFaxNumber("BusinessFaxNumber");
+		contact.setFileAs("FileAs");
+		contact.setFirstName("FirstName");
+		contact.setMiddleName("MiddleName");
+		contact.setHomeAddressCity("HomeAddressCity");
+		contact.setHomeAddressCountry("HomeAddressCountry");
+		contact.setHomeFaxNumber("HomeFaxNumber");
+		contact.setHomePhoneNumber("HomeTelephoneNumber");
+		contact.setHome2PhoneNumber("Home2TelephoneNumber");
+		contact.setHomeAddressPostalCode("HomeAddressPostalCode");
+		contact.setHomeAddressState("HomeAddressState");
+		contact.setHomeAddressStreet("HomeAddressStreet");
+		contact.setMobilePhoneNumber("MobileTelephoneNumber");
+		contact.setSuffix("Suffix");
+		contact.setCompanyName("CompanyName");
+		contact.setOtherAddressCity("OtherAddressCity");
+		contact.setOtherAddressCountry("OtherAddressCountry");
+		contact.setCarPhoneNumber("CarTelephoneNumber");
+		contact.setOtherAddressPostalCode("OtherAddressPostalCode");
+		contact.setOtherAddressState("OtherAddressState");
+		contact.setOtherAddressStreet("OtherAddressStreet");
+		contact.setPagerNumber("PagerNumber");
+		contact.setTitle("Title");
+		contact.setBusinessPostalCode("BusinessAddressPostalCode");
+		contact.setBusinessState("BusinessAddressState");
+		contact.setBusinessStreet("BusinessAddressStreet");
+		contact.setBusinessAddressCountry("BusinessAddressCountry");
+		contact.setBusinessAddressCity("BusinessAddressCity");
+		contact.setLastName("LastName");
+		contact.setSpouse("Spouse");
+		contact.setJobTitle("JobTitle");
+		contact.setYomiFirstName("YomiFirstName");
+		contact.setYomiLastName("YomiLastName");
+		contact.setYomiCompanyName("YomiCompanyName");
+		contact.setOfficeLocation("OfficeLocation");
+		contact.setRadioPhoneNumber("RadioTelephoneNumber");
+		contact.setPicture("Picture");
+		contact.setAnniversary(date("2008-10-15T11:15:10Z"));
+		contact.setBirthday(date("2007-10-15T11:15:10Z"));
+		contact.setCategories(Lists.newArrayList("category"));
+		contact.setChildren(Lists.newArrayList("children"));
+		contact.setCustomerId("CustomerId");
+		contact.setGovernmentId("GovernmentId");
+		contact.setIMAddress("IMAddress");
+		contact.setIMAddress2("IMAddress2");
+		contact.setIMAddress3("IMAddress3");
+		contact.setManagerName("ManagerName");
+		contact.setCompanyMainPhone("CompanyMainPhone");
+		contact.setAccountName("AccountName");
+		contact.setNickName("NickName");
+		contact.setMMS("MMS");
+		contact.setData("Data");
+		objectOutputStream.writeObject(contact);
 	}
 	
 	@Test
@@ -169,12 +238,63 @@ public class SerializableTest {
 				 .build());
 	}
 
-	
 	@Test
 	public void testMSEvent() throws IOException {
-		MSEvent msEvent = new MSEvent();
-		msEvent.addAttendee(new MSAttendee());
-		msEvent.setRecurrence(new MSRecurrence());
+		MSRecurrence msRecurrence = new MSRecurrence();
+		msRecurrence.setType(RecurrenceType.DAILY);
+		msRecurrence.setInterval(7);
+		msRecurrence.setUntil(date("2004-12-11T11:15:10Z"));
+		msRecurrence.setOccurrences(4);
+		msRecurrence.setDayOfMonth(2);
+		msRecurrence.setDayOfWeek(ImmutableSet.of(RecurrenceDayOfWeek.FRIDAY, RecurrenceDayOfWeek.SUNDAY));
+		msRecurrence.setWeekOfMonth(4);
+		msRecurrence.setMonthOfYear(2);
+		msRecurrence.setDeadOccur(true);
+		msRecurrence.setRegenerate(true);
+		msRecurrence.setStart(date("2004-12-11T12:15:10Z"));
+		
+		MSEvent msEvent = new MSEventBuilder()
+		.withStartTime(date("2004-12-11T11:15:10Z"))
+		.withEndTime(date("2004-12-12T11:15:10Z"))
+		.withDtStamp(date("2004-12-15T11:15:10Z"))
+		.withSubject("Any Subject")
+		.withRecurrence(msRecurrence)
+		.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
+		.withAllDayEvent(true)
+		.withAttendees(ImmutableSet.of(MSAttendee.builder()
+				.withEmail("email")
+				.withName("name")
+				.withStatus(AttendeeStatus.ACCEPT)
+				.withType(AttendeeType.REQUIRED)
+				.build()))
+		.withBusyStatus(CalendarBusyStatus.BUSY)
+		.withCategories(ImmutableList.of("business"))
+		.withDescription("description")
+		.withExceptions(ImmutableList.of(new MSEventExceptionBuilder()
+				.withAllDayEvent(true)
+				.withBusyStatus(CalendarBusyStatus.TENTATIVE)
+				.withCategories(ImmutableList.of("business"))
+				.withDeleted(false)
+				.withDescription("description")
+				.withDtStamp(date("2004-12-18T11:15:10Z"))
+				.withEndTime(date("2004-11-15T11:15:10Z"))
+				.withExceptionStartTime(date("2004-12-14T21:15:10Z"))
+				.withLocation("location")
+				.withMeetingStatus(CalendarMeetingStatus.MEETING_IS_CANCELED)
+				.withReminder(46)
+				.withSensitivity(CalendarSensitivity.CONFIDENTIAL)
+				.withStartTime(date("2004-10-15T11:15:10Z"))
+				.withSubject("subject")
+				.build()))
+		.withLocation("location")
+		.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
+		.withOrganizerEmail("organizerEmail")
+		.withOrganizerName("organizerName")
+		.withReminder(45)
+		.withSensitivity(CalendarSensitivity.NORMAL)
+		.withTimeZone(TimeZone.getTimeZone("GMT"))
+		.withUid(new MSEventUid("456"))
+		.build();
 		objectOutputStream.writeObject(msEvent);
 	}
 	

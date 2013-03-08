@@ -44,6 +44,7 @@ import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.MSEventBuilder;
 import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Attendee;

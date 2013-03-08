@@ -128,6 +128,9 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		return new Key(credentials, device, collectionId, unsynchronizedItemType);
 	}
 
+	public static Key key(Credentials credentials, Device device, int collectionId, UnsynchronizedItemType unsynchronizedItemType) {
+		return new Key(credentials, device, collectionId, unsynchronizedItemType);
+	}
 	@VisibleForTesting static class Key implements Serializable {
 
 		private static final long serialVersionUID = 3512553571924589754L;
