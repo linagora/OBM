@@ -13,6 +13,13 @@
             "description": "Check that the obm-sync servers are up and running.",
             "url": "http://obm.org/wiki/configuration-0",
             "parentId": null
+        },
+        {
+            "id": "SyncStatus",
+            "name": "OBM-Sync Synchronization Check",
+            "description": "Check that we can login and synchronize user's information on obm-sync server(s)",
+            "url": null,
+            "parentId": null
         }
     ]
 }
