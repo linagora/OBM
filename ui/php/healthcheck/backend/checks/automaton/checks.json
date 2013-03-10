@@ -1,0 +1,11 @@
+{
+	"checks": [
+        {
+            "id": "LogsConfigurationStatus",
+            "name": "Logs configuration check",
+            "description": "Checks that /var/log/obm-services is writable by the web server.",
+            "url": null,
+            "parentId": null
+        }
+    ]
+}
