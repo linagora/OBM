@@ -41,6 +41,12 @@
             "name": "Automaton Module",
             "description": "Checks the automaton (various low-level OBM services) service",
             "url": null
+        },
+        {
+            "id": "imap",
+            "name": "IMAP Module",
+            "description": "Checks the IMAP (Cyrus) configuration",
+            "url": null
         }
     ]
 }

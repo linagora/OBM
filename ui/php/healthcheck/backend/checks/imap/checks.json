@@ -1,0 +1,11 @@
+{
+    "checks": [
+        {
+            "id": "HostInDatabaseStatus",
+            "name": "IMAP Database Definition Check",
+            "description": "Check that the database contains the proper mappings between domains and IMAP hosts.",
+            "url": "http://obm.org/wiki/getting-started",
+            "parentId": null
+        }
+    ]
+}
