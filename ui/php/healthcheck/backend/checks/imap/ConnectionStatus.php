@@ -30,23 +30,32 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-class CheckHelper {
+require_once dirname(__FILE__) . '/../AbstractUserStatus.php';
+
+class ConnectionStatus extends AbstractUserStatus {
   
-  public static function curlGet($url, $username, $password) {
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  const IMAP_INBOX_URL = "imap://%HOST%/INBOX";
+  
+  public function executeForDomain($domain) {
+    global $obm;
     
-    if (isset($username) && isset($password)) {
-      curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
+    $user = $this->getTestUser();
+    $servers = of_domain_get_domain_mailserver('imap', $domain['id']);
+    
+    $obm['domain_id'] = $domain['id']; //So that get_user_id works as expected
+    $userInfo = get_user_info(get_user_id($user['login']));
+    
+    foreach ($servers as $server) {
+      $host = $server[0];      
+      $url = str_replace("%HOST%", $host["ip"], self::IMAP_INBOX_URL);
+      $curl = CheckHelper::curlGet($url, $userInfo['email'], $user['password']);
+      
+      if ($curl["errno"] != 0) {
+        return new CheckResult(CheckStatus::ERROR, array("IMAP connection failed (using URL: " . $url . ") for domain '" . $domain["name"] . "'. Error: " . $curl['errno']));
+      }
     }
     
-    $success = curl_exec($curl);
-    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $errno = curl_errno($curl);
-    
-    curl_close($curl);
-    
-    return array("success" => $success, "code" => $code, "errno" => $errno);
+    return new CheckResult(CheckStatus::OK);
   }
   
 }
