@@ -41,10 +41,10 @@ import com.google.inject.Singleton;
 public class PageFactory {
 
 	private final Injector injector;
-
+	
 	@Inject
 	private PageFactory(Injector injector) {
-		this.injector = injector;
+		this.injector = injector; 
 	}
 
 	public <T extends Page> T create(WebDriver driver, Class<T> pageClass) {

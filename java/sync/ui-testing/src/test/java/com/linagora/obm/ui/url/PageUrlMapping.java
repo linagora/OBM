@@ -38,6 +38,8 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.linagora.obm.ui.ioc.Module;
 import com.linagora.obm.ui.page.HomePage;
 import com.linagora.obm.ui.page.LoginPage;
 import com.linagora.obm.ui.page.Page;
@@ -45,20 +47,14 @@ import com.linagora.obm.ui.page.Page;
 @Singleton
 public class PageUrlMapping {
 
-	private final URL serverUrl;
 	private final Map<Class<? extends Page>, URL> mapping;
 	
 	@Inject
-	private PageUrlMapping() throws MalformedURLException {
-		serverUrl = new URL(findServerIp());
+	private PageUrlMapping(@Named(Module.SERVER_URL) URL serverUrl) throws MalformedURLException {
 		mapping = ImmutableMap.<Class<? extends Page>, URL>builder()
 				.put(LoginPage.class, new URL(serverUrl, "/"))
 				.put(HomePage.class, new URL(serverUrl, "/obm.php"))
 				.build();
-	}
-
-	private String findServerIp() {
-		return System.getProperty("serverUrl");
 	}
 	
 	public URL lookup(Class<? extends Page> page) {

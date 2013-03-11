@@ -31,6 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.ioc;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import com.google.common.base.Strings;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -38,18 +48,45 @@ import com.google.inject.name.Names;
 public class Module extends AbstractModule {
 
 	public static final String SERVER_URL = "serverUrl";
+	public static final String CLIENT_URL = "clientUrl";
 
 	@Override
 	protected void configure() {
-		bind(String.class).annotatedWith(Names.named(SERVER_URL)).toInstance(readVmServerUrlArg());
+		bind(URL.class).annotatedWith(Names.named(SERVER_URL)).toInstance(readRequiredUrlArg(SERVER_URL));
+
+		URL clientUrl = readUrlArg(CLIENT_URL);
+		if (clientUrl != null) {
+			bind(WebDriver.class).toInstance(new RemoteWebDriver(clientUrl, buildDriverCapabilities()));
+		} else {
+			bind(WebDriver.class).toInstance(new FirefoxDriver());
+		}
 	}
 
-	private String readVmServerUrlArg() {
-		String serverUrl = System.getProperty(SERVER_URL);
-		if (!Strings.isNullOrEmpty(serverUrl)) {
-			return serverUrl;
+	private Capabilities buildDriverCapabilities() {
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		capabilities.setCapability("version", "17");
+		capabilities.setCapability("platform", Platform.LINUX);
+		return capabilities;
+	}
+	
+	private URL readRequiredUrlArg(String vmArg) {
+		URL urlArg = readUrlArg(vmArg);
+		if (urlArg != null) {
+			return urlArg;
 		}
-		throw new IllegalStateException(SERVER_URL + " arg is required");
+		throw new IllegalStateException(vmArg + " arg is required");
+	}
+
+	private URL readUrlArg(String vmArg) {
+		String serverUrl = System.getProperty(vmArg);
+		if (!Strings.isNullOrEmpty(serverUrl)) {
+			try {
+				return new URL(serverUrl);
+			} catch (MalformedURLException e) {
+				throw new IllegalStateException(vmArg + " must be a valid URL, found:" + serverUrl);
+			}
+		}
+		return null;
 	}
 
 }

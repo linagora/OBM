@@ -34,14 +34,12 @@ package com.linagora.obm.ui.tests;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.google.inject.Inject;
 import com.linagora.obm.ui.bean.UIDomain;
@@ -56,13 +54,7 @@ import com.linagora.obm.ui.page.PageFactory;
 public class UILoginTest {
 
 	@Inject PageFactory pageFactory;
-	
-	private WebDriver driver;
-
-	@Before
-	public void setUp() {
-		this.driver = new FirefoxDriver();
-	}
+	@Inject WebDriver driver;
 
 	@After
 	public void tearDown() {
@@ -101,7 +93,6 @@ public class UILoginTest {
 		loginPage.open();
 		HomePage homePage = loginPage.login(uiUser, uiDomain);
 
-		System.out.println(homePage.currentTitle());
 		assertThat(homePage.currentTitle()).contains("OBM");
 		assertThat(homePage.elInformationUser().getText()).startsWith(uiUser.getLogin()).contains(uiDomain.getName());
 		assertThat(homePage.elInformationProfile().getText()).contains(uiUser.getProfile().getUiValue());
