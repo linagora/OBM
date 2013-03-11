@@ -30,51 +30,64 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
-import org.obm.configuration.VMArgumentsUtils;
+
+import org.crsh.plugin.CRaSHPlugin;
+import org.crsh.ssh.SSHPlugin;
+import org.obm.auth.crsh.ObmSyncAuthenticationPlugin;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.java.mail.ImapModule;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
+import com.linagora.crsh.guice.CrashGuiceConfiguration;
+import com.linagora.crsh.guice.CrashGuiceSupport;
+import com.linagora.crsh.guice.CrashGuiceSupport.Bootstrap;
 
-public class OpushModule extends AbstractModule {
+public class OpushCrashModule extends AbstractModule {
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
 	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
 	
-	@Override
 	protected void configure() {
-		installImapModule();
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new LoggerModule());
-		install(new OpushCrashModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
+		boolean autostart = false;
+		install(new CrashGuiceSupport(autostart));
+		Multibinder<CRaSHPlugin<?>> pluginBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<CRaSHPlugin<?>>(){});
+		pluginBinder.addBinding().to(ObmSyncAuthenticationPlugin.class);
+		bind(CRaSHBootstrap.class).asEagerSingleton();
+	}
 
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
-	}
-	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
+	public static class CRaSHBootstrap {
+
+		private final RemoteConsoleConfiguration configuration;
+		private final Bootstrap bootstrap;
+
+		@Inject
+		private CRaSHBootstrap(RemoteConsoleConfiguration configuration, Bootstrap bootstrap) {
+			this.configuration = configuration;
+			this.bootstrap = bootstrap;
+			bootstrap();
 		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
+
+		private void bootstrap() {
+			boolean enable = configuration.enable();
+			logger.debug("CRaSH remote shell : " + (enable ? "enable" : "disable"));
+			if (enable) {
+				logger.debug("CRaSH remote shell started on port : " + configuration.port());
+				bootstrap.start();
+			}
 		}
-		
-		return defaultImapModule();
+
 	}
-	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
+
+	@Provides
+	public CrashGuiceConfiguration crashConfiguration(RemoteConsoleConfiguration configuration) {
+		return CrashGuiceConfiguration.builder()
+				.property(SSHPlugin.SSH_PORT.getName(), configuration.port())
+				.property(SSHPlugin.AUTH.getName(), "obm-sync")
+				.build();
 	}
 }

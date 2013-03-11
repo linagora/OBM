@@ -29,52 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
-import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.push.java.mail.ImapModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.obm.auth.crsh;
 
-import com.google.common.base.Strings;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import org.crsh.auth.AuthenticationPlugin;
+import org.crsh.plugin.CRaSHPlugin;
+import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.login.LoginService;
 
-public class OpushModule extends AbstractModule {
+import com.google.inject.Inject;
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
+public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> implements
+		AuthenticationPlugin {
+
+	private final LoginService loginService;
+
+	@Inject
+	private ObmSyncAuthenticationPlugin(LoginService loginService) {
+		this.loginService = loginService;
+	}
 	
 	@Override
-	protected void configure() {
-		installImapModule();
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new LoggerModule());
-		install(new OpushCrashModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
-
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
+	public boolean authenticate(String username, String password) throws Exception {
+		try {
+			return loginService.authenticateGlobalAdmin(username, password);
+		} catch (AuthFault e) {
+			return false;
+		}
 	}
 	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
-		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
-		}
-		
-		return defaultImapModule();
+	@Override
+	public AuthenticationPlugin getImplementation() {
+		return this;
 	}
 	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
+	@Override
+	public String getName() {
+		return "obm-sync";
 	}
+	
 }
