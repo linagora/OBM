@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Login;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailAddress;
@@ -75,6 +76,7 @@ public class BeansTest {
 	@Test
 	public void test() {
 		equalsVerifierUtilsTest.test(
+				Credentials.class,
 				ObmDomain.class,
 				Event.class,
 				DeletedEvent.class,
