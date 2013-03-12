@@ -44,6 +44,7 @@ import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -84,12 +85,12 @@ public class SessionManagement {
 	private final HelperService helperService;
 
 	@Inject
-	private SessionManagement(AuthentificationServiceFactory authentificationServiceFactory,
-			DomainService domainService, UserDao userDao, ObmSyncConfigurationService constantService,
+	@VisibleForTesting SessionManagement(AuthentificationServiceFactory authentificationServiceFactory,
+			DomainService domainService, UserDao userDao, ObmSyncConfigurationService configurationService,
 			SpecialAccounts specialAccounts, HelperService helperService) {
 
 		this.userManagementDAO = userDao;
-		this.configuration = constantService;
+		this.configuration = configurationService;
 		this.specialAccounts = specialAccounts;
 		this.helperService = helperService;
 		this.conversationUidGenerator = new AtomicInteger();
@@ -211,9 +212,9 @@ public class SessionManagement {
 		logger.warn("cannot figure out domain for the domain_name "	+ domainName);
 	}
 
-	private Login prepareLogin(String specifiedLogin, String lemonLogin,
+	@VisibleForTesting Login prepareLogin(String specifiedLogin, String lemonLogin,
 			String lemonDomain, IAuthentificationService authService) {
-		Login login = new Login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain));
+		Login login = Login.builder().login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain)).build();
 		return login.hasDomain()
 				? login
 				: login.withDomain(authService.getObmDomain(login.getLogin()));

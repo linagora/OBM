@@ -1,7 +1,7 @@
 package org.obm.sync.auth;
 
 
-import org.fest.assertions.api.Assertions;
+import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 
 public class LoginTest {
@@ -13,42 +13,54 @@ public class LoginTest {
 
 	@Test
 	public void creationByFullLogin() {
-		login = new Login(FULL_LOGIN);
+		login = Login.builder().login(FULL_LOGIN).build();
 		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
 	}
 
 	@Test
+	public void creationByFullLoginAndMatchingDomain() {
+		login = Login.builder().login(FULL_LOGIN).domain(DOMAIN).build();
+		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void creationByFullLoginAndDifferentDomain() {
+		login = Login.builder().login(FULL_LOGIN).domain("differentdomain").build();
+	}
+	
+	@Test
 	public void creationByLoginParts() {
-		login = new Login(LOGIN, DOMAIN);
+		login = Login.builder().login(LOGIN).domain(DOMAIN).build();
 		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
 	}
 
 	@Test
 	public void nullDomain() {
-		login = new Login(LOGIN, null);
+		login = Login.builder().login(LOGIN).build();
 		assertLogin(LOGIN, null, LOGIN);
 	}
-	@Test(expected=NullPointerException.class)
+	
+	@Test(expected=IllegalStateException.class)
 	public void nullFullLogin() {
-		login = new Login(null);
+		login = Login.builder().build();
 	}
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void nullLogin() {
-		login = new Login(null, DOMAIN);
+		login = Login.builder().domain(DOMAIN).build();
 	}
 
 	@Test
 	public void alterDomain() {
-		login = new Login(FULL_LOGIN);
+		login = Login.builder().login(FULL_LOGIN).build();
 		login = login.withDomain(ALTERNATIVE_DOMAIN);
 		Login alternative = new Login(LOGIN, ALTERNATIVE_DOMAIN);
 		assertLogin(LOGIN, ALTERNATIVE_DOMAIN, alternative.getFullLogin());
 	}
 
 	private void assertLogin(String shortLogin, String domain, String fullLogin) {
-		Assertions.assertThat(login.getLogin()).isEqualTo(shortLogin);
-		Assertions.assertThat(login.getDomain()).isEqualTo(domain);
-		Assertions.assertThat(login.getFullLogin()).isEqualTo(fullLogin);
+		assertThat(login.getLogin()).isEqualTo(shortLogin);
+		assertThat(login.getDomain()).isEqualTo(domain);
+		assertThat(login.getFullLogin()).isEqualTo(fullLogin);
 	}
 }
