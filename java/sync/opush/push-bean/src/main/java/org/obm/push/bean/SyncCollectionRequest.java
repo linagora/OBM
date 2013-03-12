@@ -38,7 +38,7 @@ import org.obm.push.exception.activesync.ASRequestStringFieldException;
 
 import com.google.common.base.Objects;
 
-public class SyncCollectionRequest extends SyncCollection<SyncCollectionCommands.Request> implements SyncDefaultValues, Serializable {
+public class SyncCollectionRequest extends AbstractSyncCollection<SyncCollectionCommands.Request> implements SyncDefaultValues, Serializable {
 
 	public static Builder builder() {
 		return new Builder();
@@ -160,7 +160,7 @@ public class SyncCollectionRequest extends SyncCollection<SyncCollectionCommands
 	}
 	
 	@Override
-	protected boolean equalsImpl(SyncCollection<?> object) {
+	protected boolean equalsImpl(AbstractSyncCollection<?> object) {
 		if (object instanceof SyncCollectionRequest) {
 			SyncCollectionRequest that = (SyncCollectionRequest) object;
 			return Objects.equal(this.deletesAsMoves, that.deletesAsMoves)

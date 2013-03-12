@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
-public class SyncCollectionTest {
+public class AbstractSyncCollectionTest {
 
 	@Test
 	public void testDataClassForNullDataType() {

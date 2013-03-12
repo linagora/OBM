@@ -38,8 +38,10 @@ import org.obm.push.exception.activesync.ASRequestStringFieldException;
 
 import com.google.common.base.Objects;
 
-public class AnalysedSyncCollection extends SyncCollection<SyncCollectionCommands.Response> implements SyncDefaultValues, Serializable {
+public class AnalysedSyncCollection extends AbstractSyncCollection<SyncCollectionCommands.Response> implements SyncDefaultValues, Serializable {
 	
+	private static final long serialVersionUID = 348968178554764052L;
+
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -197,7 +199,7 @@ public class AnalysedSyncCollection extends SyncCollection<SyncCollectionCommand
 	}
 	
 	@Override
-	protected boolean equalsImpl(SyncCollection<?> object) {
+	protected boolean equalsImpl(AbstractSyncCollection<?> object) {
 		if (object instanceof AnalysedSyncCollection) {
 			AnalysedSyncCollection that = (AnalysedSyncCollection) object;
 			return Objects.equal(this.collectionPath, that.collectionPath)

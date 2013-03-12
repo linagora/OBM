@@ -48,6 +48,7 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.BodyPreference;
@@ -78,6 +79,8 @@ import org.obm.push.bean.RecurrenceDayOfWeek;
 import org.obm.push.bean.RecurrenceType;
 import org.obm.push.bean.SyncCollection;
 import org.obm.push.bean.SyncCollectionChange;
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
@@ -159,6 +162,7 @@ import com.google.common.collect.Lists;
 	"org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl$Key", 
 	"org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl$Key"
  */
+@SuppressWarnings("deprecation")
 public class SerializableCompatibilityTest {
 
 	private ImmutableMap<String, Object> serializedClasses;
@@ -382,6 +386,28 @@ public class SerializableCompatibilityTest {
 		syncCollection.setSyncKey(syncKey);
 		syncCollection.setWindowSize(24);
 		
+		SyncCollectionCommand.Response syncCollectionCommand = SyncCollectionCommand.Response.builder()
+				.serverId("serverId")
+				.clientId("clientId")
+				.commandType(SyncCommand.ADD)
+				.applicationData(msEmail)
+				.build();
+		
+		SyncCollectionCommands.Response syncCollectionCommands = SyncCollectionCommands.Response.builder()
+				.addCommand(syncCollectionCommand)
+				.build();
+		
+		AnalysedSyncCollection analysedSyncCollection = AnalysedSyncCollection.builder()
+				.dataType(syncCollection.getDataType())
+				.syncKey(syncCollection.getSyncKey())
+				.collectionId(syncCollection.getCollectionId())
+				.collectionPath(syncCollection.getCollectionPath())
+				.windowSize(syncCollection.getWindowSize())
+				.options(syncCollection.getOptions())
+				.status(syncCollection.getStatus())
+				.commands(syncCollectionCommands)
+				.build();
+		
 		serializedClasses = ImmutableMap.<String, Object>builder()
 				.put("org.obm.push.mail.EmailChanges", 
 					EmailChanges.builder()
@@ -403,7 +429,10 @@ public class SerializableCompatibilityTest {
 				.put("org.obm.push.bean.SyncKeysKey",
 						SyncKeysKey.builder().collectionId(456).deviceId(deviceId).build())
 				.put("org.obm.push.bean.Credentials", credentials)
-				.put("org.obm.push.bean.SyncCollection", syncCollection)
+				.put("org.obm.push.bean.SyncCollection", analysedSyncCollection)
+				.put("org.obm.push.bean.SyncCollectionCommand.Response", syncCollectionCommand)
+				.put("org.obm.push.bean.SyncCollectionCommands.Response", syncCollectionCommands)
+				.put("org.obm.push.bean.AnalysedSyncCollection", analysedSyncCollection)
 				.put("org.obm.push.bean.MSContact", contact)
 				.put("org.obm.push.bean.ms.MSEmail", msEmail) 
 				.put("org.obm.push.bean.ms.UidMSEmail", UidMSEmail.uidBuilder().email(msEmail).uid(1456l).build()) 

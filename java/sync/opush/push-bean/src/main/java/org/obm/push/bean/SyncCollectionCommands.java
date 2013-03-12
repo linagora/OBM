@@ -46,7 +46,12 @@ import com.google.common.collect.ImmutableListMultimap;
 
 public abstract class SyncCollectionCommands<T extends SyncCollectionCommand> implements Serializable {
 
+	private static final long serialVersionUID = 5403154747427044879L;
+
 	public static class Request extends SyncCollectionCommands<SyncCollectionCommand.Request> {
+		
+		private static final long serialVersionUID = 7346187155191351839L;
+
 		private Request(
 				ImmutableListMultimap<SyncCommand, SyncCollectionCommand.Request> commandsByType, 
 				List<SyncCollectionCommand.Request> commands) {
@@ -74,6 +79,9 @@ public abstract class SyncCollectionCommands<T extends SyncCollectionCommand> im
 	}
 	
 	public static class Response extends SyncCollectionCommands<SyncCollectionCommand.Response> {
+		
+		private static final long serialVersionUID = -6871877347639563687L;
+
 		private Response(
 				ImmutableListMultimap<SyncCommand, SyncCollectionCommand.Response> commandsByType, 
 				List<SyncCollectionCommand.Response> commands) {

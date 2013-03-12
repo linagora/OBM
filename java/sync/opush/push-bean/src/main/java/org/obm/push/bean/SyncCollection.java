@@ -32,35 +32,89 @@
 package org.obm.push.bean;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.obm.push.bean.change.SyncCommand;
-
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
-public abstract class SyncCollection<T extends SyncCollectionCommands<?>> implements Serializable {
+/*
+ * This legacy class mustn't be used.
+ * It's only in use for cache deserialization comptability.
+ */
+@Deprecated
+public class SyncCollection implements Serializable {
 	
 	private static final long serialVersionUID = -6717593719409450005L;
 	
-	private final PIMDataType dataType;
-	private final SyncKey syncKey;
-	private final int collectionId;
-	private final T commands;
+	private ItemSyncState itemSyncState;
+	private List<String> fetchIds;
+	private Integer collectionId;
+	private String collectionPath;
+	private SyncKey syncKey;
+	private Integer windowSize;
+	private boolean moreAvailable;
+	private Set<SyncCollectionChange> changes;
+	private SyncStatus status;
+	private PIMDataType dataType;
+	private SyncCollectionOptions options;
 	
-	protected SyncCollection(PIMDataType dataType, SyncKey syncKey, int collectionId, T commands) {
-		this.dataType = dataType;
-		this.syncKey = syncKey;
+	public SyncCollection() {
+		this(0, null);
+	}
+
+	public SyncCollection(int collectionId, String collectionPath) {
+		this(null, Lists.<String>newLinkedList(), Lists.<BodyPreference>newArrayList());
 		this.collectionId = collectionId;
-		this.commands = commands;
+		this.collectionPath = collectionPath;
 	}
 	
-	public PIMDataType getDataType() {
-		return dataType;
+	public SyncCollection(PIMDataType dataType, List<String> fetchIds, List<BodyPreference> bodyPreferences) {
+		super();
+		this.dataType = dataType;
+		this.fetchIds = fetchIds;
+		this.options = new SyncCollectionOptions(bodyPreferences);
+		this.moreAvailable = false;
+		this.windowSize = 100;
+		this.changes = new HashSet<SyncCollectionChange>();
+		this.status = SyncStatus.OK;
 	}
 	
+	private Object readResolve() {
+		return AnalysedSyncCollection.builder()
+				.dataType(getDataType())
+				.syncKey(getSyncKey())
+				.collectionId(getCollectionId())
+				.collectionPath(getCollectionPath())
+				.windowSize(getWindowSize())
+				.options(getOptions())
+				.status(getStatus())
+				.commands(getCommands(getChanges()))
+				.build();
+	}
+	
+	private SyncCollectionCommands.Response getCommands(Set<SyncCollectionChange> changes) {
+		SyncCollectionCommands.Response.Builder builder = SyncCollectionCommands.Response.builder();
+		for (SyncCollectionChange change : changes) {
+			builder.addCommand(SyncCollectionCommand.Response.builder()
+					.serverId(change.getServerId())
+					.clientId(change.getClientId())
+					.commandType(change.getCommand())
+					.applicationData(change.getData())
+					.build());
+		}
+		return builder.build();
+	}
+
+	public ItemSyncState getItemSyncState() {
+		return itemSyncState;
+	}
+
+	public void setItemSyncState(ItemSyncState itemSyncState) {
+		this.itemSyncState = itemSyncState;
+	}
+
 	public String getDataClass() {
 		if (dataType != null && dataType != PIMDataType.UNKNOWN) {
 			return dataType.asXmlValue();
@@ -68,65 +122,134 @@ public abstract class SyncCollection<T extends SyncCollectionCommands<?>> implem
 		return null;
 	}
 
-	public int getCollectionId() {
+	public Integer getCollectionId() {
 		return collectionId;
+	}
+
+	public void setCollectionId(Integer collectionId) {
+		this.collectionId = collectionId;
 	}
 
 	public SyncKey getSyncKey() {
 		return syncKey;
 	}
-	
-	public T getCommands() {
-		return commands;
+
+	public void setSyncKey(SyncKey syncKey) {
+		this.syncKey = syncKey;
 	}
 
 	public List<String> getFetchIds() {
-		if (commands == null) {
-			return ImmutableList.of();
-		}
-		return FluentIterable.from(
-				commands.getCommandsForType(SyncCommand.FETCH))
-				.transform(new Function<SyncCollectionCommand, String>() {
-					@Override
-					public String apply(SyncCollectionCommand input) {
-						return input.getServerId();
-					}
-				}).toList();
+		return fetchIds;
+	}
+
+	public void setFetchIds(List<String> fetchIds) {
+		this.fetchIds = fetchIds;
+	}
+
+	public Integer getWindowSize() {
+		return windowSize;
+	}
+
+	public void setWindowSize(Integer windowSize) {
+		this.windowSize = windowSize;
+	}
+	
+	public boolean isMoreAvailable() {
+		return moreAvailable;
+	}
+
+	public void setMoreAvailable(boolean moreAvailable) {
+		this.moreAvailable = moreAvailable;
+	}
+	
+	public String getCollectionPath() {
+		return collectionPath;
+	}
+
+	public void setCollectionPath(String collectionPath) {
+		this.collectionPath = collectionPath;
+	}
+
+	public Set<SyncCollectionChange> getChanges() {
+		return changes;
+	}
+
+	public void addChange(SyncCollectionChange change) {
+		this.changes.add(change);
+	}
+	
+	public SyncStatus getStatus(){
+		return status;
+	}
+	
+	public void setStatus(SyncStatus status){
+		this.status = status;
+	}
+
+	public PIMDataType getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(PIMDataType dataType) {
+		this.dataType = dataType;
+	}
+
+	public SyncCollectionOptions getOptions() {
+		return options;
+	}
+
+	public void setOptions(SyncCollectionOptions options) {
+		this.options = options;
+	}
+
+	public boolean hasSyncState() {
+		return itemSyncState != null;
+	}
+
+	public boolean isValidToProcess() {
+		return status == null || status == SyncStatus.OK;
 	}
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(dataType, syncKey, collectionId, commands, hashCodeImpl());
+		return Objects.hashCode(itemSyncState, fetchIds, collectionId, collectionPath, 
+				syncKey, windowSize, moreAvailable, changes, status, dataType, options);
 	}
 	
-	protected abstract int hashCodeImpl();
-
 	@Override
 	public final boolean equals(Object object){
-		if (object instanceof SyncCollection<?>) {
-			SyncCollection<?> that = (SyncCollection<?>) object;
-			return Objects.equal(this.dataType, that.dataType)
-				&& Objects.equal(this.syncKey, that.syncKey)
+		if (object instanceof SyncCollection) {
+			SyncCollection that = (SyncCollection) object;
+			return Objects.equal(this.itemSyncState, that.itemSyncState)
+				&& Objects.equal(this.fetchIds, that.fetchIds)
 				&& Objects.equal(this.collectionId, that.collectionId)
-				&& Objects.equal(this.commands, that.commands)
-				&& equalsImpl(that);
+				&& Objects.equal(this.collectionPath, that.collectionPath)
+				&& Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.windowSize, that.windowSize)
+				&& Objects.equal(this.moreAvailable, that.moreAvailable)
+				&& Objects.equal(this.changes, that.changes)
+				&& Objects.equal(this.status, that.status)
+				&& Objects.equal(this.dataType, that.dataType)
+				&& Objects.equal(this.options, that.options);
 		}
 		return false;
 	}
 
-	protected abstract boolean equalsImpl(SyncCollection<?> object);
-
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("dataType", dataType)
-			.add("syncKey", syncKey)
+			.add("itemSyncState", itemSyncState)
+			.add("fetchIds", fetchIds)
 			.add("collectionId", collectionId)
-			.add("commands", commands)
+			.add("collectionPath", collectionPath)
 			.add("syncKey", syncKey)
-			.toString()
-			.concat(toStringImpl());
+			.add("windowSize", windowSize)
+			.add("moreAvailable", moreAvailable)
+			.add("changes", changes)
+			.add("status", status)
+			.add("dataType", dataType)
+			.add("options", options)
+			.toString();
 	}
-
-	protected abstract String toStringImpl();
+	
 }

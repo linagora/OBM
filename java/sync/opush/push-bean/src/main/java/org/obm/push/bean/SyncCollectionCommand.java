@@ -40,7 +40,12 @@ import com.google.common.base.Objects;
 
 public abstract class SyncCollectionCommand implements Serializable {
 
+	private static final long serialVersionUID = 5244279911428703760L;
+
 	public static class Request extends SyncCollectionCommand {
+		
+		private static final long serialVersionUID = 6165838750984946199L;
+
 		public static Builder builder() {
 			return new Builder();
 		}
@@ -58,6 +63,7 @@ public abstract class SyncCollectionCommand implements Serializable {
 				return this;
 			}
 			
+			@Override
 			protected Request buildImpl(SyncCommand commandType, String serverId, String clientId) {
 				return new Request(commandType, serverId, clientId, data);
 			}
@@ -76,6 +82,9 @@ public abstract class SyncCollectionCommand implements Serializable {
 	}
 	
 	public static class Response extends SyncCollectionCommand {
+		
+		private static final long serialVersionUID = -246587854210988404L;
+
 		public static Builder builder() {
 			return new Builder();
 		}
@@ -93,6 +102,7 @@ public abstract class SyncCollectionCommand implements Serializable {
 				return this;
 			}
 			
+			@Override
 			protected Response buildImpl(SyncCommand commandType, String serverId, String clientId) {
 				return new Response(commandType, serverId, clientId, data);
 			}

@@ -46,7 +46,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-public class SyncCollectionResponse extends SyncCollection<SyncCollectionCommands.Response> implements Serializable {
+public class SyncCollectionResponse extends AbstractSyncCollection<SyncCollectionCommands.Response> implements Serializable {
 
 	public static Builder builder() {
 		return new Builder();
@@ -207,7 +207,7 @@ public class SyncCollectionResponse extends SyncCollection<SyncCollectionCommand
 	}
 	
 	@Override
-	protected boolean equalsImpl(SyncCollection<?> object) {
+	protected boolean equalsImpl(AbstractSyncCollection<?> object) {
 		if (object instanceof SyncCollectionResponse) {
 			SyncCollectionResponse that = (SyncCollectionResponse) object;
 			return Objects.equal(this.status, that.status)
