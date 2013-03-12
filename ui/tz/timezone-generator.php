@@ -29,41 +29,94 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
+$options = getopt("d:cv");
 
-
-$path='/tmp/timezone';
-if(!is_dir($path)) {
-  mkdir($path);
+if (!$options) {
+  echo "Usage: php " . $argv[0] . " -d <path> [-v] [-c]\n";
+  echo "Options:\n";
+  echo "\t-d <path> - Target directory\n";
+  echo "\t-v - Be verbose\n";
+  echo "\t-c - Clear target directory before generating the new definitions\n";
+  
+  exit(1);
 }
+
+$path = $options["d"];
+$clear = array_key_exists("c", $options);
+$verbose = array_key_exists("v", $options);
+
+if (is_dir($path) && $clear) {
+  if ($verbose) {
+    echo "Deleting folder " . $path . "\n";
+  }
+  
+  delTree($path);
+}
+
+if (!is_dir($path)) {
+  mkdir($path, 0755, true);
+}
+
 $timezones = DateTimeZone::listIdentifiers();
+$total = count($timezones);
+$idx = 1;
+
+if ($verbose) {
+  echo "Generating " . $total . " timezone definition(s)\n";
+}
+
 foreach ($timezones as $tzIdentifier) {
   $timezone = new DateTimeZone($tzIdentifier);
-  $transitions = $timezone->getTransitions();
+  
+  if ($verbose) {
+    echo "Generating timezone definition (" . $idx++ . "/" . $total . "): " . $timezone->getName() . "\n";
+  }
+  
   $timezoneInfos = array();
+  $transitions = $timezone->getTransitions();
+  
   if($transitions[0]) {
     $timezoneInfos[] = array( 'from' => false, 'to' => $transitions[0]['ts'], 'offset' => $transitions[0]['offset']);
   } else {
     $timezoneInfos[] = array( 'from' => false, 'to' => false, 'offset' => 0);
   }
+  
   for($i = 0; $i < count($transitions); $i++) {
     $transition = $transitions[$i];
+    
     if($i == (count($transitions) -1)) {
       $timezoneInfos[] = array( 'from' => $transition['ts'], 'to' => false, 'offset' => $transition['offset']);
     } else {
       $timezoneInfos[] = array( 'from' => $transition['ts'], 'to' => $transitions[$i +1]['ts'], 'offset' => $transition['offset']);
     }
   }
-  $filePath = explode('/', $tzIdentifier);
-  $currenPath = $path;
+
   $i = 0;
+  $currenPath = $path;
+  $filePath = explode('/', $tzIdentifier);
+  
   while($i < (count($filePath) - 1)) {
-    $currenPath .= '/'.$filePath[$i];
+    $currenPath .= '/' . $filePath[$i];
+    
     if(!is_dir($currenPath)) {
       mkdir($currenPath);
     }
+    
     $i++;
   }
+  
   $handle = fopen($currenPath.'/'.$filePath[$i], 'w');
+  
   fwrite($handle, json_encode($timezoneInfos));
   fclose($handle);
+}
+
+function delTree($dir) {
+  $files = array_diff(scandir($dir), array('.','..'));
+  
+  foreach ($files as $file) {
+    is_dir("$dir/$file") ? delTree("$dir/$file") : unlink("$dir/$file");
+  }
+  
+  return rmdir($dir);
 }
