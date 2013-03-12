@@ -29,14 +29,9 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.page;
+package com.linagora.obm.ui.service;
 
-import com.linagora.obm.ui.service.Service;
 
-public interface Page extends Service {
+public interface Service {
 
-	void open();
-	
-	String currentTitle();
-	
 }

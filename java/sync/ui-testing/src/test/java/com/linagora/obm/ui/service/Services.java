@@ -29,35 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.url;
+package com.linagora.obm.ui.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.linagora.obm.ui.ioc.Module;
-import com.linagora.obm.ui.page.HomePage;
-import com.linagora.obm.ui.page.LoginPage;
-import com.linagora.obm.ui.page.Page;
+public class Services {
 
-@Singleton
-public class PageUrlMapping {
-
-	private final Map<Class<? extends Page>, URL> mapping;
+	public static class Logout implements Service {}
 	
-	@Inject
-	private PageUrlMapping(@Named(Module.SERVER_URL) URL serverUrl) throws MalformedURLException {
-		mapping = ImmutableMap.<Class<? extends Page>, URL>builder()
-				.put(LoginPage.class, new URL(serverUrl, "/"))
-				.put(HomePage.class, new URL(serverUrl, "/obm.php"))
-				.build();
-	}
-	
-	public URL lookup(Class<? extends Page> page) {
-		return mapping.get(page);
-	}
 }

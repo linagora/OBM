@@ -1281,7 +1281,7 @@ function display_menu($module) {
       $wait_event
       <li id='informationUser'>$login ($domain)</li>
       <li id='informationProfile'>$l_profile: $p</li>
-      <li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
+      <li><a id='bannerLogoutLink' href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
       $dis_printer
     </ul>
     </div>

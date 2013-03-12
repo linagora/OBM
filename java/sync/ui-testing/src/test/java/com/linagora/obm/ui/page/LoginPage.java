@@ -39,11 +39,11 @@ import org.openqa.selenium.support.FindBy;
 import com.google.inject.Inject;
 import com.linagora.obm.ui.bean.UIDomain;
 import com.linagora.obm.ui.bean.UIUser;
-import com.linagora.obm.ui.url.PageUrlMapping;
+import com.linagora.obm.ui.url.ServiceUrlMapping;
 
 public class LoginPage implements Page {
 
-	@Inject PageUrlMapping mapping;
+	@Inject ServiceUrlMapping mapping;
 	@Inject PageFactory pageFactory;
 
 	private final WebDriver driver;

@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -96,5 +97,54 @@ public class UILoginTest {
 		assertThat(homePage.currentTitle()).contains("OBM");
 		assertThat(homePage.elInformationUser().getText()).startsWith(uiUser.getLogin()).contains(uiDomain.getName());
 		assertThat(homePage.elInformationProfile().getText()).contains(uiUser.getProfile().getUiValue());
-	}
+    }
+
+    @Test
+    public void accessHomePageWithoutLoginReturnsLoginPage() {
+    	HomePage homePage = pageFactory.create(driver, HomePage.class);
+    	homePage.open();
+    	
+    	LoginPage loginPage = pageFactory.create(driver, LoginPage.class);
+    	
+		assertThat(loginPage.elLoginForm()).isNotNull();
+    }
+
+    @Test(expected=NoSuchElementException.class)
+    public void accessHomePageWithLoginDoesNotReturnLoginPage() {
+    	UIUser uiUser = UIUser.admin0();
+    	UIDomain uiDomain = UIDomain.globalDomain();
+
+    	LoginPage loginPage = pageFactory.create(driver, LoginPage.class);
+    	loginPage.open();
+		loginPage.login(uiUser, uiDomain);
+
+    	LoginPage newPage = pageFactory.create(driver, LoginPage.class);
+    	newPage.elLoginForm().isDisplayed();
+    }
+
+    @Test
+    public void logout() {
+    	UIUser uiUser = UIUser.admin0();
+    	UIDomain uiDomain = UIDomain.globalDomain();
+
+    	LoginPage loginPage = pageFactory.create(driver, LoginPage.class);
+    	loginPage.open();
+		HomePage homePage = loginPage.login(uiUser, uiDomain);
+		LoginPage newLoginPage = homePage.logout();
+		
+		assertThat(newLoginPage).isNotNull();
+    }
+
+    @Test
+    public void logoutByUrl() {
+    	UIUser uiUser = UIUser.admin0();
+    	UIDomain uiDomain = UIDomain.globalDomain();
+
+    	LoginPage loginPage = pageFactory.create(driver, LoginPage.class);
+    	loginPage.open();
+		HomePage homePage = loginPage.login(uiUser, uiDomain);
+		LoginPage newLoginPage = homePage.logoutByUrl();
+		
+		assertThat(newLoginPage).isNotNull();
+    }
 }

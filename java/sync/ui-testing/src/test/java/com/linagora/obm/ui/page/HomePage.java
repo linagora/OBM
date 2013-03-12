@@ -33,18 +33,23 @@ package com.linagora.obm.ui.page;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
 import com.google.inject.Inject;
-import com.linagora.obm.ui.url.PageUrlMapping;
+import com.linagora.obm.ui.service.Services.Logout;
+import com.linagora.obm.ui.url.ServiceUrlMapping;
 
 public class HomePage implements Page {
 	
-	@Inject PageUrlMapping mapping;
+	@Inject ServiceUrlMapping mapping;
+	@Inject PageFactory pageFactory;
 	
 	private final WebDriver driver;
 	private WebElement information;
 	private WebElement informationUser;
 	private WebElement informationProfile;
+	@FindBy(id="bannerLogoutLink")
+	private WebElement logoutLink;
 	
 	public HomePage(WebDriver driver) {
 		this.driver = driver;
@@ -60,6 +65,16 @@ public class HomePage implements Page {
 		return driver.getTitle();
 	}
 
+	public LoginPage logout() {
+		elLogoutLink().click();
+		return pageFactory.create(driver, LoginPage.class);
+	}
+
+	public LoginPage logoutByUrl() {
+		driver.get(mapping.lookup(Logout.class).toExternalForm());
+		return pageFactory.create(driver, LoginPage.class);
+	}
+
 	public WebElement elInformationPanel() {
 		return information;
 	}
@@ -70,5 +85,9 @@ public class HomePage implements Page {
 
 	public WebElement elInformationProfile() {
 		return informationProfile;
+	}
+
+	public WebElement elLogoutLink() {
+		return logoutLink;
 	}
 }
