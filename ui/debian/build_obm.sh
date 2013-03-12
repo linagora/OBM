@@ -24,6 +24,7 @@ mkdir -p ${BUILD_DEB_DIR_CORE}/var/lib/obm/documents/6
 mkdir -p ${BUILD_DEB_DIR_CORE}/var/lib/obm/documents/7
 mkdir -p ${BUILD_DEB_DIR_CORE}/var/lib/obm/documents/8
 mkdir -p ${BUILD_DEB_DIR_CORE}/var/lib/obm/documents/9
+mkdir -p ${BUILD_DEB_DIR_CORE}/usr/share/obm-ui
 
 cp ${CURDIR}/conf/obm_conf.inc.sample ${BUILD_DEB_DIR_CORE}/usr/share/obm/sample
 cp -r ${CURDIR}/contrib ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
@@ -36,6 +37,7 @@ cp -r ${CURDIR}/locale ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/views ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/app ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/lib ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
+cp ${CURDIR}/tz/timezone-generator.php ${BUILD_DEB_DIR_CORE}/usr/share/obm-ui
 
 exit 0
 

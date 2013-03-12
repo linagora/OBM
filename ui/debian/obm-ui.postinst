@@ -76,6 +76,8 @@ if [ -n "$2" ] && dpkg --compare-versions "$2" lt 2.2.0-0; then
   invoke-rc.d apache2 restart 0>/dev/null 1>/dev/null 2>/dev/null 3>/dev/null || true
 fi
 
+echo "Generating timezone definitions..."
+php /usr/share/obm-ui/timezone-generator.php -d /usr/share/obm/www/resources/js/bin/timezone -c
 
 #DEBHELPER#
 exit 0
