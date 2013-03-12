@@ -114,22 +114,10 @@ public class LoginHandler implements ISyncHandler {
 		try {
 			request.createSession();
 
-			String origin = request.getParameter("origin");
-			
-			if (origin == null) {
-				responder.sendError("Login refused with null 'origin' parameter");
-				return;
-			}
-
-			String login = request.getParameter("login");
-			
-			if (login == null) {
-				responder.sendError("Login refused with null 'login' parameter");
-				return;
-			}
-			
-			String pass = request.getParameter("password");
-			boolean isPasswordHashed = Boolean.valueOf(request.getParameter("isPasswordHashed"));
+			String origin = getOrigin(request);
+			String login = getLogin(request);
+			String pass = getPassword(request);
+			boolean isPasswordHashed = isPasswordHashed(request);
 
 			if (logger.isDebugEnabled()) {
 				request.dumpHeaders();
@@ -138,7 +126,7 @@ public class LoginHandler implements ISyncHandler {
 			AccessToken token = loginBinding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
 				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
 			
-			if(token == null) {
+			if (token == null) {
 				responder.sendError("Login failed for user '" + login + "'");
 				return;
 			}
@@ -154,7 +142,25 @@ public class LoginHandler implements ISyncHandler {
 			notifyConnectorVersionError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
+		} catch (IllegalArgumentException e) {
+			responder.sendError("Login refused : " + e.getMessage());
 		}
+	}
+
+	private String getOrigin(Request request) {
+		return request.getMandatoryParameter("origin");
+	}
+	
+	private String getLogin(Request request) {
+		return request.getMandatoryParameter("login");
+	}
+	
+	private String getPassword(Request request) {
+		return request.getParameter("password");
+	}
+
+	private Boolean isPasswordHashed(Request request) {
+		return Boolean.valueOf(request.getParameter("isPasswordHashed"));
 	}
 	
 	private void fillTokenWithUserSettings(AccessToken token) {

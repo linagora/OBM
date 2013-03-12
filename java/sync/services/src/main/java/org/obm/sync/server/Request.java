@@ -40,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 
@@ -84,6 +85,12 @@ public class Request {
 
 	public String getParameter(String name) {
 		return req.getParameter(name);
+	}
+	
+	public String getMandatoryParameter(String name) {
+		String value = getParameter(name);
+		Preconditions.checkArgument(value != null, "'" + name + "' is mandatory");
+		return value;
 	}
 
 	public String[] getParameterValues(String name) {
