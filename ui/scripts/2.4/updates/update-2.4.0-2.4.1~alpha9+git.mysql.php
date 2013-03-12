@@ -45,7 +45,7 @@ class HashEventExtId extends UpdateObject {
     private function was_wrong_2_4_1_alpha6_update_applied($con) {
         $con->query("SELECT COUNT(*) AS count_event_ext_id_hash ".
             "FROM information_schema.columns ".
-            "WHERE table_name='opush_event_mapping' AND column_name='event_ext_id_hash'");
+            "WHERE table_name='opush_event_mapping' AND column_name='event_ext_id_hash' AND trigger_schema = '".$this->database."'");
         $con->next_record();
         return $con->f('count_event_ext_id_hash') != 0;
     }
@@ -53,7 +53,7 @@ class HashEventExtId extends UpdateObject {
     private function fix_wrong_2_4_1_alpha6_update($con) {
         $con->query("SELECT COUNT(*) AS count_create_triggers ".
             "FROM information_schema.triggers ".
-            "WHERE trigger_name='opush_event_mapping_event_ext_id_hash_create_trigger'");
+            "WHERE trigger_name='opush_event_mapping_event_ext_id_hash_create_trigger' AND trigger_schema = '".$this->database."'");
         $con->next_record();
         if ($con->f('count_create_triggers') != 0) {
             try {
@@ -68,7 +68,7 @@ class HashEventExtId extends UpdateObject {
         }
         $con->query("SELECT COUNT(*) AS count_update_triggers ".
             "FROM information_schema.triggers ".
-            "WHERE trigger_name='opush_event_mapping_event_ext_id_hash_update_trigger'");
+            "WHERE trigger_name='opush_event_mapping_event_ext_id_hash_update_trigger' AND trigger_schema = '".$this->database."'");
         $con->next_record();
         if ($con->f('count_update_triggers') != 0) {
             try {

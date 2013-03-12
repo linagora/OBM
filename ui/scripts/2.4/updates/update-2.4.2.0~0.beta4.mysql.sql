@@ -12,7 +12,7 @@ WHERE NOT EXISTS (SELECT 1 FROM UserObmPref WHERE userobmpref_option='set_allday
 
 -- TABLE deletedeventlink;
 
-CREATE  TABLE `obm`.`DeletedEventLink` (
+CREATE  TABLE `DeletedEventLink` (
   `deletedeventlink_id` INT NOT NULL AUTO_INCREMENT ,
   `deletedeventlink_userobm_id` INT NOT NULL ,
   `deletedeventlink_event_id` INT NOT NULL ,
@@ -23,12 +23,12 @@ CREATE  TABLE `obm`.`DeletedEventLink` (
   INDEX `deletedeventlink_event_id_event_id_fkey` (`deletedeventlink_event_id` ASC) ,
   CONSTRAINT `deletedeventlink_userobm_id_userobm_id_fkey`
     FOREIGN KEY (`deletedeventlink_userobm_id` )
-    REFERENCES `obm`.`UserObm` (`userobm_id` )
+    REFERENCES `UserObm` (`userobm_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `deletedeventlink_event_id_event_id_fkey`
     FOREIGN KEY (`deletedeventlink_event_id` )
-    REFERENCES `obm`.`Event` (`event_id` )
+    REFERENCES `Event` (`event_id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
