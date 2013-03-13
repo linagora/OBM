@@ -74,6 +74,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ObmSyncBackend;
+import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
@@ -102,17 +103,20 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	private final ContactConfiguration contactConfiguration;
 	private final IAddressBook bookClient;
 	private final BackendWindowingService backendWindowingService;
+	private final ClientIdService clientIdService;
 	
 	@Inject
 	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
-			BackendWindowingService backendWindowingService) {
+			BackendWindowingService backendWindowingService,
+			ClientIdService clientIdService) {
 		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.bookClient = bookClient;
 		this.contactConfiguration = contactConfiguration;
 		this.backendWindowingService = backendWindowingService;
+		this.clientIdService = clientIdService;
 	}
 
 	@Override
@@ -424,7 +428,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = login(udr);
 		try {
-			return bookClient.createContact(token, addressBookId, contact, getHashClientId(udr, clientId));
+			return bookClient.createContact(token, addressBookId, contact, clientIdService.hash(udr, clientId));
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {

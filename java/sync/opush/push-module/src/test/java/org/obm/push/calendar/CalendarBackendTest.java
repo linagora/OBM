@@ -81,6 +81,7 @@ import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.service.ClientIdService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -130,6 +131,7 @@ public class CalendarBackendTest {
 	private ConsistencyEventChangesLogger consistencyLogger;
 	private EventExtId.Factory eventExtIdFactory;
 	private BackendWindowingService backendWindowingService;
+	private ClientIdService clientIdService;
 	
 	private CalendarBackend calendarBackend;
 	private IMocksControl mockControl;
@@ -166,6 +168,7 @@ public class CalendarBackendTest {
 		this.consistencyLogger = mockControl.createMock(ConsistencyEventChangesLogger.class);
 		this.eventExtIdFactory = mockControl.createMock(EventExtId.Factory.class);
 		this.backendWindowingService = mockControl.createMock(BackendWindowingService.class);
+		this.clientIdService = mockControl.createMock(ClientIdService.class);
 		
 		consistencyLogger.log(anyObject(Logger.class), anyObject(EventChanges.class));
 		expectLastCall().anyTimes();
@@ -176,7 +179,8 @@ public class CalendarBackendTest {
 				eventService, 
 				loginService, 
 				collectionPathBuilderProvider, consistencyLogger, eventExtIdFactory, 
-				backendWindowingService);
+				backendWindowingService,
+				clientIdService);
 	}
 	
 	@Test
@@ -620,6 +624,7 @@ public class CalendarBackendTest {
 		int collectionId = 1;
 		String serverId = null;
 		String clientId = "3";
+		String clientIdHash = "54661110";
 
 		Event oldEvent = null;
 		Event creatingEvent = new Event();
@@ -636,6 +641,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		expectLoginBehavior();
 		
@@ -661,6 +667,7 @@ public class CalendarBackendTest {
 	public void testCreateInternalEvent() throws Exception {
 		int collectionId = 1;
 		String clientId = "13";
+		String clientIdHash = "135660464";
 		String serverId = null;
 
 		EventExtId eventExtId = null;
@@ -678,6 +685,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		expectLoginBehavior();
 		
@@ -1198,6 +1206,7 @@ public class CalendarBackendTest {
 	public void testCreateOrUpdateThrowsHierarchyChangedExceptionOnCreateCalendarEntity() throws Exception {
 		int collectionId = 1;
 		String clientId = "3";
+		String clientIdHash = "35466464106456405";
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(new MSEventUid("abc0123"));
 		String eventExtIdString = "00000123-0456-0789-0012-000000000345";
@@ -1208,12 +1217,11 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		expectLoginBehavior();
-
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device))
-			.andReturn(eventExtId).once();
 		
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId).once();
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(null).once();
 	
@@ -1237,6 +1245,7 @@ public class CalendarBackendTest {
 	public void testCreateOrUpdateThrowsHierarchyChangedExceptionOnEventAlreadyExist() throws Exception {
 		int collectionId = 1;
 		String clientId = "3";
+		String clientIdHash = "35466464106456405";
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(new MSEventUid("abc0123"));
 		String eventExtIdString = "00000123-0456-0789-0012-000000000345";
@@ -1245,15 +1254,13 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device))
-			.andReturn(eventExtId).once();
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId).once();
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(userCalendarCollectionPath.collectionPath());
 		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
-		
-		expectLoginBehavior();
 		
 		expect(eventService.getEventExtIdFor(msEvent.getUid(), device))
 			.andReturn(eventExtId).once();

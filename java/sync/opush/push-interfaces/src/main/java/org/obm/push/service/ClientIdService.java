@@ -29,43 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.service;
 
-import org.obm.push.backend.CollectionPath.Builder;
-import org.obm.push.backend.OpushBackend;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.service.impl.MappingService;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.inject.Provider;
+public interface ClientIdService {
 
-public abstract class ObmSyncBackend extends OpushBackend {
-
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	String hash(UserDataRequest udr, String clientId);
 	
-	protected String obmSyncHost;
-
-	private final LoginService login;
-
-	protected ObmSyncBackend(MappingService mappingService, LoginService login, Provider<Builder> collectionPathBuilderProvider) {
-		super(mappingService, collectionPathBuilderProvider);
-		this.login = login;
-	}
-
-	protected AccessToken login(UserDataRequest session) throws UnexpectedObmSyncServerException {
-		try {
-			return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
-		} catch (AuthFault e) {
-			throw new UnexpectedObmSyncServerException(e);
-		}
-	}
-
-	protected void logout(AccessToken at) {
-		login.logout(at);
-	}
 }

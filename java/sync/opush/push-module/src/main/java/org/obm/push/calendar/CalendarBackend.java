@@ -73,6 +73,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ObmSyncBackend;
+import org.obm.push.service.ClientIdService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
@@ -114,6 +115,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final ConsistencyEventChangesLogger consistencyLogger;
 	private final EventExtId.Factory eventExtIdFactory;
 	private final BackendWindowingService backendWindowingService;
+	private final ClientIdService clientIdService;
 
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
@@ -123,7 +125,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			LoginService login,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger,
 			EventExtId.Factory eventExtIdFactory,
-			BackendWindowingService backendWindowingService) {
+			BackendWindowingService backendWindowingService,
+			ClientIdService clientIdService) {
 		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
@@ -132,6 +135,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		this.consistencyLogger = consistencyLogger;
 		this.eventExtIdFactory = eventExtIdFactory;
 		this.backendWindowingService = backendWindowingService;
+		this.clientIdService = clientIdService;
 	}
 	
 	@Override
@@ -500,7 +504,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
 		assignExtId(udr, msEvent, eventExtId, event);
 		try { 
-			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, getHashClientId(udr, clientId));
+			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, clientIdService.hash(udr, clientId));
 		} catch (EventAlreadyExistException e) {
 			return getEventIdFromExtId(token, collectionPath, event);
 		}
@@ -515,7 +519,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			event.setExtId(eventExtId);
 		}
 	}
-
+	
 	private EventObmId convertServerIdToEventObmId(String serverId) {
 		return new EventObmId(mappingService.getItemIdFromServerId(serverId));
 	}

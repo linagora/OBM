@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.service.impl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -37,45 +37,30 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.backend.CollectionPath;
-import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.hierarchy.CollectionChange;
-import org.obm.push.bean.change.hierarchy.CollectionDeletion;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
 
 @RunWith(SlowFilterRunner.class)
-public class ObmSyncBackendTest {
-	
+public class ClientIdServiceImplTest {
+
 	private UserDataRequest udr;
 
 	@Before
 	public void setup() {
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser("test@test", "test@domain", "displayName"), 
-						"password"), 
-				"noCommand", 
-				new Device.Factory()
-					.create(null, 
-							"iPhone", 
-							"iOs 5", 
-							new DeviceId("my phone"), 
-							null));
+		User user = User.Factory.create().createUser("test@test", "test@domain", "displayName");
+		Device device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 	}
-
+	
 	@Test
 	public void testGetHashClientId() {
 		String clientId = "123";
 		String expectedHashClientId = "429ceb34c4b664d63da6cee8fd40ce0d4b2532aa";
 		
-		MyBackend backend = new MyBackend();
-		String hashClientId = backend.getHashClientId(udr, clientId);
+		String hashClientId = new ClientIdServiceImpl().hash(udr, clientId);
 
 		assertThat(hashClientId).isEqualTo(expectedHashClientId);
 	}
@@ -85,28 +70,8 @@ public class ObmSyncBackendTest {
 		String clientId = "456";
 		String expectedHashClientId = "574394a967e7c3db37d5b74b649fba31f899c7a2";
 		
-		MyBackend backend = new MyBackend();
-		String hashClientId = backend.getHashClientId(udr, clientId);
+		String hashClientId = new ClientIdServiceImpl().hash(udr, clientId);
 
 		assertThat(hashClientId).isEqualTo(expectedHashClientId);
-	}
-	
-	private class MyBackend extends ObmSyncBackend {
-
-		public MyBackend() {
-			super(null, null, null);
-		}
-		
-		@Override
-		protected CollectionChange createCollectionChange(UserDataRequest udr, OpushCollection collection) 
-				throws DaoException, CollectionNotFoundException {
-			return null;
-		}
-
-		@Override
-		protected CollectionDeletion createCollectionDeletion(UserDataRequest udr, CollectionPath collectionPath)
-				throws DaoException, CollectionNotFoundException {
-			return null;
-		}
 	}
 }

@@ -31,9 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.contacts;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -69,6 +67,7 @@ import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
@@ -104,6 +103,7 @@ public class ContactsBackendTest {
 	private ContactConfiguration contactConfiguration;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	private BackendWindowingService backendWindowingService;
+	private ClientIdService clientIdService;
 	private AccessToken token;
 	private ContactsBackend contactsBackend;
 	
@@ -121,9 +121,10 @@ public class ContactsBackendTest {
 		contactConfiguration = mocks.createMock(ContactConfiguration.class);
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
 		backendWindowingService = mocks.createMock(BackendWindowingService.class);
+		clientIdService = mocks.createMock(ClientIdService.class);
 		
 		contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration,
-				collectionPathBuilderProvider, backendWindowingService);
+				collectionPathBuilderProvider, backendWindowingService, clientIdService);
 		
 		expectDefaultAddressAndParentForContactConfiguration();
 	}
@@ -148,7 +149,7 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void testGetPIMDataType() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null);
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null, null);
 		assertThat(contactsBackend.getPIMDataType()).isEqualTo(PIMDataType.CONTACTS);
 	}
 
@@ -232,6 +233,7 @@ public class ContactsBackendTest {
 		int targetcontactCollectionUid = 2;
 		int serverId = 215;
 		String clientId = "1";
+		String clientIdHash = "146565647814688";
 
 		List<AddressBook> books = ImmutableList.of(
 				newAddressBookObject("folder", otherContactCollectionUid, false),
@@ -241,12 +243,13 @@ public class ContactsBackendTest {
 		expectListAllBooks(token,books);
 		expectBuildCollectionPath("folder", otherContactCollectionUid);
 		expectBuildCollectionPath("folder_1", targetcontactCollectionUid);
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		MSContact msContact = new MSContact();
 		
 		Contact contact = newContactObject(serverId);
 		Contact convertedContact = new ContactConverter().contact(msContact);
-		expect(bookClient.createContact(eq(token), eq(targetcontactCollectionUid), eq(convertedContact), anyObject(String.class)))
+		expect(bookClient.createContact(token, targetcontactCollectionUid, convertedContact, clientIdHash))
 			.andReturn(contact).once();
 		
 		expectMappingServiceCollectionIdBehavior(books);

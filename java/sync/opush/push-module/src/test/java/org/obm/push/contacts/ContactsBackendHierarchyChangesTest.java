@@ -65,6 +65,7 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -97,11 +98,10 @@ public class ContactsBackendHierarchyChangesTest {
 	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
+	private BackendWindowingService backendWindowingService;
+	private ClientIdService clientIdService;
 	
 	private ContactsBackend contactsBackend;
-
-	private BackendWindowingService backendWindowingService;
-
 
 	@Before
 	public void setUp() throws Exception {
@@ -120,13 +120,15 @@ public class ContactsBackendHierarchyChangesTest {
 		contactConfiguration = publicContactConfiguration();
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
 		backendWindowingService = mocks.createMock(BackendWindowingService.class);
+		clientIdService = mocks.createMock(ClientIdService.class);
 		
 		contactsBackend = new ContactsBackend(mappingService, 
 				bookClient, 
 				loginService, 
 				contactConfiguration, 
 				collectionPathBuilderProvider,
-				backendWindowingService);
+				backendWindowingService,
+				clientIdService);
 		
 		expectLoginBehavior();
 	}
