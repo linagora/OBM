@@ -51,6 +51,11 @@ public class Credentials {
 			loginBuilder = Login.builder();
 		}
 		
+		public Builder login(Login login) {
+			loginBuilder.from(login);
+			return this;
+		}
+		
 		public Builder login(String login) {
 			loginBuilder.login(login);
 			return this;

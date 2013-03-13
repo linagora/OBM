@@ -109,4 +109,13 @@ public class CredentialsTest {
 		Credentials.builder().login(FULL_LOGIN).domain("differentdomain").password(PASSWORD).build();
 	}
 	
+	@Test
+	public void creationByLoginObject() {
+		Credentials credentials = Credentials.builder().login(Login.builder().login(LOGIN).domain(DOMAIN).build()).password(PASSWORD).build();
+		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
+		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
+		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
+		assertThat(credentials.isPasswordHashed()).isFalse();
+	}
+	
 }
