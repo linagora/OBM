@@ -79,7 +79,7 @@ public class Credentials {
 		}
 		
 		public Credentials build() {
-			Preconditions.checkState(password != null);
+			Preconditions.checkState(password != null, "'password' is mandatory");
 			return new Credentials(loginBuilder.build(), password, hashedPassword);
 		}
 

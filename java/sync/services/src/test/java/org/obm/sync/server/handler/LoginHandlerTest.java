@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.easymock.EasyMock.isA;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -70,6 +71,7 @@ import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.server.template.ITemplateLoader;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -115,9 +117,72 @@ public class LoginHandlerTest {
 	}
 	
 	@Test
+	public void authenticateGlobalAdminNoParameters() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of();
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
+		XmlResponder responder = createResponder();
+		control.replay();
+		handler.handle(new Request(httpServletRequest), responder);
+		assertResultEquals("AuthenticationRefusedWithNullLogin.xml");
+	}
+
+	@Test
+	public void authenticateGlobalAdminWithOnlyLogin() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera");
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
+		XmlResponder responder = createResponder();
+		control.replay();
+		handler.handle(new Request(httpServletRequest), responder);
+		assertResultEquals("AuthenticationRefusedWithNullOrigin.xml");
+	}
+
+	@Test
+	public void authenticateGlobalAdminWithLoginAndOrigin() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera", "origin", "origin");
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
+		XmlResponder responder = createResponder();
+		control.replay();
+		handler.handle(new Request(httpServletRequest), responder);
+		assertResultEquals("AuthenticationRefusedWithNullPassword.xml");
+	}
+	
+	@Test
+	public void authenticateGlobalAdminValidCredentials() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera", "origin", "origin", "password", "password");
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
+		XmlResponder responder = createResponder();
+		
+		expect(rs.next()).andReturn(true).once(); // So that the password selection returns something
+		expect(rs.getString(eq(1))).andReturn("PLAIN").once(); // Password type
+		expect(rs.getString(eq(2))).andReturn("password").once();// Password
+		
+		control.replay();
+		handler.handle(new Request(httpServletRequest), responder);
+		assertThat(resultStream.toString()).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><string xmlns=\"http://www.obm.org/xsd/sync/string.xsd\"><value>true</value></string>");
+	}
+
+	@Test
+	public void authenticateGlobalAdminInvalidCredentials() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera", "origin", "origin", "password", "invalid");
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
+		XmlResponder responder = createResponder();
+		
+		expect(rs.next()).andReturn(true).once(); // So that the password selection returns something
+		expect(rs.getString(eq(1))).andReturn("PLAIN").once(); // Password type
+		expect(rs.getString(eq(2))).andReturn("password").once();// Password
+		
+		control.replay();
+		handler.handle(new Request(httpServletRequest), responder);
+		assertThat(resultStream.toString()).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><string xmlns=\"http://www.obm.org/xsd/sync/string.xsd\"><value>false</value></string>");
+	}
+
+	
+	@Test
 	public void testDoLoginNoParameters() throws Exception {
 		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of();
-		HttpServletRequest httpServletRequest = createHttpServletRequestMock(parameters);
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		assertLoginResult(httpServletRequest, "loginRefusedWithNullOrigin.xml");
 	}
@@ -125,7 +190,7 @@ public class LoginHandlerTest {
 	@Test
 	public void testDoLoginWithOnlyLogin() throws Exception {
 		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("login", "usera");
-		HttpServletRequest httpServletRequest = createHttpServletRequestMock(parameters);
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		assertLoginResult(httpServletRequest, "loginRefusedWithNullOrigin.xml");
 	}
@@ -133,7 +198,7 @@ public class LoginHandlerTest {
 	@Test
 	public void testDoLoginWithOnlyOrigin() throws Exception {
 		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("origin", "origin");
-		HttpServletRequest httpServletRequest = createHttpServletRequestMock(parameters);
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		assertLoginResult(httpServletRequest, "loginRefusedWithNullLogin.xml");
 	}
@@ -141,7 +206,7 @@ public class LoginHandlerTest {
 	@Test
 	public void testDoLoginUnknownDomainForLogin() throws Exception {
 		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("origin", "origin", "login", "usera");
-		HttpServletRequest httpServletRequest = createHttpServletRequestMock(parameters);
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		expect(rs.next()).andReturn(false).anyTimes(); // So that domain selection returns nothing
 		
@@ -151,13 +216,13 @@ public class LoginHandlerTest {
 	@Test
 	public void testDoLoginInvalidPassword() throws Exception {
 		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("origin", "origin", "login", "usera", "password", "invalid");
-		HttpServletRequest httpServletRequest = createHttpServletRequestMock(parameters);
+		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		expectPaswordVerification("valid");
 		
 		assertLoginResult(httpServletRequest, "loginFailedForUserUsera.xml");
 	}
-
+	
 	private void expectPaswordVerification(String password) throws SQLException {
 		expect(rs.next()).andReturn(true).once(); // So that domain selection returns something...
 		expect(rs.next()).andReturn(false).once(); // ...but exactly one record
@@ -173,6 +238,10 @@ public class LoginHandlerTest {
 		control.replay();
 		handler.handle(new Request(httpServletRequest), responder);
 
+		assertResultEquals(controlFile);
+	}
+
+	private void assertResultEquals(String controlFile) throws SAXException, IOException {
 		XMLAssert.assertXMLEqual(IOUtils.toString(getClass().getResourceAsStream(controlFile)), resultStream.toString());
 	}
 
@@ -186,7 +255,7 @@ public class LoginHandlerTest {
 		return new XmlResponder(response);
 	}
 
-	private HttpServletRequest createHttpServletRequestMock(final Map<String, String> parameters) {
+	private HttpServletRequest createHttpServletRequestMock(String endpoint, final Map<String, String> parameters) {
 		HttpSession session = control.createMock(HttpSession.class);
 		HttpServletRequest request = control.createMock(HttpServletRequest.class);
 
@@ -196,7 +265,7 @@ public class LoginHandlerTest {
 
 		expect(request.getRemoteAddr()).andReturn("127.0.0.1").anyTimes();
 		expect(request.getHeader(isA(String.class))).andReturn(null).anyTimes();
-		expect(request.getPathInfo()).andReturn("/login/doLogin").anyTimes();
+		expect(request.getPathInfo()).andReturn("/login/" + endpoint).anyTimes();
 		expect(request.getSession()).andReturn(session).anyTimes();
 		expect(request.getSession(anyBoolean())).andReturn(session).anyTimes();
 		expect(request.getParameterMap()).andReturn(parameters).anyTimes();

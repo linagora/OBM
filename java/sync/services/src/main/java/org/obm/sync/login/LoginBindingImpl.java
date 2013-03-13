@@ -33,19 +33,32 @@ package org.obm.sync.login;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.Credentials;
+import org.obm.sync.auth.Credentials.Builder;
+import org.obm.sync.server.auth.AuthentificationServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @Singleton
 public class LoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final AuthentificationServiceFactory authenticationServiceFactory;
+	private final ObmSyncConfigurationService configurationService;
+
 	@Inject
-	protected LoginBindingImpl(SessionManagement sessionManagement) {
+	protected LoginBindingImpl(SessionManagement sessionManagement, AuthentificationServiceFactory authenticationServiceFactory,
+			ObmSyncConfigurationService configurationService) {
 		super(sessionManagement);
+		this.authenticationServiceFactory = authenticationServiceFactory;
+		this.configurationService = configurationService;
 	}
 
 	@Override
@@ -56,4 +69,17 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}
+
+	@Transactional(readOnly=true)
+	public boolean authenticateGlobalAdmin(String user, String password, String origin, boolean isPasswordHashed) {
+		logger.info("trying global admin authentication with login '{}' from '{}'", user, origin);
+		Builder builder = Credentials.builder().login(user).domain(configurationService.getGlobalDomain());
+		if (isPasswordHashed) {
+			builder.hashedPassword(password);
+		} else {
+			builder.password(password);
+		}
+		return authenticationServiceFactory.get().doAuth(builder.build());
+	}
+	
 }

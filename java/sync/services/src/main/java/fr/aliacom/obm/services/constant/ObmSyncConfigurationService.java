@@ -54,6 +54,7 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	private static final String OBM_SYNC_MAILER = "x-obm-sync";
 	private static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
 	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
+	private static final String GLOBAL_DOMAIN = "global.virt";
 	
 	public static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
 	public static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
@@ -96,6 +97,10 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 		return null;
 	}
 
+	public String getGlobalDomain() {
+		return GLOBAL_DOMAIN;
+	}
+	
 	public String getLdapBindPassword() {
 		String bindPassword = getStringValue("auth-ldap-bindpw");
 		if (bindPassword != null) {
