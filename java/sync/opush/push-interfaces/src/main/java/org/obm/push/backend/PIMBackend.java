@@ -33,6 +33,8 @@ package org.obm.push.backend;
 
 import java.util.List;
 
+import javax.naming.NoPermissionException;
+
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
@@ -61,7 +63,8 @@ public interface PIMBackend {
 	String createOrUpdate(UserDataRequest udr, Integer collectionId,
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
-			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException, ConversionException, HierarchyChangedException;
+			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException,
+			ConversionException, HierarchyChangedException, NoPermissionException;
 	
 	String move(UserDataRequest udr, String srcFolder, String dstFolder, String messageId)
 		throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException;

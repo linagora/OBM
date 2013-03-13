@@ -36,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.naming.NoPermissionException;
+
 import org.eclipse.jetty.continuation.ContinuationThrowable;
 import org.obm.push.ContinuationService;
 import org.obm.push.backend.CollectionChangeListener;
@@ -313,6 +315,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				}
 			} catch (ItemNotFoundException e) {
 				logger.warn("Item with server id {} not found.", change.getServerId());
+			} catch (NoPermissionException e) {
+				logger.warn("Client is not allowed to perform the command: {}", change);
 			}
 		}
 		return clientCommandsBuilder.build();
@@ -320,7 +324,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Update updateServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException {
 
 		return new SyncClientCommands.Update(contentsImporter.importMessageChange(
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));
@@ -328,7 +332,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Add addServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException {
 
 		return new SyncClientCommands.Add(change.getClientId(), contentsImporter.importMessageChange(
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));

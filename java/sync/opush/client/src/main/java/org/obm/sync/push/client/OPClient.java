@@ -41,8 +41,10 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
+import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncKey;
@@ -77,6 +79,7 @@ import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.SimpleSyncCommand;
 import org.obm.sync.push.client.commands.Sync;
 import org.obm.sync.push.client.commands.SyncWithCommand;
+import org.obm.sync.push.client.commands.SyncWithDataCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -147,7 +150,16 @@ public abstract class OPClient {
 	}
 	
 	public SyncResponse syncWithCommand(SyncDecoder decoder, SyncKey key, String collectionId, SyncCommand command, String serverId) throws Exception {
-		return run(new SyncWithCommand(decoder, key, collectionId, command, serverId));
+		return syncWithCommand(decoder, key, collectionId, command, serverId, null);
+	}
+	
+	public SyncResponse syncWithCommand(SyncDecoder decoder, SyncKey key, String collectionId, SyncCommand command, String serverId, String clientId) throws Exception {
+		return run(new SyncWithCommand(decoder, key, collectionId, command, serverId, clientId));
+	}
+	
+	public SyncResponse syncWithCommand(SyncWithDataCommand.Factory factory, Device device, SyncKey key,
+			String collectionId, SyncCommand command, String serverId, String clientId, IApplicationData data) throws Exception {
+		return run(factory.create(key, collectionId, command, serverId, clientId, data, device));
 	}
 
 	public SyncResponse syncWithoutOptions(SyncDecoder decoder, SyncKey key, String collectionId) throws Exception {

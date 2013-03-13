@@ -43,24 +43,52 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class SyncWithCommand extends Sync {
+import com.google.common.base.Strings;
 
-	public SyncWithCommand(final SyncDecoder decoder, final SyncKey syncKey, final String collectionId, final SyncCommand command,
-			final String serverId) throws SAXException, IOException {
-		
-		super(decoder, new TemplateDocument("SyncWithCommandRequest.xml") {
+public class SyncWithCommand extends Sync {
+	
+	public SyncWithCommand(SyncDecoder decoder, SyncKey syncKey, String collectionId, SyncCommand command,
+			String serverId, String clientId) throws SAXException, IOException {
+		this(decoder, new SyncWithCommandTemplate(syncKey, collectionId, command, serverId, clientId));
+	}
+	
+	protected SyncWithCommand(SyncDecoder decoder, TemplateDocument template) {
+		super(decoder, template);
+	}
+	
+	public static class SyncWithCommandTemplate extends TemplateDocument {
+
+		protected final SyncKey syncKey;
+		protected final String collectionId;
+		protected final SyncCommand command;
+		protected final String serverId;
+		protected final String clientId;
+
+		protected SyncWithCommandTemplate(SyncKey syncKey, String collectionId, SyncCommand command,
+				String serverId, String clientId) throws SAXException, IOException {
+			super("SyncWithCommandRequest.xml");
+			this.syncKey = syncKey;
+			this.collectionId = collectionId;
+			this.command = command;
+			this.serverId = serverId;
+			this.clientId = clientId;
+		}
+
+		@Override
+		protected void customize(Document document, AccountInfos accountInfos) {
+			Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.SYNC_KEY.getName());
+			sk.setTextContent(syncKey.getSyncKey());
+			Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COLLECTION_ID.getName());
+			collection.setTextContent(collectionId);
 			
-			@Override
-			protected void customize(Document document, AccountInfos accountInfos) {
-				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.SYNC_KEY.getName());
-				sk.setTextContent(syncKey.getSyncKey());
-				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COLLECTION_ID.getName());
-				collection.setTextContent(collectionId);
-				
-				Element commandsEl = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COMMANDS.getName());
-				Element commandEl = DOMUtils.createElement(commandsEl, command.asSpecificationValue());
+			Element commandsEl = DOMUtils.getUniqueElement(document.getDocumentElement(), SyncRequestFields.COMMANDS.getName());
+			Element commandEl = DOMUtils.createElement(commandsEl, command.asSpecificationValue());
+			if (!Strings.isNullOrEmpty(serverId)) {
 				DOMUtils.createElementAndText(commandEl, SyncRequestFields.SERVER_ID.getName(), serverId);
 			}
-		});
+			if (!Strings.isNullOrEmpty(clientId)) {
+				DOMUtils.createElementAndText(commandEl, SyncRequestFields.CLIENT_ID.getName(), clientId);
+			}
+		}
 	}
 }

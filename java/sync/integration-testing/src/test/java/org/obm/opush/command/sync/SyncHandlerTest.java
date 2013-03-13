@@ -64,24 +64,27 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
+
+import javax.naming.NoPermissionException;
 
 import org.easymock.IMocksControl;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.IntegrationUserAccessUtils;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.opush.env.Configuration;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.backend.IContentsImporter;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
@@ -122,6 +125,9 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.commands.SyncWithDataCommand;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -129,18 +135,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@GuiceModule(SyncHandlerTestModule.class)
+@RunWith(SlowGuiceRunner.class) @Slow
 public class SyncHandlerTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(SyncHandlerTestModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject SyncDecoder decoder;
-	
+	@Inject Configuration configuration;
+	@Inject IContentsImporter contentsImporter;
+	@Inject SyncWithDataCommand.Factory syncWithDataCommandFactory;
+
 	private List<OpushUser> fakeTestUsers;
 
 	@Before
@@ -728,5 +735,95 @@ public class SyncHandlerTest {
 		SyncResponse syncResponse = opClient.syncWithCommand(decoder, syncKey, "15", command, "15:51");
 
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.PROTOCOL_ERROR);
+	}
+
+	@Test
+	public void testAddLeadingToNoPermissionExceptionReplyNothing() throws Exception {
+		TimeZone defaultTimeZone = TimeZone.getDefault();
+		TimeZone.setDefault(DateTimeZone.UTC.toTimeZone());
+		
+		SyncKey syncKey = new SyncKey("13424");
+		int collectionId = 1;
+		List<Integer> existingCollections = ImmutableList.of(collectionId);
+		String serverId = null;
+		String clientId = "156";
+
+		DataDelta serverDataDelta = DataDelta.newEmptyDelta(date("2012-10-10T16:22:53"), syncKey);
+		
+		MSEmail clientData = MSEmail.builder()
+			.header(MSEmailHeader.builder().build())
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream("obm".getBytes())))
+					.bodyType(MSEmailBodyType.PlainText)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
+			.build();
+		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
+		
+		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
+		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
+			.andThrow(new NoPermissionException());
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		SyncResponse syncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, singleUserFixture.jaures.device, 
+				syncKey, String.valueOf(collectionId), SyncCommand.ADD, serverId, clientId, clientData);
+
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
+		checkMailFolderHasNoChange(syncResponse, String.valueOf(collectionId));
+		TimeZone.setDefault(defaultTimeZone);
+	}
+
+	@Test
+	public void testChangeLeadingToNoPermissionExceptionReplyNothing() throws Exception {
+		TimeZone defaultTimeZone = TimeZone.getDefault();
+		TimeZone.setDefault(DateTimeZone.UTC.toTimeZone());
+		
+		SyncKey syncKey = new SyncKey("13424");
+		int collectionId = 1;
+		List<Integer> existingCollections = ImmutableList.of(collectionId);
+		String serverId = "432:1456";
+		String clientId = null;
+
+		DataDelta serverDataDelta = DataDelta.newEmptyDelta(date("2012-10-10T16:22:53"), syncKey);
+
+		MSEmail clientData = MSEmail.builder()
+			.header(MSEmailHeader.builder().build())
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream(new ByteArrayInputStream("obm".getBytes())))
+					.bodyType(MSEmailBodyType.PlainText)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
+			.build();
+		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
+		
+		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
+		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
+			.andThrow(new NoPermissionException());
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		SyncResponse syncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, singleUserFixture.jaures.device, 
+				syncKey, String.valueOf(collectionId), SyncCommand.ADD, serverId, clientId, clientData);
+
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
+		checkMailFolderHasNoChange(syncResponse, String.valueOf(collectionId));
+		TimeZone.setDefault(defaultTimeZone);
 	}
 }

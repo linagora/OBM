@@ -47,15 +47,22 @@ public class SyncHandlerTestModule  extends AbstractOpushEnv {
 	@Override
 	protected Module overrideModule() throws Exception {
 		Module overrideModule = super.overrideModule();
-		
+
 		Module contentsExporterBackend = bindContentsExporterBackendModule();
+		Module contentsImporterBackend = bindContentsImporterBackendModule();
 		
-		return Modules.combine(overrideModule, contentsExporterBackend);
+		return Modules.combine(overrideModule, contentsExporterBackend, contentsImporterBackend);
 	}
 
 	private Module bindContentsExporterBackendModule() {
 		AbstractOverrideModule contentsExporterBackend = ModuleUtils.buildContentsExporterBackendModule(getMocksControl());
 		getMockMap().addMap(contentsExporterBackend.getMockMap());
 		return contentsExporterBackend;
+	}
+
+	private Module bindContentsImporterBackendModule() {
+		AbstractOverrideModule contentsImporterBackend = ModuleUtils.buildContentsImporterBackendModule(getMocksControl());
+		getMockMap().addMap(contentsImporterBackend.getMockMap());
+		return contentsImporterBackend;
 	}
 }

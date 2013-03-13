@@ -34,20 +34,30 @@ package org.obm.opush;
 import org.easymock.IMocksControl;
 import org.obm.opush.env.AbstractOverrideModule;
 import org.obm.push.backend.IContentsExporter;
+import org.obm.push.backend.IContentsImporter;
 import org.obm.push.service.DateService;
 import org.obm.push.state.SyncKeyFactory;
 
 public class ModuleUtils {
 
 	public static AbstractOverrideModule buildContentsExporterBackendModule(IMocksControl mocksControl) {
-		AbstractOverrideModule contentsExporterBackend = new AbstractOverrideModule(mocksControl) {
+		return new AbstractOverrideModule(mocksControl) {
 
 			@Override
 			protected void configureImpl() {
 				bindWithMock(IContentsExporter.class);
 			}
 		};
-		return contentsExporterBackend;
+	}
+	
+	public static AbstractOverrideModule buildContentsImporterBackendModule(IMocksControl mocksControl) {
+		return new AbstractOverrideModule(mocksControl) {
+
+			@Override
+			protected void configureImpl() {
+				bindWithMock(IContentsImporter.class);
+			}
+		};
 	}
 
 	public static AbstractOverrideModule buildSyncKeyFactoryModule(IMocksControl mocksControl) {

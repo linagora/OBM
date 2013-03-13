@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.naming.NoPermissionException;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -267,6 +269,65 @@ public class ContactsBackendTest {
 		mocks.verify();
 		
 		assertThat(newServerId).isEqualTo(serverIdAsString);
+	}
+	
+	@Test(expected=NoPermissionException.class)
+	public void testCreateNoPermissionLetsPropagateTheException() throws Exception {
+		int contactCollectionUid = 2;
+		int itemId = 215;
+		String serverId = null;
+		String clientId = "489654";
+		String clientIdHash = "78481484087";
+		MSContact msContact = new MSContact();
+
+		List<AddressBook> books = ImmutableList.of(
+				newAddressBookObject("folder", contactCollectionUid, false));
+		
+		expectLoginBehavior(token);
+		expectListAllBooks(token,books);
+		expectBuildCollectionPath("folder", contactCollectionUid);
+		expectMappingServiceCollectionIdBehavior(books);
+		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId).once();
+		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
+		
+		expect(bookClient.createContact(token, contactCollectionUid, new Contact(), clientIdHash)).andThrow(new NoPermissionException());
+
+		mocks.replay();
+		try {
+			contactsBackend.createOrUpdate(userDataRequest, contactCollectionUid, serverId, clientId, msContact);
+		} catch (NoPermissionException e) {
+			mocks.verify();
+			throw e;
+		}
+	}
+
+	@Test(expected=NoPermissionException.class)
+	public void testUpdateNoPermissionLetsPropagateTheException() throws Exception {
+		int contactCollectionUid = 2;
+		int itemId = 215;
+		String serverId = "2:215";
+		String clientId = null;
+		MSContact msContact = new MSContact();
+
+		List<AddressBook> books = ImmutableList.of(
+				newAddressBookObject("folder", contactCollectionUid, false));
+		
+		expectLoginBehavior(token);
+		expectListAllBooks(token,books);
+		expectBuildCollectionPath("folder", contactCollectionUid);
+		expectMappingServiceCollectionIdBehavior(books);
+		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId).once();
+		
+		Contact contact = newContactObject(itemId);
+		expect(bookClient.modifyContact(token, contactCollectionUid, contact)).andThrow(new NoPermissionException());
+
+		mocks.replay();
+		try {
+			contactsBackend.createOrUpdate(userDataRequest, contactCollectionUid, serverId, clientId, msContact);
+		} catch (NoPermissionException e) {
+			mocks.verify();
+			throw e;
+		}
 	}
 	
 	@Test

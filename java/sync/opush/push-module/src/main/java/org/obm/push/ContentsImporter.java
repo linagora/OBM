@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import javax.naming.NoPermissionException;
+
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.CollectionPathHelper;
@@ -65,7 +67,8 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException,
+			ConversionException, HierarchyChangedException, NoPermissionException {
 		
 		PIMBackend backend = backends.getBackend(data.getType());
 		return backend.createOrUpdate(udr, collectionId, serverId, clientId, data);
