@@ -29,6 +29,13 @@ public class Login {
 			return this;
 		}
 		
+		public Builder from(Login login) {
+			Preconditions.checkNotNull(login);
+			this.login = login.getLogin();
+			this.domain = login.getDomain();
+			return this;
+		}
+		
 		public Login build() {
 			Preconditions.checkState(login != null);
 			
@@ -41,6 +48,7 @@ public class Login {
 			}
 			return new Login(loginPart, domainPart != null ? domainPart : domain);
 		}
+		
 	}
 	
 	@VisibleForTesting

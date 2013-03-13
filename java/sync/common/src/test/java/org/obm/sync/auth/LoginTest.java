@@ -23,6 +23,18 @@ public class LoginTest {
 		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
 	}
 	
+	@Test
+	public void creationByLoginObject() {
+		Login input = Login.builder().login(FULL_LOGIN).domain(DOMAIN).build();
+		login = Login.builder().from(input).build();
+		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void creationByNullLoginObject() {
+		Login.builder().from(null);
+	}
+	
 	@Test(expected=IllegalStateException.class)
 	public void creationByFullLoginAndDifferentDomain() {
 		login = Login.builder().login(FULL_LOGIN).domain("differentdomain").build();
