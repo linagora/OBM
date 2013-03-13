@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.auth;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import org.obm.sync.auth.Credentials;
 
 public interface IAuthentificationService {
 
 	String getObmDomain(String userLogin);
 
-	boolean doAuth(String userLogin, ObmDomain obmDomain, String password, boolean isPasswordHashed);
+	boolean doAuth(Credentials credentials);
 
 	String getType();
 

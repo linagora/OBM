@@ -38,6 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.Credentials;
+import org.obm.sync.auth.Credentials.Builder;
 import org.obm.sync.auth.Login;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
@@ -197,15 +199,27 @@ public class SessionManagement {
 			return null;
 		}
 
+		Credentials credentials = buildCredentials(login, password, isPasswordHashed);
+		
 		if ((lemonLogin != null && lemonDomain != null
 				&& doAuthLemonLdap(remoteIP))
 			|| doAuthSpecialAccount(login.getLogin(), obmDomain, clientIP)
-			|| authService.doAuth(login.getLogin(), obmDomain, password, isPasswordHashed)) {
+			|| authService.doAuth(credentials)) {
 
 			return login(origin, login.getLogin(), obmDomain, authService.getType());
 		}
 		logLoginFailure(login.getLogin(), authService, obmDomain.getName());
 		return null;
+	}
+
+	private Credentials buildCredentials(Login login, String password, boolean isPasswordHashed) {
+		Builder credentialsBuilder = Credentials.builder().login(login);
+		if (isPasswordHashed) {
+			credentialsBuilder.hashedPassword(password);
+		} else {
+			credentialsBuilder.password(password);
+		}
+		return credentialsBuilder.build();
 	}
 
 	private void logNoDomain(String domainName) {

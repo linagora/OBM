@@ -39,6 +39,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchResult;
 
+import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.contact.UserDao;
-import fr.aliacom.obm.common.domain.ObmDomain;
 
 /**
  * Authenticate on LDAP
@@ -78,10 +78,9 @@ public class LDAPAuthService implements IAuthentificationService {
 	}
 
 	@Override
-	public boolean doAuth(String userLogin, ObmDomain obmDomain,
-			String clearTextPassword, boolean isPasswordHashed) {
-		Preconditions.checkArgument(!isPasswordHashed, "The LDAP authentication service does not handle already hashed passwords");
-		return doBindAuth(userLogin, obmDomain.getName(), clearTextPassword);
+	public boolean doAuth(Credentials credentials) {
+		Preconditions.checkArgument(!credentials.isPasswordHashed(), "The LDAP authentication service does not handle already hashed passwords");
+		return doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), credentials.getPassword());
 	}
 
 	private boolean doBindAuth(String login, String domain,
@@ -143,11 +142,6 @@ public class LDAPAuthService implements IAuthentificationService {
 	@Override
 	public String getType() {
 		return "LDAP";
-	}
-
-	public void init() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

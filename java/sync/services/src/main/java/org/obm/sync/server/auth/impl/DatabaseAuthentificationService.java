@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.ldap.UnixCrypt;
 import fr.aliacom.obm.utils.HelperService;
@@ -52,29 +54,32 @@ import fr.aliacom.obm.utils.ObmHelper;
  * Authentification against the OBM database
  */
 @Singleton
-public class DatabaseAuthentificationService implements
-		IAuthentificationService {
+public class DatabaseAuthentificationService implements IAuthentificationService {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DatabaseAuthentificationService.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ObmHelper obmHelper;
 	private final HelperService helperService;
+	private final DomainService domainService;
 
 	@Inject
-	private DatabaseAuthentificationService(ObmHelper obmHelper, HelperService helperService) {
+	private DatabaseAuthentificationService(ObmHelper obmHelper, HelperService helperService, DomainService domainService) {
 		this.obmHelper = obmHelper;
 		this.helperService = helperService;
+		this.domainService = domainService;
 	}
 	
 	@Override
-	public boolean doAuth(String userLogin, ObmDomain obmDomain, String password, boolean isPasswordHashed) {
-		boolean valid = false;
+	public boolean doAuth(Credentials credentials) {
 		try {
-			valid = isValidPassword(userLogin, password, obmDomain.getId(), isPasswordHashed);
+			ObmDomain obmDomain = domainService.findDomainByName(credentials.getLogin().getDomain());
+			if (obmDomain == null) {
+				throw new RuntimeException("domain not found");
+			}
+			return isValidPassword(credentials.getLogin().getLogin(), credentials.getPassword(), obmDomain.getId(), credentials.isPasswordHashed());
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
-		return valid;
+		return false;
 	}
 
 	/**
