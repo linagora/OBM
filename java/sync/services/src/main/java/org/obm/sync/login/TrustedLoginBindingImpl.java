@@ -42,7 +42,7 @@ import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.trust.TrustTokenDao;
 
-public class TrustedLoginBindingImpl extends LoginBindingImpl {
+public class TrustedLoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 	private final TrustTokenDao trustTokenDao;
 	private final ConfigurationService configurationService;
 	private final Logger logger = LoggerFactory.getLogger(getClass());

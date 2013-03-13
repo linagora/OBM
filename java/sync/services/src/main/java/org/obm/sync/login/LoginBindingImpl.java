@@ -41,25 +41,19 @@ import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 
 @Singleton
-public class LoginBindingImpl {
-
-	protected final SessionManagement sessionManagement;
+public class LoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 
 	@Inject
 	protected LoginBindingImpl(SessionManagement sessionManagement) {
-		this.sessionManagement = sessionManagement;
+		super(sessionManagement);
 	}
 
+	@Override
 	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
-	}
-
-	@Transactional(readOnly=true)
-	public void logout(String sessionId) {
-		sessionManagement.logout(sessionId);
 	}
 }

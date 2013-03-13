@@ -34,6 +34,7 @@ package org.obm.sync.server.handler;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.OBMConnectorVersionException;
+import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
 import org.obm.sync.server.Request;
@@ -110,7 +111,7 @@ public class LoginHandler implements ISyncHandler {
 		doLogin(request, responder, binding);
 	}
 
-	private void doLogin(Request request, XmlResponder responder, LoginBindingImpl loginBinding) {
+	private void doLogin(Request request, XmlResponder responder, LoginBackend loginBackend) {
 		try {
 			request.createSession();
 
@@ -123,7 +124,7 @@ public class LoginHandler implements ISyncHandler {
 				request.dumpHeaders();
 			}
 
-			AccessToken token = loginBinding.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+			AccessToken token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
 				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
 			
 			if (token == null) {
