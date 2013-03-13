@@ -197,4 +197,9 @@ public class StaticConfigurationService implements ConfigurationService {
 		throw new IllegalStateException();
 	}
 
+	@Override
+	public String getGlobalDomain() {
+		return "global.test";
+	}
+
 }

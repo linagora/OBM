@@ -66,4 +66,6 @@ public interface ConfigurationService {
 	int solrCheckingInterval();
 
 	String getDataDirectory();
+
+	String getGlobalDomain();
 }

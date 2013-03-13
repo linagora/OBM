@@ -52,38 +52,40 @@ import com.google.inject.name.Named;
 public class ConfigurationServiceImpl extends AbstractConfigurationService
         implements ConfigurationService {
 
-    private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
+	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
-    private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
-    private static final String LOCATOR_CACHE_TIMEOUT_KEY = "locator-cache-timeout";
-    private static final int LOCATOR_CACHE_TIMEOUT_DEFAULT = 30;
+	private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
+	private static final String LOCATOR_CACHE_TIMEOUT_KEY = "locator-cache-timeout";
+	private static final int LOCATOR_CACHE_TIMEOUT_DEFAULT = 30;
 
-    private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
-    private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
-    private static final int TRANSACTION_TIMEOUT_DEFAULT = 1;
+	private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
+	private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
+	private static final int TRANSACTION_TIMEOUT_DEFAULT = 1;
 
 	private static final String TRUST_TOKEN_TIMEOUT_KEY = "trust-token-timeout";
 	private static final int TRUST_TOKEN_TIMEOUT_DEFAULT = 60;
-	
+
 	private static final String SOLR_CHECKING_INTERVAL_KEY = "solr-checking-interval";
 	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
-    private final static String ASCMD = "Microsoft-Server-ActiveSync";
+	private final static String ASCMD = "Microsoft-Server-ActiveSync";
 
-    private final static String EXTERNAL_URL_KEY = "external-url";
+	private final static String EXTERNAL_URL_KEY = "external-url";
 
-    private final static String LOCATOR_HOST_KEY = "host";
-    private final static String LOCATOR_PORT = "8084";
-    private final static String LOCATOR_APP_NAME = "obm-locator";
+	private final static String LOCATOR_HOST_KEY = "host";
+	private final static String LOCATOR_PORT = "8084";
+	private final static String LOCATOR_APP_NAME = "obm-locator";
 
-    private final static String OBM_SYNC_PORT = "8080";
-    private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
+	private final static String OBM_SYNC_PORT = "8080";
+	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
 
-    private final ImmutableMap<String, TimeUnit> timeUnits;
+	private static final String GLOBAL_DOMAIN = "global.virt";
+
+	private final ImmutableMap<String, TimeUnit> timeUnits;
 
 	private final String applicationName;
 
-    @Inject
+	@Inject
 	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName) {
 		super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
 		this.applicationName = applicationName;
@@ -115,27 +117,27 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 	public String getObmSyncUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
-	
+
 	@Override
 	public int getLocatorCacheTimeout() {
 		return getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);
 	}
-	
+
 	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
 		String key = getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
-	
+
 	private int getTransactionTimeout() {
 		return getIntValue(TRANSACTION_TIMEOUT_KEY, TRANSACTION_TIMEOUT_DEFAULT);
 	}
-	
+
 	private TimeUnit getTransactionTimeoutUnit() {
 		String key = getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
-	
+
 	private TimeUnit getTimeUnitOrDefault(String key, TimeUnit defaultUnit) {
 		if (key != null) {
 			TimeUnit unit = timeUnits.get(key.toLowerCase());
@@ -153,7 +155,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 		long transactionTimeoutInSeconds = transactionTimeoutUnit.toSeconds(transactionTimeout);
 		return Ints.checkedCast(transactionTimeoutInSeconds);
 	}
-	
+
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return ResourceBundle.getBundle("Messages", locale, new Control());
@@ -188,9 +190,15 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 	public int solrCheckingInterval() {
 		return getIntValue(SOLR_CHECKING_INTERVAL_KEY, SOLR_CHECKING_INTERVAL_DEFAULT);
 	}
-	
+
 	@Override
 	public String getDataDirectory() {
 		return "/var/lib/" + applicationName;
+	}
+
+
+	@Override
+	public String getGlobalDomain() {
+		return GLOBAL_DOMAIN;
 	}
 }

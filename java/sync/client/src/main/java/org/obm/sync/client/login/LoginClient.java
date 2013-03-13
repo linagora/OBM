@@ -34,6 +34,7 @@ package org.obm.sync.client.login;
 import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
 import org.obm.annotations.technicallogging.TechnicalLogging;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -48,6 +49,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -58,12 +60,15 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	private final Locator locator;
 	private final String origin;
+	private final ConfigurationService configurationService;
 
 	@Inject
 	protected LoginClient(@Named("origin")String origin,
+			ConfigurationService configurationService,
 			SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		super(syncClientException, obmSyncLogger);
 		this.origin = origin;
+		this.configurationService = configurationService;
 		this.locator = locator;
 	}
 	
@@ -122,6 +127,18 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	@Override
+	public boolean authenticateGlobalAdmin(String login, String password) throws AuthFault {
+		ImmutableMultimap<String, String> params = ImmutableMultimap.<String, String>of(
+				"login", login, "password", password, "origin", origin);
+
+		AccessToken token = newAccessToken(login, configurationService.getGlobalDomain(), origin);
+		
+		Document doc = execute(token, "/login/authenticateGlobalAdmin", params);
+		exceptionFactory.checkLoginExpection(doc);
+		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
+	}
+	
+	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	public void logout(AccessToken at) {
 		try {
@@ -142,18 +159,23 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	private AccessToken newAccessToken(String loginAtDomain, String origin) {
+		return newAccessToken(loginAtDomain.split("@", 2)[0], loginAtDomain.split("@", 2)[1], origin);
+	}
+
+	private AccessToken newAccessToken(String login, String domain, String origin) {
 		AccessToken token = new AccessToken(0, origin);
 		ObmDomain obmDomain = ObmDomain
                 				.builder()
-                				.name(loginAtDomain.split("@", 2)[1])
+                				.name(domain)
                 				.build();
 
-		token.setUserLogin(loginAtDomain.split("@", 2)[0]);
+		token.setUserLogin(login);
 		token.setDomain(obmDomain);
 		
 		return token;
 	}
 
+	
 	@Override
 	protected Locator getLocator() {
 		return locator;

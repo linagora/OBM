@@ -38,6 +38,7 @@ public interface LoginService {
 
 	AccessToken login(String loginAtDomain, String password) throws AuthFault;
 	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+	boolean authenticateGlobalAdmin(String login, String password) throws AuthFault;
 	void logout(AccessToken at);
 	
 }
