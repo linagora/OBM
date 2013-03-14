@@ -84,7 +84,7 @@ public class SyncCollection implements Serializable {
 	private Object readResolve() {
 		return AnalysedSyncCollection.builder()
 				.dataType(getDataType())
-				.syncKey(getSyncKey())
+				.syncKey(Objects.firstNonNull(getSyncKey(), SyncKey.INITIAL_FOLDER_SYNC_KEY))
 				.collectionId(getCollectionId())
 				.collectionPath(getCollectionPath())
 				.windowSize(getWindowSize())
