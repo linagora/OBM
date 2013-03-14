@@ -37,6 +37,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.client.SyncClientCommands;
+import org.obm.push.bean.change.client.SyncClientCommands.Add;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
@@ -70,7 +72,7 @@ public class SyncCollectionCommandsTest {
 		ImmutableList<ItemChange> changes = ImmutableList.<ItemChange> of(new ItemChange("123"));
 		ImmutableList<ItemDeletion> deletions = ImmutableList.<ItemDeletion> of(ItemDeletion.builder().serverId("234").build());
 		SyncCollectionCommands.Response commands = SyncCollectionCommands.Response.builder()
-				.changes(changes)
+				.changes(changes, SyncClientCommands.builder().build())
 				.deletions(deletions)
 				.build();
 				
@@ -81,6 +83,24 @@ public class SyncCollectionCommandsTest {
 		assertThat(commands.getCommandsForType(SyncCommand.DELETE)).containsOnly(SyncCollectionCommand.Response.builder()
 				.commandType(SyncCommand.DELETE)
 				.serverId("234")
+				.build());
+	}
+	
+	@Test
+	public void testChangesWithClientId() {
+		String serverId = "123";
+		String clientId = "456";
+		ImmutableList<ItemChange> changes = ImmutableList.<ItemChange> of(new ItemChange(serverId));
+		SyncCollectionCommands.Response commands = SyncCollectionCommands.Response.builder()
+				.changes(changes, SyncClientCommands.builder()
+						.putAdd(new Add(clientId, serverId))
+						.build())
+				.build();
+				
+		assertThat(commands.getCommandsForType(SyncCommand.CHANGE)).containsOnly(SyncCollectionCommand.Response.builder()
+				.commandType(SyncCommand.CHANGE)
+				.serverId(serverId)
+				.clientId(clientId)
 				.build());
 	}
 }

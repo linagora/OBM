@@ -161,6 +161,10 @@ public class SyncClientCommands {
 			this.serverId = serverId;
 		}
 
+		public String getClientId() {
+			return clientId;
+		}
+		
 		@Override
 		public SyncCommand syncCommand() {
 			return SyncCommand.ADD;

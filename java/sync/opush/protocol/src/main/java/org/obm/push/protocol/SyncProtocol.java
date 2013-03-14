@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -156,7 +157,8 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 						}
 
 						if (collectionResponse.getFetchIds().isEmpty()) {
-							buildUpdateItemChange(collectionResponse, syncResponse.getProcessedClientIds(), ce);
+							buildUpdateItemChange(collectionResponse, 
+									Maps.newHashMap(syncResponse.getProcessedClientIds()), ce);
 						} else {
 							buildFetchItemChange(collectionResponse, ce);
 						}

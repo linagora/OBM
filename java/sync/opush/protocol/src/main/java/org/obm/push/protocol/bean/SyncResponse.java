@@ -34,12 +34,15 @@ package org.obm.push.protocol.bean;
 import java.util.Collection;
 import java.util.Map;
 
+import org.obm.push.bean.SyncCollectionCommand;
+import org.obm.push.bean.SyncCollectionCommands.Response;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncStatus;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
 public class SyncResponse {
 
@@ -50,24 +53,16 @@ public class SyncResponse {
 	public static class Builder {
 		
 		private ImmutableList.Builder<SyncCollectionResponse> responsesBuilder;
-		private Map<String, String> processedClientIds;
 		private SyncStatus status;
 		
 		private Builder() {
 			this.responsesBuilder = ImmutableList.builder();
-			this.processedClientIds = Maps.newHashMap();
 		}
 		
 		public Builder addResponse(SyncCollectionResponse response) {
 			responsesBuilder.add(response);
 			return this;
 		}
-		
-		// TODO
-//		public Builder addAllProcessedClientIds(Map<String, String> processedClientIds) {
-//			processedClientIds.putAll(processedClientIds);
-//			return this;
-//		}
 		
 		public Builder status(SyncStatus status) {
 			this.status = status;
@@ -76,8 +71,24 @@ public class SyncResponse {
 		
 		public SyncResponse build() {
 			SyncStatus status = Objects.firstNonNull(this.status, SyncStatus.OK);
-			return new SyncResponse(responsesBuilder.build(), 
-					processedClientIds, status);
+			ImmutableList<SyncCollectionResponse> responses = responsesBuilder.build();
+			return new SyncResponse(responses, 
+					buildProcessedClientIds(responses), status);
+		}
+		
+		private Map<String, String> buildProcessedClientIds(ImmutableList<SyncCollectionResponse> responses) {
+			ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+			for (SyncCollectionResponse response : responses) {
+				Response commands = response.getCommands();
+				if (commands != null) {
+					for (SyncCollectionCommand.Response command : commands.getCommands()) {
+						if (!Strings.isNullOrEmpty(command.getClientId())) {
+							builder.put(command.getServerId(), command.getClientId());
+						}
+					}
+				}
+			}
+			return builder.build();
 		}
 	}
 	
