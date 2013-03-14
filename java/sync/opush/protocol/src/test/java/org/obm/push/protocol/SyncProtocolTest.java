@@ -133,7 +133,7 @@ public class SyncProtocolTest {
 	}
 
 	@Test
-	public void testEncodeValidResponse() throws TransformerException {
+	public void testEncodeValidResponseRespectWindowsMobileOrderingExpectation() throws TransformerException {
 		int collectionId = 515;
 		SyncCollectionResponse collectionResponse = newSyncCollectionResponse(collectionId, SyncStatus.OK);
 
@@ -168,9 +168,9 @@ public class SyncProtocolTest {
 					"<Collections>" +
 						"<Collection>" +
 							"<Class>Email</Class>" +
+							"<SyncKey>123456789</SyncKey>" +
 							"<CollectionId>" + String.valueOf(collectionId) + "</CollectionId>" +
 							"<Status>1</Status>" +
-							"<SyncKey>123456789</SyncKey>" +
 						"</Collection>" +
 					"</Collections>" +
 				"</Sync>";

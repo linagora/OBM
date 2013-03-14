@@ -137,15 +137,17 @@ public class SyncProtocol implements ActiveSyncProtocol<SyncRequest, SyncRespons
 				}
 				
 				SyncStatus status = collectionResponse.getStatus();
-				DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getCollectionId());
-				DOMUtils.createElementAndText(ce, "Status", status.asSpecificationValue());
-				
 				if (status != SyncStatus.OK) {
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getCollectionId());
+					DOMUtils.createElementAndText(ce, "Status", status.asSpecificationValue());
 					if (status == SyncStatus.INVALID_SYNC_KEY) {
 						DOMUtils.createElementAndText(ce, "SyncKey", "0");
 					}
 				} else {
+					// For WindowsMobile, XML order must be : SyncKey, CollectionId, Status 
 					Element sk = DOMUtils.createElement(ce, "SyncKey");
+					DOMUtils.createElementAndText(ce, "CollectionId", collectionResponse.getCollectionId());
+					DOMUtils.createElementAndText(ce, "Status", status.asSpecificationValue());
 	
 					if (!collectionResponse.getSyncKey().equals(SyncKey.INITIAL_FOLDER_SYNC_KEY)) {
 						if (collectionResponse.isMoreAvailable()) {
