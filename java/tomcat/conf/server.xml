@@ -14,6 +14,7 @@
 	       protocol="org.apache.coyote.http11.Http11NioProtocol"
 	       URIEncoding="UTF-8"
 	       maxThreads="400"
+	       socket.soTrafficClass="0"
                enableLookups="false" redirectPort="8443" acceptCount="100"
                connectionTimeout="600000" disableUploadTimeout="true" />
 
