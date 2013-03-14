@@ -118,7 +118,7 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 		<div class="container">
-			<a class="brand" href="" style="margin-left:10px;">OBM Health Check: First Access Configration Page</a>
+			<a class="brand" href="" style="margin-left:10px;">OBM Health Check: First Access Configuration Page</a>
 		</div>
 	</div>
 </div>
@@ -131,11 +131,11 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 		</h2>
 		<h3>It's your first access to Health Check OBM:</h3>
 		<p>
-			To use OBM healthcheck you need a <strong>unique user and password</strong> in a configuration file. <br/><br/>
-			So please complete this form to generate your login and hashed password and paste the result in a file <strong>/etc/obm/heathcheck.ini</strong> on your Apache web server.
+			To use OBM Health Check, you need a <strong>unique user and password</strong> in a configuration file. <br/><br/>
+			So please complete this form to generate your login and hashed password and paste the result in a file <strong>/etc/obm/healthcheck.ini</strong> on your Apache web server.
 		</p>
 		<p>
-			When you're done, <a href="index.php" class="btn">Click here to access the healthcheck</a>.
+			When you're done, <a href="index.php" class="btn">Click here to access the Health Check</a>.
 	</div>
 
 	<div class="span3 alert alert-info">
