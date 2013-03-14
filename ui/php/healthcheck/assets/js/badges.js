@@ -25,14 +25,14 @@ define([], function() {
     if ( !(code in badgeName) ) {
       return ;
     }
-    return parseInt($( badgeName[code] ).text(count),10);
+    return $( badgeName[code] ).text(count);
   };
   
   var getCount = function(code) {
     if ( !(code in badgeName) ) {
       return ;
     }
-    return $( badgeName[code] ).text();
+    return parseInt($( badgeName[code] ).text(), 10);
   };
   
   var getErrorCount = function() {
