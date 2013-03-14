@@ -2428,7 +2428,7 @@ function update_decision_and_comment($params, $user_id) {
   $isRecurrent = $event_q->f('event_repeatkind')!='none' && $params['all'] != 1;
   $GLOBALS["send_notification_mail"] = true;
   if (!run_query_calendar_update_occurrence_state($calendar_id, $entity_kind, $owner_id, $decision_event,
-          $isRecurrent)) {
+          $isRecurrent, $params['owner_notification'])) {
     throw new DBUpdateException();
   }
   return true;

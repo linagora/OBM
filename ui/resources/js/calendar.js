@@ -2224,7 +2224,8 @@ Obm.CommentedDecisionPopup = new Class({
     }
     var options = {
       uriAction: this.uriAction,
-      success: Obm.responseHandlers.update_decision_and_comment
+      success: Obm.responseHandlers.update_decision_and_comment,
+      owner_notification: $('owner_notification').checked
     };
     if ( this.occurrenceDate && this.occurrenceDate.length ) {
       options.date_edit_occurrence = this.occurrenceDate;
@@ -2308,6 +2309,10 @@ Obm.Rest = {
     if ( options.date_edit_occurrence ) {
       postData.date_edit_occurrence = options.date_edit_occurrence;
     }
+    // OBMFULL-3770
+    // The "<property> not in <object>" syntax is there to guarantee that the email will be sent
+    // when the option isn't defined. This way we don't need to change all calls to this function
+    postData.owner_notification = !("owner_notification" in options) || options.owner_notification;
     
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
