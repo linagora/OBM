@@ -515,7 +515,7 @@ public class LinagoraMailboxService implements MailboxService {
 						public boolean apply(FastFetch input) {
 							return !input.isDeleted();
 						}
-					}).toImmutableList();
+					}).toList();
 		} catch (LocatorClientException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
