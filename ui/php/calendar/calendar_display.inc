@@ -4188,7 +4188,7 @@ function dis_calendar_quick_form($calendar_entity) {
 
     $block_template = "
       <th>$GLOBALS[l_template]:</th>
-      <td><select id='template_id' name='template_id'>
+      <td><select id='template_id' name='template_id' onchange='toggleSubmitOnSelection(this);'>
         <option value='$GLOBALS[c_none]'>$GLOBALS[l_undef]</option>
         $select
       </select></td>";
@@ -4224,7 +4224,7 @@ function dis_calendar_quick_form($calendar_entity) {
           </table>
           $calendar_inputs
           <fieldset class='buttons'> 
-            <input class='closeSticky' type='submit' value='$GLOBALS[l_validate]' />
+            <input id='calendarQuickFormSubmit' class='closeSticky' type='submit' value='$GLOBALS[l_validate]' />
             <input type='button' id='calendarQuickFormAdvanced' onclick='obm.calendarQuickForm.goTo();' />
             <input type='button' id='calendarQuickFormEdit' onclick=\"obm.calendarQuickForm.submit('detailupdate');\" />
             <input type='button' id='calendarQuickFormDetail' onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value='$GLOBALS[l_details]' />

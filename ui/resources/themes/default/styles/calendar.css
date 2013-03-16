@@ -1202,6 +1202,7 @@ li.eventOwner19Legend {
 input[type="submit"][disabled] {
   background:#666;
   color: #CCC;
+  cursor: default;
 }
 
 #calendarToolbar {

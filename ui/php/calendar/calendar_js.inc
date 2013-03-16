@@ -970,6 +970,11 @@ function reinitSharePopup(type){
   div.injectInside($('calendarSharePopup'));
   obm.popup.show('sharePopup');
 }
+
+function toggleSubmitOnSelection(select) {
+  $('calendarQuickFormSubmit').disabled = select.selectedIndex > 0;
+}
+
 ";
 
 ?>
