@@ -35,6 +35,8 @@ package com.linagora.obm.ui.bean;
 public enum UIUserProfile {
 
 	USER("Utilisateur"),
+	EDITOR("Editeur"),
+	ADMIN_DELEGATE("Admin délégué"),
 	ADMIN("Admin");
 
 	private final String uiValue;
