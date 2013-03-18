@@ -133,7 +133,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		return Lists.newArrayList(
 				"RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 8 nov. 2010", 
-				"au 23 nov. 2012", 				
+				"au \"Sans date de fin\"",
 				"du            : 8 nov. 2010", 
 				"au            : 23 nov. 2012",
 				"de 11:00 à 11:45",
@@ -150,7 +150,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		return Lists.newArrayList(
 				"Invitation à un évènement récurrent : mise à jour",
 				"du 8 nov. 2010", 
-				"au 23 nov. 2012", 
+				"au \"Sans date de fin\"",
 				"Du 8 nov. 2010", 
 				"Au 23 nov. 2012", 
 				"Sujet Sprint planning OBM", 

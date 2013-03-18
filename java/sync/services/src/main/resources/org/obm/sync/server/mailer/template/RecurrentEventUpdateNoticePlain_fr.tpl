@@ -3,7 +3,7 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS RÉCURRENT MODIFIÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous récurrent ${old.subject}, initialement prévu du ${old.start?date} au ${old.recurrenceEnd?date} de ${old.startTime?string.short} à ${old.endTime?string.short}, (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}), a été modifié :
+Le rendez-vous récurrent ${old.subject}, initialement prévu du ${old.start?date} au ${old.recurrenceEnd} de ${old.startTime?string.short} à ${old.endTime?string.short}, (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}), a été modifié :
 
 du            : ${new.start?date}
 

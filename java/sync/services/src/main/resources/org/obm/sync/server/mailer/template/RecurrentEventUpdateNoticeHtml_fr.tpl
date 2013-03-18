@@ -5,7 +5,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous récurrent <strong><?php echo $title; ?></strong>, initialement prévu du ${old.start?date} au ${old.recurrenceEnd?date} de ${old.startTime?string.short} à ${old.endTime?string.short} (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}),
+        <td colspan="2">Le rendez-vous récurrent <strong><?php echo $title; ?></strong>, initialement prévu du ${old.start?date} au ${old.recurrenceEnd} de ${old.startTime?string.short} à ${old.endTime?string.short} (lieu : ${old.location}, type de récurrence : ${old.recurrenceKind}),
 a été modifié :</td>
     </tr>
     <tr>

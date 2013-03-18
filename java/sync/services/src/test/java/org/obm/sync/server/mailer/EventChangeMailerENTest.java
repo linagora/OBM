@@ -132,7 +132,7 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 		return Lists.newArrayList(
 				"RECURRENT APPOINTMENT UPDATED !",
 				"from Nov 8, 2010", 
-				"to Nov 23, 2012", 				
+				"to \"No end date\"",
 				"from          : Nov 8, 2010", 
 				"to            : Nov 23, 2012",
 				"at 11:00 AM - 11:45 AM",
@@ -149,7 +149,7 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 		return Lists.newArrayList(
 				"Recurrent appointment updated",
 				"from Nov 8, 2010", 
-				"to Nov 23, 2012", 
+				"to \"No end date\"",
 				"From Nov 8, 2010", 
 				"To Nov 23, 2012", 
 				"Subject Sprint planning OBM", 

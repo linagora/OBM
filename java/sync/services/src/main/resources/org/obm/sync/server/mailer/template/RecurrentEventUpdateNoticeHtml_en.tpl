@@ -6,7 +6,7 @@
     </tr>
     <tr>
         <td colspan="2">
-The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd?date} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :</td>
+The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;">${new.subject}</td>

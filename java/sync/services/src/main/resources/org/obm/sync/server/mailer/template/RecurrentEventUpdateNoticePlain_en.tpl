@@ -3,7 +3,7 @@ This email was automatically sent by OBM
 RECURRENT APPOINTMENT UPDATED !
 ------------------------------------------------------------------
 
-The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd?date} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :
+The recurrent appointment ${old.subject}, initially scheduled from ${old.start?date} to ${old.recurrenceEnd} at ${old.startTime?string.short} - ${old.endTime?string.short}, (location : ${old.location}, recurrence kind : ${old.recurrenceKind}), was updated :
 
 from          : ${new.start?date}
 

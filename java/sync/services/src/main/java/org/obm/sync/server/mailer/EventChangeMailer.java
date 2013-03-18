@@ -519,7 +519,7 @@ public class EventChangeMailer extends AbstractMailer {
 				.put("endDate", new SimpleDate(event.getEndDate(), TemplateDateModel.DATE))
 				.put("endTime", new SimpleDate(event.getEndDate(), TemplateDateModel.TIME))
 				.put("recurrenceKind", getMessages(locale).withoutRecurrence())
-				.put("recurrenceEnd", new SimpleDate(event.getEndDate(), TemplateDateModel.DATETIME));
+				.put("recurrenceEnd", new SimpleDate(event.getEndDate(), TemplateDateModel.DATE));
 		}
 
 		return datamodel;
