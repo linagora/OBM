@@ -506,6 +506,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       var accept_admin = this.name[3];
       var item_id = element.getProperty('id');
       var id = item_id.substr(('item_').length,item_id.length);
+      var user_id = id.substr((entity + '-').length,id.length);
       var entity = this.selectedBox.id;
       var tr_id = entity +'-'+ id;
       var text = $(item_id+'_label').innerHTML;
@@ -552,6 +553,13 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           accept_access_style = 'hidden';
         }
 
+        var accept_admin_style = 'visible';
+        var accept_admin_disabled = false;
+        if (user_id == ".$entity_id.") {
+          accept_access_disabled = accept_read_disabled = accept_write_disabled = accept_admin_disabled = true;
+          accept_access_style = accept_read_style = accept_write_style = accept_admin_style = 'visible';
+        }
+
         new Element('td').adopt(
           new Element('a').setProperty('href', '#')
                           .addEvent('click', function() { select_all_perms(tr_id); })
@@ -588,10 +596,20 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         new Element('td').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_admin+'[]')
+                              .setProperty('disabled', accept_admin_disabled)
                               .setProperty('value', id)
-        ).injectInside(result);
+        ).setStyle('visibility', accept_admin_style).injectInside(result);
         
         result.injectInside(this.selectedBox);
+
+        if (user_id == ".$entity_id.") {
+          var c = document.getElementById(tr_id).getElementsByTagName('input');
+          for (var i = 0; i < c.length; i++) {
+            if (c[i].type == 'checkbox') {
+              c[i].checked = 'checked';
+            }
+          }
+        }
       } else {
         this.inputField.blur();
         this.resetFunc();
