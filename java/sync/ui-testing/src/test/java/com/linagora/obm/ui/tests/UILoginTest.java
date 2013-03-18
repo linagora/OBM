@@ -96,7 +96,7 @@ public class UILoginTest {
 
 		assertThat(homePage.currentTitle()).contains("OBM");
 		assertThat(homePage.elInformationUser().getText()).startsWith(uiUser.getLogin()).contains(uiDomain.getName());
-		assertThat(homePage.elInformationProfile().getText()).contains(uiUser.getProfile().getUiValue());
+		assertThat(homePage.elInformationProfile().getText()).contains(uiUser.getProfile().getUiFrenchText());
     }
 
     @Test

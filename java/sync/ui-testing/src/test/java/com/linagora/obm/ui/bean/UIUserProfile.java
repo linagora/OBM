@@ -34,18 +34,25 @@ package com.linagora.obm.ui.bean;
 
 public enum UIUserProfile {
 
-	USER("Utilisateur"),
-	EDITOR("Editeur"),
-	ADMIN_DELEGATE("Admin délégué"),
-	ADMIN("Admin");
+	USER("user", "Utilisateur"),
+	EDITOR("editor", "Editeur"),
+	ADMIN_DELEGATE("admin_delegue", "Admin délégué"),
+	ADMIN("admin", "Admin");
 
 	private final String uiValue;
+	private final String uiFrenchText;
 
-	private UIUserProfile(String uiValue) {
+	private UIUserProfile(String uiValue, String uiFrenchText) {
 		this.uiValue = uiValue;
+		this.uiFrenchText = uiFrenchText;
 	}
 
 	public String getUiValue() {
 		return uiValue;
 	}
+
+	public String getUiFrenchText() {
+		return uiFrenchText;
+	}
+	
 }
