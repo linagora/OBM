@@ -2166,7 +2166,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   // Buttons
   if (($action == 'new') || ($action == 'insert')) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
+      <input id=\"createUserSubmit\" type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($action=='detailupdate') || ($action=='update') || ($action=='valid')) {
     $dis_button = "<input type=\"hidden\" id=\"user_action\" name=\"action\" value=\"update\" />

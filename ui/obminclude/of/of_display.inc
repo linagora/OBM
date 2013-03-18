@@ -1744,7 +1744,7 @@ function display_ok_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"message ok\">$msg</p>";
+    $ret = "<p name=\"displayMessageOk\" class=\"message ok\">$msg</p>";
   }
   
   return $ret;

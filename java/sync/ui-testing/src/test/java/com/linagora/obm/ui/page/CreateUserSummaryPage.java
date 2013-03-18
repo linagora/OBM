@@ -29,39 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.url;
+package com.linagora.obm.ui.page;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
+import java.util.List;
 
-import com.google.common.collect.ImmutableMap;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.linagora.obm.ui.ioc.Module;
-import com.linagora.obm.ui.page.CreateUserPage;
-import com.linagora.obm.ui.page.HomePage;
-import com.linagora.obm.ui.page.LoginPage;
-import com.linagora.obm.ui.service.Service;
-import com.linagora.obm.ui.service.Services.Logout;
+import com.linagora.obm.ui.url.ServiceUrlMapping;
 
-@Singleton
-public class ServiceUrlMapping {
-
-	private final Map<Class<? extends Service>, URL> mapping;
+public class CreateUserSummaryPage implements Page {
 	
-	@Inject
-	private ServiceUrlMapping(@Named(Module.SERVER_URL) URL serverUrl) throws MalformedURLException {
-		mapping = ImmutableMap.<Class<? extends Service>, URL>builder()
-				.put(LoginPage.class, new URL(serverUrl, "/"))
-				.put(HomePage.class, new URL(serverUrl, "/obm.php"))
-				.put(Logout.class, new URL(serverUrl, "/obm.php?action=logout"))
-				.put(CreateUserPage.class, new URL(serverUrl, "/user/user_index.php?action=new"))
-				.build();
+	@Inject ServiceUrlMapping mapping;
+	@Inject PageFactory pageFactory;
+	
+	private final WebDriver driver;
+	@FindBy(name="displayMessageOk")
+	private List<WebElement> messages;
+	
+	public CreateUserSummaryPage(WebDriver driver) {
+		this.driver = driver;
 	}
 	
-	public URL lookup(Class<? extends Service> page) {
-		return mapping.get(page);
+	@Override
+	public void open() {
+		driver.get(mapping.lookup(CreateUserSummaryPage.class).toExternalForm());
 	}
+	
+	@Override
+	public String currentTitle() {
+		return driver.getTitle();
+	}
+
+	public List<WebElement> messages() {
+		return messages;
+	}
+	
 }

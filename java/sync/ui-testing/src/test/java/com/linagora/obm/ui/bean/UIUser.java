@@ -45,6 +45,14 @@ public class UIUser {
 		return builder().login("admin0").password("admin").profile(UIUserProfile.ADMIN).build();
 	}
 	
+	public static UIUser admin() { 
+		return builder().login("admin").password("admin").commonName("admin").profile(UIUserProfile.ADMIN).build();
+	}
+	
+	public static UIUser user() {
+		return builder().login("usera").password("usera").commonName("Utilisateur a").profile(UIUserProfile.USER).build();		
+	}
+	
 	public static class Builder {
 		
 		private String login;
@@ -280,6 +288,8 @@ public class UIUser {
 	private final UIUserKind kind;
 	private final UIUserProfile profile;
 	
+	public boolean hasKindDefined() {
+		return kind != null;
 	}
 	
 }

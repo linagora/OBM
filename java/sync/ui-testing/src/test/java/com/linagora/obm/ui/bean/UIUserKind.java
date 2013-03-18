@@ -29,39 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.url;
+package com.linagora.obm.ui.bean;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.linagora.obm.ui.ioc.Module;
-import com.linagora.obm.ui.page.CreateUserPage;
-import com.linagora.obm.ui.page.HomePage;
-import com.linagora.obm.ui.page.LoginPage;
-import com.linagora.obm.ui.service.Service;
-import com.linagora.obm.ui.service.Services.Logout;
+public enum UIUserKind {
 
-@Singleton
-public class ServiceUrlMapping {
+	MISTER("Mr"),
+	MISS("Mmd");
 
-	private final Map<Class<? extends Service>, URL> mapping;
-	
-	@Inject
-	private ServiceUrlMapping(@Named(Module.SERVER_URL) URL serverUrl) throws MalformedURLException {
-		mapping = ImmutableMap.<Class<? extends Service>, URL>builder()
-				.put(LoginPage.class, new URL(serverUrl, "/"))
-				.put(HomePage.class, new URL(serverUrl, "/obm.php"))
-				.put(Logout.class, new URL(serverUrl, "/obm.php?action=logout"))
-				.put(CreateUserPage.class, new URL(serverUrl, "/user/user_index.php?action=new"))
-				.build();
+	private final String uiValue;
+
+	private UIUserKind(String uiValue) {
+		this.uiValue = uiValue;
 	}
-	
-	public URL lookup(Class<? extends Service> page) {
-		return mapping.get(page);
+
+	public String getUiValue() {
+		return uiValue;
 	}
 }
