@@ -31,8 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.bean;
 
-import com.google.common.base.Objects;
+import java.util.Date;
 
+import lombok.Data;
+
+@Data
 public class UIUser {
 	
 	public static Builder builder() {
@@ -46,10 +49,38 @@ public class UIUser {
 		
 		private String login;
 		private String password;
+		private String firstName;
+		private String lastName;
+		private String commonName;
+		private boolean mailboxHidden;
+		private boolean mailboxArchive;
+		private String delegation;
+		private String title;
+		private Date dateBegin;
+		private Date dateExpire;
+		private boolean noExpire;
+		private String phone;
+		private String phone2;
+		private String phoneMobile;
+		private String phoneFax;
+		private String phoneFax2;
+		private String company;
+		private String direction;
+		private String service;
+		private String address1;
+		private String address2;
+		private String address3;
+		private String addressZip;
+		private String addressTown;
+		private String addressCedex;
+		private String description;
+		private boolean emailInternalEnabled;
+		private String emailAddress;
+		private UIUserKind kind;
 		private UIUserProfile profile;
 		
 		private Builder() {
-			this.profile = UIUserProfile.USER;
+			profile = UIUserProfile.USER;
 		}
 		
 		public Builder login(String login) {
@@ -62,61 +93,193 @@ public class UIUser {
 			return this;
 		}
 		
+		public Builder commonName(String commonName) {
+			this.commonName = commonName;
+			return this;
+		}
+		
+		public Builder firstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+		
+		public Builder lastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+		
+		public Builder mailboxHidden(boolean mailboxHidden) {
+			this.mailboxHidden = mailboxHidden;
+			return this;
+		}
+		
+		public Builder mailboxArchive(boolean mailboxArchive) {
+			this.mailboxArchive = mailboxArchive;
+			return this;
+		}
+		
+		public Builder delegation(String delegation) {
+			this.delegation = delegation;
+			return this;
+		}
+		
+		public Builder title(String title) {
+			this.title = title;
+			return this;
+		}
+		
+		public Builder dateBegin(Date dateBegin) {
+			this.dateBegin = dateBegin;
+			return this;
+		}
+		
+		public Builder dateExpire(Date dateExpire) {
+			this.dateExpire = dateExpire;
+			return this;
+		}
+		
+		public Builder noExpire(boolean noExpire) {
+			this.noExpire = noExpire;
+			return this;
+		}
+		
+		public Builder phone(String phone) {
+			this.phone = phone;
+			return this;
+		}
+		
+		public Builder phone2(String phone2) {
+			this.phone2 = phone2;
+			return this;
+		}
+		
+		public Builder phoneMobile(String phoneMobile) {
+			this.phoneMobile = phoneMobile;
+			return this;
+		}
+		
+		public Builder phoneFax(String phoneFax) {
+			this.phoneFax = phoneFax;
+			return this;
+		}
+		
+		public Builder phoneFax2(String phoneFax2) {
+			this.phoneFax2 = phoneFax2;
+			return this;
+		}
+		
+		public Builder company(String company) {
+			this.company = company;
+			return this;
+		}
+		
+		public Builder direction(String direction) {
+			this.direction = direction;
+			return this;
+		}
+		
+		public Builder service(String service) {
+			this.service = service;
+			return this;
+		}
+		
+		public Builder address1(String address1) {
+			this.address1 = address1;
+			return this;
+		}
+		
+		public Builder address2(String address2) {
+			this.address2 = address2;
+			return this;
+		}
+		
+		public Builder address3(String address3) {
+			this.address3 = address3;
+			return this;
+		}
+		
+		public Builder addressZip(String addressZip) {
+			this.addressZip = addressZip;
+			return this;
+		}
+		
+		public Builder addressTown(String addressTown) {
+			this.addressTown = addressTown;
+			return this;
+		}
+		
+		public Builder addressCedex(String addressCedex) {
+			this.addressCedex = addressCedex;
+			return this;
+		}
+		
+		public Builder description(String description) {
+			this.description = description;
+			return this;
+		}
+		
+		public Builder emailInternalEnabled(boolean emailInternalEnabled) {
+			this.emailInternalEnabled = emailInternalEnabled;
+			return this;
+		}
+		
+		public Builder emailAddress(String emailAddress) {
+			this.emailAddress = emailAddress;
+			return this;
+		}
+		
+		public Builder kind(UIUserKind kind) {
+			this.kind = kind;
+			return this;
+		}
+
 		public Builder profile(UIUserProfile profile) {
 			this.profile = profile;
 			return this;
 		}
-		
+
 		public UIUser build() {
-			return new UIUser(login, password, profile);
+			return new UIUser(
+					login, password, firstName, lastName, commonName, mailboxHidden,
+					mailboxArchive, delegation, title, dateBegin, dateExpire, noExpire, 
+					phone, phone2, phoneMobile, phoneFax, phoneFax2, company, direction, 
+					service, address1, address2, address3, addressZip, addressTown, addressCedex, 
+					description, emailInternalEnabled, emailAddress, kind, profile);
 		}
-		
 	}
 	
 	private final String login;
 	private final String password;
+	private final String firstName;
+	private final String lastName;
+	private final String commonName;
+	private final boolean mailboxHidden;
+	private final boolean mailboxArchive;
+	private final String delegation;
+	private final String title;
+	private final Date dateBegin;
+	private final Date dateExpire;
+	private final boolean noExpire;
+	private final String phone;
+	private final String phone2;
+	private final String phoneMobile;
+	private final String phoneFax;
+	private final String phoneFax2;
+	private final String company;
+	private final String direction;
+	private final String service;
+	private final String address1;
+	private final String address2;
+	private final String address3;
+	private final String addressZip;
+	private final String addressTown;
+	private final String addressCedex;
+	private final String description;
+	private final boolean emailInternalEnabled;
+	private final String emailAddress;
+	private final UIUserKind kind;
 	private final UIUserProfile profile;
 	
-	public UIUser(String login, String password, UIUserProfile profile) {
-		this.login = login;
-		this.password = password;
-		this.profile = profile;
 	}
 	
-	public String getLogin() {
-		return login;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
-	
-	public UIUserProfile getProfile() {
-		return profile;
-	}
-	
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(login, password, profile);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof UIUser) {
-			UIUser that = (UIUser) object;
-			return Objects.equal(this.login, that.login)
-				&& Objects.equal(this.password, that.password)
-				&& Objects.equal(this.profile, that.profile);
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("login", login)
-			.add("password", password)
-			.add("profile", profile)
-			.toString();
-	}
 }
