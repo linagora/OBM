@@ -1810,8 +1810,6 @@ function session_load_user_prefs() {
   if(!isset($_SESSION['set_timezone'])) {
     $_SESSION['set_timezone'] = $set_timezone_default;
   }
-  date_default_timezone_set($_SESSION['set_timezone']);
-  Of_Date::setOption('timezone',$_SESSION['set_timezone']);
 }
 
 

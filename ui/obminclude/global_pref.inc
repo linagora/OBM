@@ -55,6 +55,11 @@ if (($_SESSION['set_lang'] == '') && ($params['mode'] != 'txt')) {
   run_query_userobm_update_lastaccess($obm['uid']);
 }
 
+if ( $_SESSION['set_timezone'] ) {
+  date_default_timezone_set($_SESSION['set_timezone']);
+  Of_Date::setOption('timezone',$_SESSION['set_timezone']);
+}
+
 // Display parameters if debug level is set
 display_debug_param($params);
 
