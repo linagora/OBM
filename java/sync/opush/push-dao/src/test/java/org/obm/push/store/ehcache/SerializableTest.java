@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 
@@ -47,10 +48,8 @@ public class SerializableTest {
 
 	@Test
 	public void unsynchronizedItemDaoEhcacheImplKey() {
-		UnsynchronizedItemDaoEhcacheImpl.Key key = new UnsynchronizedItemDaoEhcacheImpl.Key(
-				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
-				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), BigDecimal.valueOf(12)),
-				12, UnsynchronizedItemType.ADD);
+		UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4 key = new UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4(
+				new SyncKey("132"), UnsynchronizedItemType.ADD);
 		SerializableTester.reserializeAndAssert(key);
 	}
 

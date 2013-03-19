@@ -508,7 +508,7 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		expectUnsynchronizedItemToNeverExceedWindowSize(unsynchronizedItemDao, user, collectionId);
+		expectUnsynchronizedItemToNeverExceedWindowSize(unsynchronizedItemDao, secondSyncKey);
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class),
@@ -544,15 +544,15 @@ public class SyncHandlerTest {
 	}
 
 	private void expectUnsynchronizedItemToNeverExceedWindowSize(
-			UnsynchronizedItemDao unsynchronizedItemDao, OpushUser user, int collectionId) {
+			UnsynchronizedItemDao unsynchronizedItemDao, SyncKey syncKey) {
 		
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, collectionId))
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, collectionId))
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey))
 				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, collectionId);
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		expectLastCall().anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, collectionId);
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
 		expectLastCall().anyTimes();
 	}
 	

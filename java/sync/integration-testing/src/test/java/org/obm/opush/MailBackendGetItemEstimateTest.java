@@ -166,7 +166,7 @@ public class MailBackendGetItemEstimateTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		expect(collectionDao.findItemStateForKey(invalidSyncKey)).andReturn(null);
-		expectUnsynchronizedItemToNeverHavePendingAdds();
+		expectUnsynchronizedItemToNeverHavePendingAdds(invalidSyncKey);
 
 		mocksControl.replay();
 		
@@ -201,7 +201,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds();
+		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -247,7 +247,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds();
+		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -293,7 +293,7 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds();
+		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -348,8 +348,8 @@ public class MailBackendGetItemEstimateTest {
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
 	}
 
-	private void expectUnsynchronizedItemToNeverHavePendingAdds() {
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
+	private void expectUnsynchronizedItemToNeverHavePendingAdds(SyncKey syncKey) {
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
 				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 	}
 

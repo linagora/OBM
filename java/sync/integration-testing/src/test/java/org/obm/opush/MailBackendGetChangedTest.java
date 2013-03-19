@@ -40,11 +40,11 @@ import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+import static org.obm.opush.command.sync.EmailSyncTestUtils.assertEqualsWithoutApplicationData;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -73,7 +73,6 @@ import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.change.SyncCommand;
-import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
@@ -913,19 +912,6 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.closeCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(2);
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
-	}
-
-	private void assertEqualsWithoutApplicationData(List<ItemChange> itemChanges, List<ItemChange> expectedChanges) {
-		assertThat(itemChanges).hasSize(expectedChanges.size());
-		
-		for (ItemChange change : itemChanges) {
-			for (ItemChange expected : expectedChanges) {
-				if (change.getServerId().equals(expected.getServerId())) {
-					assertThat(change.isMSEmail()).isEqualTo(expected.isMSEmail());
-					assertThat(change.isNew()).isEqualTo(expected.isNew());
-				}
-			}
-		}
 	}
 
 	@Test

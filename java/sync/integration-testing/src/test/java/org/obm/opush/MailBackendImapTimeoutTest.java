@@ -308,7 +308,7 @@ public class MailBackendImapTimeoutTest {
 		expect(collectionDao.findItemStateForKey(syncKey))
 			.andReturn(syncState);
 		
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, inboxCollectionId))
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
 			.andReturn(ImmutableList.<ItemChange> of());
 		
 		expect(dateService.getCurrentDate()).andReturn(syncState.getSyncDate());

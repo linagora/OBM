@@ -40,9 +40,12 @@ import net.sf.ehcache.Element;
 
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -53,6 +56,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao implements UnsynchronizedItemDao {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	@Inject UnsynchronizedItemDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
@@ -63,58 +68,61 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 	}
 
 	@Override
-	public Set<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
+	public Set<ItemChange> listItemsToAdd(SyncKey syncKey) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.ADD);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemsToAdd(Credentials credentials, Device device, int collectionId) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
+	public void clearItemsToAdd(SyncKey syncKey) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.ADD);
 		clearItems(key);
 	}
 
 	@Override
-	public void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemDeletion> ic) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
+	public void storeItemsToRemove(SyncKey syncKey, Collection<ItemDeletion> ic) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.DELETE);
 		storeItems(ic, key);
 	}
 
 	@Override
-	public void storeItemsToAdd(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.ADD);
+	public void storeItemsToAdd(SyncKey syncKey, Collection<ItemChange> ic) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.ADD);
 		storeItems(ic, key);
 	}
 	
 	@Override
-	public Set<ItemDeletion> listItemsToRemove(Credentials credentials, Device device, int collectionId) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
+	public Set<ItemDeletion> listItemsToRemove(SyncKey syncKey) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.DELETE);
 		return listItem(key);
 	}
 
 	@Override
-	public void clearItemsToRemove(Credentials credentials, Device device, int collectionId) {
-		Key key = buildKey(credentials, device, collectionId, UnsynchronizedItemType.DELETE);
+	public void clearItemsToRemove(SyncKey syncKey) {
+		Key_2_4_2_4 key = buildKey(syncKey, UnsynchronizedItemType.DELETE);
 		clearItems(key);
 	}
 
 	@Override
-	public boolean hasAnyItemsFor(Credentials credentials, Device device, int collectionId) {
-		return !listItemsToAdd(credentials, device, collectionId).isEmpty()
-			|| !listItemsToRemove(credentials, device, collectionId).isEmpty();
+	public boolean hasAnyItemsFor(SyncKey syncKey) {
+		return !listItemsToAdd(syncKey).isEmpty()
+			|| !listItemsToRemove(syncKey).isEmpty();
 	}
 
-	private <T> void storeItems(Collection<T> ic, Key key) {
+	private <T> void storeItems(Collection<T> ic, Key_2_4_2_4 key) {
 		HashSet<T> itemChanges = Sets.newHashSet(ic);
 		store.put( new Element(key, itemChanges) );
+		logger.debug("Put Key : {} Ic : {}", key, itemChanges);
 	}
 	
-	private void clearItems(Key key) {
+	private void clearItems(Key_2_4_2_4 key) {
 		store.put( new Element(key, Sets.newHashSet()) );
+		logger.debug("Clear Key : {}", key);
 	}
 	
-	private <T> Set<T> listItem(Key key) {
+	private <T> Set<T> listItem(Key_2_4_2_4 key) {
 		Element element = store.get(key);
+		logger.debug("List Key : {} Element : {}", key, element);
 		if (element != null) {
 			return (Set<T>) element.getValue();
 		} else {
@@ -122,15 +130,17 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		}
 	}
 
-	private Key buildKey(Credentials credentials, Device device, Integer collectionId, 
-			UnsynchronizedItemType unsynchronizedItemType) {
+	private Key_2_4_2_4 buildKey(SyncKey syncKey, UnsynchronizedItemType unsynchronizedItemType) {
 		
-		return new Key(credentials, device, collectionId, unsynchronizedItemType);
+		return new Key_2_4_2_4(syncKey, unsynchronizedItemType);
 	}
 
+	@Deprecated
 	public static Key key(Credentials credentials, Device device, int collectionId, UnsynchronizedItemType unsynchronizedItemType) {
 		return new Key(credentials, device, collectionId, unsynchronizedItemType);
 	}
+	
+	@Deprecated
 	@VisibleForTesting static class Key implements Serializable {
 
 		private static final long serialVersionUID = 3512553571924589754L;
@@ -146,6 +156,10 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 			this.device = device;
 			this.collectionId = collectionId;
 			this.unsynchronizedItemType = unsynchronizedItemType;
+		}
+		
+		private Object readResolve() {
+			return new Key_2_4_2_4(SyncKey.INITIAL_FOLDER_SYNC_KEY, unsynchronizedItemType);
 		}
 		
 		@Override
@@ -177,4 +191,45 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		
 	}
 
+	public static Key_2_4_2_4 key(SyncKey syncKey, UnsynchronizedItemType unsynchronizedItemType) {
+		return new Key_2_4_2_4(syncKey, unsynchronizedItemType);
+	}
+	
+	@VisibleForTesting static class Key_2_4_2_4 implements Serializable {
+
+		private static final long serialVersionUID = 7445154857275520575L;
+		
+		private final SyncKey syncKey;
+		private final UnsynchronizedItemType unsynchronizedItemType;
+		
+		public Key_2_4_2_4(SyncKey syncKey, UnsynchronizedItemType unsynchronizedItemType) {
+			super();
+			this.syncKey = syncKey;
+			this.unsynchronizedItemType = unsynchronizedItemType;
+		}
+		
+		@Override
+		public int hashCode(){
+			return Objects.hashCode(syncKey, unsynchronizedItemType);
+		}
+		
+		@Override
+		public boolean equals(Object object){
+			if (object instanceof Key_2_4_2_4) {
+				Key_2_4_2_4 that = (Key_2_4_2_4) object;
+				return Objects.equal(this.syncKey, that.syncKey)
+					&& Objects.equal(this.unsynchronizedItemType, that.unsynchronizedItemType);
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(this)
+				.add("syncKey", syncKey)
+				.add("unsynchronizedItemType", unsynchronizedItemType)
+				.toString();
+		}
+		
+	}
 }

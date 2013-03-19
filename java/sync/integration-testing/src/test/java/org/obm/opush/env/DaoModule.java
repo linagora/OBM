@@ -44,7 +44,7 @@ import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.sync.date.DateProvider;
 
-public final class DaoModule extends AbstractOverrideModule {
+public class DaoModule extends AbstractOverrideModule {
 
 	public DaoModule(IMocksControl mocksControl) {
 		super(mocksControl);
@@ -57,11 +57,15 @@ public final class DaoModule extends AbstractOverrideModule {
 		bindWithMock(HearbeatDao.class);
 		bindWithMock(MonitoredCollectionDao.class);
 		bindWithMock(SyncedCollectionDao.class);
-		bindWithMock(UnsynchronizedItemDao.class);
+		bindUnsynchronizedItemDao();
 		bindWithMock(CalendarDao.class);
 		bindWithMock(ItemTrackingDao.class);
 		bindWithMock(FolderSyncStateBackendMappingDao.class);
 		bindWithMock(FolderSnapshotDao.class);
 		bindWithMock(DateProvider.class);
+	}
+
+	protected void bindUnsynchronizedItemDao() {
+		bindWithMock(UnsynchronizedItemDao.class);
 	}
 }

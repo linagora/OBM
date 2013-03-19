@@ -211,7 +211,7 @@ public class MailBackendHandlerTest {
 	}
 
 	private void mockDao(int serverId, ItemSyncState syncState, Integer collectionId) throws Exception {
-		mockUnsynchronizedItemDao(serverId);
+		mockUnsynchronizedItemDao(syncState.getSyncKey());
 		mockSyncedCollectionDaoToReturnSyncCollection(serverId, collectionId, syncState.getSyncKey());
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
@@ -226,21 +226,21 @@ public class MailBackendHandlerTest {
 				.build());
 	}
 
-	private void mockUnsynchronizedItemDao(int serverId) {
+	private void mockUnsynchronizedItemDao(SyncKey syncKey) {
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, serverId))
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
 			.andReturn(ImmutableSet.<ItemChange> of()).anyTimes();
 		
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, serverId);
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		expectLastCall().anyTimes();
 		
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, serverId))
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey))
 			.andReturn(ImmutableSet.<ItemDeletion>of()).anyTimes();
 		
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, serverId);
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
 		expectLastCall().anyTimes();
 		
-		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, serverId, Lists.<ItemDeletion>newArrayList());
+		unsynchronizedItemDao.storeItemsToRemove(syncKey, Lists.<ItemDeletion>newArrayList());
 		expectLastCall().anyTimes();
 	}
 	

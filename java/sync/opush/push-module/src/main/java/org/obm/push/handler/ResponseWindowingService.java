@@ -37,9 +37,7 @@ import java.util.List;
 
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ASItem;
 import org.obm.push.bean.change.item.ItemChange;
@@ -167,38 +165,35 @@ public class ResponseWindowingService {
 		this.unSynchronizedItemCache = unSynchronizedItemCache;
 	}
 	
-	public DataDelta windowedResponse(UserDataRequest udr, AnalysedSyncCollection c, DataDelta delta, SyncClientCommands clientCommands) {
+	public DataDelta windowedResponse(AnalysedSyncCollection c, DataDelta delta, SyncClientCommands clientCommands, SyncKey newSyncKey) {
 		return DataDelta.builder()
-				.changes(windowChanges(c, delta, udr, clientCommands))
-				.deletions(windowDeletions(c, delta, udr, clientCommands))
+				.changes(windowChanges(c, newSyncKey, delta, clientCommands))
+				.deletions(windowDeletions(c, newSyncKey, delta, clientCommands))
 				.syncDate(delta.getSyncDate())
 				.syncKey(delta.getSyncKey())
-				.moreAvailable(hasPendingResponse(udr.getCredentials(), udr.getDevice(), c.getCollectionId()))
+				.moreAvailable(hasPendingResponse(c.getSyncKey()))
 				.build();
 	}
 	
-	@VisibleForTesting List<ItemChange> windowChanges(AnalysedSyncCollection c, DataDelta delta,
-			UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
+	@VisibleForTesting List<ItemChange> windowChanges(AnalysedSyncCollection c, final SyncKey newSyncKey, DataDelta delta,
+			SyncClientCommands clientCommands) {
 		Preconditions.checkNotNull(delta);
 		Preconditions.checkNotNull(c);
-		Preconditions.checkNotNull(userDataRequest);
 		Preconditions.checkNotNull(clientCommands);
 		
-		final Credentials credentials = userDataRequest.getCredentials();
-		final Device device = userDataRequest.getDevice();
-		final Integer collectionId = c.getCollectionId();
+		final SyncKey syncKey = c.getSyncKey();
 		
 		return new WindowLogic<ItemChange>(new Store<ItemChange>() {
 			
 			@Override
 			public void store(List<ItemChange> itemsToStore) {
-				unSynchronizedItemCache.storeItemsToAdd(credentials, device, collectionId, itemsToStore);
+				unSynchronizedItemCache.storeItemsToAdd(newSyncKey, itemsToStore);
 			}
 
 			@Override
 			public Collection<ItemChange> listAndRemove() {
-				Collection<ItemChange> items = unSynchronizedItemCache.listItemsToAdd(credentials, device, collectionId);
-				unSynchronizedItemCache.clearItemsToAdd(credentials, device, collectionId);
+				Collection<ItemChange> items = unSynchronizedItemCache.listItemsToAdd(syncKey);
+				unSynchronizedItemCache.clearItemsToAdd(syncKey);
 				return items;
 			}
 			
@@ -210,22 +205,20 @@ public class ResponseWindowingService {
 		}).window(c, delta.getChanges(), clientCommands);
 	}
 
-	@VisibleForTesting List<ItemDeletion> windowDeletions(final AnalysedSyncCollection c, DataDelta delta, final UserDataRequest userDataRequest, SyncClientCommands clientCommands) {
-		final Credentials credentials = userDataRequest.getCredentials();
-		final Device device = userDataRequest.getDevice();
-		final Integer collectionId = c.getCollectionId();
+	@VisibleForTesting List<ItemDeletion> windowDeletions(final AnalysedSyncCollection c, final SyncKey newSyncKey, DataDelta delta, SyncClientCommands clientCommands) {
+		final SyncKey syncKey = c.getSyncKey();
 		
 		return new WindowLogic<ItemDeletion>(new Store<ItemDeletion>() {
 			
 			@Override
 			public void store(List<ItemDeletion> itemsToStore) {
-				unSynchronizedItemCache.storeItemsToRemove(credentials, device, collectionId, itemsToStore);
+				unSynchronizedItemCache.storeItemsToRemove(newSyncKey, itemsToStore);
 			}
 			
 			@Override
 			public Collection<ItemDeletion> listAndRemove() {
-				Collection<ItemDeletion> items = unSynchronizedItemCache.listItemsToRemove(credentials, device, collectionId);
-				unSynchronizedItemCache.clearItemsToRemove(credentials, device, collectionId);
+				Collection<ItemDeletion> items = unSynchronizedItemCache.listItemsToRemove(syncKey);
+				unSynchronizedItemCache.clearItemsToRemove(syncKey);
 				return items;
 			}
 			
@@ -238,8 +231,8 @@ public class ResponseWindowingService {
 		}).window(c, delta.getDeletions(), clientCommands);
 	}
 
-	public boolean hasPendingResponse(Credentials credentials, Device device, Integer collectionId) {
-		return unSynchronizedItemCache.hasAnyItemsFor(credentials, device, collectionId);
+	public boolean hasPendingResponse(SyncKey syncKey) {
+		return unSynchronizedItemCache.hasAnyItemsFor(syncKey);
 	}
 
 	

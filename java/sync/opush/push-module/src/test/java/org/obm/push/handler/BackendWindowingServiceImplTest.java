@@ -215,7 +215,7 @@ public class BackendWindowingServiceImplTest {
 				.build();
 		SyncClientCommands clientCommands = SyncClientCommands.empty();
 
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(false);
+		expect(responseWindowingService.hasPendingResponse(syncKey)).andReturn(false);
 		
 		List<ItemChange> changes = ImmutableList.of(new ItemChange("1"), new ItemChange("2"));
 		List<ItemDeletion> deletions = ImmutableList.of(ItemDeletion.builder().serverId("3").build());
@@ -228,9 +228,9 @@ public class BackendWindowingServiceImplTest {
 		
 		BackendChangesProvider backendChangesProvider = mocks.createMock(BackendChangesProvider.class);
 		expect(backendChangesProvider.getAllChanges()).andReturn(backendDataDelta);
-		expect(responseWindowingService.windowChanges(syncCollection, backendDataDelta, udr, clientCommands)).andReturn(changes);
-		expect(responseWindowingService.windowDeletions(syncCollection, backendDataDelta, udr, clientCommands)).andReturn(deletions);
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(false);
+		expect(responseWindowingService.windowChanges(syncCollection, allocatedSyncKey, backendDataDelta, clientCommands)).andReturn(changes);
+		expect(responseWindowingService.windowDeletions(syncCollection, allocatedSyncKey, backendDataDelta, clientCommands)).andReturn(deletions);
+		expect(responseWindowingService.hasPendingResponse(allocatedSyncKey)).andReturn(false);
 		
 		mocks.replay();
 		DataDelta dataDelta = testee.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, allocatedSyncKey, backendChangesProvider);
@@ -262,7 +262,7 @@ public class BackendWindowingServiceImplTest {
 				.build();
 		SyncClientCommands clientCommands = SyncClientCommands.empty();
 
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(false);
+		expect(responseWindowingService.hasPendingResponse(syncKey)).andReturn(false);
 		
 		List<ItemChange> changes = ImmutableList.of(new ItemChange("1"), new ItemChange("2"));
 		List<ItemDeletion> deletions = ImmutableList.of(ItemDeletion.builder().serverId("3").build());
@@ -275,11 +275,11 @@ public class BackendWindowingServiceImplTest {
 		
 		BackendChangesProvider backendChangesProvider = mocks.createMock(BackendChangesProvider.class);
 		expect(backendChangesProvider.getAllChanges()).andReturn(backendDataDelta);
-		expect(responseWindowingService.windowChanges(syncCollection, backendDataDelta, udr, clientCommands))
+		expect(responseWindowingService.windowChanges(syncCollection, allocatedSyncKey, backendDataDelta, clientCommands))
 			.andReturn(ImmutableList.of(new ItemChange("1")));
-		expect(responseWindowingService.windowDeletions(syncCollection, backendDataDelta, udr, clientCommands))
+		expect(responseWindowingService.windowDeletions(syncCollection, allocatedSyncKey, backendDataDelta, clientCommands))
 			.andReturn(ImmutableList.<ItemDeletion>of());
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(true);
+		expect(responseWindowingService.hasPendingResponse(allocatedSyncKey)).andReturn(true);
 	
 		mocks.replay();
 		DataDelta dataDelta = testee.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, allocatedSyncKey, backendChangesProvider);
@@ -311,16 +311,16 @@ public class BackendWindowingServiceImplTest {
 				.build();
 		SyncClientCommands clientCommands = SyncClientCommands.empty();
 
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(true);
+		expect(responseWindowingService.hasPendingResponse(syncKey)).andReturn(true);
 		
 		DataDelta continueWindowingDelta = DataDelta.newEmptyDelta(itemSyncState.getSyncDate(), allocatedSyncKey);
 		BackendChangesProvider backendChangesProvider = mocks.createMock(BackendChangesProvider.class);
 		
-		expect(responseWindowingService.windowChanges(syncCollection, continueWindowingDelta, udr, clientCommands))
+		expect(responseWindowingService.windowChanges(syncCollection, allocatedSyncKey, continueWindowingDelta, clientCommands))
 			.andReturn(ImmutableList.of(new ItemChange("123")));
-		expect(responseWindowingService.windowDeletions(syncCollection, continueWindowingDelta, udr, clientCommands))
+		expect(responseWindowingService.windowDeletions(syncCollection, allocatedSyncKey, continueWindowingDelta, clientCommands))
 			.andReturn(ImmutableList.of(ItemDeletion.builder().serverId("456").build()));
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(false);
+		expect(responseWindowingService.hasPendingResponse(allocatedSyncKey)).andReturn(false);
 		
 		mocks.replay();
 		DataDelta dataDelta = testee.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, allocatedSyncKey, backendChangesProvider);
@@ -352,16 +352,16 @@ public class BackendWindowingServiceImplTest {
 				.build();
 		SyncClientCommands clientCommands = SyncClientCommands.empty();
 
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(true);
+		expect(responseWindowingService.hasPendingResponse(syncKey)).andReturn(true);
 		
 		DataDelta continueWindowingDelta = DataDelta.newEmptyDelta(itemSyncState.getSyncDate(), allocatedSyncKey);
 		BackendChangesProvider backendChangesProvider = mocks.createMock(BackendChangesProvider.class);
 		
-		expect(responseWindowingService.windowChanges(syncCollection, continueWindowingDelta, udr, clientCommands))
+		expect(responseWindowingService.windowChanges(syncCollection, allocatedSyncKey, continueWindowingDelta, clientCommands))
 			.andReturn(ImmutableList.of(new ItemChange("123")));
-		expect(responseWindowingService.windowDeletions(syncCollection, continueWindowingDelta, udr, clientCommands))
+		expect(responseWindowingService.windowDeletions(syncCollection, allocatedSyncKey, continueWindowingDelta, clientCommands))
 			.andReturn(ImmutableList.<ItemDeletion>of());
-		expect(responseWindowingService.hasPendingResponse(credentials, device, collectionId)).andReturn(true);
+		expect(responseWindowingService.hasPendingResponse(allocatedSyncKey)).andReturn(true);
 		
 		mocks.replay();
 		DataDelta dataDelta = testee.windowedChanges(udr, itemSyncState, syncCollection, clientCommands, allocatedSyncKey, backendChangesProvider);

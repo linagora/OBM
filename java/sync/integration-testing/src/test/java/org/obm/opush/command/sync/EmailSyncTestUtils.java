@@ -116,6 +116,20 @@ public class EmailSyncTestUtils {
 		assertThat(collection.getItemChangesDeletion()).containsOnly(Iterables.toArray(deletes, ItemDeletion.class));
 	}
 
+
+	public static void assertEqualsWithoutApplicationData(List<ItemChange> itemChanges, List<ItemChange> expectedChanges) {
+		assertThat(itemChanges).hasSize(expectedChanges.size());
+		
+		for (ItemChange change : itemChanges) {
+			for (ItemChange expected : expectedChanges) {
+				if (change.getServerId().equals(expected.getServerId())) {
+					assertThat(change.isMSEmail()).isEqualTo(expected.isMSEmail());
+					assertThat(change.isNew()).isEqualTo(expected.isNew());
+				}
+			}
+		}
+	}
+	
 	public static SyncCollectionResponse getCollectionWithId(SyncResponse response, String serverId) {
 		for (SyncCollectionResponse collection : response.getCollectionResponses()) {
 			if (serverId.equals(String.valueOf(collection.getCollectionId()))) {
@@ -171,27 +185,19 @@ public class EmailSyncTestUtils {
 	
 	public static void mockEmailUnsynchronizedItemDao(UnsynchronizedItemDao unsynchronizedItemDao) {
 		expect(unsynchronizedItemDao.listItemsToAdd(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt())).andReturn(ImmutableSet.<ItemChange>of()).anyTimes();
+				anyObject(SyncKey.class)))
+			.andReturn(ImmutableSet.<ItemChange>of()).anyTimes();
 		unsynchronizedItemDao.clearItemsToAdd(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt());
+				anyObject(SyncKey.class));
 		expectLastCall().anyTimes();
 		expect(unsynchronizedItemDao.listItemsToRemove(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt())).andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
+				anyObject(SyncKey.class)))
+			.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
 		unsynchronizedItemDao.clearItemsToRemove(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt());
+				anyObject(SyncKey.class));
 		expectLastCall().anyTimes();
 		unsynchronizedItemDao.storeItemsToRemove(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt(),
+				anyObject(SyncKey.class),
 				anyObject(List.class));
 		expectLastCall().anyTimes();
 	}

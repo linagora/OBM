@@ -110,7 +110,7 @@ public class GetItemEstimateHandlerTest {
 			.andReturn(syncState);
 		expect(contentsExporter.getItemEstimateSize(udr, PIMDataType.EMAIL, syncCollection, syncState))
 			.andThrow(new FilterTypeChangedException(collectionId, FilterType.THREE_DAYS_BACK, FilterType.ONE_MONTHS_BACK));
-		expect(unSynchronizedItemCache.listItemsToAdd(null, device, collectionId))
+		expect(unSynchronizedItemCache.listItemsToAdd(syncKey))
 			.andReturn(Collections.EMPTY_SET);
 		
 		control.replay();

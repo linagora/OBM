@@ -450,7 +450,8 @@ public class SerializableCompatibilityTest {
 				.put("org.obm.push.store.ehcache.WindowingDaoEhcacheImpl$WindowingIndex", WindowingDaoEhcacheImpl.windowingIndex(45, syncKey)) 
 				.put("org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl$Key", new MonitoredCollectionDaoEhcacheImpl.Key(credentials, device)) 
 				.put("org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl$Key", SyncedCollectionDaoEhcacheImpl.key(credentials, device, 5))
-				.put("org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl$Key", UnsynchronizedItemDaoEhcacheImpl.key(credentials, device, 8, UnsynchronizedItemType.ADD))
+				.put("org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl$Key", UnsynchronizedItemDaoEhcacheImpl.key(SyncKey.INITIAL_FOLDER_SYNC_KEY, UnsynchronizedItemType.ADD))
+				.put("org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl$Key_2_4_2_4", UnsynchronizedItemDaoEhcacheImpl.key(new SyncKey("123"), UnsynchronizedItemType.ADD))
 				.build();
 		
 	}

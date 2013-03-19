@@ -33,25 +33,24 @@ package org.obm.push.store;
 
 import java.util.Collection;
 
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
+import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
 public interface UnsynchronizedItemDao {
 	
-	void storeItemsToAdd(Credentials credentials, Device device, int collectionId, Collection<ItemChange> ic);
+	void storeItemsToAdd(SyncKey syncKey, Collection<ItemChange> ic);
 
-	Collection<ItemChange> listItemsToAdd(Credentials credentials, Device device, int collectionId);
+	Collection<ItemChange> listItemsToAdd(SyncKey syncKey);
 
-	void clearItemsToAdd(Credentials credentials, Device device, int collectionId);
+	void clearItemsToAdd(SyncKey syncKey);
 	
-	void storeItemsToRemove(Credentials credentials, Device device, int collectionId, Collection<ItemDeletion> ic);
+	void storeItemsToRemove(SyncKey syncKey, Collection<ItemDeletion> ic);
 
-	Collection<ItemDeletion> listItemsToRemove(Credentials credentials, Device device, int collectionId);
+	Collection<ItemDeletion> listItemsToRemove(SyncKey syncKey);
 
-	void clearItemsToRemove(Credentials credentials, Device device, int collectionId);
+	void clearItemsToRemove(SyncKey syncKey);
 
-	boolean hasAnyItemsFor(Credentials credentials, Device device, int collectionId);
+	boolean hasAnyItemsFor(SyncKey syncKey);
 
 }

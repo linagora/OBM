@@ -69,37 +69,37 @@ public class BackendWindowingServiceImpl implements BackendWindowingService {
 		Preconditions.checkNotNull(newSyncKey, "newSyncKey is required");
 		Preconditions.checkNotNull(backendChangesProvider, "backendChangesProvider is required");
 		
-		if (collectionHasPendingResponse(udr, collection)) {
-			return continueWindowing(udr, itemSyncState, collection, clientCommands, newSyncKey);
+		if (collectionHasPendingResponse(collection)) {
+			return continueWindowing(itemSyncState, collection, clientCommands, newSyncKey);
 		} else {
-			return getBackendChanges(udr, backendChangesProvider, collection, clientCommands);
+			return getBackendChanges(backendChangesProvider, collection, clientCommands, newSyncKey);
 		}
 	}
 
-	private DataDelta getBackendChanges(UserDataRequest udr, BackendChangesProvider backendChangesProvider,
-		AnalysedSyncCollection collection, SyncClientCommands clientCommands) {
+	private DataDelta getBackendChanges(BackendChangesProvider backendChangesProvider,
+		AnalysedSyncCollection collection, SyncClientCommands clientCommands, SyncKey newSyncKey) {
 
-		return windowing(udr, collection, clientCommands, backendChangesProvider.getAllChanges());
+		return windowing(collection, clientCommands, newSyncKey, backendChangesProvider.getAllChanges());
 	}
 
-	private DataDelta continueWindowing(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection collection,
-			SyncClientCommands clientCommands, SyncKey newSyncKey) {
+	private DataDelta continueWindowing(ItemSyncState itemSyncState, AnalysedSyncCollection collection, SyncClientCommands clientCommands,
+			SyncKey newSyncKey) {
 		
 		Date lastSync = itemSyncState.getSyncDate();
-		return windowing(udr, collection, clientCommands, DataDelta.newEmptyDelta(lastSync, newSyncKey));
+		return windowing(collection, clientCommands, newSyncKey, DataDelta.newEmptyDelta(lastSync, newSyncKey));
 	}
 
-	private boolean collectionHasPendingResponse(UserDataRequest udr, AnalysedSyncCollection collection) {
-		return responseWindowingService.hasPendingResponse(udr.getCredentials(), udr.getDevice(), collection.getCollectionId());
+	private boolean collectionHasPendingResponse(AnalysedSyncCollection collection) {
+		return responseWindowingService.hasPendingResponse(collection.getSyncKey());
 	}
 
 
-	private DataDelta windowing(UserDataRequest udr, AnalysedSyncCollection collection,
-			SyncClientCommands clientCommands, DataDelta delta) {
+	private DataDelta windowing(AnalysedSyncCollection collection,
+			SyncClientCommands clientCommands, SyncKey newSyncKey, DataDelta delta) {
 		
-		List<ItemChange> changes = responseWindowingService.windowChanges(collection, delta, udr, clientCommands);
-		List<ItemDeletion> deletions = responseWindowingService.windowDeletions(collection, delta, udr, clientCommands);
-		boolean moreAvailable = responseWindowingService.hasPendingResponse(udr.getCredentials(), udr.getDevice(), collection.getCollectionId());
+		List<ItemChange> changes = responseWindowingService.windowChanges(collection, newSyncKey, delta, clientCommands);
+		List<ItemDeletion> deletions = responseWindowingService.windowDeletions(collection, newSyncKey, delta, clientCommands);
+		boolean moreAvailable = responseWindowingService.hasPendingResponse(newSyncKey);
 		
 		return DataDelta.builder()
 				.changes(changes)

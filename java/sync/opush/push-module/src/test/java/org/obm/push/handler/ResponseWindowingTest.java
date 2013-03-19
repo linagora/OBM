@@ -41,8 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.push.OpushUser;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.SyncKey;
@@ -57,55 +58,51 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-
+@RunWith(SlowFilterRunner.class)
 public class ResponseWindowingTest {
 
 	@Test(expected=NullPointerException.class)
 	public void processWindowSizeDeltaIsNull() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(syncCollection(5), null, user.userDataRequest, SyncClientCommands.empty());
+		responseWindowingProcessor.windowChanges(syncCollection(5, new SyncKey("123")), new SyncKey("456"), null, SyncClientCommands.empty());
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void processWindowSizeSyncCollectionIsNull() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(null, deltas(2), user.userDataRequest, SyncClientCommands.empty());
+		responseWindowingProcessor.windowChanges(null, new SyncKey("456"), deltas(2), SyncClientCommands.empty());
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void processWindowSizeUserDataRequestIsNull() {
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), null, SyncClientCommands.empty());
+		responseWindowingProcessor.windowChanges(syncCollection(5, new SyncKey("123")), new SyncKey("456"), deltas(2), null);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void processWindowSizeProcessedClientIdsIsNull() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
-		responseWindowingProcessor.windowChanges(syncCollection(5), deltas(2), user.userDataRequest, null);
+		responseWindowingProcessor.windowChanges(syncCollection(5, new SyncKey("123")), new SyncKey("456"), deltas(2), null);
 	}
 
 	
 	@Test
 	public void processWindowSizeChangesFitTheWindow() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
+		SyncKey syncKey = new SyncKey("123");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deltas(2);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltas, user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(5, syncKey), new SyncKey("456"), deltas, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -114,27 +111,29 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processWindowSizeChangesDoesntFit() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
 		DataDelta inputDeltas = deltas(5);
 		
+		SyncKey syncKey = new SyncKey("123");
+		SyncKey syncKey2 = new SyncKey("456");
+		SyncKey syncKey3 = new SyncKey("789");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltasWithOffset(3, 2).getChanges());
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltasWithOffset(3, 2).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltasWithOffset(1, 4).getChanges());
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltasWithOffset(1, 4).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
+		unsynchronizedItemDao.storeItemsToAdd(syncKey2, deltasWithOffset(3, 2).getChanges());
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey2)).andReturn(Sets.newLinkedHashSet(deltasWithOffset(3, 2).getChanges()));
+		unsynchronizedItemDao.clearItemsToAdd(syncKey2);
+		unsynchronizedItemDao.storeItemsToAdd(syncKey3, deltasWithOffset(1, 4).getChanges());
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey3 )).andReturn(Sets.newLinkedHashSet(deltasWithOffset(1, 4).getChanges()));
+		unsynchronizedItemDao.clearItemsToAdd(syncKey3);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> firstCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), inputDeltas, user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(2, syncKey), syncKey2, inputDeltas, SyncClientCommands.empty());
 		List<ItemChange> secondCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(2, syncKey2), syncKey3, emptyDelta(), SyncClientCommands.empty());
 		List<ItemChange> thirdCall = 
-				responseWindowingProcessor.windowChanges(syncCollection(2), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(2, syncKey3), new SyncKey("901"), emptyDelta(), SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -145,16 +144,15 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processNoNewDataButUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
+		SyncKey syncKey = new SyncKey("123");
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), emptyDelta(), user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(5, syncKey), new SyncKey("456"), emptyDelta(), SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -163,16 +161,15 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processNewDataAndUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		SyncKey syncKey = new SyncKey("123");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
-				responseWindowingProcessor.windowChanges(syncCollection(5), deltasWithOffset(2, 3), user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowChanges(syncCollection(5, syncKey), new SyncKey("456"), deltasWithOffset(2, 3), SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 		
@@ -181,19 +178,19 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processNewChangesAskedByClientAndUnsynchronized() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltas(3).getChanges());
+		SyncKey syncKey = new SyncKey("123");
+		SyncKey newSyncKey = new SyncKey("456");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(Sets.newLinkedHashSet(deltas(3).getChanges()));
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
+		unsynchronizedItemDao.storeItemsToAdd(newSyncKey, deltas(3).getChanges());
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
-						syncCollection(2), deltasWithOffset(2, 3), 
-						user.userDataRequest, clientCommands(deltasWithOffset(2, 3)));
+						syncCollection(2, syncKey), newSyncKey, deltasWithOffset(2, 3), 
+						clientCommands(deltasWithOffset(2, 3)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -202,18 +199,17 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processNewChangesAskedByClientGreaterThanWindow() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(Sets.<ItemChange>newLinkedHashSet());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		SyncKey syncKey = new SyncKey("132");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(Sets.<ItemChange>newLinkedHashSet());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		List<ItemChange> actual = 
 				responseWindowingProcessor.windowChanges(
-						syncCollection(2), deltas(5),
-						user.userDataRequest, clientCommands(deltas(5)));
+						syncCollection(2, syncKey), new SyncKey("456"), deltas(5),
+						clientCommands(deltas(5)));
 		
 		verify(unsynchronizedItemDao);
 		
@@ -222,18 +218,17 @@ public class ResponseWindowingTest {
 	
 	@Test
 	public void windowDeletionsFitTheWindow() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
+		SyncKey syncKey = new SyncKey("123");
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey)).andReturn(ImmutableSet.<ItemDeletion>of());
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deletions(2);
 		List<ItemDeletion> actual = 
-				responseWindowingProcessor.windowDeletions(syncCollection(5), deltas, user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowDeletions(syncCollection(5, syncKey), new SyncKey("456"), deltas, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -242,21 +237,19 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processWindowSizeDeletionsAndChangesFitTheWindows() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, 1)).andReturn(false);
+		SyncKey syncKey = new SyncKey("123");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey)).andReturn(ImmutableSet.<ItemDeletion>of());
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
+		expect(unsynchronizedItemDao.hasAnyItemsFor(syncKey)).andReturn(false);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deltas(2);
-		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(user.userDataRequest,
-				syncCollection(5), deltas, SyncClientCommands.empty());
+		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(syncCollection(5, syncKey), deltas, SyncClientCommands.empty(), new SyncKey("456"));
 		
 		verify(unsynchronizedItemDao);
 				
@@ -269,22 +262,21 @@ public class ResponseWindowingTest {
 
 	@Test
 	public void processWindowSizeDeletionsAndChangesDoNotFitTheWindows() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemChange>of());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1)).andReturn(ImmutableSet.<ItemDeletion>of());
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToAdd(user.credentials, user.device, 1, deltasWithOffset(3, 2).getChanges());
-		expect(unsynchronizedItemDao.hasAnyItemsFor(user.credentials, user.device, 1)).andReturn(true);
+		SyncKey syncKey = new SyncKey("123");
+		SyncKey newSyncKey = new SyncKey("456");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(ImmutableSet.<ItemChange>of());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey)).andReturn(ImmutableSet.<ItemDeletion>of());
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
+		unsynchronizedItemDao.storeItemsToAdd(newSyncKey, deltasWithOffset(3, 2).getChanges());
+		expect(unsynchronizedItemDao.hasAnyItemsFor(syncKey)).andReturn(true);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deltas(5);
-		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(user.userDataRequest,
-				syncCollection(2), deltas, SyncClientCommands.empty());
+		DataDelta windowedResponse = responseWindowingProcessor.windowedResponse(syncCollection(2, syncKey), deltas, SyncClientCommands.empty(), newSyncKey);
 		
 		verify(unsynchronizedItemDao);
 				
@@ -297,18 +289,17 @@ public class ResponseWindowingTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void windowChangesWithDuplicates() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(user.credentials, user.device, 1)).andReturn(deltas(2).getChanges());
-		unsynchronizedItemDao.clearItemsToAdd(user.credentials, user.device, 1);
+		SyncKey syncKey = new SyncKey("132");
+		expect(unsynchronizedItemDao.listItemsToAdd(syncKey)).andReturn(deltas(2).getChanges());
+		unsynchronizedItemDao.clearItemsToAdd(syncKey);
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
 		
 		DataDelta deltas = deltas(2);
 		try {
-			responseWindowingProcessor.windowChanges(syncCollection(2), deltas, user.userDataRequest, SyncClientCommands.empty());
+			responseWindowingProcessor.windowChanges(syncCollection(2, syncKey), new SyncKey("456"), deltas, SyncClientCommands.empty());
 		} catch (IllegalStateException e) {
 			verify(unsynchronizedItemDao);
 			throw e;
@@ -317,18 +308,17 @@ public class ResponseWindowingTest {
 	
 	@Test
 	public void windowDeletionsWithDuplicates() {
-		OpushUser user = OpushUser.create("usera@domain", "pw");
-
 		UnsynchronizedItemDao unsynchronizedItemDao = createMock(UnsynchronizedItemDao.class);
 		ItemDeletion duplicateEntry = ItemDeletion.builder().serverId("12:23").build();
-		expect(unsynchronizedItemDao.listItemsToRemove(user.credentials, user.device, 1))
+		SyncKey syncKey = new SyncKey("123");
+		SyncKey newSyncKey = new SyncKey("456");
+		expect(unsynchronizedItemDao.listItemsToRemove(syncKey))
 			.andReturn(
 					ImmutableSet.of(
 							ItemDeletion.builder().serverId("12:22").build(), 
 							duplicateEntry));
-		unsynchronizedItemDao.clearItemsToRemove(user.credentials, user.device, 1);
-		unsynchronizedItemDao.storeItemsToRemove(user.credentials, user.device, 1, 
-				ImmutableList.of(ItemDeletion.builder().serverId("12:24").build()));
+		unsynchronizedItemDao.clearItemsToRemove(syncKey);
+		unsynchronizedItemDao.storeItemsToRemove(newSyncKey, ImmutableList.of(ItemDeletion.builder().serverId("12:24").build()));
 		replay(unsynchronizedItemDao);
 		
 		ResponseWindowingService responseWindowingProcessor = new ResponseWindowingService(unsynchronizedItemDao);
@@ -341,7 +331,7 @@ public class ResponseWindowingTest {
 				.syncKey(new SyncKey("1234"))
 				.build();
 		List<ItemDeletion> actual = 
-				responseWindowingProcessor.windowDeletions(syncCollection(2), deltas, user.userDataRequest, SyncClientCommands.empty());
+				responseWindowingProcessor.windowDeletions(syncCollection(2, syncKey), newSyncKey, deltas, SyncClientCommands.empty());
 		
 		verify(unsynchronizedItemDao);
 				
@@ -408,10 +398,10 @@ public class ResponseWindowingTest {
 		return changes;
 	}
 	
-	private AnalysedSyncCollection syncCollection(int windowSize) {
+	private AnalysedSyncCollection syncCollection(int windowSize, SyncKey syncKey) {
 		return AnalysedSyncCollection.builder()
 				.collectionId(1)
-				.syncKey(new SyncKey("123"))
+				.syncKey(syncKey)
 				.windowSize(windowSize)
 				.build();
 	}
