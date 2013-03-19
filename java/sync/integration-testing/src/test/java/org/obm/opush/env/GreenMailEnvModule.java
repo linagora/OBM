@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.locator.LocatorClientException;
@@ -61,7 +60,7 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 	@Override
 	protected void configureImpl() {
 		install(new GreenMailProviderModule());
-		bind(EventService.class).toInstance(EasyMock.createMock(EventService.class));
+		bindWithMock(EventService.class);
 		bind(LocatorService.class).toInstance(new LocatorService() {
 			
 			@Override
