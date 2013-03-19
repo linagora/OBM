@@ -88,52 +88,77 @@ Obm.CalendarManager = new Class({
     $('todayHourMarker').style.top = (d.getHours()*3600 + d.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
+  getDaysCount: function(time, duration) {
+      if ( duration < 0 ) {
+	return false;
+      }
+      if ( duration == 0 ) {
+	return 1;
+      }
+      var firstDate = new Obm.DateTime(time);
+      firstDate.setNoon();
+      var endTime = time+duration;
+      var lastDate =  new Obm.DateTime(endTime);
+      lastDate.setNoon();
+      var days = 1;
+      while ( lastDate.format("Y-m-d") != firstDate.format("Y-m-d") ) {
+          days++;
+          firstDate.setTime( (firstDate.getTime() + (24*60*60*1000) ) );
+          firstDate.setNoon();
+      }
+      return days;
+  },
+  /* get number of days of all day events */
+  _getSizeOfAllDayEvts: function(evt, begin) {
+    var size = null;
+    size = this.getDaysCount( (evt.event.time*1000), (evt.event.duration*1000) );
+    if (size == 0) size = 1; // very, very crappy fix 
 
+    // Extensions
+    if (obm.vars.consts.calendarRange == 'month') {
+      var weeks = obm.calendarManager.getEventWeeks(evt);
+      var start = weeks[0];
+      if (evt.event.left) {
+	if ( evt.event.right ) {
+	  size = 7;
+	} else {
+	  size = size - this.getDaysCount(begin, ( begin- (evt.event.time*1000) ) );
+	  if (size == 0) size = 1; // very, very crappy fix 
+	}
+      } else if (evt.event.right) {
+	try {
+	  var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
+	} catch (e) {
+	  var startWeek = obm.vars.consts.startTime.getTime();
+	}
+	var endWeekDate = new Obm.DateTime(startWeek);
+	endWeekDate.addDays(6);
+	var indexMs = evt.event.index*1000;
+	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs));
+      }
+    }
+    return size;
+  },
+  
+  _getBeginningOfAllDayEvt: function(evt) {
+    var begin;
+    if ( obm.vars.consts.calendarRange == 'month' && evt.event.left ) {
+      begin = evt.event.index*1000;
+    } else {
+      begin = evt.event.time*1000;
+    }
+    return begin;
+  },
+  
   /**
    * Register an event
    */
   register: function(evt) {
     this.events.set(evt.element.id, evt);
-    var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
     if (evt.kind == 'all_day') {
-      var begin = evt.event.time*1000;
-      evt.size = Math.ceil(evt.event.duration/86400);
-      if (evt.size == 0) evt.size = 1; // very, very crappy fix 
-      if (!evt.event.all_day) {
-        var beginDay = new Obm.DateTime(evt.event.time*1000);
-        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration-1)*1000);
-        beginDay.setHours(0);
-        beginDay.setMinutes(0);
-        beginDay.setSeconds(0);
-        beginDay.setMilliseconds(0);
-        endDay.setHours(0);
-        endDay.setMinutes(0);
-        endDay.setSeconds(0)
-        endDay.setMilliseconds(0);
-        evt.size = 1+Math.ceil((endDay.getTime() - beginDay)/86400000);
-      }
-
-      // Extensions
-      if (obm.vars.consts.calendarRange == 'month') {
-        var weeks = obm.calendarManager.getEventWeeks(evt);
-        var start = weeks[0];
-        if (evt.event.left) {
-          var oldBegin = begin
-          begin = evt.event.index*1000;
-          evt.size = evt.size - Math.ceil((begin-oldBegin)/86400000);
-          if (evt.size == 0) evt.size = 1; // very, very crappy fix 
-        }
-        if (evt.event.right) {
-          try {
-            var startWeek = obm.vars.consts.weekTime[start][0] * 1000;
-          } catch (e) {
-            var startWeek = obm.vars.consts.startTime * 1000;
-          }
-          evt.size = Math.ceil((startWeek + (86400000 * 7) - evt.event.index*1000)/86400000);
-          if (evt.event.left) evt.size = 7; // very, very crappy fix
-        }
-      }
-
+      var begin = this._getBeginningOfAllDayEvt(evt);
+      var size = this._getSizeOfAllDayEvts(evt, begin);
+      evt.size = size;
       var current = new Obm.DateTime(begin);
       for(var i=0;i<evt.size;i++) {
         current.setTime(begin);
@@ -148,10 +173,6 @@ Obm.CalendarManager = new Class({
           this.redrawAllDay.set(index, true);
 
           if (obm.vars.consts.calendarRange == 'month') {
-            current.setHours(0);
-            current.setMinutes(0);
-            current.setSeconds(0);
-            current.setMilliseconds(0);
             var more = $('more_'+index);
             var target = "";
             var title = "";
@@ -187,6 +208,7 @@ Obm.CalendarManager = new Class({
       }
 
     } else {
+      var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
       var begin = evt.element.offsetTop.toFloat();
       var height = obm.calendarManager.defaultHeight;
       if (evt.event.duration > obm.vars.consts.timeUnit) {

@@ -230,7 +230,21 @@ Obm.DateTime = new Class({
     this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
   },
 
-
+  addDays: function(nb) {
+    var hours = this.getHours();
+    var minutes = this.getMinutes();
+    var seconds = this.getSeconds();
+//     var tmpDate = new Obm.DateTime(date.getTime());
+    this.setNoon();
+    for (var i=0;i<nb;i++) {
+      this.setTime( (this.getTime() + (24*60*60*1000)) );
+      this.setNoon();
+    }
+    this.setHours(hours);
+    this.setMinutes(minutes);
+    this.setSeconds(seconds);
+    return this;
+  },
 
   toDateString: function() {
     return this.outputDate.toDateString();
@@ -321,6 +335,12 @@ Obm.DateTime = new Class({
       offset = offset.pad(4,'0');
     }
     return offset; 
+  },
+  
+  setNoon: function() {
+    this.setHours(12);
+    this.setMinutes(0);
+    this.setSeconds(0);
   }
 });
 
