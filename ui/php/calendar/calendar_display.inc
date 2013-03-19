@@ -4640,7 +4640,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if ($action == 'conflict_manager') {
       $begin = $calendar['date_begin'];
       $end = clone $begin;
-      $end = $end->addSecond($calendar['duration']);
+      $end->addSecondsInUTC($calendar['duration']);
     } else {
       $begin = $date_edit_occurrence == null ? new Of_Date($event_q->f('event_date'), 'GMT') : new Of_Date($date_edit_occurrence);
       if (isset($calendar['template_id']) && $action == 'new') {
@@ -4650,7 +4650,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         $begin->setYear($today->getYear());
       }
       $end = clone $begin;
-      $end = $end->addSecond($event_q->f('event_duration'));
+      $end->addSecondsInUTC($event_q->f('event_duration'));
     }
     $all_day = $event_q->f('event_allday');
     if($all_day) {

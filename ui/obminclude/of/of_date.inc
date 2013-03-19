@@ -1270,6 +1270,17 @@ class Of_Date extends DateTime {
   }
 
   /**
+  * add seconds, after having set the timezone to UTC
+  * then set back the original timezone
+  **/
+  public function addSecondsInUTC($seconds) {
+    $tz = $this->getTimezone()->getName();
+    $this->setTimezone(new DateTimeZone("GMT"));
+    $this = $this->addSecond($seconds);
+    $this->setTimezone(new DateTimeZone($tz));
+  }
+
+  /**
    * substracts an second
    *
    * @param  integer|string|array|Of_Date  $second  Second to substract
