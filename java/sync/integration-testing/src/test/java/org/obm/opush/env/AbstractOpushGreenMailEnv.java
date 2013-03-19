@@ -46,6 +46,7 @@ public abstract class AbstractOpushGreenMailEnv extends AbstractOpushEnv {
 		ImmutableList<AbstractOverrideModule> modules = ImmutableList.of( 
 				dao(),
 				obmSync(),
+				backendsModule(),
 				greenMail()
 				);
 		for (AbstractOverrideModule module: modules) {

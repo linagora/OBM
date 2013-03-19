@@ -31,37 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import static org.easymock.EasyMock.expect;
+
 import org.easymock.IMocksControl;
-import org.obm.sync.client.CalendarType;
-import org.obm.sync.client.login.LoginService;
-import org.obm.sync.services.IAddressBook;
-import org.obm.sync.services.ICalendar;
-import org.obm.sync.services.IMailingList;
-import org.obm.sync.services.ISetting;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.calendar.CalendarBackend;
+import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.task.TaskBackend;
 
-import com.google.inject.name.Names;
+public class BackendsModule extends AbstractOverrideModule {
 
-public final class ObmSyncModule extends AbstractOverrideModule {
-
-	public static final boolean PUSH_ENABLED = false;
-
-	public ObmSyncModule(IMocksControl mocksControl) {
+	public BackendsModule(IMocksControl mocksControl) {
 		super(mocksControl);
 	}
 
 	@Override
 	protected void configureImpl() {
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(PUSH_ENABLED);
-		bindWithMock(IAddressBook.class);
-		ICalendar calendar = createAndRegisterMock(ICalendar.class);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.CALENDAR))
-			.toInstance(calendar);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.TODO))
-			.toInstance(calendar);
-		bindWithMock(LoginService.class);
-		bindWithMock(IMailingList.class);
-		bindWithMock(ISetting.class);
+		bindCalendarBackend();
+		bindContactsBackend();
+		bindTaskBackend();
+	}
+	
+	protected void bindCalendarBackend() {
+		bindWithMock(CalendarBackend.class);
+		CalendarBackend calendarBackend = getMock(CalendarBackend.class);
+		expect(calendarBackend.getPIMDataType()).andReturn(PIMDataType.CALENDAR);
+	}
+	
+	protected void bindContactsBackend() {
+		bindWithMock(ContactsBackend.class);
+		ContactsBackend contactBackend = getMock(ContactsBackend.class);
+		expect(contactBackend.getPIMDataType()).andReturn(PIMDataType.CONTACTS);
+	}
+	
+	protected void bindTaskBackend() {
+		bindWithMock(TaskBackend.class);
+		TaskBackend taskBackend = getMock(TaskBackend.class);
+		expect(taskBackend.getPIMDataType()).andReturn(PIMDataType.TASKS);
 	}
 }
