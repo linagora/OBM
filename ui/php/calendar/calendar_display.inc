@@ -3117,7 +3117,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   $all_day = $event_q->f('event_allday');
   $begin = ( $date_edit_occurrence != null ) ? new Of_Date($date_edit_occurrence, 'GMT') : new Of_Date($event_q->f('event_date'), 'GMT');
   $end = clone $begin;
-  $end->addSecond($event_q->f('event_duration'));
+  $end->addSecondsInUTC($event_q->f('event_duration'));
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td>$GLOBALS[l_yes]</td></tr>";
     $end->subSecond(1);
