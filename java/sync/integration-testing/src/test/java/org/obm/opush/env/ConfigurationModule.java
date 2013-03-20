@@ -35,6 +35,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 
 import com.google.inject.AbstractModule;
 
@@ -51,6 +52,7 @@ public final class ConfigurationModule extends AbstractModule {
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 		bind(SyncPermsConfigurationService.class).toInstance(new StaticConfigurationService.SyncPerms(configuration.syncPerms));
+		bind(RemoteConsoleConfiguration.class).toInstance(new StaticConfigurationService.RemoteConsole(configuration.remoteConsole));
 	}
 	
 }

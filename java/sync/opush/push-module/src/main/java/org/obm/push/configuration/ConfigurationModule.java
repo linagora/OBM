@@ -50,6 +50,7 @@ public class ConfigurationModule extends AbstractModule {
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
+		bind(RemoteConsoleConfiguration.class).to(RemoteConsoleConfigurationFileImpl.class);
 	}
 
 }

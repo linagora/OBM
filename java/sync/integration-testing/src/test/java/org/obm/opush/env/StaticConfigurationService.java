@@ -41,20 +41,40 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.opush.env.Configuration.Mail;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 
 import com.google.common.base.Throwables;
 
 public class StaticConfigurationService implements ConfigurationService {
-	
-    public static class SyncPerms implements
-			SyncPermsConfigurationService {
-    	
-    	private final org.obm.opush.env.Configuration.SyncPerms configuration;
+
+	public static class RemoteConsole implements RemoteConsoleConfiguration {
+
+		private final Configuration.RemoteConsole configuration;
+
+		public RemoteConsole(Configuration.RemoteConsole configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public boolean enable() {
+			return configuration.enable;
+		}
+
+		@Override
+		public int port() {
+			return configuration.port;
+		}
+
+	}
+
+	public static class SyncPerms implements SyncPermsConfigurationService {
+
+		private final org.obm.opush.env.Configuration.SyncPerms configuration;
 
 		public SyncPerms(org.obm.opush.env.Configuration.SyncPerms configuration) {
 			this.configuration = configuration;
 		}
-    	
+
 		@Override
 		public String getBlackListUser() {
 			return configuration.blacklist;
@@ -66,15 +86,14 @@ public class StaticConfigurationService implements ConfigurationService {
 		}
 	}
 
-	public static class Email implements
-			EmailConfiguration {
-		
+	public static class Email implements EmailConfiguration {
+
 		private final Mail configuration;
 
 		public Email(Mail configuration) {
 			this.configuration = configuration;
 		}
-		
+
 		@Override
 		public boolean loginWithDomain() {
 			return configuration.loginWithDomain;
@@ -123,69 +142,69 @@ public class StaticConfigurationService implements ConfigurationService {
 
 	private final Configuration configuration;
 
-    public StaticConfigurationService(Configuration configuration) {
-            this.configuration = configuration;
-    }
+	public StaticConfigurationService(Configuration configuration) {
+		this.configuration = configuration;
+	}
 
-    @Override
-    public String getLocatorUrl() {
-            return configuration.locatorUrl;
-    }
+	@Override
+	public String getLocatorUrl() {
+		return configuration.locatorUrl;
+	}
 
-    @Override
-    public String getObmUIBaseUrl() {
-            return configuration.obmUiBaseUrl;
-    }
+	@Override
+	public String getObmUIBaseUrl() {
+		return configuration.obmUiBaseUrl;
+	}
 
-    @Override
-    public String getObmSyncUrl(String obmSyncHost) {
-            return configuration.obmSyncUrl;
-    }
+	@Override
+	public String getObmSyncUrl(String obmSyncHost) {
+		return configuration.obmSyncUrl;
+	}
 
-    @Override
-    public int getLocatorCacheTimeout() {
-            return configuration.locatorCacheTimeout;
-    }
+	@Override
+	public int getLocatorCacheTimeout() {
+		return configuration.locatorCacheTimeout;
+	}
 
-    @Override
-    public TimeUnit getLocatorCacheTimeUnit() {
-            return configuration.locatorCacheTimeUnit;
-    }
+	@Override
+	public TimeUnit getLocatorCacheTimeUnit() {
+		return configuration.locatorCacheTimeUnit;
+	}
 
-    @Override
-    public ResourceBundle getResourceBundle(Locale locale) {
-            return configuration.bundle;
-    }
+	@Override
+	public ResourceBundle getResourceBundle(Locale locale) {
+		return configuration.bundle;
+	}
 
-    @Override
-    public String getActiveSyncServletUrl() {
-            return configuration.activeSyncServletUrl;
-    }
+	@Override
+	public String getActiveSyncServletUrl() {
+		return configuration.activeSyncServletUrl;
+	}
 
-    @Override
-    public Charset getDefaultEncoding() {
-            return configuration.defautEncoding;
-    }
+	@Override
+	public Charset getDefaultEncoding() {
+		return configuration.defautEncoding;
+	}
 
-    @Override
-    public int transactionTimeoutInSeconds() {
-            return configuration.transaction.timeoutInSeconds;
-    }
+	@Override
+	public int transactionTimeoutInSeconds() {
+		return configuration.transaction.timeoutInSeconds;
+	}
 
-    @Override
-    public boolean usePersistentCache() {
-            return configuration.transaction.usePersistentCache;
-    }
+	@Override
+	public boolean usePersistentCache() {
+		return configuration.transaction.usePersistentCache;
+	}
 
-    @Override
-    public int trustTokenTimeoutInSeconds() {
-            return configuration.trustTokenTimeoutInSeconds;
-    }
+	@Override
+	public int trustTokenTimeoutInSeconds() {
+		return configuration.trustTokenTimeoutInSeconds;
+	}
 
-    @Override
-    public int solrCheckingInterval() {
-            return configuration.solrCheckingInterval;
-    }
+	@Override
+	public int solrCheckingInterval() {
+		return configuration.solrCheckingInterval;
+	}
 
 	@Override
 	public String getDataDirectory() {

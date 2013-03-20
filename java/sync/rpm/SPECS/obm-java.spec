@@ -129,6 +129,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/opush
 cp opush/config-sample/sync_perms.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp opush/config-sample/ldap_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
+cp opush/config-sample/remote_console.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp -r opush/push/target/opush/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush/
 
 # obm-locator
@@ -165,6 +166,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %config(noreplace) %{_sysconfdir}/opush/sync_perms.ini
 %config(noreplace) %{_sysconfdir}/opush/ldap_conf.ini
 %config(noreplace) %{_sysconfdir}/opush/mail_conf.ini
+%config(noreplace) %{_sysconfdir}/opush/remote_console.ini
 
 %files -n obm-locator
 %defattr(-,root,root,-)
