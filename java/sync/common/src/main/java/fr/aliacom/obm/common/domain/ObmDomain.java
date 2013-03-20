@@ -37,6 +37,7 @@ import java.util.Set;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 public class ObmDomain implements Serializable {
 
@@ -118,6 +119,10 @@ public class ObmDomain implements Serializable {
 		return aliases;
 	}
 
+	public Set<String> getNames() {
+		return Sets.union(ImmutableSet.of(name), aliases);
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(id, name, uuid);

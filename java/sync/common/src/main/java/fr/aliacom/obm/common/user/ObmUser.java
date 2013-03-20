@@ -31,11 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.sync.utils.DisplayNameUtils;
+
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -48,7 +54,7 @@ public class ObmUser {
 	private String lastName;
 	private String firstName;
 	private String email;
-	private List<String> emailAlias;
+	private Set<String> emailAlias;
 	
 	private String address1;
 	private String address2;
@@ -73,6 +79,10 @@ public class ObmUser {
 	private ObmDomain domain;
 	private boolean publicFreeBusy;
 
+	public ObmUser() {
+		emailAlias = Sets.newHashSet();
+	}
+	
 	public String getDescription() {
 		return description;
 	}
@@ -186,22 +196,26 @@ public class ObmUser {
 	}
 
 	public String getEmail() {
-		if( email != null && !email.contains("@")){
-			return email + "@" + domain.getName();
+		return appendDomainToEmailIfRequired(email);
+	}
+
+	private String appendDomainToEmailIfRequired(String emailAddress) {
+		return appendDomainToEmailIfRequired(emailAddress, domain.getName());
+	}
+	
+	private String appendDomainToEmailIfRequired(String emailAddress, String domainName) {
+		if(emailAddress != null && !emailAddress.contains("@")) {
+			return emailAddress + "@" + domainName;
 		}
-		return email;
+		return emailAddress;
 	}
 	
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	public List<String> getEmailAlias() {
+	public Set<String> getEmailAlias() {
 		return emailAlias;
-	}
-	
-	public void setEmailAlias(List<String> emailAlias) {
-		this.emailAlias = emailAlias;
 	}
 	
 	public String getFirstName() {
@@ -297,10 +311,23 @@ public class ObmUser {
 	}
 	
 	public void addAlias(String alias) {
-		if (emailAlias == null) {
-			emailAlias = new ArrayList<String>();
-		}
 		emailAlias.add(alias);
+	}
+
+	private Set<String> emailAndAliases() {
+		return Sets.union(ImmutableSet.of(email), emailAlias);
+	}
+	
+	public Iterable<String> buildAllEmails() {
+		return FluentIterable
+				.from(Sets.cartesianProduct(
+						ImmutableList.of(emailAndAliases(), domain.getNames())))
+				.transform(new Function<List<String>, String>() {
+					@Override
+					public String apply(List<String> input) {
+						return appendDomainToEmailIfRequired(input.get(0), input.get(1));
+					}
+				});
 	}
 	
 	@Override

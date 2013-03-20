@@ -123,10 +123,10 @@ public class AttendeeServiceJdbcImplTest {
 	
 	@Before
 	public void setUp() {
+		domain = ToolBox.getDefaultObmDomain();
 		johnDoe = johnDoe();
 		externalContact = externalContact();
 		resource = resource();
-		domain = ToolBox.getDefaultObmDomain();
 		userDao = createMockBuilder(UserDao.class)
 				.withConstructor(ObmHelper.class)
 				.withArgs(obmHelper)

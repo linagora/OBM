@@ -31,49 +31,166 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
-import junit.framework.Assert;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
+import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class ObmUserTest {
 
+	private ObmDomain domain;
+	private String domainName;
+
+	@Before
+	public void setUp() {
+		domainName = "obmsync.test";
+		domain = ObmDomain.builder()
+				.id(2)
+				.name(domainName)
+				.build();
+	}
+	
 	@Test
 	public void testGetEmailWithoutDomain() {
 		String email = "user1";
-		String domainName = "obmsync.test";
-		ObmDomain domain = EasyMock.createMock(ObmDomain.class);
-		EasyMock.expect(domain.getName()).andReturn(domainName).once();
-		EasyMock.replay(domain);
-		
 		ObmUser obmUser = new ObmUser();
 		obmUser.setDomain(domain);
 		obmUser.setEmail(email);
-		
-		String emailAtDomain = obmUser.getEmail();
-		Assert.assertEquals(email + "@" +domainName, emailAtDomain);
+
+		assertThat(obmUser.getEmail()).isEqualTo(email + "@" +domainName);
 	}
 	
 	@Test
 	public void testGetEmailWithDomain() {
 		String email = "user1@obmsync.test";
-		ObmDomain domain = EasyMock.createMock(ObmDomain.class);
-		EasyMock.replay(domain);
-		
 		ObmUser obmUser = new ObmUser();
 		obmUser.setDomain(domain);
 		obmUser.setEmail(email);
-		
-		String emailAtDomain = obmUser.getEmail();
-		Assert.assertEquals(email, emailAtDomain);
+
+		assertThat(obmUser.getEmail()).isEqualTo(email);
 	}
-	
+
+	@Test
+	public void testMainThenAliasEmails() {
+		String email = "user1@obmsync.test";
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domain);
+		obmUser.setEmail(email);
+		obmUser.addAlias("user2");
+		obmUser.addAlias("user3");
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(
+				email, "user2@obmsync.test", "user3@obmsync.test");
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenSimpleMainEmail() {
+		String email = "user1";
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domain);
+		obmUser.setEmail(email);
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(email + "@" + domainName);
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenNoAlias() {
+		String email = "user1@obmsync.test";
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domain);
+		obmUser.setEmail(email);
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(email);
+	}
+
+	@Test
+	public void testMainThenAliasEmailsAliasWithDomain() {
+		String email = "user1@obmsync.test";
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domain);
+		obmUser.setEmail(email);
+		obmUser.addAlias("user2@obmsync.test");
+		obmUser.addAlias("user3");
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(
+				email, "user2@obmsync.test", "user3@obmsync.test");
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenOneLoginButDomainAlias() {
+		ObmDomain domainWithAliases = ObmDomain.builder()
+			.id(5)
+			.name(domainName)
+			.aliases(ImmutableSet.of("obm.org"))
+			.build();
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domainWithAliases);
+		obmUser.setEmail("user1");
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(
+				"user1@obmsync.test", "user1@obm.org");
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenOneLoginButTwoDomainAlias() {
+		ObmDomain domainWithAliases = ObmDomain.builder()
+				.id(5)
+				.name(domainName)
+				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
+				.build();
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domainWithAliases);
+		obmUser.setEmail("user1");
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(
+				"user1@obmsync.test", "user1@obm.org", "user1@rasta.rocket");
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenThreeLoginAndThreeDomain() {
+		ObmDomain domainWithAliases = ObmDomain.builder()
+				.id(5)
+				.name(domainName)
+				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
+				.build();
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domainWithAliases);
+		obmUser.setEmail("user1");
+		obmUser.addAlias("user2");
+		obmUser.addAlias("user3");
+
+		assertThat(obmUser.buildAllEmails()).containsExactly(
+				"user1@obmsync.test", 	"user2@obmsync.test", 	"user3@obmsync.test",
+				"user1@obm.org", 		"user2@obm.org", 		"user3@obm.org",
+				"user1@rasta.rocket", 	"user2@rasta.rocket", 	"user3@rasta.rocket");
+	}
+
+	@Test
+	public void testMainThenAliasEmailsWhenThreeLoginWithDomainAndThreeDomain() {
+		ObmDomain domainWithAliases = ObmDomain.builder()
+				.id(5)
+				.name(domainName)
+				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
+				.build();
+
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(domainWithAliases);
+		obmUser.setEmail("user1");
+		obmUser.addAlias("user2@one.org");
+		obmUser.addAlias("user3@two.org");
+
+		assertThat(obmUser.buildAllEmails()).containsOnly(
+				"user1@obmsync.test", "user1@obm.org", "user1@rasta.rocket",
+				"user2@one.org", "user3@two.org");
+	}
 }

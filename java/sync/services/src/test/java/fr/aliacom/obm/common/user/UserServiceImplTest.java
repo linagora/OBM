@@ -93,8 +93,9 @@ public class UserServiceImplTest {
 	public void testGetUserFromCalendar() throws FindException {
 		String userEmail = "User@domain";
 		String domainName = "domain";
-		ObmDomain obmDomain = ObmDomain.builder().build();
+		ObmDomain obmDomain = ObmDomain.builder().name(domainName).build();
 		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(obmDomain);
 		obmUser.setEmail(userEmail);
 
 		DomainService domainService = EasyMock.createMock(DomainService.class);

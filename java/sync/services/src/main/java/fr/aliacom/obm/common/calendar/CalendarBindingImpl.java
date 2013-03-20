@@ -1569,11 +1569,13 @@ public class CalendarBindingImpl implements ICalendar {
 		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
-	private void convertAttendeesOnEvent(Event event, ObmUser owner) {
+	private void convertAttendeesOnEvent(Event event, ObmUser owner) throws ServerFault {
 		List<Attendee> typedAttendees = Lists.newArrayList();
+
+		Attendee ownerAttendee = findRequiredOwnerAttendee(event, owner);
 		
 		for (Attendee attendee : event.getAttendees()) {
-			Attendee typedAttendee = findAttendee(attendee.getDisplayName(), attendee.getEmail(), owner.getDomain(), owner.getUid());
+			Attendee typedAttendee = findAttendee(event, owner, ownerAttendee, attendee);
 
 			typedAttendee.setCanWriteOnCalendar(attendee.isCanWriteOnCalendar());
 			typedAttendee.setOrganizer(attendee.isOrganizer());
@@ -1586,8 +1588,28 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		event.setAttendees(typedAttendees);
 	}
+
+	private Attendee findRequiredOwnerAttendee(Event event, ObmUser owner) throws ServerFault {
+		for (String emails : owner.buildAllEmails()) {
+			Attendee attendeeFromEmailAlias = event.findAttendeeFromEmail(emails);
+			if (attendeeFromEmailAlias != null) {
+				return attendeeFromEmailAlias;
+			}
+		}
+		throw new ServerFault("Cannot find owner attendee");
+	}
+
+	private Attendee findAttendee(Event event, ObmUser owner, Attendee ownerAttendee, Attendee attendee) {
+		if (attendee.equals(ownerAttendee)) {
+			return findUserAttendee(attendee, owner);
+		} else if (event.isInternalEvent()) {
+			return findTypedAttendee(attendee, owner);
+		} else {
+			return findContactAttendee(attendee, owner);
+		}
+	}
 	
-	private void convertAttendees(Event event, ObmUser owner) {
+	private void convertAttendees(Event event, ObmUser owner) throws ServerFault {
 		convertAttendeesOnEvent(event, owner);
 		
 		for (Event exception : event.getEventsExceptions()) {
@@ -1595,17 +1617,24 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private Attendee findAttendee(String name, String email, ObmDomain domain, Integer ownerId) {
-		Attendee attendee = attendeeService.findUserAttendee(name, email, domain);
-		
-		// User not found, we'll fallback to a contact and create it if needed
-		if (attendee == null) {
-			attendee = attendeeService.findContactAttendee(name, email, true, domain, ownerId);
+	private Attendee findTypedAttendee(Attendee attendee, ObmUser owner) {
+		Attendee userAttendee = findUserAttendee(attendee, owner);
+		if (userAttendee != null) {
+			return userAttendee;
 		}
 		
-		return attendee;
+		// User not found, we'll fallback to a contact and create it if needed
+		return findContactAttendee(attendee, owner);
 	}
 
+	private Attendee findUserAttendee(Attendee attendee, ObmUser owner) {
+		return attendeeService.findUserAttendee(attendee.getDisplayName(), attendee.getEmail(), owner.getDomain());
+	}
+
+	private Attendee findContactAttendee(Attendee attendee, ObmUser owner) {
+		return attendeeService.findContactAttendee(attendee.getDisplayName(), attendee.getEmail(), true, owner.getDomain(), owner.getUid());
+	}
+	
 	private void convertAttendees(Event event, String calendar, ObmDomain domain) throws ServerFault {
 		try {
 			convertAttendees(event, userService.getUserFromCalendar(calendar, domain.getName()));

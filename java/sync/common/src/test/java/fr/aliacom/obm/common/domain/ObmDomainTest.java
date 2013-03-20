@@ -54,5 +54,47 @@ public class ObmDomainTest {
 		
 		assertThat(domain.getAliases()).containsExactly("alias", "alias2");
 	}
-	
+
+	@Test
+	public void testGetNamesNoAlias() {
+		ObmDomain domain = ObmDomain.builder().name("name").build();
+		
+		assertThat(domain.getNames()).containsExactly("name");
+	}
+
+	@Test
+	public void testGetNamesOneAlias() {
+		ObmDomain domain = ObmDomain.builder().name("name").alias("alias").build();
+		
+		assertThat(domain.getNames()).containsOnly("name", "alias");
+	}
+
+	@Test
+	public void testGetNamesOneAliasSameThanName() {
+		ObmDomain domain = ObmDomain.builder().name("name").alias("name").build();
+		
+		assertThat(domain.getNames()).containsOnly("name");
+	}
+
+	@Test
+	public void testGetNamesThreeAlias() {
+		ObmDomain domain = ObmDomain.builder()
+				.name("name")
+				.alias("alias1")
+				.alias("alias2")
+				.alias("alias3").build();
+		
+		assertThat(domain.getNames()).containsOnly("name", "alias1", "alias2", "alias3");
+	}
+
+	@Test
+	public void testGetNamesThreeAliasOneSameThanName() {
+		ObmDomain domain = ObmDomain.builder()
+				.name("name")
+				.alias("alias1")
+				.alias("name")
+				.alias("alias3").build();
+		
+		assertThat(domain.getNames()).containsOnly("name", "alias1", "alias3");
+	}
 }
