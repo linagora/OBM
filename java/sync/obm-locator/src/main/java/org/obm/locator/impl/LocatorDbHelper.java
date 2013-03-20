@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.obm.configuration.ConfigurationService;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
@@ -52,10 +53,13 @@ public class LocatorDbHelper {
 
 	private final DatabaseConnectionProvider dbcp;
 	private final static int MAX_CHAR_FOR_CAST = 8;
+
+	private final ConfigurationService configurationService;
 	
 	@Inject
-	protected LocatorDbHelper(DatabaseConnectionProvider dbcp) {
+	protected LocatorDbHelper(DatabaseConnectionProvider dbcp, ConfigurationService configurationService) {
 		this.dbcp = dbcp;
+		this.configurationService = configurationService;
 	}
 	
 	/**
@@ -76,15 +80,14 @@ public class LocatorDbHelper {
 				+ "INNER JOIN DomainEntity ON domainentity_domain_id=domain_id "
 				+ " INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id "
 				+ "INNER JOIN Host ON CAST(host_id as CHAR(" + MAX_CHAR_FOR_CAST + ")) = serviceproperty_value "
-				+ "WHERE domain_name=? "
+				+ "WHERE domain_name LIKE ? "
 				+ "AND serviceproperty_service=? "
 				+ "AND serviceproperty_property=?";
 
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		int idx = loginAtDomain.indexOf("@");
-		String domain = loginAtDomain.substring(idx + 1);
+		String domain = getDomainAsJdbcString(loginAtDomain);
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(q);
@@ -104,6 +107,15 @@ public class LocatorDbHelper {
 		}
 
 		return ret;
+	}
+
+	private String getDomainAsJdbcString(String loginAtDomain) {
+		int idx = loginAtDomain.indexOf("@");
+		String domain = loginAtDomain.substring(idx + 1);
+		if (domain.equals(configurationService.getGlobalDomain())) {
+			return "%";
+		}
+		return domain;
 	}
 	
 }
