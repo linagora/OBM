@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.easymock.IMocksControl;
@@ -81,6 +82,7 @@ import org.obm.sync.services.AttendeeService;
 import org.obm.sync.solr.SolrManager;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
@@ -128,7 +130,31 @@ public class CalendarDaoJdbcImplTest {
 	private DatabaseConnectionProvider dbcp;
 	
 	@Test
-	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicates() {
+	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenExDatesDiffer() {
+		Date date = date("2004-12-14T22:00:00");
+		
+		Event firstRecurrentEvent = new Event();
+		firstRecurrentEvent.setTitle("firstRecurrentEvent");
+		firstRecurrentEvent.setStartDate(date("2012-12-17T15:19:00"));
+		firstRecurrentEvent.addException(date("2012-12-18T15:19:00"));
+		firstRecurrentEvent.addException(date("2012-12-19T15:19:00"));
+
+		Event secondRecurrentEvent = new Event();
+		secondRecurrentEvent.setTitle("firstRecurrentEvent");
+		secondRecurrentEvent.setStartDate(date("2012-12-17T15:19:00"));
+		secondRecurrentEvent.addException(date("2012-12-19T15:19:00"));
+		secondRecurrentEvent.addException(date("2012-12-18T15:19:00"));
+
+		ArrayList<Event> result = Lists.newArrayList();
+		Set<Event> parentOfDeclinedRecurrentEvent = ImmutableSet.of(firstRecurrentEvent, secondRecurrentEvent);
+		
+		calendarDaoJdbcImpl.touchParentOfDeclinedRecurrentEvents(parentOfDeclinedRecurrentEvent, result, date);
+		
+		assertThat(result).containsOnly(firstRecurrentEvent);
+	}
+	
+	@Test
+	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenMovedExceptionsDiffer() {
 		Date date = date("2004-12-14T22:00:00");
 		
 		Event firstEventException = new Event();

@@ -20,8 +20,8 @@
 		</attendees>
 		<recurrence days="" freq="1" kind="daily">
 		<exceptions>
-		<exception>1295258400000</exception>
 		<exception>1292580000000</exception>
+		<exception>1295258400000</exception>
 		</exceptions><eventExceptions/>
 		</recurrence>
 	</event>
@@ -45,8 +45,8 @@
 		</attendees>
 		<recurrence days="" freq="1" kind="daily">
 		<exceptions>
-		<exception>1295258400000</exception>
 		<exception>1292580000000</exception>
+		<exception>1295258400000</exception>
 		</exceptions><eventExceptions/>
 		</recurrence>
 	</event>

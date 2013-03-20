@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.junit.Test;
+import org.obm.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
@@ -104,6 +105,7 @@ public class DeclinedAttendeeFilterTest {
 		evExWithoutPhilby.setUid(evExWithoutPhilbyId);
 		evExWithoutPhilby.addAttendee(decliningPhilby);
 		evExWithoutPhilby.addAttendee(burgess);
+		evExWithoutPhilby.setRecurrenceId(DateUtils.date("2013-03-20T12:00:00"));
 
 		EventObmId evExWithPhilbyId = new EventObmId(4);
 		Event evExWithPhilby = new Event();

@@ -36,8 +36,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.obm.push.utils.collection.Sets;
@@ -55,11 +53,11 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 	private Date end;
 	private int frequence;
 	private RecurrenceKind kind;
-	private List<Date> exceptions;
+	private Set<Date> exceptions;
 	private Set<Event> eventExceptions;
 
 	public EventRecurrence(RecurrenceKind kind) {
-		this.exceptions = new LinkedList<Date>();
+		this.exceptions = com.google.common.collect.Sets.newTreeSet(); // Natural order is fine for dates
 		this.eventExceptions = com.google.common.collect.Sets.newHashSet();
 		this.kind = kind;
 		this.days = new RecurrenceDays();
@@ -101,12 +99,12 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		this.kind = kind;
 	}
 
-	public List<Date> getExceptions() {
+	public Set<Date> getExceptions() {
 		return exceptions;
 	}
 
 	public void setExceptions(Iterable<Date> exceptions) {
-		this.exceptions = Lists.newArrayList(exceptions);
+		this.exceptions = com.google.common.collect.Sets.newTreeSet(exceptions);
 	}
 
 	public void addException(Date d) {

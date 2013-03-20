@@ -36,14 +36,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -63,8 +62,6 @@ import org.obm.sync.calendar.EventPrivacy;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterExceptionTest {
@@ -1234,7 +1231,7 @@ public class MSEventToObmEventConverterExceptionTest {
 
 		Event converted = convertToOBMEvent(msEvent);
 		Set<Event> convertedExceptions = converted.getRecurrence().getEventExceptions();
-		List<Date> convertedExceptionsDeleted = converted.getRecurrence().getExceptions();
+		Set<Date> convertedExceptionsDeleted = converted.getRecurrence().getExceptions();
 
 		assertThat(convertedExceptions).hasSize(1);
 		assertThat(Iterables.getOnlyElement(convertedExceptions).getRecurrenceId())
