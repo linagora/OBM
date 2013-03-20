@@ -83,20 +83,23 @@ class Vpdi_Vcard_Name {
    */
   public $fullname;
   
-  public static function decode(Vpdi_Property $N, Vpdi_Property $FN = null) {
-    $N = Vpdi::decodeTextList($N->rawValue(), ';');
-    
+  public static function decode(Vpdi_Property $N = null, Vpdi_Property $FN = null) {
     $name = new Vpdi_Vcard_Name;
-  
-    $name->family     = (isset($N[0])) ? $N[0] : '';
-    $name->given      = (isset($N[1])) ? $N[1] : '';
-    $name->additional = (isset($N[2])) ? $N[2] : '';
-    $name->prefixes   = (isset($N[3])) ? $N[3] : '';
-    $name->suffixes   = (isset($N[4])) ? $N[4] : '';
+    
+    if ($N !== null) {
+      $N = Vpdi::decodeTextList($N->rawValue(), ';');
+      
+      $name->family     = (isset($N[0])) ? $N[0] : '';
+      $name->given      = (isset($N[1])) ? $N[1] : '';
+      $name->additional = (isset($N[2])) ? $N[2] : '';
+      $name->prefixes   = (isset($N[3])) ? $N[3] : '';
+      $name->suffixes   = (isset($N[4])) ? $N[4] : '';
+    }
     
     if ($FN !== null) {
       $name->fullname = $FN->rawValue();
     }
+    
     return $name;
   }
   

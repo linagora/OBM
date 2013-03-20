@@ -826,6 +826,7 @@ class OBM_Contact implements OBM_ISearchable {
     $contact = array(
       'lastname' => addslashes($vcard->name->family),
       'firstname' => addslashes($vcard->name->given),
+      'commonname' => addslashes($vcard->name->fullname),
       'function' => addslashes($vcard->role),
       'title' => addslashes($vcard->title),
       'addresses' => array(),
