@@ -1175,8 +1175,16 @@ function run_query_vcard_insert($params, $addressbook) {
   } catch (Exception $e) {
     return false;
   }
+  $skipped = 0;
   $ids = array();
   foreach ($vcards as $vcard) {
+    if (!$vcard->isValid()) {
+      error_log("Skipping invalid VCARD: " . $vcard);
+      
+      $skipped++;
+      continue;
+    }
+    
     $contact = OBM_Contact::import($vcard);
     if (isset($contact['contact_id']) && run_query_check_contact_existence($contact['contact_id'], $addressbook)) {
       $contact['addressbook']=$addressbook->id;
@@ -1191,7 +1199,7 @@ function run_query_vcard_insert($params, $addressbook) {
       }
     }
   }
-  if (count($ids) != count($vcards)) {
+  if (count($ids) != (count($vcards) - $skipped)) {
     return false;
   }
   OBM_IndexingService::commit('contact');

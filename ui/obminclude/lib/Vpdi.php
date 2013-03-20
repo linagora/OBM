@@ -110,7 +110,6 @@ class Vpdi {
     $entities = self::expand(self::decodeProperties($string));
     if (!is_null($expected_profile)) {
       self::checkProfile($entities, $expected_profile);
-      self::checkAllEntitiesAreValid($entities);
     }
     return $entities;
   }
@@ -221,13 +220,6 @@ class Vpdi {
     }
   }
   
-  public static function checkAllEntitiesAreValid($entities) {
-    foreach ($entities as $entity) {
-      if (!$entity->isValid()) {
-        throw new Vpdi_InvalidVcardEntityException($entity);
-      }
-    }
-  }
   /**
    * Decodes a string into an array of Vpdi_Property objects
    * 
