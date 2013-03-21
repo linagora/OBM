@@ -88,7 +88,7 @@ Obm.CalendarManager = new Class({
     $('todayHourMarker').style.top = (d.getHours()*3600 + d.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
-  getDaysCount: function(time, duration) {
+  getDaysCount: function(time, duration, allday) {
       if ( duration < 0 ) {
 	return false;
       }
@@ -100,7 +100,14 @@ Obm.CalendarManager = new Class({
       var endTime = time+duration;
       var lastDate =  new Obm.DateTime(endTime);
       lastDate.setNoon();
-      var days = 1;
+      
+      /**
+       * Non-allday events appear in the 'allday' area if they span multiple days.
+       * In this case, they should appear as (<duration in days> + 1) to cover all days...
+       * In case of allday events, they must appear as (<duration in days>), thus
+       * the variable initialization below.
+       */
+      var days = allday ? 0 : 1;
       while ( lastDate.format("Y-m-d") != firstDate.format("Y-m-d") ) {
           days++;
           firstDate.setTime( (firstDate.getTime() + (24*60*60*1000) ) );
@@ -111,7 +118,8 @@ Obm.CalendarManager = new Class({
   /* get number of days of all day events */
   _getSizeOfAllDayEvts: function(evt, begin) {
     var size = null;
-    size = this.getDaysCount( (evt.event.time*1000), (evt.event.duration*1000) );
+    var allday = evt.event.all_day == 1;
+    size = this.getDaysCount( (evt.event.time*1000), (evt.event.duration*1000), allday );
     if (size == 0) size = 1; // very, very crappy fix 
 
     // Extensions
@@ -122,7 +130,7 @@ Obm.CalendarManager = new Class({
 	if ( evt.event.right ) {
 	  size = 7;
 	} else {
-	  size = size - this.getDaysCount(begin, ( begin- (evt.event.time*1000) ) );
+	  size = size - this.getDaysCount(begin, ( begin- (evt.event.time*1000) ), allday );
 	  if (size == 0) size = 1; // very, very crappy fix 
 	}
       } else if (evt.event.right) {
@@ -134,7 +142,7 @@ Obm.CalendarManager = new Class({
 	var endWeekDate = new Obm.DateTime(startWeek);
 	endWeekDate.addDays(6);
 	var indexMs = evt.event.index*1000;
-	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs));
+	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday);
       }
     }
     return size;
