@@ -1276,7 +1276,7 @@ class Of_Date extends DateTime {
   public function addSecondsInUTC($seconds) {
     $tz = $this->getTimezone()->getName();
     $this->setTimezone(new DateTimeZone("GMT"));
-    $this = $this->addSecond($seconds);
+    $this->addSecond($seconds);
     $this->setTimezone(new DateTimeZone($tz));
   }
 
