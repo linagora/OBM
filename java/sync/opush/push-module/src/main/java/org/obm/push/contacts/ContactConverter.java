@@ -35,9 +35,9 @@ import java.util.Map;
 
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.SearchResult;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
-import org.obm.sync.book.Email;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
 import org.obm.sync.book.Website;
@@ -167,7 +167,7 @@ public class ContactConverter {
 
 	private String obmMail(Contact c, String lbl) {
 		String ret = null;
-		Email p = c.getEmails().get(lbl);
+		EmailAddress p = c.getEmails().get(lbl);
 		if (p != null) {
 			ret = p.getEmail();
 		} else {
@@ -285,7 +285,7 @@ public class ContactConverter {
 
 	private void addEmail(Contact oc, String label, String email) {
 		if (email != null) {
-			oc.addEmail(label, new Email(email));
+			oc.addEmail(label, new EmailAddress(email));
 		}
 	}
 

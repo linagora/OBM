@@ -46,10 +46,10 @@ import java.util.Set;
 
 import org.obm.configuration.ContactConfiguration;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
-import org.obm.sync.book.Email;
 import org.obm.sync.book.Phone;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.slf4j.Logger;
@@ -152,7 +152,7 @@ public class UserDao {
 		c.setTitle(rs.getString("userobm_title"));
 		c.setComment(rs.getString("userobm_description"));
 			
-		c.addEmail(ContactLabel.EMAIL.getContactLabel(), new Email(
+		c.addEmail(ContactLabel.EMAIL.getContactLabel(), new EmailAddress(
 				getEmail(rs.getString("userobm_email"), at.getDomain().getName())));
 		
 		addPhonesToContact(rs, c);

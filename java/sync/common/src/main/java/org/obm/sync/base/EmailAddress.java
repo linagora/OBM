@@ -29,13 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.book;
+package org.obm.sync.base;
 
 import java.io.Serializable;
 
-public class Email implements IMergeable, Serializable {
+import org.obm.sync.book.IMergeable;
 
-	public Email(String email) {
+public class EmailAddress implements IMergeable, Serializable {
+
+	public EmailAddress(String email) {
 		super();
 		this.email = email;
 	}

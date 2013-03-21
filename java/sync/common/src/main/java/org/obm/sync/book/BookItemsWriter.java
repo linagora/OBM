@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import javax.xml.transform.TransformerException;
 
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -125,11 +126,11 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	private void addEmail(Element root, Map<String, Email> emails) {
+	private void addEmail(Element root, Map<String, EmailAddress> emails) {
 		Element e = DOMUtils.createElement(root, "emails");
-		for (Entry<String, Email> entry: emails.entrySet()) {
+		for (Entry<String, EmailAddress> entry: emails.entrySet()) {
 			Element c = DOMUtils.createElement(e, "mail");
-			Email p = entry.getValue();
+			EmailAddress p = entry.getValue();
 			c.setAttribute("label", entry.getKey());
 			c.setAttribute("value", p.getEmail());
 		}

@@ -45,8 +45,8 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
-import org.obm.sync.book.Email;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.EventExtId;
@@ -178,7 +178,7 @@ public class AttendeeServiceJdbcImplTest {
 		Contact contact = new Contact();
 		
 		contact.setUid(1);
-		contact.addEmail("label", new Email("external.to@my.domain"));
+		contact.addEmail("label", new EmailAddress("external.to@my.domain"));
 		contact.setCommonname("external");
 		contact.setEntityId(2);
 		

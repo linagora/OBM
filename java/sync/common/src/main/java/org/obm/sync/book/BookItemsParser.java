@@ -41,6 +41,7 @@ import java.util.Set;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -134,7 +135,7 @@ public class BookItemsParser extends AbstractItemsParser {
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "mail", attrs);
 		for (String[] p : values) {
-			c.addEmail(p[0], new Email(p[1]));
+			c.addEmail(p[0], new EmailAddress(p[1]));
 		}
 	}
 

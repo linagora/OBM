@@ -45,9 +45,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
-import org.obm.sync.book.Email;
 import org.obm.sync.book.InstantMessagingId;
 
 import com.google.inject.Inject;
@@ -180,7 +180,7 @@ public class ContactIndexer extends SolrRequest {
 			rs = null;
 
 			LinkedList<String> mails = new LinkedList<String>();
-			for (Email e : c.getEmails().values()) {
+			for (EmailAddress e : c.getEmails().values()) {
 				mails.add(e.getEmail());
 			}
 			f(sid, "email", mails);

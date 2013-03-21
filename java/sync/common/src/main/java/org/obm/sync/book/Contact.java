@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.utils.DisplayNameUtils;
 
@@ -79,14 +80,14 @@ public class Contact implements Serializable {
 	
 	private Map<String, Phone> phones;
 	private HashSet<Website> websites;
-	private Map<String, Email> emails;
+	private Map<String, EmailAddress> emails;
 	private Map<String, InstantMessagingId> imIdentifiers;
 	private Map<String, Address> addresses;
 
 	public Contact() {
 		phones = new HashMap<String, Phone>();
 		websites = new HashSet<Website>();
-		emails = new HashMap<String, Email>();
+		emails = new HashMap<String, EmailAddress>();
 		addresses = new HashMap<String, Address>();
 		imIdentifiers = new HashMap<String, InstantMessagingId>();
 		collected = false;
@@ -187,7 +188,7 @@ public class Contact implements Serializable {
 		return null;
 	}
 
-	public Map<String, Email> getEmails() {
+	public Map<String, EmailAddress> getEmails() {
 		return emails;
 	}
 
@@ -215,7 +216,7 @@ public class Contact implements Serializable {
 		imIdentifiers.put(lbl, imid);
 	}
 
-	public void addEmail(String lbl, Email email) {
+	public void addEmail(String lbl, EmailAddress email) {
 		emails.put(lbl, email);
 	}
 

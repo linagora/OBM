@@ -71,10 +71,10 @@ import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
-import org.obm.sync.book.Email;
 import org.obm.sync.book.Folder;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
@@ -412,7 +412,7 @@ public class ContactDao {
 		
 		c.setLastname(Objects.firstNonNull(name, ""));
 		c.setFirstname("");
-		c.addEmail("INTERNET;X-OBM-Ref1", new Email(email));
+		c.addEmail("INTERNET;X-OBM-Ref1", new EmailAddress(email));
 		c.setCollected(true);
 		
 		logger.info("Attendee {} not found in OBM, will create a contact.", email);
@@ -666,7 +666,7 @@ public class ContactDao {
 
 
 	private void createOrUpdateEmails(Connection con, int entityId,
-			Map<String, Email> emails) throws SQLException {
+			Map<String, EmailAddress> emails) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			StringSQLCollectionHelper emailStrings = new StringSQLCollectionHelper(emails.keySet());
@@ -681,7 +681,7 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
 					+ "VALUES (?, ?, ?)");
-			for (Entry<String, Email> entry: emails.entrySet()) {
+			for (Entry<String, EmailAddress> entry: emails.entrySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, entry.getKey());
 				ps.setString(3, entry.getValue().getEmail());
@@ -1001,7 +1001,7 @@ public class ContactDao {
 				
 				contact.setUid(rs.getInt("contact_id"));
 				contact.setEntityId(rs.getInt("contactentity_entity_id"));
-				contact.addEmail(rs.getString("email_label"), new Email(email));
+				contact.addEmail(rs.getString("email_label"), new EmailAddress(email));
 				contact.setCommonname(rs.getString("contact_commonname"));
 				contact.setFirstname(rs.getString("contact_firstname"));
 				contact.setLastname(rs.getString("contact_lastname"));
@@ -1030,7 +1030,7 @@ public class ContactDao {
 			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
-				Email p = new Email(rs.getString(3));
+				EmailAddress p = new EmailAddress(rs.getString(3));
 				c.addEmail(rs.getString(2), p);
 			}
 		} catch (SQLException se) {
