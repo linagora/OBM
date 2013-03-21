@@ -2447,6 +2447,7 @@ Obm.CalendarQuickForm = new Class({
     $('sel_template').style.display ='';
     if ($chk($('template_id'))) {
       $('template_id').selectedIndex = 0;
+      $('calendarQuickFormSubmit').disabled = false;
     }
     if (type == 'time') {
       if(!obm.calendarManager.write) return false;
