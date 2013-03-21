@@ -35,21 +35,21 @@ import java.io.Serializable;
 
 import org.obm.sync.book.IMergeable;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 public class EmailAddress implements IMergeable, Serializable {
+	
+	private final String emailAddress;
 
-	public EmailAddress(String email) {
-		super();
-		this.email = email;
+	public EmailAddress(String emailAddress) {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(emailAddress));
+		this.emailAddress = emailAddress.toLowerCase();
 	}
 
-	private String email;
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
 	@Override
@@ -57,4 +57,24 @@ public class EmailAddress implements IMergeable, Serializable {
 		//do nothing on merge
 	}
 
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(emailAddress);
+	}
+	
+	@Override
+	public final boolean equals(Object object) {
+		if (object instanceof EmailAddress) {
+			EmailAddress that = (EmailAddress) object;
+			return Objects.equal(this.emailAddress, that.emailAddress);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("emailAddress", emailAddress)
+			.toString();
+	}
 }

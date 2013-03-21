@@ -684,7 +684,7 @@ public class ContactDao {
 			for (Entry<String, EmailAddress> entry: emails.entrySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, entry.getKey());
-				ps.setString(3, entry.getValue().getEmail());
+				ps.setString(3, entry.getValue().getEmailAddress());
 				ps.addBatch();
 			}
 			ps.executeBatch();
@@ -1370,7 +1370,7 @@ public class ContactDao {
 			}
 
 			for (String s : c.getEmails().keySet()) {
-				ps.setString(idx++, c.getEmails().get(s).getEmail()
+				ps.setString(idx++, c.getEmails().get(s).getEmailAddress()
 						.toLowerCase());
 			}
 

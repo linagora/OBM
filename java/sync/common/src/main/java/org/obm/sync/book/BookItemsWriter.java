@@ -132,7 +132,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 			Element c = DOMUtils.createElement(e, "mail");
 			EmailAddress p = entry.getValue();
 			c.setAttribute("label", entry.getKey());
-			c.setAttribute("value", p.getEmail());
+			c.setAttribute("value", p.getEmailAddress());
 		}
 	}
 

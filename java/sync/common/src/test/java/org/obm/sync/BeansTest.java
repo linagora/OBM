@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.auth.Login;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.ContactAttendee;
@@ -86,7 +87,8 @@ public class BeansTest {
 				RecurrenceId.class,
 				Resource.class,
 				UserAttendee.class, ContactAttendee.class, ResourceAttendee.class,
-				CommitedElement.class);
+				CommitedElement.class,
+				EmailAddress.class);
 	}
 	
 	@Test
