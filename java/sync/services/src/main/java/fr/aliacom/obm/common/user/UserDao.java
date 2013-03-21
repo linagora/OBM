@@ -55,6 +55,8 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class UserDao {
 
+	public  static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
+	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
 	private final ObmHelper obmHelper;
@@ -132,14 +134,14 @@ public class UserDao {
 
 	private boolean strictCompareDomain(String domain, String domainNameToCompare, String domainsAliasToCompare) {
 		if (domain != null && domainNameToCompare != null) {
-			if (domain.equals(domainNameToCompare)) {
+			if (domain.equalsIgnoreCase(domainNameToCompare)) {
 				return true;
 			}
 			
 			if (domainsAliasToCompare != null) {
-				Iterable<String> domains = Splitter.on("\r\n").split(domainsAliasToCompare);					
+				Iterable<String> domains = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(domainsAliasToCompare);					
 				for (String domainToCompare: domains) {
-					if (domain.equals(domainToCompare)) {
+					if (domain.equalsIgnoreCase(domainToCompare)) {
 						return true;
 					}
 				}	
@@ -150,7 +152,7 @@ public class UserDao {
 
 	private boolean compareMail(String mail, String emailsToCompare) {
 		if (mail != null && emailsToCompare != null) {
-			Iterable<String> emails = Splitter.on("\r\n").split(emailsToCompare);			
+			Iterable<String> emails = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emailsToCompare);			
 			for (String email: emails) {
 				email = getEmailWithoutDomain(email);
 				if (mail.equalsIgnoreCase(email)) {
@@ -237,7 +239,7 @@ public class UserDao {
 	}
 
 	private void setEmailAndAlias(ObmUser obmUser, String emails) {
-		Iterable<String> emailAndAlias = Splitter.on("\r\n").split(emails);
+		Iterable<String> emailAndAlias = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emails);
 		for (String emailOrAlias: emailAndAlias) {
 			if (obmUser.getEmail() == null) {
 				obmUser.setEmail(emailOrAlias);	
