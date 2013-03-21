@@ -907,7 +907,7 @@ function html_resource_resourceitem_form($ri_q) {
  */
 function dis_resource_links($params, $kind) {
   global $display;
-  global $l_c_cant_delete, $l_c_can_delete;
+  global $l_c_cant_delete, $l_c_can_delete, $l_resource_found_error;
   global $l_back, $l_c_delete;
   $l_kind = "l_${kind}";
   global $$l_kind;
@@ -922,7 +922,7 @@ function dis_resource_links($params, $kind) {
 
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
-    $display['msg'] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");
+    $display['msg'] .= display_warn_msg("${$l_kind} : $l_c_cant_delete : $nb $l_resource_found_error");
   } else {
     $display['msg'] .= display_ok_msg("${$l_kind} : $l_c_can_delete");
     $dis_buttons .= "<a href=\"?action=${kind}_delete&amp;${kind}=$id\">$l_c_delete</a>";

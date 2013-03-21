@@ -524,3 +524,4 @@ $l_service_get_ftp_backups = "Get available archives from the FTP server";
 
 $l_my_calendar_share = "Sharing my calendar";
 
+$l_resource_found_error = "resource(s) of this type found, you should first remove them.";

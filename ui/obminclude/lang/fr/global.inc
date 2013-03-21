@@ -608,3 +608,4 @@ $l_service_get_ftp_backups = "Récupération des archives disponibles sur le ser
 
 $l_my_calendar_share = "Partage de mon agenda";
 
+$l_resource_found_error = "ressource(s) de ce type trouvée(s), vous devez au préalable les supprimer.";
