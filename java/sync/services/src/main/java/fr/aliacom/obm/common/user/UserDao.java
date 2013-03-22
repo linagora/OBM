@@ -238,7 +238,7 @@ public class UserDao {
 		return obmUser;
 	}
 
-	private void setEmailAndAlias(ObmUser obmUser, String emails) {
+	@VisibleForTesting void setEmailAndAlias(ObmUser obmUser, String emails) {
 		Iterable<String> emailAndAlias = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emails);
 		for (String emailOrAlias: emailAndAlias) {
 			if (obmUser.getEmail() == null) {

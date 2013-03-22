@@ -55,6 +55,7 @@ import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.utils.ObmHelper;
 
 public class UserDaoTest {
@@ -268,5 +269,119 @@ public class UserDaoTest {
 		expect(rs.getString(3)).andReturn(domain);
 		expect(rs.getString(4)).andReturn(domainAlias);
 	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testSetEmailsWhenNull() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = null;
+		
+		mocksControl.replay();
+		try {
+			userDao.setEmailAndAlias(obmUser, dbEmails);
+		} catch (NullPointerException e) {
+			mocksControl.verify();
+			throw e;
+		}
+	}
 
+	@Test
+	public void testSetEmailsWhenEmpty() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = "";
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("@obm.org");
+		assertThat(obmUser.getEmailAlias()).isNull();
+	}
+
+	@Test
+	public void testSetEmailsWhenOne() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = "one";
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).isNull();
+	}
+
+	@Test
+	public void testSetEmailsWhenTwo() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR).join("one", "two");
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two");
+	}
+
+	@Test
+	public void testSetEmailsWhenThree() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR).join("one", "two", "three");
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two", "three");
+	}
+
+	@Test
+	public void testSetEmailsWhenOneWithDomain() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = "one@anotherdomain.org";
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAlias()).isNull();
+	}
+
+	@Test
+	public void testSetEmailsWhenTwoWithDomain() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR)
+				.join("one@anotherdomain.org", "two@anotherdomain.org");
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org");
+	}
+
+	@Test
+	public void testSetEmailsWhenThreeOnlyOneWithDomain() {
+		ObmUser obmUser = new ObmUser();
+		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
+		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR)
+				.join("one", "two@anotherdomain.org", "three");
+		
+		mocksControl.replay();
+		userDao.setEmailAndAlias(obmUser, dbEmails);
+		mocksControl.verify();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org", "three");
+	}
 }
