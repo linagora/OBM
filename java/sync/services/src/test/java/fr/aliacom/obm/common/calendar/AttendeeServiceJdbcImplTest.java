@@ -124,7 +124,7 @@ public class AttendeeServiceJdbcImplTest {
 	@Before
 	public void setUp() {
 		domain = ToolBox.getDefaultObmDomain();
-		johnDoe = johnDoe();
+		johnDoe = johnDoe(domain);
 		externalContact = externalContact();
 		resource = resource();
 		userDao = createMockBuilder(UserDao.class)
@@ -163,15 +163,14 @@ public class AttendeeServiceJdbcImplTest {
 				.build();
 	}
 	
-	private ObmUser johnDoe() {
-		ObmUser johnDoe = new ObmUser();
-		
-		johnDoe.setUid(1);
-		johnDoe.setEmail("johndoe@test.tlse.lng");
-		johnDoe.setDomain(domain);
-		johnDoe.setEntityId(2);
-		
-		return johnDoe;
+	private ObmUser johnDoe(ObmDomain userDomain) {
+		return ObmUser.builder()
+				.uid(1)
+				.entityId(2)
+				.login("johndoe@test.tlse.lng")
+				.domain(userDomain)
+				.emailAndAliases("johndoe@test.tlse.lng")
+				.build();
 	}
 	
 	private Contact externalContact() {

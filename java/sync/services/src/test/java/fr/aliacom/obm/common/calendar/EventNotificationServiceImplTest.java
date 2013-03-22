@@ -33,7 +33,6 @@ package fr.aliacom.obm.common.calendar;
 
 import static fr.aliacom.obm.ServicesToolBox.getDefaultSettings;
 import static fr.aliacom.obm.ServicesToolBox.getDefaultSettingsService;
-import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.compareCollections;
@@ -43,10 +42,10 @@ import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.l
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.easymock.EasyMock.expect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -886,9 +885,7 @@ public class EventNotificationServiceImplTest {
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
 
-			ObmUser calendarOwner = new ObmUser();
-			calendarOwner.setEmail("foo@attendee");
-			calendarOwner.setDomain(getDefaultObmDomain());
+			ObmUser calendarOwner = ToolBox.getDefaultObmUserWithEmails("foo@attendee");
 
 			Ical4jUser replyIcal4jUser = ServicesToolBox.getIcal4jUser(calendarOwner);
 
@@ -939,10 +936,8 @@ public class EventNotificationServiceImplTest {
 			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
-			
-			ObmUser attendeeUser = new ObmUser();
-			attendeeUser.setEmail(attendee.getEmail());
-			attendeeUser.setDomain(getDefaultObmDomain());
+
+			ObmUser attendeeUser = ToolBox.getDefaultObmUserWithEmails(attendee.getEmail());
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
@@ -955,7 +950,7 @@ public class EventNotificationServiceImplTest {
 			
 			UserService userService = EasyMock.createMock(UserService.class);
 
-			ObmUser organizerUser = new ObmUser();
+			ObmUser organizerUser = ToolBox.getDefaultObmUser();
 			EasyMock.expect(userService.getUserFromLogin(organizer.getEmail(), defaultObmUser.getDomain().getName()))
 				.andReturn(organizerUser).once();
 
@@ -994,10 +989,8 @@ public class EventNotificationServiceImplTest {
 			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
-			
-			ObmUser attendeeUser = new ObmUser();
-			attendeeUser.setEmail(attendee.getEmail());
-			attendeeUser.setDomain(getDefaultObmDomain());
+
+			ObmUser attendeeUser = ToolBox.getDefaultObmUserWithEmails(attendee.getEmail());
 			
 			Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
 			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
@@ -1045,14 +1038,9 @@ public class EventNotificationServiceImplTest {
 			event.setStartDate(after());
 			event.addAttendee(attendee);
 			event.addAttendee(organizer);
-			
-			ObmUser attendeeUser = new ObmUser();
-			attendeeUser.setEmail(attendee.getEmail());
-			attendeeUser.setDomain(getDefaultObmDomain());
-			
-			ObmUser organizerUser = new ObmUser();
-			attendeeUser.setEmail(attendee.getEmail());
-			attendeeUser.setDomain(getDefaultObmDomain());
+
+			ObmUser attendeeUser = ToolBox.getDefaultObmUserWithEmails(attendee.getEmail());
+			ObmUser organizerUser = ToolBox.getDefaultObmUserWithEmails(organizer.getEmail());
 			
 			AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 

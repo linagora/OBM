@@ -449,7 +449,7 @@ public class CalendarBindingImplTest {
 		expect(calendarFactory.createIcal4jUserFromObmUser(defaultUser)).andReturn(ical4jUser).anyTimes();		
 		
 		HelperService rightsHelper = mockRightsHelper(defaultUser.getLogin(), accessToken);
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, icsData, eventWithOwnerAttendee);
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(defaultUser.getUid(), ical4jUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, defaultUser.getLogin(), defaultUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, defaultUser.getLogin(), defaultUser, eventExtId, eventWithOwnerAttendee);
 		
@@ -623,7 +623,7 @@ public class CalendarBindingImplTest {
 		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
 		expect(calendarFactory.createIcal4jUserFromObmUser(defaultUser)).andReturn(ical4jUser).anyTimes();
 
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, icsData, eventWithOwnerAttendee);
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(defaultUser.getUid(), ical4jUser, icsData, eventWithOwnerAttendee);
 		UserService userService = mockImportICSUserService(accessToken, fakeUserAttendee, defaultUser.getLogin(), defaultUser);
 		CalendarDao calendarDao = mockImportICalendarCalendarDao(accessToken, defaultUser.getLogin(), defaultUser, eventExtId, eventWithOwnerAttendee);
 		
@@ -1172,9 +1172,9 @@ public class CalendarBindingImplTest {
 		verify(mocks);
 	}
 	
-	private Ical4jHelper mockIcal4jHelper(Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
+	private Ical4jHelper mockIcal4jHelper(Integer ownerId, Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
 		Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-		expect(ical4jHelper.parseICS(icsData, ical4jUser, 0)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
+		expect(ical4jHelper.parseICS(icsData, ical4jUser, ownerId)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
 		return ical4jHelper;
 	}
 	
@@ -1224,14 +1224,20 @@ public class CalendarBindingImplTest {
 		String calendar = "toto";
 		String email = calendar + "@" + defaultUser.getDomain().getName();
 		String ics = "icsData";
-		
-		ObmUser obmUser = new ObmUser();
-		obmUser.setEmail(email);
+
+		ObmUser obmUser = ObmUser.builder()
+			.uid(1)
+			.entityId(2)
+			.login("user")
+			.domain(defaultUser.getDomain())
+			.emailAndAliases(email)
+			.build();
 		
 		Event eventFromIcs = new Event();
 		eventFromIcs.setExtId(extId);
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
+		int accessTokenId = 0;
 		HelperService helper = mockRightsHelper(calendar, accessToken);
 		
 		UserService userService = createMock(UserService.class);
@@ -1241,7 +1247,7 @@ public class CalendarBindingImplTest {
 		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
 		expect(calendarFactory.createIcal4jUserFromObmUser(obmUser)).andReturn(ical4jUser).anyTimes();
 		
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(ical4jUser, ics, eventFromIcs);
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(accessTokenId, ical4jUser, ics, eventFromIcs);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, extId)).andReturn(eventFromDao).once();
@@ -2442,13 +2448,10 @@ public class CalendarBindingImplTest {
 
 	@Test
 	public void testCreateInternalWhenOwnerUseAliasInEvent() throws Exception {
-		ObmUser user = ToolBox.getDefaultObmUser();
-		String userEmail = user.getEmail();
 		String userEventAlias = "alias2@obm.org";
+		ObmUser user = ToolBox.getDefaultObmUserWithEmails("main@obm.org", "alias1@obm.org", userEventAlias, "alias3@obm.org");
+		String userEmail = user.getEmail();
 		String attendeeEmail = "test@obm.org";
-		user.addAlias("alias1@obm.org");
-		user.addAlias(userEventAlias);
-		user.addAlias("alias3@obm.org");
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();

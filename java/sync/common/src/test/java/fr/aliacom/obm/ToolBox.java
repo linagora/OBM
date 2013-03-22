@@ -49,10 +49,12 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.ObmUser.Builder;
 
 public class ToolBox {
 
@@ -109,14 +111,23 @@ public class ToolBox {
 	}
 
 	public static ObmUser getDefaultObmUser() {
-		ObmDomain obmDomain = getDefaultObmDomain();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setFirstName("Obm");
-		obmUser.setLastName("User");
-		obmUser.setLogin("user");
-		obmUser.setEmail("user@test");
-		obmUser.setDomain(obmDomain);
-		return obmUser;
+		return buildCommonObmUser().build();
+	}
+	
+	public static ObmUser getDefaultObmUserWithEmails(String...userEmails) {
+		String formatedUserEmails = Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join(userEmails);
+		return buildCommonObmUser().emailAndAliases(formatedUserEmails).build();
+	}
+
+	private static Builder buildCommonObmUser() {
+		return ObmUser.builder()
+			.uid(1)
+			.entityId(2)
+			.login("user")
+			.domain(getDefaultObmDomain())
+			.emailAndAliases("user@test")
+			.firstName("Obm")
+			.lastName("User");
 	}
 
 	public static Attendee getFakeAttendee(String userEmail) {

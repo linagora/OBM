@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
+import static fr.aliacom.obm.common.user.ObmUser.EMAIL_FIELD_SEPARATOR;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
@@ -38,6 +39,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -60,42 +62,57 @@ public class ObmUserTest {
 	@Test
 	public void testGetEmailWithoutDomain() {
 		String email = "user1";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
-
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(email)
+				.build();
+		
 		assertThat(obmUser.getEmail()).isEqualTo(email + "@" +domainName);
 	}
 	
 	@Test
 	public void testGetEmailWithDomain() {
 		String email = "user1@obmsync.test";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
-
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(email)
+				.build();
+		
 		assertThat(obmUser.getEmail()).isEqualTo(email);
 	}
 
 	@Test
 	public void testMainThenAliasEmails() {
-		String email = "user1@obmsync.test";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
-		obmUser.addAlias("user2");
-		obmUser.addAlias("user3");
+		String emails = Joiner.on(EMAIL_FIELD_SEPARATOR).join("user1@obmsync.test", "user2", "user3");
 
-		assertThat(obmUser.buildAllEmails()).containsExactly(
-				email, "user2@obmsync.test", "user3@obmsync.test");
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(emails)
+				.build();
+
+		assertThat(obmUser.buildAllEmails()).containsOnly(
+				"user1@obmsync.test", "user2@obmsync.test", "user3@obmsync.test");
 	}
 
 	@Test
 	public void testMainThenAliasEmailsWhenSimpleMainEmail() {
 		String email = "user1";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(email)
+				.build();
 
 		assertThat(obmUser.buildAllEmails()).containsExactly(email + "@" + domainName);
 	}
@@ -103,24 +120,147 @@ public class ObmUserTest {
 	@Test
 	public void testMainThenAliasEmailsWhenNoAlias() {
 		String email = "user1@obmsync.test";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(email)
+				.build();
 
 		assertThat(obmUser.buildAllEmails()).containsExactly(email);
 	}
 
 	@Test
 	public void testMainThenAliasEmailsAliasWithDomain() {
-		String email = "user1@obmsync.test";
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domain);
-		obmUser.setEmail(email);
-		obmUser.addAlias("user2@obmsync.test");
-		obmUser.addAlias("user3");
+		String emails = Joiner.on(EMAIL_FIELD_SEPARATOR).join("user1@obmsync.test", "user2@obmsync.test", "user3");
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domain)
+				.emailAndAliases(emails)
+				.build();
 
-		assertThat(obmUser.buildAllEmails()).containsExactly(
-				email, "user2@obmsync.test", "user3@obmsync.test");
+		assertThat(obmUser.buildAllEmails()).containsOnly(
+				"user1@obmsync.test", "user2@obmsync.test", "user3@obmsync.test");
+	}
+
+	
+	@Test(expected=NullPointerException.class)
+	public void testSetEmailsWhenNull() {
+		ObmUser.builder()
+			.uid(5)
+			.entityId(6)
+			.login("any")
+			.domain(ObmDomain.builder().id(1).name("obm.org").build())
+			.emailAndAliases(null)
+			.build();
+	}
+
+	@Test
+	public void testSetEmailsWhenEmpty() {
+		ObmUser obmUser = ObmUser.builder()
+			.uid(5)
+			.entityId(6)
+			.login("any")
+			.domain(ObmDomain.builder().id(1).name("obm.org").build())
+			.emailAndAliases("")
+			.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("@obm.org");
+		assertThat(obmUser.getEmailAlias()).isEmpty();
+	}
+
+	@Test
+	public void testSetEmailsWhenOne() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases("one")
+				.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).isEmpty();
+	}
+
+	@Test
+	public void testSetEmailsWhenTwo() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two"))
+				.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two");
+	}
+
+	@Test
+	public void testSetEmailsWhenThree() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two", "three"))
+				.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two", "three");
+	}
+
+	@Test
+	public void testSetEmailsWhenOneWithDomain() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases("one@anotherdomain.org")
+				.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAlias()).isEmpty();
+	}
+
+	@Test
+	public void testSetEmailsWhenTwoWithDomain() {
+		String dbEmails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("one@anotherdomain.org", "two@anotherdomain.org");
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases(dbEmails)
+				.build();
+		
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org");
+	}
+
+	@Test
+	public void testSetEmailsWhenThreeOnlyOneWithDomain() {
+		String dbEmails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("one", "two@anotherdomain.org", "three");
+
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(ObmDomain.builder().id(1).name("obm.org").build())
+				.emailAndAliases(dbEmails)
+				.build();
+		
+		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org", "three");
 	}
 
 	@Test
@@ -131,11 +271,15 @@ public class ObmUserTest {
 			.aliases(ImmutableSet.of("obm.org"))
 			.build();
 
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domainWithAliases);
-		obmUser.setEmail("user1");
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domainWithAliases)
+				.emailAndAliases("user1")
+				.build();
 
-		assertThat(obmUser.buildAllEmails()).containsExactly(
+		assertThat(obmUser.buildAllEmails()).containsOnly(
 				"user1@obmsync.test", "user1@obm.org");
 	}
 
@@ -147,29 +291,39 @@ public class ObmUserTest {
 				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
 				.build();
 
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domainWithAliases);
-		obmUser.setEmail("user1");
 
-		assertThat(obmUser.buildAllEmails()).containsExactly(
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domainWithAliases)
+				.emailAndAliases("user1")
+				.build();
+
+		assertThat(obmUser.buildAllEmails()).containsOnly(
 				"user1@obmsync.test", "user1@obm.org", "user1@rasta.rocket");
 	}
 
 	@Test
 	public void testMainThenAliasEmailsWhenThreeLoginAndThreeDomain() {
+		String dbEmails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("user1", "user2", "user3");
+		
 		ObmDomain domainWithAliases = ObmDomain.builder()
 				.id(5)
 				.name(domainName)
 				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
 				.build();
 
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domainWithAliases);
-		obmUser.setEmail("user1");
-		obmUser.addAlias("user2");
-		obmUser.addAlias("user3");
-
-		assertThat(obmUser.buildAllEmails()).containsExactly(
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domainWithAliases)
+				.emailAndAliases(dbEmails)
+				.build();
+		
+		assertThat(obmUser.buildAllEmails()).containsOnly(
 				"user1@obmsync.test", 	"user2@obmsync.test", 	"user3@obmsync.test",
 				"user1@obm.org", 		"user2@obm.org", 		"user3@obm.org",
 				"user1@rasta.rocket", 	"user2@rasta.rocket", 	"user3@rasta.rocket");
@@ -177,17 +331,22 @@ public class ObmUserTest {
 
 	@Test
 	public void testMainThenAliasEmailsWhenThreeLoginWithDomainAndThreeDomain() {
+		String dbEmails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("user1", "user2@one.org", "user3@two.org");
+		
 		ObmDomain domainWithAliases = ObmDomain.builder()
 				.id(5)
 				.name(domainName)
 				.aliases(ImmutableSet.of("obm.org", "rasta.rocket"))
 				.build();
 
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(domainWithAliases);
-		obmUser.setEmail("user1");
-		obmUser.addAlias("user2@one.org");
-		obmUser.addAlias("user3@two.org");
+		ObmUser obmUser = ObmUser.builder()
+				.uid(5)
+				.entityId(6)
+				.login("any")
+				.domain(domainWithAliases)
+				.emailAndAliases(dbEmails)
+				.build();
 
 		assertThat(obmUser.buildAllEmails()).containsOnly(
 				"user1@obmsync.test", "user1@obm.org", "user1@rasta.rocket",

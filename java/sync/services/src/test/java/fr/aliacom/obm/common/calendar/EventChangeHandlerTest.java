@@ -208,7 +208,7 @@ public class EventChangeHandlerTest {
 
 	@Test
 	public void testOBMFULL4510updateParticipation() {
-		ObmUser calendarOwner = new ObmUser();
+		ObmUser calendarOwner = ToolBox.getDefaultObmUser();
 
 		jmsService.writeIcsInvitationReply(token, previousEvent, calendarOwner);
 		expectLastCall().once();

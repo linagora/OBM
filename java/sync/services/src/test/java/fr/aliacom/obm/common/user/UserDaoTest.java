@@ -52,7 +52,6 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
@@ -271,129 +270,12 @@ public class UserDaoTest {
 		expect(rs.getString(4)).andReturn(domainAlias);
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void testSetEmailsWhenNull() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = null;
-		
-		mocksControl.replay();
-		try {
-			userDao.setEmailAndAlias(obmUser, dbEmails);
-		} catch (NullPointerException e) {
-			mocksControl.verify();
-			throw e;
-		}
-	}
-
-	@Test
-	public void testSetEmailsWhenEmpty() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = "";
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("@obm.org");
-		assertThat(obmUser.getEmailAlias()).isNull();
-	}
-
-	@Test
-	public void testSetEmailsWhenOne() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = "one";
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
-		assertThat(obmUser.getEmailAlias()).isNull();
-	}
-
-	@Test
-	public void testSetEmailsWhenTwo() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR).join("one", "two");
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
-		assertThat(obmUser.getEmailAlias()).containsOnly("two");
-	}
-
-	@Test
-	public void testSetEmailsWhenThree() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR).join("one", "two", "three");
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
-		assertThat(obmUser.getEmailAlias()).containsOnly("two", "three");
-	}
-
-	@Test
-	public void testSetEmailsWhenOneWithDomain() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = "one@anotherdomain.org";
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
-		assertThat(obmUser.getEmailAlias()).isNull();
-	}
-
-	@Test
-	public void testSetEmailsWhenTwoWithDomain() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR)
-				.join("one@anotherdomain.org", "two@anotherdomain.org");
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
-		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org");
-	}
-
-	@Test
-	public void testSetEmailsWhenThreeOnlyOneWithDomain() {
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(ObmDomain.builder().id(1).name("obm.org").build());
-		String dbEmails = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR)
-				.join("one", "two@anotherdomain.org", "three");
-		
-		mocksControl.replay();
-		userDao.setEmailAndAlias(obmUser, dbEmails);
-		mocksControl.verify();
-		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
-		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org", "three");
-	}
-	
 	@Test
 	public void testObmUserFromResultSet() throws Exception {
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(5);
 		expect(rs.getString("userobm_login")).andReturn("login");
 		expect(rs.getString(2)).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
-		expect(rs.getString(3)).andReturn("firstname");
-		expect(rs.getString(4)).andReturn("lastname");
 		expect(rs.getString(5)).andReturn("yes");
 		expect(rs.getString(6)).andReturn(null);
 		expect(rs.wasNull()).andReturn(true);
@@ -407,18 +289,18 @@ public class UserDaoTest {
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSet(domain, rs);
 		mocksControl.verify();
-		
-		ObmUser expectedObmUser = new ObmUser();
-		expectedObmUser.setDomain(domain);
-		expectedObmUser.setUid(5);
-		expectedObmUser.setLogin("login");
-		expectedObmUser.setEmail("useremail");
-		expectedObmUser.setEmailAlias(ImmutableList.of("useremail2"));
-		expectedObmUser.setFirstName("firstname2");
-		expectedObmUser.setLastName("lastname2");
-		expectedObmUser.setPublicFreeBusy(true);
-		expectedObmUser.setCommonName("commonname");
-		expectedObmUser.setEntityId(6);
+
+		ObmUser expectedObmUser = ObmUser.builder()
+			.uid(5)
+			.entityId(6)
+			.login("login")
+			.domain(domain)
+			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))
+			.firstName("firstname2")
+			.lastName("lastname2")
+			.commonName("commonname")
+			.publicFreeBusy(true)
+			.build();
 		
 		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);
 	}

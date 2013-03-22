@@ -131,7 +131,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
 
 @RunWith(SlowFilterRunner.class)
 public class Ical4jHelperTest {
@@ -210,12 +209,7 @@ public class Ical4jHelperTest {
 	}
 	
 	protected Ical4jUser getDefaultObmUser() {
-		ObmUser obmUser = new ObmUser();
-		ObmDomain obmDomain = getDefaultObmDomain();
-		
-		obmUser.setDomain(obmDomain);
-		
-		return Ical4jUser.Factory.create().createIcal4jUser("test@test.obm.lng.org", obmDomain);
+		return Ical4jUser.Factory.create().createIcal4jUser("test@test.obm.lng.org", getDefaultObmDomain());
 	}
 
 	protected ObmDomain getDefaultObmDomain() {

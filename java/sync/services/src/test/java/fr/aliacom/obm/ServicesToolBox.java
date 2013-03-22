@@ -55,24 +55,27 @@ public class ServicesToolBox {
 	}
 
 	public static ObmUser getDefaultObmUser(){
-		ObmDomain obmDomain = getDefaultObmDomain();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setFirstName("Obm");
-		obmUser.setLastName("User");
-		obmUser.setLogin("user");
-		obmUser.setEmail("user@test");
-		obmUser.setDomain(obmDomain);
-		return obmUser;
+		return ObmUser.builder()
+			.uid(1)
+			.entityId(2)
+			.login("user")
+			.domain(getDefaultObmDomain())
+			.emailAndAliases("user@test")
+			.firstName("Obm")
+			.lastName("User")
+			.build();
 	}
 
 	public static ObmUser getSpecificObmUserFrom(String email, String firstName, String lastName) {
-		ObmDomain obmDomain = getDefaultObmDomain();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setFirstName(firstName);
-		obmUser.setLastName(lastName);
-		obmUser.setEmail(email);
-		obmUser.setDomain(obmDomain);
-		return obmUser;
+		return ObmUser.builder()
+			.uid(1)
+			.entityId(2)
+			.login("user")
+			.domain(getDefaultObmDomain())
+			.emailAndAliases(email)
+			.firstName(firstName)
+			.lastName(lastName)
+			.build();
 	}
 
 	public static Ical4jUser getIcal4jUser() {

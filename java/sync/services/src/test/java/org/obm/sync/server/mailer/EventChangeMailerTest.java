@@ -91,6 +91,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ServicesToolBox;
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.MailService;
 import fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -804,7 +805,7 @@ public abstract class EventChangeMailerTest {
 	public void testBuildUpdateParticipationDatamodel() {
 		Event event = new Event();
 		event.setStartDate(new Date());
-		ObmUser obmUser = new ObmUser();
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
 		Participation status = Participation.accepted();
 		status.setComment(new Comment(null));
 

@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
+import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -94,9 +95,7 @@ public class UserServiceImplTest {
 		String userEmail = "User@domain";
 		String domainName = "domain";
 		ObmDomain obmDomain = ObmDomain.builder().name(domainName).build();
-		ObmUser obmUser = new ObmUser();
-		obmUser.setDomain(obmDomain);
-		obmUser.setEmail(userEmail);
+		ObmUser obmUser = ServicesToolBox.getSpecificObmUserFrom(userEmail, "firstname", "lastname");
 
 		DomainService domainService = EasyMock.createMock(DomainService.class);
 		expect(domainService.findDomainByName(domainName)).andReturn(obmDomain).once();

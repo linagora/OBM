@@ -55,7 +55,7 @@ import fr.aliacom.obm.utils.ObmHelper;
 @Singleton
 public class UserDao {
 
-	public  static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
+	public static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
@@ -221,32 +221,17 @@ public class UserDao {
 	}
 
 	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
-		ObmUser obmUser;
-		obmUser = new ObmUser();
-		obmUser.setUid(rs.getInt(1));
-		obmUser.setLogin(rs.getString("userobm_login"));
-		obmUser.setDomain(domain);
-		setEmailAndAlias(obmUser, rs.getString(2));
-		obmUser.setFirstName(rs.getString(3));
-		obmUser.setLastName(rs.getString(4));
-		obmUser.setPublicFreeBusy(computePublicFreeBusy(5, rs));
-		obmUser.setFirstName(rs.getString("userobm_firstname"));
-		obmUser.setLastName(rs.getString("userobm_lastname"));
-		obmUser.setCommonName(rs.getString("userobm_commonname"));
-		obmUser.setEntityId(rs.getInt("userentity_entity_id"));
-		
-		return obmUser;
-	}
-
-	@VisibleForTesting void setEmailAndAlias(ObmUser obmUser, String emails) {
-		Iterable<String> emailAndAlias = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emails);
-		for (String emailOrAlias: emailAndAlias) {
-			if (obmUser.getEmail() == null) {
-				obmUser.setEmail(emailOrAlias);	
-			} else {
-				obmUser.addAlias(emailOrAlias);
-			}			
-		}
+		return ObmUser.builder()
+				.uid(rs.getInt(1))
+				.login(rs.getString("userobm_login"))
+				.emailAndAliases(rs.getString(2))
+				.domain(domain)
+				.firstName(rs.getString("userobm_firstname"))
+				.lastName(rs.getString("userobm_lastname"))
+				.publicFreeBusy(computePublicFreeBusy(5, rs))
+				.commonName(rs.getString("userobm_commonname"))
+				.entityId(rs.getInt("userentity_entity_id"))
+				.build();
 	}
 	
 	public ObmUser findUserById(int id, ObmDomain domain) {

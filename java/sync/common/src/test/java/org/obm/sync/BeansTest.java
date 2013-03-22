@@ -58,6 +58,7 @@ import org.obm.sync.items.EventChanges;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.trust.TrustToken;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -89,6 +90,30 @@ public class BeansTest {
 				UserAttendee.class, ContactAttendee.class, ResourceAttendee.class,
 				CommitedElement.class,
 				EmailAddress.class);
+	}
+	
+	@Test
+	public void testObmUser() {
+		EqualsVerifierUtils
+			.createEqualsVerifier(ObmUser.class)
+			.withPrefabValues(ObmUser.class, 
+					ObmUser.builder()
+						.login("creator")
+						.emailAndAliases("createdBy@obm.org")
+						.domain(ObmDomain.builder()
+							.id(3)
+							.name("obm.org")
+							.build())
+						.build(), 
+					ObmUser.builder()
+						.login("updater")
+						.emailAndAliases("updatedBy@obm.org")
+						.domain(ObmDomain.builder()
+							.id(3)
+							.name("obm.org")
+							.build())
+						.build())
+			.verify();
 	}
 	
 	@Test
