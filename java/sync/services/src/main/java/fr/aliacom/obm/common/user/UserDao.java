@@ -220,7 +220,7 @@ public class UserDao {
 		return obmUser;
 	}
 
-	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
+	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
 		ObmUser obmUser;
 		obmUser = new ObmUser();
 		obmUser.setUid(rs.getInt(1));

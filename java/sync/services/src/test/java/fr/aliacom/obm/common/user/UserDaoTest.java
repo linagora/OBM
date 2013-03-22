@@ -52,6 +52,7 @@ import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
@@ -383,5 +384,42 @@ public class UserDaoTest {
 		
 		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
 		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org", "three");
+	}
+	
+	@Test
+	public void testObmUserFromResultSet() throws Exception {
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		expect(rs.getInt(1)).andReturn(5);
+		expect(rs.getString("userobm_login")).andReturn("login");
+		expect(rs.getString(2)).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
+		expect(rs.getString(3)).andReturn("firstname");
+		expect(rs.getString(4)).andReturn("lastname");
+		expect(rs.getString(5)).andReturn("yes");
+		expect(rs.getString(6)).andReturn(null);
+		expect(rs.wasNull()).andReturn(true);
+		expect(rs.getString("userobm_firstname")).andReturn("firstname2");
+		expect(rs.getString("userobm_lastname")).andReturn("lastname2");
+		expect(rs.getString("userobm_commonname")).andReturn("commonname");
+		expect(rs.getInt("userentity_entity_id")).andReturn(6);
+		
+		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
+
+		mocksControl.replay();
+		ObmUser obmUser = userDao.createUserFromResultSet(domain, rs);
+		mocksControl.verify();
+		
+		ObmUser expectedObmUser = new ObmUser();
+		expectedObmUser.setDomain(domain);
+		expectedObmUser.setUid(5);
+		expectedObmUser.setLogin("login");
+		expectedObmUser.setEmail("useremail");
+		expectedObmUser.setEmailAlias(ImmutableList.of("useremail2"));
+		expectedObmUser.setFirstName("firstname2");
+		expectedObmUser.setLastName("lastname2");
+		expectedObmUser.setPublicFreeBusy(true);
+		expectedObmUser.setCommonName("commonname");
+		expectedObmUser.setEntityId(6);
+		
+		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);
 	}
 }
