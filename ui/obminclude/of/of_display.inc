@@ -1421,7 +1421,7 @@ function display_actions($section, $module) {
     return display_actions_theme($section, $module);
   }
   global $modules, $action, $display;
-  global $actions, $perm, $display;
+  global $actions, $perm;
 
   beautify_title($module, $action);
 
@@ -1431,33 +1431,29 @@ function display_actions($section, $module) {
     foreach ($actions[$module] as $key => $value) {
       // If the current action has this action in target
       if (!in_array("!$action",$value['Condition']) 
-        && (in_array('all', $value['Condition'])
-	|| in_array($action, $value['Condition']))) {
-	if (($module_right & $value['Right']) == $value['Right']) {
+        && (in_array('all', $value['Condition']) || in_array($action, $value['Condition'])) ) {
 
+        if (($module_right & $value['Right']) == $value['Right']) {
           $tooltip = $value['Tooltip'];
 
-	  if ($value['Popup'] == 1) {
-	    if ($value['Target']) {
-	      $wtarget = "window.name='" . $value['Target'] . "';";
-	    }
-	    $content = "
+          if ($value['Popup'] == 1) {
+            if ($value['Target']) {
+              $wtarget = "window.name='" . $value['Target'] . "';";
+            }
+            $content = "
               <a href=\"\" 
               title=\"".$value['tooltip']."\" 
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
-	      ".$value['Name']."</a> &nbsp;";
-	  } else {
-	    $content = "
-               <a href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
+              ".$value['Name']."</a> &nbsp;";
+          } else {
+            $content = "<a href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
           }
           $block .= "<li onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" >$content</li>";
-	}
+        }
       }
     }
     $block .= "</ul>"; 
-    
   }
-
   return $block;
 }
 

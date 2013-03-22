@@ -1671,7 +1671,7 @@ Obm.CalendarInDayEvent = new Class({
      /* this.timeContainer = new Element('span').injectInside(this.dragHandler);*/
       this.timeContainer.injectInside(this.dragHandler);
     } else {
-      this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
+      this.timeContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id+'&user_id='+this.event.entity_id );
       if ( this.event.periodic )
         this.timeContainer.addEvent('click', function(evt){
           evt.preventDefault();
@@ -1930,7 +1930,7 @@ Obm.CalendarAllDayEvent = new Class({
       /*this.titleContainer = new Element('span').injectInside(this.dragHandler);*/
       this.titleContainer.injectInside(this.dragHandler);
     } else {
-      this.titleContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id);
+      this.titleContainer = new Element('a').setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id+'&user_id='+this.event.entity_id);
       if (obm.vars.consts.action == 'portlet') this.titleContainer.setProperty('target', '_blank');
       this.titleContainer.injectInside(this.dragHandler);
     
