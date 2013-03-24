@@ -140,7 +140,7 @@ Obm.CalendarManager = new Class({
 	  var startWeek = obm.vars.consts.startTime.getTime();
 	}
 	var endWeekDate = new Obm.DateTime(startWeek);
-	endWeekDate.addDays(6);
+	endWeekDate.addDays(7);
 	var indexMs = evt.event.index*1000;
 	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday);
       }
