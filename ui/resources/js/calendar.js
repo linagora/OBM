@@ -142,7 +142,16 @@ Obm.CalendarManager = new Class({
 	var endWeekDate = new Obm.DateTime(startWeek);
 	endWeekDate.addDays(7);
 	var indexMs = evt.event.index*1000;
-	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday);
+	
+	// So you wonder why the (allday=)true below? Here's why:
+	// The grid now considers that the week ends 7 days after its start, which
+	// makes sense I guess :p The problem with non all-day events that spans multiple
+	// days is that they will appear on 3 days and thus, go past the endof the grid.
+	// This is caused by an edge case of the algorithm in the getDaysCount() method
+	// but is worked around by simulating the behaviour of allday events.
+	// Reading the getDaysCount() method code will also probably help to understand
+	// the edge case and why we did it this way.
+	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), true);
       }
     }
     return size;
