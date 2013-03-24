@@ -5292,6 +5292,16 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   return $alerts;
 }
 
+function allday_start_date($date, $tz) {
+  $date->setTimezone(new DateTimeZone($tz));
+  
+  // The line below will correctly transform 00:00 in the event timezone
+  // to 00:00 in the local timezone, because Of_Date without a timezone uses
+  // the default one (i.e.: the local one).
+  // A side effect is that it will also transform 12:34 to 00:00 the same day
+  // which is fine anyway because allday events starts at 00:00..
+  return new Of_Date($date->format('Y-m-d'));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
@@ -5317,16 +5327,20 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $location = $nr_q->f('event_location'); 
       $category1 = $nr_q->f('eventcategory1_label');
       $priority = $nr_q->f('event_priority');
+      $all_day = $nr_q->f('event_allday');
+      $timezone = $nr_q->f('event_timezone');
       $date = new Of_Date($nr_q->f('event_date'),'GMT');
+      if ($all_day == 1) {
+        $date = allday_start_date($date, $timezone);
+      }
+      
       $color = $nr_q->f('event_color');
       $duration = $nr_q->f('event_duration');
-      $all_day = $nr_q->f('event_allday');
       $entity = $nr_q->f('eventlink_entity');
       $entity_id = $nr_q->f('eventlink_entity_id');
       $entity_state = $nr_q->f('eventlink_state');
       $owner = $nr_q->f('event_owner');
       $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
-      $timezone = $nr_q->f('event_timezone');
       $opacity = $nr_q->f('event_opacity');
       $tag = $nr_q->f('eventtag_id');
       if (isset($of->events[$id])) {
@@ -5351,12 +5365,17 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $properties = $r_q->f('event_properties');
       $location = $r_q->f('event_location');
       $category1 = $r_q->f('eventcategory1_label');
+      $all_day = $r_q->f('event_allday');
+      $timezone = $r_q->f('event_timezone');
       $date = new Of_Date($r_q->f('event_date'), 'GMT');
+      if ($all_day == 1) {
+        $date = allday_start_date($date, $timezone);
+      }
+      
       $duration = $r_q->f('event_duration');
       $repeatkind = $r_q->f('event_repeatkind');
       $endrepeat = new Of_Date($r_q->f('event_endrepeat'), 'GMT');
       $entity = $r_q->f('eventlink_entity');
-      $all_day = $r_q->f('event_allday');
       $color = $r_q->f('event_color');
       $repeatfrequence = $r_q->f('event_repeatfrequence');
       $repeatdays = $r_q->f('event_repeatdays');
@@ -5365,7 +5384,6 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $all_day = $r_q->f('event_allday');    
       $owner = $r_q->f('event_owner');
       $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
-      $timezone = $r_q->f('event_timezone');
       $opacity = $r_q->f('event_opacity');
       $tag = $r_q->f('eventtag_id');
 
