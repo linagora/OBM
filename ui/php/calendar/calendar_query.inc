@@ -2343,7 +2343,7 @@ function run_query_calendar_quick_event_update($calendar) {
   }
   $all = $calendar['all'];
   if ($all != 1) {
-    $event_date = "event_date = '$datebegin',";
+    $event_date = "event_date = '$datebegin', event_timezone = '" . $datebegin->getTimezone()->getName() . "',";
   }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
