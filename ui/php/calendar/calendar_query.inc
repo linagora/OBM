@@ -985,7 +985,7 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
   $location = sql_parse_text($calendar['location']);
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
   $datebegin = $calendar['date_begin'];
-  $event_duration = $calendar['event_duration'];
+  $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
   if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1;
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
@@ -1027,17 +1027,6 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
-  if($all_day == 'TRUE') {
-    //FIXME: all following could be simplified with
-    // if ($mod = $event_duration % 86400)
-    //     $event_duration += 86400 - $mod;
-    // $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $dateend = clone $datebegin;
-    $dateend->addSecond($event_duration - 1);
-    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $event_duration = $dateend->diffTimestamp($datebegin);
-  }
 
   $query = "INSERT INTO Event (
     event_ext_id,
@@ -2182,6 +2171,17 @@ function run_query_calendar_event_update(&$calendar, $sel_entity_id, $event_id, 
 
 }
 
+function event_duration($datebegin, $duration, $allDay) {
+  if (!$allDay) {
+    return $duration;
+  }
+  
+  $dateend = clone $datebegin;
+  $dateend->addSecond($duration);
+  $durationInDays = $datebegin->daysCount($dateend);
+  
+  return $durationInDays * 24 * 60 * 60;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Event Data Update Execution
@@ -2197,8 +2197,8 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   $description = sql_parse_text($calendar['description']);
   $location = sql_parse_text($calendar['location']);
   $datebegin = $calendar['date_begin'];
-  $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
+  $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
   $event_id = sql_parse_id( $calendar['calendar_id'], true); 
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'] ? $calendar['repeat_kind'] : "none";
@@ -3248,7 +3248,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $alert = sql_parse_int($calendar['alert']);
   $all_day = ($calendar['all_day'] != 1) ? 'FALSE' : 'TRUE';
   $datebegin = $calendar['date_begin'];
-  $event_duration = $calendar['event_duration'];
+  $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
   $privacy = ($calendar['privacy'] != 1) ? 0 : 1;
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
@@ -3295,13 +3295,6 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
-  if($all_day == 'TRUE') {
-    $dateend = clone $datebegin;
-    $dateend->addSecond($event_duration - 1);
-    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
-    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
-    $event_duration = $dateend->diffTimestamp($datebegin);
-  }
   
   if (isset($calendar['template_id'])) {
     $template_id = (int) $calendar['template_id'];

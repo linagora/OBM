@@ -1383,6 +1383,23 @@ class Of_Date extends DateTime {
   public function diffWeek($week, $format=null) {
     return $this->_diff(self::WEEK, $week, $format);
   }
+  
+  public function daysCount($date) {
+    if ($this->getTimestamp() > $date->getTimestamp()) {
+      $start = clone $date;
+      $stop = $this;
+    } else {
+      $start = clone $this;
+      $stop = $date;
+    }
+    
+    $days = 1;
+    while ( $start->format("Y-m-d") != $stop->format("Y-m-d") ) {
+      $start->addDay(1);
+      $days++;
+    }
+    return $days;
+  }
 
   /**
    * Set a part of a date with the given date coresponding
