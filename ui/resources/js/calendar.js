@@ -88,7 +88,7 @@ Obm.CalendarManager = new Class({
     $('todayHourMarker').style.top = (d.getHours()*3600 + d.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
-  getDaysCount: function(time, duration, allday) {
+  getDaysCount: function(time, duration, allday, inclusive) {
       if ( duration < 0 ) {
 	return false;
       }
@@ -99,6 +99,11 @@ Obm.CalendarManager = new Class({
       firstDate.setNoon();
       var endTime = time+duration;
       var lastDate =  new Obm.DateTime(endTime);
+      
+      if (!allday && lastDate.format("H:i:s") == "00:00:00") {
+          lastDate.setDate((lastDate.getDate() - 1));
+      }
+      
       lastDate.setNoon();
       
       /**
@@ -107,20 +112,20 @@ Obm.CalendarManager = new Class({
        * In case of allday events, they must appear as (<duration in days>), thus
        * the variable initialization below.
        */
-      var days = allday ? 0 : 1;
+      var days = inclusive ? 1 : 0;
       while ( lastDate.format("Y-m-d") != firstDate.format("Y-m-d") ) {
           days++;
           firstDate.setTime( (firstDate.getTime() + (24*60*60*1000) ) );
           firstDate.setNoon();
       }
-      return days;
+      
+      return days == 0 ? 1 : days;
   },
   /* get number of days of all day events */
   _getSizeOfAllDayEvts: function(evt, begin) {
     var size = null;
     var allday = evt.event.all_day == 1;
-    size = this.getDaysCount( (evt.event.time*1000), (evt.event.duration*1000), allday );
-    if (size == 0) size = 1; // very, very crappy fix 
+    size = this.getDaysCount( (evt.event.time*1000), (evt.event.duration*1000), allday, !allday );
 
     // Extensions
     if (obm.vars.consts.calendarRange == 'month') {
@@ -130,8 +135,7 @@ Obm.CalendarManager = new Class({
 	if ( evt.event.right ) {
 	  size = 7;
 	} else {
-	  size = this.getDaysCount(begin, evt.event.duration*1000 - ( begin- (evt.event.time*1000) ), allday );
-	  if (size == 0) size = 1; // very, very crappy fix 
+	  size = this.getDaysCount(begin, evt.event.duration*1000 - ( begin- (evt.event.time*1000) ), allday, !allday );
 	}
       } else if (evt.event.right) {
 	try {
@@ -143,7 +147,7 @@ Obm.CalendarManager = new Class({
 	endWeekDate.addDays(7);
 	var indexMs = evt.event.index*1000;
 	
-	// So you wonder why the (allday=)true below? Here's why:
+	// So you wonder why the false below? Here's why:
 	// The grid now considers that the week ends 7 days after its start, which
 	// makes sense I guess :p The problem with non all-day events that spans multiple
 	// days is that they will appear on 3 days and thus, go past the endof the grid.
@@ -151,7 +155,7 @@ Obm.CalendarManager = new Class({
 	// but is worked around by simulating the behaviour of allday events.
 	// Reading the getDaysCount() method code will also probably help to understand
 	// the edge case and why we did it this way.
-	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), true);
+	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday, false);
       }
     }
     return size;
