@@ -5296,6 +5296,13 @@ function allday_start_date($date, $tz) {
   return new Of_Date($date->format('Y-m-d'));
 }
 
+function allday_actual_duration($date, $duration) {
+  $end = clone $date;
+  $end->addDay(Of_Date::allDayDurationInDays($duration));
+  
+  return $end->diffTimestamp($date);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
 // Parameters: 
@@ -5323,12 +5330,13 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $all_day = $nr_q->f('event_allday');
       $timezone = $nr_q->f('event_timezone');
       $date = new Of_Date($nr_q->f('event_date'),'GMT');
+      $duration = $nr_q->f('event_duration');
       if ($all_day == 1) {
         $date = allday_start_date($date, $timezone);
+        $duration = allday_actual_duration($date, $duration);
       }
       
       $color = $nr_q->f('event_color');
-      $duration = $nr_q->f('event_duration');
       $entity = $nr_q->f('eventlink_entity');
       $entity_id = $nr_q->f('eventlink_entity_id');
       $entity_state = $nr_q->f('eventlink_state');
@@ -5361,11 +5369,12 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $all_day = $r_q->f('event_allday');
       $timezone = $r_q->f('event_timezone');
       $date = new Of_Date($r_q->f('event_date'), 'GMT');
+      $duration = $r_q->f('event_duration');
       if ($all_day == 1) {
         $date = allday_start_date($date, $timezone);
+        $duration = allday_actual_duration($date, $duration);
       }
       
-      $duration = $r_q->f('event_duration');
       $repeatkind = $r_q->f('event_repeatkind');
       $endrepeat = new Of_Date($r_q->f('event_endrepeat'), 'GMT');
       $entity = $r_q->f('eventlink_entity');

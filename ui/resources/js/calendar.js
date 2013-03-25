@@ -130,7 +130,7 @@ Obm.CalendarManager = new Class({
 	if ( evt.event.right ) {
 	  size = 7;
 	} else {
-	  size = size - this.getDaysCount(begin, ( begin- (evt.event.time*1000) ), allday );
+	  size = this.getDaysCount(begin, evt.event.duration*1000 - ( begin- (evt.event.time*1000) ), allday );
 	  if (size == 0) size = 1; // very, very crappy fix 
 	}
       } else if (evt.event.right) {

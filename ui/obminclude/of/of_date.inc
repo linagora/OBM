@@ -1862,4 +1862,14 @@ class Of_Date extends DateTime {
   public function __wakeup() {
     parent::__construct($this->serialized);
   }
+  
+  public static function allDayDurationInDays($duration) {
+    $days = ceil($duration / 86400);
+  
+    if ( $days == 0 ) {
+      $days = 1;
+    }
+  
+    return $days;
+  }
 }

@@ -3032,6 +3032,20 @@ function event_details_access_rights() {
   }
   return $access_type;
 }
+
+function event_end_date($begin, $duration, $allDay) {
+  $end = clone $begin;
+  
+  if ($allDay) {
+    $end->addDay(Of_Date::allDayDurationInDays($duration));
+    $end->subSecond(1);
+  } else {
+    $end->addSecondsInUTC($duration);
+  }
+  
+  return $end;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
@@ -3116,11 +3130,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   }
   $all_day = $event_q->f('event_allday');
   $begin = ( $date_edit_occurrence != null ) ? new Of_Date($date_edit_occurrence, 'GMT') : new Of_Date($event_q->f('event_date'), 'GMT');
-  $end = clone $begin;
-  $end->addSecondsInUTC($event_q->f('event_duration'));
+  $end = event_end_date($begin, $event_q->f('event_duration'), $all_day == 1);
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td>$GLOBALS[l_yes]</td></tr>";
-    $end->subSecond(1);
     $begin = $begin->getOutputDate();
     $end = $end->getOutputDate();
   } else {
@@ -3687,11 +3699,9 @@ function html_calendar_event_consult_ext($event, $exception_q, $attendees, $aler
   }
   $all_day = $event->isAllDay();
   $begin = new Of_Date($event->getDtstart(), 'GMT');
-  $end = clone $begin;
-  $end->addSecond($event->getDuration());
+  $end = event_end_date($begin, $event->getDuration(), $all_day);
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td>$GLOBALS[l_yes]</td></tr>";
-    $end->subSecond(1);
     $begin = $begin->getOutputDate();
     $end = $end->getOutputDate();
   } else {
@@ -4639,8 +4649,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     if ($action == 'conflict_manager') {
       $begin = $calendar['date_begin'];
-      $end = clone $begin;
-      $end->addSecondsInUTC($calendar['duration']);
     } else {
       $begin = $date_edit_occurrence == null ? new Of_Date($event_q->f('event_date'), 'GMT') : new Of_Date($date_edit_occurrence);
       if (isset($calendar['template_id']) && $action == 'new') {
@@ -4649,13 +4657,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         $begin->setMonth($today->getMonth());
         $begin->setYear($today->getYear());
       }
-      $end = clone $begin;
-      $end->addSecondsInUTC($event_q->f('event_duration'));
     }
     $all_day = $event_q->f('event_allday');
-    if($all_day) {
-      $end->subMinute(1);
-    }
+    $end = event_end_date($begin, $event_q->f('event_duration'), $all_day == 1);
     $privacy = $event_q->f('event_privacy');
     $allow_documents = $event_q->f('event_allow_documents');
     if ($date_edit_occurrence == null) {
