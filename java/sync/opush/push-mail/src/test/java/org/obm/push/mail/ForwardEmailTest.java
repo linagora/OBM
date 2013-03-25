@@ -123,7 +123,7 @@ public class ForwardEmailTest {
 		
 		ForwardEmail forwardEmail = 
 				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, ms);
-		
+
 		Message mimeMessage = forwardEmail.getMimeMessage();
 		String messageAsString = mime4jUtils.toString(mimeMessage.getBody());
 		

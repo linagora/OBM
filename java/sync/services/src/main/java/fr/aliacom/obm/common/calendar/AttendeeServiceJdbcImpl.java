@@ -152,7 +152,7 @@ public class AttendeeServiceJdbcImpl implements AttendeeService {
 				.builder()
 				.entityId(contact.getEntityId())
 				.displayName(DisplayNameUtils.getDisplayName(contact.getCommonname(), contact.getFirstname(), contact.getLastname()))
-				.email(Iterables.get(contact.getEmails().values(), 0).getEmailAddress())
+				.email(Iterables.get(contact.getEmails().values(), 0).get())
 				.build();
 	}
 

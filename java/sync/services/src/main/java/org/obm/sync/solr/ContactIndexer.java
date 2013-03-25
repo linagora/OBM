@@ -181,7 +181,7 @@ public class ContactIndexer extends SolrRequest {
 
 			LinkedList<String> mails = new LinkedList<String>();
 			for (EmailAddress e : c.getEmails().values()) {
-				mails.add(e.getEmailAddress());
+				mails.add(e.get());
 			}
 			f(sid, "email", mails);
 

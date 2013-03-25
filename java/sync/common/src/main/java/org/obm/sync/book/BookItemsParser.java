@@ -135,7 +135,7 @@ public class BookItemsParser extends AbstractItemsParser {
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "mail", attrs);
 		for (String[] p : values) {
-			c.addEmail(p[0], new EmailAddress(p[1]));
+			c.addEmail(p[0], EmailAddress.loginAtDomain(p[1]));
 		}
 	}
 

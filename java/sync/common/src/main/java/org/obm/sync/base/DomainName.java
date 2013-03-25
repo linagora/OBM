@@ -33,68 +33,34 @@ package org.obm.sync.base;
 
 import java.io.Serializable;
 
-import org.obm.push.utils.UserEmailParserUtils;
-import org.obm.sync.book.IMergeable;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
-public class EmailAddress implements IMergeable, Serializable {
-	
-	public static final String AT = "@";
+public class DomainName implements Serializable {
 
-	public static EmailAddress loginAtDomain(String loginAtDomain) {
-		UserEmailParserUtils userEmailParserUtils = new UserEmailParserUtils();
-		Preconditions.checkArgument(userEmailParserUtils.isAddress(loginAtDomain));
-		return new EmailAddress(
-				new EmailLogin(userEmailParserUtils.getLogin(loginAtDomain)),
-				new DomainName(userEmailParserUtils.getDomain(loginAtDomain)));
-	}
-	
-	public static EmailAddress loginAndDomain(EmailLogin login, DomainName domain) {
-		Preconditions.checkArgument(login != null, "login is required");
-		Preconditions.checkArgument(domain != null, "domain is required");
-		return new EmailAddress(login, domain);
-	}
+	private final String domain;
 
-	private final EmailLogin login;
-	private final DomainName domain;
-	private final String loginAtDomain;
-
-	private EmailAddress(EmailLogin login, DomainName domain) {
-		this.login = login;
-		this.domain = domain;
-		this.loginAtDomain = login.get() + AT + domain.get();
+	public DomainName(String domain) {
+		Preconditions.checkArgument(
+				!Strings.isNullOrEmpty(domain) && !domain.contains(EmailAddress.AT), "Illegal domain");
+		this.domain = domain.toLowerCase();
 	}
 
 	public String get() {
-		return loginAtDomain;
-	}
-
-	public EmailLogin getLogin() {
-		return login;
-	}
-
-	public DomainName getDomain() {
 		return domain;
 	}
 
 	@Override
-	public void merge(IMergeable previous) {
-		//do nothing on merge
-	}
-
-	@Override
 	public final int hashCode() {
-		return Objects.hashCode(login, domain);
+		return Objects.hashCode(domain);
 	}
 	
 	@Override
 	public final boolean equals(Object object) {
-		if (object instanceof EmailAddress) {
-			EmailAddress that = (EmailAddress) object;
-			return Objects.equal(this.login, that.login)
-				&& Objects.equal(this.domain, that.domain);
+		if (object instanceof DomainName) {
+			DomainName that = (DomainName) object;
+			return Objects.equal(this.domain, that.domain);
 		}
 		return false;
 	}
@@ -102,7 +68,6 @@ public class EmailAddress implements IMergeable, Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("login", login)
 			.add("domain", domain)
 			.toString();
 	}

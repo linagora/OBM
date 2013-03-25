@@ -73,6 +73,7 @@ public class ReplyEmailTest {
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isTrue();
 		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
@@ -85,6 +86,7 @@ public class ReplyEmailTest {
 	public void testReplyCopyOfAddress() throws IOException, MimeException, NotQuotableEmailException {
 		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
 		Message reply = loadMimeMessage("plainText.eml");
+
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
 	
@@ -101,6 +103,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+		
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.getCharset()).isEqualToIgnoringCase("UTF-8");
 	}
@@ -112,6 +115,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/plain");
@@ -128,6 +132,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isTrue();
 		assertThat(message.getMimeType()).isEqualTo("multipart/mixed");
@@ -147,6 +152,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/plain");
@@ -164,6 +170,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/html");
@@ -181,6 +188,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/plain");
@@ -197,6 +205,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/html");
@@ -214,6 +223,7 @@ public class ReplyEmailTest {
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isTrue();
 		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
@@ -237,6 +247,7 @@ public class ReplyEmailTest {
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/html");
@@ -253,6 +264,7 @@ public class ReplyEmailTest {
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isTrue();
 		assertThat(message.getMimeType()).isEqualTo("multipart/alternative");
@@ -276,6 +288,7 @@ public class ReplyEmailTest {
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isFalse();
 		assertThat(message.getMimeType()).isEqualTo("text/plain");
@@ -293,6 +306,7 @@ public class ReplyEmailTest {
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
+
 		Message message = replyEmail.getMimeMessage();
 		assertThat(message.isMultipart()).isTrue();
 		assertThat(message.getMimeType()).isEqualTo("multipart/mixed");

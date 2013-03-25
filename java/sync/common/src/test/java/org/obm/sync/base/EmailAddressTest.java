@@ -42,63 +42,95 @@ public class EmailAddressTest {
 
 	@Test
 	public void testEqualWhenSame() {
-		EmailAddress first = new EmailAddress("one@domain.org");
-		EmailAddress second = new EmailAddress("one@domain.org");
+		EmailAddress first = EmailAddress.loginAtDomain("one@domain.org");
+		EmailAddress second = EmailAddress.loginAtDomain("one@domain.org");
 		assertThat(first.equals(second)).isTrue();
 		assertThat(second.equals(first)).isTrue();
 	}
 
 	@Test
 	public void testEqualWhenDifferentLogin() {
-		EmailAddress first = new EmailAddress("one@domain.org");
-		EmailAddress second = new EmailAddress("two@domain.org");
+		EmailAddress first = EmailAddress.loginAtDomain("one@domain.org");
+		EmailAddress second = EmailAddress.loginAtDomain("two@domain.org");
 		assertThat(first.equals(second)).isFalse();
 		assertThat(second.equals(first)).isFalse();
 	}
 
 	@Test
 	public void testEqualWhenDifferentDomain() {
-		EmailAddress first = new EmailAddress("one@domain.org");
-		EmailAddress second = new EmailAddress("one@other.org");
+		EmailAddress first = EmailAddress.loginAtDomain("one@domain.org");
+		EmailAddress second = EmailAddress.loginAtDomain("one@other.org");
 		assertThat(first.equals(second)).isFalse();
 		assertThat(second.equals(first)).isFalse();
 	}
 
 	@Test
 	public void testEqualWhenDifferentLoginCase() {
-		EmailAddress first = new EmailAddress("oNe@domain.org");
-		EmailAddress second = new EmailAddress("one@domain.org");
+		EmailAddress first = EmailAddress.loginAtDomain("oNe@domain.org");
+		EmailAddress second = EmailAddress.loginAtDomain("one@domain.org");
 		assertThat(first.equals(second)).isTrue();
 		assertThat(second.equals(first)).isTrue();
 	}
 
 	@Test
 	public void testEqualWhenDifferentDomainCase() {
-		EmailAddress first = new EmailAddress("one@domaiN.org");
-		EmailAddress second = new EmailAddress("one@domain.org");
+		EmailAddress first = EmailAddress.loginAtDomain("one@domaiN.org");
+		EmailAddress second = EmailAddress.loginAtDomain("one@domain.org");
 		assertThat(first.equals(second)).isTrue();
 		assertThat(second.equals(first)).isTrue();
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void testNullAddress() {
-		assertThat(new EmailAddress(null)).isNull();
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testEmptyAddress() {
-		assertThat(new EmailAddress("")).isNull();
-	}
-
-	@Test
-	public void testAddress() {
-		assertThat(new EmailAddress("login@domain.org").getEmailAddress())
-			.isEqualTo("login@domain.org");
-	}
-	
 	@Test
 	public void testAddressToLowerCase() {
-		assertThat(new EmailAddress("loGin@domain.Org").getEmailAddress())
-			.isEqualTo("login@domain.org");
+		EmailAddress loginAtDomain = EmailAddress.loginAtDomain("loGin@domain.Org");
+		assertThat(loginAtDomain.get()).isEqualTo("login@domain.org");
+		assertThat(loginAtDomain.getLogin()).isEqualTo(new EmailLogin("login"));
+		assertThat(loginAtDomain.getDomain()).isEqualTo(new DomainName("domain.org"));
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testLoginAtDomainNull() {
+		EmailAddress.loginAtDomain(null);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testLoginAtDomainEmpty() {
+		EmailAddress.loginAtDomain("");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testLoginAtDomainNotAddress() {
+		EmailAddress.loginAtDomain("loginatdomain.org");
+	}
+
+	@Test
+	public void testLoginAtDomain() {
+		EmailAddress emailAddress = EmailAddress.loginAtDomain("login@domain.org");
+		assertThat(emailAddress.get()).isEqualTo("login@domain.org");
+		assertThat(emailAddress.getLogin()).isEqualTo(new EmailLogin("login"));
+		assertThat(emailAddress.getDomain()).isEqualTo(new DomainName("domain.org"));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testLoginAndDomainNullDomainAndLogin() {
+		EmailAddress.loginAndDomain(null, null);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testLoginAndDomainNullLogin() {
+		EmailAddress.loginAndDomain(null, new DomainName("domain.org"));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testLoginAndDomainNullDomain() {
+		EmailAddress.loginAndDomain(new EmailLogin("login"), null);
+	}
+
+	@Test
+	public void testLoginAndDomain() {
+		EmailAddress emailAddress = EmailAddress.loginAndDomain(new EmailLogin("login"), new DomainName("domain.org"));
+		assertThat(emailAddress.get()).isEqualTo("login@domain.org");
+		assertThat(emailAddress.getLogin()).isEqualTo(new EmailLogin("login"));
+		assertThat(emailAddress.getDomain()).isEqualTo(new DomainName("domain.org"));
 	}
 }

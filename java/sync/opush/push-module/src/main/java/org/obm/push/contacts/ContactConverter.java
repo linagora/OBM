@@ -169,11 +169,11 @@ public class ContactConverter {
 		String ret = null;
 		EmailAddress p = c.getEmails().get(lbl);
 		if (p != null) {
-			ret = p.getEmailAddress();
+			ret = p.get();
 		} else {
 			p = c.getEmails().get("PREF;" + lbl);
 			if (p != null) {
-				ret = p.getEmailAddress();
+				ret = p.get();
 			}
 		}
 		return ret;
@@ -285,7 +285,7 @@ public class ContactConverter {
 
 	private void addEmail(Contact oc, String label, String email) {
 		if (email != null) {
-			oc.addEmail(label, new EmailAddress(email));
+			oc.addEmail(label, EmailAddress.loginAtDomain(email));
 		}
 	}
 
@@ -303,7 +303,7 @@ public class ContactConverter {
 		SearchResult.Builder searchResultBuilder = SearchResult.builder();
 		searchResultBuilder.displayName(c.getFirstname()+" "+c.getLastname());
 		if(c.getEmails().values().iterator().hasNext()){
-			searchResultBuilder.emailAddress(c.getEmails().values().iterator().next().getEmailAddress());
+			searchResultBuilder.emailAddress(c.getEmails().values().iterator().next().get());
 		}
 		searchResultBuilder.homePhone(obmPhone(c, "HOME;VOICE;X-OBM-Ref1"));
 		searchResultBuilder.mobilePhone(obmPhone(c, "CELL;VOICE;X-OBM-Ref1"));

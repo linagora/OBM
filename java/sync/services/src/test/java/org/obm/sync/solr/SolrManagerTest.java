@@ -150,7 +150,7 @@ public class SolrManagerTest {
 		contact.setUid(1);
 		contact.setBirthdayId(new EventObmId(1));
 		contact.addAddress("Test", new Address("", "", "", "", "", ""));
-		contact.addEmail("Test", new EmailAddress(""));
+		contact.addEmail("Test", EmailAddress.loginAtDomain("login@domain"));
 		contact.addIMIdentifier("Test", new InstantMessagingId("", ""));
 		contact.addWebsite(new Website("Test", ""));
 		contact.addPhone("Test", new Phone(""));

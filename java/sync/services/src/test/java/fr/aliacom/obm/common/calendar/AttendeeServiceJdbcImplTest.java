@@ -177,7 +177,7 @@ public class AttendeeServiceJdbcImplTest {
 		Contact contact = new Contact();
 		
 		contact.setUid(1);
-		contact.addEmail("label", new EmailAddress("external.to@my.domain"));
+		contact.addEmail("label", EmailAddress.loginAtDomain("external.to@my.domain"));
 		contact.setCommonname("external");
 		contact.setEntityId(2);
 		

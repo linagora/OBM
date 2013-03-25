@@ -412,7 +412,7 @@ public class ContactDao {
 		
 		c.setLastname(Objects.firstNonNull(name, ""));
 		c.setFirstname("");
-		c.addEmail("INTERNET;X-OBM-Ref1", new EmailAddress(email));
+		c.addEmail("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain(email));
 		c.setCollected(true);
 		
 		logger.info("Attendee {} not found in OBM, will create a contact.", email);
@@ -684,7 +684,7 @@ public class ContactDao {
 			for (Entry<String, EmailAddress> entry: emails.entrySet()) {
 				ps.setInt(1, entityId);
 				ps.setString(2, entry.getKey());
-				ps.setString(3, entry.getValue().getEmailAddress());
+				ps.setString(3, entry.getValue().get());
 				ps.addBatch();
 			}
 			ps.executeBatch();
@@ -1001,7 +1001,7 @@ public class ContactDao {
 				
 				contact.setUid(rs.getInt("contact_id"));
 				contact.setEntityId(rs.getInt("contactentity_entity_id"));
-				contact.addEmail(rs.getString("email_label"), new EmailAddress(email));
+				contact.addEmail(rs.getString("email_label"), EmailAddress.loginAtDomain(email));
 				contact.setCommonname(rs.getString("contact_commonname"));
 				contact.setFirstname(rs.getString("contact_firstname"));
 				contact.setLastname(rs.getString("contact_lastname"));
@@ -1030,7 +1030,7 @@ public class ContactDao {
 			rs = st.executeQuery();
 			while (rs.next()) {
 				Contact c = entityContact.get(rs.getInt(1));
-				EmailAddress p = new EmailAddress(rs.getString(3));
+				EmailAddress p = EmailAddress.loginAtDomain(rs.getString(3));
 				c.addEmail(rs.getString(2), p);
 			}
 		} catch (SQLException se) {
@@ -1370,7 +1370,7 @@ public class ContactDao {
 			}
 
 			for (String s : c.getEmails().keySet()) {
-				ps.setString(idx++, c.getEmails().get(s).getEmailAddress()
+				ps.setString(idx++, c.getEmails().get(s).get()
 						.toLowerCase());
 			}
 

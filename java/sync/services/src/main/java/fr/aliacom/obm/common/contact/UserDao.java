@@ -152,7 +152,7 @@ public class UserDao {
 		c.setTitle(rs.getString("userobm_title"));
 		c.setComment(rs.getString("userobm_description"));
 			
-		c.addEmail(ContactLabel.EMAIL.getContactLabel(), new EmailAddress(
+		c.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain(
 				getEmail(rs.getString("userobm_email"), at.getDomain().getName())));
 		
 		addPhonesToContact(rs, c);
