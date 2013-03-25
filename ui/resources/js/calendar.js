@@ -1068,10 +1068,6 @@ Obm.CalendarManager = new Class({
     eventData.title = evt.event.title;
     eventData.all_day = evt.event.all_day;
     eventData.periodic = evt.event.periodic;
-    if (eventData.duration == 86400) {
-      eventData.duration = 3600;
-      eventData.all_day = 1;
-    }
     eventData.opacity = evt.event.opacity;
     return eventData;
   },
