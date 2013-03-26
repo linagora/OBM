@@ -40,6 +40,7 @@ import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.sync.exception.InvalidContactException;
 import org.w3c.dom.Document;
 
 public class SyncClientException {
@@ -50,17 +51,21 @@ public class SyncClientException {
 		}
 	}
 
-	public void checkCreateContactException(Document doc) throws ServerFault, NoPermissionException {
+	public void checkCreateContactException(Document doc)
+			throws ServerFault, NoPermissionException, InvalidContactException {
 		if (documentIsError(doc)) {
 			throwNoPermissionException(doc);
+			throwInvalidContactException(doc);
 			checkServerFaultException(doc);
 		}
 	}
 	
-	public void checkModifyContactException(Document doc) throws ContactNotFoundException, ServerFault, NoPermissionException {
+	public void checkModifyContactException(Document doc)
+			throws ContactNotFoundException, ServerFault, NoPermissionException, InvalidContactException {
 		if (documentIsError(doc)) {
 			throwContactNotFoundException(doc);
 			throwNoPermissionException(doc);
+			throwInvalidContactException(doc);
 			checkServerFaultException(doc);
 		}
 	}
@@ -116,7 +121,15 @@ public class SyncClientException {
 			throw new ContactNotFoundException(message);
 		}
 	}
-	
+
+	private void throwInvalidContactException(Document doc) throws InvalidContactException {
+		String message = getErrorMessage(doc);
+		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
+		if (InvalidContactException.class.getName().equals(type)) {
+			throw new InvalidContactException(message);
+		}
+	}
+
 	private void throwEventAlreadyExistException(Document doc) throws EventAlreadyExistException {
 		String message = getErrorMessage(doc);
 		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");

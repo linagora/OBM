@@ -49,6 +49,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -58,6 +59,7 @@ import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -72,7 +74,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	private final Locator Locator;
 
 	@Inject
-	private BookClient(SyncClientException syncClientException, Locator Locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+	@VisibleForTesting BookClient(SyncClientException syncClientException, Locator Locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		super(syncClientException, obmSyncLogger);
 		this.Locator = Locator;
 		this.respParser = new BookItemsParser();
@@ -81,7 +83,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
-			throws ServerFault, NoPermissionException {
+			throws ServerFault, NoPermissionException, InvalidContactException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
@@ -154,7 +156,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactNotFoundException {
+			throws ServerFault, NoPermissionException, ContactNotFoundException, InvalidContactException {
 		
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
