@@ -88,7 +88,7 @@ Obm.CalendarManager = new Class({
     $('todayHourMarker').style.top = (d.getHours()*3600 + d.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
-  getDaysCount: function(time, duration, allday, inclusive) {
+  getDaysCount: function(time, duration, allday, inclusive, partial) {
       if ( duration < 0 ) {
 	return false;
       }
@@ -100,7 +100,7 @@ Obm.CalendarManager = new Class({
       var endTime = time+duration;
       var lastDate =  new Obm.DateTime(endTime);
       
-      if (!allday && lastDate.format("H:i:s") == "00:00:00") {
+      if (!partial && !allday && lastDate.format("H:i:s") == "00:00:00") {
           lastDate.setDate((lastDate.getDate() - 1));
       }
       
@@ -135,7 +135,7 @@ Obm.CalendarManager = new Class({
 	if ( evt.event.right ) {
 	  size = 7;
 	} else {
-	  size = this.getDaysCount(begin, evt.event.duration*1000 - ( begin- (evt.event.time*1000) ), allday, !allday );
+	  size = this.getDaysCount(begin, evt.event.duration*1000 - ( begin- (evt.event.time*1000) ), allday, !allday, false );
 	}
       } else if (evt.event.right) {
 	try {
@@ -155,7 +155,7 @@ Obm.CalendarManager = new Class({
 	// but is worked around by simulating the behaviour of allday events.
 	// Reading the getDaysCount() method code will also probably help to understand
 	// the edge case and why we did it this way.
-	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday, false);
+	size = this.getDaysCount(indexMs, (endWeekDate.getTime() - indexMs), allday, false, true);
       }
     }
     return size;
