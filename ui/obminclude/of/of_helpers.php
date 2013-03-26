@@ -80,7 +80,7 @@ function wd_unaccent_compare_ci($a, $b)
 
 function get_localized_countries_array() {
   $countries = include(dirname(__FILE__)."/../lib/Stato/i18n/data/countries/".SI18n::get_locale().".php");
-  if (is_array($countries)) usort($countries, 'wd_unaccent_compare_ci');
+  if (is_array($countries)) uasort($countries, 'wd_unaccent_compare_ci');
   return $countries;
 }
 

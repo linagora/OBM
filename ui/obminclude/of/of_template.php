@@ -145,12 +145,9 @@ class OBM_Template {
       else $return .= '<option value="'.$label.'">'.$locale.'</option>';
     }
 
-    $country = $value['country_iso3166'];
+    $country = (!empty($value['address_country'])) ? $value['address_country'] : $value['country_iso3166'];
     $countries = get_localized_countries_array();
-    if (!$value['country_iso3166'] && $value['country_iso3166']!==0 && $value['country_iso3166']!=='0') {
-      $value['country_iso3166'] = 69;
-    }
-    $sel_countries = self::__setlist('addresses['.$addressIndex.'][country_iso3166]', $countries, __('Country'), $value['country_iso3166'], true, '');
+    $sel_countries = self::__setlist('addresses['.$addressIndex.'][country_iso3166]', $countries, __('Country'), $country, true, '');
 
     
     $return .= '
