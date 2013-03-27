@@ -148,4 +148,44 @@ public class DateUtilsTest {
 		Timestamp timestamp = DateUtils.toTimestamp(date);
 		assertThat(timestamp.getTime()).isEqualTo(currentTimeMillis);
 	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithNullId() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier(null)).isFalse();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithEmptyId() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("")).isFalse();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithWhitespaceOnlyId() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("   ")).isFalse();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithUnknownId() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("ThisIsNotAValidTimezoneIdentifier")).isFalse();
+	}
+
+	@Test
+	public void testIsValidTimeZoneIdentifier() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("UTC")).isTrue();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithEtcGMT() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("Etc/GMT")).isTrue();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithEuropeParis() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("Europe/Paris")).isTrue();
+	}
+	
+	@Test
+	public void testIsValidTimeZoneIdentifierWithAmericaGuadeloupe() {
+		assertThat(DateUtils.isValidTimeZoneIdentifier("America/Guadeloupe")).isTrue();
+	}
 }

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.sync.base.Category;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.EventChanges;
@@ -115,7 +116,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setOwnerEmail(s(e, "ownerEmail"));
 		ev.setOwnerDisplayName(owner);
 		String tz = s(e, "tz");
-		if (tz == null || tz.trim().length() == 0) {
+		if (!DateUtils.isValidTimeZoneIdentifier(tz)) {
 			tz = "Europe/Paris";
 		}
 		ev.setTimezoneName(tz);

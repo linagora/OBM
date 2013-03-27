@@ -32,12 +32,14 @@
 package org.obm.push.utils;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 import org.joda.time.Duration;
 
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
 public class DateUtils {
@@ -136,5 +138,9 @@ public class DateUtils {
 	
 	public static Timestamp toTimestamp(Date date) {
 		return new Timestamp(date.getTime()) ;
+	}
+
+	public static boolean isValidTimeZoneIdentifier(String tzId) {
+		return Iterables.contains(Arrays.asList(TimeZone.getAvailableIDs()), tzId);
 	}
 }
