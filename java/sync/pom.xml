@@ -33,7 +33,7 @@
 		<guava.version>14.0.1</guava.version>
 		<powermock.version>1.4.12</powermock.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
-		<commons-io.version>2.3</commons-io.version>
+		<commons-io.version>2.4</commons-io.version>
     <commons-validator.version>1.4.0</commons-validator.version>
 		<jms.version>1.1</jms.version>
 		<netty.version>3.5.9.Final</netty.version>		
