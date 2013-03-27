@@ -15,7 +15,7 @@
 	<version>2.5.0.0-SNAPSHOT</version>
 
 	<properties>
-		<mailapi.version>1.4.3</mailapi.version>
+		<mailapi.version>1.4.7</mailapi.version>
 		<backport-util-concurrent.version>3.1</backport-util-concurrent.version>
 	</properties>
 
