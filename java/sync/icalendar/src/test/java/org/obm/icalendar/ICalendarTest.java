@@ -34,11 +34,10 @@ package org.obm.icalendar;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.Assert;
-
 import net.fortuna.ical4j.data.ParserException;
 
 import org.fest.assertions.api.Assertions;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ICalendarTest {

@@ -34,10 +34,9 @@ package org.obm.push.store.ehcache;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

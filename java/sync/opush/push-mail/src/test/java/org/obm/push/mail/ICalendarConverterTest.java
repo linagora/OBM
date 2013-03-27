@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
 
-import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -43,6 +42,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;

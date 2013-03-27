@@ -39,10 +39,10 @@ import java.nio.charset.Charset;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.hamcrest.core.StringContains;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;

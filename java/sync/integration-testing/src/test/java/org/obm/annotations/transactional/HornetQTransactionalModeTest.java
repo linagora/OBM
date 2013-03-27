@@ -35,14 +35,15 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.configuration.TestConfigurationModule;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
@@ -51,10 +52,6 @@ import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
-
-import org.obm.configuration.TestConfigurationModule;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class HornetQTransactionalModeTest {

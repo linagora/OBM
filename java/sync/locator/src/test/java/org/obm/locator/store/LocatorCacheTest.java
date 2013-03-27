@@ -31,22 +31,19 @@ package org.obm.locator.store;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.ConfigurationService;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.LocatorClientImpl;
-
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.locator.LocatorClientException;
+import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
+
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 @RunWith(SlowFilterRunner.class)
 public class LocatorCacheTest {

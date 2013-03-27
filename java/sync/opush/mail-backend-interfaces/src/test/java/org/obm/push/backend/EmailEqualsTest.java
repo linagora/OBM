@@ -33,11 +33,9 @@ package org.obm.push.backend;
 
 import java.util.Date;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import junit.framework.Assert;
-
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Email;
 

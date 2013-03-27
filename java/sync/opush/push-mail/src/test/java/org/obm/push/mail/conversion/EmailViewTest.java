@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.Assert;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.junit.Test;
@@ -349,7 +348,7 @@ public class EmailViewTest {
 	private ICalendar anyICalendar(String filename) throws IOException, ParserException {
 		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("ics/" + filename);
 		if (in == null) {
-			Assert.fail("Cannot load " + filename);
+			throw new RuntimeException("Cannot load " + filename);
 		}
 		return ICalendar.builder().inputStream(in).build();	
 	}

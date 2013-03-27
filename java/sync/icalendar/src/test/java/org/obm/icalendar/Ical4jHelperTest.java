@@ -90,13 +90,13 @@ import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
+import org.hamcrest.core.StringContains;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;

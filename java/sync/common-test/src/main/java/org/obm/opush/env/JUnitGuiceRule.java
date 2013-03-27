@@ -40,7 +40,6 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
-@SuppressWarnings("deprecation")
 public class JUnitGuiceRule implements MethodRule {
 
 	private final Class<? extends Module> moduleClass;

@@ -47,12 +47,11 @@ import javax.mail.internet.MimeMessage;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.hamcrest.core.IsInstanceOf;
+import org.hamcrest.core.StringContains;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.junit.internal.matchers.StringContains;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.obm.filter.SlowFilterRule;

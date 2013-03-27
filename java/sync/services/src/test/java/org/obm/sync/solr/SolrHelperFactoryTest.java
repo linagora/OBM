@@ -35,10 +35,10 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
-import junit.framework.Assert;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.ConfigurationService;

@@ -31,8 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
