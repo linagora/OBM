@@ -436,16 +436,26 @@ find $RPM_BUILD_ROOT -name '.cvsignore' -exec rm -rf {} ';'
 rm -rf $RPM_BUILD_ROOT
 
 %post		-n %{name}-ui
-if [ $1 -eq 1 ] ; then
+if [ "$1" = "1" ] ; then
   chkconfig httpd on &>/dev/null
   if [ -f %{_sbindir}/setsebool ] ; then
     %{_sbindir}/setsebool httpd_can_network_connect=1 &>/dev/null
   fi
+
+  echo "Generating timezone definitions..."
+  php /usr/share/obm-ui/timezone-generator.php -d /usr/share/obm/resources/js/bin/timezone -c
+else
+  touch ~/obm-generate-tz
 fi
 
-echo "Generating timezone definitions..."
-php /usr/share/obm-ui/timezone-generator.php -d /usr/share/obm/resources/js/bin/timezone -c
 
+%posttrans  -n %{name}-ui
+if [ -e ~/obm-generate-tz ]; then
+  rm -f ~/obm-generate-tz
+  
+  echo "Generating timezone definitions..."
+  php /usr/share/obm-ui/timezone-generator.php -d /usr/share/obm/resources/js/bin/timezone -c
+fi
 
 %files
 %defattr(-,root,root,-)
