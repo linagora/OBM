@@ -305,7 +305,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			delta = buildDataDelta(udr, collectionId, token, changes, newSyncKey);
 			
 			logger.info("getContentChanges( {}, lastSync = {} ) => {}",
-				new Object[]{collectionPath.backendName(), newState.getSyncDate(), delta.statistics()});
+				collectionPath.backendName(), newState.getSyncDate(), delta.statistics());
 			
 			return delta;
 		} catch (org.obm.sync.NotAllowedException e) {

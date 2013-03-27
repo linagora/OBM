@@ -239,7 +239,7 @@ public class ImapMailboxService implements MailboxService {
 				IMAPMessage message = getMessage(uid);
 				message.setFlag(flag, status);
 				logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-						new Object[] { uid, collectionPath, imapMailBoxUtils.flagToString(flag), status });
+						uid, collectionPath, imapMailBoxUtils.flagToString(flag), status);
 			}
 		} catch (MessagingException e) {
 			throw new MailException(e);
@@ -331,7 +331,7 @@ public class ImapMailboxService implements MailboxService {
 			assertMoveItemIsSupported(store);
 			
 			logger.debug("Moving email, USER:{} UIDs:{} SRC:{} DST:{}",
-					new Object[] {udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder});
+					udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder);
 
 			return store.moveMessageUID(currentOpushImapFolder(), dstMailBox, messages);
 		} catch (MessagingException e) {
@@ -454,7 +454,7 @@ public class ImapMailboxService implements MailboxService {
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
-					new Object[]{mailboxName, time, Iterables.size(messages)});
+					mailboxName, time, Iterables.size(messages));
 			return messages;
 		} catch (ImapCommandException e) {
 			throw new MailException(e);

@@ -214,7 +214,7 @@ public class LinagoraMailboxService implements MailboxService {
 			fl.add(flag);
 			store.uidStore(messages, fl, status);
 			logger.info("Change flag for mail with UID {} in {} ( {}:{} )",
-					new Object[] { messages, mailboxName, flag.asCommandValue(), status });
+					messages, mailboxName, flag.asCommandValue(), status);
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		}
@@ -266,7 +266,7 @@ public class LinagoraMailboxService implements MailboxService {
 			assertMoveItemIsSupported(store);
 			
 			logger.debug("Moving email, USER:{} UIDs:{} SRC:{} DST:{}",
-					new Object[] {udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder});
+					udr.getUser().getLoginAtDomain(), messages, srcFolder, dstFolder);
 			
 			String srcMailBox = extractMailboxNameFromCollectionPath(udr, srcFolder);
 			String dstMailBox = extractMailboxNameFromCollectionPath(udr, dstFolder);
@@ -420,7 +420,7 @@ public class LinagoraMailboxService implements MailboxService {
 			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
-					new Object[]{collectionPath, time, Iterables.size(messages)});
+					collectionPath, time, Iterables.size(messages));
 			return messages;
 		} catch (IMAPException e) {
 			throw new MailException(e);

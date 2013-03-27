@@ -144,8 +144,8 @@ public class ActiveSyncServlet extends HttpServlet {
 			
 			logger.debug(
 					"query = {}, initial = {}, resume = {}, m = {}, num = {}",
-					new Object[] { request.getQueryString(), continuation.isInitial(),
-							continuation.isResumed(), request.getMethod(), continuation.getReqId() });
+					request.getQueryString(), continuation.isInitial(),
+							continuation.isResumed(), request.getMethod(), continuation.getReqId());
 
 			if (continuation.isResumed() || !continuation.isInitial()) {
 				handleContinuation(request, response, continuation);
@@ -217,7 +217,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		boolean syncAutho = deviceService.syncAuthorized(credentials.getUser(), deviceId);
 		if (syncAutho) {
 			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
-					new Object[]{ credentials.getUser().getEmail(), deviceType });
+					credentials.getUser().getEmail(), deviceType);
 		} else {
 			throw new AuthFault("The device has not been authorized");
 		}

@@ -167,8 +167,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException {
-		logger.info("reset Collection {} For Full Sync devId {}", 
-				new Object[]{collectionId, udr.getDevId()});
+		logger.info("reset Collection {} For Full Sync devId {}", collectionId, udr.getDevId());
 		try {
 			collectionDao.resetCollection(udr.getDevice(), collectionId);
 		} catch (RuntimeException re) {

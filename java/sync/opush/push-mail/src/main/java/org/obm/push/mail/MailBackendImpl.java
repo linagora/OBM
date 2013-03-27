@@ -459,7 +459,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		org.obm.push.bean.ms.MSEmail msEmail = (org.obm.push.bean.ms.MSEmail)data;
 		try {
 			String collectionPath = mappingService.getCollectionPathFor(collectionId);
-			logger.info("createOrUpdate( {}, {}, {} )", new Object[]{collectionPath, serverId, clientId});
+			logger.info("createOrUpdate( {}, {}, {} )", collectionPath, serverId, clientId);
 			if (serverId != null) {
 				MessageSet messages = MessageSet.singleton(getEmailUidFromServerId(serverId));
 				mailboxService.updateReadFlag(udr, collectionPath, messages, msEmail.isRead());
@@ -479,7 +479,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException {
 		
 		try {
-			logger.info("move( messageId =  {}, from = {}, to = {} )", new Object[]{messageId, srcFolder, dstFolder});
+			logger.info("move( messageId =  {}, from = {}, to = {} )", messageId, srcFolder, dstFolder);
 			final Long currentMailUid = getEmailUidFromServerId(messageId);
 			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
 			MessageSet messages = mailboxService.move(udr, srcFolder, dstFolder, MessageSet.singleton(currentMailUid));

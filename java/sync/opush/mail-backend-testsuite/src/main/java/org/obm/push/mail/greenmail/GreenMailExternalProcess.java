@@ -182,8 +182,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 			greenMail.start();
 			greenMail.setUser(mailbox, password);
 			
-			logger.info("GreenMail server is running. Known user : {}/{}",
-					new Object[]{mailbox, password});
+			logger.info("GreenMail server is running. Known user : {}/{}", mailbox, password);
 		}
 	}
 }

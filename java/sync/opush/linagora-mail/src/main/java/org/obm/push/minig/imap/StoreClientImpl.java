@@ -120,7 +120,7 @@ public class StoreClientImpl implements StoreClient {
 	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
 	public void login(Boolean activateTLS) throws IMAPException {
-		logger.debug("login attempt to {}:{} for {}", new Object[]{hostname, port, login});
+		logger.debug("login attempt to {}:{} for {}", hostname, port, login);
 		SocketAddress sa = new InetSocketAddress(hostname, port);
 		clientSupport.login(login, password, sa, activateTLS);
 	}

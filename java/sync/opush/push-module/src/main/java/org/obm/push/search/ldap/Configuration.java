@@ -108,7 +108,7 @@ class Configuration {
 
 	private void logConfiguration() {
 		logger.info("LDAP configuration done, url={} basedn={} filter={} (valid conf={})",
-				new Object[] {url, baseDn, filter, isValidConfiguration()});
+				url, baseDn, filter, isValidConfiguration());
 		if (!isValidConfiguration()) {
 			logger.error("{} configuration seems not valid, ldap connection will not be activated", LDAP_CONF_FILE);
 		}

@@ -135,8 +135,7 @@ public class ImapStoreImpl implements ImapStore {
 
 	@Override
 	public void login() throws ImapLoginException {
-		logger.debug("attempt imap login to {}:{} for user : {}",
-				new Object[]{host, port, userId});
+		logger.debug("attempt imap login to {}:{} for user : {}", host, port, userId);
 		
 		try {
 			store.connect(host, port, userId, password);

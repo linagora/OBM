@@ -134,7 +134,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps.executeUpdate();
 
 			logger.warn("mappings & states cleared for sync of collection {} of device {}",
-					new Object[]{collectionId, device.getDevId()});
+					collectionId, device.getDevId());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {

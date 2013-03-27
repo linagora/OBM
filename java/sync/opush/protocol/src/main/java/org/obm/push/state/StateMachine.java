@@ -156,12 +156,12 @@ public class StateMachine implements IStateMachine {
 	private void log(UserDataRequest udr, ItemSyncState newState) {
 		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
 		logger.info("Allocate new synckey {} for collectionPath {} with {} last sync", 
-				new Object[]{newState.getSyncKey(), collectionPath, newState.getSyncDate()});
+				newState.getSyncKey(), collectionPath, newState.getSyncDate());
 	}
 	
 	private void log(UserDataRequest udr, FolderSyncState newState) {
 		String collectionPath = "obm:\\\\" + udr.getUser().getLoginAtDomain();
 		logger.info("Allocate new synckey {} for collectionPath {}", 
-				new Object[]{newState.getSyncKey(), collectionPath});
+				newState.getSyncKey(), collectionPath);
 	}
 }

@@ -177,8 +177,7 @@ public class ImapClientProviderImpl {
 		final String login = getLogin(udr);
 		
 		try {
-			logger.debug("Creating storeClient with login {} : loginWithDomain = {}", 
-					new Object[]{login, loginWithDomain});
+			logger.debug("Creating storeClient with login {} : loginWithDomain = {}", login, loginWithDomain);
 
 			IMAPStore store = (IMAPStore) defaultSession.getStore(EmailConfiguration.IMAP_PROTOCOL);
 			return imapStoreFactory.create(defaultSession, store, messageInputStreamProvider, login, udr.getPassword(), imapHost);

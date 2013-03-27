@@ -60,11 +60,10 @@ public class HttpErrorResponder {
 	private void returnHttpError(HttpServletRequest httpServletRequest,
 			HttpServletResponse response, int status) {
 		authLogger.info("Invalid authorization format, sending http {} ( uri = {}{}{} )", 
-				new Object[] { 
 					status,
 					httpServletRequest.getMethod(), 
 					httpServletRequest.getRequestURI(), 
-					httpServletRequest.getQueryString()});
+					httpServletRequest.getQueryString());
 		
 		String s = "Basic realm=\"OBMPushService\"";
 		response.setHeader("WWW-Authenticate", s);

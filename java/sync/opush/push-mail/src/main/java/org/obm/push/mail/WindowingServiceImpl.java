@@ -97,7 +97,7 @@ public class WindowingServiceImpl implements WindowingService {
 	public void pushPendingElements(WindowingIndexKey key, SyncKey syncKey, EmailChanges changes, int windowSize) {
 		
 		logger.info("pushing windowing elements, key:{}, syncKey:{}, changes:{}, windowSize:{}", 
-				new Object[]{key, syncKey, changes, windowSize});
+				key, syncKey, changes, windowSize);
 		
 		for (EmailChanges chunk: ImmutableList.copyOf(changes.partition(windowSize)).reverse()) {
 			windowingDao.pushPendingElements(key, syncKey, chunk);
@@ -113,7 +113,7 @@ public class WindowingServiceImpl implements WindowingService {
 			return false;
 		} else if(!windowingSyncKey.equals(syncKey)) {
 			logger.info("reseting a pending windowing for key {} and syncKey {} by a new syncKey {}",
-					new Object[] {key, windowingSyncKey, syncKey});
+					key, windowingSyncKey, syncKey);
 			windowingDao.removePreviousCollectionWindowing(key);
 			return false;
 		} else {
