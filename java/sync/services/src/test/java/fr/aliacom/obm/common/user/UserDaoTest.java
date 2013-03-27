@@ -49,6 +49,8 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.sync.base.DomainName;
+import org.obm.sync.base.EmailLogin;
 import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Joiner;
@@ -106,10 +108,11 @@ public class UserDaoTest {
 	public void testUserIdFromEmailUsesEmailQueryIfEmailGiven() throws Exception {
 		Integer userId = 1;
 		String email = "usera@obm.com";
+		EmailLogin login = new EmailLogin("usera");
+		DomainName domain = new DomainName("obm.com");
 		Connection connection = mocksControl.createMock(Connection.class);
 
-		expect(userDao.userIdFromEmailQuery(connection, "usera", "obm.com")).andReturn(userId);
-
+		expect(userDao.userIdFromEmailQuery(connection, login, domain)).andReturn(userId);
 		mocksControl.replay();
 
 		assertThat(userDao.userIdFromEmail(connection, email, 1)).isEqualTo(userId);
@@ -117,52 +120,51 @@ public class UserDaoTest {
 
 	@Test
 	public void testUserIdFromEmailUsesLoginQueryIfLoginGiven() throws Exception {
-		String email = "usera";
+		EmailLogin login = new EmailLogin("usera");
 		Integer userId = 1, domainId = 1;
 		Connection connection = mocksControl.createMock(Connection.class);
 
-		expect(userDao.userIdFromLogin(connection, "usera", domainId)).andReturn(userId);
-
+		expect(userDao.userIdFromLogin(connection, login, domainId)).andReturn(userId);
 		mocksControl.replay();
 
-		assertThat(userDao.userIdFromEmail(connection, email, domainId)).isEqualTo(userId);
+		assertThat(userDao.userIdFromEmail(connection, login.get(), domainId)).isEqualTo(userId);
 	}
 
 	@Test
 	public void testUserIdFromEmailUsesLoginQueryThenEmailQueryIfLoginGiven() throws Exception {
-		String email = "usera";
+		EmailLogin login = new EmailLogin("usera");
+		DomainName domain = new DomainName("-");
 		Integer userId = 1, domainId = 1;
 		Connection connection = mocksControl.createMock(Connection.class);
 		
-		expect(userDao.userIdFromLogin(connection, "usera", domainId)).andReturn(null); // Login fetch returns no result
-		expect(userDao.userIdFromEmailQuery(connection, "usera", "-")).andReturn(userId);
-
+		expect(userDao.userIdFromLogin(connection, login, domainId)).andReturn(null); // Login fetch returns no result
+		expect(userDao.userIdFromEmailQuery(connection, login, domain)).andReturn(userId);
 		mocksControl.replay();
 
-		assertThat(userDao.userIdFromEmail(connection, email, 1)).isEqualTo(userId);
+		assertThat(userDao.userIdFromEmail(connection, login.get(), 1)).isEqualTo(userId);
 	}
 	
 	@Test
 	public void testUserIdFromEmailQuery() throws Exception {
-		String email = "usera";
+		EmailLogin login = new EmailLogin("usera");
 		String domain = "test.com";
+		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		UserDao dao = new UserDao(obmHelper);
 		
 		expectEmailQueryCalls(connection, rs, 1);
-		expectMatchingUserOfEmailQuery(rs, 1, email, domain, null);
-		
+		expectMatchingUserOfEmailQuery(rs, 1, login.get(), domain, null);
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isEqualTo(1);
+		assertThat(dao.userIdFromEmailQuery(connection, login, new DomainName(domain))).isEqualTo(1);
 	}
 	
 	@Test
 	public void testUserIdFromEmailQueryLoginDifferentCase() throws Exception {
-		String loginFromDb = "usera";
-		String loginFromEvent = "userA";
-		String domain = "test.com";
+		String loginFromDb = "userA";
+		EmailLogin loginFromEvent = new EmailLogin("usera");
+		String domain = "obm.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		UserDao dao = new UserDao(obmHelper);
@@ -172,30 +174,32 @@ public class UserDaoTest {
 		
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, loginFromEvent, domain)).isEqualTo(1);
+		assertThat(dao.userIdFromEmailQuery(connection, loginFromEvent, new DomainName(domain))).isEqualTo(1);
 	}
 	
 	@Test
 	public void testUserIdFromEmailQueryDomainDifferentCase() throws Exception {
-		String login = "usera";
-		String domainFromDb = "test.com";
-		String domainFromEvent = "tesT.com";
+		String loginFromDb = "usera";
+		String domainFromDb = "tesT.com";
+		EmailLogin loginFromEvent = new EmailLogin("usera");
+		DomainName domainFromEvent = new DomainName("test.com");
+		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		UserDao dao = new UserDao(obmHelper);
 		
 		expectEmailQueryCalls(connection, rs, 1);
-		expectMatchingUserOfEmailQuery(rs, 1, login, domainFromDb, null);
+		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, null);
 		
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, login, domainFromEvent)).isEqualTo(1);
+		assertThat(dao.userIdFromEmailQuery(connection, loginFromEvent, domainFromEvent)).isEqualTo(1);
 	}
 	
 	@Test
 	public void testUserIdFromEmailQueryDomainAliasesDifferentCase() throws Exception {
-		String login = "usera";
-		String domainName = "test.com";
+		DomainName domainFromEvent = new DomainName("test.com");
+		String loginFromDb = "usera";
 		String domainFromDb = "longdomain.com";
 		String domainFromDbAliases = Joiner.on(UserDao.DB_INNER_FIELD_SEPARATOR)
 				.join("rasta.rocket", "tEst.cOm", "obm.org");
@@ -204,17 +208,17 @@ public class UserDaoTest {
 		UserDao dao = new UserDao(obmHelper);
 		
 		expectEmailQueryCalls(connection, rs, 1);
-		expectMatchingUserOfEmailQuery(rs, 1, login, domainFromDb, domainFromDbAliases);
+		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, domainFromDbAliases);
 		
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, login, domainName)).isEqualTo(1);
+		assertThat(dao.userIdFromEmailQuery(connection, new EmailLogin(loginFromDb), domainFromEvent)).isEqualTo(1);
 	}
 	
 	@Test
 	public void testUserIdFromEmailQueryNoResult() throws Exception {
-		String email = "usera";
-		String domain = "test.com";
+		EmailLogin login = new EmailLogin("usera");
+		DomainName domain = new DomainName("test.com");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		UserDao dao = new UserDao(obmHelper);
@@ -223,7 +227,7 @@ public class UserDaoTest {
 		
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isNull();
+		assertThat(dao.userIdFromEmailQuery(connection, login, domain)).isNull();
 	}
 
 	@Test
@@ -242,7 +246,7 @@ public class UserDaoTest {
 		
 		mocksControl.replay();
 		
-		assertThat(dao.userIdFromEmailQuery(connection, email, domain)).isEqualTo(4);
+		assertThat(dao.userIdFromEmailQuery(connection, new EmailLogin(email), new DomainName(domain))).isEqualTo(4);
 	}
 	
 	private void expectEmailQueryCalls(Connection connection, ResultSet rs, int numberOfMatches) throws Exception {

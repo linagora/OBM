@@ -39,6 +39,8 @@ import java.sql.Statement;
 import java.util.Map;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.base.DomainName;
+import org.obm.sync.base.EmailLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +98,7 @@ public class UserDao {
 		return ImmutableMap.of();
 	}
 	
-	@VisibleForTesting Integer userIdFromEmailQuery(Connection con, String mail, String domain) throws SQLException {
+	@VisibleForTesting Integer userIdFromEmailQuery(Connection con, EmailLogin login, DomainName domain) throws SQLException {
 		Statement st = null;
 		ResultSet rs = null;
 		
@@ -106,7 +108,7 @@ public class UserDao {
 			String request = "SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
 					"INNER JOIN Domain ON domain_id = userobm_domain_id " +
-					"WHERE UPPER(userobm_email) like UPPER('%" + mail + "%') AND userobm_archive != 1";
+					"WHERE UPPER(userobm_email) like UPPER('%" + login.get() + "%') AND userobm_archive != 1";
 			
 			rs = st.executeQuery(request);
 			
@@ -117,7 +119,7 @@ public class UserDao {
 				String domainNameToCompare = rs.getString(3);
 				String domainsAliasToCompare = rs.getString(4);
 				
-				if (compareMail(mail, emailsToCompare)) {
+				if (compareEmailLogin(login, emailsToCompare)) {
 					
 					if (strictCompareDomain(domain, domainNameToCompare, domainsAliasToCompare)) {
 						return id;	
@@ -132,16 +134,16 @@ public class UserDao {
 		return null;
 	}
 
-	private boolean strictCompareDomain(String domain, String domainNameToCompare, String domainsAliasToCompare) {
+	private boolean strictCompareDomain(DomainName domain, String domainNameToCompare, String domainsAliasToCompare) {
 		if (domain != null && domainNameToCompare != null) {
-			if (domain.equalsIgnoreCase(domainNameToCompare)) {
+			if (domain.equals(new DomainName(domainNameToCompare))) {
 				return true;
 			}
 			
 			if (domainsAliasToCompare != null) {
 				Iterable<String> domains = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(domainsAliasToCompare);					
 				for (String domainToCompare: domains) {
-					if (domain.equalsIgnoreCase(domainToCompare)) {
+					if (domain.equals(new DomainName(domainToCompare))) {
 						return true;
 					}
 				}	
@@ -150,12 +152,11 @@ public class UserDao {
 		return false;
 	}
 
-	private boolean compareMail(String mail, String emailsToCompare) {
-		if (mail != null && emailsToCompare != null) {
+	private boolean compareEmailLogin(EmailLogin login, String emailsToCompare) {
+		if (login != null && emailsToCompare != null) {
 			Iterable<String> emails = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emailsToCompare);			
 			for (String email: emails) {
-				email = getEmailWithoutDomain(email);
-				if (mail.equalsIgnoreCase(email)) {
+				if (login.equals(getEmailLogin(email))) {
 					return true;
 				}
 			}	
@@ -163,12 +164,11 @@ public class UserDao {
 		return false;
 	}
 
-	private String getEmailWithoutDomain(String email) {
+	private EmailLogin getEmailLogin(String email) {
 		if (email != null && email.contains("@")) {
-			String[] s = email.split("@");
-			return s[0];
+			return new EmailLogin(email.split("@")[0]);
 		}
-		return email;
+		return new EmailLogin(email);
 	}
 	
 	public ObmUser findUser(String email, ObmDomain domain) {
@@ -277,7 +277,7 @@ public class UserDao {
 	}
 
 	
-	@VisibleForTesting Integer userIdFromLogin(Connection con, String login, Integer domainId) {
+	@VisibleForTesting Integer userIdFromLogin(Connection con, EmailLogin login, Integer domainId) {
 		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -289,7 +289,7 @@ public class UserDao {
 		try {
 			ps = con.prepareStatement(uq);
 			ps.setInt(1, domainId);
-			ps.setString(2, login);
+			ps.setString(2, login.get());
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				ret = rs.getInt(1);
@@ -304,15 +304,15 @@ public class UserDao {
 	
 	public Integer userIdFromEmail(Connection con, String email, Integer domainId) throws SQLException{
 		String[] parts = email.split("@");
-		String login = parts[0];
-		String domain = "-";
+		EmailLogin login = new EmailLogin(parts[0]);
+		DomainName domain = new DomainName("-");
 		Integer ownerId = null;
 		
 		// OBMFULL-4353
 		// We only fetch the user by login if a login was provided
 		// If a full email is given, we must favor the fetch by email
 		if (parts.length > 1) {
-			domain = parts[1];
+			domain = new DomainName(parts[1]);
 		} else {
 			ownerId = userIdFromLogin(con, login, domainId);
 		}
