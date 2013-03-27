@@ -42,6 +42,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.io.IOUtils;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXMLTools;
@@ -50,7 +51,6 @@ import org.w3c.dom.Document;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 
 
 public class WBXMLOPClient extends OPClient {
@@ -180,7 +180,7 @@ public class WBXMLOPClient extends OPClient {
 			responseStream = getResponseStream(pm);
 			return ByteStreams.toByteArray(responseStream);
 		} finally {
-			Closeables.closeQuietly(responseStream);
+			IOUtils.closeQuietly(responseStream);
 		}
 	}
 

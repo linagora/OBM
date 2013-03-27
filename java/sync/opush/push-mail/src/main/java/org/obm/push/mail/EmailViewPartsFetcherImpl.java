@@ -41,6 +41,7 @@ import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.apache.commons.io.IOUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
@@ -66,7 +67,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 
 public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 
@@ -177,7 +177,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		} catch (IOException e) {
 			throw new MailException(e);
 		} finally {
-			Closeables.closeQuietly(bodyData);
+			IOUtils.closeQuietly(bodyData);
 		}
 		
 	}
