@@ -102,6 +102,7 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.alpha2.mysql.sql ${UPGRADE_SQL_DIR_
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta3.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.beta3
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta4.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.beta4
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.2~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.2~0
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.5~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.5~1
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -170,5 +171,6 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.alpha2.pgsql.sql ${UPGRADE_SQL_DIR_
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta3.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.0~0.beta3
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta4.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.0~0.beta4
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.2~0.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.2~0
+cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.5~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.5~1
 
 exit 0
