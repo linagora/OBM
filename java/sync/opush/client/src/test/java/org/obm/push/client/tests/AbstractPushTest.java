@@ -74,7 +74,7 @@ public class AbstractPushTest {
 		String userAgent = p(p, "userAgent");
 
 		wbxmlTools = new WBXMLTools();
-		opc = new WBXMLOPClient(login, password, new DeviceId(devId), devType, userAgent, 9142, wbxmlTools);
+		opc = new WBXMLOPClient(login, password, new DeviceId(devId), devType, userAgent, "localhost", 9142, "/ActiveSyncServlet/", wbxmlTools);
 	}
 
 	@After

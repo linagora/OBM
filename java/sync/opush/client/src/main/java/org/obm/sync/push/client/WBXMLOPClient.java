@@ -58,9 +58,10 @@ public class WBXMLOPClient extends OPClient {
 	private final WBXMLTools wbxmlTools;
 
 	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId,
-			String devType, String userAgent, int port, WBXMLTools wbxmlTools) {
+			String devType, String userAgent, String serverAddress, int port, String webApp,
+			WBXMLTools wbxmlTools) {
 
-		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
+		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp));
 		this.wbxmlTools = wbxmlTools;
 	}
 
@@ -197,8 +198,8 @@ public class WBXMLOPClient extends OPClient {
 				+ ((inverse[2] & 0xFF) << 8) + (inverse[3] & 0xFF);
 	}
 	
-	private static String buildServiceUrl(int port) {
-		return "http://localhost:" + port + "/ActiveSyncServlet/";
+	private static String buildServiceUrl(String serverAddress, int port, String webApp) {
+		return "http://" + serverAddress + ":" + port + webApp;
 	}
 	
 }

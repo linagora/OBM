@@ -166,7 +166,8 @@ public class IntegrationTestUtils {
 				user.password, 
 				user.deviceId, 
 				user.deviceType, 
-				user.userAgent, port, new WBXMLTools());
+				user.userAgent, "localhost", port, "/ActiveSyncServlet/",
+				new WBXMLTools());
 	}
 
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {
