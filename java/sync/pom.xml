@@ -59,7 +59,7 @@
                 <plugin.surefire.version>2.14</plugin.surefire.version>
                 <plugin.compiler.version>2.5.1</plugin.compiler.version>
                 <plugin.eclipse.version>2.9</plugin.eclipse.version>
-                <plugin.dependency.version>2.5.1</plugin.dependency.version>
+                <plugin.dependency.version>2.6</plugin.dependency.version>
 	</properties>
 
 	<repositories>
