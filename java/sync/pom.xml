@@ -43,7 +43,7 @@
 		<servlet-api.version>2.5</servlet-api.version>
 		<mail.version>1.4.7</mail.version>
 		<freemarker.version>2.3.19</freemarker.version>
-		<jsoup.version>1.7.1</jsoup.version>
+		<jsoup.version>1.7.2</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
 		<btm.version>2.2.0-SNAPSHOT</btm.version>
