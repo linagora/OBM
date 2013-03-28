@@ -64,12 +64,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>annotations</artifactId>
-			<version>${obm.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
@@ -130,10 +124,6 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert-core</artifactId>
 		</dependency>
 	</dependencies>
 </project>
