@@ -56,14 +56,20 @@ import com.google.common.io.Closeables;
 public class WBXMLOPClient extends OPClient {
 
 	private final WBXMLTools wbxmlTools;
+	
+	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId, String devType,
+			String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools) {
+
+		this(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools);
+	}
 
 	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId,
-			String devType, String userAgent, String serverAddress, int port, String webApp,
-			WBXMLTools wbxmlTools) {
+			String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools) {
 
-		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp));
+		super(loginAtDomain, password, devId, devType, userAgent, serviceUrl);
 		this.wbxmlTools = wbxmlTools;
 	}
+	
 
 	private ByteArrayRequestEntity getRequestEntity(String namespace, Document doc) throws WBXmlException, IOException {
 		byte[] wbxml = wbxmlTools.toWbxml(namespace, doc);
