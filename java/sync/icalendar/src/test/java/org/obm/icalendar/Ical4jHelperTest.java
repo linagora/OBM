@@ -126,6 +126,7 @@ import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.obm.sync.services.AttendeeService;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -1655,5 +1656,60 @@ public class Ical4jHelperTest {
 		assertThat(helper.findAttendeeUsingCuType(name, email, "INDIVIDUAL", domain, 1)).isEqualTo(attendee);
 		
 		verify(service);
+	}
+	
+	private Event buildAllDayEvent(Date startDate, String tzName, int duration) {
+		Event event = new Event();
+		
+		event.setExtId(new EventExtId("ExtId"));
+		event.setAllday(true);
+		event.setDuration(Event.SECONDS_IN_A_DAY * duration);
+		event.setStartDate(startDate); // UTC
+		event.setTimezoneName(tzName);
+		event.addAttendee(UserAttendee.builder().email("organizer@obm.org").asOrganizer().build());
+		
+		return event;
+	}
+	
+	private void assertIcsEquals(String compareFile, String actual) throws Exception {
+		String expected = IOUtils.toString(getStreamICS(compareFile));
+		
+		assertThat(stripTimestamps(actual)).isEqualTo(stripTimestamps(expected));
+	}
+	
+	@Test
+	public void testBuildICSWithAllDayEventInEuropeParis() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		AccessToken token = new AccessToken(0, "");
+		Event event = buildAllDayEvent(DateUtils.date("2013-03-28T23:00:00Z"), "Europe/Paris", 1);
+		
+		assertIcsEquals("alldayOneDay.ics", ical4jHelper.buildIcs(ical4jUser, ImmutableList.of(event), token));
+	}
+	
+	@Test
+	public void testBuildICSWithAllDayThreeDaysEventInEuropeParis() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		AccessToken token = new AccessToken(0, "");
+		Event event = buildAllDayEvent(DateUtils.date("2013-03-28T23:00:00Z"), "Europe/Paris", 3);
+		
+		assertIcsEquals("alldayThreeDays.ics", ical4jHelper.buildIcs(ical4jUser, ImmutableList.of(event), token));
+	}
+	
+	@Test
+	public void testBuildICSWithAllDayEventInAmericaGuadeloupe() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		AccessToken token = new AccessToken(0, "");
+		Event event = buildAllDayEvent(DateUtils.date("2013-03-29T04:00:00Z"), "America/Guadeloupe", 1);
+		
+		assertIcsEquals("alldayOneDay.ics", ical4jHelper.buildIcs(ical4jUser, ImmutableList.of(event), token));
+	}
+	
+	@Test
+	public void testBuildICSWithAllDayEventInAsiaBangkok() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		AccessToken token = new AccessToken(0, "");
+		Event event = buildAllDayEvent(DateUtils.date("2013-03-28T17:00:00Z"), "Asia/Bangkok", 1);
+		
+		assertIcsEquals("alldayOneDay.ics", ical4jHelper.buildIcs(ical4jUser, ImmutableList.of(event), token));
 	}
 }

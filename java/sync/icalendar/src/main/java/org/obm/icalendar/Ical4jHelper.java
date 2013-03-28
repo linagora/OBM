@@ -117,6 +117,7 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.icalendar.ical4jwrapper.EventDate;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarUserType;
@@ -980,11 +981,11 @@ public class Ical4jHelper {
 	}
 
 	private void appendDtEndAsDateToICS(PropertyList prop, Event event) {
-		prop.add(new DtEnd(new net.fortuna.ical4j.model.Date(event.getEndDate()), true));
+		prop.add(new DtEnd(new EventDate(event.getEndDate(), TimeZone.getTimeZone(event.getTimezoneName())), true));
 	}
 
 	private void appendDtStartAsDateToICS(PropertyList prop, Event event) {
-		prop.add(new DtStart(new net.fortuna.ical4j.model.Date(event.getStartDate()), true));
+		prop.add(new DtStart(new EventDate(event.getStartDate(), TimeZone.getTimeZone(event.getTimezoneName())), true));
 	}
 
 	private void appendDtStartAsDateTimeToICS(PropertyList prop, Event event) {
