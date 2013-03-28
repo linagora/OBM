@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.jaxb.CheckResult;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -54,6 +53,7 @@ public class BeansTest {
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
+					.add(Credentials.class)
 					.add(CheckResult.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);

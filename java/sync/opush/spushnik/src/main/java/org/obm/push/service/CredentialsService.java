@@ -29,21 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.service;
 
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
-import org.obm.push.service.CredentialsService;
+import javax.security.cert.CertificateException;
+import javax.security.cert.X509Certificate;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+import org.obm.push.jaxb.Credentials;
 
-public class GuiceModule implements Module {
+import com.google.common.base.Strings;
+import com.google.inject.Singleton;
 
-	@Override
-	public void configure(Binder binder) {
-		binder.bind(HelloResource.class);
-		binder.bind(FolderSyncScenario.class);
-		binder.bind(CredentialsService.class);
+@Singleton
+public class CredentialsService {
+
+	public void validate(Credentials credentials) throws InvalidCredentialsException {
+		verifyNotEmptyLoginAtDomainAndPassword(credentials);
+		verifyCertificateIsValid(credentials); 
+	}
+	
+	private void verifyNotEmptyLoginAtDomainAndPassword(Credentials credentials) throws InvalidCredentialsException {
+		verifyNotEmptyLoginAtDomain(credentials);
+		verifyNotEmptyPassword(credentials);
+	}
+
+	private void verifyNotEmptyPassword(Credentials credentials) throws InvalidCredentialsException {
+		if (Strings.isNullOrEmpty(credentials.getPassword())) {
+			throw new InvalidCredentialsException("Invalid password: " + credentials.getPassword());
+		}
+	}
+
+	private void verifyNotEmptyLoginAtDomain(Credentials credentials) throws InvalidCredentialsException {
+		if (Strings.isNullOrEmpty(credentials.getLoginAtDomain())) {
+			throw new InvalidCredentialsException("Invalid loginAtDomain: " + credentials.getLoginAtDomain());
+		}
+	}
+
+	private void verifyCertificateIsValid(Credentials credentials) throws InvalidCredentialsException {
+		if (credentials.getCertificate() != null) {
+			verifyCertificateIsWellFormatted(credentials);
+		}
+	}
+
+	private void verifyCertificateIsWellFormatted(Credentials credentials) throws InvalidCredentialsException {
+		try {
+			X509Certificate cert = X509Certificate.getInstance(credentials.getCertificate());
+			cert.checkValidity();
+		} catch (CertificateException e) {
+			throw new InvalidCredentialsException("Invalid certificate", e);
+		}
 	}
 }

@@ -29,21 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.service;
 
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
-import org.obm.push.service.CredentialsService;
+public class InvalidCredentialsException extends Exception {
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+	public InvalidCredentialsException() {
+		super();
+	}
 
-public class GuiceModule implements Module {
+	public InvalidCredentialsException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	@Override
-	public void configure(Binder binder) {
-		binder.bind(HelloResource.class);
-		binder.bind(FolderSyncScenario.class);
-		binder.bind(CredentialsService.class);
+	public InvalidCredentialsException(String message) {
+		super(message);
+	}
+
+	public InvalidCredentialsException(Throwable cause) {
+		super(cause);
 	}
 }

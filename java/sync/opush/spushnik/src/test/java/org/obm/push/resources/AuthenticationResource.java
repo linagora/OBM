@@ -29,21 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.resources;
 
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.core.Headers;
+import org.jboss.resteasy.core.ServerResponse;
+import org.obm.push.jaxb.Credentials;
 import org.obm.push.service.CredentialsService;
+import org.obm.push.service.InvalidCredentialsException;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+import com.google.inject.Inject;
 
-public class GuiceModule implements Module {
+@Path("conf")
+public class AuthenticationResource {
 
-	@Override
-	public void configure(Binder binder) {
-		binder.bind(HelloResource.class);
-		binder.bind(FolderSyncScenario.class);
-		binder.bind(CredentialsService.class);
+	@Inject CredentialsService credentialsService;
+	
+	@POST
+	@Path("authenticate")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response authenticate(Credentials credentials) {
+		try {
+			credentialsService.validate(credentials);
+		} catch (InvalidCredentialsException e) {
+			return new ServerResponse("nok", HttpServletResponse.SC_OK, new Headers<Object>());
+		}
+		return new ServerResponse("ok", HttpServletResponse.SC_OK, new Headers<Object>());
 	}
+	
 }

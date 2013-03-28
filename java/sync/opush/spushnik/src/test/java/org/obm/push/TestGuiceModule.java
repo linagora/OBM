@@ -31,19 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
-import org.obm.push.service.CredentialsService;
+import org.obm.push.resources.AuthenticationResource;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 
-public class GuiceModule implements Module {
+public class TestGuiceModule implements Module {
 
 	@Override
 	public void configure(Binder binder) {
-		binder.bind(HelloResource.class);
-		binder.bind(FolderSyncScenario.class);
-		binder.bind(CredentialsService.class);
+		binder.install(new GuiceModule());
+		binder.bind(AuthenticationResource.class);
 	}
 }
