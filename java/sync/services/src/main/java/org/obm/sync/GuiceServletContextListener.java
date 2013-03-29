@@ -51,6 +51,8 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
+import org.obm.healthcheck.HealthCheckModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.date.DateProvider;
@@ -154,7 +156,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         		bind(DateProvider.class).to(ObmHelper.class);
         		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
             }
-        }, new MessageQueueModule(), new TransactionalModule(), new SolrJmsModule());
+        }, new MessageQueueModule(), new TransactionalModule(), new SolrJmsModule(), new HealthCheckModule(), new HealthCheckDefaultHandlersModule());
     }
     
     private void failStartup(String message) { 
