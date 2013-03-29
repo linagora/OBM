@@ -33,6 +33,8 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import com.google.common.base.Objects;
+
 public class Address implements IMergeable, Serializable {
 
 	private String street;
@@ -123,4 +125,34 @@ public class Address implements IMergeable, Serializable {
 		this.state = state;
 	}
 
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(street, zipCode, expressPostal, town, country, state);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Address) {
+			Address that = (Address) object;
+			return Objects.equal(this.street, that.street)
+				&& Objects.equal(this.zipCode, that.zipCode)
+				&& Objects.equal(this.expressPostal, that.expressPostal)
+				&& Objects.equal(this.town, that.town)
+				&& Objects.equal(this.country, that.country)
+				&& Objects.equal(this.state, that.state);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("street", street)
+			.add("zipCode", zipCode)
+			.add("expressPostal", expressPostal)
+			.add("town", town)
+			.add("country", country)
+			.add("state", state)
+			.toString();
+	}
 }

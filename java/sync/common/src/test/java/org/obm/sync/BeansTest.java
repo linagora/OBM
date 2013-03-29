@@ -44,6 +44,7 @@ import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.book.Phone;
@@ -97,7 +98,8 @@ public class BeansTest {
 				EmailAddress.class,
 				EmailLogin.class,
 				DomainName.class,
-				Phone.class);
+				Phone.class,
+				Address.class);
 	}
 	
 	@Test

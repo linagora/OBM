@@ -53,6 +53,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
+
 public class BookItemsParser extends AbstractItemsParser {
 
 	public AddressBook parseAddressBook(Element root) {
@@ -135,7 +137,11 @@ public class BookItemsParser extends AbstractItemsParser {
 		String[][] values = DOMUtils
 				.getAttributes(uniqueElement, "mail", attrs);
 		for (String[] p : values) {
-			c.addEmail(p[0], EmailAddress.loginAtDomain(p[1]));
+			String label = p[0];
+			String email = p[1];
+			if (!Strings.isNullOrEmpty(label) && !Strings.isNullOrEmpty(email)) {
+				c.addEmail(label, EmailAddress.loginAtDomain(email));
+			}
 		}
 	}
 
