@@ -29,18 +29,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.healthcheck;
 
-import org.obm.healthcheck.server.HealthCheckServlet;
+import org.obm.healthcheck.handlers.RootHandler;
 
-import com.google.inject.servlet.ServletModule;
+import com.google.common.collect.ImmutableMap;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.guice.JerseyServletModule;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class HealthCheckModule extends ServletModule {
+public class HealthCheckModule extends JerseyServletModule {
 
 	public static String HEALTHCHECK_URL_PREFIX = "/healthcheck";
 	public static String HEALTHCHECK_URL_PATTERN = HEALTHCHECK_URL_PREFIX + "/*";
 	
 	@Override
 	protected void configureServlets() {
-		serve(HEALTHCHECK_URL_PATTERN).with(HealthCheckServlet.class);
+		bind(RootHandler.class);
+		
+		serve(HEALTHCHECK_URL_PATTERN).with(GuiceContainer.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 	}
 
 }

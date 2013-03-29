@@ -27,43 +27,85 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.healthcheck;
+package org.obm.healthcheck.handlers;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.junit.After;
-import org.junit.Before;
-import org.mortbay.jetty.Server;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.healthcheck.HealthCheckHandler;
+import org.obm.healthcheck.handlers.RootHandler.EndpointDescription;
+import org.obm.healthcheck.handlers.RootHandlerTest.Env;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
+
+import com.google.common.collect.ImmutableList;
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.multibindings.Multibinder;
 
-public class AbstractHealthCheckTest {
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(Env.class)
+public class RootHandlerTest {
+
+	public static class Env extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			Multibinder<HealthCheckHandler> multibinder = Multibinder.newSetBinder(binder(), HealthCheckHandler.class);
+			
+			multibinder.addBinding().to(Handler1.class);
+			multibinder.addBinding().to(Handler2.class);
+		}
+		
+	}
+	
+	@Path("/handler1")
+	public static class Handler1 implements HealthCheckHandler {
+		
+		@GET
+		@Path("method1")
+		public Object method1() {
+			return null;
+		}
+		
+		@GET
+		@Path("method2")
+		public Object method2() {
+			return null;
+		}
+		
+	}
+	
+	@Path("/handler2")
+	public static class Handler2 implements HealthCheckHandler {
+		
+		@GET
+		@Path("method1")
+		public Object method1() {
+			return null;
+		}
+		
+	}
 	
 	@Inject
-	private Server server;
+	private RootHandler handler;
 	
-	protected String baseUrl;
-	protected int serverPort;
-	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
+	@Test
+	public void testRoot() {
+		List<EndpointDescription> actual = handler.root();
+		List<EndpointDescription> expected = ImmutableList.of(
+																new EndpointDescription("GET", "/handler1/method1"),
+																new EndpointDescription("GET", "/handler1/method2"),
+																new EndpointDescription("GET", "/handler2/method1")
+															);
 		
-		serverPort = server.getConnectors()[0].getLocalPort();
-		baseUrl = "http://localhost:" + serverPort + HealthCheckModule.HEALTHCHECK_URL_PREFIX;
+		assertThat(actual).isEqualTo(expected);
 	}
-	
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
-	}
-	
-	protected HttpResponse get(String path) throws Exception {
-		return createRequest(path).execute().returnResponse();
-	}
-	
-	protected Request createRequest(String path) {
-		return Request.Get(baseUrl + path);
-	}
-	
+
 }

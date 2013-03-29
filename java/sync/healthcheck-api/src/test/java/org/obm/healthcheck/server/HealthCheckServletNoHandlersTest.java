@@ -29,21 +29,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.healthcheck.server;
 
-import java.io.IOException;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.inject.Singleton;
+import org.apache.http.HttpResponse;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mortbay.util.IO;
+import org.mortbay.util.ajax.JSON;
+import org.obm.filter.Slow;
+import org.obm.healthcheck.AbstractHealthCheckTest;
+import org.obm.healthcheck.HealthCheckTestEnvNoHandlers;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
-@Singleton
-public class HealthCheckServlet extends HttpServlet {
+@Slow
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(HealthCheckTestEnvNoHandlers.class)
+public class HealthCheckServletNoHandlersTest extends AbstractHealthCheckTest {
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+	@Test
+	public void testRootUrl() throws Exception {
+		HttpResponse response = get("/");
+		
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(JSON.parse(IO.toString(response.getEntity().getContent()))).isEqualTo(new Object[0]);
 	}
 
+	@Test
+	public void testUnknownUrl() throws Exception {
+		assertThat(get("/this/surely/isnt/handled").getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
+	}
+	
 }

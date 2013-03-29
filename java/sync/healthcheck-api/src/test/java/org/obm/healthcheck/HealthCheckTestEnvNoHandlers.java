@@ -33,12 +33,18 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
 
-public class HealthCheckTestEnv extends HealthCheckModule {
+public class HealthCheckTestEnvNoHandlers extends AbstractModule {
 	
+	@Override
+	protected void configure() {
+		install(new HealthCheckModule());
+	}
+
 	@Provides
 	@Singleton
 	protected Server createServer() {

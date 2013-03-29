@@ -27,25 +27,9 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.healthcheck.server;
+package org.obm.healthcheck;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.healthcheck.AbstractHealthCheckTest;
-
-@Slow
-@RunWith(SlowFilterRunner.class)
-public class HealthCheckServletTest extends AbstractHealthCheckTest {
-
-	@Test
-	public void test() throws Exception {
-		assertThat(get("/").getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_IMPLEMENTED);
-	}
-	
-}
+/**
+ * Marker interface for HealthCheck Jersey resources.
+ */
+public interface HealthCheckHandler {}
