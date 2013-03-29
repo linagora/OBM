@@ -32,9 +32,11 @@ package org.obm.healthcheck.handlers;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +47,9 @@ import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.multibindings.Multibinder;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(Env.class)
@@ -57,54 +59,68 @@ public class RootHandlerTest {
 
 		@Override
 		protected void configure() {
-			Multibinder<HealthCheckHandler> multibinder = Multibinder.newSetBinder(binder(), HealthCheckHandler.class);
-			
-			multibinder.addBinding().to(Handler1.class);
-			multibinder.addBinding().to(Handler2.class);
+			bind(Application.class).toInstance(new Application() {
+
+				@Override
+				public Set<Class<?>> getClasses() {
+					return ImmutableSet.<Class<?>>of(Handler1.class, Handler2.class, NonHealthCheckHandler.class);
+				}
+
+			});
 		}
-		
+
 	}
 	
-	@Path("/handler1")
-	public static class Handler1 implements HealthCheckHandler {
-		
+	@Path("/nonhealthcheck")
+	public static class NonHealthCheckHandler {
+
 		@GET
 		@Path("method1")
 		public Object method1() {
 			return null;
 		}
-		
+
+	}
+
+	@Path("/handler1")
+	public static class Handler1 implements HealthCheckHandler {
+
+		@GET
+		@Path("method1")
+		public Object method1() {
+			return null;
+		}
+
 		@GET
 		@Path("method2")
 		public Object method2() {
 			return null;
 		}
-		
+
 	}
-	
+
 	@Path("/handler2")
 	public static class Handler2 implements HealthCheckHandler {
-		
+
 		@GET
 		@Path("method1")
 		public Object method1() {
 			return null;
 		}
-		
+
 	}
-	
+
 	@Inject
 	private RootHandler handler;
-	
+
 	@Test
 	public void testRoot() {
 		List<EndpointDescription> actual = handler.root();
 		List<EndpointDescription> expected = ImmutableList.of(
-																new EndpointDescription("GET", "/handler1/method1"),
-																new EndpointDescription("GET", "/handler1/method2"),
-																new EndpointDescription("GET", "/handler2/method1")
-															);
-		
+				new EndpointDescription("GET", "/handler1/method1"),
+				new EndpointDescription("GET", "/handler1/method2"),
+				new EndpointDescription("GET", "/handler2/method1"));
+
 		assertThat(actual).isEqualTo(expected);
 	}
 

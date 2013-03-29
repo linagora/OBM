@@ -62,8 +62,7 @@ public class HealthCheckServletOneHandlerTest extends AbstractHealthCheckTest {
 		
 		Object[] result = (Object[]) JSON.parse(IO.toString(response.getEntity().getContent()));
 		
-		assertThat(result).hasSize(1);
-		assertThat(result[0]).isEqualTo(expected);
+		assertThat(result).containsOnly(expected);
 	}
 
 	@Test

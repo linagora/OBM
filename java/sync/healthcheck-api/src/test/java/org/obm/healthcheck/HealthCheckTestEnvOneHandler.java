@@ -38,12 +38,7 @@ public class HealthCheckTestEnvOneHandler extends HealthCheckTestEnvNoHandlers {
 	protected void configure() {
 		super.configure();
 		
-		install(new HealthCheckParticipantModule() {
-			@Override
-			protected void configure() {
-				bindHandler(MyCustomHandler.class);
-			}
-		});
+		bind(MyCustomHandler.class);
 	}
 	
 	@Path("/testing")

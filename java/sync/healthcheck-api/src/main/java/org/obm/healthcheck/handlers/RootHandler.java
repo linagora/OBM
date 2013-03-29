@@ -30,16 +30,19 @@
 package org.obm.healthcheck.handlers;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.obm.healthcheck.HealthCheckHandler;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,32 +54,32 @@ import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 @Path("/")
 public class RootHandler implements HealthCheckHandler {
 
-	@Inject(optional = true)
-	private Set<HealthCheckHandler> handlers;
-	
+	@Inject
+	@Context
+	private Application application;
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<EndpointDescription> root() {
 		List<EndpointDescription> endpoints = Lists.newArrayList();
-		
-		if (handlers != null) {
-			for (HealthCheckHandler handler : handlers) {
-				AbstractResource resource = IntrospectionModeller.createResource(handler.getClass());
-				String resourcePath = resource.getPath().getValue();
-				
-				for (AbstractSubResourceMethod endpoint : resource.getSubResourceMethods()) {
-					endpoints.add(new EndpointDescription(endpoint.getHttpMethod(), resourcePath + '/' + endpoint.getPath().getValue()));
-				}
+		Iterable<Class<?>> classes = Iterables.filter(application.getClasses(), Predicates.assignableFrom(HealthCheckHandler.class));
+
+		for (Class<?> handlerClass : classes) {
+			AbstractResource resource = IntrospectionModeller.createResource(handlerClass);
+			String resourcePath = resource.getPath().getValue();
+
+			for (AbstractSubResourceMethod endpoint : resource.getSubResourceMethods()) {
+				endpoints.add(new EndpointDescription(endpoint.getHttpMethod(), resourcePath + '/' + endpoint.getPath().getValue()));
 			}
 		}
-		
+
 		return endpoints;
 	}
-	
+
 	public static class EndpointDescription {
 		private final String method;
 		private final String path;
-		
+
 		public EndpointDescription(String method, String path) {
 			this.method = method;
 			this.path = path;
@@ -99,10 +102,10 @@ public class RootHandler implements HealthCheckHandler {
 		public boolean equals(Object obj) {
 			if (obj instanceof EndpointDescription) {
 				EndpointDescription other = (EndpointDescription) obj;
-				
+
 				return Objects.equal(method, other.method) && Objects.equal(path, other.path);
 			}
-			
+
 			return false;
 		}
 
@@ -110,7 +113,7 @@ public class RootHandler implements HealthCheckHandler {
 		public String toString() {
 			return Objects.toStringHelper(this).add("path", path).add("method", method).toString();
 		}
-		
+
 	}
-	
+
 }

@@ -31,11 +31,13 @@ package org.obm.healthcheck;
 
 import org.obm.healthcheck.handlers.JavaInformationHandler;
 
-public class HealthCheckDefaultHandlersModule extends HealthCheckParticipantModule {
+import com.google.inject.AbstractModule;
+
+public class HealthCheckDefaultHandlersModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bindHandler(JavaInformationHandler.class);
+		bind(JavaInformationHandler.class);
 	}
 
 }
