@@ -61,6 +61,8 @@ db = obm
 user = obm
 ; Password must be enclosed with "
 password = "aliasource"
+; Size of JDBC connection pool (default: 10)
+;database-max-connection-pool-size = 10
 
 ; Default language
 lang = fr
