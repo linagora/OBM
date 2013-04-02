@@ -29,18 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.book;
+package org.obm.sync.exception;
 
-/**
- * Interface for objects supporting merge at sync time.
- */
-public interface IMergeable {
+public class InvalidContactException extends Exception {
 
-	/**
-	 * Merge the previous (stored in db) data into the new one coming from the
-	 * sync client.
-	 * 
-	 * @param previous
-	 */
-	void merge(IMergeable previous);
+	public InvalidContactException(String message) {
+		super(message);
+	}
+
+	public InvalidContactException(String message, String field) {
+		super(message + " : {" + field + "}");
+	}
 }

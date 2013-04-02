@@ -44,6 +44,7 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -92,13 +93,13 @@ public interface IAddressBook {
 	 *            
 	 */
 	Contact createContact(AccessToken token, Integer addressBook, Contact contact, String clientId) 
-			throws ServerFault, NoPermissionException;
+			throws ServerFault, NoPermissionException, InvalidContactException;
 
 	/**
 	 * modify existing contact with data provided if possible.
 	 */
 	Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
-			throws ServerFault, NoPermissionException, ContactNotFoundException;
+			throws ServerFault, NoPermissionException, ContactNotFoundException, InvalidContactException;
 
 	/**
 	 * remove the contact with specified uid 

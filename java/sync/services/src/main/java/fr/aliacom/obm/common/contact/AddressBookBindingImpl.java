@@ -57,6 +57,7 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -209,12 +210,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
-			throws ServerFault, NoPermissionException {
+			throws ServerFault, NoPermissionException, InvalidContactException {
 		
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
-				throw new NoPermissionException("no permission to add a contact to address book users.");
-			}
+			assertCanAddOrUpdate(addressBookId, contact);
 			
 			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
 			if (commitedContact != null) {
@@ -237,23 +236,38 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
+	private void assertCanAddOrUpdate(Integer addressBookId, Contact contact)
+			throws NoPermissionException, InvalidContactException {
+		assertIsNotAddressBookOfOBMUsers(addressBookId);
+		assertContactHasValidEmail(contact);
+	}
+
+	private void assertContactHasValidEmail(Contact contact)
+			throws InvalidContactException {
+		if (contact.hasInvalidEmail()) {
+			throw new InvalidContactException("The contact has invalid address emails format: "
+							+ contact.toString());
+		}
+	}
+
+	private void assertIsNotAddressBookOfOBMUsers(Integer addressBookId)
+			throws NoPermissionException {
+		if (isAddressBookOfOBMUsers(addressBookId)) {
+			throw new NoPermissionException("no permission to add or modify a contact to address book users.");
+		}
+	}
+
 	@Override
 	@Transactional
 	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact)
-		throws ServerFault, NoPermissionException, ContactNotFoundException {
+		throws ServerFault, NoPermissionException, ContactNotFoundException, InvalidContactException {
 
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
-				throw new NoPermissionException("No permission to modify a contact in address book users.");
-			} else {
-				Contact previous = contactDao.findContact(token, contact.getUid());
-				if (!contactDao.hasRightsOn(token, contact.getUid())) {
-					throw new NoPermissionException("No permission to modify a contact in address book users.");
-				} else {
-					contactMerger.merge(previous, contact);
-					return contactDao.modifyContact(token, contact);
-				}
-			}
+			assertCanAddOrUpdate(addressBookId, contact);
+			Contact previous = contactDao.findContact(token, contact.getUid());
+			assertHasDaoPermission(token, contact);
+			contactMerger.merge(previous, contact);
+			return contactDao.modifyContact(token, contact);
 		} catch (SQLException ex) {
 			throw new ServerFault(ex.getMessage());
 		} catch (FindException ex) {
@@ -262,13 +276,20 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throw new ServerFault(ex.getMessage());
 		}
 	}
+
+	private void assertHasDaoPermission(AccessToken token, Contact contact)
+			throws NoPermissionException {
+		if (!contactDao.hasRightsOn(token, contact.getUid())) {
+			throw new NoPermissionException("No permission to modify a contact in address book users.");
+		}
+	}
 	
 	@Override
 	@Transactional
 	public Contact removeContact(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		if (isUsersOBMAddressBook(addressBookId)) {
+		if (isAddressBookOfOBMUsers(addressBookId)) {
 			throw new NoPermissionException("no permission to delete an user obm contact.");
 		} else {
 			try {
@@ -284,7 +305,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException {
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
+			if (isAddressBookOfOBMUsers(addressBookId)) {
 				return userDao.findUserObmContact(token, contactId);
 			} else {
 				return contactDao.findContact(token, contactId);
@@ -432,7 +453,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 	
-	private boolean isUsersOBMAddressBook(Integer addressBookId) {
+	private boolean isAddressBookOfOBMUsers(Integer addressBookId) {
 		if (addressBookId != null) {
 			return addressBookId.intValue() == contactConfiguration.getAddressBookUserId();
 		} else {

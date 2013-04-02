@@ -33,6 +33,8 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import com.google.common.base.Objects;
+
 public class Phone implements IMergeable, Serializable {
 
 	private String number;
@@ -55,4 +57,17 @@ public class Phone implements IMergeable, Serializable {
 		//do nothing on merge
 	}
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(number);
+	}
+
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Phone) {
+			Phone that = (Phone) object;
+			return Objects.equal(this.number, that.number);
+			}
+		return false;
+	}
 }

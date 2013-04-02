@@ -46,12 +46,12 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.sync.exception.InvalidContactException;
 
 public interface IContentsImporter {
 
 	String importMessageChange(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data)
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException,
-			ConversionException, HierarchyChangedException, NoPermissionException;
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException, InvalidContactException;
 
 	void importMessageDeletion(UserDataRequest udr, PIMDataType type, Integer collectionId, String serverId, Boolean moveToTrash) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException,

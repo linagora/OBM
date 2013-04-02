@@ -34,6 +34,7 @@
 		<powermock.version>1.4.12</powermock.version>
 		<commons-httpclient.version>3.1</commons-httpclient.version>
 		<commons-io.version>2.3</commons-io.version>
+    <commons-validator.version>1.4.0</commons-validator.version>
 		<jms.version>1.1</jms.version>
 		<netty.version>3.5.9.Final</netty.version>		
 		<jta.version>1.1</jta.version>
@@ -453,6 +454,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>${commons-lang.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>${commons-validator.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.jms</groupId>

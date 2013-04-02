@@ -49,6 +49,7 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.sync.exception.InvalidContactException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -67,8 +68,7 @@ public class ContentsImporter implements IContentsImporter {
 
 	@Override
 	public String importMessageChange(UserDataRequest udr, Integer collectionId, String serverId, String clientId, IApplicationData data) 
-			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException,
-			ConversionException, HierarchyChangedException, NoPermissionException {
+			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException, InvalidContactException {
 		
 		PIMBackend backend = backends.getBackend(data.getType());
 		return backend.createOrUpdate(udr, collectionId, serverId, clientId, data);

@@ -33,6 +33,7 @@ package org.obm.sync.base;
 
 import java.io.Serializable;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.obm.push.utils.UserEmailParserUtils;
 import org.obm.sync.book.IMergeable;
 
@@ -79,6 +80,15 @@ public class EmailAddress implements IMergeable, Serializable {
 		return domain;
 	}
 
+	public boolean isValid() {
+		EmailValidator emailValidator = EmailValidator.getInstance();
+		return emailValidator.isValid(get());
+	}
+	
+	public boolean hasAnEmptyEmail() {
+		return get().isEmpty();
+	}
+	
 	@Override
 	public void merge(IMergeable previous) {
 		//do nothing on merge

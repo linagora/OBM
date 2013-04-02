@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contact collected="false" uid="8" xmlns="http://www.obm.org/xsd/sync/contact.xsd">
+	<commonname>test</commonname>
+	<first>test</first>
+	<phones/>
+	<addresses/>
+	<websites>
+		<site label="URL;X-OBM-Ref1" url="" />
+		<site label="URL;X-OBM-Ref2" url="" />
+	</websites>
+	<emails>
+		<mail label="INTERNET;X-OBM-Ref1" value="tes t@foo.fr"/>
+		<mail label="INTERNET;X-OBM-Ref2" value=""/>
+	</emails>
+	<instantmessaging/>
+</contact>

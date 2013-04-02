@@ -32,14 +32,13 @@
 package org.obm.sync.calendar;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
+import static fr.aliacom.obm.ToolBox.loadXmlFile;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -58,7 +57,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 
 /**
  * Serializes calendar related items to XML
@@ -251,14 +249,5 @@ private CalendarItemsWriter writer;
 		List<Attendee> attendees = Lists.newArrayList(john, jane);
 		
 		return attendees;
-	}
-
-	private String loadXmlFile(String filename) throws IOException {
-		InputStream inputStream = ClassLoader.getSystemClassLoader()
-				.getResourceAsStream(filename);
-
-		String fileContent = CharStreams.toString(new InputStreamReader(inputStream));
-		fileContent = fileContent.replaceAll("\n|\t", "");
-		return fileContent;
 	}
 }
