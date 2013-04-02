@@ -1,12 +1,11 @@
 package fr.aliacom.obm.common.calendar.loader.filter;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.junit.Test;
-import org.obm.DateUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
@@ -81,7 +80,6 @@ public class DeclinedAttendeeFilterTest {
 
 	@Test
 	public void testRecurrentEvent() {
-		Date currentDate = new Date();
 
 		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
 		Attendee decliningPhilby = kimPhilby(Participation.declined());
@@ -105,14 +103,14 @@ public class DeclinedAttendeeFilterTest {
 		evExWithoutPhilby.setUid(evExWithoutPhilbyId);
 		evExWithoutPhilby.addAttendee(decliningPhilby);
 		evExWithoutPhilby.addAttendee(burgess);
-		evExWithoutPhilby.setRecurrenceId(DateUtils.date("2013-03-20T12:00:00"));
+		evExWithoutPhilby.setRecurrenceId(date("2013-03-20T12:00:00"));
 
 		EventObmId evExWithPhilbyId = new EventObmId(4);
 		Event evExWithPhilby = new Event();
 		evExWithPhilby.setUid(evExWithPhilbyId);
 		evExWithPhilby.addAttendee(acceptingPhilby);
 		evExWithPhilby.addAttendee(burgess);
-		evExWithPhilby.setRecurrenceId(currentDate);
+		evExWithPhilby.setRecurrenceId(date("2013-03-13T12:00:00"));
 
 		evWithSomePhilby.getRecurrence().setEventExceptions(
 				Sets.newHashSet(evExWithoutPhilby, evExWithPhilby));
@@ -136,7 +134,6 @@ public class DeclinedAttendeeFilterTest {
 
 	@Test
 	public void testDeclinedRecurrentEvent() {
-		Date currentDate = new Date();
 
 		Attendee acceptingPhilby = kimPhilby(Participation.accepted());
 		Attendee decliningPhilby = kimPhilby(Participation.declined());
@@ -160,13 +157,14 @@ public class DeclinedAttendeeFilterTest {
 		evExWithoutPhilby.setUid(evExWithoutPhilbyId);
 		evExWithoutPhilby.addAttendee(decliningPhilby);
 		evExWithoutPhilby.addAttendee(burgess);
+		evExWithoutPhilby.setRecurrenceId(date("2013-03-13T12:00:00"));
 
 		EventObmId evExWithPhilbyId = new EventObmId(4);
 		Event evExWithPhilby = new Event();
 		evExWithPhilby.setUid(evExWithPhilbyId);
 		evExWithPhilby.addAttendee(acceptingPhilby);
 		evExWithPhilby.addAttendee(burgess);
-		evExWithPhilby.setRecurrenceId(currentDate);
+		evExWithPhilby.setRecurrenceId(date("2013-03-20T12:00:00"));
 
 		evWithSomePhilby.getRecurrence().setEventExceptions(
 				Sets.newHashSet(evExWithoutPhilby, evExWithPhilby));
