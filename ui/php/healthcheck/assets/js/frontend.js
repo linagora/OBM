@@ -301,10 +301,18 @@ $.obm.displayCheckInfo = function(moduleId, checkId, code, messages) {
 		}
 		if(messages.length > 0){
 			$("#"+htmlId+"-info").removeClass('visibility-hidden').addClass('visibility-visible text-' + $.obm.codeToStatus[code]);
-			$("#"+htmlId+"-info").html( "<strong>Messages:</strong><br/>" + messages.join("<br/>") );
+			$("#"+htmlId+"-info").html( "<strong>Messages:</strong><br/>" + $.obm.messagesToHTMLString(messages) );
 		}
 	}
 };
+
+$.obm.messagesToHTMLString = function (messages) {
+    if (!$.isArray(messages)) {
+        return messages;
+    }
+    
+    return messages.join("<br/>");
+}
 
 $.obm.updateAfterRelaunchCheck = function(moduleId, checkId, code, messages) {
 	var htmlId = $.obm.htmlId(moduleId, checkId);
