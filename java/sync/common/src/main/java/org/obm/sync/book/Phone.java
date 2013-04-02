@@ -61,13 +61,20 @@ public class Phone implements IMergeable, Serializable {
 	public final int hashCode(){
 		return Objects.hashCode(number);
 	}
-
+	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof Phone) {
 			Phone that = (Phone) object;
 			return Objects.equal(this.number, that.number);
-			}
+		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("number", number)
+			.toString();
 	}
 }

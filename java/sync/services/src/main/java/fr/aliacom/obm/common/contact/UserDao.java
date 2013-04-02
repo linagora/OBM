@@ -55,6 +55,7 @@ import org.obm.sync.exception.ContactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -87,7 +88,7 @@ public class UserDao {
 	private final ContactConfiguration contactConfiguration;
 	
 	@Inject
-	private UserDao(ContactConfiguration contactConfiguration, ObmHelper obmHelper) {
+	@VisibleForTesting UserDao(ContactConfiguration contactConfiguration, ObmHelper obmHelper) {
 		this.contactConfiguration = contactConfiguration;
 		this.obmHelper = obmHelper;
 	}
@@ -125,7 +126,7 @@ public class UserDao {
 			
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				contacts.add(loadUser(rs, at));
+				contacts.add(userAsContact(rs, at));
 			}
 			rs.close();
 			rs = null;
@@ -138,7 +139,7 @@ public class UserDao {
 		return cu;
 	}
 
-	private Contact loadUser(ResultSet rs, AccessToken at) throws SQLException {
+	@VisibleForTesting Contact userAsContact(ResultSet rs, AccessToken at) throws SQLException {
 		Contact c = new Contact();
 		c.setFolderId(contactConfiguration.getAddressBookUserId());
 		
@@ -152,8 +153,10 @@ public class UserDao {
 		c.setTitle(rs.getString("userobm_title"));
 		c.setComment(rs.getString("userobm_description"));
 			
-		c.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain(
-				getEmail(rs.getString("userobm_email"), at.getDomain().getName())));
+		String email = getEmail(rs.getString("userobm_email"), at.getDomain().getName());
+		if (!Strings.isNullOrEmpty(email)) {
+			c.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain(email));
+		}
 		
 		addPhonesToContact(rs, c);
 		addAddressToContact(rs, c);
@@ -302,7 +305,7 @@ public class UserDao {
 			rs = ps.executeQuery();
 		
 			if (rs.next()) {
-				return loadUser(rs, token);
+				return userAsContact(rs, token);
 			}
 			throw new ContactNotFoundException("Contact user obm not found.", userId);
 		
