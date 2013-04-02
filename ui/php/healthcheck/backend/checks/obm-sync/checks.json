@@ -15,6 +15,13 @@
             "parentId": null
         },
         {
+            "id": "JavaVersionStatus",
+            "name": "OBM-Sync JVM Version Check",
+            "description": "Checks that obm-sync server(s) runs on the proper JVM version",
+            "url": null,
+            "parentId": null
+        },
+        {
             "id": "SyncStatus",
             "name": "OBM-Sync Synchronization Check",
             "description": "Check that we can login and synchronize user's information on obm-sync server(s)",
