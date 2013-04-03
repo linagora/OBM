@@ -68,7 +68,7 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=true, noRollbackOn = {PrivateFreeBusyException.class})
 	public String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException {
 		String ics = null;
 

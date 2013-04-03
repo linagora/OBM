@@ -147,7 +147,6 @@ public class TransactionalInterceptor implements MethodInterceptor {
 	
 	private void rollbackTransaction(Transactional transactional, TransactionManager ut,
 			boolean haveCreatedNewTransaction, Throwable e) {
-		logger.error(e.getMessage(), e);		
 		try {
 			if (isTransactionAssociated(ut) && haveCreatedNewTransaction) {
 				if (needRollback(transactional, e)) {
