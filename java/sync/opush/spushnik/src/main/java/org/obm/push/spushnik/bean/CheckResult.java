@@ -29,21 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.jaxb;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+package org.obm.push.spushnik.bean;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-@XmlRootElement(name="CheckResult")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "status", "message" },
-		factoryMethod = "createEmptyRequest")
 public class CheckResult {
 
 	public static Builder builder() {
@@ -77,9 +67,7 @@ public class CheckResult {
 		}
 	}
 	
-	@XmlElement
 	private final int status;
-	@XmlElement
 	private final String message;
 	
 	public CheckResult(CheckStatus checkStatus, String message) {

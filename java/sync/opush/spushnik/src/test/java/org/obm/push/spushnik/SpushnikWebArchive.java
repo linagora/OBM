@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.spushnik;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,11 +44,11 @@ import org.jboss.shrinkwrap.resolver.api.ResolutionException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
-import org.obm.push.jaxb.CheckResult;
-import org.obm.push.jaxb.CheckStatus;
-import org.obm.push.resources.AuthenticationResource;
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.Scenario;
+import org.obm.push.spushnik.bean.CheckResult;
+import org.obm.push.spushnik.bean.CheckStatus;
+import org.obm.push.spushnik.resources.AuthenticationResource;
+import org.obm.push.spushnik.resources.FolderSyncScenario;
+import org.obm.push.spushnik.resources.Scenario;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;

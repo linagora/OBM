@@ -29,15 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resources;
+package org.obm.push.spushnik.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.obm.push.bean.DeviceId;
-import org.obm.push.jaxb.CheckResult;
-import org.obm.push.jaxb.CheckStatus;
+import org.obm.push.spushnik.bean.CheckResult;
+import org.obm.push.spushnik.bean.CheckStatus;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;

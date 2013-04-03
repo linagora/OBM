@@ -29,22 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.jaxb;
+package org.obm.push.spushnik.bean;
 
 import java.util.Arrays;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-@XmlRootElement(name="Credentials")
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder = { "loginAtDomain", "password", "certificate" })
 public class Credentials {
 
 	public static Builder builder() {
@@ -86,11 +77,8 @@ public class Credentials {
 		}
 	}
 	
-	@XmlElement
 	private final String loginAtDomain;
-	@XmlElement
 	private final String password;
-	@XmlElement
 	private final byte[] certificate;
 
 	private Credentials() {

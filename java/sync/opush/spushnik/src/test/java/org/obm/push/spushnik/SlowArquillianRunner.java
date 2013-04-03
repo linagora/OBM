@@ -1,4 +1,4 @@
-package org.obm.push;
+package org.obm.push.spushnik;
 
 import java.util.List;
 

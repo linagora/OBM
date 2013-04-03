@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resources;
+package org.obm.push.spushnik.resources;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
@@ -62,9 +62,9 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.jaxb.CheckResult;
-import org.obm.push.jaxb.CheckStatus;
 import org.obm.push.mail.MailBackend;
+import org.obm.push.spushnik.bean.CheckResult;
+import org.obm.push.spushnik.bean.CheckStatus;
 import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;

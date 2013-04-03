@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.jaxb;
+package org.obm.push.spushnik.bean;
 
 public enum CheckStatus {
 

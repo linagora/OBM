@@ -29,10 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.spushnik;
 
-import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.service.CredentialsService;
+import org.obm.push.spushnik.resources.FolderSyncScenario;
+import org.obm.push.spushnik.service.CredentialsService;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;

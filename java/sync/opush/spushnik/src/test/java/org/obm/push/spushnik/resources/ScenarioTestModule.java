@@ -29,34 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.jaxb;
+package org.obm.push.spushnik.resources;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.opush.ModuleUtils;
+import org.obm.opush.env.AbstractOverrideModule;
+import org.obm.opush.env.DefaultOpushModule;
 
-import com.google.common.collect.ImmutableList;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
-
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+public class ScenarioTestModule  extends DefaultOpushModule {
 	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public ScenarioTestModule() {
+		super();
 	}
 	
-	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Credentials.class)
-					.add(CheckResult.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+	@Override
+	protected Module overrideModule() throws Exception {
+		Module overrideModule = super.overrideModule();
+
+		Module syncKeyFactoryModule = bindSyncKeyFactory();
+		Module dateServiceModule = bindDateService();
+		
+		return Modules.combine(overrideModule, syncKeyFactoryModule, dateServiceModule);
 	}
-	
+
+	private Module bindDateService() {
+		AbstractOverrideModule dateServiceModule = ModuleUtils.buildDateServiceModule(getMocksControl());
+		getMockMap().addMap(dateServiceModule.getMockMap());
+		return dateServiceModule;
+	}
+
+	private Module bindSyncKeyFactory() {
+		AbstractOverrideModule syncKeyFactoryModule = ModuleUtils.buildSyncKeyFactoryModule(getMocksControl());
+		getMockMap().addMap(syncKeyFactoryModule.getMockMap());
+		return syncKeyFactoryModule;
+	}
 }

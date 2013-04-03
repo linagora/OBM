@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resources;
+package org.obm.push.spushnik.resources;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -53,9 +53,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.push.SlowArquillianRunner;
-import org.obm.push.SpushnikWebArchive;
-import org.obm.push.jaxb.Credentials;
+import org.obm.push.spushnik.bean.Credentials;
+import org.obm.push.spushnik.SlowArquillianRunner;
+import org.obm.push.spushnik.SpushnikWebArchive;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;

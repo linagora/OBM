@@ -29,53 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service;
+package org.obm.push.spushnik.service;
 
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
+public class InvalidCredentialsException extends Exception {
 
-import org.obm.push.jaxb.Credentials;
-
-import com.google.common.base.Strings;
-import com.google.inject.Singleton;
-
-@Singleton
-public class CredentialsService {
-
-	public void validate(Credentials credentials) throws InvalidCredentialsException {
-		verifyNotEmptyLoginAtDomainAndPassword(credentials);
-		verifyCertificateIsValid(credentials); 
-	}
-	
-	private void verifyNotEmptyLoginAtDomainAndPassword(Credentials credentials) throws InvalidCredentialsException {
-		verifyNotEmptyLoginAtDomain(credentials);
-		verifyNotEmptyPassword(credentials);
+	public InvalidCredentialsException() {
+		super();
 	}
 
-	private void verifyNotEmptyPassword(Credentials credentials) throws InvalidCredentialsException {
-		if (Strings.isNullOrEmpty(credentials.getPassword())) {
-			throw new InvalidCredentialsException("Invalid password: " + credentials.getPassword());
-		}
+	public InvalidCredentialsException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	private void verifyNotEmptyLoginAtDomain(Credentials credentials) throws InvalidCredentialsException {
-		if (Strings.isNullOrEmpty(credentials.getLoginAtDomain())) {
-			throw new InvalidCredentialsException("Invalid loginAtDomain: " + credentials.getLoginAtDomain());
-		}
+	public InvalidCredentialsException(String message) {
+		super(message);
 	}
 
-	private void verifyCertificateIsValid(Credentials credentials) throws InvalidCredentialsException {
-		if (credentials.getCertificate() != null) {
-			verifyCertificateIsWellFormatted(credentials);
-		}
-	}
-
-	private void verifyCertificateIsWellFormatted(Credentials credentials) throws InvalidCredentialsException {
-		try {
-			X509Certificate cert = X509Certificate.getInstance(credentials.getCertificate());
-			cert.checkValidity();
-		} catch (CertificateException e) {
-			throw new InvalidCredentialsException("Invalid certificate", e);
-		}
+	public InvalidCredentialsException(Throwable cause) {
+		super(cause);
 	}
 }

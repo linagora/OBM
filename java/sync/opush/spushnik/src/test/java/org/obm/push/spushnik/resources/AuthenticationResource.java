@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resources;
+package org.obm.push.spushnik.resources;
 
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +41,9 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.core.Headers;
 import org.jboss.resteasy.core.ServerResponse;
-import org.obm.push.jaxb.Credentials;
-import org.obm.push.service.CredentialsService;
-import org.obm.push.service.InvalidCredentialsException;
+import org.obm.push.spushnik.bean.Credentials;
+import org.obm.push.spushnik.service.CredentialsService;
+import org.obm.push.spushnik.service.InvalidCredentialsException;
 
 import com.google.inject.Inject;
 

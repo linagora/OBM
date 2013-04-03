@@ -29,41 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resources;
+package org.obm.push.spushnik;
 
-import javax.ws.rs.Path;
+import org.obm.push.spushnik.GuiceModule;
+import org.obm.push.spushnik.resources.AuthenticationResource;
 
-import org.obm.push.bean.FolderSyncStatus;
-import org.obm.push.bean.ProvisionStatus;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.jaxb.CheckResult;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.ProvisionResponse;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
-@Path("foldersync")
-public class FolderSyncScenario extends Scenario {
+public class TestGuiceModule implements Module {
 
 	@Override
-	protected CheckResult scenarii(OPClient client) throws Exception {
-		
-		ProvisionResponse provisionStepOne = client.provisionStepOne();
-		ProvisionStatus provisionStatusStepOne = provisionStepOne.getProvisionStatus();
-		if (!provisionStatusStepOne.equals(ProvisionStatus.SUCCESS)) {
-			return buildError("Provision step one: " + provisionStatusStepOne);
-		}
-		
-		ProvisionResponse provisionStepTwo = client.provisionStepTwo(provisionStepOne.getPolicyKey());
-		ProvisionStatus provisionStatusStepTwo = provisionStepTwo.getProvisionStatus();
-		if (!provisionStatusStepTwo.equals(ProvisionStatus.SUCCESS)) {
-			return buildError("Provision step two: " + provisionStatusStepOne);
-		}
-		
-		FolderSyncResponse folderSync = client.folderSync(SyncKey.INITIAL_FOLDER_SYNC_KEY);
-		FolderSyncStatus folderSyncStatus = folderSync.getStatus();
-		if (!folderSyncStatus.equals(FolderSyncStatus.OK)) {
-			return buildError("FolderSync: " + folderSyncStatus.asXmlValue());
-		}
-		return buildOK();
+	public void configure(Binder binder) {
+		binder.install(new GuiceModule());
+		binder.bind(AuthenticationResource.class);
 	}
 }
