@@ -29,56 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
-import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.push.java.mail.ImapModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.obm.opush;
 
-import com.google.common.base.Strings;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public class OpushModule extends AbstractModule {
+import javax.servlet.http.HttpServletResponse;
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.easymock.IMocksControl;
+import org.fest.util.Files;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.env.Configuration;
+import org.obm.opush.env.DefaultOpushModule;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
+
+import com.google.inject.Inject;
+
+@Slow
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(DefaultOpushModule.class)
+public class HealthCheckTest {
 	
-	@Override
-	protected void configure() {
-		installImapModule();
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new LoggerModule());
-		install(new OpushCrashModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
+	@Inject OpushServer opushServer;
+	@Inject IMocksControl mocksControl;
+	@Inject Configuration configuration;
 
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
+	@After
+	public void shutdown() throws Exception {
+		opushServer.stop();
+		Files.delete(configuration.dataDir);
 	}
-	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
-		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
-		}
-		
-		return defaultImapModule();
-	}
-	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
+
+	@Test
+	public void testHealthCheckInstalled() throws Exception {
+		mocksControl.replay();
+		opushServer.start();
+		HttpResponse response = 
+				Request.Get("http://localhost:" + opushServer.getPort() + "/healthcheck/java/version")
+						.execute()
+						.returnResponse();
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(response.getEntity().getContent())).isEqualTo(System.getProperty("java.version"));
 	}
 }

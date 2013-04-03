@@ -38,23 +38,36 @@ import org.obm.push.jaxrs.TechnicalLogPageResource;
 import org.obm.push.jaxrs.TechnicalLogStatusResource;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class TechnicalLogServletModule extends ServletModule{
 
-	 @Override
-	    protected void configureServlets() {
-	        super.configureServlets();
+	@Override
+	protected void configureServlets() {
+		super.configureServlets();
 
-	        bind(LogConfiguration.class).to(LogConfigurationImpl.class);
-	        bind(TechnicalLogPageResource.class);
-	        bind(TechnicalLogStatusResource.class);
-	        bind(TechnicalLogFileResource.class);
-	        bind(ListTechnicalLogFileResource.class);
-			serve("/TechnicalLog/*").with(GuiceContainer.class, 
-					ImmutableMap.of("com.sun.jersey.config.feature.Trace", "true",
-							ResourceConfig.FEATURE_DISABLE_WADL, "true"));
-	    }
+		bind(LogConfiguration.class).to(LogConfigurationImpl.class);
+		bind(TechnicalLogPageResource.class);
+		bind(TechnicalLogStatusResource.class);
+		bind(TechnicalLogFileResource.class);
+		bind(ListTechnicalLogFileResource.class);
+		serve("/TechnicalLog/*").with(GuiceTechnicalLogJerseyServlet.class, 
+				ImmutableMap.of("com.sun.jersey.config.feature.Trace", "true",
+						ResourceConfig.FEATURE_DISABLE_WADL, "true"));
+	}
+
+	@Singleton
+	private static class GuiceTechnicalLogJerseyServlet extends GuiceContainer {
+
+		@Inject
+		private GuiceTechnicalLogJerseyServlet(Injector injector) {
+			super(injector);
+		}
+		
+	}
 }

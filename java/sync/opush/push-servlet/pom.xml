@@ -34,6 +34,11 @@
 			<artifactId>java-mail</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>healthcheck-api</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 		<dependency>	
 			<groupId>com.linagora</groupId>
 	        <artifactId>crsh.shell.embed.guice</artifactId>

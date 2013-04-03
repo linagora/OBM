@@ -126,6 +126,11 @@
 			<artifactId>cucumber-guice</artifactId>
 			<version>${cucumber.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

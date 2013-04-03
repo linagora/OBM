@@ -32,6 +32,9 @@ package org.obm.healthcheck;
 import org.obm.healthcheck.handlers.RootHandler;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
@@ -45,7 +48,18 @@ public class HealthCheckModule extends JerseyServletModule {
 	protected void configureServlets() {
 		bind(RootHandler.class);
 		
-		serve(HEALTHCHECK_URL_PATTERN).with(GuiceContainer.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
+		serve(HEALTHCHECK_URL_PATTERN).with(GuiceHealthCheckJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 	}
 
+	@Singleton
+	private static class GuiceHealthCheckJerseyServlet extends GuiceContainer {
+
+		@Inject
+		private GuiceHealthCheckJerseyServlet(Injector injector) {
+			super(injector);
+		}
+		
+	}
+
+	
 }
