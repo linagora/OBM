@@ -33,8 +33,13 @@ require_once dirname(__FILE__) . '/auth/Authentication.php';
 
 if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 	$crypted_password = Authentication::getHasher()->hash($_POST['password']);
-
-	echo '[authentication] <br/> login='.$_POST['login'].' <br/> password='.$crypted_password;
+	$output = '[authentication] <br/> login='.$_POST['login'].' <br/> password='.$crypted_password;
+	
+	if (!empty($_POST['testUserLogin']) && !empty($_POST['testUserPassword'])) {
+	  $output .= '<br /> <br /> [test-user] <br /> login=' . $_POST['testUserLogin'] . ' <br /> password=' . $_POST['testUserPassword'];
+	}
+	
+	echo $output;
 	exit();
 }
 
@@ -47,7 +52,10 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
 	<style type="text/css">
 		.showConfig{font-family:mono,sans-serif;background-color:#333;color:#FAFAFA;border-radius:5px;padding:15px;}
-		#validator{font-size:2.9em;color:#A00;font-weight:bold;}
+		#validator, #validatorTestUser {font-size:2.6em;color:#A00;font-weight:bold;}
+		
+		#introduction p{text-align:justify;}
+		
 	</style>
 </head>
 <body>
@@ -60,11 +68,11 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 <script src="assets/js/bootstrap-popover.js"></script>
 <script type="text/javascript">
 	$.healthcheck = {};
-	$.healthcheck.encryptionRequest = function(username, password){
+	$.healthcheck.encryptionRequest = function(username, password, testUserLogin, testUserPassword){
 		$.ajax({
 			url: window.location,
 			type: "POST",
-			data: {"login": username, "password": password },
+			data: {"login": username, "password": password, "testUserLogin": testUserLogin, "testUserPassword": testUserPassword },
 			error: function(jqXhr, errorType) {
 				var status = jqXhr.status;
 				if ( status == 0 || errorType) {
@@ -75,40 +83,54 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 			success: function(response){
 				$("#configurationFile").addClass("showConfig");
 				$("#configurationFile")
-					.html("; content of the /etc/obm/healthcheck.ini file<BR>")
+					.html("; content of the /etc/obm/healthcheck.ini file <br /> <br />")
 					.append(response);
 			}
 		});
 	};
 
+	$.healthcheck.validateForm = function() {
+		var password = $.trim($("#password").val());
+		var passwordConfirm = $.trim($("#passwordConfirm").val());
+		var testUserPassword = $.trim($("#testUserPassword").val());
+		var testUserPasswordConfirm = $.trim($("#testUserPasswordConfirm").val());
+		var authPasswordsMatch = password == passwordConfirm;
+		var testUserPasswordsMatch = testUserPassword == testUserPasswordConfirm;
+
+		$("#validator").css("display", authPasswordsMatch ? "none" : "inline");
+		$("#validatorTestUser").css("display", testUserPasswordsMatch ? "none" : "inline");
+		
+		if(authPasswordsMatch && testUserPasswordsMatch && password.length > 0 && testUserPassword.length > 0){
+			$("#submitFormButton").prop('disabled', false).addClass("btn-success");
+		} else {
+			$("#submitFormButton").prop('disabled', true).removeClass("btn-success");
+		}
+	}
+
 	$(document).ready( function(){
 		$("#validator").css("display", "none");
+		$("#validatorTestUser").css("display", "none");
 		$("#submitFormButton").prop('disabled', true);
 
 		$("#formSubmit").submit( function(event) {
 
 			var username = $("#login").val();
 			var password = $("#password").val();
+			var testUserLogin = $("#testUserLogin").val();
+			var testUserPassword = $("#testUserPassword").val();
 			var passwordConfirm = $("#passwordConfirm").val();
 
 			if ( password == passwordConfirm ) {
 				$("#validator").css("display", "none");
-				$.healthcheck.encryptionRequest(username, password);
+				$.healthcheck.encryptionRequest(username, password, testUserLogin, testUserPassword);
 			}
 			event.preventDefault();
 		});
 
-		$("#passwordConfirm").keyup(function(){
-			var password = $("#password").val();
-			var passwordConfirm = $("#passwordConfirm").val();
-			if(password == passwordConfirm){
-				$("#validator").css("display", "none");
-				$("#submitFormButton").prop('disabled', false).addClass("btn-success");
-			} else {
-				$("#validator").css("display", "inline");
-				$("#submitFormButton").prop('disabled', true).removeClass("btn-success");
-			}
-		});
+		$("#password").keyup($.healthcheck.validateForm);
+		$("#passwordConfirm").keyup($.healthcheck.validateForm);
+		$("#testUserPassword").keyup($.healthcheck.validateForm);
+		$("#testUserPasswordConfirm").keyup($.healthcheck.validateForm);
 
 	});
 </script>
@@ -129,25 +151,40 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 		<h2>
 			Welcome in OBM Health Check System
 		</h2>
-		<h3>It's your first access to Health Check OBM:</h3>
+		<h3>Authentication configuration</h3>
 		<p>
-			To use OBM Health Check, you need a <strong>unique user and password</strong> in a configuration file. <br/><br/>
+			To use OBM Health Check, you need a <strong>unique user and password</strong> in a configuration file.
 			So please complete this form to generate your login and hashed password and paste the result in a file <strong>/etc/obm/healthcheck.ini</strong> on your Apache web server.
 		</p>
+		<h3>Using a test OBM user for checks</h3>
 		<p>
-			When you're done, <a href="index.php" class="btn">Click here to access the Health Check</a>.
+		    Some checks require a test OBM user to run properly (e.g.: a complete obm-sync synchronization, IMAP checks, etc.).
+		</p>
+		<p>
+		    To configure one, you 'll need a <b>[test-user]</b> section in the same configuration file.
+		    This section should have two entries <i>login</i> and <i>password</i>.
+		    You can also use the provided form to generate the configuration file snippet directly.
+		</p>
+		<h3>When you're done </h3>
+		<p> <a href="index.php" class="btn btn-primary">Click here to access the Health Check</a> </p>
 	</div>
 
 	<div class="span3 alert alert-info">
 		<h3>Generation Form</h3>
 		<form id="formSubmit" class="form">
-			<fieldset class="pull-right">
+		    <b>Authentication</b>
+			<fieldset>
 				<input id="login" type="text" class="input" placeholder="Login">
 				<input id="password" type="password" class="input" placeholder="Password">
 				<input id="passwordConfirm" type="password" class="input" placeholder="Verify Password"><span id="validator">&times;</span>
-				<br/>
-				<button id="submitFormButton" type="submit" class="btn">Hash my password</button>
 			</fieldset>
+			<b>Test User</b>
+			<fieldset>
+				<input id="testUserLogin" type="text" class="input" placeholder="Login">
+				<input id="testUserPassword" type="password" class="input" placeholder="Password">
+				<input id="testUserPasswordConfirm" type="password" class="input" placeholder="Verify Password"><span id="validatorTestUser">&times;</span>
+			</fieldset>
+			<button id="submitFormButton" type="submit" class="btn">Generate</button>
 		</form>
 	</div>
 
