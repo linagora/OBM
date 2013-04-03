@@ -34,7 +34,7 @@ package org.obm.opush;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 
-import org.apache.commons.httpclient.Header;
+import org.apache.http.Header;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Test;
@@ -47,6 +47,8 @@ import org.obm.sync.push.client.OptionsResponse;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 @RunWith(SlowGuiceRunner.class) @Slow
@@ -70,6 +72,16 @@ public class OptionsHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(user.jaures, opushServer.getPort());
 		OptionsResponse options = opClient.options();
 		
-		assertThat(options.getHeaders()).contains(new Header("MS-ASProtocolVersions", "12.0,12.1"));
+		assertThat(Iterables.tryFind(options.getHeaders(), new Predicate<Header>() {
+
+			@Override
+			public boolean apply(Header input) {
+				if ("MS-ASProtocolVersions".equals(input.getName()) && "12.0,12.1".equals(input.getValue())) {
+					return true;
+				}
+				return false;
+			}
+			
+		}).isPresent()).isTrue();
 	}
 }

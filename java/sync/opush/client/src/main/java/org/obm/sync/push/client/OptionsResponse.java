@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
-import org.apache.commons.httpclient.Header;
+import org.apache.http.Header;
 
 import com.google.common.base.Objects;
 

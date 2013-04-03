@@ -37,12 +37,18 @@ import java.util.zip.GZIPInputStream;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Consts;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXMLTools;
@@ -71,9 +77,9 @@ public class WBXMLOPClient extends OPClient {
 	}
 	
 
-	private ByteArrayRequestEntity getRequestEntity(String namespace, Document doc) throws WBXmlException, IOException {
+	private ByteArrayEntity getRequestEntity(String namespace, Document doc) throws WBXmlException, IOException {
 		byte[] wbxml = wbxmlTools.toWbxml(namespace, doc);
-		return new ByteArrayRequestEntity(wbxml, "application/vnd.ms-sync.wbxml");
+		return new ByteArrayEntity(wbxml, ContentType.create("application/vnd.ms-sync.wbxml", Consts.ISO_8859_1));
 	}
 
 	@Override
@@ -82,48 +88,49 @@ public class WBXMLOPClient extends OPClient {
 
 		DOMUtils.logDom(doc);
 
-		RequestEntity requestEntity = getRequestEntity(namespace, doc);
+		ByteArrayEntity requestEntity = getRequestEntity(namespace, doc);
 		
-		PostMethod pm = null;
-		pm = new PostMethod(buildUrl(ai.getUrl(), ai.getLogin(),
+		HttpPost request = new HttpPost(buildUrl(ai.getUrl(), ai.getLogin(),
 				ai.getDevId(), ai.getDevType(), cmd));
-		pm.setRequestHeader("Content-Length", String.valueOf(requestEntity.getContentLength()));
-		pm.setRequestEntity(requestEntity);
-		pm.setRequestHeader("Content-Type", requestEntity.getContentType());
-		pm.setRequestHeader("Authorization", ai.authValue());
-		pm.setRequestHeader("User-Agent", ai.getUserAgent());
-		pm.setRequestHeader("Ms-Asprotocolversion", protocolVersion.toString());
-		pm.setRequestHeader("Accept", "*/*");
-		pm.setRequestHeader("Accept-Language", "fr-fr");
-		pm.setRequestHeader("Connection", "keep-alive");
+		request.setHeaders(new Header[] { new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
+				new BasicHeader("Authorization", ai.authValue()),
+				new BasicHeader("User-Agent", ai.getUserAgent()),
+				new BasicHeader("Ms-Asprotocolversion", protocolVersion.toString()),
+				new BasicHeader("Accept", "*/*"),
+				new BasicHeader("Accept-Language", "fr-fr"),
+				new BasicHeader("Connection", "keep-alive")
+				});
+		request.setEntity(requestEntity);
+		
 		if (multipart) {
-			pm.setRequestHeader("MS-ASAcceptMultiPart", "T");
-			pm.setRequestHeader("Accept-Encoding", "gzip");
+			request.addHeader(new BasicHeader("MS-ASAcceptMultiPart", "T"));
+			request.addHeader(new BasicHeader("Accept-Encoding", "gzip"));
 		}
 
 		if (policyKey != null) {
-			pm.setRequestHeader("X-MS-PolicyKey", policyKey);
+			request.addHeader(new BasicHeader("X-MS-PolicyKey", policyKey));
 		}
 
 		Document xml = null;
 		try {
-			int ret = 0;
-			ret = hc.executeMethod(pm);
-			Header[] hs = pm.getResponseHeaders();
+			HttpResponse response = hc.execute(request);
+			StatusLine statusLine = response.getStatusLine();
+			Header[] hs = response.getAllHeaders();
 			for (Header h : hs) {
 				logger.error("head[" + h.getName() + "] => "
 						+ h.getValue());
 			}
-			if (ret != HttpStatus.SC_OK) {
-				logger.error("method failed:\n" + pm.getStatusLine()
-						+ "\n" + pm.getResponseBodyAsString());
-				throw new HttpRequestException(ret);
+			int statusCode = statusLine.getStatusCode();
+			HttpEntity entity = response.getEntity();
+			if (statusCode != HttpStatus.SC_OK) {
+				logger.error("method failed:{}\n{}\n",  statusLine, entity);
+				throw new HttpRequestException(statusCode);
 			} else {
-				byte[] response = getResponse(pm);
-				if (pm.getResponseHeader("Content-Type") != null
-						&& pm.getResponseHeader("Content-Type").getValue()
+				byte[] responseBytes = getResponse(response);
+				if (response.getFirstHeader("Content-Type") != null
+						&& response.getFirstHeader("Content-Type").getValue()
 								.contains("application/vnd.ms-sync.multipart")) {
-					byte[] all = response;
+					byte[] all = responseBytes;
 					int idx = 0;
 					byte[] buffer = new byte[4];
 					for (int i = 0; i < buffer.length; i++) {
@@ -155,13 +162,17 @@ public class WBXMLOPClient extends OPClient {
 						}
 
 					}
-				} else if (response.length > 0) {
-					xml = wbxmlTools.toXml(response);
-					DOMUtils.logDom(xml);
+				} else if (entity.getContentLength() > 0) {
+					try {
+						xml = wbxmlTools.toXml(responseBytes);
+						DOMUtils.logDom(xml);
+					} finally {
+						EntityUtils.consume(entity);
+					}
 				}
 			}
 		} finally {
-			pm.releaseConnection();
+			request.releaseConnection();
 		}
 		return xml;
 	}
@@ -174,20 +185,20 @@ public class WBXMLOPClient extends OPClient {
 				+ "&Cmd=" + cmd;
 	}
 
-	private byte[] getResponse(PostMethod pm) throws IOException {
+	private byte[] getResponse(HttpResponse response) throws IOException {
 		InputStream responseStream = null;
 		try {
-			responseStream = getResponseStream(pm);
+			responseStream = getResponseStream(response);
 			return ByteStreams.toByteArray(responseStream);
 		} finally {
 			IOUtils.closeQuietly(responseStream);
 		}
 	}
 
-	private InputStream getResponseStream(PostMethod pm) throws IOException {
-		InputStream is = pm.getResponseBodyAsStream();
-		if (pm.getResponseHeader("Content-Encoding") != null
-				&& pm.getResponseHeader("Content-Encoding").getValue().contains("gzip")) {
+	private InputStream getResponseStream(HttpResponse response) throws IOException {
+		InputStream is = response.getEntity().getContent();
+		if (response.getFirstHeader("Content-Encoding") != null
+				&& response.getFirstHeader("Content-Encoding").getValue().contains("gzip")) {
 			return new GZIPInputStream(is);
 		} else {
 			return is;

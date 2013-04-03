@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
-import org.apache.commons.httpclient.HttpClient;
+import org.apache.http.client.HttpClient;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.AccountInfos;

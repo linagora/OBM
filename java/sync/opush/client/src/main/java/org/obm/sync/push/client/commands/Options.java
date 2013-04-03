@@ -31,10 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.OptionsMethod;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.message.BasicHeader;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.OptionsResponse;
@@ -50,24 +53,26 @@ public class Options implements IEasCommand<OptionsResponse> {
 	
 	@Override
 	public OptionsResponse run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception {
-		OptionsMethod pm = new OptionsMethod(ai.getUrl() + "?User=" + ai.getLogin()
+		HttpOptions request = new HttpOptions(ai.getUrl() + "?User=" + ai.getLogin()
 				+ "&DeviceId=" + ai.getDevId().getDeviceId() + "&DeviceType=" + ai.getDevType());
-		pm.setRequestHeader("User-Agent", ai.getUserAgent());
-		pm.setRequestHeader("Authorization", ai.authValue());
+		request.setHeaders(new Header[] { new BasicHeader("User-Agent", ai.getUserAgent()),
+				new BasicHeader("Authorization", ai.authValue())
+				});
 		synchronized (hc) {
 			try {
-				int ret = hc.executeMethod(pm);
-				if (ret != HttpStatus.SC_OK) {
-					logger.error("method failed:\n" + pm.getStatusLine()
-							+ "\n" + pm.getResponseBodyAsString());
+				HttpResponse response = hc.execute(request);
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+				if (statusCode != HttpStatus.SC_OK) {
+					logger.error("method failed:{}\n{}\n",  statusLine, response.getEntity());
 				}
-				Header[] hs = pm.getResponseHeaders();
+				Header[] hs = response.getAllHeaders();
 				for (Header h : hs) {
 					logger.info("resp head[" + h.getName() + "] => "+ h.getValue());
 				}
 				return new OptionsResponse(ImmutableSet.copyOf(hs));
 			} finally {
-				pm.releaseConnection();
+				request.releaseConnection();
 			}
 		}
 	}

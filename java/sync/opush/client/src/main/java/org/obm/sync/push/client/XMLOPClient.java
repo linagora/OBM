@@ -38,14 +38,17 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.message.BasicHeader;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -58,10 +61,10 @@ public class XMLOPClient extends OPClient {
 		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
 	}
 
-	private RequestEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {
+	private ByteArrayEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {
 		try {
 			String xmlData = DOMUtils.serialize(doc);
-			return new ByteArrayRequestEntity(xmlData.getBytes("UTF8"), "text/xml");
+			return new ByteArrayEntity(xmlData.getBytes("UTF8"), ContentType.TEXT_XML);
 		} catch (TransformerException e) {
 			throw new TransformerException("Cannot serialize data to xml", e);
 		}
@@ -73,33 +76,35 @@ public class XMLOPClient extends OPClient {
 
 	@Override
 	public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
-			throws TransformerException, HttpException, IOException, HttpRequestException {
+			throws TransformerException, WBXmlException, IOException, HttpRequestException {
 		
 		DOMUtils.logDom(doc);
 		
-		RequestEntity requestEntity = getRequestEntity(doc);
+		ByteArrayEntity requestEntity = getRequestEntity(doc);
 
-		PostMethod pm = null;
-		pm = new PostMethod(ai.getUrl() + "?User=" + ai.getLogin());
-		pm.setRequestHeader("Content-Length", String.valueOf(requestEntity.getContentLength()));
-		pm.setRequestEntity(requestEntity);
-		pm.setRequestHeader("Content-Type", requestEntity.getContentType());
-		pm.setRequestHeader("Authorization", ai.authValue());
-		pm.setRequestHeader("Accept", "*/*");
-		pm.setRequestHeader("Accept-Language", "fr-fr");
-		pm.setRequestHeader("Connection", "keep-alive");
+		HttpPost request = new HttpPost(ai.getUrl() + "?User=" + ai.getLogin());
+		request.setHeaders(new Header[] {
+				new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
+				new BasicHeader("Authorization", ai.authValue()),
+				new BasicHeader("Accept", "*/*"),
+				new BasicHeader("Accept-Language", "fr-fr"),
+				new BasicHeader("Connection", "keep-alive")
+			});
+		request.setEntity(requestEntity);
 		
 		try {
-			int ret = 0;
-			ret = hc.executeMethod(pm);
-			Header[] hs = pm.getResponseHeaders();
+			HttpResponse response = hc.execute(request);
+			StatusLine statusLine = response.getStatusLine();
+			Header[] hs = response.getAllHeaders();
 			for (Header h: hs) {
 				logger.error("head[" + h.getName() + "] => " + h.getValue());
 			}
-			if (ret != HttpStatus.SC_OK) {
-				throw new HttpRequestException(ret, "method failed:\n" + pm.getStatusLine() + "\n" + pm.getResponseBodyAsString());
+			int statusCode = statusLine.getStatusCode();
+			if (statusCode != HttpStatus.SC_OK) {
+				logger.error("method failed:{}\n{}\n",  statusLine, response.getEntity());
+				throw new HttpRequestException(statusCode);
 			} else {
-				InputStream in = pm.getResponseBodyAsStream();
+				InputStream in = response.getEntity().getContent();
 				Document docResponse = DOMUtils.parse(in);
 				DOMUtils.logDom(docResponse);
 				return docResponse;
@@ -109,7 +114,7 @@ public class XMLOPClient extends OPClient {
 		} catch (FactoryConfigurationError e) {
 			throw new TransformerException(e);
 		} finally {
-			pm.releaseConnection();
+			request.releaseConnection();
 		}
 	}
 	

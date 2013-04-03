@@ -35,12 +35,16 @@ import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.message.BasicHeader;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
@@ -89,7 +93,7 @@ public abstract class OPClient {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected HttpClient hc;
-	private MultiThreadedHttpConnectionManager mtManager;
+	private PoolingClientConnectionManager mtManager;
 	protected ProtocolVersion protocolVersion;
 	protected AccountInfos ai;
 
@@ -115,14 +119,10 @@ public abstract class OPClient {
 	}
 
 	private HttpClient createHttpClient() {
-		this.mtManager = new MultiThreadedHttpConnectionManager();
-		HttpClient ret = new HttpClient(mtManager);
-		HttpConnectionManagerParams mp = ret.getHttpConnectionManager()
-				.getParams();
-		mp.setDefaultMaxConnectionsPerHost(100);
-		mp.setMaxTotalConnections(100);
-
-		return ret;
+		mtManager = new PoolingClientConnectionManager();
+		mtManager.setMaxTotal(100);
+		mtManager.setDefaultMaxPerRoute(100);
+		return new DefaultHttpClient(mtManager);
 	}
 
 	public OptionsResponse options() throws Exception {
@@ -224,36 +224,37 @@ public abstract class OPClient {
 	}
 
 	public byte[] postGetAttachment(String attachmentName) throws Exception {
-		PostMethod pm = new PostMethod(ai.getUrl() + "?User=" + ai.getLogin()
+		HttpPost request = new HttpPost(ai.getUrl() + "?User=" + ai.getLogin()
 				+ "&DeviceId=" + ai.getDevId() + "&DeviceType="
 				+ ai.getDevType() + "&Cmd=GetAttachment&AttachmentName="
 				+ attachmentName);
-		pm.setRequestHeader("Authorization", ai.authValue());
-		pm.setRequestHeader("User-Agent", ai.getUserAgent());
-		pm.setRequestHeader("Ms-Asprotocolversion", protocolVersion.toString());
-		pm.setRequestHeader("Accept", "*/*");
-		pm.setRequestHeader("Accept-Language", "fr-fr");
-		pm.setRequestHeader("Connection", "keep-alive");
+		request.setHeaders(new Header[] { new BasicHeader("Authorization", ai.authValue()),
+				new BasicHeader("User-Agent", ai.getUserAgent()),
+				new BasicHeader("Ms-Asprotocolversion", protocolVersion.toString()),
+				new BasicHeader("Accept", "*/*"),
+				new BasicHeader("Accept-Language", "fr-fr"),
+				new BasicHeader("Connection", "keep-alive")
+				});
 
 		synchronized (hc) {
 			try {
-				int ret = hc.executeMethod(pm);
-				Header[] hs = pm.getResponseHeaders();
+				HttpResponse response = hc.execute(request);
+				StatusLine statusLine = response.getStatusLine();
+				Header[] hs = response.getAllHeaders();
 				for (Header h : hs) {
 					logger.error("head[" + h.getName() + "] => "
 							+ h.getValue());
 				}
-				if (ret != HttpStatus.SC_OK) {
-					logger.error("method failed:\n" + pm.getStatusLine()
-							+ "\n" + pm.getResponseBodyAsString());
+				if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+					logger.error("method failed:{}\n{}\n",  statusLine, response.getEntity());
 				} else {
-					for (Header h : pm.getResponseHeaders()) {
+					for (Header h : hs) {
 						logger.info(h.getName() + ": " + h.getValue());
 					}
-					return pm.getResponseBody();
+					return IOUtils.toByteArray(response.getEntity().getContent());
 				}
 			} finally {
-				pm.releaseConnection();
+				request.releaseConnection();
 			}
 		}
 		return null;
