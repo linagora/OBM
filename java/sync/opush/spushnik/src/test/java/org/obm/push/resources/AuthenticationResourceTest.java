@@ -47,19 +47,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.push.SlowArquillianRunner;
 import org.obm.push.SpushnikWebArchive;
 import org.obm.push.jaxb.Credentials;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 
-@RunWith(Arquillian.class)
+@RunWith(SlowArquillianRunner.class) @Slow
 public class AuthenticationResourceTest {
 
 	private DefaultHttpClient httpClient;

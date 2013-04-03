@@ -34,25 +34,17 @@ package org.obm.filter;
 import java.util.List;
 
 import org.junit.rules.TestRule;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.InitializationError;
 
-public class SlowFilterRunner extends BlockJUnit4ClassRunner {
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
-	private SlowFilterRunnerDelegation delegate;
+public class SlowFilterRunnerDelegation {
 
-	public SlowFilterRunner(Class<?> klass) throws InitializationError {
-		super(klass);
-		delegate = new SlowFilterRunnerDelegation();
-	}
-
-	@Override
-	protected List<TestRule> getTestRules(Object target) {
-		return delegate.getTestRules(super.getTestRules(target));
+	public List<TestRule> getTestRules(List<TestRule> originalTestRules) {
+		return ImmutableList.copyOf(Iterables.concat(originalTestRules, ImmutableList.of(new SlowFilterRule())));
 	}
 	
-	@Override
-	protected List<TestRule> classRules() {
-		return delegate.classRules(super.classRules());
+	public List<TestRule> classRules(List<TestRule> originalClassRules) {
+		return ImmutableList.copyOf(Iterables.concat(originalClassRules, ImmutableList.of(new SlowFilterRule())));
 	}
 }
