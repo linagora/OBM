@@ -48,7 +48,6 @@ import org.obm.push.jaxb.CheckResult;
 import org.obm.push.jaxb.CheckStatus;
 import org.obm.push.resources.AuthenticationResource;
 import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
 import org.obm.push.resources.Scenario;
 
 import com.google.common.base.Throwables;
@@ -65,7 +64,6 @@ public class SpushnikWebArchive {
 				.addClass(TestGuiceModule.class)
 				.addClass(CheckResult.class)
 				.addClass(CheckStatus.class)
-				.addClass(HelloResource.class)
 				.addClass(AuthenticationResource.class)
 				.addClass(FolderSyncScenario.class)
 				.addClass(Scenario.class)

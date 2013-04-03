@@ -32,7 +32,6 @@
 package org.obm.push;
 
 import org.obm.push.resources.FolderSyncScenario;
-import org.obm.push.resources.HelloResource;
 import org.obm.push.service.CredentialsService;
 
 import com.google.inject.Binder;
@@ -42,7 +41,6 @@ public class GuiceModule implements Module {
 
 	@Override
 	public void configure(Binder binder) {
-		binder.bind(HelloResource.class);
 		binder.bind(FolderSyncScenario.class);
 		binder.bind(CredentialsService.class);
 	}
