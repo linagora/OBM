@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.healthcheck.handlers;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -43,7 +43,7 @@ import org.obm.healthcheck.HealthCheckHandler;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.jersey.api.model.AbstractResource;
@@ -60,8 +60,8 @@ public class RootHandler implements HealthCheckHandler {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<EndpointDescription> root() {
-		List<EndpointDescription> endpoints = Lists.newArrayList();
+	public Set<EndpointDescription> root() {
+		Set<EndpointDescription> endpoints = Sets.newHashSet();
 		Iterable<Class<?>> classes = Iterables.filter(application.getClasses(), Predicates.assignableFrom(HealthCheckHandler.class));
 
 		for (Class<?> handlerClass : classes) {

@@ -31,7 +31,6 @@ package org.obm.healthcheck.handlers;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -46,7 +45,6 @@ import org.obm.healthcheck.handlers.RootHandlerTest.Env;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -115,8 +113,8 @@ public class RootHandlerTest {
 
 	@Test
 	public void testRoot() {
-		List<EndpointDescription> actual = handler.root();
-		List<EndpointDescription> expected = ImmutableList.of(
+		Set<EndpointDescription> actual = handler.root();
+		Set<EndpointDescription> expected = ImmutableSet.of(
 				new EndpointDescription("GET", "/handler1/method1"),
 				new EndpointDescription("GET", "/handler1/method2"),
 				new EndpointDescription("GET", "/handler2/method1"));
