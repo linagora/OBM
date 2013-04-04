@@ -56,7 +56,13 @@ public class UserEmailParserUtils {
 	}
 	
 	public boolean isAddress(String email) {
-		return !Strings.isNullOrEmpty(getLogin(email));
+		try {
+			String[] loginAndDomain = getLoginAndDomain(email);
+			return !Strings.isNullOrEmpty(loginAndDomain[LOGIN])
+				&& !Strings.isNullOrEmpty(loginAndDomain[DOMAIN]);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	private String[] getLoginAndDomain(String userId) {

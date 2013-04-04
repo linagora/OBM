@@ -44,6 +44,10 @@ public class EmailAddress implements IMergeable, Serializable {
 	
 	public static final String AT = "@";
 
+	public static boolean isEmailAddress(String emailToCheck) {
+		return new UserEmailParserUtils().isAddress(emailToCheck);
+	}
+	
 	public static EmailAddress loginAtDomain(String loginAtDomain) {
 		UserEmailParserUtils userEmailParserUtils = new UserEmailParserUtils();
 		Preconditions.checkArgument(userEmailParserUtils.isAddress(loginAtDomain));

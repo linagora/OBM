@@ -99,6 +99,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -1029,14 +1030,24 @@ public class ContactDao {
 			contactIds.insertValues(st, 1);
 			rs = st.executeQuery();
 			while (rs.next()) {
-				Contact c = entityContact.get(rs.getInt(1));
-				EmailAddress p = EmailAddress.loginAtDomain(rs.getString(3));
-				c.addEmail(rs.getString(2), p);
+				loadEmailInContact(entityContact, rs);
 			}
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
 			obmHelper.cleanup(null, st, rs);
+		}
+	}
+
+	@VisibleForTesting void loadEmailInContact(Map<Integer, Contact> entityContact, ResultSet rs) throws SQLException {
+		Contact contact = entityContact.get(rs.getInt(1));
+		String contactEmailLabel = rs.getString(2);
+		String contactEmail = rs.getString(3);
+		if (!Strings.isNullOrEmpty(contactEmailLabel) && EmailAddress.isEmailAddress(contactEmail)) {
+			contact.addEmail(contactEmailLabel, EmailAddress.loginAtDomain(contactEmail));
+		} else {
+			logger.warn("An email field has been ignored for contact:{}, the field is not valid:{} -> {}",
+					new Object[]{contact.getEntityId(), contactEmailLabel, contactEmail});
 		}
 	}
 

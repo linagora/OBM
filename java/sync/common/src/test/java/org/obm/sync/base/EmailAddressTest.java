@@ -88,7 +88,7 @@ public class EmailAddressTest {
 		assertThat(loginAtDomain.getDomain()).isEqualTo(new DomainName("domain.org"));
 	}
 	
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void testLoginAtDomainNull() {
 		EmailAddress.loginAtDomain(null);
 	}
