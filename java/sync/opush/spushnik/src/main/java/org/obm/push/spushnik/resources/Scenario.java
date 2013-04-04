@@ -31,19 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.obm.push.bean.DeviceId;
 import org.obm.push.spushnik.bean.CheckResult;
 import org.obm.push.spushnik.bean.CheckStatus;
+import org.obm.push.spushnik.bean.Credentials;
+import org.obm.push.spushnik.service.CredentialsService;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.WBXMLOPClient;
 
 import com.google.common.base.Throwables;
+import com.google.inject.Inject;
 
 public abstract class Scenario {
 	
@@ -51,17 +54,19 @@ public abstract class Scenario {
 	private final static String DEV_TYPE = "spushnikProbe";
 	private final static String USER_AGENT = "spushnikAgent";
 	
-	@GET
+	@Inject CredentialsService credentialsService;
+	
+	@POST
 	@Produces("application/json")
 	public CheckResult run(
-			@QueryParam("loginAtDomain") String loginAtDomain, 
-			@QueryParam("password") String password, 
-			@QueryParam("serviceUrl") String serviceUrl) {
-		
-		OPClient client = new WBXMLOPClient(loginAtDomain, password, DEVICE_ID, 
-				DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
+			@QueryParam("serviceUrl") String serviceUrl,
+			Credentials credentials) {
 		
 		try {
+			credentialsService.validate(credentials);
+			OPClient client = new WBXMLOPClient(credentials.getLoginAtDomain(), credentials.getPassword(),
+				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
+		
 			return scenarii(client);
 		} catch (Exception e) {
 			return handleException(e);
@@ -71,22 +76,21 @@ public abstract class Scenario {
 	protected abstract CheckResult scenarii(OPClient client) throws Exception;
 	
 	protected CheckResult buildOK() {
-		return buildResult(CheckStatus.OK, null);
+		return CheckResult.builder().checkStatus(CheckStatus.OK).build();
 	}
 	
 	protected CheckResult buildWarning(String message) {
-		return buildResult(CheckStatus.WARNING, message);
+		return CheckResult.builder()
+				.checkStatus(CheckStatus.WARNING)
+				.addMessage(message)
+				.build();
 	}
 	
 	protected CheckResult buildError(String message) {
-		return buildResult(CheckStatus.ERROR, message);
-	}
-	
-	private CheckResult buildResult(CheckStatus checkStatus, String message) {
 		return CheckResult.builder()
-				.checkStatus(checkStatus)
-				.message(message)
-				.build(); 
+				.checkStatus(CheckStatus.ERROR)
+				.addMessage(message)
+				.build();
 	}
 	
 	private CheckResult handleException(Exception exception) {

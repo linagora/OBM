@@ -29,84 +29,20 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.spushnik.bean;
+package org.obm.push.spushnik;
 
-import java.util.Set;
+public class SpushnikTestUtils {
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-
-public class CheckResult {
-
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static CheckResult createEmptyRequest() {
-		return builder().build();
-	}
-	
-	public static class Builder {
-		private CheckStatus checkStatus;
-		private Set<String> messages;
-		
-		private Builder() {
-			messages = Sets.newHashSet();
-		}
-		
-		public Builder checkStatus(CheckStatus checkStatus) {
-			this.checkStatus = checkStatus;
-			return this;
-		}
-		
-		public Builder addMessage(String message) {
-			this.messages.add(message);
-			return this;
-		}
-		
-		public CheckResult build() {
-			Preconditions.checkState(checkStatus != null, "CheckStatus is required");
-			return new CheckResult(checkStatus, messages);
-		}
-	}
-	
-	private final int status;
-	private final Set<String> messages;
-	
-	public CheckResult(CheckStatus checkStatus, Set<String> messages) {
-		this.status = checkStatus.asSpecificationValue();
-		this.messages = messages;
-	}
-	
-	public int getStatus() {
-		return status;
-	}
-	
-	public Set<String> getMessages() {
-		return messages;
-	}
-	
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(status, messages);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof CheckResult) {
-			CheckResult that = (CheckResult) object;
-			return Objects.equal(this.status, that.status)
-				&& Objects.equal(this.messages, that.messages);
-		}
-		return false;
+	public static String buildServiceUrl(int port) {
+		return buildServiceUrl("127.0.0.1", port);
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("status", status)
-			.add("messages", messages)
-			.toString();
+	public static String buildServiceUrl(String ip, int port) {
+		return buildServiceUrl("/ActiveSyncServlet/", ip, port);
 	}
+
+	public static String buildServiceUrl(String webApp, String ip, int port) {
+		return "http://" + ip + ":" + port + webApp;
+	}
+	
 }

@@ -31,54 +31,48 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Properties;
+import java.io.InputStream;
+import java.net.URL;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.ActiveSyncServletModule.OpushServer;
-import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.SingleUserFixture;
+import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.mail.MailBackend;
-import org.obm.push.spushnik.bean.CheckResult;
-import org.obm.push.spushnik.bean.CheckStatus;
-import org.obm.push.state.SyncKeyFactory;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.store.DeviceDao;
-import org.obm.push.store.DeviceDao.PolicyStatus;
-import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.task.TaskBackend;
+import org.obm.push.spushnik.SlowArquillianRunner;
+import org.obm.push.spushnik.SpushnikScenarioTestUtils;
+import org.obm.push.spushnik.SpushnikTestUtils;
+import org.obm.push.spushnik.SpushnikWebArchive;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.client.login.LoginService;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowArquillianRunner.class) @Slow
 public class FolderSyncScenarioTest {
-	
+
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ScenarioTestModule.class);
 
@@ -88,211 +82,79 @@ public class FolderSyncScenarioTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 
+	private DefaultHttpClient httpClient;
+
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		Files.delete(configuration.dataDir);
 	}
-
-	@Test
-	public void testScenarii() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
-				singleUserFixture.jaures);
-		User user = singleUserFixture.jaures.user;
-		DeviceId deviceId = new DeviceId("spushnik");
-		Device device = new Device(user.hashCode(), 
-				"spushnikProbe", 
-				deviceId, 
-				new Properties(), 
-				singleUserFixture.jaures.deviceProtocolVersion);
-		// First provisionning
-		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		expect(deviceDao.getDevice(user, 
-				deviceId, 
-				"spushnikAgent",
-				singleUserFixture.jaures.deviceProtocolVersion))
-			.andReturn(device).anyTimes();
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(null).once();
-		Long policyKey = new Long(1);
-		expect(deviceDao.allocateNewPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(policyKey).once();
-		
-		// Second provisionning
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(policyKey).once();
-		deviceDao.removePolicyKey(user, device);
-		expectLastCall().once();
-		expect(deviceDao.allocateNewPolicyKey(user, deviceId, PolicyStatus.ACCEPTED))
-			.andReturn(policyKey).once();
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.ACCEPTED))
-			.andReturn(policyKey).once();
-		
-		// FolderSync
-		SyncKey syncKey = new SyncKey("123");
-		expect(classToInstanceMap.get(SyncKeyFactory.class).randomSyncKey())
-			.andReturn(syncKey).once();
-		FolderSyncState syncState = FolderSyncState.builder()
-				.syncKey(syncKey)
-				.id(1)
-				.build();
-		expect(classToInstanceMap.get(CollectionDao.class).allocateNewFolderSyncState(device, syncKey))
-			.andReturn(syncState).once();
-		FolderSyncState initialSyncState = FolderSyncState.builder()
-				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
-				.id(0)
-				.build();
-		ContactsBackend contactsBackend = classToInstanceMap.get(ContactsBackend.class);
-		expect(contactsBackend.getPIMDataType())
-			.andReturn(PIMDataType.CONTACTS).once();
-		expect(contactsBackend.getHierarchyChanges(anyObject(UserDataRequest.class), eq(initialSyncState), eq(syncState)))
-			.andReturn(HierarchyCollectionChanges.builder()
-					.build()).once();
-		CalendarBackend calendarBackend = classToInstanceMap.get(CalendarBackend.class);
-		expect(calendarBackend.getPIMDataType())
-			.andReturn(PIMDataType.CALENDAR).once();
-		expect(calendarBackend.getHierarchyChanges(anyObject(UserDataRequest.class), eq(initialSyncState), eq(syncState)))
-			.andReturn(HierarchyCollectionChanges.builder()
-					.build()).once();
-		TaskBackend taskBackend = classToInstanceMap.get(TaskBackend.class);
-		expect(taskBackend.getPIMDataType())
-			.andReturn(PIMDataType.TASKS).once();
-		expect(taskBackend.getHierarchyChanges(anyObject(UserDataRequest.class), eq(initialSyncState), eq(syncState)))
-			.andReturn(HierarchyCollectionChanges.builder()
-					.build()).once();
-		MailBackend mailBackend = classToInstanceMap.get(MailBackend.class);
-		expect(mailBackend.getPIMDataType())
-			.andReturn(PIMDataType.EMAIL).once();
-		expect(mailBackend.getHierarchyChanges(anyObject(UserDataRequest.class), eq(initialSyncState), eq(syncState)))
-			.andReturn(HierarchyCollectionChanges.builder()
-					.build()).once();
-		classToInstanceMap.get(FolderSyncStateBackendMappingDao.class).createMapping(anyObject(PIMDataType.class), eq(syncState));
-		expectLastCall().anyTimes();
-		
+	
+	@Before
+	public void setUp() throws Exception {
+		SpushnikScenarioTestUtils.mockWorkingFolderSync(classToInstanceMap, singleUserFixture.jaures);
 		mocksControl.replay();
 		opushServer.start();
-
-		FolderSyncScenario scenario = new FolderSyncScenario();
-		CheckResult checkResult = scenario.run(user.getLoginAtDomain(),
-				singleUserFixture.jaures.password,
-				buildServiceUrl(opushServer.getPort()));
-		
-		assertThat(checkResult.getStatus()).isEqualTo(CheckStatus.OK.asSpecificationValue());
+		httpClient = new DefaultHttpClient();
 	}
-
+	
 	@Test
-	public void testErrorInBackend() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
-				singleUserFixture.jaures);
-		User user = singleUserFixture.jaures.user;
-		DeviceId deviceId = new DeviceId("spushnik");
-		Device device = new Device(user.hashCode(), 
-				"spushnikProbe", 
-				deviceId, 
-				new Properties(), 
-				singleUserFixture.jaures.deviceProtocolVersion);
-		// First provisionning
-		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
-		expect(deviceDao.getDevice(user, 
-				deviceId, 
-				"spushnikAgent",
-				singleUserFixture.jaures.deviceProtocolVersion))
-			.andReturn(device).anyTimes();
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(null).once();
-		Long policyKey = new Long(1);
-		expect(deviceDao.allocateNewPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(policyKey).once();
+	@RunAsClient
+	public void testFolderSyncScenarioWithNiceCertificate(@ArquillianResource URL baseURL) throws Exception {
+		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_good.txt");
 		
-		// Second provisionning
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.PENDING))
-			.andReturn(policyKey).once();
-		deviceDao.removePolicyKey(user, device);
-		expectLastCall().once();
-		expect(deviceDao.allocateNewPolicyKey(user, deviceId, PolicyStatus.ACCEPTED))
-			.andReturn(policyKey).once();
-		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.ACCEPTED))
-			.andReturn(policyKey).once();
-		
-		// FolderSync
-		SyncKey syncKey = new SyncKey("123");
-		expect(classToInstanceMap.get(SyncKeyFactory.class).randomSyncKey())
-			.andReturn(syncKey).once();
-		FolderSyncState syncState = FolderSyncState.builder()
-				.syncKey(syncKey)
-				.id(1)
-				.build();
-		expect(classToInstanceMap.get(CollectionDao.class).allocateNewFolderSyncState(device, syncKey))
-			.andReturn(syncState).once();
-		
-		mocksControl.replay();
-		opushServer.start();
-
-		FolderSyncScenario scenario = new FolderSyncScenario();
-		CheckResult checkResult = scenario.run(user.getLoginAtDomain(),
-				singleUserFixture.jaures.password,
-				buildServiceUrl(opushServer.getPort()));
-		
-		assertThat(checkResult.getStatus()).isEqualTo(CheckStatus.ERROR.asSpecificationValue());
+		InputStream content = httpResponse.getEntity().getContent();
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo("{\"status\":0,\"messages\":[]}");
 	}
-
+	
 	@Test
-	public void testBadOpushPort() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
-				singleUserFixture.jaures);
+	@RunAsClient
+	public void testFolderSyncScenarioWithBadCertificate(@ArquillianResource URL baseURL) throws Exception {
+		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_bad.txt");
 		
-		mocksControl.replay();
-		opushServer.start();
-
-		FolderSyncScenario scenario = new FolderSyncScenario();
-		CheckResult checkResult = scenario.run(singleUserFixture.jaures.user.getLoginAtDomain(),
-				singleUserFixture.jaures.password,
-				buildServiceUrl(opushServer.getPort() +1));
-		
-		assertThat(checkResult.getStatus()).isEqualTo(CheckStatus.ERROR.asSpecificationValue());
+		InputStream content = httpResponse.getEntity().getContent();
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(content, Charsets.UTF_8))
+			.startsWith("{\"status\":2,\"messages\":[\"org.obm.push.spushnik.service.InvalidCredentialsException: Invalid certificate")
+			.endsWith("\"]}");
 	}
-
+	
 	@Test
-	public void testBadOpushAddress() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
-				singleUserFixture.jaures);
+	@RunAsClient
+	public void testFolderSyncScenarioWithNullCertificate(@ArquillianResource URL baseURL) throws Exception {
+		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_null.txt");
 		
-		mocksControl.replay();
-		opushServer.start();
-
-		FolderSyncScenario scenario = new FolderSyncScenario();
-		CheckResult checkResult = scenario.run(singleUserFixture.jaures.user.getLoginAtDomain(),
-				singleUserFixture.jaures.password,
-				buildServiceUrl("123.456.0.1", opushServer.getPort()));
-		
-		assertThat(checkResult.getStatus()).isEqualTo(CheckStatus.ERROR.asSpecificationValue());
+		InputStream content = httpResponse.getEntity().getContent();
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo("{\"status\":0,\"messages\":[]}");
 	}
-
+	
 	@Test
-	public void testBadWebApp() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
-				singleUserFixture.jaures);
+	@RunAsClient
+	public void testFolderSyncScenarioWithoutCertificate(@ArquillianResource URL baseURL) throws Exception {
+		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_none.txt");
 		
-		mocksControl.replay();
-		opushServer.start();
-
-		FolderSyncScenario scenario = new FolderSyncScenario();
-		CheckResult checkResult = scenario.run(singleUserFixture.jaures.user.getLoginAtDomain(),
-				singleUserFixture.jaures.password,
-				buildServiceUrl("/VeryBad/", "127.0.0.1", opushServer.getPort()));
-		
-		assertThat(checkResult.getStatus()).isEqualTo(CheckStatus.ERROR.asSpecificationValue());
+		InputStream content = httpResponse.getEntity().getContent();
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo("{\"status\":0,\"messages\":[]}");
 	}
 
-	private String buildServiceUrl(int port) {
-		return buildServiceUrl("127.0.0.1", port);
+	private HttpResponse folderSyncScenarioWithRequest(URL baseURL, String certificate) throws Exception {
+		InputStream requestInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(certificate);
+		byte[] requestContent = ByteStreams.toByteArray(requestInputStream);
+
+		HttpPost httpPost = new HttpPost(buildRequestUrl(baseURL));
+		httpPost.setEntity(new ByteArrayEntity(requestContent, ContentType.APPLICATION_JSON));
+		return httpClient.execute(httpPost);
 	}
 
-	private String buildServiceUrl(String ip, int port) {
-		return buildServiceUrl("/ActiveSyncServlet/", ip, port);
+	private String buildRequestUrl(URL baseURL) {
+		return baseURL.toExternalForm() + "foldersync?serviceUrl=" + SpushnikTestUtils.buildServiceUrl(opushServer.getPort());
 	}
-
-	private String buildServiceUrl(String webApp, String ip, int port) {
-		return "http://" + ip + ":" + port + webApp;
+	
+	@Deployment
+	public static WebArchive createDeployment() throws Exception {
+		return SpushnikWebArchive.buildInstance();
 	}
 }
