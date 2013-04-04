@@ -196,9 +196,7 @@ public class ClientSupport {
 		try {
 			sslFilter = new MinigTLSFilter();
 			sslFilter.setUseClientMode(true);
-			session.getFilterChain().addBefore(
-					"org.apache.mina.common.ExecutorThreadModel", "tls",
-					sslFilter);
+			session.getFilterChain().addFirst("tls", sslFilter);
 			logger.debug("Network traffic with IMAP server will be encrypted. ");
 		} catch (Throwable t) {
 			logger.error("Error starting ssl", t);
