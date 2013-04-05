@@ -405,6 +405,7 @@ $l_header_add_resource = "Add resource";
 $l_header_add_group = "Add group";
 $l_header_add_mailserver = "Add mail server";
 $l_header_select_syncserver = "Select obm-sync server";
+$l_header_select_opushserver = "Select OPush server";
 $l_header_select_solrserver = "Select solr server";
 $l_header_select_imapfrontendserver = "Select IMAP frontend";
 $l_header_upd_group = "Update groups";

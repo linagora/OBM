@@ -441,6 +441,7 @@ $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_resource = "Ajouter ressource";
 $l_header_add_group = "Ajouter groupe";
 $l_header_select_syncserver = "Selection du serveur obm-sync";
+$l_header_select_opushserver = "Selection du serveur OPush";
 $l_header_select_solrserver = "Selection du serveur Solr";
 $l_header_select_imapfrontendserver = "Selection du serveur frontal IMAP";
 $l_header_upd_group = "Modifier groupes";

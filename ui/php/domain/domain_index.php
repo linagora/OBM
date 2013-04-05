@@ -105,12 +105,13 @@ if ($action == 'index' || $action == '') {
   $ms_q = of_domain_get_domain_mailserver('', $params['domain_id']);
   $sync_q = of_domain_get_domain_syncserver($params['domain_id']);
   $solr_q = of_domain_get_domain_solrserver($params['domain_id']);
+  $opush_q = of_domain_get_domain_opushserver($params['domain_id']);
   $imapfrontend_q = of_domain_get_domain_imapfrontendserver($params['domain_id']);
   $backupftp_q = of_domain_get_domain_backupftpserver($params['domain_id']);
   $samba = run_query_domain_samba_properties($params['domain_id']);
   if ($obm_q->num_rows() == 1) {
     $display['detailInfo'] = display_record_info($obm_q);
-    $display['detail'] = html_domain_form($obm_q, $ms_q, $sync_q, $solr_q, $imapfrontend_q, $backupftp_q, $samba, $prop_q, $params);
+    $display['detail'] = html_domain_form($obm_q, $ms_q, $sync_q, $solr_q, $imapfrontend_q, $backupftp_q, $samba, $prop_q, $params, $opush_q);
   } else {
     $display['msg'] .= display_err_msg($l_query_error . ' - ' . $query . ' !');
   }

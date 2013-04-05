@@ -522,7 +522,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $imapfrontendservers, $backupftpservers=NULL, $samba, $properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $imapfrontendservers, $backupftpservers=NULL, $samba, $properties_q, $domain, $opushservers = NULL) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use, $c_none, $l_none, $l_properties;
@@ -550,6 +550,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     foreach($solrservers as $solrserver_id => $solrserver) {
       $solr[] = $solrserver_id;
     }
+    foreach($opushservers as $opushserver_id => $opushserver) {
+      $opush[] = $opushserver_id;
+    }
     foreach($imapfrontendservers as $imapfrontendserver_id => $imapfrontendserver) {
       $imap_frontend[] = $imapfrontendserver_id;
     }
@@ -570,6 +573,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
   if (isset($domain['obm_sync'])) { $obm_sync = $domain['obm_sync'];}
   if (isset($domain['solr'])) { $solr = $domain['solr'];}
+  if (isset($domain['opush'])) { $opush = $domain['opush'];}
   if (isset($domain['imap_frontend'])) { $imap_frontend = $domain['imap_frontend'];}
   if (isset($domain['backup_ftp'])) { $backup_ftp = $domain['backup_ftp'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
@@ -881,6 +885,40 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
       </fieldset>";
   } 
 
+  $opushservers = get_domain_opushservers($id);
+  if (is_array($opush)) {
+    foreach($opush as $opush_id) {
+      $opush_sel = $opush_id;
+    }
+  }
+  if (sizeof($opushservers) > 0) {
+    foreach($opushservers as $host_id => $serverinfos) {
+      $selected = '';
+      if(isset($opush_sel) && $opush_sel == $host_id) $selected = "selected='selected'";
+      $opush_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+    }
+    $dis_opush = "<fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_opush]</legend>
+      <table>
+      <tr>
+      <th>$GLOBALS[l_header_select_opushserver]</th>
+      <td id='obm_opushServer'>
+      <div class=\"multiple\">
+      <select name='sel_opush[]'>
+      <option value=''>---</option>
+      $opush_list
+      </select>
+      </div>
+      </td>
+      </tr>
+      </table>
+      </fieldset>";
+  } else {
+    $dis_opush = "
+      <fieldset class=\"detail infos\">
+      <legend class='warning'>$GLOBALS[l_opush] : $GLOBALS[l_opushserver_warn]</legend>
+      </fieldset>";
+  }
 
   $imap_frontend_servers = get_domain_frontendservers($id);
   if (is_array($imap_frontend)) {
@@ -998,6 +1036,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     $dis_samba
     $dis_obm_sync
     $dis_solr
+    $dis_opush
     $properties_block
     <fieldset class=\"buttons\">
     $dis_button

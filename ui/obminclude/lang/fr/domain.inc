@@ -69,6 +69,7 @@ $l_mailserver = "Serveur de mail";
 
 $l_mailserver_warn = 'Vous devez créer un hôte de ce type';
 $l_syncserver_warn = 'Vous devez créer un hôte de ce type';
+$l_opushserver_warn = 'Vous devez créer un hôte de ce type';
 $l_solrserver_warn = 'Vous devez créer un hôte de ce type';
 $l_imapfrontendserver_warn = 'Vous devez créer un hôte de ce type';
 
@@ -77,6 +78,7 @@ $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM sync';
 $l_solr_calendar = 'Solr';
+$l_opush = 'OPush';
 
 $l_samba = 'Serveur windows';
 $l_samba_sid = 'SID du domaine';
