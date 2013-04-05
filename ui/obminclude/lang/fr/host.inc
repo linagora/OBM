@@ -67,6 +67,7 @@ $l_obm_sync = 'OBM Sync';
 $l_solr = 'Solr';
 $l_imap_frontend = 'IMAP Frontal';
 $l_monitor = 'Supervision';
+$l_opush = 'OPush';
 
 
 $l_fqdn = 'Nom complet de la machine';

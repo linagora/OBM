@@ -396,6 +396,7 @@ function html_host_consult($host_q) {
   $id = $host_q->f('host_id');
   $entity_id = $host_q->f('host_entity_id');
   $delegation = $host_q->f('host_delegation');
+  $opush = $host_q->f('host_opush');
   $samba = $host_q->f('host_samba');
   $imap = $host_q->f('host_imap');
   $smtp_out = $host_q->f('host_smtp_out');
@@ -425,6 +426,7 @@ function html_host_consult($host_q) {
     </tr>";
 
   // Formatage des informations de la BD
+  if ($opush) $opush = $l_yes; else $opush = $l_no;
   if ($samba) $samba = $l_yes; else $samba = $l_no;
   if ($imap) $imap = $l_yes; else $imap = $l_no;
   if ($smtp_in) $smtp_in = $l_yes; else $smtp_in = $l_no;
@@ -519,6 +521,12 @@ function html_host_consult($host_q) {
     <td>$solr</td>
   </tr>";    
 
+  $block_opush = "
+  <tr>
+  <th>$GLOBALS[l_opush]</th>
+  <td>$opush</td>
+  </tr>";
+
   $host_domain_explode = explode('.', $fqdn, 2 );
   $host_domain = $host_domain_explode[1];
   $graph_list = get_host_graph_list($fqdn);
@@ -594,6 +602,7 @@ function html_host_consult($host_q) {
     $block_mail
     $block_sync
     $block_solr
+    $block_opush
     $block_backup_ftp
     <tr>
       <th>$GLOBALS[l_monitor]</th>
