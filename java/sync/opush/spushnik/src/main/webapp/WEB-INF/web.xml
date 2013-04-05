@@ -7,7 +7,7 @@
 	
 	<context-param>
 		<param-name>resteasy.guice.modules</param-name>
-		<param-value>org.obm.push.GuiceModule</param-value>
+		<param-value>org.obm.push.spushnik.GuiceModule</param-value>
 	</context-param>
 	
 

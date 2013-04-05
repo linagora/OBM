@@ -46,7 +46,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
 import org.obm.push.spushnik.bean.CheckResult;
 import org.obm.push.spushnik.bean.CheckStatus;
-import org.obm.push.spushnik.resources.AuthenticationResource;
 import org.obm.push.spushnik.resources.FolderSyncScenario;
 import org.obm.push.spushnik.resources.Scenario;
 
@@ -61,10 +60,9 @@ public class SpushnikWebArchive {
 
 		return ShrinkWrap
 				.create(WebArchive.class)
-				.addClass(TestGuiceModule.class)
+				.addClass(GuiceModule.class)
 				.addClass(CheckResult.class)
 				.addClass(CheckStatus.class)
-				.addClass(AuthenticationResource.class)
 				.addClass(FolderSyncScenario.class)
 				.addClass(Scenario.class)
 				.addAsLibraries(
