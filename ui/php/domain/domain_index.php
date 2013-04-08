@@ -173,7 +173,7 @@ if ($action == 'index' || $action == '') {
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_domain_delete($params['domain_id']);
-  if ($retour) {
+  if ($retour == 0) {
     $display['msg'] .= display_ok_msg($l_delete_ok);
   } else {
     $display['msg'] .= display_err_msg($l_delete_error);
