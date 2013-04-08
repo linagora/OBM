@@ -618,15 +618,10 @@ public class Ical4jHelper {
 		}
 	}
 
-	private void appendPrivacy(Event event, Clazz classification) {
-		if (classification != null
-				&& (Clazz.PRIVATE.equals(classification) || Clazz.CONFIDENTIAL
-						.equals(classification))) {
-			event.setPrivacy(EventPrivacy.PRIVATE);
-		} else {
-			event.setPrivacy(EventPrivacy.PUBLIC);
+	private void appendPrivacy(Event event, Clazz clazz) {
+		if (clazz != null) {
+			event.setPrivacy(EventPrivacy.valueOf(clazz.getValue()));
 		}
-
 	}
 
 	private void appendUid(Event event, Uid uid) {
@@ -1423,10 +1418,7 @@ public class Ical4jHelper {
 	}
 
 	/* package */ Clazz getClazz(EventPrivacy privacy) {
-		if (EventPrivacy.PUBLIC == privacy) {
-			return Clazz.PUBLIC;
-		}
-		return Clazz.PRIVATE;
+		return new Clazz(privacy.name());
 	}
 
 	/* package */ Organizer getOrganizer(String owner, String ownerEmail) {

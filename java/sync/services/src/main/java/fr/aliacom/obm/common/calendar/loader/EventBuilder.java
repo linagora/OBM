@@ -40,7 +40,7 @@ public class EventBuilder {
 		e.setStartDate(cal.getTime());
 		e.setDuration(JDBCUtils.convertNegativeIntegerToZero(rs, "event_duration"));
 		e.setPriority(rs.getInt("event_priority"));
-		e.setPrivacy(EventPrivacy.fromSqlIntCode(rs.getInt("event_privacy")));
+		e.setPrivacy(EventPrivacy.valueOf(rs.getInt("event_privacy")));
 		e.setAllday(rs.getBoolean("event_allday"));
 		e.setDescription(rs.getString("event_description"));
 		e.setSequence(rs.getInt("event_sequence"));

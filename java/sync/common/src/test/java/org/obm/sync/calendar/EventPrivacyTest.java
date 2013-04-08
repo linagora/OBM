@@ -42,70 +42,42 @@ import org.obm.filter.SlowFilterRunner;
 public class EventPrivacyTest {
 
 	@Test
-	public void testPublicFromSqlInt() {
-		EventPrivacy result = EventPrivacy.fromSqlIntCode(0);
+	public void testPublicValueOf() {
+		EventPrivacy result = EventPrivacy.valueOf(0);
 		assertThat(result).isEqualTo(EventPrivacy.PUBLIC);
 	}
 
 	@Test
-	public void testPrivateFromSqlInt() {
-		EventPrivacy result = EventPrivacy.fromSqlIntCode(1);
+	public void testPrivateValueOf() {
+		EventPrivacy result = EventPrivacy.valueOf(1);
 		assertThat(result).isEqualTo(EventPrivacy.PRIVATE);
+	}
+	
+	@Test
+	public void testConfidentialValueOf() {
+		EventPrivacy result = EventPrivacy.valueOf(2);
+		assertThat(result).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testNegativeFromSqlInt() {
-		EventPrivacy.fromSqlIntCode(-1);
+		EventPrivacy.valueOf(-1);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testTwoBigFromSqlInt() {
-		EventPrivacy.fromSqlIntCode(2);
-	}
-
-	@Test
-	public void testPublicFromXmlInt() {
-		EventPrivacy result = EventPrivacy.fromXmlIntCode(0);
-		assertThat(result).isEqualTo(EventPrivacy.PUBLIC);
-	}
-
-	@Test
-	public void testPrivateFromXmlInt() {
-		EventPrivacy result = EventPrivacy.fromXmlIntCode(1);
-		assertThat(result).isEqualTo(EventPrivacy.PRIVATE);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testNegativeFromXmlInt() {
-		EventPrivacy.fromXmlIntCode(-1);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testTwoBigFromXmlInt() {
-		EventPrivacy.fromXmlIntCode(2);
-	}
-	
-	@Test
-	public void testPrivateToXmlInt() {
-		int sqlIntCode = EventPrivacy.PRIVATE.toXmlIntCode();
-		assertThat(sqlIntCode).isEqualTo(1);
-	}
-	
-	@Test
-	public void testPublicToXmlInt() {
-		int sqlIntCode = EventPrivacy.PUBLIC.toXmlIntCode();
-		assertThat(sqlIntCode).isEqualTo(0);
+		EventPrivacy.valueOf(3);
 	}
 	
 	@Test
 	public void testPrivateToSqlInt() {
-		int sqlIntCode = EventPrivacy.PRIVATE.toSqlIntCode();
+		int sqlIntCode = EventPrivacy.PRIVATE.toInteger();
 		assertThat(sqlIntCode).isEqualTo(1);
 	}
 	
 	@Test
 	public void testPublicToSqlInt() {
-		int sqlIntCode = EventPrivacy.PUBLIC.toSqlIntCode();
+		int sqlIntCode = EventPrivacy.PUBLIC.toInteger();
 		assertThat(sqlIntCode).isEqualTo(0);
 	}
 }

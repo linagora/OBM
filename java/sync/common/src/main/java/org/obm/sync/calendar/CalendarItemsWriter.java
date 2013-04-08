@@ -196,7 +196,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(parent, "location", event.getLocation());
 		createIfNotNull(parent, "alert", event.getAlert());
 		createIfNotNull(parent, "priority", (event.getPriority() != null ? String.valueOf(event.getPriority()) : "0"));
-		createIfNotNull(parent, "privacy", String.valueOf(event.getPrivacy().toSqlIntCode()));
+		createIfNotNull(parent, "privacy", String.valueOf(event.getPrivacy().toInteger()));
 
 		appendAttendeesToEventXml(parent, event);
 		appendRecurrenceToEventXml(parent, event);

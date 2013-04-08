@@ -436,6 +436,13 @@ public class Ical4jHelperTest {
 		assertEquals(EventPrivacy.PRIVATE, event1.getPrivacy());
 	}
 
+	@Test
+	public void testGetPrivacyConfidential() {
+		VEvent vEvent = new VEvent();
+		vEvent.getProperties().add(Clazz.CONFIDENTIAL);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		assertEquals(EventPrivacy.CONFIDENTIAL, event1.getPrivacy());
+	}
 	
 	@Test
 	public void testGetOwner() throws URISyntaxException {
@@ -861,20 +868,21 @@ public class Ical4jHelperTest {
 	
 	@Test
 	public void testGetPublicClazz() {
-		Event event = new Event();
-		event.setPrivacy(EventPrivacy.PUBLIC);
-		Clazz clazz = ical4jHelper.getClazz(event.getPrivacy());
-		assertEquals("PUBLIC", clazz.getValue());
+		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.PUBLIC);
+		assertEquals(Clazz.PUBLIC, clazz);
 	}
 
 	@Test
 	public void testGetPrivateClazz() {
-		Event event = new Event();
-		event.setPrivacy(EventPrivacy.PRIVATE);
-		Clazz clazz = ical4jHelper.getClazz(event.getPrivacy());
-		assertEquals("PRIVATE", clazz.getValue());
+		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.PRIVATE);
+		assertEquals(Clazz.PRIVATE, clazz);
 	}
 
+	@Test
+	public void testGetConfidentialClazz() {
+		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.CONFIDENTIAL);
+		assertEquals(Clazz.CONFIDENTIAL, clazz);
+	}
 	
 	@Test
 	public void testGetOrganizer() {
@@ -1345,6 +1353,63 @@ public class Ical4jHelperTest {
         Assert.assertTrue(icsRequest.contains(XOBMORIGIN));
         Assert.assertTrue(icsCancel.contains(XOBMORIGIN));
         Assert.assertTrue(icsReply.contains(XOBMORIGIN));    
+    }
+    
+    @Test
+    public void testInvitationIcsContainsPublicClassProperty() {
+        Event event = buildEvent();
+        event.setPrivacy(EventPrivacy.PUBLIC);
+            
+        final Attendee attendeeReply = event.getAttendees().get(2);
+        final Ical4jUser obmUser = buildObmUser(attendeeReply);
+        AccessToken token = new AccessToken(0, "OBM");
+        
+        String icsRequest = ical4jHelper.buildIcsInvitationRequest(obmUser, event, token);
+        String icsCancel = ical4jHelper.buildIcsInvitationCancel(obmUser, event, token);
+        String icsReply = ical4jHelper.buildIcsInvitationReply(event, obmUser, token);
+            
+        String CLASS = "CLASS:PUBLIC";
+        Assert.assertTrue(icsRequest.contains(CLASS));
+        Assert.assertTrue(icsCancel.contains(CLASS));
+        Assert.assertTrue(icsReply.contains(CLASS));    
+    }
+    
+    @Test
+    public void testInvitationIcsContainsPrivateClassProperty() {
+        Event event = buildEvent();
+        event.setPrivacy(EventPrivacy.PRIVATE);
+            
+        final Attendee attendeeReply = event.getAttendees().get(2);
+        final Ical4jUser obmUser = buildObmUser(attendeeReply);
+        AccessToken token = new AccessToken(0, "OBM");
+        
+        String icsRequest = ical4jHelper.buildIcsInvitationRequest(obmUser, event, token);
+        String icsCancel = ical4jHelper.buildIcsInvitationCancel(obmUser, event, token);
+        String icsReply = ical4jHelper.buildIcsInvitationReply(event, obmUser, token);
+            
+        String CLASS = "CLASS:PRIVATE";
+        Assert.assertTrue(icsRequest.contains(CLASS));
+        Assert.assertTrue(icsCancel.contains(CLASS));
+        Assert.assertTrue(icsReply.contains(CLASS));    
+    }
+    
+    @Test
+    public void testInvitationIcsContainsConfidentialClassProperty() {
+        Event event = buildEvent();
+        event.setPrivacy(EventPrivacy.CONFIDENTIAL);
+            
+        final Attendee attendeeReply = event.getAttendees().get(2);
+        final Ical4jUser obmUser = buildObmUser(attendeeReply);
+        AccessToken token = new AccessToken(0, "OBM");
+        
+        String icsRequest = ical4jHelper.buildIcsInvitationRequest(obmUser, event, token);
+        String icsCancel = ical4jHelper.buildIcsInvitationCancel(obmUser, event, token);
+        String icsReply = ical4jHelper.buildIcsInvitationReply(event, obmUser, token);
+            
+        String CLASS = "CLASS:CONFIDENTIAL";
+        Assert.assertTrue(icsRequest.contains(CLASS));
+        Assert.assertTrue(icsCancel.contains(CLASS));
+        Assert.assertTrue(icsReply.contains(CLASS));    
     }
 
 	@Test

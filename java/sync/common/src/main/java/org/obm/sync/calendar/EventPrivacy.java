@@ -34,30 +34,22 @@ package org.obm.sync.calendar;
 import java.security.InvalidParameterException;
 
 public enum EventPrivacy {
-	PUBLIC(0), PRIVATE(1);
+	PUBLIC(0), PRIVATE(1), CONFIDENTIAL(2);
 	
-	private final int sqlIntCode;
+	private final int code;
 
 	private EventPrivacy(int code) {
-		this.sqlIntCode = code;
-	}
-
-	public int toXmlIntCode() {
-		return toSqlIntCode();
+		this.code = code;
 	}
 	
-	public int toSqlIntCode() {
-		return sqlIntCode;
-	}
-
-	public static EventPrivacy fromXmlIntCode(int code) {
-		return fromSqlIntCode(code);
+	public int toInteger() {
+		return code;
 	}
 	
-	public static EventPrivacy fromSqlIntCode(int code) {
-		for (EventPrivacy value: values()) {
-			if (value.sqlIntCode == code) {
-				return value;
+	public static EventPrivacy valueOf(int code) {
+		for (EventPrivacy eventPrivacy: values()) {
+			if (eventPrivacy.code == code) {
+				return eventPrivacy;
 			}
 		}
 		throw new InvalidParameterException("code " + code + " doesn't match any EventPrivacy value");

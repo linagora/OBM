@@ -415,7 +415,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		e.setStartDate(cal.getTime());
 		e.setDuration(JDBCUtils.convertNegativeIntegerToZero(evrs, "event_duration"));
 		e.setPriority(evrs.getInt("event_priority"));
-		e.setPrivacy(EventPrivacy.fromSqlIntCode(evrs.getInt("event_privacy")));
+		e.setPrivacy(EventPrivacy.valueOf(evrs.getInt("event_privacy")));
 		e.setAllday(evrs.getBoolean("event_allday"));
 		e.setDescription(evrs.getString("event_description"));
 		e.setSequence(evrs.getInt("event_sequence"));
@@ -471,7 +471,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setNull(idx++, Types.INTEGER);
 		}
 		ps.setInt(idx++, RFC2445.getPriorityOrDefault(ev.getPriority()));
-		ps.setInt(idx++, ev.getPrivacy().toSqlIntCode());
+		ps.setInt(idx++, ev.getPrivacy().toInteger());
 		if (ev.getStartDate() != null) {
 			ps.setTimestamp(idx++, new Timestamp(ev.getStartDate().getTime()));
 		} else {
@@ -1772,7 +1772,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		// do not allow making a private event become public from sync
 		// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
 		// .getPrivacy());
-		ps.setInt(9, ev.getPrivacy().toSqlIntCode());
+		ps.setInt(9, ev.getPrivacy().toInteger());
 		ps.setTimestamp(10, new Timestamp(ev.getStartDate().getTime()));
 		ps.setInt(11, ev.getDuration());
 		ps.setBoolean(12, ev.isAllday());

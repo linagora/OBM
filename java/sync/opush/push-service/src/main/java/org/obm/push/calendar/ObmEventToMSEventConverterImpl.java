@@ -219,6 +219,8 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 			return CalendarSensitivity.PRIVATE;
 		case PUBLIC:
 			return CalendarSensitivity.NORMAL;
+		case CONFIDENTIAL:
+			return CalendarSensitivity.CONFIDENTIAL;
 		}
 		throw new IllegalArgumentException("EventPrivacy " + privacy + " can't be converted to MSEvent property");
 	}

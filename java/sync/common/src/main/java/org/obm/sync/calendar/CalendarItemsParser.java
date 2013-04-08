@@ -152,7 +152,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 	private EventPrivacy getPrivacy(Element e) {
 		Integer privacy = i(e, "privacy");
 		if (privacy != null) {
-			return EventPrivacy.fromXmlIntCode(privacy);
+			return EventPrivacy.valueOf(privacy);
 		}
 		return DEFAULT_PRIVACY_VALUE;
 	}
