@@ -31,40 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
-import java.util.List;
-
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
-import com.google.inject.Inject;
-import com.linagora.obm.ui.url.ServiceUrlMapping;
-
-public class CreateUserSummaryPage implements Page {
-	
-	@Inject ServiceUrlMapping mapping;
-	@Inject PageFactory pageFactory;
-	
-	private final WebDriver driver;
-	@FindBy(name="displayMessageOk")
-	private List<WebElement> messages;
+public class CreateUserSummaryPage extends RootPage {
 	
 	public CreateUserSummaryPage(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
 	
 	@Override
 	public void open() {
 		driver.get(mapping.lookup(CreateUserSummaryPage.class).toExternalForm());
-	}
-	
-	@Override
-	public String currentTitle() {
-		return driver.getTitle();
-	}
-
-	public List<WebElement> messages() {
-		return messages;
 	}
 	
 }

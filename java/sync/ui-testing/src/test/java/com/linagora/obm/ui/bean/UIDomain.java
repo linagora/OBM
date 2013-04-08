@@ -42,6 +42,11 @@ public class UIDomain {
 		return builder().name("Global Domain").selectValue(1).build();
 	}
 	
+	public static UIDomain obmDomain() {
+		// @TODO search domain name
+		return builder().name("obm15").selectValue(2).build();
+	}
+	
 	public static class Builder {
 		
 		private String name;

@@ -34,16 +34,17 @@ package com.linagora.obm.ui.bean;
 
 public enum UIUserKind {
 
-	MISTER("Mr"),
-	MISS("Mmd");
+	MONSIEUR("M."),
+	MADEMOISELLE("Mlle"),
+	MADAME("Mme");
 
-	private final String uiValue;
+	private final String uiFrenchText;
 
-	private UIUserKind(String uiValue) {
-		this.uiValue = uiValue;
+	private UIUserKind(String uiFrenchText) {
+		this.uiFrenchText = uiFrenchText;
 	}
 
-	public String getUiValue() {
-		return uiValue;
+	public String getUiFrenchText() {
+		return uiFrenchText;
 	}
 }

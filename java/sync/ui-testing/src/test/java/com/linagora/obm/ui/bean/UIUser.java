@@ -50,7 +50,7 @@ public class UIUser {
 	}
 	
 	public static UIUser user() {
-		return builder().login("usera").password("usera").commonName("Utilisateur a").profile(UIUserProfile.USER).build();		
+		return builder().login("userb").password("userb").commonName("Utilisateur b").profile(UIUserProfile.USER).build();		
 	}
 	
 	public static class Builder {

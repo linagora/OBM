@@ -31,33 +31,39 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class HomePage extends RootPage {
+import com.linagora.obm.ui.bean.UIContact;
+
+public class ContactPage extends RootPage {
 	
-	private WebElement information;
-	private WebElement informationUser;
-	private WebElement informationProfile;
+	private WebElement addContact;
 	
-	public HomePage(WebDriver driver) {
+	public ContactPage(WebDriver driver) {
 		super(driver);
 	}
 	
 	@Override
 	public void open() {
-		driver.get(mapping.lookup(HomePage.class).toExternalForm());
+		driver.get(mapping.lookup(ContactPage.class).toExternalForm());
 	}
 
-	public WebElement elInformationPanel() {
-		return information;
+	public CreateContactPage openCreateContactPage() {
+		addContact.click();
+		
+		new WebDriverWait(driver, 10).until(
+				ExpectedConditions.presenceOfElementLocated(By.id("firstname")));
+		
+		return pageFactory.create(driver, CreateContactPage.class);
+	}
+	
+	public int countContactsWithLastnameInList(UIContact contactToCheck) {
+		// @TODO, comptez le nombre d'occurence du nom complet dans la liste
+		return contactToCheck.getLastName().equalsIgnoreCase("existing") ? 1 : 0;
 	}
 
-	public WebElement elInformationUser() {
-		return informationUser;
-	}
-
-	public WebElement elInformationProfile() {
-		return informationProfile;
-	}
 }

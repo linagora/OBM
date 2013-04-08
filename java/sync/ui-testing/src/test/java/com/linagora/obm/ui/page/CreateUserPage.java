@@ -32,21 +32,18 @@
 package com.linagora.obm.ui.page;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 
-import com.google.inject.Inject;
+import com.google.common.collect.Iterables;
 import com.linagora.obm.ui.bean.UIUser;
-import com.linagora.obm.ui.url.ServiceUrlMapping;
 
-public class CreateUserPage implements Page {
+public class CreateUserPage extends RootPage {
 	
-	@Inject ServiceUrlMapping mapping;
-	@Inject PageFactory pageFactory;
-	
-	private final WebDriver driver;
 	private WebElement userKind;
 	private WebElement userFirstname;
 	private WebElement userLastname;
@@ -77,26 +74,34 @@ public class CreateUserPage implements Page {
 	private WebElement userTown; 
 	private WebElement userCdx; 
 	private WebElement userDesc;
+	@FindBy(id="userMailActive")
 	private WebElement userMailActive; 
 	private WebElement externalEmailField;
+	@FindBy(name="tf_email[]")
+	private List<WebElement> internalEmailFields;
 	
 	public CreateUserPage(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
 	
 	@Override
 	public void open() {
 		driver.get(mapping.lookup(CreateUserPage.class).toExternalForm());
 	}
+
+	public CreateUserPage createUserAsExpectingError(UIUser userToCreate) {
+		doCreateUser(userToCreate);
+		return this;
+	}
 	
-	@Override
-	public String currentTitle() {
-		return driver.getTitle();
+	public CreateUserSummaryPage createUser(UIUser userToCreate) {
+		doCreateUser(userToCreate);
+		return pageFactory.create(driver, CreateUserSummaryPage.class);
 	}
 
-	public CreateUserSummaryPage createUser(UIUser userToCreate) {
+	private void doCreateUser(UIUser userToCreate) {
 		if (userToCreate.hasKindDefined()) {
-			userKind.sendKeys(userToCreate.getKind().getUiValue());
+			userKind.sendKeys(userToCreate.getKind().getUiFrenchText());
 		}
 		userLogin.sendKeys(userToCreate.getLogin());
 		userFirstname.sendKeys(userToCreate.getFirstName());
@@ -123,8 +128,13 @@ public class CreateUserPage implements Page {
 		userTown.sendKeys(userToCreate.getAddressTown());
 		userCdx.sendKeys(userToCreate.getAddressCedex());
 		userDesc.sendKeys(userToCreate.getDescription());
-		externalEmailField.sendKeys(userToCreate.getEmailAddress());
-		clickCheckbox(userMailActive, userToCreate.isEmailInternalEnabled());
+
+		if (clickCheckbox(userMailActive, userToCreate.isEmailInternalEnabled())) {
+			WebElement firstInternalEmail = Iterables.getLast(internalEmailFields);
+			firstInternalEmail.sendKeys(userToCreate.getEmailAddress());
+		} else {
+			externalEmailField.sendKeys(userToCreate.getEmailAddress());
+		}
 
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 		if (userToCreate.getDateBegin() != null) {
@@ -141,12 +151,6 @@ public class CreateUserPage implements Page {
 		}
 		
 		createUserSubmit.click();
-		return pageFactory.create(driver, CreateUserSummaryPage.class);
 	}
 
-	private void clickCheckbox(WebElement field, boolean hasToBeClicked) {
-		if (hasToBeClicked) {
-			field.click();
-		}
-	}
 }

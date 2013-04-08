@@ -29,35 +29,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.page;
+package com.linagora.obm.ui.bean;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import lombok.Data;
 
-public class HomePage extends RootPage {
+@Data
+public class UIContact {
 	
-	private WebElement information;
-	private WebElement informationUser;
-	private WebElement informationProfile;
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static UIContact contact() {
+		return builder().firstName("firstnamea").lastName("lastnamea").companyField("linagora").mailokField(true).newsletterField(false).build();		
+	}
+
+	public static UIContact emptyFields() {
+		return builder().build();		
+	}
 	
-	public HomePage(WebDriver driver) {
-		super(driver);
+	public static class Builder {
+		
+		private String firstName;
+		private String lastName;
+		private String companyField;
+		private boolean mailokField;
+		private boolean newsletterField;
+
+		private Builder() {
+			super();
+		}
+
+		public Builder firstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+		
+		public Builder lastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+		
+		public Builder companyField(String companyField) {
+			this.companyField = companyField;
+			return this;
+		}
+		
+		public Builder mailokField(boolean mailokField) {
+			this.mailokField = mailokField;
+			return this;
+		}
+		
+		public Builder newsletterField(boolean newsletterField) {
+			this.newsletterField = newsletterField;
+			return this;
+		}
+		
+		public UIContact build() {
+			return new UIContact(firstName, lastName, companyField, mailokField, newsletterField);
+		}
 	}
+
+	private final String firstName;
+	private final String lastName;
+	private final String companyField;
+	private final boolean mailokField;
+	private final boolean newsletterField;
 	
-	@Override
-	public void open() {
-		driver.get(mapping.lookup(HomePage.class).toExternalForm());
-	}
-
-	public WebElement elInformationPanel() {
-		return information;
-	}
-
-	public WebElement elInformationUser() {
-		return informationUser;
-	}
-
-	public WebElement elInformationProfile() {
-		return informationProfile;
-	}
 }

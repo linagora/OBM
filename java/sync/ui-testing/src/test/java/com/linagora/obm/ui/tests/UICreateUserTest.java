@@ -48,6 +48,7 @@ import org.openqa.selenium.WebElement;
 import com.google.inject.Inject;
 import com.linagora.obm.ui.bean.UIDomain;
 import com.linagora.obm.ui.bean.UIUser;
+import com.linagora.obm.ui.bean.UIUserKind;
 import com.linagora.obm.ui.bean.UIUserProfile;
 import com.linagora.obm.ui.ioc.Module;
 import com.linagora.obm.ui.page.CreateUserPage;
@@ -77,9 +78,60 @@ public class UICreateUserTest {
 	
 	@After
 	public void tearDown() {
+		// TODO Pastille jaune ou suppression de ce qu'on a créé ?
 		driver.quit();
 	}
 
+	@Test
+	public void createUserFailsNoName() {
+		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
+		createPage.open();
+		
+		CreateUserPage failedCreateUserPage = createPage.createUserAsExpectingError(UIUser.builder()
+				.login("testAdmin")
+				.password("admin")
+				.commonName("admin")
+				.profile(UIUserProfile.ADMIN)
+				.address1("add1")
+				.address2("add2")
+				.phone("0606060606")
+				.build());
+		
+		List<WebElement> errorMessages = failedCreateUserPage.elMessagesError();
+		assertThat(failedCreateUserPage.elMessagesInfo()).isEmpty();
+		assertThat(failedCreateUserPage.elMessagesOk()).isEmpty();
+		assertThat(failedCreateUserPage.elMessagesWarning()).isEmpty();
+		assertThat(errorMessages).hasSize(1);
+		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : Le nom doit être correctement renseigné ! :");
+	}
+	
+	@Test
+	public void createUserFailsNoEmail() {
+		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
+		createPage.open();
+		
+		CreateUserSummaryPage creationSummaryPage = createPage.createUser(UIUser.builder()
+				.login("testAdmin")
+				.lastName("admin lastname")
+				.password("admin")
+				.commonName("admin")
+				.profile(UIUserProfile.ADMIN)
+				.address1("add1")
+				.address2("add2")
+				.emailInternalEnabled(true)
+				.emailAddress("")
+				.phone("0606060606")
+				.build());
+		
+		List<WebElement> errorMessages = creationSummaryPage.elMessagesError();
+		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesOk()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
+		assertThat(errorMessages).hasSize(1);
+		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : Vous devez saisir une adresse E-mail afin d'activer la messagerie !");
+	}
+	
+	
 	@Test
 	public void createUserAdmin() {
 		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
@@ -95,11 +147,79 @@ public class UICreateUserTest {
 				.address2("add2")
 				.phone("0606060606")
 				.build());
-		
-		List<WebElement> messages = creationSummaryPage.messages();
-		assertThat(messages).hasSize(2);
-		assertThat(messages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
-		WebElement findElement = messages.get(1).findElement(By.tagName("input"));
+
+		List<WebElement> okMessages = creationSummaryPage.elMessagesOk();
+		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesError()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
+		assertThat(okMessages).hasSize(2);
+		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
+		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
 		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
     }
+	
+	@Test
+	public void createUser() {
+		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
+		createPage.open();
+		
+		CreateUserSummaryPage creationSummaryPage = createPage.createUser(UIUser.builder()
+				.kind(UIUserKind.MADAME)
+				.login("testUser")
+				.lastName("testUser lastname")
+				.firstName("testUser Firstname")
+				.password("testUser")
+				.commonName("commonname testUser")
+				.title("Chef d'usine")
+				.noExpire(true)
+				.profile(UIUserProfile.USER)
+				.address1("Avenue de l'aviation")
+				.address2("Impasse de l'immeuble")
+				.addressZip("Z23456")
+				.addressCedex("12 560")
+				.addressTown("L'Isle d'Abeau")
+				.phone("0606060606")
+				.phone2("+33 4 72 56 98")
+				.phoneMobile("+33 6-24-55-66")
+				.phoneFax("0123654789")
+				.phoneFax2("987564123")
+				.company("Linagora de L'yon")
+				.direction("Centre'Est")
+				.service("d'utilité publique")
+				.description("Here's a short description of this user : " +
+						"This is a \"Lovely\" test with nearly all fields filled up !")
+				.emailInternalEnabled(true)
+				.emailAddress("testuser")
+				.build());
+
+		List<WebElement> okMessages = creationSummaryPage.elMessagesOk();
+		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesError()).isEmpty();
+		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
+		assertThat(okMessages).hasSize(2);
+		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
+		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
+		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
+    }
+	
+	@Test
+	public void createUserFailsAlreadyExists() {
+		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
+		createPage.open();
+		
+		CreateUserPage failedCreateUserPage = createPage.createUserAsExpectingError(UIUser.builder()
+				.login("testUser")
+				.password("testUser")
+				.commonName("commonname testUser")
+				.profile(UIUserProfile.USER)
+				.build());
+		
+		List<WebElement> errorMessages = failedCreateUserPage.elMessagesError();
+		assertThat(failedCreateUserPage.elMessagesInfo()).isEmpty();
+		assertThat(failedCreateUserPage.elMessagesOk()).isEmpty();
+		assertThat(failedCreateUserPage.elMessagesWarning()).isEmpty();
+		assertThat(errorMessages).hasSize(1);
+		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : testuser : Le login est déjà attribué à un autre utilisateur !");
+	}
 }
+	

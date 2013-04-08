@@ -63,7 +63,7 @@ public class Module extends AbstractModule {
 	}
 
 	private Capabilities buildDriverCapabilities() {
-		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox()	;
 		capabilities.setCapability("version", "17");
 		capabilities.setCapability("platform", Platform.LINUX);
 		return capabilities;

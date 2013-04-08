@@ -1763,7 +1763,7 @@ function display_info_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"message info\">$msg</p>";
+    $ret = "<p name=\"displayMessageInfo\" class=\"message info\">$msg</p>";
   }
   
   return $ret;
@@ -1782,7 +1782,7 @@ function display_warn_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"message warning\">$msg</p>";
+    $ret = "<p name=\"displayMessageWarning\" class=\"message warning\">$msg</p>";
   }
   
   return $ret;
@@ -1801,7 +1801,7 @@ function display_err_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p class=\"message error\">$msg</p>";
+    $ret = "<p name=\"displayMessageError\" class=\"message error\">$msg</p>";
   }
   
   return $ret;

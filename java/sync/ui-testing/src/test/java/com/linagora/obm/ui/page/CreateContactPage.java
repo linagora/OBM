@@ -34,56 +34,85 @@ package com.linagora.obm.ui.page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.FluentWait;
 
-import com.linagora.obm.ui.bean.UIDomain;
-import com.linagora.obm.ui.bean.UIUser;
+import com.google.common.base.Predicate;
+import com.linagora.obm.ui.bean.UIContact;
 
-public class LoginPage extends RootPage {
+public class CreateContactPage extends ContactPage {
+	
+	private WebElement firstname;
+	private WebElement lastname;
+	private WebElement companyField;
+	private WebElement mailokField;
+	private WebElement newsletterField;
+	private WebElement contactForm;
 
-	private WebElement loginForm;
-	private WebElement loginField;
-	private WebElement passwordField;
-	@FindBy(id = "sel_domain_id")
-	private WebElement selectDropdown;
-	@FindBy(css = "#loginForm fieldset > legend[class=\"error\"]")
-	private WebElement errorLegend;
-
-	public LoginPage(WebDriver driver) {
+	
+	public CreateContactPage(WebDriver driver) {
 		super(driver);
 	}
-
+	
 	@Override
 	public void open() {
-		driver.get(mapping.lookup(LoginPage.class).toExternalForm());
+		driver.get(mapping.lookup(CreateContactPage.class).toExternalForm());
 	}
 
-	public LoginPage loginAsExpectingError(UIUser user, UIDomain domain) {
-		doLogin(user, domain);
+	public ContactPage createContact(UIContact contactToCreate) {
+		doCreateContact(contactToCreate);
+		
+		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
+			@Override
+			public boolean apply(WebDriver input) {
+				return driver.findElements(By.id("informationContainer")).size() == 0;
+			}
+		});
+		
+		return pageFactory.create(driver, ContactPage.class);
+	}
+
+	public CreateContactPage createContactAsExpectingError(UIContact contactToCreate) {
+		doCreateContact(contactToCreate);
+		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
+			@Override
+			public boolean apply(WebDriver input) {
+				return lastname.getAttribute("class").equalsIgnoreCase("error");
+			}
+		});
 		return this;
 	}
 
-	public HomePage login(UIUser user, UIDomain domain) {
-		doLogin(user, domain);
-		return pageFactory.create(driver, HomePage.class);
+	private void doCreateContact(UIContact contactToCreate) {
+		firstname.sendKeys(contactToCreate.getFirstName());
+		lastname.sendKeys(contactToCreate.getLastName());
+		companyField.sendKeys(contactToCreate.getCompanyField());
+		clickCheckbox(mailokField, contactToCreate.isMailokField());
+		clickCheckbox(newsletterField, contactToCreate.isNewsletterField());
+		
+		contactForm.submit();
 	}
 
-	private void doLogin(UIUser user, UIDomain domain) {
-		loginField.sendKeys(user.getLogin());
-		passwordField.sendKeys(user.getPassword());
-		for (WebElement domainOption : selectDropdown.findElements(By.tagName("option"))) {
-			if (domainOption.getAttribute("value").equals(String.valueOf(domain.getSelectValue()))) {
-				domainOption.click();
-			}
-		}
-		loginForm.submit();
+	public WebElement elFirstname() {
+		return firstname;
 	}
 
-	public WebElement elLoginForm() {
-		return loginForm;
+	public WebElement elLastname() {
+		return lastname;
 	}
 
-	public WebElement elErrorLegend() {
-		return errorLegend;
+	public WebElement elCompanyField() {
+		return companyField;
+	}
+
+	public WebElement elMailokField() {
+		return mailokField;
+	}
+
+	public WebElement elNewsletterField() {
+		return newsletterField;
+	}
+
+	public WebElement elContactForm() {
+		return contactForm;
 	}
 }

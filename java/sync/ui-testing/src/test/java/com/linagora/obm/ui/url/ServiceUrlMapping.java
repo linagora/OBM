@@ -40,6 +40,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.obm.ui.ioc.Module;
+import com.linagora.obm.ui.page.ContactPage;
+import com.linagora.obm.ui.page.CreateContactPage;
 import com.linagora.obm.ui.page.CreateUserPage;
 import com.linagora.obm.ui.page.HomePage;
 import com.linagora.obm.ui.page.LoginPage;
@@ -58,6 +60,8 @@ public class ServiceUrlMapping {
 				.put(HomePage.class, new URL(serverUrl, "/obm.php"))
 				.put(Logout.class, new URL(serverUrl, "/obm.php?action=logout"))
 				.put(CreateUserPage.class, new URL(serverUrl, "/user/user_index.php?action=new"))
+				.put(ContactPage.class, new URL(serverUrl, "/contact/contact_index.php"))
+				.put(CreateContactPage.class, new URL(serverUrl, "/contact/contact_index.php"))
 				.build();
 	}
 	
