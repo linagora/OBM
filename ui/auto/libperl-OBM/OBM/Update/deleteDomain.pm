@@ -129,7 +129,7 @@ sub update {
         }
 
         if( !$error && defined($self->{'smtpInEngine'}) ) {
-            if( $self->{'smtpInEngine'}->updateByDomainId( [$entity->getId()] ) || $self->{'smtpInEngine'}->updateMaps() ) {
+            if( $self->{'smtpInEngine'}->updateByDomainId( [$entity->getId()] ) || $self->{'smtpInEngine'}->updateMapsForDeletedDomain() ) {
                 $error = 1;
             }
         }

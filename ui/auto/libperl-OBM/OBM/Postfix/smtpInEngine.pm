@@ -151,6 +151,24 @@ sub updateMaps {
     return 0;
 }
 
+sub updateMapsForDeletedDomain {
+	my $self = shift;
+
+	$self->{'usePTables'} = 1;
+	$self->updateMaps();
+}
+
+sub _getSMTPInHostsQuery {
+	my $self = shift;
+	my ($dbHandler, @smtpInDomainId) = @_;
+	my $useP = $self->{'usePTables'} == 1;
+
+	return 'SELECT host_id, host_name, host_ip, host_fqdn
+                FROM ' . ($useP ? 'P_ServiceProperty' : 'ServiceProperty') .'
+                INNER JOIN ' . ($useP ? 'P_DomainEntity' : 'DomainEntity') .' ON serviceproperty_entity_id=domainentity_entity_id AND serviceproperty_property=\'smtp_in\'
+                INNER JOIN ' . ($useP ? 'P_Host' : 'Host') .' ON host_id='.$dbHandler->castAsInteger('serviceproperty_value').'
+                WHERE domainentity_domain_id IN ('.join( ', ', @smtpInDomainId ).')';
+}
 
 sub _updateSmtpInMaps {
     my $self = shift;
@@ -165,14 +183,7 @@ sub _updateSmtpInMaps {
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
     $self->_log( 'obtention des serveurs SMTP-in à mettre à jour', 3 );
-    my $query = 'SELECT host_id,
-                        host_name,
-                        host_ip,
-                        host_fqdn
-                 FROM ServiceProperty
-                 INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id AND serviceproperty_property=\'smtp_in\'
-                 INNER JOIN Host ON host_id='.$dbHandler->castAsInteger('serviceproperty_value').' 
-                 WHERE domainentity_domain_id IN ('.join( ', ', @smtpInDomainId ).')';
+    my $query = $self->_getSMTPInHostsQuery($dbHandler, @smtpInDomainId);
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
