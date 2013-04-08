@@ -806,7 +806,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
 
   $syncservers = get_domain_syncservers($id);
   if (is_array($obm_sync)) {
-    foreach($solr as $obm_sync_id) {
+    foreach($obm_sync as $obm_sync_id) {
       $obm_sync_sel = $obm_sync_id;
     }
   }
