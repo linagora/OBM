@@ -1068,7 +1068,7 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
     '".$obm_q->escape($title)."',
     '$datebegin',
     '".$obm_q->escape($description)."',
-    '$properties',
+    '".$obm_q->escape($properties)."',
     '".$obm_q->escape($location)."',
     $category1_id,
     $priority,
