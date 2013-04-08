@@ -63,16 +63,16 @@ public class WBXMLOPClient extends OPClient {
 
 	private final WBXMLTools wbxmlTools;
 	
-	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId, String devType,
-			String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools) {
+	public WBXMLOPClient(String loginAtDomain, String password,
+			DeviceId devId, String devType, String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools) {
 
-		this(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools);
+		this(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools);
 	}
 
-	public WBXMLOPClient(String loginAtDomain, String password, DeviceId devId,
-			String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools) {
+	public WBXMLOPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
+			DeviceId devId, String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools) {
 
-		super(loginAtDomain, password, devId, devType, userAgent, serviceUrl);
+		super(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, serviceUrl);
 		this.wbxmlTools = wbxmlTools;
 	}
 	

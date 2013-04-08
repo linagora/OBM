@@ -42,8 +42,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -93,36 +91,22 @@ public abstract class OPClient {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected HttpClient hc;
-	private PoolingClientConnectionManager mtManager;
 	protected ProtocolVersion protocolVersion;
 	protected AccountInfos ai;
 
 	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
-	protected OPClient(String loginAtDomain, String password, DeviceId devId,
-			String devType, String userAgent, String url) {
+	protected OPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
+			DeviceId devId, String devType, String userAgent, String url) {
 
 		setProtocolVersion(ProtocolVersion.V121);
-		this.ai = new AccountInfos(loginAtDomain, password, devId, devType,
-				url, userAgent);
-
-		this.hc = createHttpClient();
-	}
-
-	public void destroy() {
-		mtManager.shutdown();
+		this.ai = new AccountInfos(loginAtDomain, password, devId, devType, url, userAgent);
+		this.hc = httpClientBuilder.build();
 	}
 
 	private <T> T run(IEasCommand<T> cmd) throws Exception {
 		return cmd.run(ai, this, hc);
-	}
-
-	private HttpClient createHttpClient() {
-		mtManager = new PoolingClientConnectionManager();
-		mtManager.setMaxTotal(100);
-		mtManager.setDefaultMaxPerRoute(100);
-		return new DefaultHttpClient(mtManager);
 	}
 
 	public OptionsResponse options() throws Exception {

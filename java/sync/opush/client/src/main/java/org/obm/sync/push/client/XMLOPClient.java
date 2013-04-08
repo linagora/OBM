@@ -58,7 +58,7 @@ public class XMLOPClient extends OPClient {
 	public XMLOPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, int port) {
 		
-		super(loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
+		super(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
 	}
 
 	private ByteArrayEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {

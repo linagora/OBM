@@ -43,6 +43,7 @@ import org.obm.push.spushnik.service.CredentialsService;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.PoolingHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
 
 import com.google.common.base.Throwables;
@@ -64,7 +65,8 @@ public abstract class Scenario {
 		
 		try {
 			credentialsService.validate(credentials);
-			OPClient client = new WBXMLOPClient(credentials.getLoginAtDomain(), credentials.getPassword(),
+			OPClient client = new WBXMLOPClient(new PoolingHttpClientBuilder(),
+				credentials.getLoginAtDomain(), credentials.getPassword(),
 				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
 		
 			return scenarii(client);

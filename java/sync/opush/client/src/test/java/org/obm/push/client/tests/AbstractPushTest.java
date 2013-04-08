@@ -79,7 +79,6 @@ public class AbstractPushTest {
 
 	@After
 	protected void tearDown() {
-		opc.destroy();
 		opc = null;
 	}
 
