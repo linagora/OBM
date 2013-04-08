@@ -416,7 +416,7 @@ sub getMailboxRestoreFolder {
     my $self = shift;
     my( $new ) = @_;
 
-    return $self->getLogin().'/'.$self->_cleanLogin().'@'.$self->getRealm();
+    return $self->_cleanLogin().'@'.$self->getRealm();
 }
 
 
