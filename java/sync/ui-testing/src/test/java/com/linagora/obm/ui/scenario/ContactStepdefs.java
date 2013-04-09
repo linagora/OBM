@@ -29,16 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.tests;
+package com.linagora.obm.ui.scenario;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
+import java.util.List;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -46,22 +42,31 @@ import com.google.inject.Inject;
 import com.linagora.obm.ui.bean.UIContact;
 import com.linagora.obm.ui.bean.UIDomain;
 import com.linagora.obm.ui.bean.UIUser;
-import com.linagora.obm.ui.ioc.Module;
 import com.linagora.obm.ui.page.ContactPage;
 import com.linagora.obm.ui.page.CreateContactPage;
 import com.linagora.obm.ui.page.LoginPage;
 import com.linagora.obm.ui.page.PageFactory;
 
-@GuiceModule(Module.class)
-@RunWith(SlowGuiceRunner.class)
-public class UICreateContactTest {
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+
+public class ContactStepdefs {
 
 	@Inject PageFactory pageFactory;
 	@Inject WebDriver driver;
 	
 	private UIUser uiUser;
 	private UIDomain uiDomain;
-
+	
+	private CreateContactPage createContactPage;
+	private CreateContactPage processedCreateContactPage;
+	private UIContact contactToCreate;
+	private ContactPage okCreationPage;
+	
 	@Before
 	public void setUp() {
 		uiUser = UIUser.user();
@@ -77,73 +82,56 @@ public class UICreateContactTest {
 		driver.quit();
 	}
 
-	@Test
-	public void createContactFailsNoName() {
+	@Given("on create contact page")
+	public void createContactPage() {
 		ContactPage contactPage = pageFactory.create(driver, ContactPage.class);
 		contactPage.open();
 		
-		CreateContactPage createContactPage = contactPage.openCreateContactPage();
-		CreateContactPage failedCreationPage = createContactPage.createContactAsExpectingError(UIContact.emptyFields());
-		
-		WebElement lastNameField = failedCreationPage.elLastname();
+		createContactPage = contactPage.openCreateContactPage();
+	}
+	
+	@When("user creates a contact without lastname")
+	public void createContactWithoutLastname() {
+		processedCreateContactPage = createContactPage.createContactAsExpectingError(new UIContact());
+	}
+	
+	@Then("creation fails")
+	public void creationFails() {
+		WebElement lastNameField = processedCreateContactPage.elLastname();
 		assertThat(lastNameField.getAttribute("class")).isEqualTo("error");
 		assertThat(lastNameField.getAttribute("title")).isEqualTo("Vous devez renseigner le Nom avant de valider.");
 	}
 	
-	@Test
-	public void createContactSuccess() {
-		ContactPage contactPage = pageFactory.create(driver, ContactPage.class);
-		contactPage.open();
-		
-		CreateContactPage createContactPage = contactPage.openCreateContactPage();
-		UIContact contactToCreate = UIContact
-				.builder()
-				.firstName("J'ohn")
-				.lastName("D'oe")
-				.companyField("Lina'gora")
-				.build();
-		
-		ContactPage okCreationPage = createContactPage.createContact(contactToCreate);
-		assertThat(okCreationPage.countContactsWithLastnameInList(contactToCreate)).isEqualTo(1);
+	@When("user creates a contact:$")
+	public void userCreatesContact(List<UIContact> contacts) {
+		assertThat(contacts).hasSize(1);
+		contactToCreate = contacts.get(0);
+	}
+
+	@And("user validate")
+	public void userValidate() {
+		okCreationPage = createContactPage.createContact(contactToCreate);
 	}
 	
-	@Test
-	public void createContactFailsAlreadyExistsAccept() {
-		ContactPage contactPage = pageFactory.create(driver, ContactPage.class);
-		contactPage.open();
-		
-		CreateContactPage createContactPage = contactPage.openCreateContactPage();
-		UIContact contactToCreate = UIContact
-				.builder()
-				.firstName("existing")
-				.lastName("contact")
-				.build();
-		// A popup appears because contact already exists, but we accept to recreate it
-		
-		ContactPage okCreationPage = createContactPage.createContact(contactToCreate);
-		assertThat(okCreationPage.countContactsWithLastnameInList(contactToCreate)).isEqualTo(2);
+	@And("user validate accepting existing popup") 
+	public void userValidateAcceptingExistingPopup() {
+		okCreationPage = createContactPage.createContactAndRespondOKTOConfirmCreation(contactToCreate);
 	}
 	
-	@Test
-	public void	createContactFailsAlreadyExistsCancel() {
-		ContactPage contactPage = pageFactory.create(driver, ContactPage.class);
-		contactPage.open();
-		
-		CreateContactPage createContactPage = contactPage.openCreateContactPage();
-		UIContact contactToCreate = UIContact
-				.builder()
-				.firstName("existing")
-				.lastName("contact")
-				.build();
-			
-		// A popup appears because contact already exists, we cancel it
-		
-		ContactPage canceledCreationPage = createContactPage.createContact(contactToCreate);
-		assertThat(canceledCreationPage.countContactsWithLastnameInList(contactToCreate)).isEqualTo(2);
+	@And("user validate cancelling existing popup") 
+	public void userValidateCancellingExistingPopup() {
+		processedCreateContactPage = createContactPage.createContactAndRespondCancelTOConfirmCreation(contactToCreate);
 	}
 	
+	@Then("creation page still active with \"([^\"]*)\" as lastname")
+	public void creationPageStillActive(String lastname) {
+		WebElement lastNameField = processedCreateContactPage.elLastname();
+		assertThat(lastNameField.getAttribute("value")).isEqualTo(lastname);
+	}
 	
-	
+	@Then("^\"([^\"]*)\" is (\\d+) time\\(s\\) in contact list$")
+	public void isLastnameInList(String name, int times) {
+		assertThat(okCreationPage.countNameInList(name)).isEqualTo(times);
+	}
 	
 }
-	

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
-import org.openqa.selenium.By;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -64,13 +64,60 @@ public class CreateContactPage extends ContactPage {
 		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
 			@Override
 			public boolean apply(WebDriver input) {
-				return driver.findElements(By.id("informationContainer")).size() == 0;
+				return !informationGrid.isDisplayed() 
+					&& "expanded".equals(dataGrid.getAttribute("class"));
 			}
 		});
 		
 		return pageFactory.create(driver, ContactPage.class);
 	}
+	
+	public ContactPage createContactAndRespondOKTOConfirmCreation(UIContact contactToCreate) {
+		doCreateContact(contactToCreate);
+		
+		managePopup(true);
+		
+		return createContactPage();
+	}
 
+	public CreateContactPage createContactAndRespondCancelTOConfirmCreation(UIContact contactToCreate) {
+		doCreateContact(contactToCreate);
+		
+		managePopup(false);
+		
+		return this;
+	}
+
+	private void managePopup(final boolean accept) {
+		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
+			@Override
+			public boolean apply(WebDriver input) {
+				Alert alert = driver.switchTo().alert();
+				if (alert != null) {
+					if (accept) {
+						alert.accept();
+					} else {
+						alert.dismiss();
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	private ContactPage createContactPage() {
+		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
+			@Override
+			public boolean apply(WebDriver input) {
+				return !informationGrid.isDisplayed() 
+					&& "expanded".equals(dataGrid.getAttribute("class"));
+			}
+		});
+		
+		return pageFactory.create(driver, ContactPage.class);
+	}
+	
 	public CreateContactPage createContactAsExpectingError(UIContact contactToCreate) {
 		doCreateContact(contactToCreate);
 		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {

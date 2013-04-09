@@ -29,16 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.bean;
+package com.linagora.obm.ui.scenario;
 
-import lombok.Data;
+import org.junit.runner.RunWith;
 
-@Data
-public class UIContact {
+import cucumber.api.junit.Cucumber;
+
+@RunWith(Cucumber.class)
+public class ContactCucumber {
 	
-	public String firstName;
-	public String lastName;
-	public String companyField;
-	public boolean mailokField;
-	public boolean newsletterField;
 }

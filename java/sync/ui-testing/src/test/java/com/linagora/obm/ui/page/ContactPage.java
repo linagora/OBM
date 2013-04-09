@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -42,6 +43,9 @@ import com.linagora.obm.ui.bean.UIContact;
 public class ContactPage extends RootPage {
 	
 	private WebElement addContact;
+	protected WebElement informationGrid;
+	protected WebElement dataGrid;
+	private WebElement dataContainer;
 	
 	public ContactPage(WebDriver driver) {
 		super(driver);
@@ -61,9 +65,12 @@ public class ContactPage extends RootPage {
 		return pageFactory.create(driver, CreateContactPage.class);
 	}
 	
-	public int countContactsWithLastnameInList(UIContact contactToCheck) {
-		// @TODO, comptez le nombre d'occurence du nom complet dans la liste
-		return contactToCheck.getLastName().equalsIgnoreCase("existing") ? 1 : 0;
+	public int countContactsByFirstNameAndLastnameInList(UIContact contactToCheck) {
+		String text = dataContainer.getText();
+		return text.contains(contactToCheck.getFirstName() + " " + contactToCheck.getLastName()) ? 1 : 0;
 	}
-
+	
+	public int countNameInList(String name) {
+		return StringUtils.countMatches(dataContainer.getText(), name);
+	}
 }
