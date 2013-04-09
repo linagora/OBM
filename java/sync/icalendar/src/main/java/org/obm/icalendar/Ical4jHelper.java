@@ -181,6 +181,13 @@ public class Ical4jHelper {
 			.put(RecurrenceKind.monthlybydate, Recur.MONTHLY).put(RecurrenceKind.monthlybyday, Recur.MONTHLY)
 			.put(RecurrenceKind.yearly, Recur.YEARLY).put(RecurrenceKind.yearlybyday, Recur.YEARLY).build();
 	
+	private static final BiMap<EventPrivacy, Clazz> PRIVACY_TO_CLASSIFICATION = new ImmutableBiMap.Builder<EventPrivacy, Clazz>()
+			.put(EventPrivacy.PUBLIC, Clazz.PUBLIC)
+			.put(EventPrivacy.PRIVATE, Clazz.PRIVATE)
+			.put(EventPrivacy.CONFIDENTIAL, Clazz.CONFIDENTIAL)
+			.build();
+	private static final BiMap<Clazz, EventPrivacy> CLASSIFICATION_TO_PRIVACY = PRIVACY_TO_CLASSIFICATION.inverse();
+	
 	private final DateProvider dateProvider;
 	private final Factory eventExtIdFactory;
 	private final AttendeeService attendeeService;
@@ -618,10 +625,9 @@ public class Ical4jHelper {
 		}
 	}
 
-	private void appendPrivacy(Event event, Clazz clazz) {
-		if (clazz != null) {
-			event.setPrivacy(EventPrivacy.valueOf(clazz.getValue()));
-		}
+	private void appendPrivacy(Event event, Clazz classification) {
+		EventPrivacy eventPrivacy = CLASSIFICATION_TO_PRIVACY.get(classification);
+		event.setPrivacy(Objects.firstNonNull(eventPrivacy, EventPrivacy.PUBLIC));
 	}
 
 	private void appendUid(Event event, Uid uid) {
@@ -1418,7 +1424,7 @@ public class Ical4jHelper {
 	}
 
 	/* package */ Clazz getClazz(EventPrivacy privacy) {
-		return new Clazz(privacy.name());
+		return Objects.firstNonNull(PRIVACY_TO_CLASSIFICATION.get(privacy), Clazz.PUBLIC);
 	}
 
 	/* package */ Organizer getOrganizer(String owner, String ownerEmail) {

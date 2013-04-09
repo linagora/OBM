@@ -52,13 +52,13 @@ public class EventPrivacyTest {
 		EventPrivacy result = EventPrivacy.valueOf(1);
 		assertThat(result).isEqualTo(EventPrivacy.PRIVATE);
 	}
-	
+
 	@Test
 	public void testConfidentialValueOf() {
 		EventPrivacy result = EventPrivacy.valueOf(2);
 		assertThat(result).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testNegativeFromSqlInt() {
 		EventPrivacy.valueOf(-1);
@@ -79,5 +79,11 @@ public class EventPrivacyTest {
 	public void testPublicToSqlInt() {
 		int sqlIntCode = EventPrivacy.PUBLIC.toInteger();
 		assertThat(sqlIntCode).isEqualTo(0);
+	}
+	
+	@Test
+	public void testConfidentialToSqlInt() {
+		int sqlIntCode = EventPrivacy.CONFIDENTIAL.toInteger();
+		assertThat(sqlIntCode).isEqualTo(2);
 	}
 }

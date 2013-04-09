@@ -443,6 +443,21 @@ public class Ical4jHelperTest {
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
 		assertEquals(EventPrivacy.CONFIDENTIAL, event1.getPrivacy());
 	}
+
+	@Test
+	public void testGetPrivacyIsPublicWhenOther() {
+		VEvent vEvent = new VEvent();
+		vEvent.getProperties().add(new Clazz("other"));
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
+	}
+
+	@Test
+	public void testGetPrivacyIsPublicWhenNull() {
+		VEvent vEvent = new VEvent();
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
+	}
 	
 	@Test
 	public void testGetOwner() throws URISyntaxException {
