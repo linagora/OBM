@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -41,9 +44,11 @@ import org.obm.push.spushnik.bean.CheckStatus;
 import org.obm.push.spushnik.bean.Credentials;
 import org.obm.push.spushnik.service.CredentialsService;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.push.client.HttpClientBuilder;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.PoolingHttpClientBuilder;
+import org.obm.sync.push.client.SSLHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
 
 import com.google.common.base.Throwables;
@@ -65,7 +70,8 @@ public abstract class Scenario {
 		
 		try {
 			credentialsService.validate(credentials);
-			OPClient client = new WBXMLOPClient(new PoolingHttpClientBuilder(),
+			
+			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials),
 				credentials.getLoginAtDomain(), credentials.getPassword(),
 				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
 		
@@ -73,6 +79,17 @@ public abstract class Scenario {
 		} catch (Exception e) {
 			return handleException(e);
 		}
+	}
+
+	private HttpClientBuilder chooseHttpClientBuilder(Credentials credentials) {
+		if (credentials.getPkcs12() != null) {
+			return new SSLHttpClientBuilder(getPkcs12Stream(credentials), credentials.getPkcs12Password());
+		}
+		return new PoolingHttpClientBuilder();
+	}
+
+	private InputStream getPkcs12Stream(Credentials credentials) {
+		return new ByteArrayInputStream(credentials.getPkcs12());
 	}
 	
 	protected abstract CheckResult scenarii(OPClient client) throws Exception;

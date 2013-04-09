@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.verify;
 
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,11 +64,12 @@ public class CredentialsServiceTest {
 
 	@Test
 	public void testCredentialsWithNiceCertificate() throws Exception {
-		InputStream certificateInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("cert.pem");
+		InputStream certificateInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_pwd_toto.p12");
 		service.validate(Credentials.builder()
 					.loginAtDomain("user@domain")
 					.password("password")
-					.certificate(ByteStreams.toByteArray(certificateInputStream))
+					.pkcs12(ByteStreams.toByteArray(certificateInputStream))
+					.pkcs12Password("toto")
 					.build());
 	}
 	
@@ -75,11 +77,12 @@ public class CredentialsServiceTest {
 	public void testCredentialsWithBadCertificate() throws Exception {
 		thrown.expect(InvalidCredentialsException.class);
 		thrown.expectMessage("Invalid certificate");
-		InputStream certificateInputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("bad_cert.pem");
+		InputStream certificateInputStream = IOUtils.toInputStream("I'm not a pkcs12 file");
 		service.validate(Credentials.builder()
 					.loginAtDomain("user@domain")
 					.password("password")
-					.certificate(ByteStreams.toByteArray(certificateInputStream))
+					.pkcs12(ByteStreams.toByteArray(certificateInputStream))
+					.pkcs12Password("")
 					.build());
 	}
 	

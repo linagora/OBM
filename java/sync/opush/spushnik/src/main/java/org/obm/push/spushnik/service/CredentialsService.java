@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.service;
 
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
+import java.io.ByteArrayInputStream;
+import java.security.KeyStore;
 
 import org.obm.push.spushnik.bean.Credentials;
 
@@ -64,17 +64,16 @@ public class CredentialsService {
 		}
 	}
 
-	private void verifyCertificateIsValid(Credentials credentials) throws InvalidCredentialsException {
-		if (credentials.getCertificate() != null) {
-			verifyCertificateIsWellFormatted(credentials);
-		}
+	private boolean verifyCertificateIsValid(Credentials credentials) throws InvalidCredentialsException {
+		return credentials.getPkcs12() == null || pkcs12IsWellFormated(credentials);
 	}
 
-	private void verifyCertificateIsWellFormatted(Credentials credentials) throws InvalidCredentialsException {
+	private boolean pkcs12IsWellFormated(Credentials credentials) throws InvalidCredentialsException {
 		try {
-			X509Certificate cert = X509Certificate.getInstance(credentials.getCertificate());
-			cert.checkValidity();
-		} catch (CertificateException e) {
+			KeyStore keyStore = KeyStore.getInstance("PKCS12");
+			keyStore.load(new ByteArrayInputStream(credentials.getPkcs12()), credentials.getPkcs12Password());
+			return true;
+		} catch (Exception e) {
 			throw new InvalidCredentialsException("Invalid certificate", e);
 		}
 	}

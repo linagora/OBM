@@ -1,1 +1,1 @@
-{"loginAtDomain":"jaures@sfio.fr","password":"jaures","certificate":null}
+{"loginAtDomain":"jaures@sfio.fr","password":"jaures","pkcs12":null}

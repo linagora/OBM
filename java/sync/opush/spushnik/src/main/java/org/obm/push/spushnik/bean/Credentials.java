@@ -49,7 +49,8 @@ public class Credentials {
 	public static class Builder {
 		private String loginAtDomain;
 		private String password;
-		private byte[] certificate;
+		private String pkcs12Password;
+		private byte[] pkcs12;
 		
 		private Builder() {
 			super();
@@ -65,30 +66,37 @@ public class Credentials {
 			return this;
 		}
 		
-		public Builder certificate(byte[] certificate) {
-			this.certificate = certificate;
+		public Builder pkcs12(byte[] pkcs12) {
+			this.pkcs12 = pkcs12;
+			return this;
+		}
+
+		public Builder pkcs12Password(String pkcs12Password) {
+			this.pkcs12Password = pkcs12Password;
 			return this;
 		}
 		
 		public Credentials build() {
 			Preconditions.checkState(loginAtDomain != null, "loginAtDomain is required");
 			Preconditions.checkState(password != null, "password is required");
-			return new Credentials(loginAtDomain, password, certificate);
+			return new Credentials(loginAtDomain, password, pkcs12Password, pkcs12);
 		}
 	}
 	
 	private final String loginAtDomain;
 	private final String password;
-	private final byte[] certificate;
+	private final String pkcs12Password;
+	private final byte[] pkcs12;
 
 	private Credentials() {
-		this(null, null, null);
+		this(null, null, null, null);
 	}
 	
-	private Credentials(String loginAtDomain, String password, byte[] certificate) {
+	private Credentials(String loginAtDomain, String password, String pkcs12Password, byte[] pkcs12) {
 		this.loginAtDomain = loginAtDomain;
 		this.password = password;
-		this.certificate = certificate;
+		this.pkcs12 = pkcs12;
+		this.pkcs12Password = pkcs12Password;
 	}
 	
 	public String getLoginAtDomain() {
@@ -99,13 +107,20 @@ public class Credentials {
 		return password;
 	}
 	
-	public byte[] getCertificate() {
-		return certificate;
+	public byte[] getPkcs12() {
+		return pkcs12;
 	}
 	
+	public char[] getPkcs12Password() {
+		if (pkcs12Password == null) {
+			return null;
+		}
+		return pkcs12Password.toCharArray();
+	}
+
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(loginAtDomain, password, Arrays.hashCode(certificate));
+		return Objects.hashCode(loginAtDomain, password, Arrays.hashCode(pkcs12), pkcs12Password);
 	}
 	
 	@Override
@@ -114,7 +129,8 @@ public class Credentials {
 			Credentials that = (Credentials) object;
 			return Objects.equal(this.loginAtDomain, that.loginAtDomain)
 				&& Objects.equal(this.password, that.password)
-				&& Arrays.equals(this.certificate, that.certificate);
+				&& Objects.equal(this.pkcs12Password, that.pkcs12Password)
+				&& Arrays.equals(this.pkcs12, that.pkcs12);
 		}
 		return false;
 	}
@@ -124,7 +140,8 @@ public class Credentials {
 		return Objects.toStringHelper(this)
 			.add("loginAtDomain", loginAtDomain)
 			.add("password", password)
-			.add("certificate", certificate)
+			.add("pkcs12Password", pkcs12Password)
+			.add("pkcs12", pkcs12)
 			.toString();
 	}
 }

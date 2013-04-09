@@ -64,6 +64,7 @@ import org.obm.push.spushnik.SlowArquillianRunner;
 import org.obm.push.spushnik.SpushnikScenarioTestUtils;
 import org.obm.push.spushnik.SpushnikTestUtils;
 import org.obm.push.spushnik.SpushnikWebArchive;
+import org.obm.push.spushnik.bean.Credentials;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 
 import com.google.common.base.Charsets;
@@ -110,12 +111,25 @@ public class FolderSyncScenarioTest {
 	
 	@Test
 	@RunAsClient
+	public void testFolderSyncScenarioWithNiceCertificateWrongPwd(@ArquillianResource URL baseURL) throws Exception {
+		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_wrong_pwd.txt");
+		
+		InputStream content = httpResponse.getEntity().getContent();
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IOUtils.toString(content, Charsets.UTF_8))
+			.startsWith("{\"status\":2,\"messages\":[\"org.obm.push.spushnik.service.InvalidCredentialsException: Invalid certificate")
+			.endsWith("\"]}");
+	}
+	
+	@Test
+	@RunAsClient
 	public void testFolderSyncScenarioWithBadCertificate(@ArquillianResource URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_bad.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
-		assertThat(IOUtils.toString(content, Charsets.UTF_8))
+		String string = IOUtils.toString(content, Charsets.UTF_8);
+		assertThat(string)
 			.startsWith("{\"status\":2,\"messages\":[\"org.obm.push.spushnik.service.InvalidCredentialsException: Invalid certificate")
 			.endsWith("\"]}");
 	}
