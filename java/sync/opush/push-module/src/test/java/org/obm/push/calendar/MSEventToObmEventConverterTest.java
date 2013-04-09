@@ -687,7 +687,7 @@ public class MSEventToObmEventConverterTest {
 		
 		Event convertedEvent = convertToOBMEvent(msEvent);
 		
-		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(convertedEvent.getPrivacy()).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
 
 	@Test

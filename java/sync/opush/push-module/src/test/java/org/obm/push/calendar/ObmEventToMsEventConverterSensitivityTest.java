@@ -77,4 +77,10 @@ public class ObmEventToMsEventConverterSensitivityTest {
 		assertThat(sensitivity).isEqualTo(CalendarSensitivity.CONFIDENTIAL);
 	}
 
+	@Test
+	public void testConfidentialConversion() {
+		CalendarSensitivity sensitivity = converter.sensitivity(EventPrivacy.CONFIDENTIAL);
+		assertThat(sensitivity).isEqualTo(CalendarSensitivity.CONFIDENTIAL);
+	}
+
 }

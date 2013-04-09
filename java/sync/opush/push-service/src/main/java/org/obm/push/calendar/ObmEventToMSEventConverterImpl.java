@@ -215,10 +215,10 @@ public class ObmEventToMSEventConverterImpl implements ObmEventToMSEventConverte
 	@VisibleForTesting CalendarSensitivity sensitivity(EventPrivacy privacy) {
 		Preconditions.checkNotNull(privacy);
 		switch (privacy) {
-		case PRIVATE:
-			return CalendarSensitivity.PRIVATE;
 		case PUBLIC:
 			return CalendarSensitivity.NORMAL;
+		case PRIVATE:
+			return CalendarSensitivity.PRIVATE;
 		case CONFIDENTIAL:
 			return CalendarSensitivity.CONFIDENTIAL;
 		}

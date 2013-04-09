@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
@@ -73,6 +74,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.inject.Singleton;
 
@@ -82,6 +84,14 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private static final Logger logger = LoggerFactory.getLogger(MSEventToObmEventConverterImpl.class);
 	
 	private static final int EVENT_CATEGORIES_MAX = 300;
+	
+	private static final Map<CalendarSensitivity, EventPrivacy> SENSITIVITY_TO_PRIVACY =
+			new ImmutableMap.Builder<CalendarSensitivity, EventPrivacy>()
+				.put(CalendarSensitivity.NORMAL, EventPrivacy.PUBLIC)
+				.put(CalendarSensitivity.PERSONAL, EventPrivacy.PRIVATE)
+				.put(CalendarSensitivity.PRIVATE, EventPrivacy.PRIVATE)
+				.put(CalendarSensitivity.CONFIDENTIAL, EventPrivacy.CONFIDENTIAL)
+				.build();
 	
 	@Override
 	public Event convert(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent)
@@ -332,14 +342,9 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	
 	private EventPrivacy convertSensitivityToPrivacy(MSEventCommon msEvent) {
 		if (msEvent.getSensitivity() != null) {
-			if (msEvent.getSensitivity() == CalendarSensitivity.NORMAL) {
-				return EventPrivacy.PUBLIC;
-			} else {
-				return EventPrivacy.PRIVATE;
-			}
-		} else {
-			return EventPrivacy.PUBLIC;
+			return Objects.firstNonNull(SENSITIVITY_TO_PRIVACY.get(msEvent.getSensitivity()), EventPrivacy.PUBLIC);
 		}
+		return EventPrivacy.PUBLIC;
 	}
 
 	private EventPrivacy convertSensitivityToPrivacy(Event parentEvent, MSEventCommon msEvent) {

@@ -1058,7 +1058,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
 
 	@Test
@@ -1140,7 +1140,7 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
 
 	@Test
