@@ -316,10 +316,14 @@ class Vcalendar_Reader_OBM {
   }
     
   function parsePrivacy($privacy) {
-    if($privacy == 1) {
-      return 'PRIVATE';
+    switch ($privacy) {
+      case 0:
+        return 'PUBLIC';
+      case 1:
+        return 'PRIVATE';
+      case 2:
+        return 'CONFIDENTIAL';
     }
-    return 'PUBLIC';
   }
 
   function parsePriority($priority) {
