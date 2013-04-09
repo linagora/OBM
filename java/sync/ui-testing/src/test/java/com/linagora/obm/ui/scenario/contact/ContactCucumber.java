@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.scenario;
+package com.linagora.obm.ui.scenario.contact;
 
 import org.junit.runner.RunWith;
 

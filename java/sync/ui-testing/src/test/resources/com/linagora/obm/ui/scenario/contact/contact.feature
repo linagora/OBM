@@ -11,7 +11,7 @@ Feature: tests on contacts
       | firstName | lastName | companyField |
       | John      | Doe      | Linagora     | 
     And user validate
-    Then "John Doe" is 1 time(s) in contact list
+    Then "John Doe" is once in contact list
     
    Scenario: create a existing contact and accept
     Given on create contact page
@@ -19,7 +19,7 @@ Feature: tests on contacts
       | firstName | lastName | companyField |
       | John      | Doe      | Linagora     | 
     And user validate accepting existing popup
-    Then "John Doe" is 2 time(s) in contact list
+    Then "John Doe" is twice in contact list
     
    Scenario: create a existing contact and cancel
     Given on create contact page

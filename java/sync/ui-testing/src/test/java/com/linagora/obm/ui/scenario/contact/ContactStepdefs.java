@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.scenario;
+package com.linagora.obm.ui.scenario.contact;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -129,8 +129,17 @@ public class ContactStepdefs {
 		assertThat(lastNameField.getAttribute("value")).isEqualTo(lastname);
 	}
 	
-	@Then("^\"([^\"]*)\" is (\\d+) time\\(s\\) in contact list$")
-	public void isLastnameInList(String name, int times) {
+	@Then("^\"([^\"]*)\" is once in contact list$")
+	public void isOnceInContactList(String name) {
+		count(name, 1);
+	}
+	
+	@Then("^\"([^\"]*)\" is twice in contact list$")
+	public void isTwiceInContactList(String name) {
+		count(name, 2);
+	}
+	
+	private void count(String name, int times) {
 		assertThat(okCreationPage.countNameInList(name)).isEqualTo(times);
 	}
 	
