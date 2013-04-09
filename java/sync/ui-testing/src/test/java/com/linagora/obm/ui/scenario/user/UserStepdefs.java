@@ -29,18 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.obm.ui.tests;
+package com.linagora.obm.ui.scenario.user;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -50,22 +44,29 @@ import com.linagora.obm.ui.bean.UIDomain;
 import com.linagora.obm.ui.bean.UIUser;
 import com.linagora.obm.ui.bean.UIUserKind;
 import com.linagora.obm.ui.bean.UIUserProfile;
-import com.linagora.obm.ui.ioc.Module;
 import com.linagora.obm.ui.page.CreateUserPage;
 import com.linagora.obm.ui.page.CreateUserSummaryPage;
 import com.linagora.obm.ui.page.LoginPage;
 import com.linagora.obm.ui.page.PageFactory;
 
-@GuiceModule(Module.class)
-@RunWith(SlowGuiceRunner.class)
-public class UICreateUserTest {
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+
+public class UserStepdefs {
 
 	@Inject PageFactory pageFactory;
 	@Inject WebDriver driver;
 	
 	private UIUser uiUser;
 	private UIDomain uiDomain;
-
+	
+	private CreateUserPage createUserPage;
+	private CreateUserPage processedCreateUserPage;
+	private CreateUserSummaryPage processedCreationSummaryPage;
+	
 	@Before
 	public void setUp() {
 		uiUser = UIUser.admin0();
@@ -82,12 +83,15 @@ public class UICreateUserTest {
 		driver.quit();
 	}
 
-	@Test
-	public void createUserFailsNoName() {
-		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
-		createPage.open();
-		
-		CreateUserPage failedCreateUserPage = createPage.createUserAsExpectingError(UIUser.builder()
+	@Given("on create user page")
+	public void createUserPage() {
+		createUserPage = pageFactory.create(driver, CreateUserPage.class);
+		createUserPage.open();
+	}
+	
+	@When("user creates a user without name")
+	public void createUserWithoutName() {
+		processedCreateUserPage = createUserPage.createUserAsExpectingError(UIUser.builder()
 				.login("testAdmin")
 				.password("admin")
 				.commonName("admin")
@@ -96,21 +100,11 @@ public class UICreateUserTest {
 				.address2("add2")
 				.phone("0606060606")
 				.build());
-		
-		List<WebElement> errorMessages = failedCreateUserPage.elMessagesError();
-		assertThat(failedCreateUserPage.elMessagesInfo()).isEmpty();
-		assertThat(failedCreateUserPage.elMessagesOk()).isEmpty();
-		assertThat(failedCreateUserPage.elMessagesWarning()).isEmpty();
-		assertThat(errorMessages).hasSize(1);
-		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : Le nom doit être correctement renseigné ! :");
 	}
 	
-	@Test
-	public void createUserFailsNoEmail() {
-		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
-		createPage.open();
-		
-		CreateUserSummaryPage creationSummaryPage = createPage.createUser(UIUser.builder()
+	@When("user creates a user without email")
+	public void createUserWithoutEmail() {
+		processedCreateUserPage = createUserPage.createUserAsExpectingError(UIUser.builder()
 				.login("testAdmin")
 				.lastName("admin lastname")
 				.password("admin")
@@ -122,22 +116,11 @@ public class UICreateUserTest {
 				.emailAddress("")
 				.phone("0606060606")
 				.build());
-		
-		List<WebElement> errorMessages = creationSummaryPage.elMessagesError();
-		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesOk()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
-		assertThat(errorMessages).hasSize(1);
-		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : Vous devez saisir une adresse E-mail afin d'activer la messagerie !");
 	}
 	
-	
-	@Test
-	public void createUserAdmin() {
-		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
-		createPage.open();
-		
-		CreateUserSummaryPage creationSummaryPage = createPage.createUser(UIUser.builder()
+	@When("user creates a user with admin profile")
+	public void createUserWithAdminProfile() {
+		processedCreationSummaryPage = createUserPage.createUser(UIUser.builder()
 				.login("testAdmin")
 				.lastName("admin lastname")
 				.password("admin")
@@ -147,23 +130,11 @@ public class UICreateUserTest {
 				.address2("add2")
 				.phone("0606060606")
 				.build());
-
-		List<WebElement> okMessages = creationSummaryPage.elMessagesOk();
-		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesError()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
-		assertThat(okMessages).hasSize(2);
-		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
-		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
-		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
-    }
+	}
 	
-	@Test
+	@When("user creates a user")
 	public void createUser() {
-		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
-		createPage.open();
-		
-		CreateUserSummaryPage creationSummaryPage = createPage.createUser(UIUser.builder()
+		processedCreationSummaryPage = createUserPage.createUser(UIUser.builder()
 				.kind(UIUserKind.MADAME)
 				.login("testUser")
 				.lastName("testUser lastname")
@@ -191,35 +162,37 @@ public class UICreateUserTest {
 				.emailInternalEnabled(true)
 				.emailAddress("testuser")
 				.build());
-
-		List<WebElement> okMessages = creationSummaryPage.elMessagesOk();
-		assertThat(creationSummaryPage.elMessagesInfo()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesError()).isEmpty();
-		assertThat(creationSummaryPage.elMessagesWarning()).isEmpty();
-		assertThat(okMessages).hasSize(2);
-		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
-		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
-		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
-    }
+	}
 	
-	@Test
-	public void createUserFailsAlreadyExists() {
-		CreateUserPage createPage = pageFactory.create(driver, CreateUserPage.class);
-		createPage.open();
-		
-		CreateUserPage failedCreateUserPage = createPage.createUserAsExpectingError(UIUser.builder()
+	@When("user creates a user already existing")
+	public void createUserAlreadyExisting() {
+		processedCreateUserPage = createUserPage.createUserAsExpectingError(UIUser.builder()
 				.login("testUser")
 				.password("testUser")
 				.commonName("commonname testUser")
 				.profile(UIUserProfile.USER)
 				.build());
-		
-		List<WebElement> errorMessages = failedCreateUserPage.elMessagesError();
-		assertThat(failedCreateUserPage.elMessagesInfo()).isEmpty();
-		assertThat(failedCreateUserPage.elMessagesOk()).isEmpty();
-		assertThat(failedCreateUserPage.elMessagesWarning()).isEmpty();
+	}
+	
+	@Then("creation fails with \"([^\"]*)\" as message")
+	public void creationFails(String message) {
+		List<WebElement> errorMessages = processedCreateUserPage.elMessagesError();
+		assertThat(processedCreateUserPage.elMessagesInfo()).isEmpty();
+		assertThat(processedCreateUserPage.elMessagesOk()).isEmpty();
+		assertThat(processedCreateUserPage.elMessagesWarning()).isEmpty();
 		assertThat(errorMessages).hasSize(1);
-		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : testuser : Le login est déjà attribué à un autre utilisateur !");
+		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : " + message);
+	}
+	
+	@Then("creation succeeds")
+	public void creationSucceeds() {
+		List<WebElement> okMessages = processedCreationSummaryPage.elMessagesOk();
+		assertThat(processedCreationSummaryPage.elMessagesInfo()).isEmpty();
+		assertThat(processedCreationSummaryPage.elMessagesError()).isEmpty();
+		assertThat(processedCreationSummaryPage.elMessagesWarning()).isEmpty();
+		assertThat(okMessages).hasSize(2);
+		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
+		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
+		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
 	}
 }
-	
