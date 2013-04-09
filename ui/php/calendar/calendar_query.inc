@@ -6255,8 +6255,12 @@ function run_query_calendar_solr_store($event_id) {
   } elseif ($db->f('event_opacity') == 'TRANSPARENT') {
     $doc->setMultiValue('is', 'free');
   }
-  if ($db->f('event_privacy')) {
-    $doc->setMultiValue('is', 'private');
+  switch ($db->f('event_privacy')) {
+    case 1:
+      $doc->setMultiValue('is', 'private');
+      break;
+    case 2:
+      $doc->setMultiValue('is', 'confidential');
   }
   $doc->setField('from', $db->f('event_origin'));
   $attendees_q = run_query_get_events_attendee(array($event_id));
