@@ -3055,7 +3055,7 @@ function event_end_date($begin, $duration, $allDay) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts, $date_edit_occurrence=null) {
   global $obm, $display, $cgp_show, $ccalendar_weekstart, $ccalendar_resource;
-  global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private;
+  global $l_users, $l_resources, $l_title, $l_location, $l_priority,$l_private, $l_public, $l_confidential, $l_privacy;
   global $l_low,$l_medium,$l_datebegin,$l_day,$l_month,$l_week,$l_desc,$l_high;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_state, $l_user;
   global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
@@ -3139,7 +3139,16 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
     $begin = $begin->getOutputDateTime();
     $end = $end->getOutputDateTime();
   }     
-  $privacy = $event_q->f('event_privacy') == 1? $l_yes : $l_no;
+  switch ($event_q->f('event_privacy')) {
+    case 0:
+      $privacy = $l_public;
+      break;
+    case 1:
+      $privacy = $l_private;
+      break;
+    case 2:
+      $privacy = $l_confidential;
+  }
   
   if($event_q->f('event_opacity') == "OPAQUE"){
     $opacity = $l_opacity_busy;
@@ -3615,7 +3624,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   <h1>$l_carac</h1>
   <table>
      <tr>
-      <th>$l_private :</th>
+      <th>$l_privacy :</th>
       <td>$privacy</td>
     </tr>
    $dis_all_day
