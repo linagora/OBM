@@ -6370,6 +6370,14 @@ Class Event {
   function isPrivate() {
     return ($this->privacy == 1);
   }
+  
+  function isConfidential() {
+    return $this->privacy == 2;
+  }
+  
+  function isNotPublic() {
+    return $this->isPrivate() || $this->isConfidential();
+  }
 
   function isExternal() {
     return ($this->external);

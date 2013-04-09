@@ -1875,7 +1875,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
               }
             }
           }
-          if($event->isPrivate()) {
+          if($event->isNotPublic()) {
             $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> ".$title;
           }
           if($event->isMeeting()) {
@@ -2181,21 +2181,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       break;
   }
 
-  if ($event->isPrivate()) {
-    $event_data["private"] = true;
-  } else {
-    $event_data["private"] = false;
-  }
-  if ($event->isMeeting()) {
-    $event_data["meeting"] = true;
-  } else {
-    $event_data["meeting"] = false;
-  }
-  if ($event->isPeriodic()) {
-    $event_data["periodic"] = true;
-  } else {
-    $event_data["periodic"] = false;
-  }
+  $event_data["notPublic"] = $event->isNotPublic();
+  $event_data["private"] = $event->isPrivate();
+  $event_data["confidential"] = $event->isConfidential();
+  $event_data["meeting"] = $event->isMeeting();
+  $event_data["periodic"] = $event->isPeriodic();
   if ($all_day) {
     $head .= $title;
   } else {
@@ -6707,7 +6697,7 @@ function html_freebusy_tip($ocs) {
   $tip = '<table>';
   foreach($ocs as $oc) {
     if ($oc->event->isMeeting()) $title .= "<img src='$GLOBALS[ico_meeting_alt]'/>";
-    if ($oc->event->isPrivate()) $title .= "<img src='$GLOBALS[ico_private_alt]'/>";
+    if ($oc->event->isNotPublic()) $title .= "<img src='$GLOBALS[ico_private_alt]'/>";
     if ($oc->event->isPeriodic()) $title .= "<img src='$GLOBALS[ico_periodic_alt]'/>";
     if ($oc->event->isAllDay()) {
       $title .= "<img src='$GLOBALS[ico_allday_alt]'/>";

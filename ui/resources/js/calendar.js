@@ -1564,7 +1564,7 @@ Obm.CalendarEvent = new Class({
     if(this.event.meeting) {                                 
       new Element('img').setProperty('src',obm.vars.images.meeting).injectInside(this.dragHandler);
     }
-    if (this.event.private) {
+    if (this.event.notPublic) {
       new Element('img').setProperty('src',obm.vars.images.private).injectInside(this.dragHandler);
     }
   },
