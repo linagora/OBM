@@ -4520,6 +4520,17 @@ function dis_event_commented_decision_popup( $display_wait ) {
   ";
   return $block;
 }
+
+function get_available_privacy_options() {
+  global $l_private, $l_public, $l_confidential;
+  
+  return array(
+      0 => $l_public,
+      1 => $l_private,
+      2 => $l_confidential
+  );
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
@@ -4539,7 +4550,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $ico_cancel;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   // -- Labels
-  global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc;
+  global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc, $l_privacy;
   global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_opacity, $l_opacity_free, $l_opacity_busy;
@@ -5313,11 +5324,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_force .= $l_force_disabled;
   }
 
-  if ($privacy == 1) {
-    $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" checked=\"checked\" name=\"cba_privacy\" />";
-  } else {
-    $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" name=\"cba_privacy\" />";
+  $options = get_available_privacy_options();
+  $dis_privacy = "<select id='sel_privacy' name='sel_privacy' >";
+
+  foreach ($options as $option => $label) {
+    $selected = ($option == $privacy) ? "selected='selected'" : "";
+    $dis_privacy .= "<option value=\"$option\" $selected>$label</option>";
   }
+
+  $dis_privacy .= "</select>";
 
   // the following code is perhaps a little complicated to just do a 0 to 23 loop !!!
   $hour_size = "4em";
@@ -5530,7 +5545,7 @@ $date_edit_occurrence
   <legend>$l_carac</legend>
   <table>
   <tr>
-    <th><label for=\"cba_privacy\">$l_private</label></th>
+    <th><label for=\"sel_privacy\">$l_privacy</label></th>
     <td>$dis_privacy</td>
   </tr> 
   <tr>
