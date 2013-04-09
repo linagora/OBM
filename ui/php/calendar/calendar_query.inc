@@ -3249,7 +3249,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $all_day = ($calendar['all_day'] != 1) ? 'FALSE' : 'TRUE';
   $datebegin = $calendar['date_begin'];
   $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
-  $privacy = ($calendar['privacy'] != 1) ? 0 : 1;
+  $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
   $repeat_end = isset($calendar['repeat_end']) ? "'$calendar[repeat_end]'" : 'NULL';
