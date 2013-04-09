@@ -1231,12 +1231,74 @@ function display_head($p_module, $standard=true) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu($module) {
-  
+  global $path, $obm, $display, $obm_version, $cgp_show, $modules;
+  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
+  global $l_logout, $l_profile, $l_scope_update, $l_waiting_events;
+  global $perm, $cright_write_admin, $conf_obm3_topbar;
+
+  // If a new topbar specif function is provided
+  if ($conf_obm3_topbar) {
+    return display_unified_menu($module);
+  }
+
   // If a theme specif function is provided
   if (function_exists('display_menu_theme')) {
     return display_menu_theme($module);
-  }  
+  }
 
+  $obm['uid'];
+  $login = $obm['login'];
+  $profil = $obm['profile'];
+  $p = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
+  $domain = $obm['domain_label'];
+  $domain_id = $obm['domain_id'];
+  $section = $cgp_show['module'][$module];
+  if (empty($section)) {
+    $section = $module;
+  }
+  $display['section'] = display_sections($section);
+  $display['last'] = display_last_visited();
+  $display['todo'] = display_todos();
+  $display['action'] = display_actions($section, $module);
+  $update_state = get_update_state($domain_id);
+  if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
+    $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
+  }
+  if ($display['print_url'] != '') {
+    $url = $display['print_url']."&amp;output_target=print";
+    $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
+  }
+
+  $wait_event = "<li><a id=\"bannerWaitingEvent\" href='".$path."/calendar/calendar_index.php?action=waiting_events'></a></li>";
+
+  $block = "
+    <!-- Bandeau -->
+    <div id='banner'>
+
+    <div style='float:left;'>
+      <a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
+      ".$display['section']."
+    </div>
+
+    <div style='float:right;'>
+    <ul id='information'>
+      <li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
+      $dis_scope
+      $wait_event
+      <li id='informationUser'>$login ($domain)</li>
+      <li id='informationProfile'>$l_profile: $p</li>
+      <li><a id='bannerLogoutLink' href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
+      $dis_printer
+    </ul>
+    </div>
+
+    </div>
+    ".$display['module'];
+
+  return $block;
+}
+
+function display_unified_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show, $modules;
   global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
   global $l_logout, $l_profile, $l_scope_update, $l_waiting_events;
@@ -1275,7 +1337,7 @@ function display_menu($module) {
       <a href=\"$path/obm.php?redirect=false\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
       <ul id='section'>
         <li><a href=\"$path/webmail/webmail_index.php\">Mail $mail_notif</a></li>
-        <li><a href=\"$path/calendar/calendar_index.php?action=waiting_events\">Agenda $wait_event</a></li>
+        <li><a href=\"$path/calendar/calendar_index.php\">Agenda<a/> <a href=\"$path/calendar/calendar_index.php?action=waiting_events\">$wait_event</a></li>
         <li><a href=\"$path/contact/contact_index.php\">Contact</a></li>
       </ul>
       <!-- ".$display['section']." -->
@@ -1295,22 +1357,12 @@ function display_menu($module) {
       <img src='http://icongal.com/gallery/image/81019/format_indent_more_submenu.png' style='margin-top:-1px;width:33px;'/>
       </a>
       </li>  
-
-      <!-- <li>$l_profile: $p</li> -->
       <li style='text-decoration:none;'>
         <a href='".$path."/obm.php?action=logout' style='text-decoration:none;'>
         <img src='http://www.azerty.be/icones/img101gr.gif
         ' alt='$l_logout' style='width:32px;text-decoration:none;margin-top:-4px;margin-left:0;'/>
         </a>
       </li>
-
-      
-      <!-- $wait_event
-       
-      <li>$login ($domain)</li>
-      <li>$l_profile: $p</li> 
-      <li><a href='".$path."/obm.php?action=logout' onclick='logout_roundcube()'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
-      $dis_printer -->
     </ul>
     </div>
     ".dis_all_in_one_menu()."

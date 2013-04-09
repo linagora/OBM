@@ -678,11 +678,7 @@ function refreshWaitEvent() {
             var elem = $('bannerWaitingEvent');
             if(elem){
               elem.set('text',response.msg);
-              if(response.msg > 0){
-                elem.setStyle('display', 'inline-block');
-              } else {
-                elem.setStyle('display', 'none');
-              }
+              elem.setStyle('display', 'inline-block');
               //setTimeout(refreshWaitEvent,30000);
             }
         }

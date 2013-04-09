@@ -806,7 +806,7 @@ function run_query_calendar_waiting_events() {
 
 function get_json_waiting_events($id) {
   global $obm, $cdg_sql, $display;
-  global $l_waiting_events;
+  global $l_waiting_events, $conf_obm3_topbar;
 
   $multidomain = sql_multidomain('event');
   $obm_q = new DB_OBM;
@@ -833,12 +833,18 @@ function get_json_waiting_events($id) {
   if ($obm_q->num_rows() == 1) {
     $obm_q->next_record();
     $nb_event = $obm_q->f('nb_event');
-    if($nb_event != 0) {
-      $display['json'] = "{msg : ".phpStringToJsString($nb_event)."}";
-    } else {
-      $display['json'] = "{msg : ".phpStringToJsString('0')."}";
+
+    if($nb_event == 0) {
+      $nb_event = '0';
     }
 
+    if ($conf_obm3_topbar) {
+      $message_event = $nb_event;
+    } else{
+      $message_event = $l_waiting_events.' : '.$nb_event;
+    }
+
+    $display['json'] = "{msg : '".phpStringToJsString($message_event)."'}";
   }
 }
 

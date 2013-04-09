@@ -350,4 +350,7 @@ $backup_desactived_mail = false;
 // Maximum number of conflicts to display, default is 10
 // $ccalendar_conflicts_limit = 10;
 
+// New Top Bar OBM 3.0
+$conf_obm3_topbar = true;
+
 </script>
