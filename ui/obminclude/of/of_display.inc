@@ -1265,14 +1265,6 @@ function display_menu($module) {
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
 
-  $userInfo = get_user_info($obm['uid']);
-  
-  if ( isset($userInfo['email']) ){
-    $mailbox= imap_open('{127.0.0.1:143/novalidate-cert}INBOX', $userInfo['email'], $userInfo['password']);
-    $mail = imap_mailboxmsginfo($mailbox);
-    $mail_notif = ($mail->Unread > '0') ? "<span id=\"mail_notification\" class='notification_popup' style=\"display:inline-block;\">".$mail->Unread."</span>" : '';
-  }
-
   $wait_event = "<span id=\"bannerWaitingEvent\" class='notification_popup'></span>";
 
   $block = "
