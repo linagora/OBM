@@ -5493,7 +5493,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               $uid = $uid.'-'.count($extra_exceptions);
             }
             $event = new Event($uid,$vevent->getDuration(), $vevent->getSummary(), $vevent->getLocation(),
-              $vevent->getCategory(),$vevent->isPrivate(),$vevent->getDescription(), null,
+              $vevent->getCategory(),$vevent->getPrivacy(),$vevent->getDescription(), null,
               $vevent->isAllDay(),'none',$c['id'],$owner_name, null, $vevent->getTransparency(),null,true);
 	    if ( get_class($vevent) == "Vpdi_Icalendar_Freebusy" ) {
 	      $event->addAttendee('contact',$c['id'],$owner_name, "ACCEPTED");

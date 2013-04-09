@@ -2065,7 +2065,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $owner_name = phpStringToJsString($event->owner_name);
   $organizer_name = phpStringToJsString($event->organizer_name);
   $attendee = $event->attendee;
-  if ($event->privacy == 1 && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid']) {
+  if ($event->isNotPublic() && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid']) {
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;

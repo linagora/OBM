@@ -122,6 +122,21 @@ class Vpdi_Icalendar_Event {
     return $this->evt->isPrivate();
   }
 
+  public function isConfidential() {
+    return $this->evt->isConfidential();
+  }
+
+  public function getPrivacy() {
+    switch ($this->evt->getValue('CLASS')) {
+      case 'PUBLIC':
+        return 0;
+      case 'PRIVATE':
+        return 1;
+      case 'CONFIDENTIAL':
+        return 2;
+    }
+  }
+
   public function match($pattern, $type) {
     if ($type == "basic") {
       $p = explode(" ", $pattern);

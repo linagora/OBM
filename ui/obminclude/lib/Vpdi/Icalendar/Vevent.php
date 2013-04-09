@@ -189,6 +189,10 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
     return ($this->getValue('CLASS') == "PRIVATE");
   }
   
+  public function isConfidential() {
+    return ($this->getValue('CLASS') == "CONFIDENTIAL");
+  }
+
   public function setAsTransparent() {
     $this->setProperty('TRANSP', 'TRANSPARENT');
   }
