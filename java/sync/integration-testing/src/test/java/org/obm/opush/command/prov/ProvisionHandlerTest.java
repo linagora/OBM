@@ -109,13 +109,43 @@ public class ProvisionHandlerTest {
 
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
 		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		
 		mocksControl.replay();
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
+		assertOnProvisionResponseSendPolicy(nextPolicyKeyGenerated, provisionResponse);
+	}
+	
+	@Test
+	public void testFirstProvisionWithNotAllowedUnknownDevice() throws Exception {
+		configuration.syncPerms.allowUnknownDevice = false;
+		long nextPolicyKeyGenerated = 115l;
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+		
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.syncAuthorized(user.user, user.deviceId)).andReturn(true);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		ProvisionResponse provisionResponse = opClient.provisionStepOne();
+
+		assertOnProvisionResponseSendPolicy(nextPolicyKeyGenerated, provisionResponse);
+	}
+
+	private void assertOnProvisionResponseSendPolicy(long nextPolicyKeyGenerated, ProvisionResponse provisionResponse) {
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
 		assertThat(provisionResponse.getPolicyKey()).isEqualTo(nextPolicyKeyGenerated);
 		assertThat(provisionResponse.getPolicyStatus()).isEqualTo(ProvisionPolicyStatus.SUCCESS);
@@ -131,6 +161,8 @@ public class ProvisionHandlerTest {
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
 		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
 		mocksControl.replay();
@@ -153,6 +185,8 @@ public class ProvisionHandlerTest {
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
 		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(pendingPolicyKey).once();
 		deviceDao.removePolicyKey(user.user, user.device);
 		expectLastCall().once();

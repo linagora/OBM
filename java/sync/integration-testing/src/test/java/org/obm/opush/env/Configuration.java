@@ -43,7 +43,7 @@ public class Configuration {
 
 	public static class SyncPerms {
 		public String blacklist = "";
-		public boolean allowUnkwownDevice = true;
+		public boolean allowUnknownDevice = true;
 	}
 
 	public static class Mail {

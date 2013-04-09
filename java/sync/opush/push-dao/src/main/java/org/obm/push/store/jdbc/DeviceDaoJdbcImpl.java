@@ -271,4 +271,29 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 	}
+
+	@Override
+	public void removeUnknownDeviceSyncPerm(User user, Device device) {
+		Integer deviceDbId = device.getDatabaseId();
+		
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement(
+					"DELETE FROM opush_sync_perms " +
+					"WHERE device_id IN (" +
+					"SELECT id FROM opush_device " +
+					"INNER JOIN UserObm ON owner=userobm_id " +
+					"WHERE device_id = ? AND policy IS NULL)");
+			
+			ps.setInt(1, deviceDbId);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+	}
 }

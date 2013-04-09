@@ -84,6 +84,8 @@ public class SpushnikScenarioTestUtils {
 			.andReturn(device).anyTimes();
 		expect(deviceDao.getPolicyKey(user, deviceId, PolicyStatus.PENDING))
 			.andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user, device);
+		expectLastCall().once();
 		Long policyKey = new Long(1);
 		expect(deviceDao.allocateNewPolicyKey(user, deviceId, PolicyStatus.PENDING))
 			.andReturn(policyKey).once();

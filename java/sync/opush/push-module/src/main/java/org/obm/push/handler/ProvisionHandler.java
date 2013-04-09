@@ -138,6 +138,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	private Long retrievePendingPolicyKey(UserDataRequest udr) {
 		Long actualPolicyKey = deviceDao.getPolicyKey(udr.getUser(), udr.getDevId(), PolicyStatus.PENDING);
 		if (actualPolicyKey == null) {
+			deviceDao.removeUnknownDeviceSyncPerm(udr.getUser(), udr.getDevice());
 			return deviceDao.allocateNewPolicyKey(udr.getUser(), udr.getDevId(), PolicyStatus.PENDING);
 		} else {
 			return actualPolicyKey;

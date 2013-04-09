@@ -62,4 +62,6 @@ public interface DeviceDao {
 
 	void removePolicyKey(User user, Device device) throws DaoException;
 
+	void removeUnknownDeviceSyncPerm(User user, Device device);
+
 }
