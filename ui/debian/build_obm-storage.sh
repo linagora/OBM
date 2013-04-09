@@ -16,6 +16,8 @@ OBM_UPDATE_SCRIPTS_24=${CURDIR}/scripts/2.4/updates
 OBM_UPDATE_SCRIPTS_25=${CURDIR}/scripts/2.5/updates
 OBM_UPDATE_SCRIPTS_26=${CURDIR}/scripts/2.6/updates
 
+OBM_ROUNDCUBE_SCRIPTS=${CURDIR}/php/webmail/SQL
+
 ##Mysql OBM Installation
 cp ${CURDIR}/debian/misc/db/mysql/mysql.sh ${INSTALL_DIR_SCRIPT}/mysql
 BUILD_DEB_DIR_STORAGE_SCRIPTS="${BUILD_DEB_DIR_STORAGE}/usr/share/obm-storage/update-install"
@@ -196,5 +198,10 @@ cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.8~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.
 
 # Upgrade Pg OBM 2.5.6
 cp ${OBM_UPDATE_SCRIPTS_26}/update-2.6.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.6.0~1
+
+#RoundCube
+BUILD_DEB_ROUNDCUBE_SCRIPTS=${BUILD_DEB_DIR_STORAGE_SCRIPTS}/scripts/2.4/roundcube
+mkdir -p ${BUILD_DEB_ROUNDCUBE_SCRIPTS}
+cp -a ${OBM_ROUNDCUBE_SCRIPTS} ${BUILD_DEB_ROUNDCUBE_SCRIPTS}/
 
 exit 0

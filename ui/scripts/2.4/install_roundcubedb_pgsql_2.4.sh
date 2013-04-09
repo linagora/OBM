@@ -5,9 +5,8 @@ user=$2
 pw=$3
 
 echo "Creating ${db} database"
-su - postgres -c "dropdb ${db}"
+ignored=$(su - postgres -c "dropdb ${db}" >/dev/null 2>&1)
 su - postgres -c "createdb  -O ${user} --encoding=UTF-8 ${db}"
 
 echo "Filling ${db} database"
-psql -U ${user} -h localhost ${db} -f "../../php/webmail/SQL/postgres.initial.sql"
-psql -U ${user} -h localhost ${db} -f "../../php/webmail/SQL/postgres.update.sql"
+PGPASSWORD="$pw" psql -U ${user} -h localhost ${db} -f "roundcube/SQL/postgres.initial.sql"
