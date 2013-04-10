@@ -162,7 +162,7 @@ class obm_addressbook_backend extends rcube_addressbook {
       if($xmlcontact->getElementsByTagName('first')->length > 0) 
         $firstname = $xmlcontact->getElementsByTagName('first')->item(0)->nodeValue;
 
-      $name = $surname.' '.$firstname;
+      $name = $this->formatContactDisplayName($surname, $firstname, $email);
 
       if ( method_exists("rcube_contacts", "get_display_name") )
         $name = rcube_contacts::get_display_name($surname, $firstname);
@@ -177,6 +177,28 @@ class obm_addressbook_backend extends rcube_addressbook {
       $this->result->add($arr);
       $this->result->count++;
     }
+  }
+
+  private function formatContactDisplayName($surname, $firstname, $email){
+    $name = $surname.' '.$firstname;
+    $trimmed_name = trim($name);
+
+    $rcmail = rcmail::get_instance();
+    $showContactEmail = $rcmail->config->get('OBMaddressbook_showContactEmail');
+
+    if( $showContactEmail ){
+
+      if ( empty($trimmed_name) ) {
+        return $email;
+      }
+
+      if ( !empty($email) ) {
+        return $trimmed_name.' (' . $email . ')';
+      }
+
+    }
+
+    return $name;
   }
 
   private function getSortedContacts($xmlcontacts){

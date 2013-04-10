@@ -18,8 +18,7 @@ class obm_addressbook extends rcube_plugin
   private $requester;
   public static $possible_sort_fields = array(
       "primary_sort_field" => "first",
-      "secondary_sort_field" => "last",
-      "tertiary_sort_field" => "email"
+      "secondary_sort_field" => "last"
   );
   
   public function init() 
@@ -32,11 +31,12 @@ class obm_addressbook extends rcube_plugin
     $this->domain = $rcmail->config->get('OBM_domain');
     $this->ssl = $rcmail->config->get('OBM_url').'://';
     $port = $rcmail->config->get('OBM_SYNC_port');
-  $timeout = $rcmail->config->get('networkTimeout');
-  $requesterOptions = array();
-  if ( $timeout ) {
-    $requesterOptions["networkTimeout"] = $timeout;
-  }
+    $timeout = $rcmail->config->get('networkTimeout');
+
+    $requesterOptions = array();
+    if ( $timeout ) {
+      $requesterOptions["networkTimeout"] = $timeout;
+    }
     $httpRequester = new CurlRequester($requesterOptions);    
     obmSyncRequester::$userEmail =  strpos($this->user,'@') === false 
                                     ? $this->user."@".$this->domain 
@@ -81,7 +81,7 @@ class obm_addressbook extends rcube_plugin
                                 $xmlbooks->item($i)->getAttribute('uid'),
                                 $xmlbooks->item($i)->getAttribute('name'),
                                 'OBM'.$xmlbooks->item($i)->getAttribute('uid'),
-                $xmlbooks->item($i)->getAttribute('readonly')
+                                $xmlbooks->item($i)->getAttribute('readonly')
                               );
     }
     $config = rcmail::get_instance()->config;
@@ -97,7 +97,17 @@ class obm_addressbook extends rcube_plugin
   }
 
   public function addressbooks_list($p) {
+    $rcmail = rcmail::get_instance();
+    
     foreach($this->addressbooks as $addressbook) {
+      if ($this->isUsersAddressbook($addressbook) && !$rcmail->config->get('OBMaddressbook_showUsersBook')) {
+        continue;
+      }
+      
+      if ($this->isPublicAddressbook($addressbook) && !$rcmail->config->get('OBMaddressbook_showPublicContactsBook')) {
+        continue;
+      }
+      
       $p['sources'][$addressbook->uid] = array(
         'id' => ($addressbook->uid),
         'name' => $addressbook->name,
@@ -140,6 +150,10 @@ class obm_addressbook extends rcube_plugin
 
   protected function isPublicAddressbook($book) {
     return $book->name == $this->getAddressbookByDatabaseName('public_contacts')->name;
+  }
+  
+  protected function isUsersAddressbook($book) {
+    return $book->obmuid == -1;
   }
 
   protected function sanitizeContact($contact) {
@@ -384,6 +398,9 @@ class obm_addressbook extends rcube_plugin
         }
       }
     }
+
+    $key .= " " . $xmlcontact->getAttribute('uid');
+
     return $key;
   }
 

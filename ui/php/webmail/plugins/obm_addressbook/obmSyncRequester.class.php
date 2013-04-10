@@ -186,17 +186,17 @@ class obmSyncRequester extends obmServiceRequester{
       throw new Exception("Login failed : no obm-sync path defined in obmSyncRequester", 500);
     }
 
-    $loginAuthParameters = "?origin=".self::$origin;
+    $loginAuthParameters = "?origin=".urlencode(self::$origin);
     if($this->authKind == "standalone"){
       if(!$this->login){
         throw new Exception("For a standalone authentication, you must set the login and password in obmSyncRequester", 500);
       }
     }
-    if($authKind != "LemonLDAP"){
-      if($this->login)
-        $loginAuthParameters .= "&login=".$this->login;
-      if($this->password)
-        $loginAuthParameters .= "&password=".$this->password;
+    if ( $this->login ) {
+      $loginAuthParameters .= "&login=".urlencode($this->login);
+    }
+    if($this->authKind != "LemonLDAP" && $this->password ){
+      $loginAuthParameters .= "&password=".urlencode($this->password);
     }
     return $this->rootPath.self::LOGIN_PATH.$loginAuthParameters;
   }
