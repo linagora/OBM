@@ -31,20 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.test;
 
-import org.junit.runners.model.InitializationError;
-import org.obm.filter.SlowFilterRunner;
+import org.junit.runners.model.TestClass;
 
-public class SlowGuiceRunner extends SlowFilterRunner {
+import com.google.inject.Guice;
+import com.google.inject.Module;
 
-	private GuiceRunnerDelegation guiceRunnerDelegation;
-
-	public SlowGuiceRunner(Class<?> klass) throws InitializationError {
-		super(klass);
-		guiceRunnerDelegation = new GuiceRunnerDelegation();
-	}
-
-	@Override
-	protected Object createTest() throws Exception {
-		return guiceRunnerDelegation.createTest(getTestClass(), super.createTest());
+public class GuiceRunnerDelegation {
+	
+	public Object createTest(TestClass testClass, Object testInstance) throws Exception {
+		GuiceModule moduleAnnotation = testClass.getJavaClass().getAnnotation(GuiceModule.class);
+		Class<? extends Module> module = moduleAnnotation.value();
+		Guice.createInjector(module.newInstance()).injectMembers(testInstance);
+		return testInstance;
 	}
 }

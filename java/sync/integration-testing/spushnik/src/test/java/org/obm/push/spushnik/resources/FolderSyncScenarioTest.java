@@ -52,29 +52,26 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.Configuration;
-import org.obm.opush.env.JUnitGuiceRule;
-import org.obm.push.arquillian.SlowArquillianRunner;
+import org.obm.push.arquillian.SlowGuiceArquillianRunner;
 import org.obm.push.spushnik.SpushnikScenarioTestUtils;
 import org.obm.push.spushnik.SpushnikTestUtils;
 import org.obm.push.spushnik.SpushnikWebArchive;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.test.GuiceModule;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@RunWith(SlowArquillianRunner.class) @Slow
+@RunWith(SlowGuiceArquillianRunner.class) @Slow
+@GuiceModule(ScenarioTestModule.class)
 public class FolderSyncScenarioTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ScenarioTestModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
