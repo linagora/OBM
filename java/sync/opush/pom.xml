@@ -44,7 +44,8 @@
 		<module>mail-backend-tools</module>
 		<module>mail-backend-testsuite</module>
 		<module>push-gatling</module>
-		<module>spushnik</module>
+		<module>spushnik-module</module>
+		<module>spushnik-webapp</module>
 	</modules>
 
 	<dependencyManagement>

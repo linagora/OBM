@@ -1,4 +1,4 @@
-package org.obm.push.spushnik;
+package org.obm.push.arquillian;
 
 import java.util.List;
 
