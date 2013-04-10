@@ -70,10 +70,7 @@ class Vpdi_Icalendar_Component extends Vpdi_Entity {
     if (is_null($prop)) {
       return null;
     }
-    $dt = Vpdi::decodeDateTime($prop->value());
-    if (($tzid = $prop->getParam('TZID')) !== false) {
-      $dt->setTimezone(Vpdi::decodeTimezone($tzid));
-    }
-    return $dt;
+
+    return Vpdi::decodeDateTime($prop->value(), $prop->getParam('TZID'));
   }
 }

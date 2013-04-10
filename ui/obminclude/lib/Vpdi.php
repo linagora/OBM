@@ -386,8 +386,8 @@ class Vpdi {
    * @access public
    * @return DateTime
    */
-  public static function decodeDate($value) {
-    $date = new Of_Date($value, null, false);
+  public static function decodeDate($value, $tzid = false) {
+    $date = new Of_Date($value, $tzid ? $tzid : null, false);
     return $date;
   }
   
@@ -398,8 +398,8 @@ class Vpdi {
    * @access public
    * @return DateTime
    */
-  public static function decodeDateTime($value) {
-    return self::decodeDate($value);
+  public static function decodeDateTime($value, $tzid = false) {
+    return self::decodeDate($value, $tzid);
   }
   
   /**
