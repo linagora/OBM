@@ -60,3 +60,6 @@ install/obm-tomcat-common-libs::
 
 install/obm-jetty-common-libs::
 	cp $(CURDIR)/webapp-common-dependencies/target/jetty/*.jar $(CURDIR)/debian/obm-jetty-common-libs/usr/share/jetty/lib/
+
+install/spushnik::
+	cp $(CURDIR)/opush/spushnik/target/spushnik.war $(CURDIR)/debian/spushnik/var/lib/jetty/webapps/
