@@ -364,7 +364,7 @@ chmod 0664 \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/%{name}include/*/of_session.inc
 
 ln -s %{_datadir}/%{name}/resources $RPM_BUILD_ROOT%{_datadir}/%{name}/php/images
-ln -s %{_datadir}/%{name}/php/webmail/ %{_datadir}/%{name}/scripts/2.4/roundcube
+ln -s %{_datadir}/%{name}/php/webmail/ $RPM_BUILD_ROOT%{_datadir}/%{name}/scripts/2.4/roundcube
 
 cd $RPM_BUILD_ROOT%{_sysconfdir}
 ln -s %{_sysconfdir}/%{name} $RPM_BUILD_ROOT%{_datadir}/%{name}/conf
