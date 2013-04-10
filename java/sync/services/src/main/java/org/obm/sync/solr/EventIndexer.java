@@ -36,7 +36,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -119,10 +118,10 @@ public class EventIndexer extends SolrRequest {
 	}
 
 	@VisibleForTesting boolean doIndex() throws IOException, SolrServerException {
-		SolrInputDocument sid = null;
+		SolrInputDocument solrInputDocument = null;
 		
 		try {
-			sid = buildDocument();
+			solrInputDocument = buildDocument();
 		}
 		catch (Exception e) {
 			logger.warn("Could not build SolR document, event cannot be indexed.", e);
@@ -130,8 +129,8 @@ public class EventIndexer extends SolrRequest {
 		}
 		
 		try {
-			addTagsToEvent(sid);
-			server.add(sid);
+			addTagsToEvent(solrInputDocument);
+			server.add(solrInputDocument);
 			server.commit();
 			logger.info("[" + event.getObmId() + "] indexed in SOLR");
 		} catch (SQLException t) {
@@ -141,28 +140,26 @@ public class EventIndexer extends SolrRequest {
 	}
 
 	@VisibleForTesting SolrInputDocument buildDocument() {
-		SolrInputDocument sid = new SolrInputDocument();
-
-		f(sid, "id", event.getObmId().getObmId());
-		f(sid, "timecreate", event.getTimeCreate());
-		f(sid, "timeupdate", event.getTimeUpdate());
-		f(sid, "domain", domain.getId());
-		f(sid, "title", event.getTitle());
-		f(sid, "location", event.getLocation());
-		f(sid, "category", event.getCategory());
-		f(sid, "date", event.getStartDate());
-		f(sid, "duration", event.getDuration());
-
 		String owner = getOwner();
 		ObmUser obmUser = userDao.findUser(owner, domain);
-		
 		if (obmUser == null) {
 			throw new IllegalArgumentException("Cannot fetch owner details (using '" + owner + "') from database.");
 		}
+		
+		SolrInputDocument sid = new SolrInputDocument();
 
-		f(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
-		f(sid, "ownerId", obmUser.getUid());
-		f(sid, "description", event.getDescription());
+		putField(sid, "id", event.getObmId().getObmId());
+		putField(sid, "timecreate", event.getTimeCreate());
+		putField(sid, "timeupdate", event.getTimeUpdate());
+		putField(sid, "domain", domain.getId());
+		putField(sid, "title", event.getTitle());
+		putField(sid, "location", event.getLocation());
+		putField(sid, "category", event.getCategory());
+		putField(sid, "date", event.getStartDate());
+		putField(sid, "duration", event.getDuration());
+		putField(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
+		putField(sid, "ownerId", obmUser.getUid());
+		putField(sid, "description", event.getDescription());
 
 		List<String> attendees = new LinkedList<String>();
 		for (Attendee attendee : event.getAttendees()) {
@@ -170,12 +167,13 @@ public class EventIndexer extends SolrRequest {
 			s += " " + attendee.getEmail();
 			attendees.add(s);
 		}
-		f(sid, "with", attendees);
+		putField(sid, "with", attendees);
 		
-		f(sid, "is", (event.isAllday() ? "allday" : null),
-				(event.isRecurrent() ? "periodic" : null),
-				(event.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
-				(event.getPrivacy() == EventPrivacy.PUBLIC ? null : event.getPrivacy().name().toLowerCase()));
+		putField(sid, "is",
+			(event.isAllday() ? "allday" : null),
+			(event.isRecurrent() ? "periodic" : null),
+			(event.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
+			(event.getPrivacy() == EventPrivacy.PUBLIC ? null : event.getPrivacy().name().toLowerCase()));
 		
 		return sid;
 	}
@@ -185,6 +183,18 @@ public class EventIndexer extends SolrRequest {
 			return event.getOwnerEmail();
 		} else {
 			return event.getOwner();
+		}
+	}
+	
+	private void putField(SolrInputDocument solrInputDocument, String field, Object... values) {
+		SolrInputField solrInputField = new SolrInputField(field);
+		for (Object value: values) {
+			if (value != null) {
+				solrInputField.addValue(value, 1);
+			}
+		}
+		if (solrInputField.getValueCount() >= 1) {
+			solrInputDocument.put(field, solrInputField);
 		}
 	}
 
@@ -202,31 +212,10 @@ public class EventIndexer extends SolrRequest {
 			st.setInt(1, event.getObmId().getObmId());
 			rs = st.executeQuery();
 			if (rs.next()) {
-				f(sid, "tag", rs.getString(1));
+				putField(sid, "tag", rs.getString(1));
 			}
 		} finally {
 			obmHelper.cleanup(con, st, rs);
 		}
-	}
-	
-	private void f(SolrInputDocument sid, String field,
-			Collection<Object> values) {
-		if (values != null && !values.isEmpty()) {
-			SolrInputField sif = new SolrInputField(field);
-			for (Object v : values) {
-				sif.addValue(v, 1);
-			}
-			sid.put(field, sif);
-		}
-	}
-
-	private void f(SolrInputDocument sid, String field, Object... values) {
-		LinkedList<Object> l = new LinkedList<Object>();
-		for (Object o : values) {
-			if (o != null) {
-				l.add(o);
-			}
-		}
-		f(sid, field, l);
 	}
 }
