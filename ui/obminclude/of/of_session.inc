@@ -193,6 +193,10 @@ class Session {
     header("Cache-Control: post-check=0, pre-check=0");
     header("Pragma: no-cache");
 
+    if ( ini_get("suhosin.session.encrypt") && ini_set("suhosin.session.encrypt", 0) === FALSE ) {
+      die("Unable to desactivate suhosin.session.encrypt");
+    }
+
     session_name($this->cookie_name);
     session_start();
     $this->id = session_id();
