@@ -53,6 +53,20 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
+%package -n spushnik
+Summary: Opush probe
+Group:  Development/Tools
+Requires: java-devel >= 1.6.0
+Requires(post): obm-jetty-common-libs = %{version}-%{release}
+
+%description -n spushnik
+This package contains a Java webapp probe able to check the status of an Opush server instance.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
 %package -n obm-locator
 Summary: Locator for Open Business Management
 Group:	Development/Tools
@@ -132,6 +146,11 @@ cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp opush/config-sample/remote_console.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp -r opush/push/target/opush/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush/
 
+# spushnik
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/spushnik
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/spushnik
+cp opush/spushnik/target/spushnik.war $RPM_BUILD_ROOT/%{jetty_home}/webapps/
+
 # obm-locator
 
 mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
@@ -168,6 +187,11 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %config(noreplace) %{_sysconfdir}/opush/mail_conf.ini
 %config(noreplace) %{_sysconfdir}/opush/remote_console.ini
 
+%files -n spushnik
+%defattr(-,root,root,-)
+%{jetty_home}/webapps/spushnik.war
+%attr(0775,jetty,jetty) %{_localstatedir}/log/spushnik
+
 %files -n obm-locator
 %defattr(-,root,root,-)
 %{jetty_home}/webapps/obm-locator
@@ -187,6 +211,15 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 /sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n opush
+if [ "$1" -ge "1" ] ; then
+    /sbin/service jetty6 restart >/dev/null 2>&1 || :
+fi
+
+%post -n spushnik
+[ ! -f %{_sysconfdir}/spushnik/logback.xml ] && echo "<included/>" > %{_sysconfdir}/spushnik/logback.xml
+/sbin/service jetty6 restart >/dev/null 2>&1 || :
+
+%postun -n spushnik
 if [ "$1" -ge "1" ] ; then
     /sbin/service jetty6 restart >/dev/null 2>&1 || :
 fi
