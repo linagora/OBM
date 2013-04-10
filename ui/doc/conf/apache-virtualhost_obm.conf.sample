@@ -28,6 +28,7 @@ NameVirtualHost *:443
     php_value session.bug_compat_42  0
     php_value session.bug_compat_warn  0
 #    php_value session.gc_maxlifetime 2880
+    php_value suhosin.session.encrypt Off
     php_value magic_quotes_gpc  Off
     php_value memory_limit 128M
     php_value post_max_size 10M

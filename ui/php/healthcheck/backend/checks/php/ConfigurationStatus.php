@@ -40,6 +40,7 @@ class ConfigurationStatus implements Check {
     $result = new CheckResult(CheckStatus::OK);
     $expects = array(
         "magic_quotes_gpc" => array(false, CheckStatus::ERROR),
+        "suhosin.session.encrypt" => array(false, CheckStatus::ERROR),
         "display_errors" => array(false, CheckStatus::WARNING),
         "log_errors" => array(false, CheckStatus::WARNING),
         "error_reporting" => array(6135, CheckStatus::WARNING),
