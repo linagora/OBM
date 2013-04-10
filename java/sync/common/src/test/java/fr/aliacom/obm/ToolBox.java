@@ -116,6 +116,7 @@ public class ToolBox {
 	public static ObmDomain getDefaultObmDomain() {
 		return ObmDomain
 				.builder()
+				.id(1)
 				.name("test.tlse.lng")
 				.uuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6")
 				.build();

@@ -81,7 +81,7 @@ public class EventIndexer extends SolrRequest {
 
 	}
 
-	private final Event e;
+	private final Event event;
 	private final ObmDomain domain;
 	private final ObmHelper obmHelper;
 	private final UserDao userDao;
@@ -93,12 +93,12 @@ public class EventIndexer extends SolrRequest {
 		this.obmHelper = obmHelper;
 		this.userDao = userDao;
 		this.domain = domain;
-		this.e = e;
+		this.event = e;
 	}
 
 	@Override
 	public void run() throws Exception {
-		if (e.getType() != EventType.VEVENT) {
+		if (event.getType() != EventType.VEVENT) {
 			return;
 		}
 
@@ -126,9 +126,6 @@ public class EventIndexer extends SolrRequest {
 		}
 		catch (Exception e) {
 			logger.warn("Could not build SolR document, event cannot be indexed.", e);
-			
-			// We're returning true as we don't need to retry
-			// The event won't be indexed but the error will be logged
 			return true;
 		}
 		
@@ -136,9 +133,8 @@ public class EventIndexer extends SolrRequest {
 			addTagsToEvent(sid);
 			server.add(sid);
 			server.commit();
-			logger.info("[" + e.getObmId() + "] indexed in SOLR");
+			logger.info("[" + event.getObmId() + "] indexed in SOLR");
 		} catch (SQLException t) {
-			//tags seems to be not so important
 			logger.error(t.getMessage(), t);
 		}
 		return true;
@@ -147,69 +143,63 @@ public class EventIndexer extends SolrRequest {
 	@VisibleForTesting SolrInputDocument buildDocument() {
 		SolrInputDocument sid = new SolrInputDocument();
 
-		f(sid, "id", e.getObmId().getObmId());
-		f(sid, "timecreate", e.getTimeCreate());
-		f(sid, "timeupdate", e.getTimeUpdate());
-
-		// TODO usercreate
-		// TODO userupdate
-
+		f(sid, "id", event.getObmId().getObmId());
+		f(sid, "timecreate", event.getTimeCreate());
+		f(sid, "timeupdate", event.getTimeUpdate());
 		f(sid, "domain", domain.getId());
-		f(sid, "title", e.getTitle());
-		f(sid, "location", e.getLocation());
-		f(sid, "category", e.getCategory());
-		f(sid, "date", e.getStartDate());
-		f(sid, "duration", e.getDuration());
+		f(sid, "title", event.getTitle());
+		f(sid, "location", event.getLocation());
+		f(sid, "category", event.getCategory());
+		f(sid, "date", event.getStartDate());
+		f(sid, "duration", event.getDuration());
 
 		String owner = getOwner();
-		ObmUser u = userDao.findUser(owner, domain);
+		ObmUser obmUser = userDao.findUser(owner, domain);
 		
-		if (u == null) {
+		if (obmUser == null) {
 			throw new IllegalArgumentException("Cannot fetch owner details (using '" + owner + "') from database.");
 		}
 
-		f(sid, "owner", u.getLastName(), u.getFirstName(), u.getLogin(),
-				u.getEmail());
-		f(sid, "ownerId", u.getUid());
-		f(sid, "description", e.getDescription());
+		f(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
+		f(sid, "ownerId", obmUser.getUid());
+		f(sid, "description", event.getDescription());
 
-		List<String> atts = new LinkedList<String>();
-		for (Attendee at : e.getAttendees()) {
-			String s = at.getDisplayName() != null ? at.getDisplayName() : "";
-			s += " " + at.getEmail();
-			atts.add(s);
+		List<String> attendees = new LinkedList<String>();
+		for (Attendee attendee : event.getAttendees()) {
+			String s = attendee.getDisplayName() != null ? attendee.getDisplayName() : "";
+			s += " " + attendee.getEmail();
+			attendees.add(s);
 		}
-		f(sid, "with", atts);
-
-		// withId is unused
-
-		f(sid, "is", (e.isAllday() ? "allday" : null),
-				(e.isRecurrent() ? "periodic" : null),
-				(e.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
-				(e.getPrivacy() == EventPrivacy.PRIVATE ? "private" : null));
+		f(sid, "with", attendees);
+		
+		f(sid, "is", (event.isAllday() ? "allday" : null),
+				(event.isRecurrent() ? "periodic" : null),
+				(event.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
+				(event.getPrivacy() == EventPrivacy.PUBLIC ? null : event.getPrivacy().name().toLowerCase()));
+		
 		return sid;
 	}
 
 	private String getOwner() {
-		if (!Strings.isNullOrEmpty(e.getOwnerEmail())) {
-			return e.getOwnerEmail();
+		if (!Strings.isNullOrEmpty(event.getOwnerEmail())) {
+			return event.getOwnerEmail();
 		} else {
-			return e.getOwner();
+			return event.getOwner();
 		}
 	}
 
 	private void addTagsToEvent(SolrInputDocument sid) throws SQLException {
-
-		// state is unused
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement st = null;
 		try {
 			con = obmHelper.getConnection();
-			st = con.prepareStatement("SELECT eventtag_label FROM Event " +
-					"INNER JOIN EventTag ON event_tag_id=eventtag_id WHERE event_id=?");
-			// query tag...
-			st.setInt(1, e.getObmId().getObmId());
+			st = con.prepareStatement(
+					"SELECT eventtag_label FROM Event " +
+					"INNER JOIN EventTag ON event_tag_id=eventtag_id " +
+					"WHERE event_id=?");
+			
+			st.setInt(1, event.getObmId().getObmId());
 			rs = st.executeQuery();
 			if (rs.next()) {
 				f(sid, "tag", rs.getString(1));
@@ -239,5 +229,4 @@ public class EventIndexer extends SolrRequest {
 		}
 		f(sid, field, l);
 	}
-
 }
