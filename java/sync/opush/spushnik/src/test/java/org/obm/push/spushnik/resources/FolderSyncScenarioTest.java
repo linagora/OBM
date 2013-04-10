@@ -64,7 +64,6 @@ import org.obm.push.spushnik.SlowArquillianRunner;
 import org.obm.push.spushnik.SpushnikScenarioTestUtils;
 import org.obm.push.spushnik.SpushnikTestUtils;
 import org.obm.push.spushnik.SpushnikWebArchive;
-import org.obm.push.spushnik.bean.Credentials;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 
 import com.google.common.base.Charsets;
