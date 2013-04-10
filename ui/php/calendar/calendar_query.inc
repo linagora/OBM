@@ -5311,6 +5311,7 @@ function allday_actual_duration($date, $duration) {
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null, $occurences=true) {
+  global $obm;
 
   // Get all non repeating events and construct occurences & events model
   $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter,$events, $opac);
@@ -5449,6 +5450,17 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $event->setOrganizerName($entity_label);
       }
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
+    }
+
+    // Remove occurences of confidential events that the logged-in user doesn't attend
+    foreach ($of->events as $id => $event) {
+      if ($event->privacy == 2) {
+        foreach ($of->occurrences[$id] as $occurence) {
+          if ($occurence->id != $obm['uid'] && !$event->userAttendeeExists($obm['uid'])) {
+            $of->removeOccurrences($id, $occurence->date);
+          }
+        }
+      }
     }
   }
 
@@ -6422,6 +6434,16 @@ Class Event {
       "entity_label"=>$entity_label,
       "entity_state"=>$entity_state
     );
+  }
+
+  function userAttendeeExists($entity_id) {
+    foreach ($this->attendee_data as $attendee) {
+      if ($attendee["entity"] == "user" && $attendee["entity_id"] == $entity_id) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   function setOrganizerName($organizerName){
