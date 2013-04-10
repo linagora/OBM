@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -37,54 +37,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
+import org.obm.Configuration.Mail;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.opush.env.Configuration.Mail;
-import org.obm.push.configuration.RemoteConsoleConfiguration;
 
 import com.google.common.base.Throwables;
 
 public class StaticConfigurationService implements ConfigurationService {
-
-	public static class RemoteConsole implements RemoteConsoleConfiguration {
-
-		private final Configuration.RemoteConsole configuration;
-
-		public RemoteConsole(Configuration.RemoteConsole configuration) {
-			this.configuration = configuration;
-		}
-
-		@Override
-		public boolean enable() {
-			return configuration.enable;
-		}
-
-		@Override
-		public int port() {
-			return configuration.port;
-		}
-
-	}
-
-	public static class SyncPerms implements SyncPermsConfigurationService {
-
-		private final org.obm.opush.env.Configuration.SyncPerms configuration;
-
-		public SyncPerms(org.obm.opush.env.Configuration.SyncPerms configuration) {
-			this.configuration = configuration;
-		}
-
-		@Override
-		public String getBlackListUser() {
-			return configuration.blacklist;
-		}
-
-		@Override
-		public Boolean allowUnknownPdaToSync() {
-			return configuration.allowUnknownDevice;
-		}
-	}
 
 	public static class Email implements EmailConfiguration {
 

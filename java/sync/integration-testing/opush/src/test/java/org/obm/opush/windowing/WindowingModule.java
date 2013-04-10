@@ -33,10 +33,10 @@ package org.obm.opush.windowing;
 
 import java.util.concurrent.TimeUnit;
 
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.opush.env.Configuration;
-import org.obm.opush.env.StaticConfigurationService;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.store.WindowingDao;

@@ -29,53 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm.opush.env;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.opush.env.OpushStaticConfigurationService.*;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.easymock.IMocksControl;
-import org.fest.util.Files;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.Configuration;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
-import org.obm.opush.ActiveSyncServletModule.OpushServer;
-import org.obm.opush.env.DefaultOpushModule;
+import org.obm.ConfigurationModule;
+import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 
-import com.google.inject.Inject;
+import com.google.inject.AbstractModule;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(DefaultOpushModule.class)
-public class HealthCheckTest {
+public final class OpushConfigurationModule extends AbstractModule {
+
+	private final Configuration configuration;
+
+	public OpushConfigurationModule(Configuration configuration) {
+		this.configuration = configuration;
+	}
 	
-	@Inject OpushServer opushServer;
-	@Inject IMocksControl mocksControl;
-	@Inject Configuration configuration;
-
-	@After
-	public void shutdown() throws Exception {
-		opushServer.stop();
-		Files.delete(configuration.dataDir);
+	@Override
+	protected void configure() {
+		install(new ConfigurationModule(configuration));
+		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
+		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
 	}
-
-	@Test
-	public void testHealthCheckInstalled() throws Exception {
-		mocksControl.replay();
-		opushServer.start();
-		HttpResponse response = 
-				Request.Get("http://localhost:" + opushServer.getPort() + "/healthcheck/java/version")
-						.execute()
-						.returnResponse();
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
-		assertThat(IOUtils.toString(response.getEntity().getContent())).isEqualTo(System.getProperty("java.version"));
-	}
+	
 }

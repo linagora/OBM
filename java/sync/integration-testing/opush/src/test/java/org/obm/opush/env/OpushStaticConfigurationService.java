@@ -31,54 +31,53 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
+import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 
-import com.google.common.base.Charsets;
+public class OpushStaticConfigurationService extends StaticConfigurationService {
 
-public class Configuration {
-
-	public static class SyncPerms {
-		public String blacklist = "";
-		public boolean allowUnknownDevice = true;
+	public OpushStaticConfigurationService(Configuration configuration) {
+		super(configuration);
 	}
 
-	public static class Mail {
-		public boolean activateTls = false;
-		public boolean loginWithDomain = true;
-		public int timeoutInMilliseconds = 5000;
-		public int imapPort = 143;
-		protected int maxMessageSize = 1024;
-		protected int fetchBlockSize = 1 << 20;
-	}
+	public static class RemoteConsole implements RemoteConsoleConfiguration {
 
-	public static class Transaction {
-		public int timeoutInSeconds = 10;
-		public boolean usePersistentCache = true;
-	}
+		private final Configuration.RemoteConsole configuration;
 
-	public static class RemoteConsole {
-		public boolean enable = true;
-		public int port = 0; //random
+		public RemoteConsole(Configuration.RemoteConsole configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public boolean enable() {
+			return configuration.enable;
+		}
+
+		@Override
+		public int port() {
+			return configuration.port;
+		}
 	}
 	
-	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
-	public SyncPerms syncPerms = new SyncPerms();
-	public Mail mail = new Mail();
-	public Transaction transaction = new Transaction();
-	public RemoteConsole remoteConsole = new RemoteConsole();
-	public File dataDir;
-	public String locatorUrl = null;
-	public String obmUiBaseUrl = null;
-	public String obmSyncUrl = null;
-	public int locatorCacheTimeout = 10;
-	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
-	public String activeSyncServletUrl = null;
-	public Charset defautEncoding = Charsets.UTF_8;
-	public int trustTokenTimeoutInSeconds = 10;
-	public int solrCheckingInterval = 10;
+	public static class SyncPerms implements SyncPermsConfigurationService {
+
+		private final org.obm.Configuration.SyncPerms configuration;
+
+		public SyncPerms(org.obm.Configuration.SyncPerms configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public String getBlackListUser() {
+			return configuration.blacklist;
+		}
+
+		@Override
+		public Boolean allowUnknownPdaToSync() {
+			return configuration.allowUnknownDevice;
+		}
+	}
 
 }

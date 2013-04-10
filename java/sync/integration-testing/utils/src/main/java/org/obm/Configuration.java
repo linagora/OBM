@@ -29,30 +29,56 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.configuration.TransactionConfiguration;
-import org.obm.push.configuration.RemoteConsoleConfiguration;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 
-import com.google.inject.AbstractModule;
+import com.google.common.base.Charsets;
 
-public final class ConfigurationModule extends AbstractModule {
+public class Configuration {
 
-	private final Configuration configuration;
+	public static class SyncPerms {
+		public String blacklist = "";
+		public boolean allowUnknownDevice = true;
+	}
 
-	public ConfigurationModule(Configuration configuration) {
-		this.configuration = configuration;
+	public static class Mail {
+		public boolean activateTls = false;
+		public boolean loginWithDomain = true;
+		public int timeoutInMilliseconds = 5000;
+		public int imapPort = 143;
+		public int maxMessageSize = 1024;
+		public int fetchBlockSize = 1 << 20;
+	}
+
+	public static class Transaction {
+		public int timeoutInSeconds = 10;
+		public boolean usePersistentCache = true;
+	}
+
+	public static class RemoteConsole {
+		public boolean enable = true;
+		public int port = 0; //random
 	}
 	
-	@Override
-	protected void configure() {
-		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
-		bind(SyncPermsConfigurationService.class).toInstance(new StaticConfigurationService.SyncPerms(configuration.syncPerms));
-		bind(RemoteConsoleConfiguration.class).toInstance(new StaticConfigurationService.RemoteConsole(configuration.remoteConsole));
-	}
-	
+	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
+	public SyncPerms syncPerms = new SyncPerms();
+	public Mail mail = new Mail();
+	public Transaction transaction = new Transaction();
+	public RemoteConsole remoteConsole = new RemoteConsole();
+	public File dataDir;
+	public String locatorUrl = null;
+	public String obmUiBaseUrl = null;
+	public String obmSyncUrl = null;
+	public int locatorCacheTimeout = 10;
+	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
+	public String activeSyncServletUrl = null;
+	public Charset defautEncoding = Charsets.UTF_8;
+	public int trustTokenTimeoutInSeconds = 10;
+	public int solrCheckingInterval = 10;
+
 }

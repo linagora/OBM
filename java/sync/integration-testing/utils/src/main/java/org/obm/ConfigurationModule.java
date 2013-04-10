@@ -29,53 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 
-import javax.servlet.http.HttpServletResponse;
+import com.google.inject.AbstractModule;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.easymock.IMocksControl;
-import org.fest.util.Files;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.Configuration;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
-import org.obm.opush.ActiveSyncServletModule.OpushServer;
-import org.obm.opush.env.DefaultOpushModule;
+public final class ConfigurationModule extends AbstractModule {
 
-import com.google.inject.Inject;
+	private final Configuration configuration;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(DefaultOpushModule.class)
-public class HealthCheckTest {
+	public ConfigurationModule(Configuration configuration) {
+		this.configuration = configuration;
+	}
 	
-	@Inject OpushServer opushServer;
-	@Inject IMocksControl mocksControl;
-	@Inject Configuration configuration;
-
-	@After
-	public void shutdown() throws Exception {
-		opushServer.stop();
-		Files.delete(configuration.dataDir);
+	@Override
+	protected void configure() {
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 	}
-
-	@Test
-	public void testHealthCheckInstalled() throws Exception {
-		mocksControl.replay();
-		opushServer.start();
-		HttpResponse response = 
-				Request.Get("http://localhost:" + opushServer.getPort() + "/healthcheck/java/version")
-						.execute()
-						.returnResponse();
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
-		assertThat(IOUtils.toString(response.getEntity().getContent())).isEqualTo(System.getProperty("java.version"));
-	}
+	
 }

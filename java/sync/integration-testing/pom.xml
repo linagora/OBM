@@ -21,6 +21,7 @@
 
 	
         <modules>
+                <module>utils</module>
                 <module>common</module>
                 <module>arquillian-bundle</module>
                 <module>opush</module>

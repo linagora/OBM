@@ -38,7 +38,9 @@ import java.util.Collections;
 import java.util.Date;
 
 import org.easymock.IMocksControl;
+import org.obm.Configuration;
 import org.obm.DateUtils;
+import org.obm.StaticConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
@@ -115,8 +117,8 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 		return new DaoModule(mocksControl);
 	}
 
-	protected ConfigurationModule configuration() {
-		return new ConfigurationModule(configuration);
+	protected OpushConfigurationModule configuration() {
+		return new OpushConfigurationModule(configuration);
 	}
 
 	protected Module emailConfiguration() {
