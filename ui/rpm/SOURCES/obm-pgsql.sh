@@ -65,14 +65,29 @@ if [ $? -eq 1 ]; then
 	fix_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} md5
 	restart_pgsql=1
 fi
+check_pg_perms ${RC_DBNAME} ${OBM_DBUSER} md5
+if [ $? -eq 1 ]; then
+	fix_pg_perms ${RC_DBNAME} ${OBM_DBUSER} md5
+	restart_pgsql=1
+fi
 check_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} 0.0.0.0/0 md5
 if [ $? -eq 1 ]; then
 	fix_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} 0.0.0.0/0 md5
 	restart_pgsql=1
 fi
+check_pg_perms ${RC_DBNAME} ${OBM_DBUSER} 0.0.0.0/0 md5
+if [ $? -eq 1 ]; then
+	fix_pg_perms ${RC_DBNAME} ${OBM_DBUSER} 0.0.0.0/0 md5
+	restart_pgsql=1
+fi
 check_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} ::1/128 md5
 if [ $? -eq 1 ]; then
     fix_pg_perms ${OBM_DBNAME} ${OBM_DBUSER} ::1/128 md5
+    restart_pgsql=1
+fi
+check_pg_perms ${RC_DBNAME} ${OBM_DBUSER} ::1/128 md5
+if [ $? -eq 1 ]; then
+    fix_pg_perms ${RC_DBNAME} ${OBM_DBUSER} ::1/128 md5
     restart_pgsql=1
 fi
   
