@@ -311,11 +311,10 @@ class CAS_Auth extends Auth {
 
   function of_session_dis_login_page() {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
-
     include_once('obmCAS.inc');
     obmCAS::setDebug('/tmp/obm-cas.log');
     if (!$lock) {
-      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri,true);
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri, false);
       $lock = true;
     }
     obmCAS::forceAuthentication();
@@ -359,19 +358,8 @@ class CAS_Auth extends Auth {
     }
   }
 
-  function auth_validatelogin () {
-    global $obm, $lock;
-    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
-
-    include_once('obmCAS.inc');
-    if (!$lock) {
-      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
-      $lock = 'true';
-    }
-    //valider le login CAS
-    if (!obmCAS::checkAuthentication()) {
-      return false;
-    }
+  function auth_validate_callback() {
+    global $obm;
     $login = obmCAS::getUser();
     // NTLM authentication hack - prerequisite: login do not contain \
     if (ereg("[\\]", $login)){$tmp = split("[\\]", $login);$login = $tmp[1];}
@@ -393,15 +381,36 @@ class CAS_Auth extends Auth {
     } else {
       header('location:'.obmCAS::getServerBaseURL());
     }
-
     if (global_allow_access($perm)) {
       $obm['profile'] = $perm;
       $obm['login'] = $login;
       $obm['domain_id'] = $domain_id;
+      $obm['uid'] = $uid;
+      $obm = $this->add_domain_infos($obm);
+      $_SESSION["obm"] = $obm;
       return $uid;
     } else {
       return false;
     }
+  }
+
+  function auth_validatelogin () {
+    global $obm, $lock;
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
+    include_once('obmCAS.inc');
+    if (!$lock) {
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri,false);
+      $lock = 'true';
+    }
+
+    obmCAS::setNoCasServerValidation();
+    obmCAS::setPostAuthenticateCallback(array($this,"auth_validate_callback"));
+
+    //valider le login CAS
+    if (!obmCAS::checkAuthentication()) {
+      return false;
+    }
+    return $this->auth_validate_callback();
   }
 
   function logout($nobody = '') {
@@ -414,7 +423,7 @@ class CAS_Auth extends Auth {
     $this->unauth($nobody == '' ? $this->nobody : $nobody);
     
     if (!$lock) {
-      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri, false);
       $lock = 'true';
     }
 

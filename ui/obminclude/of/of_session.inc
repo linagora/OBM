@@ -54,8 +54,7 @@ function page_open($feature) {
     # the auth feature depends on sess
     if (isset($feature["auth"])) {
       global $auth;
-
-      if (!isset($auth)) {
+      if (!$auth) {
         $auth = new $feature["auth"];
       }
       $auth->start();
@@ -301,15 +300,7 @@ class Auth {
 
 	  $obm['uid'] = $uid;
 	  // Domain in session
-	  // XXXX optimisation, recup domaine_label in auth_vali
-	  $d = of_domain_get_domain_infos($obm['domain_id'], true);
-	  $obm['domain_label'] = $d['label'];
-          $obm['domain_name'] = $d['name'];
-          $obm['domain_global'] = $d['global'];
-          $obm['mailserver'] = $d['mailserver'];
-          $obm['group_admin'] = $d['group_admin'];
-          $obm['group_com'] = $d['group_com'];
-          $obm['group_prod'] = $d['group_prod'];
+	  $obm = $this->add_domain_infos($obm);
 	  // OBM : in OBM each time is in seconds. this->lifetime too.
 	  $this->auth["exp"] = time() + $this->lifetime;
 	  $this->auth["refresh"] = time() + (60 * $this->refresh);
@@ -334,6 +325,17 @@ class Auth {
     return true;
   }
 
+  function add_domain_infos($obm) {
+    $d = of_domain_get_domain_infos($obm['domain_id'], true);
+    $obm['domain_label'] = $d['label'];
+    $obm['domain_name'] = $d['name'];
+    $obm['domain_global'] = $d['global'];
+    $obm['mailserver'] = $d['mailserver'];
+    $obm['group_admin'] = $d['group_admin'];
+    $obm['group_com'] = $d['group_com'];
+    $obm['group_prod'] = $d['group_prod'];
+    return $obm;
+  }
 
   function of_session_login_init() {
     global $obm;
