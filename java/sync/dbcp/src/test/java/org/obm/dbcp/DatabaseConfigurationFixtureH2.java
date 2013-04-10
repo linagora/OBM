@@ -29,32 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.ldap;
 
-import com.google.inject.Inject;
+package org.obm.dbcp;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
-/**
- * Contient la liste des ldaps sur lesquels on peut essayer de s'authentifier
- */
-public class LDAPAuthConfig {
+public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
-	private LDAPDirectory dir;
-
-	@Inject
-	private LDAPAuthConfig(ObmSyncConfigurationService obmSyncConfiguration) {
-		String uri = obmSyncConfiguration.getLdapServer();
-		String baseDN = obmSyncConfiguration.getLdapBaseDn();
-		String userFilter = obmSyncConfiguration.getLdapFilter();
-		String bindDn = obmSyncConfiguration.getLdapBindDn();
-		String bindPw = obmSyncConfiguration.getLdapBindPassword();
-		dir = new LDAPDirectory(uri, userFilter, bindDn, bindPw, baseDN, null,
-				null);
+	@Override
+	public Integer getDatabaseMaxConnectionPoolSize() {
+		return 10;
 	}
 
-	public LDAPDirectory getDirectory() {
-		return dir;
+	@Override
+	public DatabaseFlavour getDatabaseSystem() {
+		return DatabaseFlavour.PGSQL;
 	}
 
+	@Override
+	public String getDatabaseName() {
+		return "obm";
+	}
+
+	@Override
+	public String getDatabaseHost() {
+		return "localhost";
+	}
+
+	@Override
+	public String getDatabaseLogin() {
+		return "sa";
+	}
+
+	@Override
+	public String getDatabasePassword() {
+		return "sa";
+	}
+
+    @Override
+    public boolean isPostgresSSLEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isPostgresSSLNonValidating() {
+        return true;
+    }
 }

@@ -37,11 +37,13 @@ import com.google.inject.Guice;
 import com.google.inject.Module;
 
 public class GuiceRunnerDelegation {
-	
+
 	public Object createTest(TestClass testClass, Object testInstance) throws Exception {
 		GuiceModule moduleAnnotation = testClass.getJavaClass().getAnnotation(GuiceModule.class);
-		Class<? extends Module> module = moduleAnnotation.value();
-		Guice.createInjector(module.newInstance()).injectMembers(testInstance);
+		if (moduleAnnotation != null) {
+			Class<? extends Module> module = moduleAnnotation.value();
+			Guice.createInjector(module.newInstance()).injectMembers(testInstance);
+		}
 		return testInstance;
 	}
 }

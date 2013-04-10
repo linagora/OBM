@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Vendor: Linagora
+Implementation-Title: obm-sync services
+Implementation-Version: 2.5.0.0
+Implementation-Vendor-Id: com.linagora.obm
+Built-By: thilaire
+Build-Jdk: 1.6.0_33
+Created-By: Apache Maven 3.0.4
+Archiver-Version: Plexus Archiver
+

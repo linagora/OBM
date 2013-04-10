@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
 
 public class Configuration {
 
@@ -63,6 +64,23 @@ public class Configuration {
 	public static class RemoteConsole {
 		public boolean enable = true;
 		public int port = 0; //random
+	}
+	
+	public static class ObmSync {
+		public String defaultTemplateFolder;
+		public String overrideTemplateFolder;
+		public String obmSyncMailer;
+		public String ldapServer = "ldap://localhost";
+		public String ldapBaseDn = "dc=local";
+		public String ldapFilter;
+		public String ldapBindDn = "uid=uid=ldapadmin,ou=sysusers,dc=local";
+		public String ldapBindPassword = "password";
+		public Iterable<String> lemonLdapIps = ImmutableSet.of();
+		public String rootAccounts = "";
+		public String appliAccounts = "";
+		public String anyUserAccounts = "";
+		public String emailCalendarEncoding = "Auto";
+		public boolean syncUsersAsAddressBook = true;
 	}
 	
 	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);

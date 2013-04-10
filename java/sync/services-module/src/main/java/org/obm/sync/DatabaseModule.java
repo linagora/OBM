@@ -33,12 +33,19 @@ package org.obm.sync;
 
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 
 import com.google.inject.AbstractModule;
+
+import fr.aliacom.obm.common.addition.CommitedOperationDao;
+import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
+import fr.aliacom.obm.common.calendar.CalendarDao;
+import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 
 public class DatabaseModule extends AbstractModule {
 
@@ -47,5 +54,8 @@ public class DatabaseModule extends AbstractModule {
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 	}
 }

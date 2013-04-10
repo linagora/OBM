@@ -40,14 +40,20 @@ import com.google.inject.AbstractModule;
 public final class ConfigurationModule extends AbstractModule {
 
 	private final Configuration configuration;
+	private final Class<? extends TransactionConfiguration> transactionConfigurationImpl;
 
 	public ConfigurationModule(Configuration configuration) {
+		this(configuration, DefaultTransactionConfiguration.class);
+	}
+	
+	public ConfigurationModule(Configuration configuration, Class<? extends TransactionConfiguration> transactionConfigurationImpl) {
 		this.configuration = configuration;
+		this.transactionConfigurationImpl = transactionConfigurationImpl;
 	}
 	
 	@Override
 	protected void configure() {
-		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(TransactionConfiguration.class).to(transactionConfigurationImpl);
 		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 	}
 	

@@ -29,32 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.ldap;
 
-import com.google.inject.Inject;
+package org.obm.dbcp.jdbc;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import java.util.Map;
 
-/**
- * Contient la liste des ldaps sur lesquels on peut essayer de s'authentifier
- */
-public class LDAPAuthConfig {
+import org.obm.configuration.DatabaseConfiguration;
 
-	private LDAPDirectory dir;
+import com.google.common.collect.ImmutableMap;
 
-	@Inject
-	private LDAPAuthConfig(ObmSyncConfigurationService obmSyncConfiguration) {
-		String uri = obmSyncConfiguration.getLdapServer();
-		String baseDN = obmSyncConfiguration.getLdapBaseDn();
-		String userFilter = obmSyncConfiguration.getLdapFilter();
-		String bindDn = obmSyncConfiguration.getLdapBindDn();
-		String bindPw = obmSyncConfiguration.getLdapBindPassword();
-		dir = new LDAPDirectory(uri, userFilter, bindDn, bindPw, baseDN, null,
-				null);
+public class H2DriverConfiguration implements DatabaseDriverConfiguration {
+
+	@Override
+	public String getLastInsertIdQuery() {
+		return "SELECT lastval()";
 	}
 
-	public LDAPDirectory getDirectory() {
-		return dir;
+	@Override
+	public String getDataSourceClassName() {
+		return "org.h2.jdbcx.JdbcDataSource";
 	}
 
+	@Override
+	public String getUniqueName() {
+		return "h2db";
+	}
+
+	@Override
+	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		builder.put("user", conf.getDatabaseLogin());
+		builder.put("password", conf.getDatabasePassword());
+		builder.put("URL", getJDBCUrl(conf.getDatabaseName()));
+		return builder.build();
+	}
+
+	private String getJDBCUrl(String dbName) {
+		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=3";
+	}
+	
+	@Override
+	public boolean readOnlySupported() {
+		return false;
+	}
+
+	@Override
+	public String getGMTTimezoneQuery() {
+		return null;
+	}
 }

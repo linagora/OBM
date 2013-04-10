@@ -29,32 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.ldap;
+package org.obm.sync.calendar;
 
-import com.google.inject.Inject;
+import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.sync.DatabaseModule;
+import org.obm.sync.MessageQueueModule;
+import org.obm.sync.ModuleUtils;
+import org.obm.sync.ObmSyncServicesModule;
+import org.obm.sync.SolrJmsModule;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+import com.google.inject.util.Modules;
+import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-/**
- * Contient la liste des ldaps sur lesquels on peut essayer de s'authentifier
- */
-public class LDAPAuthConfig {
+public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 
-	private LDAPDirectory dir;
-
-	@Inject
-	private LDAPAuthConfig(ObmSyncConfigurationService obmSyncConfiguration) {
-		String uri = obmSyncConfiguration.getLdapServer();
-		String baseDN = obmSyncConfiguration.getLdapBaseDn();
-		String userFilter = obmSyncConfiguration.getLdapFilter();
-		String bindDn = obmSyncConfiguration.getLdapBindDn();
-		String bindPw = obmSyncConfiguration.getLdapBindPassword();
-		dir = new LDAPDirectory(uri, userFilter, bindDn, bindPw, baseDN, null,
-				null);
+	@Override
+	protected void configure() {
+		OverriddenModuleBuilder override = Modules.override(
+				new ObmSyncServicesModule(),
+				new MessageQueueModule(),
+				new TransactionalModule(),
+				new DatabaseModule(),
+				new SolrJmsModule());
+		try {
+			install(override.with(overrideModule()));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public LDAPDirectory getDirectory() {
-		return dir;
+	public Module overrideModule() {
+		return Modules.combine(
+				ModuleUtils.buildDummyConfigurationModule(),
+				ModuleUtils.buildDummyJmsModule());
 	}
-
 }

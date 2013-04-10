@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -130,8 +131,11 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	private void setTimeZoneToUTC(Connection connection) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(driverConfiguration.getGMTTimezoneQuery());
-		ps.executeUpdate();
+		String gmtTimezoneQuery = driverConfiguration.getGMTTimezoneQuery();
+		if (!Strings.isNullOrEmpty(gmtTimezoneQuery)) {
+			PreparedStatement ps = connection.prepareStatement(gmtTimezoneQuery);
+			ps.executeUpdate();
+		}
 	}
 
 	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
