@@ -41,7 +41,9 @@ $query = "SELECT
 		    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
 		    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
 		    WHERE
-		    serviceproperty_property = 'imap_frontend' or serviceproperty_property = 'smtp_out'";
+		    serviceproperty_property = 'imap_frontend' 
+            OR serviceproperty_property = 'smtp_out'
+            OR serviceproperty_property = 'obm_sync'";
 
 $obm_q = new DB_OBM;
 $obm_q->query($query);
@@ -53,9 +55,11 @@ $rcmail_config['multiple_smtp_server'] = array();
 while ($obm_q->next_record()) {
 	if ($obm_q->f('serviceproperty_property') == 'imap_frontend') {
 		$rcmail_config['default_host'][$obm_q->f('host_ip')] = $obm_q->f('domain_name');
-	} else {
+	} else if ($obm_q->f('serviceproperty_property') == 'smtp_out') {
 		$rcmail_config['multiple_smtp_server'][$obm_q->f('domain_name')] = $obm_q->f('host_ip');
-	}
+	} else if ($obm_q->f('serviceproperty_property') == 'obm_sync') {
+      $rcmail_config["obmSyncIp"] = $obm_q->f('host_ip');
+    }
 }
 
 // OBM SPECIFIC
