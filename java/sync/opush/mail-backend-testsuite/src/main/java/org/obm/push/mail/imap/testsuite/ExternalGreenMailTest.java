@@ -43,6 +43,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -56,8 +58,6 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;

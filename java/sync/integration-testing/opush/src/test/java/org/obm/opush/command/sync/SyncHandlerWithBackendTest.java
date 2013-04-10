@@ -58,6 +58,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
@@ -93,8 +95,6 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.services.ICalendar;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;

@@ -33,6 +33,7 @@ package org.obm.opush.env;
 
 import org.easymock.IMocksControl;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.CountingImapStore;

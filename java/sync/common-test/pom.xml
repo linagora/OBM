@@ -44,7 +44,7 @@
 		<dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
-        	<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easytesting</groupId>

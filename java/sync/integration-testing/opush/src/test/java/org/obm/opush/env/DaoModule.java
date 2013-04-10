@@ -32,6 +32,7 @@
 package org.obm.opush.env;
 
 import org.easymock.IMocksControl;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;

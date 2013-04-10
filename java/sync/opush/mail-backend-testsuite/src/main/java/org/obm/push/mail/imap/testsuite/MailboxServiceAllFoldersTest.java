@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
@@ -47,7 +48,6 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;

@@ -6,7 +6,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.rules.TestRule;
 import org.junit.runners.model.InitializationError;
 import org.obm.filter.SlowFilterRunnerDelegation;
-import org.obm.test.GuiceRunnerDelegation;
+import org.obm.guice.GuiceRunnerDelegation;
 
 public class SlowGuiceArquillianRunner extends Arquillian {
 

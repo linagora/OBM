@@ -55,6 +55,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.Configuration;
@@ -63,7 +64,6 @@ import org.obm.push.spushnik.SpushnikScenarioTestUtils;
 import org.obm.push.spushnik.SpushnikTestUtils;
 import org.obm.push.spushnik.SpushnikWebArchive;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.test.GuiceModule;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;

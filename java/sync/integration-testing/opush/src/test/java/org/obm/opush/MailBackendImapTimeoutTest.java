@@ -53,6 +53,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
@@ -96,8 +98,6 @@ import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;

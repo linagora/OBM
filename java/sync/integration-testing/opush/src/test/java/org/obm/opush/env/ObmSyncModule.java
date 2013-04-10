@@ -32,6 +32,7 @@
 package org.obm.opush.env;
 
 import org.easymock.IMocksControl;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.IAddressBook;

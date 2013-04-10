@@ -34,6 +34,7 @@ package org.obm.opush.env;
 import static org.easymock.EasyMock.expect;
 
 import org.easymock.IMocksControl;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;

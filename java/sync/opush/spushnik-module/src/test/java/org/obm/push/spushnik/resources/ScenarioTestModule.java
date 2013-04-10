@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ModuleUtils;
-import org.obm.opush.env.AbstractOverrideModule;
 import org.obm.opush.env.DefaultOpushModule;
 
 import com.google.inject.Module;

@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ModuleUtils;
 import org.obm.opush.env.AbstractOpushEnv;
-import org.obm.opush.env.AbstractOverrideModule;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;

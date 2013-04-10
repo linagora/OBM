@@ -54,6 +54,7 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.CollectionPathHelper;
@@ -69,7 +70,6 @@ import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
 import org.obm.push.mail.mime.MimeAddress;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;

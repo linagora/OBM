@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.env.AbstractOpushGreenMailEnv;
-import org.obm.opush.env.AbstractOverrideModule;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;

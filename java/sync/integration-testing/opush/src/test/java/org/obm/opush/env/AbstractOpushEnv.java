@@ -40,6 +40,7 @@ import java.util.Date;
 import org.easymock.IMocksControl;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.exception.DaoException;

@@ -44,11 +44,11 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.DefaultOpushModule;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.inject.Inject;
 

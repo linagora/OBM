@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.test;
+package org.obm.guice;
 
 import org.junit.runners.model.InitializationError;
 import org.obm.filter.SlowFilterRunner;

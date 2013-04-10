@@ -54,6 +54,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
@@ -84,8 +86,6 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;

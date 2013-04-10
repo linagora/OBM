@@ -39,11 +39,11 @@ import javax.ws.rs.core.Application;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.healthcheck.HealthCheckHandler;
 import org.obm.healthcheck.handlers.RootHandler.EndpointDescription;
 import org.obm.healthcheck.handlers.RootHandlerTest.Env;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;

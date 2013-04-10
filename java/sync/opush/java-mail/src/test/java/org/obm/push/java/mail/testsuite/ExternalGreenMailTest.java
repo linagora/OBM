@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.java.mail.testsuite;
 
+import org.obm.guice.GuiceModule;
 import org.obm.push.java.mail.ExternalProcessMailEnvModule;
-import org.obm.test.GuiceModule;
 
 @GuiceModule(ExternalProcessMailEnvModule.class)
 public class ExternalGreenMailTest extends

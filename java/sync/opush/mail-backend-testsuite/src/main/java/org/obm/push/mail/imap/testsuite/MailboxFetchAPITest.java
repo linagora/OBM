@@ -50,6 +50,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
@@ -69,7 +70,6 @@ import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.IMimePart;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

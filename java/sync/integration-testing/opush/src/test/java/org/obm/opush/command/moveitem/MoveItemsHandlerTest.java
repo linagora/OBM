@@ -47,6 +47,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
@@ -62,8 +64,6 @@ import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.MoveItemsResponse.MoveResult;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
-import org.obm.test.GuiceModule;
-import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;

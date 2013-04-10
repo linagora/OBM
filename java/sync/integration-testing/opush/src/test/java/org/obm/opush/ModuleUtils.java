@@ -32,7 +32,7 @@
 package org.obm.opush;
 
 import org.easymock.IMocksControl;
-import org.obm.opush.env.AbstractOverrideModule;
+import org.obm.guice.AbstractOverrideModule;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.service.DateService;

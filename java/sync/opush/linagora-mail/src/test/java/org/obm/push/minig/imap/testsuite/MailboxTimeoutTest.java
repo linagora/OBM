@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.testsuite;
 
+import org.obm.guice.GuiceModule;
 import org.obm.push.minig.imap.TimeoutMailEnvModule;
-import org.obm.test.GuiceModule;
 
 @GuiceModule(TimeoutMailEnvModule.class)
 public class MailboxTimeoutTest extends
