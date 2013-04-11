@@ -2289,14 +2289,11 @@ function update_calendar_action($writable_calendars) {
       unset($actions['calendar']['new']);
   }
   $id = $params['calendar_id'];
-  $user_calendar = $_GET['user_id'];
-  $user_logged = $obm['uid'];
-  $not_calendar_of_logged_user = (isset($user_calendar) && $user_calendar != $user_logged);
   if($id) {
     $event_info = get_calendar_event_info($id);
     $owner = $event_info['owner'];
     $organizerUserObmId = get_event_organizer_userObm_id($id);
-    if ( !$organizerUserObmId || $not_calendar_of_logged_user || $owner != $user_logged && !OBM_Acl::canWrite($user_logged, 'calendar', $owner)) {
+    if ( !$organizerUserObmId || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);
 

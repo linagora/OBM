@@ -2675,7 +2675,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   } else {
     $event_data = "
       <li style='$style'>
-      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."&amp;user_id=".$occurrence->id."\">$schedule - $title</a>
+      <a href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$schedule - $title</a>
       </li>";
   }
   return $event_data;  
@@ -3073,8 +3073,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   $id = $event_q->f('event_id');
   $is_exception = $date_edit_occurrence != null || $event_q->f('event_is_exception');
 
-  $user_displayed = ( isset($_GET['user_id']) && $_GET['user_id'] != $obm['uid'] ) ? $_GET['user_id'] : $obm['uid'];
-
   $organizer_display_name = null;
   foreach($entities as $entityType => $entitiesLists){
     if($entityType == "user" || $entityType == "contact"){
@@ -3089,8 +3087,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   }
 
   if ($event_q->f('event_privacy') == 0 || 
-      $event_q->f('event_owner') == $user_displayed ||
-      in_array($user_displayed,$entities['user']['ids'])) {
+      $event_q->f('event_owner') == $obm['uid'] ||
+      in_array($obm['uid'],$entities['user']['ids'])) {
 
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
@@ -3253,8 +3251,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   $ie6_radio_fix = "style='border:none; padding:0;margin:0;width:auto;'";
   $access_rights =  event_details_access_rights();
   if ($event_q->f('event_privacy') == 0 ||
-      $event_q->f('event_owner') == $user_displayed ||
-      in_array($user_displayed,$entities['user']['ids'])) {
+      $event_q->f('event_owner') == $obm['uid'] ||
+      in_array($obm['uid'],$entities['user']['ids'])) {
     $attendee = $entities['user'];
     if (is_array($attendee['entity'])) {
       foreach ($attendee['entity'] as $u_id => $entity) {
@@ -3274,7 +3272,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
         $block_status = isset($GLOBALS['ccalendar_block_status'])
                           && $GLOBALS['ccalendar_block_status']
                           && (strcasecmp($owner_login, $GLOBALS['block_status_str']) == 0);
-        if (OBM_Acl::canWrite($user_displayed, 'calendar', $u_id) && $access_rights =='rw' && $block_status == false) {
+        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id) && $access_rights =='rw' && $block_status == false) {
           $user_alert = $ccalendar_alerts;
           $bell_alert_class = $bell_alert_onclick = $bell_alert_title ='';
           if($alerts[$u_id] > 0 && !($user_alert[$alerts[$u_id]])) {
@@ -3440,7 +3438,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
         
         $comment = $entity['comment'];
         $resource_comment = phpStringToJsString(str_replace("\n\r", ', ', $comment));
-        if (OBM_Acl::canWrite($user_displayed, 'resource', $r_id)) {
+        if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\" disabled";
           $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
     
@@ -3517,20 +3515,20 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
   }
   
   if ($access_rights == 'rw' && ($event_q->f('event_privacy') == 0 ||
-      $event_q->f('event_owner') == $user_displayed ||
-      in_array($user_displayed,$entities['user']['ids']))) {
+      $event_q->f('event_owner') == $obm['uid'] ||
+      in_array($obm['uid'],$entities['user']['ids']))) {
   
-    $display_documents_form = !isset($GLOBALS['token']) && ($event_q->f('event_owner') == $user_displayed 
-      || ($allow_documents && in_array($user_displayed, $entities['user']['ids'])));
+    $display_documents_form = !isset($GLOBALS['token']) && ($event_q->f('event_owner') == $obm['uid'] 
+      || ($allow_documents && in_array($obm['uid'], $entities['user']['ids'])));
     
     $docs = $entities['document'];
     if (is_array($docs['entity'])) {
       $dis_document_list = '';
       $event_entity_id = $event_q->f('event_entity_id');
       foreach ($docs['entity'] as $d_id => $entity) {
-        if (!$entity['private'] || $entity['user'] == $user_displayed || in_array($user_displayed, $entities['user']['ids'])) {
+        if (!$entity['private'] || $entity['user'] == $obm['uid'] || in_array($obm['uid'], $entities['user']['ids'])) {
           $content = "<a href=\"".get_document_attachments_url($d_id, $entity['private'])."\">$entity[title]</a>";
-          if ($event_q->f('event_owner') == $user_displayed || $entity['user'] == $user_displayed) {
+          if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
             $content = "
               <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='doc$d_id'>
                 <img src=\"$ico_delete\" alt=\"[Delete]\" />
