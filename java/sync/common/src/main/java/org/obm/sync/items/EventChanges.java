@@ -38,6 +38,7 @@ import java.util.Set;
 import org.obm.sync.calendar.Anonymizable;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventPrivacy;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -45,6 +46,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class EventChanges implements Anonymizable<EventChanges> {
 
@@ -161,6 +163,34 @@ public class EventChanges implements Anonymizable<EventChanges> {
 		anonymizedEventChanges.participationUpdated = this.participationUpdated;
 		return anonymizedEventChanges;
 
+	}
+	
+	public EventChanges removeNotAllowedConfidentialEvents(String loggedUserEmail) {
+		EventChanges newEventChanges = new EventChanges();
+		newEventChanges.lastSync = this.lastSync;
+		List<Event> updatedEvents = Lists.<Event>newArrayList();
+		Set<DeletedEvent> deletedEvents = Sets.<DeletedEvent>newHashSet(this.deletedEvents);
+		
+		
+		for (Event event: this.updatedEvents) {
+			if (hasAccessToConfidentialEvent(loggedUserEmail, event)) {
+				deletedEvents.add(new DeletedEvent(event.getObmId(), event.getExtId()));
+			} else {
+				updatedEvents.add(event);
+			}
+		}
+		
+		newEventChanges.deletedEvents = deletedEvents;
+		newEventChanges.updatedEvents = updatedEvents;
+		newEventChanges.participationUpdated = this.participationUpdated;
+		return newEventChanges;
+	}
+
+	private boolean hasAccessToConfidentialEvent(String loggedUserEmail,
+			Event event) {
+		return event.getPrivacy().equals(EventPrivacy.CONFIDENTIAL)
+				&& !loggedUserEmail.equals(event.getOwnerEmail())
+				&& event.findAttendeeFromEmail(loggedUserEmail) == null;
 	}
 
 	@Override

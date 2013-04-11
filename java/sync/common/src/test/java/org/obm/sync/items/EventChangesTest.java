@@ -31,11 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.items;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 
-import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ContactAttendee;
@@ -50,27 +52,37 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class EventChangesTest {
+	
+	private Date lastSync;
+	
+	DeletedEvent deletedEvent1;
+	DeletedEvent deletedEvent2;
+	
+	@Before
+	public void setUp() {
+		lastSync = new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate();
+		deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
+		deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
+		
+	}
 
 	@Test
 	public void testAnonymize() {
-		Date lastSync = new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate();
+		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
+		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
 
 		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
 		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
-		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
-		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
-
-		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId(
-				"deleted_event_1"));
-		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId(
-				"deleted_event_2"));
-
+		
 		ParticipationChanges participationChanges1 = new ParticipationChanges();
 		participationChanges1.setEventId(new EventObmId(3));
 		participationChanges1.setEventExtId(new EventExtId("participation_changes_1"));
 		participationChanges1.setRecurrenceId(new RecurrenceId("recurrence_id_1"));
 		participationChanges1.setAttendees(Lists.newArrayList(attendee1, attendee2));
 
+		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
+		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
+		
 		ParticipationChanges participationChanges2 = new ParticipationChanges();
 		participationChanges2.setEventId(new EventObmId(4));
 		participationChanges2.setEventExtId(new EventExtId("participation_changes_2"));
@@ -86,24 +98,85 @@ public class EventChangesTest {
 		privateEvent.setExtId(new EventExtId("private_event"));
 		privateEvent.setTitle("private event");
 
+		EventChanges changes = new EventChanges();
+		changes.setLastSync(lastSync);
+		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
+		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
+		changes.setUpdated(Lists.newArrayList(publicEvent, privateEvent));
+		
 		Event privateAnonymizedEvent = new Event();
 		privateAnonymizedEvent.setPrivacy(EventPrivacy.PRIVATE);
 		privateAnonymizedEvent.setExtId(new EventExtId("private_event"));
 
-		EventChanges changes = new EventChanges();
-		changes.setLastSync(lastSync);
-		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1,
-				participationChanges2));
-		changes.setUpdated(Lists.newArrayList(publicEvent, privateEvent));
-
 		EventChanges expectedChanges = new EventChanges();
 		expectedChanges.setLastSync(lastSync);
 		expectedChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1,
-				participationChanges2));
+		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
 		expectedChanges.setUpdated(Lists.newArrayList(publicEvent, privateAnonymizedEvent));
 
-		Assertions.assertThat(changes.anonymizePrivateItems()).isEqualTo(expectedChanges);
+		assertThat(changes.anonymizePrivateItems()).isEqualTo(expectedChanges);
+	}
+	
+	@Test
+	public void testRemoveNotAllowedConfidentialEvents() {
+		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
+		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
+
+		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
+		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
+		
+		ParticipationChanges participationChanges1 = new ParticipationChanges();
+		participationChanges1.setEventId(new EventObmId(3));
+		participationChanges1.setEventExtId(new EventExtId("participation_changes_1"));
+		participationChanges1.setRecurrenceId(new RecurrenceId("recurrence_id_1"));
+		participationChanges1.setAttendees(Lists.newArrayList(attendee1, attendee2));
+
+		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
+		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
+		
+		ParticipationChanges participationChanges2 = new ParticipationChanges();
+		participationChanges2.setEventId(new EventObmId(4));
+		participationChanges2.setEventExtId(new EventExtId("participation_changes_2"));
+		participationChanges2.setRecurrenceId(new RecurrenceId("recurrence_id_2"));
+		participationChanges2.setAttendees(Lists.newArrayList(attendee3, attendee4));
+
+		Event publicEvent = new Event();
+		publicEvent.setExtId(new EventExtId("public_event"));
+		publicEvent.setTitle("public event");
+		
+		Event confidentialEvent = new Event();
+		confidentialEvent.setUid(new EventObmId(3));
+		confidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEvent.setExtId(new EventExtId("confidential_event"));
+		confidentialEvent.addAttendee(attendee1);
+		
+		Event confidentialEvent2 = new Event();
+		confidentialEvent2.setUid(new EventObmId(4));
+		confidentialEvent2.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEvent2.setExtId(new EventExtId("confidential_event2"));
+		confidentialEvent2.setOwnerEmail("attendee1@email.com");
+		
+		Event confidentialEvent3 = new Event();
+		confidentialEvent3.setUid(new EventObmId(5));
+		confidentialEvent3.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEvent3.setExtId(new EventExtId("confidential_event3"));
+		
+		EventChanges changes = new EventChanges();
+		changes.setLastSync(lastSync);
+		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
+		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
+		changes.setUpdated(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2, confidentialEvent3));
+		
+		DeletedEvent confidentialEventToDeletedEvent =
+				new DeletedEvent(new EventObmId(5), new EventExtId("confidential_event3"));
+
+		EventChanges expectedChanges = new EventChanges();
+		expectedChanges.setLastSync(lastSync);
+		expectedChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2, confidentialEventToDeletedEvent));
+		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
+		expectedChanges.setUpdated(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2));
+
+		EventChanges resultChanges = changes.removeNotAllowedConfidentialEvents("attendee1@email.com");
+		assertThat(resultChanges).isEqualTo(expectedChanges);
 	}
 }

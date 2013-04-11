@@ -914,10 +914,12 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.info(LogUtils.prefix(token) + "Calendar : getSync("
 					+ calendar + ") => " + changesFromDatabase.getUpdated().size() + " upd, "
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
+			
+			EventChanges changesToSend = changesFromDatabase.removeNotAllowedConfidentialEvents(token.getUserEmail());
+			
 			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
-
-			return userHasReadOnlyDelegation ? changesFromDatabase.anonymizePrivateItems()
-					: changesFromDatabase;
+			return userHasReadOnlyDelegation ?
+					changesToSend.anonymizePrivateItems() : changesToSend;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());

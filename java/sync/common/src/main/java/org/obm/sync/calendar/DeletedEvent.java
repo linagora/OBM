@@ -51,7 +51,6 @@ public final class DeletedEvent {
 		return extId;
 	}
 
-
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(id, extId);
