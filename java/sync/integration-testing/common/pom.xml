@@ -7,9 +7,9 @@
 		<version>2.5.0.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>opush-integration-testing</artifactId>
+	<artifactId>common-integration-testing</artifactId>
 	<packaging>jar</packaging>
-	<name>OBM Opush integration testing</name>
+	<name>OBM Common integration testing</name>
 	<url>http://www.obm.org/</url>
 	<version>2.5.0.0-SNAPSHOT</version>
 
@@ -37,33 +37,12 @@
 		<dependency>
 		    <groupId>com.google.guiceberry</groupId>
 		    <artifactId>guiceberry</artifactId>
+		    <version>3.1.0</version>
+		    <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-servlet</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>client-opush</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -71,14 +50,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>greenmail</groupId>
-			<artifactId>greenmail</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>message-queue</artifactId>
 			<version>${obm.version}</version>
-			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -88,44 +74,5 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>java-mail</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-java</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>info.cukes</groupId>
-			<artifactId>cucumber-guice</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>fluent-hc</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>jar-test-classes</id>
-						<phase>package</phase>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>
