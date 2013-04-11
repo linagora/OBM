@@ -2065,7 +2065,10 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $owner_name = phpStringToJsString($event->owner_name);
   $organizer_name = phpStringToJsString($event->organizer_name);
   $attendee = $event->attendee;
-  if ($event->isNotPublic() && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid']) {
+  // OBMFULL-4914
+  // The uid is 0 when we browse the calendar through a public sharing URL,
+  // so we assume no write rights in this specific case
+  if ($event->isNotPublic() && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid'] && ($obm['uid'] == 0 || !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner))) {
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;
@@ -3062,6 +3065,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
 
   $id = $event_q->f('event_id');
   $is_exception = $date_edit_occurrence != null || $event_q->f('event_is_exception');
+  $owner = $event_q->f('event_owner');
 
   $organizer_display_name = null;
   foreach($entities as $entityType => $entitiesLists){
@@ -3078,12 +3082,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
 
   if ($event_q->f('event_privacy') == 0 || 
       $event_q->f('event_owner') == $obm['uid'] ||
-      in_array($obm['uid'],$entities['user']['ids'])) {
+      in_array($obm['uid'],$entities['user']['ids']) ||
+      // OBMFULL-4914
+      // An uid of 0 has write access on everyone according to Of_ACL... Unfortunately, the uid
+      // is 0 when we browse a calendar through a public sharing URL, thus the check for != 0 here
+      ($obm['uid'] != 0 && OBM_Acl::canWrite($obm['uid'], 'calendar', $owner))) {
 
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
-    $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
     $priority = $event_q->f('event_priority'); 
