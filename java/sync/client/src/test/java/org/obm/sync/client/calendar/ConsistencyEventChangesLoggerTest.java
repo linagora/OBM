@@ -123,10 +123,10 @@ public class ConsistencyEventChangesLoggerTest {
 
 	@Test
 	public void testOnNoDuplicateDelete() {
-		DeletedEvent event1 = new DeletedEvent(new EventObmId(1), new EventExtId("a"));
-		DeletedEvent event2 = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
-		DeletedEvent event3 = new DeletedEvent(new EventObmId(3), new EventExtId("c"));
-		DeletedEvent event4 = new DeletedEvent(new EventObmId(4), new EventExtId("d"));
+		DeletedEvent event1 = DeletedEvent.builder().eventObmId(1).eventExtId("a").build();
+		DeletedEvent event2 = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
+		DeletedEvent event3 = DeletedEvent.builder().eventObmId(3).eventExtId("c").build();
+		DeletedEvent event4 = DeletedEvent.builder().eventObmId(4).eventExtId("d").build();
 		
 		EventChanges eventChanges = EventChanges.builder()
 			.lastSync(date("2012-01-01T11:22:33"))
@@ -224,11 +224,11 @@ public class ConsistencyEventChangesLoggerTest {
 
 	@Test
 	public void testOnDuplicateDelete() {
-		DeletedEvent event1 = new DeletedEvent(new EventObmId(1), new EventExtId("a"));
-		DeletedEvent event2 = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
-		DeletedEvent event3 = new DeletedEvent(new EventObmId(3), new EventExtId("c"));
-		DeletedEvent event4 = new DeletedEvent(new EventObmId(4), new EventExtId("d"));
-		DeletedEvent event2Again = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
+		DeletedEvent event1 = DeletedEvent.builder().eventObmId(1).eventExtId("a").build();
+		DeletedEvent event2 = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
+		DeletedEvent event3 = DeletedEvent.builder().eventObmId(3).eventExtId("c").build();
+		DeletedEvent event4 = DeletedEvent.builder().eventObmId(4).eventExtId("d").build();
+		DeletedEvent event2Again = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
 		
 		EventChanges eventChanges = EventChanges.builder()
 			.lastSync(date("2012-01-01T11:22:33"))
@@ -246,11 +246,11 @@ public class ConsistencyEventChangesLoggerTest {
 
 	@Test
 	public void testOnDuplicateDeleteWhenOnlyUid() {
-		DeletedEvent event1 = new DeletedEvent(new EventObmId(1), new EventExtId("a"));
-		DeletedEvent event2 = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
-		DeletedEvent event3 = new DeletedEvent(new EventObmId(3), new EventExtId("c"));
-		DeletedEvent event4 = new DeletedEvent(new EventObmId(4), new EventExtId("d"));
-		DeletedEvent event2Again = new DeletedEvent(new EventObmId(2), new EventExtId("e"));
+		DeletedEvent event1 = DeletedEvent.builder().eventObmId(1).eventExtId("a").build();
+		DeletedEvent event2 = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
+		DeletedEvent event3 = DeletedEvent.builder().eventObmId(3).eventExtId("c").build();
+		DeletedEvent event4 = DeletedEvent.builder().eventObmId(4).eventExtId("d").build();
+		DeletedEvent event2Again = DeletedEvent.builder().eventObmId(2).eventExtId("e").build();
 		
 		EventChanges eventChanges = EventChanges.builder()
 			.lastSync(date("2012-01-01T11:22:33"))
@@ -272,10 +272,10 @@ public class ConsistencyEventChangesLoggerTest {
 
 	@Test
 	public void testOnDuplicateWhenNoDeletedUidIsInUpdatedUid() {
-		DeletedEvent eventDeleted1 = new DeletedEvent(new EventObmId(1), new EventExtId("a"));
-		DeletedEvent eventDeleted2 = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
-		DeletedEvent eventDeleted3 = new DeletedEvent(new EventObmId(3), new EventExtId("c"));
-		DeletedEvent eventDeleted4 = new DeletedEvent(new EventObmId(4), new EventExtId("d"));
+		DeletedEvent eventDeleted1 = DeletedEvent.builder().eventObmId(1).eventExtId("a").build();
+		DeletedEvent eventDeleted2 = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
+		DeletedEvent eventDeleted3 = DeletedEvent.builder().eventObmId(3).eventExtId("c").build();
+		DeletedEvent eventDeleted4 = DeletedEvent.builder().eventObmId(4).eventExtId("d").build();
 		
 		Event event1 = new Event();
 		event1.setUid(new EventObmId(5));
@@ -301,10 +301,10 @@ public class ConsistencyEventChangesLoggerTest {
 
 	@Test
 	public void testOnDuplicateWhenADeletedUidIsAlsoInUpdatedUid() {
-		DeletedEvent eventDeleted1 = new DeletedEvent(new EventObmId(1), new EventExtId("a"));
-		DeletedEvent eventDeleted2 = new DeletedEvent(new EventObmId(2), new EventExtId("b"));
-		DeletedEvent eventDeleted3 = new DeletedEvent(new EventObmId(3), new EventExtId("c"));
-		DeletedEvent eventDeleted4 = new DeletedEvent(new EventObmId(4), new EventExtId("d"));
+		DeletedEvent eventDeleted1 = DeletedEvent.builder().eventObmId(1).eventExtId("a").build();
+		DeletedEvent eventDeleted2 = DeletedEvent.builder().eventObmId(2).eventExtId("b").build();
+		DeletedEvent eventDeleted3 = DeletedEvent.builder().eventObmId(3).eventExtId("c").build();
+		DeletedEvent eventDeleted4 = DeletedEvent.builder().eventObmId(4).eventExtId("d").build();
 		
 		Event event1 = new Event();
 		event1.setUid(new EventObmId(1));

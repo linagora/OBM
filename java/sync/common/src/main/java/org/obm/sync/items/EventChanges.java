@@ -174,7 +174,11 @@ public class EventChanges implements Anonymizable<EventChanges> {
 		
 		for (Event event: this.updatedEvents) {
 			if (hasAccessToConfidentialEvent(loggedUserEmail, event)) {
-				deletedEvents.add(new DeletedEvent(event.getObmId(), event.getExtId()));
+				deletedEvents.add(
+						DeletedEvent.builder()
+							.eventObmId(event.getObmId().getObmId())
+							.eventExtId(event.getExtId().getExtId())
+							.build());
 			} else {
 				updatedEvents.add(event);
 			}

@@ -61,16 +61,13 @@ public class EventChangesTest {
 	@Before
 	public void setUp() {
 		lastSync = new DateTime(2012, Calendar.APRIL, 25, 14, 0).toDate();
-		deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
-		deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
+		deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted_event_1").build();
+		deletedEvent2 = DeletedEvent.builder().eventObmId(2).eventExtId("deleted_event_2").build();
 		
 	}
 
 	@Test
 	public void testAnonymize() {
-		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
-		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
-
 		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
 		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
 		
@@ -119,9 +116,6 @@ public class EventChangesTest {
 	
 	@Test
 	public void testRemoveNotAllowedConfidentialEvents() {
-		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("deleted_event_1"));
-		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("deleted_event_2"));
-
 		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
 		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
 		
@@ -168,7 +162,7 @@ public class EventChangesTest {
 		changes.setUpdated(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2, confidentialEvent3));
 		
 		DeletedEvent confidentialEventToDeletedEvent =
-				new DeletedEvent(new EventObmId(5), new EventExtId("confidential_event3"));
+				DeletedEvent.builder().eventObmId(5).eventExtId("confidential_event3").build();
 
 		EventChanges expectedChanges = new EventChanges();
 		expectedChanges.setLastSync(lastSync);

@@ -72,9 +72,11 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		Set<DeletedEvent> removedIds = Sets.newHashSetWithExpectedSize(rmed.getLength() + 1);
 		for (int i = 0; i < rmed.getLength(); i++) {
 			Element e = (Element) rmed.item(i);
-			removedIds.add(new DeletedEvent(
-					new EventObmId(e.getAttribute("id")), 
-					new EventExtId(e.getAttribute("extId"))));
+			removedIds.add(
+					DeletedEvent.builder()
+						.eventObmId(Integer.valueOf(e.getAttribute("id")))
+						.eventExtId(e.getAttribute("extId"))
+						.build());
 		}
 		changes.setDeletedEvents(removedIds);
 

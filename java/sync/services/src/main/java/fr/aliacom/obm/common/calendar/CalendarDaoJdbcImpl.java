@@ -526,9 +526,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
                     rs = ps.executeQuery();
                     while (rs.next()) {
-                            result.add(new DeletedEvent(
-                                            new EventObmId(rs.getInt(1)),
-                                            new EventExtId(rs.getString(2))));
+                            result.add(
+                            	DeletedEvent.builder()
+                            		.eventObmId(rs.getInt(1))
+                            		.eventExtId(rs.getString(2))
+                            		.build());
                     }
             } catch (SQLException se) {
                     logger.error(se.getMessage(), se);
@@ -1005,9 +1007,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				Integer eventId = evrs.getInt(1);
 				if (state == State.DECLINED) {
 					if (recurentParentId == 0) {
-						declined.add(new DeletedEvent(
-							new EventObmId(eventId), 
-							new EventExtId(evrs.getString(3))));
+						declined.add(
+							DeletedEvent.builder()
+								.eventObmId(eventId)
+								.eventExtId(evrs.getString(3))
+								.build());
 					} else {					
 						Event e = findEventById(token, new EventObmId(recurentParentId));
 						parentOfDeclinedRecurrentEvent.add(e);
@@ -1148,9 +1152,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-					result.add(new DeletedEvent(
-							new EventObmId(rs.getInt(1)),
-							new EventExtId(rs.getString(2))));
+					result.add(
+						DeletedEvent.builder()
+							.eventObmId(rs.getInt(1))
+							.eventExtId(rs.getString(2))
+							.build());
 			}
 		} catch (SQLException se) {
 				logger.error(se.getMessage(), se);

@@ -85,8 +85,14 @@ private CalendarItemsWriter writer;
 	public void testGetXMLDocumentFromEventChangesWithRemovedElements() throws SAXException, IOException, TransformerException {
 		EventChanges eventChanges = getFakeEventChanges();
 
-		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId("123"));
-		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId("456"));
+		DeletedEvent deletedEvent1 = DeletedEvent.builder()
+										.eventObmId(1)
+										.eventExtId("123")
+										.build();
+		DeletedEvent deletedEvent2 = DeletedEvent.builder()
+										.eventObmId(2)
+										.eventExtId("456")
+										.build();
 		eventChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithRemovedElements.xml");

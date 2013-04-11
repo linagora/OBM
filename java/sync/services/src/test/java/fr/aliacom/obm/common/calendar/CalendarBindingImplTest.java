@@ -1770,10 +1770,8 @@ public class CalendarBindingImplTest {
 		Date lastSyncDate = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
 		Date syncDateFromDao = new DateTime(lastSyncDate).plusSeconds(5).toDate();
 
-		DeletedEvent deletedEvent1 = new DeletedEvent(new EventObmId(1), new EventExtId(
-				"deleted event 1"));
-		DeletedEvent deletedEvent2 = new DeletedEvent(new EventObmId(2), new EventExtId(
-				"deleted event 2"));
+		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
+		DeletedEvent deletedEvent2 = DeletedEvent.builder().eventObmId(2).eventExtId("deleted event 2").build();
 
 		Event publicUpdatedEvent1 = new Event();
 		publicUpdatedEvent1.setTitle("publicUpdatedEvent1");

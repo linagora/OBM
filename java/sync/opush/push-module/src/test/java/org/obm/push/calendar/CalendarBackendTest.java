@@ -609,7 +609,10 @@ public class CalendarBackendTest {
 	}
 
 	private DeletedEvent createDeletedEvent(EventObmId eventObmId, EventExtId eventExtId) {
-		return new DeletedEvent(eventObmId, eventExtId);
+		return DeletedEvent.builder()
+					.eventObmId(eventObmId.getObmId())
+					.eventExtId(eventExtId.getExtId())
+					.build();
 	}
 	
 	private void expectConvertUpdatedEventsToMSEvents(EventChanges eventChanges) throws DaoException, ConversionException {

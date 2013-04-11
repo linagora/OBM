@@ -32,13 +32,43 @@
 package org.obm.sync.calendar;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public final class DeletedEvent {
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private EventObmId eventObmId;
+		private EventExtId eventExtId;
+		
+		public Builder() {
+		}
+		
+		public Builder eventObmId(int eventObmId) {
+			this.eventObmId = new EventObmId(eventObmId);
+			return this;
+		}
+		
+		public Builder eventExtId(String eventExtId) {
+			this.eventExtId = new EventExtId(eventExtId);
+			return this;
+		}
+		
+		public DeletedEvent build() {
+			Preconditions.checkNotNull(eventObmId);
+			Preconditions.checkNotNull(eventExtId);
+			
+			return new DeletedEvent(eventObmId, eventExtId);
+		}
+	}
 	
 	private final EventObmId id;
 	private final EventExtId extId;
 	
-	public DeletedEvent(EventObmId id, EventExtId extId) {
+	private DeletedEvent(EventObmId id, EventExtId extId) {
 		this.id = id;
 		this.extId = extId;
 	}
