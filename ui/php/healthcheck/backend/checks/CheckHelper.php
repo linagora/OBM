@@ -40,6 +40,20 @@ class CheckHelper {
       curl_setopt($curl, CURLOPT_USERPWD, $username . ':' . $password);
     }
     
+    return self::executeCurl($curl);
+  }
+  
+  public static function curlPost($url, $headers, $params) {
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+    
+    return self::executeCurl($curl);
+  }
+
+  private static function executeCurl($curl) {
     $success = curl_exec($curl);
     $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $errno = curl_errno($curl);
@@ -48,5 +62,4 @@ class CheckHelper {
     
     return array("success" => $success, "code" => $code, "errno" => $errno);
   }
-  
 }
