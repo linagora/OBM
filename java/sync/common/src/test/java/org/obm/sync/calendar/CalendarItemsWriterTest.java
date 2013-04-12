@@ -31,14 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static fr.aliacom.obm.ToolBox.loadXmlFile;
+
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
-import static fr.aliacom.obm.ToolBox.loadXmlFile;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -65,16 +67,21 @@ import com.google.common.collect.Lists;
 public class CalendarItemsWriterTest extends AbstractItemsWriter {
 
 private CalendarItemsWriter writer;
+
+	private Date lastSync;
 	
 	@Before
 	public void initCalendarWriter(){
 		writer = new CalendarItemsWriter();
+		lastSync = new DateTime(2012, 3, 5, 14, 26, 29).toDate();
 		XMLUnit.setIgnoreWhitespace(true);
 	}
 
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithNoChange() throws SAXException, IOException, TransformerException {
-		EventChanges eventChanges = getFakeEventChanges();
+		EventChanges eventChanges = EventChanges.builder()
+										.lastSync(lastSync)
+										.build();
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithNoChange.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
@@ -83,8 +90,6 @@ private CalendarItemsWriter writer;
 
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithRemovedElements() throws SAXException, IOException, TransformerException {
-		EventChanges eventChanges = getFakeEventChanges();
-
 		DeletedEvent deletedEvent1 = DeletedEvent.builder()
 										.eventObmId(1)
 										.eventExtId("123")
@@ -93,7 +98,11 @@ private CalendarItemsWriter writer;
 										.eventObmId(2)
 										.eventExtId("456")
 										.build();
-		eventChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
+		
+		EventChanges eventChanges = EventChanges.builder()
+										.lastSync(lastSync)
+										.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+										.build();
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithRemovedElements.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
@@ -102,14 +111,16 @@ private CalendarItemsWriter writer;
 
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
-		EventChanges eventChanges = getFakeEventChanges();
-
 		Event updatedEvent = getFakeEvent();
 		Event eventException = updatedEvent.getOccurrence(updatedEvent.getStartDate());
 		updatedEvent.addEventException(eventException);
 
 		List<Event> updated = Lists.newArrayList(updatedEvent);
-		eventChanges.setUpdated(updated);
+		
+		EventChanges eventChanges = EventChanges.builder()
+				.lastSync(lastSync)
+				.updates(updated)
+				.build();
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithUpdatedElements.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
@@ -119,10 +130,12 @@ private CalendarItemsWriter writer;
 
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithParticipationChangesElements() throws SAXException, IOException, TransformerException {
-		EventChanges eventChanges = getFakeEventChanges();
-
 		List<ParticipationChanges> participationUpdated = getFakeListOfParticipationChanges();
-		eventChanges.setParticipationUpdated(participationUpdated);
+		
+		EventChanges eventChanges = EventChanges.builder()
+				.lastSync(lastSync)
+				.participationChanges(participationUpdated)
+				.build();
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithParticipationChangesElements.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
@@ -168,14 +181,6 @@ private CalendarItemsWriter writer;
 		String expectedXML = loadXmlFile("ResourceInfoWithoutDescription.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
-	}
-
-	private EventChanges getFakeEventChanges() {
-		EventChanges eventChanges = new EventChanges();
-		DateTime date = new DateTime(2012, 3, 5, 14, 26, 29);
-		eventChanges.setLastSync(date.toDate());
-
-		return eventChanges;
 	}
 
 	private Event getFakeEvent() {

@@ -61,10 +61,8 @@ public class CalendarItemsParser extends AbstractItemsParser {
 	private static final int DEFAULT_DURATION_VALUE = 0;
 
 	public EventChanges parseChanges(Document doc) {
-		EventChanges changes = new EventChanges();
 		Element root = doc.getDocumentElement();
 		Date lastSync = DateHelper.asDate(root.getAttribute("lastSync"));
-		changes.setLastSync(lastSync);
 		Element removed = DOMUtils.getUniqueElement(root, "removed");
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
@@ -78,7 +76,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 						.eventExtId(e.getAttribute("extId"))
 						.build());
 		}
-		changes.setDeletedEvents(removedIds);
 
 		NodeList upd = updated.getElementsByTagName("event");
 		List<Event> updatedEvents = new ArrayList<Event>(upd.getLength() + 1);
@@ -87,9 +84,12 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			Event ev = parseEvent(e);
 			updatedEvents.add(ev);
 		}
-		changes.setUpdated(updatedEvents);
 
-		return changes;
+		return EventChanges.builder()
+					.lastSync(lastSync)
+					.deletes(removedIds)
+					.updates(updatedEvents)
+					.build();
 	}
 
 	public Event parseEvent(Element e) {

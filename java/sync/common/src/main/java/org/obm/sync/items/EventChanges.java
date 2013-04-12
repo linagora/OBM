@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class EventChanges implements Anonymizable<EventChanges> {
+public final class EventChanges implements Anonymizable<EventChanges> {
 
 	public static Builder builder() {
 		return new Builder();
@@ -97,10 +97,10 @@ public class EventChanges implements Anonymizable<EventChanges> {
 		
 	}
 	
-	private Set<DeletedEvent> deletedEvents;
-	private List<Event> updatedEvents;
-	private List<ParticipationChanges> participationUpdated;
-	private Date lastSync;
+	private final Set<DeletedEvent> deletedEvents;
+	private final List<Event> updatedEvents;
+	private final List<ParticipationChanges> participationUpdated;
+	private final Date lastSync;
 
 	public EventChanges() {
 		this(Lists.<DeletedEvent>newArrayList(), Lists.<Event>newArrayList(), Lists.<ParticipationChanges>newArrayList(), null);
@@ -118,41 +118,21 @@ public class EventChanges implements Anonymizable<EventChanges> {
 		return deletedEvents;
 	}
 
-	public void setDeletedEvents(Set<DeletedEvent> deleted) {
-		this.deletedEvents = ImmutableSet.copyOf(deleted);
-	}
-
 	public List<Event> getUpdated() {
 		return updatedEvents;
-	}
-
-	public void setUpdated(List<Event> updated) {
-		this.updatedEvents = updated;
 	}
 
 	public Date getLastSync() {
 		return lastSync;
 	}
 
-	public void setLastSync(Date lastSync) {
-		this.lastSync = lastSync;
-	}
-
 	public List<ParticipationChanges> getParticipationUpdated() {
 		return participationUpdated;
-	}
-	
-	public void setParticipationUpdated(List<ParticipationChanges> participationUpdated) {
-		this.participationUpdated = participationUpdated;
 	}
 
 	@Override
 	public EventChanges anonymizePrivateItems() {
-		EventChanges anonymizedEventChanges = new EventChanges();
-		anonymizedEventChanges.lastSync = this.lastSync;
-		anonymizedEventChanges.deletedEvents = this.deletedEvents;
-
-		anonymizedEventChanges.updatedEvents = Lists.transform(this.updatedEvents,
+		List<Event> anonymizedUpdatedEvents = Lists.transform(this.updatedEvents,
 				new Function<Event, Event>() {
 					@Override
 					public Event apply(Event event) {
@@ -160,17 +140,19 @@ public class EventChanges implements Anonymizable<EventChanges> {
 					}
 
 				});
-		anonymizedEventChanges.participationUpdated = this.participationUpdated;
-		return anonymizedEventChanges;
+		
+		return EventChanges.builder()
+					.lastSync(this.lastSync)
+					.deletes(this.deletedEvents)
+					.updates(anonymizedUpdatedEvents)
+					.participationChanges(this.participationUpdated)
+					.build();
 
 	}
 	
 	public EventChanges removeNotAllowedConfidentialEvents(String loggedUserEmail) {
-		EventChanges newEventChanges = new EventChanges();
-		newEventChanges.lastSync = this.lastSync;
 		List<Event> updatedEvents = Lists.<Event>newArrayList();
 		Set<DeletedEvent> deletedEvents = Sets.<DeletedEvent>newHashSet(this.deletedEvents);
-		
 		
 		for (Event event: this.updatedEvents) {
 			if (hasAccessToConfidentialEvent(loggedUserEmail, event)) {
@@ -184,10 +166,12 @@ public class EventChanges implements Anonymizable<EventChanges> {
 			}
 		}
 		
-		newEventChanges.deletedEvents = deletedEvents;
-		newEventChanges.updatedEvents = updatedEvents;
-		newEventChanges.participationUpdated = this.participationUpdated;
-		return newEventChanges;
+		return EventChanges.builder()
+					.lastSync(this.lastSync)
+					.deletes(deletedEvents)
+					.updates(updatedEvents)
+					.participationChanges(this.participationUpdated)
+					.build();
 	}
 
 	private boolean hasAccessToConfidentialEvent(String loggedUserEmail,

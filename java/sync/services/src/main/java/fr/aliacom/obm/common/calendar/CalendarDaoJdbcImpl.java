@@ -925,8 +925,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	@Override
 	public EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate) {
-		EventChanges ret = new EventChanges();
-
+		
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
 		Connection con = null;
@@ -1040,6 +1039,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		evrs = null;
 		con = null;
 
+		Date lastSyncToBuild = null;
 		if (fetchedData) {
 			String ev = "SELECT "
 					+ EVENT_SELECT_FIELDS
@@ -1060,7 +1060,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				boolean lastSyncSet = false;
 				while (evrs.next()) {
 					if (!lastSyncSet) {
-						ret.setLastSync(JDBCUtils.getDate(evrs, "last_sync"));
+						lastSyncToBuild = JDBCUtils.getDate(evrs, "last_sync");
 						lastSyncSet = true;
 					}
 
@@ -1075,16 +1075,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		}
 
-		if (ret.getLastSync() == null) {
+		if (lastSyncToBuild == null) {
 			if (lastSync != null) {
 				Connection conDate = null;
 				try {
 					conDate = obmHelper.getConnection();
 					Date newLastSync = obmHelper.selectNow(conDate);
 					if (newLastSync != null) {
-						ret.setLastSync(newLastSync);
+						lastSyncToBuild = newLastSync;
 					} else {
-						ret.setLastSync(lastSync);
+						lastSyncToBuild = lastSync;
 					}
 				} catch (SQLException e) {
 					logger.error("error updating lastsync field", e);
@@ -1095,7 +1095,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			} else {
 				Calendar ls = Calendar.getInstance();
 				ls.set(Calendar.YEAR, 1970);
-				ret.setLastSync(ls.getTime());
+				lastSyncToBuild = ls.getTime();
 			}
 		}
 
@@ -1124,13 +1124,20 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		} finally {
 			obmHelper.cleanup(conComp, null, null);
 		}
-		ret.setUpdated(changedEvent);
 
-		Iterable<DeletedEvent> deletedEvents = Iterables.concat(findDeletedEvents(calendarUser, lastSync, typeFilter,declined), findDeletedEventsLinks(calendarUser, lastSync));
-
-		ret.setDeletedEvents(Sets.newHashSet(deletedEvents));
+		Iterable<DeletedEvent> deletedEvents =
+				Iterables.concat(
+						findDeletedEvents(calendarUser, lastSync, typeFilter,declined),
+						findDeletedEventsLinks(calendarUser, lastSync));
 		
-		return ret;
+		EventChanges syncEventChanges =
+				EventChanges.builder()
+					.lastSync(lastSyncToBuild)
+					.updates(changedEvent)
+					.deletes(Sets.newHashSet(deletedEvents))
+					.build();
+		
+		return syncEventChanges;
 	}
 
 	private Collection<DeletedEvent> findDeletedEventsLinks(ObmUser calendarUser, Date lastSync) {

@@ -1379,23 +1379,24 @@ public class CalendarBindingImplTest {
 	}
 	
 	private EventChanges getFakeEventChanges(RecurrenceKind recurrenceKind) {
-		EventChanges newEventChanges = new EventChanges();
 		Event updatedEvent = getFakeEvent(recurrenceKind);
-
-		newEventChanges.setUpdated(Lists.newArrayList(updatedEvent));
-		return newEventChanges;
+		return EventChanges.builder()
+				.lastSync(new Date())
+				.updates(Lists.newArrayList(updatedEvent))
+				.build();
 	}
 
 	private EventChanges getFakeAllRecurrentEventChanges() {
-		EventChanges newRecurrentEventChanges = new EventChanges();
 		List<Event> changedRecurrentEvents = Lists.newArrayList(getFakeEvent(RecurrenceKind.daily),
 				getFakeEvent(RecurrenceKind.monthlybydate),
 				getFakeEvent(RecurrenceKind.monthlybyday),
 				getFakeEvent(RecurrenceKind.weekly),
 				getFakeEvent(RecurrenceKind.yearly));
 
-		newRecurrentEventChanges.setUpdated(changedRecurrentEvents);
-		return newRecurrentEventChanges;
+		return EventChanges.builder()
+					.lastSync(new Date())
+					.updates(changedRecurrentEvents)
+					.build();
 	}
 	
 	private Event getFakeEvent(RecurrenceKind recurrenceKind) {
@@ -1785,25 +1786,28 @@ public class CalendarBindingImplTest {
 		privateUpdatedEvent1.setTitle("privateUpdatedEvent1");
 		privateUpdatedEvent1.setPrivacy(EventPrivacy.PRIVATE);
 		privateUpdatedEvent1.setTimeCreate(timeCreate);
-
-		EventChanges eventChangesFromDao = new EventChanges();
-		eventChangesFromDao.setLastSync(syncDateFromDao);
-		eventChangesFromDao.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		eventChangesFromDao.setParticipationUpdated(new ArrayList<ParticipationChanges>());
-		eventChangesFromDao.setUpdated(Lists.newArrayList(publicUpdatedEvent1, publicUpdatedEvent2,
-				privateUpdatedEvent1));
+		
+		EventChanges eventChangesFromDao = 
+				EventChanges.builder()
+					.lastSync(syncDateFromDao)
+					.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+					.participationChanges(new ArrayList<ParticipationChanges>())
+					.updates(Lists.newArrayList(publicUpdatedEvent1, publicUpdatedEvent2, privateUpdatedEvent1))
+					.build();
 
 		Event privateUpdatedAndAnonymizedEvent1 = new Event();
 		privateUpdatedAndAnonymizedEvent1.setTitle(null);
 		privateUpdatedAndAnonymizedEvent1.setPrivacy(EventPrivacy.PRIVATE);
 		privateUpdatedAndAnonymizedEvent1.setTimeCreate(timeCreate);
 
-		EventChanges anonymizedEventChanges = new EventChanges();
-		anonymizedEventChanges.setLastSync(syncDateFromDao);
-		anonymizedEventChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		anonymizedEventChanges.setParticipationUpdated(new ArrayList<ParticipationChanges>());
-		anonymizedEventChanges.setUpdated(Lists.newArrayList(publicUpdatedEvent1,
-				publicUpdatedEvent2, privateUpdatedAndAnonymizedEvent1));
+		EventChanges anonymizedEventChanges = 
+				EventChanges.builder()
+					.lastSync(syncDateFromDao)
+					.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+					.participationChanges(new ArrayList<ParticipationChanges>())
+					.updates(Lists.newArrayList(
+							publicUpdatedEvent1, publicUpdatedEvent2, privateUpdatedAndAnonymizedEvent1))
+					.build();
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user)

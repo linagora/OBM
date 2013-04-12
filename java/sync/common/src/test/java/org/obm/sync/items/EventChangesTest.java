@@ -96,21 +96,25 @@ public class EventChangesTest {
 		privateEvent.setExtId(new EventExtId("private_event"));
 		privateEvent.setTitle("private event");
 
-		EventChanges changes = new EventChanges();
-		changes.setLastSync(lastSync);
-		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
-		changes.setUpdated(Lists.newArrayList(publicEvent, privateEvent));
+		EventChanges changes = EventChanges.builder()
+									.lastSync(lastSync)
+									.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+									.participationChanges(
+											Lists.newArrayList(participationChanges1, participationChanges2))
+									.updates(Lists.newArrayList(publicEvent, privateEvent))
+									.build();
 		
 		Event privateAnonymizedEvent = new Event();
 		privateAnonymizedEvent.setPrivacy(EventPrivacy.PRIVATE);
 		privateAnonymizedEvent.setExtId(new EventExtId("private_event"));
 
-		EventChanges expectedChanges = new EventChanges();
-		expectedChanges.setLastSync(lastSync);
-		expectedChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
-		expectedChanges.setUpdated(Lists.newArrayList(publicEvent, privateAnonymizedEvent));
+		EventChanges expectedChanges = EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+				.participationChanges(
+						Lists.newArrayList(participationChanges1, participationChanges2))
+				.updates(Lists.newArrayList(publicEvent, privateAnonymizedEvent))
+				.build();
 
 		assertThat(changes.anonymizePrivateItems()).isEqualTo(expectedChanges);
 	}
@@ -158,20 +162,24 @@ public class EventChangesTest {
 		confidentialEvent3.setPrivacy(EventPrivacy.CONFIDENTIAL);
 		confidentialEvent3.setExtId(new EventExtId("confidential_event3"));
 		
-		EventChanges changes = new EventChanges();
-		changes.setLastSync(lastSync);
-		changes.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2));
-		changes.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
-		changes.setUpdated(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2, confidentialEvent3));
+		EventChanges changes = EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2))
+				.participationChanges(
+						Lists.newArrayList(participationChanges1, participationChanges2))
+				.updates(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2, confidentialEvent3))
+				.build();
 		
 		DeletedEvent confidentialEventToDeletedEvent =
 				DeletedEvent.builder().eventObmId(5).eventExtId("confidential_event3").build();
 
-		EventChanges expectedChanges = new EventChanges();
-		expectedChanges.setLastSync(lastSync);
-		expectedChanges.setDeletedEvents(ImmutableSet.of(deletedEvent1, deletedEvent2, confidentialEventToDeletedEvent));
-		expectedChanges.setParticipationUpdated(Lists.newArrayList(participationChanges1, participationChanges2));
-		expectedChanges.setUpdated(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2));
+		EventChanges expectedChanges = EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(ImmutableSet.of(deletedEvent1, deletedEvent2, confidentialEventToDeletedEvent))
+				.participationChanges(
+						Lists.newArrayList(participationChanges1, participationChanges2))
+				.updates(Lists.newArrayList(publicEvent, confidentialEvent, confidentialEvent2))
+				.build();
 
 		EventChanges resultChanges = changes.removeNotAllowedConfidentialEvents("attendee1@email.com");
 		assertThat(resultChanges).isEqualTo(expectedChanges);

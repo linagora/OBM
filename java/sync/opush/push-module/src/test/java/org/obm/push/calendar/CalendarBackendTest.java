@@ -584,22 +584,19 @@ public class CalendarBackendTest {
 	}
 
 	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate) {
-		EventChanges eventChanges = new EventChanges();
 		Set<DeletedEvent> deletedEvents = ImmutableSet.of(
 				createDeletedEvent(new EventObmId(11), new EventExtId("11")),
-				createDeletedEvent(new EventObmId(12), new EventExtId("12")));
-		eventChanges.setDeletedEvents(deletedEvents);
-		
-		eventChanges.setParticipationUpdated(ImmutableList.<ParticipationChanges> of());
-		
+				createDeletedEvent(new EventObmId(12), new EventExtId("12")));		
 		List<Event> updated = new ArrayList<Event>();
 		updated.add(createEvent(21));
 		updated.add(createEvent(22));
-		eventChanges.setUpdated(updated);
 		
-		eventChanges.setLastSync(currentDate);
-		
-		return eventChanges;
+		return EventChanges.builder()
+					.lastSync(currentDate)
+					.deletes(deletedEvents)
+					.updates(updated)
+					.participationChanges(ImmutableList.<ParticipationChanges> of())
+					.build();
 	}
 
 	private Event createEvent(int obmId) {

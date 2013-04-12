@@ -842,12 +842,10 @@ public class CalendarBindingImpl implements ICalendar {
 			String calendar, Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException {
 
 		EventChanges changes = getSync(token, calendar, lastSync, syncRange, false);
-		sortUpdatedEvents(changes, lastSync);
-		
-		return changes;
+		return sortUpdatedEvents(changes, lastSync);
 	}
 	
-	private void sortUpdatedEvents(EventChanges changes, Date lastSync) {
+	private EventChanges sortUpdatedEvents(EventChanges changes, Date lastSync) {
 		List<Event> updated = new ArrayList<Event>();
 		List<Event> participationChanged = new ArrayList<Event>();
 		
@@ -862,8 +860,13 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 			
 		}
-		changes.setParticipationUpdated(eventsToParticipationUpdateArray(participationChanged));
-		changes.setUpdated(updated);
+		
+		return EventChanges.builder()
+					.lastSync(changes.getLastSync())
+					.deletes(changes.getDeletedEvents())
+					.participationChanges(eventsToParticipationUpdateArray(participationChanged))
+					.updates(updated)
+					.build();
 	}
 
 	private List<ParticipationChanges> eventsToParticipationUpdateArray(List<Event> participationChanged) {
