@@ -35,5 +35,10 @@ public enum ServerCapability {
 	 * Used to indicate whether the calendar API supports {@link NotAllowedException}
 	 * when there's a rights problem. 
 	 */
-	CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION
+	CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION,
+	/**
+	 * Used to indicate if the calendar API supports {@link EventPrivacy}
+	 * new CONFIDENTIAL value.
+	 */
+	CONFIDENTIAL_EVENTS
 }

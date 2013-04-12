@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+import java.util.Map;
+
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.OBMConnectorVersionException;
@@ -188,7 +190,9 @@ public class LoginHandler implements ISyncHandler {
 	}
 	
 	private void fillTokenWithServerCapabilities(AccessToken token) {
-		token.getServerCapabilities().put(ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
+		Map<ServerCapability, String> serverCapabilities = token.getServerCapabilities();
+		serverCapabilities.put(ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
+		serverCapabilities.put(ServerCapability.CONFIDENTIAL_EVENTS, "true");
 	}
 
 	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
