@@ -47,6 +47,12 @@
             "name": "IMAP Module",
             "description": "Checks the IMAP (Cyrus) configuration",
             "url": null
+        },
+        {
+            "id": "opush",
+            "name": "OPush  Module",
+            "description": "Checks the OPush (mobile devices synchronization serice) configuration",
+            "url": "/Microsoft-Server-ActiveSync/"
         }
     ]
 }
