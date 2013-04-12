@@ -13,6 +13,13 @@
             "description": "Check that the OPush servers are up and running.",
             "url": null,
             "parentId": null
+        },
+        {
+            "id": "JavaVersionStatus",
+            "name": "OPush JVM Version Check",
+            "description": "Checks that OPush server(s) run on the proper JVM version",
+            "url": null,
+            "parentId": null
         }
     ]
 }
