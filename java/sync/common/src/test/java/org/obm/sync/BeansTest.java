@@ -59,6 +59,7 @@ import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
+import org.obm.sync.items.ParticipationChanges;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
@@ -99,7 +100,8 @@ public class BeansTest {
 				EmailLogin.class,
 				DomainName.class,
 				Phone.class,
-				Address.class);
+				Address.class,
+				ParticipationChanges.class);
 	}
 	
 	@Test

@@ -229,17 +229,18 @@ private CalendarItemsWriter writer;
 	}
 
 	private List<ParticipationChanges> getFakeListOfParticipationChanges() {
-		ParticipationChanges participationChanges1 = new ParticipationChanges();
-		participationChanges1.setEventExtId(new EventExtId("123"));
-		participationChanges1.setEventId(new EventObmId(1));
-		List<Attendee> attendees = getFakeListOfAttendee();
-		participationChanges1.setAttendees(attendees);
-
-		ParticipationChanges participationChanges2 = new ParticipationChanges();
-		participationChanges2.setEventExtId(new EventExtId("456"));
-		participationChanges2.setEventId(new EventObmId(2));
-		participationChanges2.setRecurrenceId(new RecurrenceId("789"));
-		participationChanges2.setAttendees(attendees);
+		ParticipationChanges participationChanges1 = ParticipationChanges.builder()
+			.eventExtId("123")
+			.eventObmId(1)
+			.attendees(getFakeListOfAttendee())
+			.build();
+		
+		ParticipationChanges participationChanges2 = ParticipationChanges.builder()
+			.eventExtId("456")
+			.eventObmId(2)
+			.recurrenceId("789")
+			.attendees(getFakeListOfAttendee())
+			.build();
 
 		List<ParticipationChanges> participationUpdated = Lists.newArrayList(participationChanges1, participationChanges2);
 		return participationUpdated;

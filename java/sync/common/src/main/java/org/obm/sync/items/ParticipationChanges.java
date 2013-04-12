@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.items;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.obm.sync.calendar.Attendee;
@@ -38,46 +39,112 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.RecurrenceId;
 
-public class ParticipationChanges {
-	private EventObmId eventId;
-	private EventExtId eventExtId;
-	private RecurrenceId recurrenceId;
-	private List<Attendee> attendees;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+public final class ParticipationChanges implements Serializable {
 	
-	public ParticipationChanges() {
-		super();
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private EventObmId eventObmId;
+		private EventExtId eventExtId;
+		private RecurrenceId recurrenceId;
+		private Iterable<Attendee> attendees;
+		
+		private Builder() {
+			super();
+		}
+		
+		public Builder eventObmId(int eventObmId) {
+			this.eventObmId = new EventObmId(eventObmId);
+			return this;
+		}
+		
+		public Builder eventExtId(String eventExtId) {
+			this.eventExtId = new EventExtId(eventExtId);
+			return this;
+		}
+		
+		public Builder recurrenceId(String recurrenceId) {
+			this.recurrenceId = new RecurrenceId(recurrenceId);
+			return this;
+		}
+		
+		public Builder attendees(Iterable<Attendee> attendees) {
+			this.attendees = attendees;
+			return this;
+		}
+		
+		public ParticipationChanges build() {
+			Preconditions.checkNotNull(eventObmId);
+			Preconditions.checkNotNull(eventExtId);
+			
+			return new ParticipationChanges(
+					eventObmId,
+					eventExtId,
+					recurrenceId,
+					Objects.firstNonNull(attendees, ImmutableList.<Attendee>of()));
+		}
+	}
+	
+	private final EventObmId eventId;
+	private final EventExtId eventExtId;
+	private final RecurrenceId recurrenceId;
+	private final List<Attendee> attendees;
+	
+	private ParticipationChanges(EventObmId eventId, EventExtId eventExtId,
+			RecurrenceId recurrenceId, Iterable<Attendee> attendees) {
+		this.eventId = eventId;
+		this.eventExtId = eventExtId;
+		this.recurrenceId = recurrenceId;
+		this.attendees = Lists.newArrayList(attendees);
 	}
 
 	public EventObmId getEventId() {
 		return eventId;
 	}
 
-	public void setEventId(EventObmId eventObmId) {
-		this.eventId = eventObmId;
-	}
-
 	public EventExtId getEventExtId() {
 		return eventExtId;
-	}
-
-	public void setEventExtId(EventExtId eventExtId) {
-		this.eventExtId = eventExtId;
 	}
 
 	public RecurrenceId getRecurrenceId() {
 		return recurrenceId;
 	}
 
-	public void setRecurrenceId(RecurrenceId recurrenceId) {
-		this.recurrenceId = recurrenceId;
-	}
-
 	public List<Attendee> getAttendees() {
 		return attendees;
 	}
-
-	public void setAttendees(List<Attendee> attendees) {
-		this.attendees = attendees;
+	
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof ParticipationChanges) {
+			ParticipationChanges other = (ParticipationChanges) obj;
+			return Objects.equal(eventId, other.eventId)
+				&& Objects.equal(eventExtId, other.eventExtId)
+				&& Objects.equal(recurrenceId, other.recurrenceId)
+				&& Objects.equal(attendees, other.attendees);
+		}
+		return false;
 	}
 	
+	@Override
+	public final int hashCode() {
+		return Objects.hashCode(eventId, eventExtId, recurrenceId, attendees);
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("eventId", eventId)
+			.add("eventExtId", eventExtId)
+			.add("recurrenceId", recurrenceId)
+			.add("attendees", attendees)
+			.toString();
+	}
 }

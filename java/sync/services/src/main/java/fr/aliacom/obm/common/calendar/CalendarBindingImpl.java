@@ -842,8 +842,6 @@ public class CalendarBindingImpl implements ICalendar {
 			String calendar, Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException {
 
 		EventChanges changes = getSync(token, calendar, lastSync, syncRange, false);
-		
-		//sort between update and participation update based on event timestamp
 		sortUpdatedEvents(changes, lastSync);
 		
 		return changes;
@@ -860,7 +858,6 @@ public class CalendarBindingImpl implements ICalendar {
 			if (event.modifiedSince(lastSync) || event.isRecurrent()) {
 				updated.add(event);
 			} else {
-				//means that only participation changed
 				participationChanged.add(event);
 			}
 			
@@ -873,19 +870,23 @@ public class CalendarBindingImpl implements ICalendar {
 		return Lists.transform(participationChanged, new Function<Event, ParticipationChanges>() {
 			@Override
 			public ParticipationChanges apply(Event event) {
-				ParticipationChanges participationChanges = new ParticipationChanges(); 
-				participationChanges.setAttendees(event.getAttendees());
-				participationChanges.setEventExtId(event.getExtId());
-				if(event.getRecurrenceId() != null) {
-					String recurrenceId = getRecurrenceIdToIcalFormat(event.getRecurrenceId());
-					participationChanges.setRecurrenceId(new RecurrenceId(recurrenceId));
+				if (event.getRecurrenceId() == null) {
+					return ParticipationChanges.builder()
+							.eventObmId(event.getObmId().getObmId())
+							.eventExtId(event.getExtId().getExtId())
+							.attendees(event.getAttendees())
+							.build(); 
 				}
-				participationChanges.setEventId(event.getObmId());
-				return participationChanges;
+				return ParticipationChanges.builder()
+							.eventObmId(event.getObmId().getObmId())
+							.eventExtId(event.getExtId().getExtId())
+							.attendees(event.getAttendees())
+							.recurrenceId(getRecurrenceIdToIcalFormat(event.getRecurrenceId()))
+							.build();
 			}
 		});
 	}
-
+	
 	private String getRecurrenceIdToIcalFormat(Date recurrenceId) {
 		DateTime recurrenceIdToIcalFormat = new DateTime(recurrenceId);
 		recurrenceIdToIcalFormat.setUtc(true);

@@ -1399,7 +1399,9 @@ public class CalendarBindingImplTest {
 	}
 	
 	private Event getFakeEvent(RecurrenceKind recurrenceKind) {
-		Event updatedEvent = new Event();    
+		Event updatedEvent = new Event();
+		updatedEvent.setUid(new EventObmId(1));
+		updatedEvent.setExtId(new EventExtId("123"));
 		EventRecurrence eventRecurrence = new EventRecurrence();
 		eventRecurrence.setKind(recurrenceKind);
 		updatedEvent.setRecurrence(eventRecurrence);

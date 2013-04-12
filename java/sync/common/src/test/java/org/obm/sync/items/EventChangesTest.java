@@ -46,7 +46,6 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventPrivacy;
-import org.obm.sync.calendar.RecurrenceId;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -71,21 +70,23 @@ public class EventChangesTest {
 		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
 		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
 		
-		ParticipationChanges participationChanges1 = new ParticipationChanges();
-		participationChanges1.setEventId(new EventObmId(3));
-		participationChanges1.setEventExtId(new EventExtId("participation_changes_1"));
-		participationChanges1.setRecurrenceId(new RecurrenceId("recurrence_id_1"));
-		participationChanges1.setAttendees(Lists.newArrayList(attendee1, attendee2));
+		ParticipationChanges participationChanges1 = ParticipationChanges.builder()
+				.eventExtId("participation_changes_1")
+				.eventObmId(3)
+				.recurrenceId("recurrence_id_1")
+				.attendees(Lists.newArrayList(attendee1, attendee2))
+				.build();
 
 		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
 		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
 		
-		ParticipationChanges participationChanges2 = new ParticipationChanges();
-		participationChanges2.setEventId(new EventObmId(4));
-		participationChanges2.setEventExtId(new EventExtId("participation_changes_2"));
-		participationChanges2.setRecurrenceId(new RecurrenceId("recurrence_id_2"));
-		participationChanges2.setAttendees(Lists.newArrayList(attendee3, attendee4));
-
+		ParticipationChanges participationChanges2 = ParticipationChanges.builder()
+				.eventExtId("participation_changes_2")
+				.eventObmId(4)
+				.recurrenceId("recurrence_id_2")
+				.attendees(Lists.newArrayList(attendee3, attendee4))
+				.build();
+		
 		Event publicEvent = new Event();
 		publicEvent.setExtId(new EventExtId("public_event"));
 		publicEvent.setTitle("public event");
@@ -119,20 +120,22 @@ public class EventChangesTest {
 		Attendee attendee1 = ContactAttendee.builder().email("attendee1@email.com").build();
 		Attendee attendee2 = ContactAttendee.builder().email("attendee2@email.com").build();
 		
-		ParticipationChanges participationChanges1 = new ParticipationChanges();
-		participationChanges1.setEventId(new EventObmId(3));
-		participationChanges1.setEventExtId(new EventExtId("participation_changes_1"));
-		participationChanges1.setRecurrenceId(new RecurrenceId("recurrence_id_1"));
-		participationChanges1.setAttendees(Lists.newArrayList(attendee1, attendee2));
+		ParticipationChanges participationChanges1 = ParticipationChanges.builder()
+				.eventExtId("participation_changes_1")
+				.eventObmId(3)
+				.recurrenceId("recurrence_id_1")
+				.attendees(Lists.newArrayList(attendee1, attendee2))
+				.build();
 
 		Attendee attendee3 = ContactAttendee.builder().email("attendee3@email.com").build();
 		Attendee attendee4 = ContactAttendee.builder().email("attendee4@email.com").build();
 		
-		ParticipationChanges participationChanges2 = new ParticipationChanges();
-		participationChanges2.setEventId(new EventObmId(4));
-		participationChanges2.setEventExtId(new EventExtId("participation_changes_2"));
-		participationChanges2.setRecurrenceId(new RecurrenceId("recurrence_id_2"));
-		participationChanges2.setAttendees(Lists.newArrayList(attendee3, attendee4));
+		ParticipationChanges participationChanges2 = ParticipationChanges.builder()
+				.eventExtId("participation_changes_2")
+				.eventObmId(4)
+				.recurrenceId("recurrence_id_2")
+				.attendees(Lists.newArrayList(attendee3, attendee4))
+				.build();
 
 		Event publicEvent = new Event();
 		publicEvent.setExtId(new EventExtId("public_event"));
