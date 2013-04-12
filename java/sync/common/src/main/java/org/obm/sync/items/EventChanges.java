@@ -150,7 +150,7 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 
 	}
 	
-	public EventChanges removeNotAllowedConfidentialEvents(String loggedUserEmail) {
+	public EventChanges moveConfidentialEventsToRemovedEvents(String loggedUserEmail) {
 		List<Event> updatedEvents = Lists.<Event>newArrayList();
 		Set<DeletedEvent> deletedEvents = Sets.<DeletedEvent>newHashSet(this.deletedEvents);
 		
@@ -174,10 +174,8 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 					.build();
 	}
 
-	private boolean hasAccessToConfidentialEvent(String loggedUserEmail,
-			Event event) {
+	private boolean hasAccessToConfidentialEvent(String loggedUserEmail, Event event) {
 		return event.getPrivacy().equals(EventPrivacy.CONFIDENTIAL)
-				&& !loggedUserEmail.equals(event.getOwnerEmail())
 				&& event.findAttendeeFromEmail(loggedUserEmail) == null;
 	}
 

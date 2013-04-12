@@ -919,15 +919,24 @@ public class CalendarBindingImpl implements ICalendar {
 					+ calendar + ") => " + changesFromDatabase.getUpdated().size() + " upd, "
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
 			
-			EventChanges changesToSend = changesFromDatabase.removeNotAllowedConfidentialEvents(token.getUserEmail());
+			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
 			
 			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
-			return userHasReadOnlyDelegation ?
-					changesToSend.anonymizePrivateItems() : changesToSend;
+			return userHasReadOnlyDelegation ? changesToSend.anonymizePrivateItems() : changesToSend;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private EventChanges moveConfidentalEventsOnDelegation(AccessToken token,
+			ObmUser calendarUser, EventChanges changesFromDatabase) {
+		String userEmailOfToken = token.getUserEmail();
+		boolean isNotCalendarOfLoggedUser = !userEmailOfToken.equals(calendarUser.getEmail());
+		EventChanges changesToSend = isNotCalendarOfLoggedUser ?
+			changesFromDatabase.moveConfidentialEventsToRemovedEvents(userEmailOfToken) :
+			changesFromDatabase;
+		return changesToSend;
 	}
 
 	@Override

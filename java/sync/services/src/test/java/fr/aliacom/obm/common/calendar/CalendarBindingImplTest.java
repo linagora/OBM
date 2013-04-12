@@ -1833,6 +1833,113 @@ public class CalendarBindingImplTest {
 		assertThat(actualChanges).isEqualTo(anonymizedEventChanges);
 	}
 	
+	@Test
+	public void testGetSyncMoveNotAllowedConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
+		String calendar = "bill.colby@cia.gov";
+		ObmUser user = ToolBox.getDefaultObmUser();
+
+		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date lastSync = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
+		
+		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
+		
+		Event publicEvent = new Event();
+		publicEvent.setExtId(new EventExtId("public_event"));
+		publicEvent.setTitle("public event");
+		publicEvent.setTimeCreate(timeCreate);
+		
+		Event confidentialEventWithAttendee = new Event();
+		confidentialEventWithAttendee.setUid(new EventObmId(3));
+		confidentialEventWithAttendee.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEventWithAttendee.setExtId(new EventExtId("confidential_event"));
+		confidentialEventWithAttendee.addAttendee(ContactAttendee.builder().email("user@test.tlse.lng").build());
+		confidentialEventWithAttendee.setTimeCreate(timeCreate);
+		
+		Event simpleConfidentialEvent = new Event();
+		simpleConfidentialEvent.setUid(new EventObmId(4));
+		simpleConfidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		simpleConfidentialEvent.setExtId(new EventExtId("confidential_event2"));
+		simpleConfidentialEvent.setTimeCreate(timeCreate);
+		
+		EventChanges eventChangesFromDao = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.deletes(ImmutableSet.of(deletedEvent1))
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(
+						publicEvent, confidentialEventWithAttendee, simpleConfidentialEvent))
+				.build();
+		
+		DeletedEvent confidentialEventToDeletedEvent =
+				DeletedEvent.builder().eventObmId(4).eventExtId("confidential_event2").build();
+
+		EventChanges expectedEventChanges = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.deletes(ImmutableSet.of(deletedEvent1, confidentialEventToDeletedEvent))
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(publicEvent, confidentialEventWithAttendee))
+				.build();
+		
+		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user).atLeastOnce();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true).once();
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
+		
+		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
+
+		mocksControl.replay();
+		
+		EventChanges actualEventChanges = binding.getSyncWithSortedChanges(token, calendar, lastSync, null);
+		
+		mocksControl.verify();
+		
+		assertThat(actualEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
+	@Test
+	public void testGetSyncDoesNotMoveConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
+		String calendar = "user@test.tlse.lng";
+		ObmUser user =
+				ObmUser.builder().uid(1).entityId(2).login("user").domain(ToolBox.getDefaultObmDomain())
+				.emailAndAliases("user@test.tlse.lng").firstName("Obm").lastName("User")
+				.build();
+
+		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date lastSync = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
+		
+		Event simpleConfidentialEvent = new Event();
+		simpleConfidentialEvent.setUid(new EventObmId(4));
+		simpleConfidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		simpleConfidentialEvent.setExtId(new EventExtId("confidential_event2"));
+		simpleConfidentialEvent.setTimeCreate(timeCreate);
+		
+		EventChanges eventChangesFromDao = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.updates(Lists.newArrayList(simpleConfidentialEvent))
+				.build();
+
+		EventChanges expectedEventChanges = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.updates(Lists.newArrayList(simpleConfidentialEvent))
+				.build();
+		
+		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user).atLeastOnce();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true).once();
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
+		
+		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
+
+		mocksControl.replay();
+		
+		EventChanges actualEventChanges = binding.getSyncWithSortedChanges(token, calendar, lastSync, null);
+		
+		mocksControl.verify();
+		
+		assertThat(actualEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
 	@Test(expected=NotAllowedException.class)
 	public void testAssertEventCanBeModifiedWhenCannotWriteOnCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
