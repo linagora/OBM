@@ -3893,11 +3893,13 @@ function check_calendar_access($id, $right = 'write') {
     if (in_array($obm['uid'], $e['attendees']['user'])) {
       return true;
     }
-    if(is_array($e['attendees']['user']) && count($e['attendees']['user']) > 0) {
-      $access = OBM_Acl::areSomeAllowed($obm['uid'], 'calendar', $e['attendees']['user'], $right);
-    }
-    if (!$access && is_array($e['attendees']['resource'])) {
-      $access = OBM_Acl::areSomeAllowed($obm['uid'], 'resource', $e['attendees']['resource'], $right);
+    if ($e['privacy'] != 2) {
+      if(is_array($e['attendees']['user']) && count($e['attendees']['user']) > 0) {
+        $access = OBM_Acl::areSomeAllowed($obm['uid'], 'calendar', $e['attendees']['user'], $right);
+      }
+      if (!$access && is_array($e['attendees']['resource'])) {
+        $access = OBM_Acl::areSomeAllowed($obm['uid'], 'resource', $e['attendees']['resource'], $right);
+      }
     }
   }
   if (!$access) { 
@@ -4256,6 +4258,7 @@ function get_calendar_event_info($id,$attendees=true) {
   if(!$obm_q->next_record()) {
     return false;
   }
+  $e['privacy'] = $obm_q->f('event_privacy');
   $e['usercreate'] = $obm_q->f('event_usercreate');
   $e['owner'] = $obm_q->f('event_owner');
   $e['date'] = new  Of_Date($obm_q->f('event_date'), 'GMT');
