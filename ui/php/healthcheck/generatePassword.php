@@ -166,7 +166,7 @@ if ( !empty($_POST['login']) && !empty($_POST['password']) ) {
 		    You can also use the provided form to generate the configuration file snippet directly.
 		</p>
 		<h3>When you're done </h3>
-		<p> <a href="index.php" class="btn btn-primary">Click here to access the Health Check</a> </p>
+		<p> <a href="/healthcheck" class="btn btn-primary">Click here to access the Health Check</a> </p>
 	</div>
 
 	<div class="span3 alert alert-info">
