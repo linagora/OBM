@@ -6,6 +6,13 @@
             "description": "Check that the database contains the proper mappings between domains and opush hosts.",
             "url": "http://obm.org/wiki/getting-started",
             "parentId": null
+        },
+        {
+            "id": "ConnectionStatus",
+            "name": "OPush Connection Check",
+            "description": "Check that the OPush servers are up and running.",
+            "url": null,
+            "parentId": null
         }
     ]
 }
