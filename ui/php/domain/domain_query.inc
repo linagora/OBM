@@ -511,6 +511,7 @@ function run_query_domain_update($domain_id, $domain) {
   of_service_property_replace('solr','event', $entity_id, $domain['solr']);
   of_service_property_replace('solr','contact', $entity_id, $domain['solr']);
   of_service_property_replace('opush','opush', $entity_id, $domain['opush']);
+  of_service_property_replace('opush','opush_frontend', $entity_id, $domain['opush_frontend']);
   of_service_delete('backup', $entity_id);
   of_service_property_delete_all('backup', $entity_id);
   if (is_array($domain['backup_ftp']) && !empty($domain['backup_ftp'][0])) {
@@ -1153,6 +1154,43 @@ function get_domain_opushservers($domain_id= NULL) {
   return $m;
 }
 
+function get_domain_opushfrontendservers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain syncserver
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " AND (opush_frontend.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT
+  Host.*,
+  opush_frontend.service_id as host_opush_frontend
+  FROM Host
+  INNER JOIN HostEntity ON hostentity_host_id = host_id
+  LEFT JOIN Domain ON domain_id = host_domain_id
+  LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
+  WHERE 1 = 1
+  $where
+  $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_opushfrontendservers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+  $id = $obm_q->f('host_id');
+      $m[$id]['id'] = $id;
+      $m[$id]['name'] = $obm_q->f('host_name');
+      $m[$id]['opush_frontend'] = $obm_q->f('host_opush_frontend');
+  }
+
+  return $m;
+}
 
 /**
  * Get the frontendserver list candidate for a domain

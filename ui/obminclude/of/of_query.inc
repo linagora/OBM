@@ -683,7 +683,9 @@ function of_domain_get_domain_opushfrontendserver($domain_id = NULL, $entity = "
   LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
   LEFT JOIN Host ON host_id = #CAST(serviceproperty_value,INTEGER)
   WHERE
-  serviceproperty_service = 'opush_frontend'
+  serviceproperty_service = 'opush'
+  AND
+  serviceproperty_property = 'opush_frontend'
   $where
   $where_domain
   GROUP BY serviceproperty_property, host_id, host_name, host_ip";
