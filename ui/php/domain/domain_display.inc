@@ -169,11 +169,12 @@ function dis_domain_consult($domain) {
   $syncservers = of_domain_get_domain_syncserver($id);
   $solrservers = of_domain_get_domain_solrserver($id);
   $opushservers = of_domain_get_domain_opushserver($id);
+  $opushfrontendservers = of_domain_get_domain_opushfrontendserver($id);
   $imapfrontendservers = of_domain_get_domain_imapfrontendserver($id);
   $backupftpservers = of_domain_get_domain_backupftpserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers, $opushfrontendservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -188,7 +189,7 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL) {
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL, $opushfrontendservers=NULL) {
   global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
@@ -281,6 +282,9 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   if (is_array($syncservers)) {
     if (is_array($opushservers)) {
       $syncservers = array_merge($syncservers, $opushservers);
+    }
+    if (is_array($opushfrontendservers)) {
+      $syncservers = array_merge($syncservers, $opushfrontendservers);
     }
     
     foreach ($syncservers as $s_id => $syncserver_info) {
