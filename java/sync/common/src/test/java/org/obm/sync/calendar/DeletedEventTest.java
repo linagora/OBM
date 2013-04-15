@@ -31,76 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public final class DeletedEvent {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
+public class DeletedEventTest {
 	
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static class Builder {
-		private EventObmId eventObmId;
-		private EventExtId eventExtId;
-		
-		private Builder() {
-		}
-		
-		public Builder eventObmId(int eventObmId) {
-			this.eventObmId = new EventObmId(eventObmId);
-			return this;
-		}
-		
-		public Builder eventExtId(String eventExtId) {
-			this.eventExtId = new EventExtId(eventExtId);
-			return this;
-		}
-		
-		public DeletedEvent build() {
-			Preconditions.checkState(eventObmId != null);
-			Preconditions.checkState(eventExtId != null);
-			
-			return new DeletedEvent(eventObmId, eventExtId);
-		}
+	private static final String EXTID = "123";
+	private static final int OBMID = 123;
+
+	@Test(expected=IllegalStateException.class)
+	public void BuildNull() {
+		DeletedEvent.builder().build();
 	}
 	
-	private final EventObmId id;
-	private final EventExtId extId;
-	
-	private DeletedEvent(EventObmId id, EventExtId extId) {
-		this.id = id;
-		this.extId = extId;
-	}
-
-	public EventObmId getId() {
-		return id;
-	}
-
-	public EventExtId getExtId() {
-		return extId;
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hashCode(id, extId);
+	@Test(expected=IllegalStateException.class)
+	public void BuilderWithNullEventObmId() {
+		DeletedEvent.builder().eventExtId(EXTID).build();
 	}
 	
-	@Override
-	public final boolean equals(Object object) {
-		if (object instanceof DeletedEvent) {
-			DeletedEvent that = (DeletedEvent) object;
-			return Objects.equal(this.extId, that.extId)
-				&& Objects.equal(this.id, that.id);
-		}
-		return false;
+	@Test(expected=IllegalStateException.class)
+	public void BuilderWithNullEventExtId() {
+		DeletedEvent.builder().eventObmId(OBMID).build();
 	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("extId", extId)
-			.add("id", id)
-			.toString();
+	
+	@Test
+	public void BuilderSimpleDeletedEvent() {
+		DeletedEvent deletedEvent = DeletedEvent.builder().eventExtId(EXTID).eventObmId(OBMID).build();
+		assertThat(deletedEvent.getExtId().getExtId()).isEqualTo(EXTID);
+		assertThat(deletedEvent.getId().getObmId()).isEqualTo(OBMID);
 	}
 }
