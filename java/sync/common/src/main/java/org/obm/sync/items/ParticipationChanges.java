@@ -32,7 +32,7 @@
 package org.obm.sync.items;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.EventExtId;
@@ -41,8 +41,7 @@ import org.obm.sync.calendar.RecurrenceId;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 
 public final class ParticipationChanges implements Serializable {
 	
@@ -54,10 +53,11 @@ public final class ParticipationChanges implements Serializable {
 		private EventObmId eventObmId;
 		private EventExtId eventExtId;
 		private RecurrenceId recurrenceId;
-		private Iterable<Attendee> attendees;
+		private ImmutableSet.Builder<Attendee> attendees;
 		
 		private Builder() {
 			super();
+			attendees = ImmutableSet.builder();
 		}
 		
 		public Builder eventObmId(int eventObmId) {
@@ -76,33 +76,35 @@ public final class ParticipationChanges implements Serializable {
 		}
 		
 		public Builder attendees(Iterable<Attendee> attendees) {
-			this.attendees = attendees;
+			Preconditions.checkNotNull(attendees);
+			
+			this.attendees.addAll(attendees);
 			return this;
 		}
 		
 		public ParticipationChanges build() {
-			Preconditions.checkNotNull(eventObmId);
-			Preconditions.checkNotNull(eventExtId);
+			Preconditions.checkState(eventObmId != null);
+			Preconditions.checkState(eventExtId != null);
 			
 			return new ParticipationChanges(
 					eventObmId,
 					eventExtId,
 					recurrenceId,
-					Objects.firstNonNull(attendees, ImmutableList.<Attendee>of()));
+					attendees.build());
 		}
 	}
 	
 	private final EventObmId eventId;
 	private final EventExtId eventExtId;
 	private final RecurrenceId recurrenceId;
-	private final List<Attendee> attendees;
+	private final Set<Attendee> attendees;
 	
 	private ParticipationChanges(EventObmId eventId, EventExtId eventExtId,
-			RecurrenceId recurrenceId, Iterable<Attendee> attendees) {
+			RecurrenceId recurrenceId, Set<Attendee> attendees) {
 		this.eventId = eventId;
 		this.eventExtId = eventExtId;
 		this.recurrenceId = recurrenceId;
-		this.attendees = Lists.newArrayList(attendees);
+		this.attendees = attendees;
 	}
 
 	public EventObmId getEventId() {
@@ -117,7 +119,7 @@ public final class ParticipationChanges implements Serializable {
 		return recurrenceId;
 	}
 
-	public List<Attendee> getAttendees() {
+	public Set<Attendee> getAttendees() {
 		return attendees;
 	}
 	
