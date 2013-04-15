@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.items;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.obm.sync.calendar.Anonymizable;
@@ -43,9 +43,8 @@ import org.obm.sync.calendar.EventPrivacy;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public final class EventChanges implements Anonymizable<EventChanges> {
@@ -56,27 +55,36 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 	
 	public static class Builder {
 		
-		private Iterable<DeletedEvent> deletes;
-		private Iterable<Event> updates;
-		private Iterable<ParticipationChanges> participationChanges;
+		private ImmutableSet.Builder<DeletedEvent> deletes;
+		private ImmutableSet.Builder<Event> updates;
+		private ImmutableSet.Builder<ParticipationChanges> participationChanges;
 		private Date lastSync;
 
 		private Builder() {
 			super();
+			deletes = ImmutableSet.builder();
+			updates = ImmutableSet.builder();
+			participationChanges = ImmutableSet.builder();
 		}
 		
 		public Builder deletes(Iterable<DeletedEvent> deletes) {
-			this.deletes = deletes;
+			Preconditions.checkNotNull(deletes);
+			
+			this.deletes.addAll(deletes);
 			return this;
 		}
 		
 		public Builder updates(Iterable<Event> updates) {
-			this.updates = updates;
+			Preconditions.checkNotNull(updates);
+			
+			this.updates.addAll(updates);
 			return this;
 		}
 		
 		public Builder participationChanges(Iterable<ParticipationChanges> participationChanges) {
-			this.participationChanges = participationChanges;
+			Preconditions.checkNotNull(participationChanges);
+			
+			this.participationChanges.addAll(participationChanges);
 			return this;
 		}
 		
@@ -87,30 +95,21 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 		
 		public EventChanges build() {
 			Preconditions.checkState(lastSync != null);
-			return new EventChanges(
-					Objects.firstNonNull(deletes, ImmutableList.<DeletedEvent>of()),
-					Objects.firstNonNull(updates, ImmutableList.<Event>of()),
-					Objects.firstNonNull(participationChanges, ImmutableList.<ParticipationChanges>of()),
-					lastSync
-					);
+			return new EventChanges(deletes.build(), updates.build(), participationChanges.build(), lastSync);
 		}
 		
 	}
 	
 	private final Set<DeletedEvent> deletedEvents;
-	private final List<Event> updatedEvents;
-	private final List<ParticipationChanges> participationUpdated;
+	private final Set<Event> updatedEvents;
+	private final Set<ParticipationChanges> participationUpdated;
 	private final Date lastSync;
-
-	public EventChanges() {
-		this(Lists.<DeletedEvent>newArrayList(), Lists.<Event>newArrayList(), Lists.<ParticipationChanges>newArrayList(), null);
-	}
 	
-	private EventChanges(Iterable<DeletedEvent> deletes, Iterable<Event> updates,
-						Iterable<ParticipationChanges> participationChanges, Date lastSync) {
-		this.deletedEvents = ImmutableSet.copyOf(deletes);
-		this.updatedEvents = Lists.newArrayList(updates);
-		this.participationUpdated = Lists.newArrayList(participationChanges);
+	private EventChanges(Set<DeletedEvent> deletes, Set<Event> updates,
+						Set<ParticipationChanges> participationChanges, Date lastSync) {
+		this.deletedEvents = deletes;
+		this.updatedEvents = updates;
+		this.participationUpdated = participationChanges;
 		this.lastSync = lastSync;
 	}
 
@@ -118,7 +117,7 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 		return deletedEvents;
 	}
 
-	public List<Event> getUpdated() {
+	public Set<Event> getUpdated() {
 		return updatedEvents;
 	}
 
@@ -126,19 +125,19 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 		return lastSync;
 	}
 
-	public List<ParticipationChanges> getParticipationUpdated() {
+	public Set<ParticipationChanges> getParticipationUpdated() {
 		return participationUpdated;
 	}
 
 	@Override
 	public EventChanges anonymizePrivateItems() {
-		List<Event> anonymizedUpdatedEvents = Lists.transform(this.updatedEvents,
-				new Function<Event, Event>() {
+		Collection<Event> anonymizedUpdatedEvents =
+				Collections2.transform(this.updatedEvents, new Function<Event, Event>() {
 					@Override
 					public Event apply(Event event) {
 						return event.anonymizePrivateItems();
 					}
-
+		
 				});
 		
 		return EventChanges.builder()
@@ -151,11 +150,11 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 	}
 	
 	public EventChanges moveConfidentialEventsToRemovedEvents(String loggedUserEmail) {
-		List<Event> updatedEvents = Lists.<Event>newArrayList();
+		Set<Event> updatedEvents = Sets.<Event>newHashSet();
 		Set<DeletedEvent> deletedEvents = Sets.<DeletedEvent>newHashSet(this.deletedEvents);
 		
 		for (Event event: this.updatedEvents) {
-			if (hasAccessToConfidentialEvent(loggedUserEmail, event)) {
+			if (isFilteredConfidentialEvent(loggedUserEmail, event)) {
 				deletedEvents.add(
 						DeletedEvent.builder()
 							.eventObmId(event.getObmId().getObmId())
@@ -174,7 +173,7 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 					.build();
 	}
 
-	private boolean hasAccessToConfidentialEvent(String loggedUserEmail, Event event) {
+	private boolean isFilteredConfidentialEvent(String loggedUserEmail, Event event) {
 		return event.getPrivacy().equals(EventPrivacy.CONFIDENTIAL)
 				&& event.findAttendeeFromEmail(loggedUserEmail) == null;
 	}

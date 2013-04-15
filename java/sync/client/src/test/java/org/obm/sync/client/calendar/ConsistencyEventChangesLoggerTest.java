@@ -170,16 +170,12 @@ public class ConsistencyEventChangesLoggerTest {
 			.deletes(ImmutableList.<DeletedEvent>of())
 			.build();
 
-		logger.error(anyObject(String.class));
-		expectLastCall().times(2);
 		replay(logger);
 		NotConsistentEventChanges duplicateChanges = consistencyEventChangesLogger.build(eventChanges);
 		consistencyEventChangesLogger.log(logger, duplicateChanges);
 		verify(logger);
 		
-		assertThat(duplicateChanges.getDuplicatesEntries()).hasSize(1);
-		assertThat(duplicateChanges.getDuplicatesEntries().get(new EventObmId(2)))
-			.containsOnly(event2, event2Again);
+		assertThat(duplicateChanges.getDuplicatesEntries()).isEmpty();
 	}
 
 	@Test

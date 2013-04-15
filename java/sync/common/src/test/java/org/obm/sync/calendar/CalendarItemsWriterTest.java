@@ -44,10 +44,10 @@ import javax.xml.transform.TransformerException;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Participation.State;
@@ -73,8 +73,8 @@ private CalendarItemsWriter writer;
 	@Before
 	public void initCalendarWriter(){
 		writer = new CalendarItemsWriter();
-		lastSync = new DateTime(2012, 3, 5, 14, 26, 29).toDate();
 		XMLUnit.setIgnoreWhitespace(true);
+		lastSync = DateUtils.date("2012-03-05T14:26:29");
 	}
 
 	@Test

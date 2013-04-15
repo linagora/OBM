@@ -332,7 +332,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				.build();
 	}
 
-	private List<ItemChange> addOrUpdateEventFilter(List<Event> events, String userEmail,
+	private List<ItemChange> addOrUpdateEventFilter(Set<Event> events, String userEmail,
 			Integer collectionId, UserDataRequest udr) throws DaoException, ConversionException {
 		
 		List<ItemChange> items = Lists.newArrayList();

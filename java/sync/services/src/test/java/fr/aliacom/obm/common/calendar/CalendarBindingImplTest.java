@@ -57,6 +57,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -1330,8 +1331,9 @@ public class CalendarBindingImplTest {
 		
 		EventChanges sortedChanges = mockGetSyncWithSortedChanges(calendar, userName, lastSync, daoChanges);
 		
-		List<ParticipationChanges> participationUpdated = sortedChanges.getParticipationUpdated();
-		Assert.assertEquals(participationUpdated.get(0).getRecurrenceId().serializeToString(), "20120127T160000Z");
+		Set<ParticipationChanges> participationUpdated = sortedChanges.getParticipationUpdated();
+		final ParticipationChanges firstParticipationChanges = participationUpdated.iterator().next();
+		Assert.assertEquals(firstParticipationChanges.getRecurrenceId().serializeToString(), "20120127T160000Z");
 	}
 	
 	@Test
@@ -1343,7 +1345,7 @@ public class CalendarBindingImplTest {
 		
 		EventChanges sortedChanges = mockGetSyncWithSortedChanges(calendar, userName, lastSync, daoChanges);
 		
-		List<Event> updatedEvents = sortedChanges.getUpdated();
+		Set<Event> updatedEvents = sortedChanges.getUpdated();
 		
 		assertThat(updatedEvents).containsOnly(
 				getFakeEvent(RecurrenceKind.daily),
@@ -1769,9 +1771,9 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		AccessToken token = ToolBox.mockAccessToken();
 
-		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
-		Date lastSyncDate = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
-		Date syncDateFromDao = new DateTime(lastSyncDate).plusSeconds(5).toDate();
+		Date timeCreate = DateUtils.date("1974-09-04T14:00:00");
+		Date lastSync = DateUtils.date("1973-09-04T14:00:00");
+		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
 
 		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
 		DeletedEvent deletedEvent2 = DeletedEvent.builder().eventObmId(2).eventExtId("deleted event 2").build();
@@ -1818,7 +1820,7 @@ public class CalendarBindingImplTest {
 		expect(rightsHelper.canWriteOnCalendar(token, calendar)).andReturn(false).once();
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.getSync(token, user, lastSyncDate, null, null, false)).andReturn(
+		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(
 				eventChangesFromDao);
 
 		Object[] mocks = { token, userService, calendarDao, rightsHelper };
@@ -1828,7 +1830,7 @@ public class CalendarBindingImplTest {
 				calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		EventChanges actualChanges = calendarService.getSyncWithSortedChanges(token, calendar,
-				lastSyncDate, null);
+				lastSync, null);
 		verify(mocks);
 		assertThat(actualChanges).isEqualTo(anonymizedEventChanges);
 	}
@@ -1838,8 +1840,8 @@ public class CalendarBindingImplTest {
 		String calendar = "bill.colby@cia.gov";
 		ObmUser user = ToolBox.getDefaultObmUser();
 
-		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
-		Date lastSync = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();
+		Date timeCreate = DateUtils.date("1974-09-04T14:00:00");
+		Date lastSync = DateUtils.date("1973-09-04T14:00:00");
 		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
 		
 		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
