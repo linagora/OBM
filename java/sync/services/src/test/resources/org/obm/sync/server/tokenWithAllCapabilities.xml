@@ -4,14 +4,9 @@
 	<version major="0" minor="0" release="0" />
 	<email>user@test.tlse.lng</email>
 	<domain uuid="ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6">test.tlse.lng</domain>
-	<settings>
-		<setting name="setting1">value1</setting>
-		<setting name="setting2">value2</setting>
-		<setting name="setting3">value3</setting>
-		<setting name="setting4">value4</setting>
-		<setting name="setting5">value5</setting>
-	</settings>
+	<settings />
 	<server-capabilities>
 		<server-capability name="CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION">true</server-capability>
+		<server-capability name="CONFIDENTIAL_EVENTS">true</server-capability>
 	</server-capabilities>
 </token>

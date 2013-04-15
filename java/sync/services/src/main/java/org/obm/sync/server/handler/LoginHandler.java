@@ -191,8 +191,9 @@ public class LoginHandler implements ISyncHandler {
 	
 	private void fillTokenWithServerCapabilities(AccessToken token) {
 		Map<ServerCapability, String> serverCapabilities = token.getServerCapabilities();
-		serverCapabilities.put(ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
-		serverCapabilities.put(ServerCapability.CONFIDENTIAL_EVENTS, "true");
+		for (ServerCapability serverCapability: ServerCapability.values()) {
+			serverCapabilities.put(serverCapability, "true");
+		}
 	}
 
 	private void notifyConnectorVersionError(OBMConnectorVersionException e) {

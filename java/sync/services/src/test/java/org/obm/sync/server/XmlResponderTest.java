@@ -76,8 +76,7 @@ public class XmlResponderTest {
 		ImmutableMap<String, String> settings = ImmutableMap.of("setting1", "value1", "setting2", "value2", "setting3", "value3", "setting4", "value4", "setting5", "value5");
 		ImmutableMap<ServerCapability, String> caps =
 				ImmutableMap.of(
-						ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true",
-						ServerCapability.CONFIDENTIAL_EVENTS, "true");
+						ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
 		
 		expect(at.getUserSettings()).andReturn(new UserSettings(settings)).once();
 		expect(at.getServerCapabilities()).andReturn(caps).once();
@@ -87,6 +86,24 @@ public class XmlResponderTest {
 		Document doc = responder.toXML(at);
 
 		XMLAssert.assertXMLEqual(loadXMLFile("tokenWithFiveUserSettings.xml"), DOMUtils.serialize(doc));
+		verify(at);
+	}
+	
+	@Test
+	public void testToXMLAllCapability() throws Exception {
+		ImmutableMap<ServerCapability, String> caps =
+				ImmutableMap.of(
+						ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true",
+						ServerCapability.CONFIDENTIAL_EVENTS, "true");
+		
+		expect(at.getUserSettings()).andReturn(null).once();
+		expect(at.getServerCapabilities()).andReturn(caps).once();
+		expect(at.getUserDisplayName()).andReturn(null).once();
+		replay(at);
+
+		Document doc = responder.toXML(at);
+
+		XMLAssert.assertXMLEqual(loadXMLFile("tokenWithAllCapabilities.xml"), DOMUtils.serialize(doc));
 		verify(at);
 	}
 
