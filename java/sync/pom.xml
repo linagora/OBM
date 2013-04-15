@@ -83,7 +83,8 @@
 	<modules>
 		<module>common</module>
 		<module>client</module>
-		<module>services</module>
+		<module>services-module</module>
+		<module>services-webapp</module>
 		<module>locator</module>
 		<module>message-queue</module>
 		<module>opush</module>	

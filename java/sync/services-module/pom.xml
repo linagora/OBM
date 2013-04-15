@@ -7,9 +7,9 @@
 		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>services</artifactId>
-	<packaging>war</packaging>
-	<name>obm-sync services</name>
+	<artifactId>services-module</artifactId>
+	<packaging>jar</packaging>
+	<name>obm-sync services module</name>
 	<url>http://www.obm.org/</url>
 	<version>2.6.0-SNAPSHOT</version>
 
@@ -177,9 +177,17 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jar-test-classes</id>
+						<phase>package</phase>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<archiveClasses>true</archiveClasses>
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -189,5 +197,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

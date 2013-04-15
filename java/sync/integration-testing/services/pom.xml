@@ -44,5 +44,26 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>arquillian-bundle</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>utils-integration-testing</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>services-module</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>services-module</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
+		</dependency>
 	</dependencies>
 </project>
