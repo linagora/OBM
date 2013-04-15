@@ -133,7 +133,8 @@ function run_query_host_search($host) {
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id";
+      LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id";
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT Host.*,
@@ -144,6 +145,7 @@ function run_query_host_search($host) {
       obm_sync.service_id as host_obm_sync,
       solr.service_id as host_solr,
       opush.service_id as host_opush,
+      opush_frontend.service_id as host_opush_frontend,
       monitor.service_id as host_monitor,
       backup_ftp.service_id as host_backup_ftp,
       host_id as id,
@@ -196,6 +198,7 @@ function run_query_host_detail($id) {
       obm_sync.service_id as host_obm_sync,
       solr.service_id as host_solr,
       opush.service_id as host_opush,
+      opush_frontend.service_id as host_opush_frontend,
       imap_frontend.service_id as host_imap_frontend,
       monitor.service_id as host_monitor,
       backup_ftp.service_id as host_backup_ftp,
@@ -220,6 +223,7 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
       LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
       $multidomain";
@@ -584,6 +588,7 @@ function get_host_info($id) {
       smtp_out.service_id as host_smtp_out,
       solr.service_id as host_solr,
       opush.service_id as host_opush,
+      opush_frontend.service_id as host_opush_frontend,
       obm_sync.service_id as host_obm_sync,
       imap_frontend.service_id as host_imap_frontend,
       monitor.service_id as host_monitor,
@@ -600,6 +605,7 @@ function get_host_info($id) {
       LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
