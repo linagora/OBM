@@ -3,14 +3,14 @@
         {
             "id": "HostInDatabaseStatus",
             "name": "OBM-Sync Database Definition Check",
-            "description": "Check that the database contains the proper mappings between domains and obm-sync hosts.",
+            "description": "Checks that the database contains the proper mappings between domains and obm-sync hosts.",
             "url": "http://obm.org/wiki/getting-started",
             "parentId": null
         },
         {
             "id": "ConnectionStatus",
             "name": "OBM-Sync Connection Check",
-            "description": "Check that the obm-sync servers are up and running.",
+            "description": "Checks that the obm-sync server(s) are up and running.",
             "url": "http://obm.org/wiki/configuration-0",
             "parentId": null
         },
@@ -24,7 +24,7 @@
         {
             "id": "SyncStatus",
             "name": "OBM-Sync Synchronization Check",
-            "description": "Check that we can login and synchronize user's information on obm-sync server(s)",
+            "description": "Checks that we can login and synchronize user's information on obm-sync server(s)",
             "url": null,
             "parentId": null
         }

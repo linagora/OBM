@@ -3,14 +3,14 @@
         {
             "id": "HostInDatabaseStatus",
             "name": "IMAP Database Definition Check",
-            "description": "Check that the database contains the proper mappings between domains and IMAP hosts.",
+            "description": "Checks that the database contains the proper mappings between domains and IMAP hosts.",
             "url": "http://obm.org/wiki/getting-started",
             "parentId": null
         },
         {
             "id": "ConnectionStatus",
             "name": "IMAP Connection Check",
-            "description": "Check that IMAP servers are up and running and that we can connect to a user's Inbox.",
+            "description": "Checks that IMAP servers are up and running and that we can connect to a user's Inbox.",
             "url": null,
             "parentId": null
         }

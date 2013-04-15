@@ -3,14 +3,14 @@
         {
             "id": "HostInDatabaseStatus",
             "name": "SOLR Database Definition Check",
-            "description": "Check that the database contains the proper mappings between domains and SOLR hosts.",
+            "description": "Checks that the database contains the proper mappings between domains and SOLR hosts.",
             "url": "http://obm.org",
             "parentId": null
         },
         {
             "id": "ConnectionStatus",
             "name": "SOLR Connection Check",
-            "description": "Check that the SOLR servers are up and running.",
+            "description": "Checks that the SOLR server(s) are up and running.",
             "url": "http://obm.org",
             "parentId": null
         }

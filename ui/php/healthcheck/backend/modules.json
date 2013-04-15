@@ -32,26 +32,26 @@
         },
         {
             "id": "solr",
-            "name": "SOLR Module",
-            "description": "Checks the solr (indexation server) service",
+            "name": "SOLR",
+            "description": "Checks the solr (indexing server) service",
             "url": null
         },
         {
             "id": "automaton",
-            "name": "Automaton Module",
+            "name": "Automaton",
             "description": "Checks the automaton (various low-level OBM services) service",
             "url": null
         },
         {
             "id": "imap",
-            "name": "IMAP Module",
+            "name": "IMAP",
             "description": "Checks the IMAP (Cyrus) configuration",
             "url": null
         },
         {
             "id": "opush",
-            "name": "OPush  Module",
-            "description": "Checks the OPush (mobile devices synchronization serice) configuration",
+            "name": "OPush ",
+            "description": "Checks the OPush (mobile devices synchronization service) configuration",
             "url": "/Microsoft-Server-ActiveSync/"
         }
     ]

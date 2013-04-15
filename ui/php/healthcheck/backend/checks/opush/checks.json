@@ -3,14 +3,14 @@
         {
             "id": "HostInDatabaseStatus",
             "name": "OPush Database Definition Check",
-            "description": "Check that the database contains the proper mappings between domains and opush hosts.",
+            "description": "Checks that the database contains the proper mappings between domains and OPush hosts.",
             "url": "http://obm.org/wiki/getting-started",
             "parentId": null
         },
         {
             "id": "ConnectionStatus",
             "name": "OPush Connection Check",
-            "description": "Check that the OPush servers are up and running.",
+            "description": "Checks that the OPush server(s) are up and running.",
             "url": null,
             "parentId": null
         },

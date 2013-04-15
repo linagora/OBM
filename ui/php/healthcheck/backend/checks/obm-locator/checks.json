@@ -3,7 +3,7 @@
         {
             "id": "ConnectionStatus",
             "name": "OBM-Locator Connection Check",
-            "description": "Check that the obm-locator servers are up and running.",
+            "description": "Checks that the obm-locator server(s) are up and running.",
             "url": null,
             "parentId": null
         }
