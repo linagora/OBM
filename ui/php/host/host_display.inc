@@ -189,6 +189,7 @@ function html_host_search_form($host) {
   $obm_sync = ($host['obm_sync'] == '1' ? "checked = \"checked\"" : '');
   $solr = ($host['solr'] == '1' ? "checked = \"checked\"" : '');
   $opush = ($host['opush'] == '1' ? "checked = \"checked\"" : '');
+  $opush_frontend = ($host['opush_frontend'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
   $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
   $imap_frontend = ($host['imap_frontend'] == '1' ? "checked = \"checked\"" : '');
@@ -236,6 +237,11 @@ function html_host_search_form($host) {
   <input type=\"checkbox\" name=\"cb_opush\" value=\"1\" $opush />
   </label>";
 
+  $block_opush_frontend = "
+  <label>$GLOBALS[l_opush_frontend]<br />
+  <input type=\"checkbox\" name=\"cb_opush_frontend\" value=\"1\" $opush_frontend />
+  </label>";
+
   $block_backup_ftp = "
   <label>$GLOBALS[l_backup_ftp]<br />
     <input type=\"checkbox\" name=\"cb_backup_ftp\" value=\"1\" $backup_ftp />
@@ -256,6 +262,7 @@ function html_host_search_form($host) {
       $block_sync
       $block_solr
       $block_opush
+      $block_opush_frontend
       $block_backup_ftp
       <label>$GLOBALS[l_monitor]<br />
         <input type=\"checkbox\" name=\"cb_monitor\" value=\"1\" $monitor />
