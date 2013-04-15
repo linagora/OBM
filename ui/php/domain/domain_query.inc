@@ -196,6 +196,8 @@ function run_query_domain_insert($domain) {
     of_service_property_insert('solr','contact', $entity_id, $domain['solr']);
     of_service_insert('opush', $entity_id);
     of_service_property_insert('opush','opush', $entity_id, $domain['opush']);
+    of_service_insert('opush_frontend', $entity_id);
+    of_service_property_insert('opush','opush_frontend', $entity_id, $domain['opush_frontend']);
     if (is_array($domain['backup_ftp']) && !empty($domain['backup_ftp'][0])) {
       of_service_insert('backup', $entity_id);
       of_service_property_insert('backup','backup_ftp', $entity_id, $domain['backup_ftp']);
