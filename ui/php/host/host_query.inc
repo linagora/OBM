@@ -386,6 +386,7 @@ function run_query_host_update($host) {
   $obm_sync = sql_parse_int($host['obm_sync']);
   $solr = sql_parse_int($host['solr']);
   $opush = sql_parse_int($host['opush']);
+  $opush_frontend = sql_parse_int($host['opush_frontend']);
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
@@ -442,6 +443,11 @@ function run_query_host_update($host) {
       of_service_insert('opush', $entity_id);
     } else {
       of_service_delete('opush', $entity_id);
+    }
+    if($opush_frontend > 0) {
+      of_service_insert('opush_frontend', $entity_id);
+    } else {
+      of_service_delete('opush_frontend', $entity_id);
     }
     if($imap_frontend > 0) {
       of_service_insert('imap_frontend', $entity_id); 
