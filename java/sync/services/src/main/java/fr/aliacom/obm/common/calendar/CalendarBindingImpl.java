@@ -845,7 +845,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return sortUpdatedEvents(changes, lastSync);
 	}
 	
-	private EventChanges sortUpdatedEvents(EventChanges changes, Date lastSync) {
+	@VisibleForTesting EventChanges sortUpdatedEvents(EventChanges changes, Date lastSync) {
 		List<Event> updated = new ArrayList<Event>();
 		List<Event> participationChanged = new ArrayList<Event>();
 		

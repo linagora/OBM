@@ -1348,11 +1348,11 @@ public class CalendarBindingImplTest {
 		Set<Event> updatedEvents = sortedChanges.getUpdated();
 		
 		assertThat(updatedEvents).containsOnly(
-				getFakeEvent(RecurrenceKind.daily),
-				getFakeEvent(RecurrenceKind.monthlybydate),
-				getFakeEvent(RecurrenceKind.monthlybyday),
-				getFakeEvent(RecurrenceKind.weekly),
-				getFakeEvent(RecurrenceKind.yearly));
+				getFakeEvent(1, RecurrenceKind.daily),
+				getFakeEvent(2, RecurrenceKind.monthlybydate),
+				getFakeEvent(3, RecurrenceKind.monthlybyday),
+				getFakeEvent(4, RecurrenceKind.weekly),
+				getFakeEvent(5, RecurrenceKind.yearly));
 	}
 
 	private EventChanges mockGetSyncWithSortedChanges(String calendar, String userName,
@@ -1381,19 +1381,19 @@ public class CalendarBindingImplTest {
 	}
 	
 	private EventChanges getFakeEventChanges(RecurrenceKind recurrenceKind) {
-		Event updatedEvent = getFakeEvent(recurrenceKind);
+		Event updatedEvent = getFakeEvent(1, recurrenceKind);
 		return EventChanges.builder()
-				.lastSync(new Date())
-				.updates(Lists.newArrayList(updatedEvent))
-				.build();
+					.updates(Lists.newArrayList(updatedEvent))
+					.lastSync(new Date())
+					.build();
 	}
 
 	private EventChanges getFakeAllRecurrentEventChanges() {
-		List<Event> changedRecurrentEvents = Lists.newArrayList(getFakeEvent(RecurrenceKind.daily),
-				getFakeEvent(RecurrenceKind.monthlybydate),
-				getFakeEvent(RecurrenceKind.monthlybyday),
-				getFakeEvent(RecurrenceKind.weekly),
-				getFakeEvent(RecurrenceKind.yearly));
+		List<Event> changedRecurrentEvents = Lists.newArrayList(getFakeEvent(1, RecurrenceKind.daily),
+				getFakeEvent(2, RecurrenceKind.monthlybydate),
+				getFakeEvent(3, RecurrenceKind.monthlybyday),
+				getFakeEvent(4, RecurrenceKind.weekly),
+				getFakeEvent(5, RecurrenceKind.yearly));
 
 		return EventChanges.builder()
 					.lastSync(new Date())
@@ -1401,10 +1401,10 @@ public class CalendarBindingImplTest {
 					.build();
 	}
 	
-	private Event getFakeEvent(RecurrenceKind recurrenceKind) {
+	private Event getFakeEvent(int eventId, RecurrenceKind recurrenceKind) {
 		Event updatedEvent = new Event();
-		updatedEvent.setUid(new EventObmId(1));
-		updatedEvent.setExtId(new EventExtId("123"));
+		updatedEvent.setUid(new EventObmId(eventId));
+		updatedEvent.setExtId(new EventExtId(String.valueOf(eventId)));
 		EventRecurrence eventRecurrence = new EventRecurrence();
 		eventRecurrence.setKind(recurrenceKind);
 		updatedEvent.setRecurrence(eventRecurrence);
@@ -2817,6 +2817,163 @@ public class CalendarBindingImplTest {
 		return null;
 	}
 
+  @Test
+	public void testSortUpdatedEvents() {
+		
+		DeletedEvent deletedEvent = DeletedEvent.builder().eventObmId(0).eventExtId("deleted_event").build();
+		Set<DeletedEvent> deletedEvents = Sets.newHashSet(deletedEvent);
+		
+		Event updatedSimpleEvent = getFakeEvent(1, RecurrenceKind.none);
+		updatedSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T14:00:01"));
+		updatedSimpleEvent.setTimeUpdate(null);
+		updatedSimpleEvent.setRecurrenceId(null);
+		
+		Event updatedRecurrenceEvent = getFakeEvent(2, RecurrenceKind.daily);
+		updatedRecurrenceEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
+		updatedRecurrenceEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		
+		Event shouldMoveSimpleEvent = getFakeEvent(3, RecurrenceKind.none);
+		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
+		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		shouldMoveSimpleEvent.setRecurrenceId(null);
+		
+		Event shouldMoveEventException = getFakeEvent(4, RecurrenceKind.none);
+		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T14:00:00"));
+		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57"));
+		shouldMoveEventException.setTimeUpdate(null);
+		
+		Date lastSync = DateUtils.date("2012-01-01T14:00:00");
+		
+		EventChanges eventChangesToSort =
+				EventChanges.builder()
+					.lastSync(lastSync)
+					.deletes(deletedEvents)
+					.updates(Lists.newArrayList(
+							updatedSimpleEvent, updatedRecurrenceEvent,
+							shouldMoveEventException, shouldMoveSimpleEvent))
+					.build();
+		
+		EventChanges sortedEventChanges = binding.sortUpdatedEvents(eventChangesToSort, lastSync);
+
+		final Attendee attendee = ToolBox.getFakeAttendee("user2@domain1");
+		attendee.setParticipation(Participation.accepted());
+		
+		ParticipationChanges expectedParticipationChange1 =
+				ParticipationChanges.builder()
+					.eventExtId("3")
+					.eventObmId(3)
+					.attendees(Lists.newArrayList(attendee))
+					.build();
+		
+		ParticipationChanges expectedParticipationChange2 = 
+				ParticipationChanges.builder()
+				.eventExtId("4")
+				.eventObmId(4)
+				.attendees(Lists.newArrayList(attendee))
+				.recurrenceId("20120101T130000Z")
+				.build();
+		
+		EventChanges expectedEventChanges =
+			EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(deletedEvents)
+				.participationChanges(
+						Lists.newArrayList(expectedParticipationChange1, expectedParticipationChange2))
+				.updates(Lists.newArrayList(updatedSimpleEvent, updatedRecurrenceEvent))
+				.build();
+		
+		assertThat(sortedEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
+	@Test
+	public void testSortShouldMoveAllUpdatedEvents() {
+		
+		DeletedEvent deletedEvent = DeletedEvent.builder().eventObmId(0).eventExtId("deleted_event").build();
+		Set<DeletedEvent> deletedEvents = Sets.newHashSet(deletedEvent);
+		
+		Event shouldMoveSimpleEvent = getFakeEvent(3, RecurrenceKind.none);
+		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
+		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		shouldMoveSimpleEvent.setRecurrenceId(null);
+		
+		Event shouldMoveEventException = getFakeEvent(4, RecurrenceKind.none);
+		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T14:00:00"));
+		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57"));
+		shouldMoveEventException.setTimeUpdate(null);
+		
+		Date lastSync = DateUtils.date("2012-01-01T14:00:00");
+		
+		EventChanges eventChangesToSort =
+				EventChanges.builder()
+					.lastSync(lastSync)
+					.deletes(deletedEvents)
+					.updates(Lists.newArrayList(shouldMoveEventException, shouldMoveSimpleEvent))
+					.build();
+		
+		EventChanges sortedEventChanges = binding.sortUpdatedEvents(eventChangesToSort, lastSync);
+
+		final Attendee attendee = ToolBox.getFakeAttendee("user2@domain1");
+		attendee.setParticipation(Participation.accepted());
+		
+		ParticipationChanges expectedParticipationChange1 =
+				ParticipationChanges.builder()
+					.eventExtId("3")
+					.eventObmId(3)
+					.attendees(Lists.newArrayList(attendee))
+					.build();
+		
+		ParticipationChanges expectedParticipationChange2 = 
+				ParticipationChanges.builder()
+				.eventExtId("4")
+				.eventObmId(4)
+				.attendees(Lists.newArrayList(attendee))
+				.recurrenceId("20120101T130000Z")
+				.build();
+		
+		EventChanges expectedEventChanges =
+			EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(deletedEvents)
+				.participationChanges(Lists.newArrayList(expectedParticipationChange1, expectedParticipationChange2))
+				.build();
+		
+		assertThat(sortedEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
+	@Test
+	public void testSortUpdatedEventsFirstSyncDoNothing() {
+		DeletedEvent deletedEvent = DeletedEvent.builder().eventObmId(0).eventExtId("deleted_event").build();
+		Set<DeletedEvent> deletedEvents = Sets.newHashSet(deletedEvent);
+		
+		Event updatedSimpleEvent = getFakeEvent(1, RecurrenceKind.none);
+		updatedSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T14:00:01"));
+		updatedSimpleEvent.setTimeUpdate(null);
+		
+		Event updatedRecurrenceEvent = getFakeEvent(2, RecurrenceKind.daily);
+		updatedRecurrenceEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:59"));
+		updatedRecurrenceEvent.setTimeUpdate(DateUtils.date("2012-01-01T14:00:01"));
+		
+		Date lastSync = DateUtils.date("2012-01-01T14:00:00");
+		
+		EventChanges eventChangesToSort =
+				EventChanges.builder()
+					.lastSync(lastSync)
+					.deletes(deletedEvents)
+					.updates(Lists.newArrayList(updatedSimpleEvent, updatedRecurrenceEvent))
+					.build();
+		
+		EventChanges sortedEventChanges = binding.sortUpdatedEvents(eventChangesToSort, lastSync);
+		
+		EventChanges expectedEventChanges =
+			EventChanges.builder()
+				.lastSync(lastSync)
+				.deletes(deletedEvents)
+				.updates(Lists.newArrayList(updatedSimpleEvent, updatedRecurrenceEvent))
+				.build();
+		
+		assertThat(sortedEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
 	private void expectNoRightsForCalendar(String calendar) {
 		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();
 		expect(helperService.canReadCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();

@@ -179,7 +179,7 @@ public class ToolBox {
 		return ex;
 	}
 	
-	public static Event getFakeEvent( int id){
+	public static Event getFakeEvent(int id) {
 		Event event = new Event();
 		Date date = new Date();
 		
