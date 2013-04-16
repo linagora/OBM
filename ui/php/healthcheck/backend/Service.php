@@ -31,10 +31,14 @@
 * ***** END LICENSE BLOCK ***** */
 
 require_once 'IncludeCheckLoader.php';
+require_once 'IncludeModuleLoader.php';
 
 class Service {
   
+  const MODULE_PHP = "Module.php";
+  const CHECKS = "checks";
   private $checkLoader;
+  private $moduleLoader;
   
   function route($path) {
     $pathExploded = explode("/", $path);
@@ -58,7 +62,7 @@ class Service {
   }
 
   function getModuleChecks($module) {
-    $file = dirname(__FILE__) . "/checks/$module/checks.json";
+    $file = dirname(__FILE__) . "/" . Service::CHECKS . "/$module/" . Service::CHECKS . ".json";
 
     if ( !file_exists($file) ) {
       throw new InvalidArgumentException("Unknown module $module ");
@@ -68,7 +72,62 @@ class Service {
   }
   
   function getAvailableModules() {
-    return file_get_contents(dirname(__FILE__) . "/modules.json");
+    $this->loadGlobalInc();
+
+    $domains = $this->listDomains();
+    $modulesToPlay = array();
+    $checksFolderName = dirname(__FILE__) . "/" . Service::CHECKS;
+    $checksFolder = opendir($checksFolderName);
+    while (($checkFolder = readdir($checksFolder)) !== false) {
+      if ($checkFolder == "." || $checkFolder == "..") {
+        continue;
+      }
+      if ($this->isAModule($checksFolderName . "/" . $checkFolder)) {
+        $module = $this->loadModule($checksFolderName, $checkFolder);
+        if ($module != NULL && $this->isModuleEnabled($module, $domains)) {
+          $modulesToPlay = array_merge(array($module), $modulesToPlay);
+        }
+      }
+    }
+    closedir($checksFolder);
+    return json_encode(array("modules" => $modulesToPlay));
+  }
+
+  function listDomains() {
+    return of_domain_get_list();
+  }
+
+  function isAModule($moduleFolder) {
+    return is_file($moduleFolder . '/' . self::MODULE_PHP);
+  }
+
+  function loadModule($modulesFolderName, $moduleFolder) {
+    if (!isset($this->moduleLoader)) {
+      $this->moduleLoader = new IncludeModuleLoader();
+    }
+    
+    $module = $this->moduleLoader->load($modulesFolderName, $moduleFolder);
+    
+    if (!isset($module)) {
+      throw new InvalidArgumentException("Module " . $modulesFolderName . "/" . $moduleFolder . " doesn't contains module informations");
+    }
+  
+    return $module;
+  }
+
+  function isModuleEnabled($module, $domains) {
+    return $module->isEnabled($domains);
+  }
+
+  function loadGlobalInc() {
+    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
+
+    $path = "../..";
+    $obminclude = getenv("OBM_INCLUDE_VAR");
+    if ($obminclude == "") {
+      $obminclude = "obminclude";
+    }
+    require_once "$obminclude/global.inc";
   }
   
   function executeCheck($module, $id = null) {

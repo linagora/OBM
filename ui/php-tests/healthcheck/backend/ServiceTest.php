@@ -74,7 +74,22 @@ class ServiceTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testGetAvailableModules() {
-    $service = new Service();
+    $service = $this->getMock('Service', array('loadGlobalInc', 'listDomains', 'isModuleEnabled'));
+
+    $service->expects($this->once())
+            ->method('loadGlobalInc');
+
+    $domain[0]['id'] = 0;
+    $domain[0]['label'] = "domain.linagora.org";
+    $domain[0]['name'] = "domain.linagora.org";
+    $domain[0]['global'] = FALSE;
+    $service->expects($this->once())
+            ->method('listDomains')
+            ->will($this->returnValue($domain));
+    
+    $service->expects($this->any())
+            ->method('isModuleEnabled')
+            ->will($this->returnValue(TRUE));
     
     $this->assertNotNull(json_decode($service->getAvailableModules()));
   }
