@@ -962,7 +962,7 @@ sub _getAvailableBackupFile {
 		    if ($fname =~ /$realm\/$backupNamePrefix/) {
 		    	push @availableBackup, basename($_);
 		    }
-    	}, no_chdir => 1}, $entity->getBackupRoot());
+    	}, no_chdir => 1, follow => 1}, $entity->getBackupRoot());
     } else {
     	return $self->_response(RC_INTERNAL_SERVER_ERROR, {
         content => [ 'Can\'t open backup root ' . $entity->getBackupRoot() ]
@@ -1016,7 +1016,7 @@ sub _getFilesFromArchive {
 		    	$automaticBackup = $File::Find::name;
 		    	$File::Find::prune = 1;
 		    }
-    	}, no_chdir => 1}, $entity->getBackupRoot());
+    	}, no_chdir => 1, follow => 1}, $entity->getBackupRoot());
         
         if ($automaticBackup) {
         	$entity->setBackupFileName($automaticBackup);
