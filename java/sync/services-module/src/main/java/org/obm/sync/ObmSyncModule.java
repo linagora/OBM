@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
@@ -45,6 +46,8 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
+import org.obm.healthcheck.HealthCheckModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.date.DateProvider;
@@ -84,43 +87,47 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class ObmSyncModule extends AbstractModule {
 
 	private static final String APPLICATION_NAME = "obm-sync";
-	
-    @Override
-    protected void configure() {
-        bind(DomainService.class).to(DomainCache.class);
-        bind(UserService.class).to(UserServiceImpl.class);
-        bind(SettingsService.class).to(SettingsServiceImpl.class);
-        bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
-        bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-        bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
-        bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
-        bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-        bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-        bind(LocatorService.class).to(LocatorCache.class);
-        bind(HelperService.class).to(HelperServiceImpl.class);
-        bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-        bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
-        bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-        bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
-        bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
-        bind(ICalendar.class).to(CalendarBindingImpl.class);
 
-        ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
-                .load(FreeBusyPluginModule.class);
+	@Override
+	protected void configure() {
+		install(new MessageQueueModule());
+		install(new TransactionalModule());
+		install(new SolrJmsModule());
+		install(new HealthCheckModule());
+		install(new HealthCheckDefaultHandlersModule());
 
-        List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
-        for (FreeBusyPluginModule pluginModule : pluginModules) {
-            pluginModulesList.add(pluginModule);
-        }
+		bind(DomainService.class).to(DomainCache.class);
+		bind(UserService.class).to(UserServiceImpl.class);
+		bind(SettingsService.class).to(SettingsServiceImpl.class);
+		bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
+		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
+		bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
+		bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		bind(LocatorService.class).to(LocatorCache.class);
+		bind(HelperService.class).to(HelperServiceImpl.class);
+		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
+		bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
+		bind(ICalendar.class).to(CalendarBindingImpl.class);
 
-        Collections.sort(pluginModulesList, Collections.reverseOrder());
-        for (FreeBusyPluginModule pluginModule : pluginModulesList) {
-            this.install(pluginModule);
-        }
-        
+		ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load(FreeBusyPluginModule.class);
+		List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
+		for (FreeBusyPluginModule pluginModule : pluginModules) {
+			pluginModulesList.add(pluginModule);
+		}
+
+		Collections.sort(pluginModulesList, Collections.reverseOrder());
+		for (FreeBusyPluginModule pluginModule : pluginModulesList) {
+			this.install(pluginModule);
+		}
+
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
-    }
+	}
 }

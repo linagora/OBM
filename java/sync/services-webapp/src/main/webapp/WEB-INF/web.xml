@@ -9,7 +9,12 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 	<listener>
 		<listener-class>org.obm.sync.GuiceServletContextListener</listener-class>
 	</listener>
-	
+
+	<context-param>
+		<param-name>guiceModule</param-name>
+		<param-value>org.obm.sync.ObmSyncModule</param-value>
+	</context-param>
+
 	<filter>
 		<filter-name>guiceFilter</filter-name>
 		<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>

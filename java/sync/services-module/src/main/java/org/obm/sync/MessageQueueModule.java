@@ -35,6 +35,7 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -45,7 +46,7 @@ public class MessageQueueModule extends AbstractModule {
 
 	private final QueueManager queueManager;
 	
-	public MessageQueueModule() throws Exception {
+	public MessageQueueModule() {
 		super();
 		this.queueManager = constructQueueManager();
 	}
@@ -55,10 +56,15 @@ public class MessageQueueModule extends AbstractModule {
 		bind(QueueManager.class).toInstance(queueManager);
 	}
 	
-	private QueueManager constructQueueManager() throws Exception {
-		QueueManager queueManager = new QueueManager();
-		queueManager.start();
-		return queueManager;
+	private QueueManager constructQueueManager() {
+		try {
+			QueueManager queueManager = new QueueManager();
+			queueManager.start();
+			return queueManager;
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
+		throw new RuntimeException("Cannot construct queue manager");
 	}
 	
 	@Provides @Singleton

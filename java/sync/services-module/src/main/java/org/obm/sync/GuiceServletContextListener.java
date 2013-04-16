@@ -38,13 +38,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -58,7 +58,7 @@ public class GuiceServletContextListener implements ServletContextListener {
         final ServletContext servletContext = servletContextEvent.getServletContext(); 
         
         try {
-        	Injector injector = createInjector();
+        	Injector injector = createInjector(servletContext);
         	if (injector == null) { 
         		failStartup("Could not create injector: createInjector() returned null"); 
         	} 
@@ -69,16 +69,27 @@ public class GuiceServletContextListener implements ServletContextListener {
         } 
     } 
     
-    private Injector createInjector() throws Exception {
-        return Guice.createInjector(
-        		new ObmSyncModule(),
-        		new MessageQueueModule(),
-        		new TransactionalModule(),
-        		new SolrJmsModule(),
-        		new HealthCheckModule(),
-        		new HealthCheckDefaultHandlersModule()
-    		);
+    private Injector createInjector(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    	
+        return Guice.createInjector(selectGuiceModule(servletContext));
     }
+
+    @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
+	}
+
+    @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    	
+		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
+		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
+			return null;
+		}
+		return (Module) Class.forName(guiceModuleClassName).newInstance();
+	}
     
     private void failStartup(String message) { 
         throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
