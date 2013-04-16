@@ -61,13 +61,13 @@ import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.filter.Slow;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.push.arquillian.SlowGuiceArquillianRunner;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.H2GuiceServletContextListener;
 import org.obm.sync.ModuleUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncStaticConfigurationService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
+import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.impl.SyncClientException;
@@ -85,7 +85,7 @@ import com.google.common.collect.FluentIterable;
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@RunWith(SlowGuiceArquillianRunner.class) @Slow
+@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
 public class CalendarBindingImplIntegrationTest {
 	
 	@ArquillianResource URL baseURL;

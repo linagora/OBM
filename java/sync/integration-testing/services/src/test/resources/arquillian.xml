@@ -6,7 +6,7 @@
         
     <container qualifier="tomcat-managed-6" default="true">
         <configuration>
-            <property name="catalinaHome">${user.home}/dev/bin/tomcat/apache-tomcat-6.0.36</property>
+            <property name="catalinaHome">/tmp/tomcat/apache-tomcat-6.0.20</property>
             <property name="user">arquillian</property>
             <property name="pass">arquillian</property>
         </configuration>
