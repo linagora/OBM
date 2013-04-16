@@ -3347,9 +3347,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
       foreach ($attendee['entity'] as $c_id => $entity) {
         $label = $entity['label'];
         $state = $entity['state'];
-        $ACCEPTED = '';
-        ${'NEEDS-ACTION'} = '';
-        $DECLINED = '';
+        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $owner) && $access_rights =='rw' && $block_status == false) {
+          $ACCEPTED = '';
+          ${'NEEDS-ACTION'} = '';
+          $DECLINED = '';
           $$state = "checked=\"checked\" disabled";
           $urld = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
 
@@ -3363,6 +3364,22 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
           </td>
           </tr>";
           $$state = '';
+        } else {
+          $ACCEPTED = 'class="disabled"';
+          ${'NEEDS-ACTION'} = 'class="disabled"';
+          $DECLINED = 'class="disabled"';
+          $$state = '';
+
+          $dis_contact_list .= "
+            <tr>
+            <td>$label</td>
+            <td class=\"C\">
+            <span $ACCEPTED> $l_accepted</span>
+            <span ${'NEEDS-ACTION'}> $l_needs_action</span>
+            <span $DECLINED> $l_declined</span>
+            </td>
+            </tr>";
+        }
       }
     }
   }
