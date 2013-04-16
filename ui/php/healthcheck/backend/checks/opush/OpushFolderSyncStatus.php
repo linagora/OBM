@@ -40,7 +40,7 @@ class OpushFolderSyncStatus extends AbstractUserStatus {
     $user = $this->getTestUser();
     $servers = of_domain_get_domain_opushfrontendserver($domain["id"]);
     if (empty($servers)) {
-      return new CheckResult(CheckStatus::WARNING, array("Domain '" . $domain["name"] . "' has no associated OPush frontend server."));
+      return new CheckResult(CheckStatus::OK);
     }
 
     try {
