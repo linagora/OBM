@@ -760,13 +760,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	@Override
 	public Event anonymizePrivateItems() {
-		Preconditions.checkState(this.privacy == EventPrivacy.PRIVATE
-				|| this.privacy == EventPrivacy.PUBLIC, "Cannot handle the privacy level "
-				+ this.privacy);
 		if (this.privacy == EventPrivacy.PRIVATE) {
 			return this.anonymize();
 		} else {
-			return this.clone();
+			return this;
 		}
 	}
 

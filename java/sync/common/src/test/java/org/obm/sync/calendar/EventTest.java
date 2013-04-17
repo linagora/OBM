@@ -1311,6 +1311,14 @@ public class EventTest {
 
 		assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
 	}
+	
+	@Test
+	public void testAnonymizeConfidentialEvent() {
+		Event confidentialEvent = createNonRecurrentEventWithMostFields();
+		confidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+
+		assertThat(confidentialEvent.anonymizePrivateItems()).isEqualTo(confidentialEvent);
+	}
 
 	@Test
 	public void testAnonymizePrivateEvent() {
