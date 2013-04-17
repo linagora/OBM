@@ -3064,10 +3064,12 @@ function run_query_userobm_mobile_add_partnership($user) {
   $query = "INSERT INTO opush_sync_perms(
     owner,
     device_id,
-    policy) VALUES(
+    policy,
+    pending_accept) VALUES(
     '".$obm_q->escape($owner)."',
     '$device_id',
-    NULL)";
+    NULL,
+    false)";
   $obm_q->query($query);
 }
 
