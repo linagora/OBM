@@ -29,43 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.sync;
 
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
-import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
-import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
-import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSnapshotDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
-import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
-import org.obm.push.store.jdbc.TransactionDateProvider;
-import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
 
-public class DaoModule extends AbstractModule{
+public class DatabaseModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-
-		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
-		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
-		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
-		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
-		bind(DateProvider.class).to(TransactionDateProvider.class);
+		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
+		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
 	}
-
 }

@@ -48,8 +48,6 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,18 +78,17 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	public DatabaseConnectionProviderImpl(
 			ITransactionAttributeBinder transactionAttributeBinder,
 			DatabaseConfiguration databaseConfiguration,
+			DatabaseDriverConfiguration driverConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
 		this.databaseConfiguration = databaseConfiguration;
+		this.driverConfiguration = driverConfiguration;
 
 		configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
 		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
 		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
-		configurationLogger.info("Databse login : {}", databaseConfiguration.getDatabaseLogin());
+		configurationLogger.info("Database login : {}", databaseConfiguration.getDatabaseLogin());
 		logger.info("Starting OBM connection pool...");
-
-		driverConfiguration = buildDriverConfigurationForDatabaseFlavour(databaseConfiguration
-				.getDatabaseSystem());
 
 		poolingDataSource = new PoolingDataSource();
 		poolingDataSource.setClassName(driverConfiguration.getDataSourceClassName());
@@ -105,19 +102,6 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		poolingDataSource.setShareTransactionConnections(true);
 
 		poolingDataSource.init();
-	}
-
-	private DatabaseDriverConfiguration buildDriverConfigurationForDatabaseFlavour(DatabaseFlavour databaseFlavour) {
-		DatabaseDriverConfiguration driverConfiguration = null;
-		if (databaseFlavour.equals(DatabaseFlavour.PGSQL)) {
-			driverConfiguration = new PostgresDriverConfiguration();
-		} else if (databaseFlavour.equals(DatabaseFlavour.MYSQL)) {
-			driverConfiguration = new MySQLDriverConfiguration();
-		} else {
-			throw new IllegalArgumentException(
-					"No connection factory found for database flavour: [" + databaseFlavour + "]");
-		}
-		return driverConfiguration;
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {

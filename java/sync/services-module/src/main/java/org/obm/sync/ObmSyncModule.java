@@ -39,13 +39,9 @@ import java.util.ServiceLoader;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.locator.store.LocatorCache;
@@ -94,6 +90,7 @@ public class ObmSyncModule extends AbstractModule {
 	protected void configure() {
 		install(new MessageQueueModule());
 		install(new TransactionalModule());
+		install(new DatabaseModule());
 		install(new SolrJmsModule());
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
@@ -106,12 +103,10 @@ public class ObmSyncModule extends AbstractModule {
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 		bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
 		bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(HelperService.class).to(HelperServiceImpl.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
 		bind(ObmSyncConfigurationService.class).to(ObmSyncConfigurationServiceImpl.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
 		bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
