@@ -82,6 +82,8 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 import fr.aliacom.obm.utils.HelperService;
 
 @RunWith(SlowFilterRunner.class)
@@ -310,6 +312,7 @@ public class LoginHandlerTest {
 			bindMock(ObmSmtpConf.class);
 			bindMock(ITemplateLoader.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+			bind(ObmSyncConfigurationService.class).to(ObmSyncConfigurationServiceImpl.class);
 			
 			expect(domainService.findDomainByName(isA(String.class))).andAnswer(new IAnswer<ObmDomain>() {
 				@Override

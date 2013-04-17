@@ -80,6 +80,8 @@ import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.freebusy.DatabaseFreeBusyProvider;
 import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.HelperServiceImpl;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -108,6 +110,7 @@ public class ObmSyncModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(HelperService.class).to(HelperServiceImpl.class);
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+		bind(ObmSyncConfigurationService.class).to(ObmSyncConfigurationServiceImpl.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
