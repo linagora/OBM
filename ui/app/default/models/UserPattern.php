@@ -763,7 +763,7 @@ class UserPattern {
     if (!empty($meta_attribute) && !empty($this->attributes[$attribute])) {
       $type = $meta_attribute['type'];
       $generate_func = "generate_{$type}";
-      $this->$generate_func(&$generated, $attribute);
+      $this->$generate_func($generated, $attribute);
     } else {
       $generated[$attribute] = '';
     }
