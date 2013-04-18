@@ -1,0 +1,14 @@
+<arquillian xmlns="http://jboss.org/schema/arquillian"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://jboss.org/schema/arquillian
+        http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+        
+    <container qualifier="tomcat-managed-6" default="true">
+        <configuration>
+            <property name="catalinaHome">${user.home}/tomcat_path</property>
+            <property name="user">arquillian</property>
+            <property name="pass">arquillian</property>
+        </configuration>
+    </container>
+</arquillian>
