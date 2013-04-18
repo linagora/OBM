@@ -103,7 +103,7 @@ function html_plannedtask_cell($colspan,$rowspan,$bgcolor,$label,$urlparams=fals
   return $block;
 }
 
-function inc_stats($stats,$day,$duration,$rows,$type)
+function inc_stats(&$stats,$day,$duration,$rows,$type)
 {
   if(!is_array($stats))
   return;
@@ -116,6 +116,7 @@ function inc_stats($stats,$day,$duration,$rows,$type)
   $stats["user"][$type] += $duration*$rows;
   $stats["user"][S_TOTAL] += $duration*$rows;
 }
+
 function html_pourcent_cell($value,$bgcolor=true)
 { 
   if($bgcolor)
@@ -369,7 +370,7 @@ function dis_planning_user_month($obm_q, $params ) {
 
   $block .= "<table class=\"planning\">\n";
 
-  $d = dis_planning_month_userslines($year,$month,$first_day,$last_day,$params['group_id'],&$array_res,&$planning,&$stats);
+  $d = dis_planning_month_userslines($year,$month,$first_day,$last_day,$params['group_id'],$array_res,$planning,$stats);
 
   if(! $reportingmode )
   {
@@ -463,7 +464,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
               $r = 2;
               $block.= html_plannedtask_cell($s,$r,"#cccccc",' ');
               $type = S_FERIE_NONPRESENT;
-              inc_stats(&$stats,$day,$s,$r,$type);
+              inc_stats($stats,$day,$s,$r,$type);
             }
             $day++;
           }
@@ -484,7 +485,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
             $c = $taskgroups[$type]['bgcolor'];
             $r = $user_planning[$day][$period]["rowspan"];
             $block.= html_plannedtask_cell($s,$r,$c,$v,"action=detailupdate&amp;plannedtask_id=".$user_planning[$day][$period]["id"].($j>0?"&returnline=$j":""));
-            inc_stats(&$stats,$day,$s,$r,$type);
+            inc_stats($stats,$day,$s,$r,$type);
             $day+=$s-1;
           }
 	  else if(is_integer($user_planning[$day][$period]))
@@ -500,7 +501,7 @@ function dis_planning_month_userslines($year,$month,$first_day,$last_day,$group_
             $r = 1; //$user_planning[$day][$period]["rowspan"];
             $block.= html_plannedtask_cell($s,$r,"white","_","action=new&amp;datebegin=$mdatebegin&amp;user=$u_id&period=ALLDAY".($j>0?"&line=$j":""));
             $type=S_INTERCONTRAT;
-            inc_stats(&$stats,$day,$s,$r,$type);
+            inc_stats($stats,$day,$s,$r,$type);
           }
  //         else $block.="<td>".$day."|".$period."</td>";
      
@@ -1093,7 +1094,7 @@ function dis_planning_admin_index() {
   return $block;
 }
 
-function html_tasktypegroup_select($tasktype_id,$tasktypegroup_sel,$tasktypegroups)
+function html_tasktypegroup_select($tasktype_id,$tasktypegroup_sel,&$tasktypegroups)
 {
   $bgcolor = $tasktypegroups[$tasktypegroup_sel]['bgcolor'];
   $fgcolor = $tasktypegroups[$tasktypegroup_sel]['fgcolor'];
@@ -1179,7 +1180,7 @@ function html_planning_admin_form($ttg_q,$tasktypegroups) {
     <tr $class>
     <input type=\"hidden\" id=\"tasktype_$id\" value=\"$id\" />
     <td>$label</td>
-    <td> ".html_tasktypegroup_select($id,$ttg,&$tasktypegroups)." </td>
+    <td> ".html_tasktypegroup_select($id,$ttg,$tasktypegroups)." </td>
     <td>
       <a href=\"#\" onclick=\"return updateLine($id,'tasktype');\">
       <img src=\"$ico_ok\" alt=\"$l_type_update\" title=\"$l_type_update\" />
