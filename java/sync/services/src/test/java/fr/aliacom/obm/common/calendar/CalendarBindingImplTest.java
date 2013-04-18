@@ -42,6 +42,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reportMatcher;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -60,6 +61,8 @@ import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.apache.commons.io.IOUtils;
+import org.easymock.IArgumentMatcher;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
@@ -2615,6 +2618,92 @@ public class CalendarBindingImplTest {
 		assertThat(eventObmId).isEqualTo(event.getObmId());
 	}
 	
+	@Test
+	public void testImportICSWithoutOrganizerNorAttendees() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String domainName = "test.tlse.lng", calendar = "user@" + domainName;
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/eventWithoutOrganizerNorAttendees.ics"));
+
+		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(true).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).times(2);
+		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
+		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(obmUser);
+		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithSingleAttendeeAsOrganizer(), eq(true))).andReturn(null);
+		mocksControl.replay();
+
+		binding.importICalendar(token, calendar, ics, null);
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testImportICSWithoutOrganizerNorAttendeesSetsOwner() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String domainName = "test.tlse.lng", calendar = "user@" + domainName;
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/eventWithoutOrganizerNorAttendees.ics"));
+
+		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(true).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).times(2);
+		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
+		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(obmUser);
+		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithDefinedOwner(), eq(true))).andReturn(null);
+		mocksControl.replay();
+
+		binding.importICalendar(token, calendar, ics, null);
+
+		mocksControl.verify();
+	}
+
+	private static Event eventWithDefinedOwner() {
+		reportMatcher(new IArgumentMatcher() {
+			@Override
+			public boolean matches(Object argument) {
+				if (!(argument instanceof Event)) {
+					return false;
+				}
+
+				Event event = (Event) argument;
+
+				return event.getOwnerEmail() != null || event.getOwner() != null;
+			}
+
+			@Override
+			public void appendTo(StringBuffer buffer) {
+				buffer.append("event with a defined 'owner' or 'ownerEmail'");
+			}
+		});
+
+		return null;
+	}
+
+	private static Event eventWithSingleAttendeeAsOrganizer() {
+		reportMatcher(new IArgumentMatcher() {
+			@Override
+			public boolean matches(Object argument) {
+				if (!(argument instanceof Event)) {
+					return false;
+				}
+
+				Event event = (Event) argument;
+
+				if (Iterables.size(event.getAttendees()) != 1) {
+					return false;
+				}
+
+				return Iterables.getFirst(event.getAttendees(), null).isOrganizer();
+			}
+
+			@Override
+			public void appendTo(StringBuffer buffer) {
+				buffer.append("event with a single organizer attendee");
+			}
+		});
+
+		return null;
+	}
+
 	private void expectNoRightsForCalendar(String calendar) {
 		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();
 		expect(helperService.canReadCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();

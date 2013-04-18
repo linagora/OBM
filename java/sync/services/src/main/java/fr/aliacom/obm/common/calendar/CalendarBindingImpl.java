@@ -80,6 +80,7 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.AttendeeService;
@@ -91,6 +92,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
@@ -1508,6 +1510,24 @@ public class CalendarBindingImpl implements ICalendar {
 	private void addAttendeeForCalendarOwner(final AccessToken token, final String calendar, final Event event) {
 		Attendee attendee = attendeeService.findUserAttendee(null, calendar, token.getDomain());
 			
+		if (Iterables.isEmpty(event.getAttendees())) {
+			attendee = UserAttendee
+					.builder()
+					.asOrganizer()
+					.canWriteOnCalendar(attendee.isCanWriteOnCalendar())
+					.displayName(attendee.getDisplayName())
+					.email(attendee.getEmail())
+					.entityId(attendee.getEntityId())
+					.participation(Participation.accepted())
+					.participationRole(attendee.getParticipationRole())
+					.percent(attendee.getPercent())
+					.build();
+
+			// Because we're handling the case where noone attends the event yet
+			// So we're adding the calendar owner as the organizer and as such, he's the owner of the event
+			event.setOwnerEmail(attendee.getEmail());
+		}
+
 		event.getAttendees().add(attendee);
 	}
 
