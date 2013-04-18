@@ -41,7 +41,7 @@ use vars qw( @EXPORT_OK $VERSION );
 use base qw(Exporter);
 
 use MIME::Base64;
-use Digest::SHA1;
+use Digest::SHA;
 use Digest::MD5;
 use Crypt::SmbHash;
 
@@ -91,7 +91,7 @@ sub _toSsha {
     my( $passwdPlain ) = @_;
 
     my $salt = join '', ('a'..'z')[rand 26,rand 26,rand 26,rand 26,rand 26,rand 26,rand 26,rand 26];
-    my $cryptPass = Digest::SHA1->new;
+    my $cryptPass = Digest::SHA->new;
 
     $cryptPass->add( $passwdPlain );
     $cryptPass->add( $salt );
