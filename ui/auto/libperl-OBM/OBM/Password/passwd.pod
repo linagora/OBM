@@ -8,7 +8,7 @@ de chiffrage nécéssaires.
  use OBM::Parameters::common;
  use MIME::Base64;
  use Digest::MD5;
- use Digest::SHA1;
+ use Digest::SHA;
 
 =head1 DESCRIPTION
 

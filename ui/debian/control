@@ -99,7 +99,7 @@ Description: web interface configuration for OBM
 Package: libobm-perl
 Section: perl
 Architecture: all
-Depends: libnet-telnet-perl, libcyrus-imap-perl23|libcyrus-imap-perl22, libnet-server-perl, libcrypt-smbhash-perl, libdigest-sha1-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, libclass-singleton-perl, libdbi-perl, libdbd-pg-perl | libdbd-mysql-perl, libsasl2-modules, libio-socket-ssl-perl, libxml-simple-perl, liblog-log4perl-perl, ${perl:Depends}, ${misc:Depends}
+Depends: libnet-telnet-perl, libcyrus-imap-perl23|libcyrus-imap-perl22, libnet-server-perl, libcrypt-smbhash-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, libclass-singleton-perl, libdbi-perl, libdbd-pg-perl | libdbd-mysql-perl, libsasl2-modules, libio-socket-ssl-perl, libxml-simple-perl, liblog-log4perl-perl, ${perl:Depends}, ${misc:Depends}
 Description: library for the integration of OBM with LDAP/Postfix/Cyrus
  This package contains the library used by obm-services to interact with LDAP,
  Postfix and Cyrus.
