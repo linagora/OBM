@@ -287,4 +287,15 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 				}));
 		return anonymizedRecurrence;
 	}
+
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(this)
+				.add("kind", kind)
+				.add("end", end)
+				.add("frequence", frequence)
+				.add("days", days)
+				.toString();
+	}
 }

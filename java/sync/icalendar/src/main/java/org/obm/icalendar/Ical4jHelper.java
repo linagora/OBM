@@ -1221,109 +1221,90 @@ public class Ical4jHelper {
 		}
 		return false;
 	}
-	
-	private void appendRecurence(Event event, CalendarComponent component) {
-		RRule rrule = (RRule) component.getProperties().getProperty(
-				Property.RRULE);
 
+	private void appendRecurence(Event event, CalendarComponent component) {
 		EventRecurrence er = new EventRecurrence();
+		RRule rrule = (RRule) component.getProperty(Property.RRULE);
 		EnumSet<RecurrenceDay> recurrenceDays = EnumSet.noneOf(RecurrenceDay.class);
+
 		if (rrule != null) {
 			Recur recur = rrule.getRecur();
-			boolean setDays = false;
-			for (Object ob : recur.getDayList()) {
-				WeekDay weekDay = (WeekDay) ob;
-				RecurrenceDay recurrenceDay = WEEK_DAY_TO_RECURRENCE_DAY.get(weekDay);
-				if (recurrenceDay == null) {
-					throw new IllegalArgumentException("Unknown week day " + weekDay);
-				}
-				recurrenceDays.add(recurrenceDay);
-				setDays = true;
-			}
-			if (Recur.WEEKLY.equals(rrule.getRecur().getFrequency())
-					&& !setDays) {
-				DtStart start = (DtStart) component.getProperties()
-						.getProperty(Property.DTSTART);
-				GregorianCalendar cal = new GregorianCalendar();
-				cal.setTime(start.getDate());
-				switch (cal.get(GregorianCalendar.DAY_OF_WEEK)) {
-				case 1:
-					recurrenceDays.add(RecurrenceDay.Sunday);
-					break;
-				case 2:
-					recurrenceDays.add(RecurrenceDay.Monday);
-					break;
-				case 3:
-					recurrenceDays.add(RecurrenceDay.Tuesday);
-					break;
-				case 4:
-					recurrenceDays.add(RecurrenceDay.Wednesday);
-					break;
-				case 5:
-					recurrenceDays.add(RecurrenceDay.Thursday);
-					break;
-				case 6:
-					recurrenceDays.add(RecurrenceDay.Friday);
-					break;
-				case 7:
-					recurrenceDays.add(RecurrenceDay.Saturday);
-					break;
+			String frequency = recur.getFrequency();
+
+			if (Recur.WEEKLY.equals(frequency) || Recur.DAILY.equals(frequency)) {
+				for (Object ob : recur.getDayList()) {
+					recurrenceDays.add(weekDayToRecurrenceDay((WeekDay) ob));
 				}
 
+				if (Recur.WEEKLY.equals(frequency) && recurrenceDays.isEmpty()) {
+					GregorianCalendar cal = getEventStartCalendar(event);
+					WeekDay eventStartWeekDay = WeekDay.getDay(cal.get(GregorianCalendar.DAY_OF_WEEK));
+
+					recurrenceDays.add(WEEK_DAY_TO_RECURRENCE_DAY.get(eventStartWeekDay));
+				}
 			}
+
 			er.setDays(new RecurrenceDays(recurrenceDays));
 			er.setEnd(recur.getUntil());
-			PropertyList exdates = component.getProperties(Property.EXDATE);
-			Set<Date> dates = new HashSet<Date>();
-			for (Object ob : exdates) {
-				ExDate exdate = (ExDate) ob;
-				DateList dl = exdate.getDates();
-				for (Object date : dl) {
-					dates.add((Date) date);
-				}
-			}
+			er.setFrequence(Math.max(recur.getInterval(), 1)); // getInterval() returns -1 if no interval is defined
 
-			for (Date d : dates) {
-				er.addException(d);
-			}
-
-			er.setFrequence(recur.getInterval());
 			if (er.getDays().isEmpty()) {
-				if (Recur.DAILY.equals(recur.getFrequency())) {
+				if (Recur.DAILY.equals(frequency)) {
 					er.setKind(RecurrenceKind.daily);
-				} else if (Recur.WEEKLY.equals(recur.getFrequency())) {
+				} else if (Recur.WEEKLY.equals(frequency)) {
 					er.setKind(RecurrenceKind.weekly);
-				} else if (Recur.MONTHLY.equals(recur.getFrequency())) {
+				} else if (Recur.MONTHLY.equals(frequency)) {
 					WeekDayList wdl = recur.getDayList();
 
 					if (wdl.size() > 0) {
+						WeekDay day = (WeekDay) wdl.get(0);
+						GregorianCalendar cal = getEventStartCalendar(event);
+
 						er.setKind(RecurrenceKind.monthlybyday);
-						GregorianCalendar cal = new GregorianCalendar();
-						cal.setTime(event.getStartDate());
-						cal.set(GregorianCalendar.WEEK_OF_MONTH,
-								((WeekDay) wdl.get(0)).getOffset());
-						cal.set(GregorianCalendar.DAY_OF_WEEK,
-								WeekDay.getCalendarDay((WeekDay) wdl.get(0)));
+						cal.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
+						cal.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
 						event.setStartDate(cal.getTime());
 					} else {
 						er.setKind(RecurrenceKind.monthlybydate);
 					}
 
-				} else if (Recur.YEARLY.equals(recur.getFrequency())) {
+				} else if (Recur.YEARLY.equals(frequency)) {
 					er.setKind(RecurrenceKind.yearly);
 				}
-
 			} else {
 				er.setKind(RecurrenceKind.weekly);
 			}
 		}
-		if (er.getKind() == null) {
-			er.setKind(RecurrenceKind.none);
-		}
-		if (er.getFrequence() < 1) {
-			er.setFrequence(1);
-		}
+
 		event.setRecurrence(er);
+
+		appendNegativeExceptions(event, component.getProperties(Property.EXDATE));
+	}
+
+	private void appendNegativeExceptions(Event event, PropertyList exdates) {
+		for (Object ob : exdates) {
+			for (Object date : ((ExDate) ob).getDates()) {
+				event.getRecurrence().addException((Date) date);
+			}
+		}
+	}
+
+	private RecurrenceDay weekDayToRecurrenceDay(WeekDay weekDay) {
+		RecurrenceDay recurrenceDay = WEEK_DAY_TO_RECURRENCE_DAY.get(weekDay);
+
+		if (recurrenceDay == null) {
+			throw new IllegalArgumentException("Unknown week day " + weekDay);
+		}
+
+		return recurrenceDay;
+	}
+
+	private GregorianCalendar getEventStartCalendar(Event event) {
+		GregorianCalendar cal = new GregorianCalendar();
+
+		cal.setTime(event.getStartDate());
+
+		return cal;
 	}
 
 	private void appendAttendees(Event event, Component vEvent, ObmDomain domain, Integer ownerId) {

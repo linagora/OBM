@@ -90,13 +90,13 @@ import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.StringContains;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
@@ -127,6 +127,7 @@ import org.obm.sync.services.AttendeeService;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -1711,5 +1712,154 @@ public class Ical4jHelperTest {
 		Event event = buildAllDayEvent(DateUtils.date("2013-03-28T17:00:00Z"), "Asia/Bangkok", 1);
 		
 		assertIcsEquals("alldayOneDay.ics", ical4jHelper.buildIcs(ical4jUser, ImmutableList.of(event), token));
+	}
+
+	private EventRecurrence getRecurrence(RecurrenceKind kind, int frequence) {
+		return getRecurrence(kind, frequence, null);
+	}
+
+	private EventRecurrence getRecurrence(RecurrenceKind kind, int frequence, RecurrenceDays days) {
+		EventRecurrence rec = new EventRecurrence();
+
+		rec.setKind(kind);
+		rec.setFrequence(frequence);
+		if (days != null) {
+			rec.setDays(days);
+		}
+
+		return rec;
+	}
+
+	private void assertRecurrenceEquals(Event event, EventRecurrence recurrence) {
+		assertThat(event.getRecurrence()).isEqualTo(recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDateRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDate.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybydate, 1);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDateFreq3RecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDateFreq3.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybydate, 3);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithDailyRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("daily.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.daily, 1);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithDailyFreq4RecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("dailyFreq4.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.daily, 4);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithWeeklyRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("weekly.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 1, new RecurrenceDays(RecurrenceDay.Wednesday)); // 2013-04-17 is wedsneday
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithWeeklyAllDaysRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("weeklyAllDays.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 1, RecurrenceDays.ALL_DAYS);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithWeeklyAllDaysFreq3RecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("weeklyAllDaysFreq3.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 3, RecurrenceDays.ALL_DAYS);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithYearlyRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("yearly.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.yearly, 1);
+
+		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDay3WRRecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDay3WE.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 1);
+		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
+
+		assertThat(event.getStartDate()).isEqualTo(DateUtils.date("2013-04-17T12:00:00Z")); // 3WE of 2013/04
+		assertRecurrenceEquals(event, recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDayMinus1SURecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDay-1SU.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 1);
+		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
+
+		assertThat(event.getStartDate()).isEqualTo(DateUtils.date("2013-04-28T12:00:00Z")); // -1SU of 2013/04
+		assertRecurrenceEquals(event, recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDayMinus2TURecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDay-2TU.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 3);
+		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
+
+		assertThat(event.getStartDate()).isEqualTo(DateUtils.date("2013-04-23T12:00:00Z")); // -2TU of 2013/04
+		assertRecurrenceEquals(event, recurrence);
+	}
+
+	@Test
+	public void testParseIcsWithMonthlyByDay2MORecurrentEvent() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("monthlyByDay2MO.ics"));
+		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 2);
+		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
+
+		assertThat(event.getStartDate()).isEqualTo(DateUtils.date("2013-04-08T12:00:00Z")); // 2MO of 2013/04
+		assertRecurrenceEquals(event, recurrence);
+	}
+
+	@Test
+	public void testParceIcsHandlesEXDATEs() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("eventWithEXDATEs.ics"));
+		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
+		Set<Date> expectedExceptions = ImmutableSet.of(
+				DateUtils.date("2005-01-13T21:00:00Z"),
+				DateUtils.date("2005-01-14T21:00:00Z"),
+				DateUtils.date("2005-02-01T21:00:00Z"));
+
+		assertThat(event.getRecurrence().getExceptions()).isEqualTo(expectedExceptions);
 	}
 }

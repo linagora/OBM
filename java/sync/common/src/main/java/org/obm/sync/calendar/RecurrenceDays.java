@@ -147,4 +147,9 @@ public class RecurrenceDays implements Set<RecurrenceDay>, Serializable {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
+	}
 }
