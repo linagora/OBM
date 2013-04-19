@@ -38,15 +38,12 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.domain.DomainDao;
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
+import fr.aliacom.obm.common.user.UserService;
 
 /**
  * Retrieves freebusy data from the local database.
@@ -54,17 +51,15 @@ import fr.aliacom.obm.common.user.UserDao;
 @Singleton
 public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	private Ical4jHelper ical4jHelper;
-	private DomainDao domainDao;
-	private UserDao userDao;
 	private CalendarDao calendarDao;
+	private UserService userService;
 
 	@Inject
-	/* package */DatabaseFreeBusyProvider(Ical4jHelper ical4jHelper, DomainDao domainDao,
-			UserDao userDao, CalendarDao calendarDao) {
+	/* package */DatabaseFreeBusyProvider(
+			Ical4jHelper ical4jHelper, CalendarDao calendarDao, UserService userService) {
 		this.ical4jHelper = ical4jHelper;
-		this.domainDao = domainDao;
-		this.userDao = userDao;
 		this.calendarDao = calendarDao;
+		this.userService = userService;
 	}
 
 	@Override
@@ -81,8 +76,7 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 
 	private FreeBusy findFreeBusy(FreeBusyRequest fbr) throws PrivateFreeBusyException {
 		String email = fbr.getOwner();
-		String domainName = findDomainName(email);
-		ObmUser user = findObmUser(email, domainName);
+		ObmUser user = userService.getUserFromEmail(email);
 		if (user == null) {
 			return null;
 		}
@@ -97,26 +91,5 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 			freeBusy = freeBusyList.get(0);
 		}
 		return freeBusy;
-	}
-
-	private ObmUser findObmUser(String email, String domainName) {
-		ObmDomain domain = null;
-		ObmUser user = null;
-		if (!Strings.isNullOrEmpty(domainName)) {
-			domain = domainDao.findDomainByName(domainName);
-		}
-		if (domain != null) {
-			user = userDao.findUser(email, domain);
-		}
-		return user;
-	}
-
-	private String findDomainName(String email) {
-		String[] parts = email.split("@");
-		String domain = null;
-		if (parts.length > 1) {
-			domain = parts[1];
-		}
-		return domain;
 	}
 }

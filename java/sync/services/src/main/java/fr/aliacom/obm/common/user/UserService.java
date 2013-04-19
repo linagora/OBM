@@ -42,7 +42,7 @@ public interface UserService {
 	ObmUser getUserFromLogin(String login, String domainName);
 	ObmUser getUserFromCalendar(String calendar, String domainName) throws FindException;
 	ObmUser getUserFromAttendee(Attendee organizer, String domainName);
+	ObmUser getUserFromEmail(String email);
 	String getLoginFromEmail(String email);
 	String getDomainNameFromEmail(String email);
-	
 }

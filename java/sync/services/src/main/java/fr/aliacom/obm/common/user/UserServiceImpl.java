@@ -109,14 +109,15 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public String getLoginFromEmail(String email) {
-		ObmUser obmUser = findUserFromEmail(email);
+		ObmUser obmUser = getUserFromEmail(email);
 		if (obmUser != null && obmUser.getLogin() != null) {
 			return obmUser.getLogin();
 		}
 		return null;
 	}
 
-	private ObmUser findUserFromEmail(String email) {
+	@Override
+	public ObmUser getUserFromEmail(String email) {
 		String domainName = getDomainNameFromEmail(email);
 		if (domainName != null) {
 			ObmDomain obmDomain = domainService.findDomainByName(domainName);

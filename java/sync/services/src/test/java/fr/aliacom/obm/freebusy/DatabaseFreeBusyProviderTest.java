@@ -7,6 +7,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.List;
 
 import org.easymock.IMocksControl;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +25,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.domain.DomainDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
+import fr.aliacom.obm.common.user.UserService;
 
 @RunWith(SlowFilterRunner.class)
 public class DatabaseFreeBusyProviderTest {
@@ -40,8 +40,7 @@ public class DatabaseFreeBusyProviderTest {
 			bind(IMocksControl.class).toInstance(mocksControl);
 			
 			bindWithMock(Ical4jHelper.class);
-			bindWithMock(DomainDao.class);
-			bindWithMock(UserDao.class);
+			bindWithMock(UserService.class);
 			bindWithMock(CalendarDao.class);
 		}
 		
@@ -60,29 +59,34 @@ public class DatabaseFreeBusyProviderTest {
 	@Inject
 	private Ical4jHelper ical4jHelper;
 	@Inject
-	private DomainDao domainDao;
-	@Inject
-	private UserDao userDao;
+	private UserService userService;
 	@Inject
 	private CalendarDao calendarDao;
 	
 	private final static String DOMAIN = "domain";
 	private final static String ICS = "ics";
+	private final static String OWNER_LOGIN = "owner";
+	private final static String OWNER_EMAIL = "owner@domain";
+
+	private ObmDomain domain;
+	private ObmUser user;
+	
+	@Before
+	public void setUp() {
+		domain = ObmDomain.builder().name(DOMAIN).build();
+		user = ObmUser.builder().uid(1).login(OWNER_LOGIN).domain(domain).publicFreeBusy(true).build();
+	}
 	
 	@Test
 	public void testFindFreeBusyIcs() throws FreeBusyException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
-		
-		ObmDomain domain = ObmDomain.builder().name(DOMAIN).build();
-		ObmUser user = ObmUser.builder().uid(1).login("owner").domain(domain).publicFreeBusy(true).build();
 		
 		FreeBusy freeBusy = buildFakeFreeBusyResponse();
 		
 		List<FreeBusy> freeBusyList = Lists.newArrayList();
 		freeBusyList.add(freeBusy);
 		
-		expect(domainDao.findDomainByName(DOMAIN)).andReturn(domain);
-		expect(userDao.findUser("owner@domain", domain)).andReturn(user);
+		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
 		expect(calendarDao.getFreeBusy(domain, fbr)).andReturn(freeBusyList);
 		expect(ical4jHelper.parseFreeBusy(freeBusy)).andReturn(ICS);
 		
@@ -99,11 +103,9 @@ public class DatabaseFreeBusyProviderTest {
 	public void testFindFreeBusyIcsThrowPrivateFreebusyException() throws FreeBusyException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
-		ObmDomain domain = ObmDomain.builder().name(DOMAIN).build();
-		ObmUser user = ObmUser.builder().uid(1).login("owner").domain(domain).publicFreeBusy(false).build();
+		ObmUser user = ObmUser.builder().uid(1).login(OWNER_LOGIN).domain(domain).publicFreeBusy(false).build();
 		
-		expect(domainDao.findDomainByName(DOMAIN)).andReturn(domain);
-		expect(userDao.findUser("owner@domain", domain)).andReturn(user);
+		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
 		
 		mocksControl.replay();
 		
@@ -120,10 +122,7 @@ public class DatabaseFreeBusyProviderTest {
 	public void testFindFreeBusyIcsReturnNullOnNullObmUser() throws FreeBusyException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
-		ObmDomain domain = ObmDomain.builder().name(DOMAIN).build();
-		
-		expect(domainDao.findDomainByName(DOMAIN)).andReturn(domain);
-		expect(userDao.findUser("owner@domain", domain)).andReturn(null);
+		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(null);
 		
 		mocksControl.replay();
 		
@@ -138,16 +137,12 @@ public class DatabaseFreeBusyProviderTest {
 	public void testFindFreeBusyIcsReturnNullOnNullIcal4jHelper() throws FreeBusyException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
-		ObmDomain domain = ObmDomain.builder().name(DOMAIN).build();
-		ObmUser user = ObmUser.builder().uid(1).login("owner").domain(domain).publicFreeBusy(true).build();
-		
 		FreeBusy freeBusy = buildFakeFreeBusyResponse();
 		
 		List<FreeBusy> freeBusyList = Lists.newArrayList();
 		freeBusyList.add(freeBusy);
 		
-		expect(domainDao.findDomainByName(DOMAIN)).andReturn(domain);
-		expect(userDao.findUser("owner@domain", domain)).andReturn(user);
+		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
 		expect(calendarDao.getFreeBusy(domain, fbr)).andReturn(freeBusyList);
 		expect(ical4jHelper.parseFreeBusy(freeBusy)).andReturn(null);
 		
@@ -164,7 +159,7 @@ public class DatabaseFreeBusyProviderTest {
 		FreeBusyRequest freeBusyRequest = new FreeBusyRequest();
 		freeBusyRequest.setStart(DateUtils.date("2013-01-01T14:00:00"));
 		freeBusyRequest.setEnd(DateUtils.date("2013-02-01T14:00:00"));
-		freeBusyRequest.setOwner("owner@domain");
+		freeBusyRequest.setOwner(OWNER_EMAIL);
 		freeBusyRequest.setUid("1");
 		freeBusyRequest.addAttendee(UserAttendee.builder().email("attendee@domain").build());
 		return freeBusyRequest;
@@ -185,7 +180,7 @@ public class DatabaseFreeBusyProviderTest {
 		freeBusy.setAtt(UserAttendee.builder().email("attendee@domain").build());
 		freeBusy.setStart(DateUtils.date("2013-01-01T14:00:00"));
 		freeBusy.setEnd(DateUtils.date("2013-02-01T14:00:00"));
-		freeBusy.setOwner("owner@domain");
+		freeBusy.setOwner(OWNER_EMAIL);
 		freeBusy.setUid("1");
 		freeBusy.addFreeBusyInterval(freeBusyInterval);
 		freeBusy.addFreeBusyInterval(freeBusyInterval2);
