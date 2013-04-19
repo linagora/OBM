@@ -4,7 +4,7 @@
             "id": "ConnectionStatus",
             "name": "Database connection Check",
             "description": "Checks that the database system is up and running by opening a connection.",
-            "url": "http://obm.org",
+            "url": null,
             "parentId": null
         },
         {

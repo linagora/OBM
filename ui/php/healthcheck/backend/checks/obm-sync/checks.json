@@ -11,7 +11,7 @@
             "id": "ConnectionStatus",
             "name": "OBM-Sync Connection Check",
             "description": "Checks that the obm-sync server(s) are up and running.",
-            "url": "http://obm.org/wiki/configuration-0",
+            "url": null,
             "parentId": null
         },
         {

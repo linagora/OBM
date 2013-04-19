@@ -31,7 +31,9 @@
 							<a class="btn btn-warning btn-small retryButton" type="button" data-module="{{referentModule}}" data-check="{{id}}" data-external="{{external}}">
 								Retry this Check
 							</a>
-							<a class="btn btn-info btn-small" type="button" href="{{url}}">Documentation</a>
+							{{#checkUrl}}
+							<a class="btn btn-info btn-small" type="button" href="{{checkUrl}}">Documentation</a>
+							{{/checkUrl}}
 						</span>
 						</div>
 					</div>

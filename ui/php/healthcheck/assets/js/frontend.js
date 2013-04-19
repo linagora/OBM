@@ -269,6 +269,7 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 			check.htmlId = module.id+"-"+check.id;
 			check.referentModule = module.id;
 			check.external = module.url;
+			check.checkUrl = check.url;
 		});
 	});
 	for( var index in checkList.modules){
@@ -283,7 +284,7 @@ $.obm.insertExternalCheck = function(module){
 			"id": "ExternalAccess",
 			"name": "External Access to " + module.name,
 			"description": "Check access to " + module.name + " module ( " + module.url + " ) from this browser.",
-			"url": "http://obm.org",
+			"url": null,
 			"parentId": null
 		}
 	);

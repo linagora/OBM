@@ -4,14 +4,14 @@
                     "id": "ReadabilityStatus",
                     "name": "Readability Check",
                     "description": "Checks that OBM configuration files are readable on the UI server.",
-                    "url": "http://obm.org/wiki/configuration-1",
+                    "url": null,
                     "parentId": null
                 },
                 {
                     "id": "MinimalSubsetStatus",
                     "name": "Minimal Subset Check",
                     "description": "Checks that OBM configuration files contains the minimum required information.",
-                    "url": "http://obm.org/wiki/configuration-1",
+                    "url": null,
                     "parentId": null
                 }
             ]
