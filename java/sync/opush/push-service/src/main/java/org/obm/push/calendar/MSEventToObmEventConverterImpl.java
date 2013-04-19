@@ -88,7 +88,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private static final Map<CalendarSensitivity, EventPrivacy> SENSITIVITY_TO_PRIVACY =
 			new ImmutableMap.Builder<CalendarSensitivity, EventPrivacy>()
 				.put(CalendarSensitivity.NORMAL, EventPrivacy.PUBLIC)
-				.put(CalendarSensitivity.PERSONAL, EventPrivacy.PRIVATE)
+				.put(CalendarSensitivity.PERSONAL, EventPrivacy.PUBLIC)
 				.put(CalendarSensitivity.PRIVATE, EventPrivacy.PRIVATE)
 				.put(CalendarSensitivity.CONFIDENTIAL, EventPrivacy.CONFIDENTIAL)
 				.build();
