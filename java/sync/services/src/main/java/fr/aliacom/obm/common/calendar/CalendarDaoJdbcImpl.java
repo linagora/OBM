@@ -741,19 +741,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	public List<FreeBusy> getFreeBusy(ObmDomain domain, FreeBusyRequest fbr) {
 
 		String fb = "SELECT e.event_id, e.event_date, e.event_duration, event_allday"
-				+ ", e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat"
-				+ " FROM Event e "
+				+ ", e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat "
+				+ "FROM Event e "
 				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
-				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
-				+ "INNER JOIN EventEntity ON e.event_id=evententity_event_id "
-				+ "INNER JOIN UserObm ON ue.userentity_user_id=userobm_id "
-				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
-				+ "LEFT JOIN EventCategory1 ON e.event_category1_id=eventcategory1_id "
-				+ "WHERE "
-				+ "userentity_user_id = ? AND event_type=? "
-				+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) OR "
-				+ "(event_date >= ? AND event_date <= ?) ) "
-                + "AND eventlink_state!=? AND event_opacity=?";
+				+ "LEFT JOIN EventLink organizer ON organizer.eventlink_event_id=e.event_id "
+					+ "AND organizer.eventlink_entity_id=? "
+				+ "WHERE att.eventlink_entity_id = ? "
+					+ "AND event_type=? "
+					+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) "
+					+ "OR (event_date >= ? AND event_date <= ?) ) "
+					+ "AND att.eventlink_state!=? "
+					+ "AND event_opacity=? "
+					+ "AND (event_privacy!=? OR organizer.eventlink_entity_id IS NOT NULL)";
 
 
 		PreparedStatement ps = null;
@@ -767,10 +766,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				logger.info("freebusy " + att.getEmail() + " dstart: "
 						+ fbr.getStart() + " dend: " + fbr.getEnd());
 
-				ObmUser u = userDao.findUser(att.getEmail(), domain);
+				ObmUser attendee = userDao.findUser(att.getEmail(), domain);
+				ObmUser organizer = userDao.findUser(fbr.getOwner(), domain);
 
 				Calendar cal = getGMTCalendar();
-				if (u != null) {
+				if (attendee != null) {
 					ps = null;
 					rs = null;
 					try {
@@ -778,7 +778,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						ps = con.prepareStatement(fb);
 
 						int idx = 1;
-						ps.setInt(idx++, u.getUid());
+						ps.setInt(idx++, organizer.getEntityId());
+						ps.setInt(idx++, attendee.getEntityId());
 						ps.setObject(idx++, obmHelper.getDBCP()
 								.getJdbcObject(ObmHelper.VCOMPONENT, EventType.VEVENT.toString()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getStart()
@@ -791,6 +792,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 								.getJdbcObject(ObmHelper.VPARTSTAT, State.DECLINED.toString()));
 						ps.setObject(idx++, obmHelper.getDBCP()
 								.getJdbcObject(ObmHelper.VOPACITY, EventOpacity.OPAQUE.toString()));
+						ps.setInt(idx++, EventPrivacy.CONFIDENTIAL.toInteger());
 						rs = ps.executeQuery();
 						FreeBusy freebusy = new FreeBusy();
 						freebusy.setStart(fbr.getStart());
