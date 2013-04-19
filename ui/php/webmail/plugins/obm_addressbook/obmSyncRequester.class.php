@@ -1,6 +1,8 @@
 <?php
 include_once dirname(__FILE__).'/httpRequester.class.php';
 require_once(dirname(__FILE__) . '/obmServiceRequester.class.php');
+require_once(dirname(__FILE__) . '/sync/doLoginAuth.class.php');
+require_once(dirname(__FILE__) . '/sync/doTrustedLoginAuth.class.php');
 
 /**
  * This class handles requests to obm-sync services
@@ -24,6 +26,7 @@ require_once(dirname(__FILE__) . '/obmServiceRequester.class.php');
 class obmSyncRequester extends obmServiceRequester{
   private       $sid                    = false;
   private       $authKind               = null;
+  private       $auth;
   private       $login;
   private       $password;
   private       $domainName;
@@ -41,9 +44,7 @@ class obmSyncRequester extends obmServiceRequester{
   private       $authorizedHttpMethods  = array("GET", "POST");
   public static $rootPathScheme         = "http://%s:8080";
   public static $port                   = "8080";
-  public static $origin                 = "obm-ui";
   public static $userEmail;
-  const         LOGIN_PATH              = "/obm-sync/services/login/doLogin";
   const         LOCATION_PATH           = "/location/host/sync/obm_sync/";
   private       $simpleFields           = array(
                                             'name'          => 'commonname',
@@ -132,11 +133,25 @@ class obmSyncRequester extends obmServiceRequester{
    */
   public function __construct(HTTPRequester $httpRequester,
                               $authKind,
-                              $serverIp = null) {
+                              $serverIp = null,
+                              $user,
+                              $pass,
+                              $domain
+                              ) {
     parent::__construct($httpRequester, $serverIp, self::$userEmail);
     $this->authKind = $authKind;
     if(!$this->serverIp){
       throw new Exception("The IP of the obm-sync is null", 500);
+    }
+
+    if ( $authKind == 'trust' ) {
+      if ( function_exists('get_trust_token') ) {
+        $this->auth = new doTrustedLoginAuth($user, null, $domain, $authKind);
+      } else{
+        throw new Exception("Unable to do trusted Authentification, only unified UI (OBM 3.0.0) can do this.", 500);
+      }
+    } else {
+      $this->auth = new doLoginAuth($user, $pass, $domain, $authKind);
     }
   }
 
@@ -147,58 +162,6 @@ class obmSyncRequester extends obmServiceRequester{
    */
   private function getServiceUrlMethod($serviceName){
     return "get".ucfirst($serviceName)."Url";
-  }
-
-  /**
-   * Determines which headers should be set depending on the authentification type
-   *
-   * @return array headers to set for obm-sync login
-   */
-  private function getLoginHttpHeaders(){
-    if($this->authKind == "LemonLDAP"){
-      if ( !$this->domainName ) {
-	$loginSplit = explode("@",$this->login);
-	if ( count($loginSplit) == 2 ) {
-	  $this->login = $loginSplit[0];
-	  $this->domainName = $loginSplit[1];
-	}
-      }
-      if(!$this->login || !$this->domainName){
-        throw new Exception("You must set login and domain name before trying to log in with LemonLDAP", 500);
-      }
-      return array("obm_uid" => $this->login, "obm_domain" => $this->domainName);
-    }
-    return array();
-  }
-
-  /**
-   * Calculates obm-sync login url
-   * Must not return an empty string in any case. An exception must be thrown if
-   * an element is missing
-   * 
-   * @return string obm-sync login webservice url
-   */
-  private function getLoginUrl(){
-    if(!$this->serverIp){
-      throw new Exception("Login failed : no obm-sync server defined in obmSyncRequester", 500);
-    }
-    if(!$this->rootPath){
-      throw new Exception("Login failed : no obm-sync path defined in obmSyncRequester", 500);
-    }
-
-    $loginAuthParameters = "?origin=".urlencode(self::$origin);
-    if($this->authKind == "standalone"){
-      if(!$this->login){
-        throw new Exception("For a standalone authentication, you must set the login and password in obmSyncRequester", 500);
-      }
-    }
-    if ( $this->login ) {
-      $loginAuthParameters .= "&login=".urlencode($this->login);
-    }
-    if($this->authKind != "LemonLDAP" && $this->password ){
-      $loginAuthParameters .= "&password=".urlencode($this->password);
-    }
-    return $this->rootPath.self::LOGIN_PATH.$loginAuthParameters;
   }
 
   protected function getImportICalendarUrl(){
@@ -214,8 +177,6 @@ class obmSyncRequester extends obmServiceRequester{
 //     echo $createContactUrl;
     return $createContactUrl;
   }
-
-
 
   protected function getUpdateContactUrl($contact){
     $path = "/obm-sync/services/book/modifyContact";
@@ -382,39 +343,8 @@ class obmSyncRequester extends obmServiceRequester{
    * @return boolean True if everything went well, false otherwise
    */
   public function obmSyncLogin(){
-    try {
-      $loginUrl = $this->getLoginUrl();
-      $response = $this->httpRequester
-                  ->executeHTTPRequest(
-                    $loginUrl,
-                    $this->getLoginHttpHeaders(),
-                    array("httpMethod" => "GET")
-                  );
-      if($response === false){
-        $this->errors[] = "Couldn't login to obm-sync";
-        throw new Exception("No response from login request", 500);
-      }
 
-      // XML parsing in order to find some eventual errors
-      $xmlLogin = new DomDocument();
-      $xmlLogin->loadXML($response);
-      $errors = $xmlLogin->getElementsByTagName("error");
-      if($errors->length > 0){
-        $this->errors[] = "Couldn't login to obm-sync (".$errors->item(0)->nodeValue.")";
-        throw new Exception("An error occured at login request", 500);
-      }
-      if($xmlLogin->getElementsByTagName('sid')->item(0) == null){
-        $this->errors[] = "Couldn't login to obm-sync (no session id returned)";
-        throw new Exception("An error occured at login request", 500);
-      }
-    } catch (Exception $exc) {
-      return false;
-    }
-
-    // Everything went well : user is logged in and has a session id
-    $this->sid = $xmlLogin->getElementsByTagName('sid')
-                  ->item(0)
-                  ->nodeValue;
+    $this->sid = $this->auth->logIn($this);
     return true;
   }
 
@@ -488,6 +418,10 @@ class obmSyncRequester extends obmServiceRequester{
     return null;
   }
 
+  protected function getRootPathForIp($serverIp){
+    return sprintf(self::$rootPathScheme, trim($serverIp));
+  }
+
   public function setLogin($login){
     $this->login = $login;
   }
@@ -503,9 +437,4 @@ class obmSyncRequester extends obmServiceRequester{
   public function isLoggedIn(){
     return $this->sid != null;
   }
-
-  protected function getRootPathForIp($serverIp){
-    return sprintf(self::$rootPathScheme, trim($serverIp));
-  }
 }
-

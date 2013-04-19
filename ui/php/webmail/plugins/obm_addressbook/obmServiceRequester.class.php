@@ -178,6 +178,14 @@ abstract class obmServiceRequester{
     }
   }
 
+  public function getRootPath() {
+    return $this->rootPath;
+  }
+
+  public function getHttpRequester() {
+    return $this->httpRequester;
+  }
+
   abstract protected function getRootPathForIp($serverIp);
 }
 

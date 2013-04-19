@@ -44,11 +44,11 @@ class obm_addressbook extends rcube_plugin
     $this->requester = new obmSyncRequester(
                             $httpRequester,
                             $rcmail->config->get('obmAuthType'),
-                            $rcmail->config->get('obmSyncIp')
+                            $rcmail->config->get('obmSyncIp'),
+                            $this->user,
+                            $this->pass,
+                            $this->domain
                            );
-    $this->requester->setLogin($this->user);
-    $this->requester->setPassword($this->pass);
-    $this->requester->setDomainName($this->domain);
     
     $this->add_hook('addressbooks_list', array($this, 'addressbooks_list'));
     $this->add_hook('addressbook_get', array($this, 'addressbook_get'));
