@@ -59,6 +59,9 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
+/*
+ * /obm-sync/freebusy/firstname.lastname@obmdomain
+ */
 public class FreeBusyServlet extends HttpServlet {
 
 	public final static String DATASOURCE_PARAMETER = "datasource";
@@ -92,18 +95,14 @@ public class FreeBusyServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		String reqString = request.getRequestURI();
-		logger.info("FreeBusyServlet : reqString: '" + reqString + "'");
-
-		// get user from reqString : format
-		// "/obm-sync/freebusy/firstname.lastname@obmdomain"
+		logger.info("FreeBusyServlet : reqString: '{}'", reqString);
 
 		String email = reqString.substring(reqString.lastIndexOf("/") + 1);
 		email = URLDecoder.decode(email, "UTF-8");
-		logger.info("freebusy email : '" + email + "'");
+		logger.info("freebusy email : '{}'", email);
 		
 
 		java.util.Calendar dnow = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		// Date dstamp = dnow.getTime();
 		dnow.add(java.util.Calendar.MONTH, -1);
 		Date dstart = dnow.getTime();
 		dnow.add(java.util.Calendar.MONTH, 2);
@@ -120,15 +119,13 @@ public class FreeBusyServlet extends HttpServlet {
 				response.getOutputStream().write(ics.getBytes());
 			}
 			else {
-				logger.warn("FreeBusyServlet : user not found : '" + email +
-				 "'");
+				logger.warn("FreeBusyServlet : user not found : '{}'", email);
 			}
 		} catch (PrivateFreeBusyException e) {
-			logger.warn("FreeBusyServlet : freebusy for user : '" + email +
-					 "' is not public.");
+			logger.warn("FreeBusyServlet : freebusy for user : '{}' is not public.", email);
 		}
 		if (ics == null)
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN); 
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	private String findFreeBusyIcs(FreeBusyRequest request, List<FreeBusyProvider> freeBusyProviders) throws PrivateFreeBusyException {
@@ -143,7 +140,8 @@ public class FreeBusyServlet extends HttpServlet {
 				throw e;
 			}
 			catch (Exception e) {
-				logger.error("Got an error while looking up the availability (free/busy) of the " +
+				logger.error(
+						"Got an error while looking up the availability (free/busy) of the " +
 						"user '" + request.getOwner() + "' on provider " + freeBusyProvider + ", " + 
 						"cascading to next provider if any", e);
 			}
@@ -161,7 +159,8 @@ public class FreeBusyServlet extends HttpServlet {
 				freeBusyProviders.addAll(remoteFreeBusyProviders);
 			}
 			else {
-				logger.warn("Attempted to retrieve a remote freebusy status, but no " +
+				logger.warn(
+						"Attempted to retrieve a remote freebusy status, but no " +
 						"freebusy providers are configured");
 			}
 		}
