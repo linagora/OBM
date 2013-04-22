@@ -1,14 +1,12 @@
 /**
  * Roundcube functions for default skin interface
  *
- * Copyright (c) 2011, The Roundcube Dev Team
+ * Copyright (c) 2013, The Roundcube Dev Team
  *
  * The contents are subject to the Creative Commons Attribution-ShareAlike
  * License. It is allowed to copy, distribute, transmit and to adapt the work
  * by keeping credits to the original autors in the README file.
  * See http://creativecommons.org/licenses/by-sa/3.0/ for details.
- *
- * $Id$
  */
 
 
@@ -23,7 +21,6 @@ function rcube_mail_ui()
     dragmessagemenu:    { sticky:1 },
     groupmenu:          { above:1 },
     mailboxmenu:        { above:1 },
-    composeoptionsmenu: { editable:1, overlap:1 },
     spellmenu:          { callback: spellmenu },
     // toggle: #1486823, #1486930
     'attachment-form':  { editable:1, above:1, toggle:!bw.ie&&!bw.linux },
@@ -46,6 +43,15 @@ function rcube_mail_ui()
   this.hide_header_row = hide_header_row;
 
 
+  // set minimal mode on small screens (don't wait for document.ready)
+  if (window.$ && document.body) {
+    var minmode = rcmail.get_cookie('minimalmode');
+    if (parseInt(minmode) || (minmode === null && $(window).height() < 850)) {
+      $(document.body).addClass('minimal');
+    }
+  }
+
+
   /**
    *
    */
@@ -62,6 +68,17 @@ function rcube_mail_ui()
   {
     rcmail.addEventListener('message', message_displayed);
 
+    /*** prepare minmode functions ***/
+    $('#taskbar a').each(function(i,elem){
+      $(elem).append('<span class="tooltip">' + $('.button-inner', this).html() + '</span>')
+    });
+
+    $('#taskbar .minmodetoggle').click(function(e){
+      var ismin = $(document.body).toggleClass('minimal').hasClass('minimal');
+      rcmail.set_cookie('minimalmode', ismin?1:0);
+      $(window).resize();
+    });
+
     /***  mail task  ***/
     if (rcmail.env.task == 'mail') {
       rcmail.addEventListener('menu-open', show_listoptions);
@@ -75,7 +92,6 @@ function rcube_mail_ui()
       }
 
       if (rcmail.env.action == 'show' || rcmail.env.action == 'preview') {
-        layout_messageview();
         rcmail.addEventListener('aftershow-headers', function() { layout_messageview(); });
         rcmail.addEventListener('afterhide-headers', function() { layout_messageview(); });
         $('#previewheaderstoggle').click(function(e){ toggle_preview_headers(this); return false });
@@ -93,12 +109,17 @@ function rcube_mail_ui()
             show_header_row(fields[f], true);
         }
 
-        $('#composeoptionstoggle').parent().click(function(){
-          $('#composeoptionstoggle').toggleClass('enabled');
+        $('#composeoptionstoggle').click(function(){
+          $('#composeoptionstoggle').toggleClass('remove');
           $('#composeoptions').toggle();
           layout_composeview();
           return false;
         }).css('cursor', 'pointer');
+
+        // toggle compose options if opened in new window and they were visible before
+        var opener_rc = rcmail.opener();
+        if (opener_rc && opener_rc.env.action == 'compose' && $('#composeoptionstoggle', opener.document).hasClass('remove'))
+          $('#composeoptionstoggle').click();
 
         new rcube_splitter({ id:'composesplitterv', p1:'#composeview-left', p2:'#composeview-right',
           orientation:'v', relative:true, start:248, min:170, size:12, render:layout_composeview }).init();
@@ -147,6 +168,10 @@ function rcube_mail_ui()
         new rcube_splitter({ id:'identviewsplitter', p1:'#identitieslist', p2:'#identity-details',
           orientation:'v', relative:true, start:266, min:180, size:12 }).init();
       }
+      else if (rcmail.env.action == 'preferences' || !rcmail.env.action) {
+        new rcube_splitter({ id:'prefviewsplitter', p1:'#sectionslist', p2:'#preferences-box',
+          orientation:'v', relative:true, start:266, min:180, size:12 }).init();
+      }
     }
     /***  addressbook task  ***/
     else if (rcmail.env.task == 'addressbook') {
@@ -160,6 +185,12 @@ function rcube_mail_ui()
 
         new rcube_scroller('#directorylist-content', '#directorylist-header', '#directorylist-footer');
       }
+    }
+
+    // set min-width to show all toolbar buttons
+    var screen = $('.minwidth');
+    if (screen.length) {
+      screen.css('min-width', $('.toolbar').width() + $('#quicksearchbar').parent().width() + 20);
     }
 
     // turn a group of fieldsets into tabs
@@ -252,11 +283,11 @@ function rcube_mail_ui()
    */
   function resize()
   {
-    if (rcmail.env.task == 'mail' && (rcmail.env.action == 'show' || rcmail.env.action == 'preview')) {
-      layout_messageview();
-    }
-    if (rcmail.env.task == 'mail' && rcmail.env.action == 'compose') {
-      layout_composeview();
+    if (rcmail.env.task == 'mail') {
+      if (rcmail.env.action == 'show' || rcmail.env.action == 'preview')
+        layout_messageview();
+      else if (rcmail.env.action == 'compose')
+        layout_composeview();
     }
 
     // make iframe footer buttons float if scrolling is active
@@ -265,13 +296,13 @@ function rcube_mail_ui()
         body = $(document.body),
         floating = footer.hasClass('floating'),
         overflow = body.outerHeight(true) > $(window).height();
+
       if (overflow != floating) {
         var action = overflow ? 'addClass' : 'removeClass';
         footer[action]('floating');
         body[action]('floatingbuttons');
       }
-    })
-
+    });
   }
 
   /**
@@ -281,14 +312,21 @@ function rcube_mail_ui()
   {
     // show a popup dialog on errors
     if (p.type == 'error' && rcmail.env.task != 'login') {
+      if (me.message_timer) {
+        window.clearTimeout(me.message_timer);
+      }
       if (!me.messagedialog) {
-        me.messagedialog = $('<div>').addClass('popupdialog');
+        me.messagedialog = $('<div>').addClass('popupdialog').hide();
       }
 
-      var pos = $(p.object).offset();
+      var msg = p.message,
+        pos = $(p.object).offset();
       pos.top -= (rcmail.env.task == 'login' ? 20 : 160);
-      me.messagedialog.dialog('close');
-      me.messagedialog.html(p.message)
+
+      if (me.messagedialog.is(':visible'))
+        msg = me.messagedialog.html() + '<p>' + p.message + '</p>';
+
+      me.messagedialog.html(msg)
         .dialog({
           resizable: false,
           closeOnEscape: true,
@@ -303,7 +341,7 @@ function rcube_mail_ui()
           minHeight: 90
         }).show();
 
-      window.setTimeout(function(){ me.messagedialog.dialog('close'); }, Math.max(2000, p.timeout / 2));
+      me.message_timer = window.setTimeout(function(){ me.messagedialog.dialog('close'); }, Math.max(2000, p.timeout / 2));
     }
   }
 
@@ -313,7 +351,7 @@ function rcube_mail_ui()
    */
   function layout_messageview()
   {
-    $('#messagecontent').css('top', ($('#messageheader').outerHeight() + 10) + 'px');
+    $('#messagecontent').css('top', ($('#messageheader').outerHeight() + 1) + 'px');
     $('#message-objects div a').addClass('button');
 
     if (!$('#attachment-list li').length) {
@@ -340,9 +378,14 @@ function rcube_mail_ui()
     var body = $('#composebody'),
       form = $('#compose-content'),
       bottom = $('#composeview-bottom'),
-      w, h;
+      w, h, bh, ovflw, btns = 0,
+      minheight = 300,
 
-    bottom.css('height', (form.height() - bottom.position().top) + 'px');
+    bh = (form.height() - bottom.position().top);
+    ovflw = minheight - bh;
+    btns = ovflw > -100 ? 0 : 40;
+    bottom.css('height', Math.max(minheight, bh) + 'px');
+    form.css('overflow', ovflw > 0 ? 'auto' : 'hidden');
 
     w = body.parent().width() - 5;
     h = body.parent().height() - 16;
@@ -351,6 +394,8 @@ function rcube_mail_ui()
     $('#composebody_tbl').width((w+8)+'px').height('').css('margin-top', '1px');
     $('#composebody_ifr').width((w+8)+'px').height((h-40)+'px');
     $('#googie_edit_layer').height(h+'px');
+//    $('#composebodycontainer')[(btns ? 'addClass' : 'removeClass')]('buttons');
+//    $('#composeformbuttons')[(btns ? 'show' : 'hide')]();
 
     var abooks = $('#directorylist');
     $('#compose-contacts .scroller').css('top', abooks.position().top + abooks.outerHeight());
@@ -459,7 +504,7 @@ function rcube_mail_ui()
     var button = $(e.target),
       frame = $('#mailpreviewframe'),
       visible = !frame.is(':visible'),
-      splitter = mailviewsplit.pos || parseInt(bw.get_cookie('mailviewsplitter') || 320),
+      splitter = mailviewsplit.pos || parseInt(rcmail.get_cookie('mailviewsplitter') || 320),
       topstyles, bottomstyles, uid;
 
     frame.toggle();
@@ -845,6 +890,8 @@ function rcube_mail_ui()
       // Select/unselect tab
       $('#tab'+idx).toggleClass('selected', idx==index);
     });
+
+    resize();
   }
 
   /**
@@ -894,11 +941,11 @@ function rcube_scroller(list, top, bottom)
   this.delay = 500;
 
   this.top
-    .mouseenter(function() { ref.ts = window.setTimeout(function() { ref.scroll('down'); }, ref.delay); })
+    .mouseenter(function() { if (rcmail.drag_active) ref.ts = window.setTimeout(function() { ref.scroll('down'); }, ref.delay); })
     .mouseout(function() { if (ref.ts) window.clearTimeout(ref.ts); });
 
   this.bottom
-    .mouseenter(function() { ref.ts = window.setTimeout(function() { ref.scroll('up'); }, ref.delay); })
+    .mouseenter(function() { if (rcmail.drag_active) ref.ts = window.setTimeout(function() { ref.scroll('up'); }, ref.delay); })
     .mouseout(function() { if (ref.ts) window.clearTimeout(ref.ts); });
 
   this.scroll = function(dir)
@@ -972,7 +1019,7 @@ function rcube_splitter(p)
       $(window).resize(onResize);
 
     // read saved position from cookie
-    var cookie = bw.get_cookie(this.id);
+    var cookie = rcmail.get_cookie(this.id);
     if (cookie && !isNaN(cookie)) {
       this.pos = parseFloat(cookie);
       this.resize();
@@ -1133,7 +1180,7 @@ function rcube_splitter(p)
   {
     var exp = new Date();
     exp.setYear(exp.getFullYear() + 1);
-    bw.set_cookie(this.id, this.pos, exp);
+    rcmail.set_cookie(this.id, this.pos, exp);
   };
 
 } // end class rcube_splitter

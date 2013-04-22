@@ -1,10 +1,17 @@
+<?php
+
+if (!class_exists('rcube_install') || !is_object($RCI)) {
+    die("Not allowed! Please open installer/index.php instead.");
+}
+
+?>
 <form action="index.php?_step=3" method="post">
 
 <h3>Check config files</h3>
 <?php
 
-$read_main = is_readable(RCMAIL_CONFIG_DIR.'/main.inc.php');
-$read_db = is_readable(RCMAIL_CONFIG_DIR.'/db.inc.php');
+$read_main = is_readable(RCUBE_CONFIG_DIR . 'main.inc.php');
+$read_db = is_readable(RCUBE_CONFIG_DIR . 'db.inc.php');
 
 if ($read_main && !empty($RCI->config)) {
   $RCI->pass('main.inc.php');
@@ -125,9 +132,9 @@ else {
 $db_working = false;
 if ($RCI->configured) {
     if (!empty($RCI->config['db_dsnw'])) {
-
-        $DB = new rcube_mdb2($RCI->config['db_dsnw'], '', false);
+        $DB = rcube_db::factory($RCI->config['db_dsnw'], '', false);
         $DB->db_connect('w');
+
         if (!($db_error_msg = $DB->is_error())) {
             $RCI->pass('DSN (write)');
             echo '<br />';
@@ -157,17 +164,15 @@ if ($db_working && $_POST['initdb']) {
 }
 
 else if ($db_working && $_POST['updatedb']) {
-  if (!($success = $RCI->update_db($DB, $_POST['version']))) {
-      $updatefile = INSTALL_PATH . 'SQL/' . (isset($RCI->db_map[$DB->db_provider]) ? $RCI->db_map[$DB->db_provider] : $DB->db_provider) . '.update.sql';
-      echo '<p class="warning">Please manually execute the SQL statements from '.$updatefile.' on your database.<br/>';
-      echo 'See comments in the file and execute queries below the comment with the currently installed version number.</p>';
-  }
+    if (!($success = $RCI->update_db($_POST['version']))) {
+        echo '<p class="warning">Database schema update failed.</p>';
+    }
 }
 
 // test database
 if ($db_working) {
     $db_read = $DB->query("SELECT count(*) FROM {$RCI->config['db_table_users']}");
-    if ($DB->db_error) {
+    if ($DB->is_error()) {
         $RCI->fail('DB Schema', "Database not initialized");
         echo '<p><input type="submit" name="initdb" value="Initialize database" /></p>';
         $db_working = false;
@@ -176,9 +181,8 @@ if ($db_working) {
         $RCI->fail('DB Schema', "Database schema differs");
         echo '<ul style="margin:0"><li>' . join("</li>\n<li>", $err) . "</li></ul>";
         $select = $RCI->versions_select(array('name' => 'version'));
-        echo '<p class="suggestion">You should run the update queries to get the schmea fixed.<br/><br/>Version to update from: ' . $select->show() . '&nbsp;<input type="submit" name="updatedb" value="Update" /></p>';
-//        echo '<p class="warning">Please manually execute the SQL statements from '.$updatefile.' on your database.<br/>';
-//        echo 'See comments in the file and execute queries that are superscribed with the currently installed version number.</p>';
+        $select->add('0.9 or newer', '');
+        echo '<p class="suggestion">You should run the update queries to get the schema fixed.<br/><br/>Version to update from: ' . $select->show() . '&nbsp;<input type="submit" name="updatedb" value="Update" /></p>';
         $db_working = false;
     }
     else {

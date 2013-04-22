@@ -145,6 +145,14 @@ img
   color: #999999;
 }
 
+/* fixes vertical alignment of checkboxes and labels */
+label input,
+label span
+{
+  vertical-align: middle;
+}
+
+
 /** common user interface objects */
 
 #mainscreen
@@ -154,6 +162,11 @@ img
   right: 20px;
   bottom: 20px;
   left: 20px;
+}
+
+.extwin #mainscreen
+{
+  top: 43px;
 }
 
 body > #logo
@@ -774,7 +787,15 @@ a.rcmContactAddress:hover
 	margin: 5em auto;
 	font-size: 85%;
 	text-align: center;
-	color: #333;
+	color: #666;
+}
+
+#login-noscriptwarning
+{
+	margin: 2em auto 0 auto;
+	width: 400px;
+	color: #cf2734;
+	font-weight: bold;
 }
 
 #console

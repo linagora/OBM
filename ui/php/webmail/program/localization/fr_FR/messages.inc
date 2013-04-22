@@ -2,20 +2,23 @@
 
 /*
  +-----------------------------------------------------------------------+
- | localization/fr_FR/messages.inc                                       |
+ | localization/<lang>/messages.inc                                      |
  |                                                                       |
- | Language file of the Roundcube Webmail client                         |
- | Copyright (C) 2012, The Roundcube Dev Team                            |
- | Licensed under the GNU General Public License                         |
+ | Localization file of the Roundcube Webmail client                     |
+ | Copyright (C) 2005-2013, The Roundcube Dev Team                       |
+ |                                                                       |
+ | Licensed under the GNU General Public License version 3 or            |
+ | any later version with exceptions for skins & plugins.                |
+ | See the README file for a full license statement.                     |
  |                                                                       |
  +-----------------------------------------------------------------------+
- | Author: Nicolas Delvaux                                               |
- +-----------------------------------------------------------------------+
+
+ For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages = array();
-$messages['errortitle'] = 'Une erreur est survenue !';
-$messages['loginfailed'] = 'Erreur d\'authentification';
+$messages['errortitle']  = 'Une erreur est survenue !';
+$messages['loginfailed']  = 'L\'authentification a échoué';
 $messages['cookiesdisabled'] = 'Votre navigateur n\'accepte pas les cookies';
 $messages['sessionerror'] = 'Votre session est invalide ou a expiré';
 $messages['storageerror'] = 'Erreur de connexion au serveur IMAP';
@@ -26,40 +29,42 @@ $messages['requesttimedout'] = 'Délai de la requête expiré';
 $messages['errorreadonly'] = 'Impossible d\'effectuer cette opération. Le dossier est en lecture seule';
 $messages['errornoperm'] = 'Impossible d\'effectuer cette opération. Permission refusée';
 $messages['invalidrequest'] = 'Requête invalide ! Aucune donnée n\'a été sauvegardée.';
-$messages['nomessagesfound'] = 'Aucun message trouvé dans cette boîte aux lettres';
+$messages['invalidhost'] = 'Nom du serveur invalide.';
+$messages['nomessagesfound'] = 'Cette boîte aux lettres ne contient aucun message.';
 $messages['loggedout'] = 'Vous venez de vous déconnecter avec succès. Au revoir !';
-$messages['mailboxempty'] = 'Boîte aux lettres vide';
+$messages['mailboxempty'] = 'La boîte aux lettres est vide.';
+$messages['refreshing'] = 'Rafraîchissement en cours...';
 $messages['loading'] = 'Chargement...';
 $messages['uploading'] = 'Envoi du fichier...';
 $messages['uploadingmany'] = 'Envoi des fichiers ...';
 $messages['loadingdata'] = 'Chargement des données...';
 $messages['checkingmail'] = 'Vérification des nouveaux messages...';
-$messages['sendingmessage'] = 'Message en cours d\'envoi...';
-$messages['messagesent'] = 'Message bien envoyé';
+$messages['sendingmessage'] = 'Expédition du message...';
+$messages['messagesent'] = 'Message expédié.';
 $messages['savingmessage'] = 'Sauvegarde du message...';
 $messages['messagesaved'] = 'Message sauvegardé dans Brouillons';
 $messages['successfullysaved'] = 'Sauvegarde effectuée';
 $messages['addedsuccessfully'] = 'Contact ajouté dans le carnet d\'adresses';
-$messages['contactexists'] = 'Un contact avec ce courriel existe déjà';
-$messages['contactnameexists'] = 'Un contact avec le même nom existe déjà.';
-$messages['blockedimages'] = 'Afin de préserver votre vie privée, les images distantes ont été bloquées dans ce message.';
-$messages['encryptedmessage'] = 'Ceci est un message crypté et il ne peut pas être affiché. Désolé !';
+$messages['contactexists'] = 'Cette adresse courriel est utilisée par un autre contact';
+$messages['contactnameexists'] = 'Il existe déjà un contact nommé ainsi.';
+$messages['blockedimages'] = 'Les images distantes sont bloquées pour protéger votre vie privée.';
+$messages['encryptedmessage'] = 'Désolé, ce message est chiffré et ne peut être affiché.';
 $messages['nocontactsfound'] = 'Aucun contact n\'a pu être trouvé';
-$messages['contactnotfound'] = 'Le contact demandé n\'a pas été trouvé';
+$messages['contactnotfound'] = 'Le contact demandé n\'a pas été trouvé.';
 $messages['contactsearchonly'] = 'Entrez un ou plusieurs mots clés pour trouver des contacts';
 $messages['sendingfailed'] = 'L\'envoi du message a échoué';
-$messages['senttooquickly'] = 'Vous devez attendre $sec sec. pour envoyer le message';
+$messages['senttooquickly'] = 'Vous devez attendre $sec s. pour envoyer le message';
 $messages['errorsavingsent'] = 'Une erreur est survenue pendant la sauvegarde du message envoyé';
 $messages['errorsaving'] = 'Une erreur a empêché la sauvegarde';
 $messages['errormoving'] = 'Impossible de déplacer le message';
-$messages['errorcopying'] = 'Le(s) message(s) n\'a/ont pas pu être copié(s)';
+$messages['errorcopying'] = 'La copie de ce(s) message(s) a échoué.';
 $messages['errordeleting'] = 'Impossible d\'effacer le message';
 $messages['errormarking'] = 'Impossible de marquer le message';
-$messages['deletecontactconfirm'] = 'Voulez-vous vraiment effacer le(s) contact(s) sélectionné(s) ?';
-$messages['deletegroupconfirm'] = 'Êtes-vous sûr de vouloir supprimer le groupe sélectionné ?';
-$messages['deletemessagesconfirm'] = 'Voulez-vous vraiment supprimer le(s) message(s) sélectionné(s) ?';
-$messages['deletefolderconfirm'] = 'Voulez-vous vraiment effacer ce dossier ?';
-$messages['purgefolderconfirm'] = 'Voulez-vous vraiment effacer tous les messages de ce dossier ?';
+$messages['deletecontactconfirm']  = 'Êtes-vous sûr de vouloir supprimer le(s) contact(s) sélectionné(s) ?';
+$messages['deletegroupconfirm']  = 'Êtes-vous sûr de vouloir supprimer le groupe sélectionné ?';
+$messages['deletemessagesconfirm'] = 'Êtes-vous sûr de vouloir supprimer le(s) message(s) sélectionné(s) ?';
+$messages['deletefolderconfirm']  = 'Êtes-vous sûr de vouloir supprimer ce dossier ?';
+$messages['purgefolderconfirm']  = 'Êtes-vous sûr de vouloir supprimer tous les messages de ce dossier ?';
 $messages['contactdeleting'] = 'Suppression de contact(s)...';
 $messages['groupdeleting'] = 'Suppression du groupe ...';
 $messages['folderdeleting'] = 'Suppression du dossier...';
@@ -68,16 +73,16 @@ $messages['foldersubscribing'] = 'Inscription du dossier...';
 $messages['folderunsubscribing'] = 'Désinscription du dossier...';
 $messages['formincomplete'] = 'Le formulaire n\'a pas été entièrement rempli';
 $messages['noemailwarning'] = 'Veuillez spécifier un courriel valide';
-$messages['nonamewarning'] = 'Veuillez fournir un nom';
+$messages['nonamewarning']  = 'Veuillez fournir un nom';
 $messages['nopagesizewarning'] = 'Veuillez indiquer une taille de page';
 $messages['nosenderwarning'] = 'Veuillez renseigner l\'adresse d\'expéditeur';
 $messages['norecipientwarning'] = 'Veuillez ajouter au moins un destinataire';
-$messages['nosubjectwarning'] = 'Le champ «Objet» est vide. Souhaitez-vous le renseigner maintenant ?';
+$messages['nosubjectwarning']  = 'Le champ «Objet» est vide. Souhaitez-vous le renseigner maintenant ?';
 $messages['nobodywarning'] = 'Envoyer ce message sans texte ?';
 $messages['notsentwarning'] = 'Le message n\'a pas été envoyé. Voulez-vous abandonner ce message ?';
 $messages['noldapserver'] = 'Choisissez un serveur LDAP pour la recherche';
 $messages['nosearchname'] = 'Entrez un nom de contact ou un courriel';
-$messages['notuploadedwarning'] = 'Toutes les pièces jointes ne sont pas encore envoyées pour le moment. Merci d\'attendre ou d\'annuler l\'envoi.';
+$messages['notuploadedwarning'] = 'Certaines pièces jointes sont en cours d\'expédition : attendez ou annulez l\'envoi.';
 $messages['searchsuccessful'] = '$nr messages trouvés';
 $messages['contactsearchsuccessful'] = '$nr contact(s) trouvé(s).';
 $messages['searchnomatch'] = 'La recherche ne donne aucun résultat';
@@ -114,8 +119,9 @@ $messages['selectimportfile'] = 'Veuillez sélectionner un fichier à envoyer';
 $messages['addresswriterror'] = 'Impossible d\'écrire dans le carnet d\'adresse sélectionné';
 $messages['contactaddedtogroup'] = 'Les contacts ont bien été ajoutés à ce groupe';
 $messages['contactremovedfromgroup'] = 'Les contacts ont bien été supprimés de ce groupe';
+$messages['nogroupassignmentschanged'] = 'Appartenance aux groupes inchangée.';
 $messages['importwait'] = 'Importation, veuillez patienter...';
-$messages['importerror'] = 'Importation échouée ! Le fichier envoyé n\'est pas un fichier vCard valide.';
+$messages['importformaterror'] = 'Echec de l\'import ! Le fichier n\'est pas un fichier d\'import de données valide.';
 $messages['importconfirm'] = '<b>$inserted contacts importés avec succès, $skipped entrées existantes ignorées</b>:<p><em>$names</em></p>';
 $messages['importconfirmskipped'] = '<b>$skipped entrée(s) déjà existante(s)</b>';
 $messages['opnotpermitted'] = 'Cette opération n\'est pas permise !';
@@ -157,4 +163,7 @@ $messages['invalidimageformat'] = 'Format d\'image invalide';
 $messages['mispellingsfound'] = 'Des fautes d\'orthographe ont été détectées dans le message.';
 $messages['parentnotwritable'] = 'Impossible de créer/déplacer le dossier dans le dossier parent sélectionné. Aucun droit d\'accès.';
 $messages['messagetoobig'] = 'Le message est trop gros pour être traité.';
+$messages['attachmentvalidationerror'] = 'ATTENTION ! Cette pièce jointe est suspecte car son type ne correspond pas au type déclaré dans ce message. Si vous ne faites pas confiance à l\'expéditeur, vous ne devriez pas l\'ouvrir dans le navigateur, car il peut contenir des contenus malveillants.<br/><br/><em>Attendu : $expected; trouvé : $detected</em>';
+$messages['noscriptwarning'] = 'Atention : Ce service de webmail nécessite Javascript ! Pour pouvoir l\'utiliser, merci d\'activer Javascript dans les préférences de votre navigateur.';
 
+?>
