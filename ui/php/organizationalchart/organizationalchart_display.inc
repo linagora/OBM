@@ -1266,7 +1266,7 @@ function export_svg_outline($node_q, &$xml, &$svg) {
     foreach($t_child as $key => $child_id){
       $y+=20;
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      export_svg_outline($child_q, &$xml, &$svg);
+      export_svg_outline($child_q, $xml, $svg);
     }
   } 
 
@@ -1400,7 +1400,7 @@ function export_svg_chart($node_q, &$xml, &$svg) {
         }
       }
       $child_q = run_query_organizationalchart_node_infos($child_id);
-      export_svg_chart($child_q, &$xml, &$svg);
+      export_svg_chart($child_q, $xml, $svg);
     }
   } 
 
