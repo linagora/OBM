@@ -32,12 +32,13 @@
 package fr.aliacom.obm.freebusy;
 
 import org.obm.sync.calendar.FreeBusyRequest;
+import org.obm.sync.exception.ObmUserNotFoundException;
 
 /**
  * Returns the availability of a user for a given period of time.
  */
 public abstract interface FreeBusyProvider {
 
-	public abstract String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException;
+	public abstract String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException, ObmUserNotFoundException;
 
 }

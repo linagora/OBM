@@ -19,6 +19,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.exception.ObmUserNotFoundException;
 
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
@@ -79,7 +80,7 @@ public class DatabaseFreeBusyProviderTest {
 	}
 	
 	@Test
-	public void testFindFreeBusyIcs() throws FreeBusyException {
+	public void testFindFreeBusyIcs() throws FreeBusyException, ObmUserNotFoundException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
 		FreeBusy freeBusy = buildFakeFreeBusyResponse();
@@ -101,7 +102,7 @@ public class DatabaseFreeBusyProviderTest {
 	}
 	
 	@Test(expected=FreeBusyException.class)
-	public void testFindFreeBusyIcsThrowPrivateFreebusyException() throws FreeBusyException {
+	public void testFindFreeBusyIcsThrowPrivateFreebusyException() throws FreeBusyException, ObmUserNotFoundException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
 		ObmUser user = ObmUser.builder().uid(1).login(OWNER_LOGIN).domain(domain).publicFreeBusy(false).build();
@@ -119,23 +120,25 @@ public class DatabaseFreeBusyProviderTest {
 		}
 	}
 	
-	@Test
-	public void testFindFreeBusyIcsReturnNullOnNullObmUser() throws FreeBusyException {
+	@Test(expected=ObmUserNotFoundException.class)
+	public void testFindFreeBusyIcsThrowObmUserNotFoundException() throws FreeBusyException, ObmUserNotFoundException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
 		expect(userService.getUserFromEmail(ATTENDEE_EMAIL)).andReturn(null);
 		
 		mocksControl.replay();
 		
-		String ics = databaseFreebusyProvider.findFreeBusyIcs(fbr);
-		
-		mocksControl.verify();
-		
-		assertThat(ics).isNull();
+		try {
+			databaseFreebusyProvider.findFreeBusyIcs(fbr);
+		} catch (ObmUserNotFoundException e) {
+			throw e;
+		} finally {
+			mocksControl.verify();
+		}
 	}
 	
 	@Test
-	public void testFindFreeBusyIcsReturnNullOnNullIcal4jHelper() throws FreeBusyException {
+	public void testFindFreeBusyIcsReturnNullOnNullIcal4jHelper() throws FreeBusyException, ObmUserNotFoundException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
 		FreeBusy freeBusy = buildFakeFreeBusyResponse();

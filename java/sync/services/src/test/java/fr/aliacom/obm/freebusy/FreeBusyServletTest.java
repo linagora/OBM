@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.calendar.FreeBusyRequest;
+import org.obm.sync.exception.ObmUserNotFoundException;
 
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
@@ -105,11 +106,15 @@ public class FreeBusyServletTest {
 	}
 	
 	@Test
-	public void testDoGetWithNullDataSourceCallLocalProvider() throws IOException, ServletException, FreeBusyException {
+	public void testDoGetWithNullDataSourceCallLocalProvider()
+			throws IOException, ServletException, FreeBusyException, ObmUserNotFoundException {
 		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
 		expect(response.getOutputStream()).andReturn(outputStream).once();
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		expectLastCall().once();
 		
 		mocksControl.replay();
 		
@@ -122,13 +127,17 @@ public class FreeBusyServletTest {
 	}
 	
 	@Test
-	public void testDoGetWithNullDataSourceCallRemoteProvider() throws IOException, ServletException, FreeBusyException {
+	public void testDoGetWithNullDataSourceCallRemoteProvider()
+			throws IOException, ServletException, FreeBusyException, ObmUserNotFoundException {
 		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
 		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
 		expect(response.getOutputStream()).andReturn(outputStream).once();
 		
+		response.setStatus(HttpServletResponse.SC_OK);
+		expectLastCall().once();
+		
 		mocksControl.replay();
 		
 		freeBusyServlet.init(servletConfig);
@@ -140,13 +149,37 @@ public class FreeBusyServletTest {
 	}
 	
 	@Test
-	public void testDoGetFreeBusyReturnNullIcs() throws ServletException, FreeBusyException, IOException {
+	public void testDoGetCallFollowingProviderOnException()
+			throws IOException, ServletException, FreeBusyException, ObmUserNotFoundException {
+		expectOnHttpRequest();
+		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
+		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class)))
+			.andThrow(new RuntimeException());
+		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
+		expect(response.getOutputStream()).andReturn(outputStream).once();
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		freeBusyServlet.init(servletConfig);
+		freeBusyServlet.doGet(request, response);
+		
+		mocksControl.verify();
+		
+		assertThat(outputStream.toString()).isEqualTo(ICS);
+	}
+	
+	@Test
+	public void testDoGetFreeBusyReturnNullIcs()
+			throws ServletException, FreeBusyException, IOException, ObmUserNotFoundException {
 		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
 		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
 		
-		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		expectLastCall().once();
 		
 		mocksControl.replay();
@@ -166,6 +199,73 @@ public class FreeBusyServletTest {
 		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
 		
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		freeBusyServlet.init(servletConfig);
+		freeBusyServlet.doGet(request, response);
+		
+		mocksControl.verify();
+		
+		assertThat(outputStream.toString()).isNull();
+	}
+	
+	@Test
+	public void testDoGetWithLocalProviderButNoRemote()
+			throws FreeBusyException, IOException, ServletException, ObmUserNotFoundException {
+		String[] dataSource = {LOCAL_DATASOURCE};
+		
+		expectOnHttpRequest();
+		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
+		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
+		expect(response.getOutputStream()).andReturn(outputStream).once();
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		freeBusyServlet.init(servletConfig);
+		freeBusyServlet.doGet(request, response);
+		
+		mocksControl.verify();
+		
+		assertThat(outputStream.toString()).isEqualTo(ICS);
+	}
+	
+	@Test
+	public void testDoGetWithRemoteProviderButNoLocal()
+			throws FreeBusyException, IOException, ServletException, ObmUserNotFoundException {
+		String[] dataSource = {REMOTE_DATASOURCE};
+		
+		expectOnHttpRequest();
+		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
+		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
+		expect(response.getOutputStream()).andReturn(outputStream).once();
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		freeBusyServlet.init(servletConfig);
+		freeBusyServlet.doGet(request, response);
+		
+		mocksControl.verify();
+		
+		assertThat(outputStream.toString()).isEqualTo(ICS);
+	}
+	
+	@Test
+	public void testDoGetWarnForPrivateFreeBusy()
+			throws ServletException, IOException, FreeBusyException, ObmUserNotFoundException {
+		expectOnHttpRequest();
+		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
+		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class)))
+			.andThrow(new PrivateFreeBusyException());
+		
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		expectLastCall().once();
 		
@@ -180,51 +280,14 @@ public class FreeBusyServletTest {
 	}
 	
 	@Test
-	public void testDoGetWithLocalProviderButNoRemote() throws FreeBusyException, IOException, ServletException {
-		String[] dataSource = {LOCAL_DATASOURCE};
-		
-		expectOnHttpRequest();
-		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
-		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
-		expect(response.getOutputStream()).andReturn(outputStream).once();
-		
-		mocksControl.replay();
-		
-		freeBusyServlet.init(servletConfig);
-		freeBusyServlet.doGet(request, response);
-		
-		mocksControl.verify();
-		
-		assertThat(outputStream.toString()).isEqualTo(ICS);
-	}
-	
-	@Test
-	public void testDoGetWithRemoteProviderButNoLocal() throws FreeBusyException, IOException, ServletException {
-		String[] dataSource = {REMOTE_DATASOURCE};
-		
-		expectOnHttpRequest();
-		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
-		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
-		expect(response.getOutputStream()).andReturn(outputStream).once();
-		
-		mocksControl.replay();
-		
-		freeBusyServlet.init(servletConfig);
-		freeBusyServlet.doGet(request, response);
-		
-		mocksControl.verify();
-		
-		assertThat(outputStream.toString()).isEqualTo(ICS);
-	}
-	
-	@Test
-	public void testDoGetWarnForPrivateFreeBusy() throws ServletException, IOException, FreeBusyException {
+	public void testDoGetWarnForNotFoundObmUser()
+			throws ObmUserNotFoundException, FreeBusyException, ServletException, IOException {
 		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class)))
-			.andThrow(new PrivateFreeBusyException());
+			.andThrow(new ObmUserNotFoundException("not found"));
 		
-		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		expectLastCall().once();
 		
 		mocksControl.replay();

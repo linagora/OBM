@@ -38,6 +38,7 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
+import org.obm.sync.exception.ObmUserNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -65,7 +66,7 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 
 	@Override
 	@Transactional(readOnly=true, noRollbackOn = {PrivateFreeBusyException.class})
-	public String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException {
+	public String findFreeBusyIcs(FreeBusyRequest fbr) throws FreeBusyException, ObmUserNotFoundException {
 		String ics = null;
 
 		FreeBusy freeBusy = findFreeBusy(fbr);
@@ -75,23 +76,24 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 		return ics;
 	}
 
-	private FreeBusy findFreeBusy(FreeBusyRequest fbr) throws PrivateFreeBusyException {
+	private FreeBusy findFreeBusy(FreeBusyRequest fbr) throws PrivateFreeBusyException, ObmUserNotFoundException {
 		Attendee attendee = fbr.getAttendees().get(0);
 		String email = attendee.getEmail();
 		ObmUser user = userService.getUserFromEmail(email);
+		
 		if (user == null) {
-			return null;
+			throw new ObmUserNotFoundException("Could not find any ObmUser with email " + email);
 		}
 
 		if (!user.isPublicFreeBusy()) {
 			throw new PrivateFreeBusyException();
 		}
 
-		FreeBusy freeBusy = null;
+		return getFreeBusy(fbr, user);
+	}
+
+	private FreeBusy getFreeBusy(FreeBusyRequest fbr, ObmUser user) {
 		List<FreeBusy> freeBusyList = calendarDao.getFreeBusy(user.getDomain(), fbr);
-		if (!freeBusyList.isEmpty()) {
-			freeBusy = freeBusyList.get(0);
-		}
-		return freeBusy;
+		return !freeBusyList.isEmpty() ? freeBusyList.get(0) : null;
 	}
 }

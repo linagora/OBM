@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.exception.ObmUserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public class FreeBusyServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		logger.info("FreeBusyServlet : reqString: '" + request.getRequestURI() + "'");
+		logger.info("FreeBusyServlet : reqString: '{}'", request.getRequestURI());
 
 		String attendee = request.getParameter("attendee");
 		String organizer = request.getParameter("organizer");
@@ -105,41 +106,44 @@ public class FreeBusyServlet extends HttpServlet {
 		Date dend = dnow.getTime();
 
 		FreeBusyRequest fbr = makeFreeBusyRequest(organizer, attendee, dstart, dend);
-		
 		Set<FreeBusyQueryType> queryTypes = findFreeBusyQueryTypes(request);
 		List<FreeBusyProvider> providers = makeProvidersList(queryTypes);
-		String ics = null;
 		try {
-			ics = findFreeBusyIcs(fbr, providers);
+			String ics = findFreeBusyIcs(fbr, providers);
 			if (ics != null) {
 				response.getOutputStream().write(ics.getBytes());
-			}
-			else {
-				logger.warn("FreeBusyServlet : user not found : '{}'", attendee);
+				response.setStatus(HttpServletResponse.SC_OK);
+			} else {
+				logger.warn("FreeBusyServlet : freebusy could not be generated for '{}' requested by '{}'.",
+						attendee, organizer);
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			}
 		} catch (PrivateFreeBusyException e) {
 			logger.warn("FreeBusyServlet : freebusy for user : '{}' is not public.", attendee);
-		}
-		if (ics == null)
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		} catch (ObmUserNotFoundException e) {
+			logger.warn("FreeBusyServlet : user : '{}' was not found.", attendee);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
 	}
 
-	private String findFreeBusyIcs(FreeBusyRequest request, List<FreeBusyProvider> freeBusyProviders) throws PrivateFreeBusyException {
+	private String findFreeBusyIcs(FreeBusyRequest request, List<FreeBusyProvider> freeBusyProviders)
+			throws PrivateFreeBusyException, ObmUserNotFoundException {
 		String freeBusyIcs = null;
 		for (FreeBusyProvider freeBusyProvider: freeBusyProviders) {
 			try {
 				freeBusyIcs = freeBusyProvider.findFreeBusyIcs(request);
-				if (freeBusyIcs != null)
+				if (freeBusyIcs != null) {
 					return freeBusyIcs;
-			}
-			catch (PrivateFreeBusyException e) {
+				}
+			} catch (PrivateFreeBusyException e) {
 				throw e;
-			}
-			catch (Exception e) {
+			} catch (ObmUserNotFoundException e) {
+				throw e;
+			} catch (Exception e) {
 				logger.error(
-						"Got an error while looking up the availability (free/busy) of the " +
-						"user '" + request.getOwner() + "' on provider " + freeBusyProvider + ", " + 
-						"cascading to next provider if any", e);
+					"Could not generate freebusy ICS with provider " + freeBusyProvider + ", " + 
+					"cascading to next provider if any.", e);
 			}
 		}
 		return freeBusyIcs;
