@@ -67,6 +67,7 @@ public class DatabaseFreeBusyProviderTest {
 	private final static String ICS = "ics";
 	private final static String OWNER_LOGIN = "owner";
 	private final static String OWNER_EMAIL = "owner@domain";
+	private final static String ATTENDEE_EMAIL = "attendee@domain";
 
 	private ObmDomain domain;
 	private ObmUser user;
@@ -86,7 +87,7 @@ public class DatabaseFreeBusyProviderTest {
 		List<FreeBusy> freeBusyList = Lists.newArrayList();
 		freeBusyList.add(freeBusy);
 		
-		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
+		expect(userService.getUserFromEmail(ATTENDEE_EMAIL)).andReturn(user);
 		expect(calendarDao.getFreeBusy(domain, fbr)).andReturn(freeBusyList);
 		expect(ical4jHelper.parseFreeBusy(freeBusy)).andReturn(ICS);
 		
@@ -105,7 +106,7 @@ public class DatabaseFreeBusyProviderTest {
 		
 		ObmUser user = ObmUser.builder().uid(1).login(OWNER_LOGIN).domain(domain).publicFreeBusy(false).build();
 		
-		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
+		expect(userService.getUserFromEmail(ATTENDEE_EMAIL)).andReturn(user);
 		
 		mocksControl.replay();
 		
@@ -122,7 +123,7 @@ public class DatabaseFreeBusyProviderTest {
 	public void testFindFreeBusyIcsReturnNullOnNullObmUser() throws FreeBusyException {
 		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
 		
-		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(null);
+		expect(userService.getUserFromEmail(ATTENDEE_EMAIL)).andReturn(null);
 		
 		mocksControl.replay();
 		
@@ -142,7 +143,7 @@ public class DatabaseFreeBusyProviderTest {
 		List<FreeBusy> freeBusyList = Lists.newArrayList();
 		freeBusyList.add(freeBusy);
 		
-		expect(userService.getUserFromEmail(OWNER_EMAIL)).andReturn(user);
+		expect(userService.getUserFromEmail(ATTENDEE_EMAIL)).andReturn(user);
 		expect(calendarDao.getFreeBusy(domain, fbr)).andReturn(freeBusyList);
 		expect(ical4jHelper.parseFreeBusy(freeBusy)).andReturn(null);
 		
@@ -161,7 +162,7 @@ public class DatabaseFreeBusyProviderTest {
 		freeBusyRequest.setEnd(DateUtils.date("2013-02-01T14:00:00"));
 		freeBusyRequest.setOwner(OWNER_EMAIL);
 		freeBusyRequest.setUid("1");
-		freeBusyRequest.addAttendee(UserAttendee.builder().email("attendee@domain").build());
+		freeBusyRequest.addAttendee(UserAttendee.builder().email(ATTENDEE_EMAIL).build());
 		return freeBusyRequest;
 	}
 	
@@ -177,7 +178,7 @@ public class DatabaseFreeBusyProviderTest {
 		freeBusyInterval.setStart(DateUtils.date("2013-01-20T07:00:00"));
 		
 		FreeBusy freeBusy = new FreeBusy();
-		freeBusy.setAtt(UserAttendee.builder().email("attendee@domain").build());
+		freeBusy.setAtt(UserAttendee.builder().email(ATTENDEE_EMAIL).build());
 		freeBusy.setStart(DateUtils.date("2013-01-01T14:00:00"));
 		freeBusy.setEnd(DateUtils.date("2013-02-01T14:00:00"));
 		freeBusy.setOwner(OWNER_EMAIL);

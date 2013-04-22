@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 
@@ -75,7 +76,8 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	}
 
 	private FreeBusy findFreeBusy(FreeBusyRequest fbr) throws PrivateFreeBusyException {
-		String email = fbr.getOwner();
+		Attendee attendee = fbr.getAttendees().get(0);
+		String email = attendee.getEmail();
 		ObmUser user = userService.getUserFromEmail(email);
 		if (user == null) {
 			return null;

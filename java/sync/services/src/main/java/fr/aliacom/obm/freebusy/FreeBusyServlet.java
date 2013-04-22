@@ -32,7 +32,6 @@
 package fr.aliacom.obm.freebusy;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -60,7 +59,7 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
 /*
- * /obm-sync/freebusy/firstname.lastname@obmdomain
+ * /obm-sync/freebusy?organizer=...&attendee=firstname.lastname@obmdomain
  */
 public class FreeBusyServlet extends HttpServlet {
 
@@ -94,13 +93,10 @@ public class FreeBusyServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String reqString = request.getRequestURI();
-		logger.info("FreeBusyServlet : reqString: '{}'", reqString);
+		logger.info("FreeBusyServlet : reqString: '" + request.getRequestURI() + "'");
 
-		String email = reqString.substring(reqString.lastIndexOf("/") + 1);
-		email = URLDecoder.decode(email, "UTF-8");
-		logger.info("freebusy email : '{}'", email);
-		
+		String attendee = request.getParameter("attendee");
+		String organizer = request.getParameter("organizer");
 
 		java.util.Calendar dnow = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		dnow.add(java.util.Calendar.MONTH, -1);
@@ -108,7 +104,7 @@ public class FreeBusyServlet extends HttpServlet {
 		dnow.add(java.util.Calendar.MONTH, 2);
 		Date dend = dnow.getTime();
 
-		FreeBusyRequest fbr = makeFreeBusyRequest(email, dstart, dend);
+		FreeBusyRequest fbr = makeFreeBusyRequest(organizer, attendee, dstart, dend);
 		
 		Set<FreeBusyQueryType> queryTypes = findFreeBusyQueryTypes(request);
 		List<FreeBusyProvider> providers = makeProvidersList(queryTypes);
@@ -119,10 +115,10 @@ public class FreeBusyServlet extends HttpServlet {
 				response.getOutputStream().write(ics.getBytes());
 			}
 			else {
-				logger.warn("FreeBusyServlet : user not found : '{}'", email);
+				logger.warn("FreeBusyServlet : user not found : '{}'", attendee);
 			}
 		} catch (PrivateFreeBusyException e) {
-			logger.warn("FreeBusyServlet : freebusy for user : '{}' is not public.", email);
+			logger.warn("FreeBusyServlet : freebusy for user : '{}' is not public.", attendee);
 		}
 		if (ics == null)
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -188,13 +184,13 @@ public class FreeBusyServlet extends HttpServlet {
 		return freeBusyQueryTypes;
 	}
 
-	private FreeBusyRequest makeFreeBusyRequest(String email, Date dstart, Date dend) {
+	private FreeBusyRequest makeFreeBusyRequest(String organizer, String attendee, Date dstart, Date dend) {
 		FreeBusyRequest fbr = new FreeBusyRequest();
 		
 		fbr.setStart(dstart);
 		fbr.setEnd(dend);
-		fbr.addAttendee(UserAttendee.builder().email(email).build());
-		fbr.setOwner(email);
+		fbr.addAttendee(UserAttendee.builder().email(attendee).build());
+		fbr.setOwner(organizer);
 		return fbr;
 	}
 }

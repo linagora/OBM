@@ -85,7 +85,9 @@ public class FreeBusyServletTest {
 	private ServletOutputStream outputStream;
 	
 	private final static String ICS = "ics";
-	private final static String REQUEST_URI = "/obm-sync/freebusy/secr@domain";
+	private final static String REQUEST_URI = "/obm-sync/freebusy";
+	private final static String PARAM_ATTENDEE = "attendee";
+	private final static String PARAM_ORGANIZER = "organizer";
 	private final static String DATASOURCE_PARAMETER = "datasource";
 	private final static String LOCAL_DATASOURCE = "local";
 	private final static String REMOTE_DATASOURCE = "remote";
@@ -104,7 +106,7 @@ public class FreeBusyServletTest {
 	
 	@Test
 	public void testDoGetWithNullDataSourceCallLocalProvider() throws IOException, ServletException, FreeBusyException {
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
 		expect(response.getOutputStream()).andReturn(outputStream).once();
@@ -121,7 +123,7 @@ public class FreeBusyServletTest {
 	
 	@Test
 	public void testDoGetWithNullDataSourceCallRemoteProvider() throws IOException, ServletException, FreeBusyException {
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
 		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
@@ -139,7 +141,7 @@ public class FreeBusyServletTest {
 	
 	@Test
 	public void testDoGetFreeBusyReturnNullIcs() throws ServletException, FreeBusyException, IOException {
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
 		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(null).once();
@@ -161,7 +163,7 @@ public class FreeBusyServletTest {
 	public void testDoGetDoesNotWantLocalDataSource() throws IOException, ServletException {
 		String[] dataSource = {};
 		
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
 		
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -181,7 +183,7 @@ public class FreeBusyServletTest {
 	public void testDoGetWithLocalProviderButNoRemote() throws FreeBusyException, IOException, ServletException {
 		String[] dataSource = {LOCAL_DATASOURCE};
 		
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
 		expect(response.getOutputStream()).andReturn(outputStream).once();
@@ -200,7 +202,7 @@ public class FreeBusyServletTest {
 	public void testDoGetWithRemoteProviderButNoLocal() throws FreeBusyException, IOException, ServletException {
 		String[] dataSource = {REMOTE_DATASOURCE};
 		
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(dataSource).once();
 		expect(remoteFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class))).andReturn(ICS).once();
 		expect(response.getOutputStream()).andReturn(outputStream).once();
@@ -217,7 +219,7 @@ public class FreeBusyServletTest {
 	
 	@Test
 	public void testDoGetWarnForPrivateFreeBusy() throws ServletException, IOException, FreeBusyException {
-		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expectOnHttpRequest();
 		expect(request.getParameterValues(DATASOURCE_PARAMETER)).andReturn(null).once();
 		expect(localFreeBusyProvider.findFreeBusyIcs(anyObject(FreeBusyRequest.class)))
 			.andThrow(new PrivateFreeBusyException());
@@ -235,6 +237,12 @@ public class FreeBusyServletTest {
 		assertThat(outputStream.toString()).isNull();
 	}
 
+	private void expectOnHttpRequest() {
+		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expect(request.getParameter(PARAM_ATTENDEE)).andReturn(PARAM_ATTENDEE).once();
+		expect(request.getParameter(PARAM_ORGANIZER)).andReturn(PARAM_ORGANIZER).once();
+	}
+	
 	private ServletOutputStream getFakeOutputStream() {
 		return new ServletOutputStream() {
 			
