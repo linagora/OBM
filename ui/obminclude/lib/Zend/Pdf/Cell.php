@@ -163,7 +163,7 @@ class Zend_Pdf_Cell {
 	 * @param array $section Section of text to wrap.
 	 * @return boolean True if it wrapped text, false if it did not.
 	 */
-	private function _wordWrap($section) {
+	private function _wordWrap(&$section) {
 		if ($this->isAutoWidth()) {
 			$maxWidth=$this->_page->getWidth();
 		} else {
@@ -262,7 +262,7 @@ class Zend_Pdf_Cell {
 		
 		
 		$section=$this->_makeTextSection($text,$charEncoding);
-		if ($this->_wordWrap(&$section)) {
+		if ($this->_wordWrap($section)) {
 			return; //word wrap has already taken care of calling addText
 		}
 		
