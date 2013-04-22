@@ -145,7 +145,7 @@ class Vpdi {
    * @access public
    * @return mixed
    */
-  public static function expand($properties, $break_profile = null) {
+  public static function expand(&$properties, $break_profile = null) {
     $stack = array();
     $current_profile = null;
     $current_entity = null;
