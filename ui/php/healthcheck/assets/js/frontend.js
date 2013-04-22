@@ -260,7 +260,6 @@ $.obm.htmlId = function(moduleId, checkId) {
 };
 
 $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
-	var counter = 0;
 	checkList.modules.forEach(function(module) {
 		if(module.url){
 			$.obm.insertExternalCheck(module);
@@ -268,7 +267,6 @@ $.obm.addModules = function(checkList, moduleTemplate, testTemplate) {
 		module.checks.forEach(function(check) {
 			check.htmlId = module.id+"-"+check.id;
 			check.referentModule = module.id;
-			check.external = module.url;
 			check.checkUrl = check.url;
 		});
 	});
@@ -285,7 +283,8 @@ $.obm.insertExternalCheck = function(module){
 			"name": "External Access to " + module.name,
 			"description": "Check access to " + module.name + " module ( " + module.url + " ) from this browser.",
 			"url": null,
-			"parentId": null
+			"parentId": null,
+			"external": module.url
 		}
 	);
 }
