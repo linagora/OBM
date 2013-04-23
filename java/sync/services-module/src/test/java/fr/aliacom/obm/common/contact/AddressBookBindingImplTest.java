@@ -31,69 +31,104 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.easymock.EasyMock;
+import javax.naming.NoPermissionException;
+
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
 
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(AddressBookBindingImplTest.Env.class)
 public class AddressBookBindingImplTest {
+
+	public static class Env extends AbstractModule {
+		private IMocksControl mocksControl = createControl();
+
+		@Override
+		protected void configure() {
+			bind(IMocksControl.class).toInstance(mocksControl);
+
+			bindWithMock(ObmHelper.class);
+			bindWithMock(ContactDao.class);
+			bindWithMock(UserDao.class);
+			bindWithMock(ContactMerger.class);
+			bindWithMock(ContactConfiguration.class);
+			bindWithMock(DatabaseConnectionProvider.class);
+			bindWithMock(CommitedOperationDao.class);
+			bindWithMock(ObmSyncConfigurationService.class);
+			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+		}
+
+		private <T> void bindWithMock(Class<T> cls) {
+			bind(cls).toInstance(mocksControl.createMock(cls));
+		}
+	}
+
+	private static final int USERS_ADDRESS_BOOK_ID = -1;
 	
+	@Inject
+	private IMocksControl mocksControl;
+	@Inject
+	private AddressBookBindingImpl binding;
+	@Inject
+	private ContactConfiguration contactConfiguration;
+	@Inject
+	private ContactMerger contactMerger;
+	@Inject
+	private CommitedOperationDao commitedOperationDao;
+	@Inject
+	private ObmSyncConfigurationService configuration;
+	@Inject
+	private UserDao userDao;
+	@Inject
+	private ContactDao contactDao;
+	@Inject
+	private ObmHelper helper;
+
 	private AccessToken token;
 
 	@Before
 	public void setUp() {
-		ObmDomain domain = ObmDomain
-							.builder()
-							.id(123)
-							.name("obm.org")
-							.uuid("01324-56789")
-							.build();
-		
-		token = new AccessToken(1, "");
-		token.setUserLogin("login");
-		token.setDomain(domain);
+		token = ToolBox.mockAccessToken(mocksControl);
 	}
-	
-	private ObmHelper mockHelper() throws SQLException {
-		ObmHelper helper = createMock(ObmHelper.class);
-		expect(helper.getConnection()).andReturn(null);
-		helper.cleanup(null, null, null);
-		expect(helper.selectNow(null)).andReturn(new Date());
-		return helper;
+
+	@After
+	public void tearDown() {
+		mocksControl.verify();
 	}
 
 	/**
@@ -102,87 +137,48 @@ public class AddressBookBindingImplTest {
 	 * AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC is set to true.
 	 */
 	@Test
-	public void testGetSyncGlobalAddressBookSync() throws ServerFault, SQLException {
+	public void testGetSyncGlobalAddressBookSync() throws Exception {
 		Date timestamp = DateUtils.getEpochCalendar().getTime();
 
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");
 
-		List<Contact> updatedContacts = ImmutableList.of(newContact);
-
-		Set<Integer> archivedContactIds = ImmutableSet.of(1, 2);
-
 		ContactUpdates contactUpdates = new ContactUpdates();
-		contactUpdates.setContacts(updatedContacts);
-		contactUpdates.setArchived(archivedContactIds);
-
-		Set<Integer> removalCandidates = ImmutableSet.of(3);
+		contactUpdates.setContacts(ImmutableList.of(newContact));
+		contactUpdates.setArchived(ImmutableSet.of(1, 2));
 
 		Contact newUser = new Contact();
 		newUser.setLastname("obmuser");
 
-		List<Contact> updatedUsers = ImmutableList.of(newUser);
-
-		Set<Integer> archivedUserIds = ImmutableSet.of(5, 7, 8);
-
 		ContactUpdates userUpdates = new ContactUpdates();
-		userUpdates.setContacts(updatedUsers);
-		userUpdates.setArchived(archivedUserIds);
-
-		Set<Contact> allUpdatedContacts = new HashSet<Contact>();
-		allUpdatedContacts.addAll(updatedContacts);
-		allUpdatedContacts.addAll(updatedUsers);
+		userUpdates.setContacts(ImmutableList.of(newUser));
+		userUpdates.setArchived(ImmutableSet.of(5, 7, 8));
 
 		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
+		Set<Folder> updatedContactFolders = Sets.newHashSet(updatedContactFolder1, updatedContactFolder2);
 
-		Set<Folder> updatedContactFolders = new HashSet<Folder>();
-		updatedContactFolders.add(updatedContactFolder1);
-		updatedContactFolders.add(updatedContactFolder2);
-
-		int defautUsersIdFolder = -1;
-		String defaultUsersNameFolder = "users";
-		Folder updatedUserFolder = Folder.builder().uid(defautUsersIdFolder).name(defaultUsersNameFolder).ownerLoginAtDomain("login@obm.org").build();
+		Folder updatedUserFolder = Folder.builder().uid(USERS_ADDRESS_BOOK_ID).name("users").ownerLoginAtDomain("user@test.tlse.lng").build();
 
 		Folder removedContactFolder1 = Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder removedContactFolder2 = Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
 		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
-		
-		ObmHelper helper = mockHelper();
 
-		ContactDao contactDao = createMock(ContactDao.class);
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
-		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
-		
-		expect(helper.getConnection()).andReturn(null);
-		helper.cleanup(null, null, null);
-		expect(helper.selectNow(null)).andReturn(new Date());
-		
+		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(3)).once();
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
-
-		expect(helper.getConnection()).andReturn(null);
-		helper.cleanup(null, null, null);
-		expect(helper.selectNow(null)).andReturn(new Date());
-		
-		UserDao userDao = createMock(UserDao.class);
 		expect(userDao.findUpdatedUsers(timestamp, token)).andReturn(userUpdates).once();
-
-		ObmSyncConfigurationService configuration = createMock(ObmSyncConfigurationService.class);
 		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
-
-		ContactConfiguration contactConfiguration = createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1);
 		expect(contactConfiguration.getAddressBookUsersName()).andReturn("users");
+		expect(helper.getConnection()).andReturn(null).anyTimes();
+		expect(helper.selectNow(null)).andReturn(new Date()).anyTimes();
+		helper.cleanup(null, null, null);
+		expectLastCall().anyTimes();
+		mocksControl.replay();
 		
-		Object[] mocks = { helper, contactDao, userDao, configuration, contactConfiguration };
-		replay(mocks);
-
-		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, userDao, null, helper, 
-				configuration, contactConfiguration, null);
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
-
-		verify(mocks);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact, newUser);
 		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3, 5, 7, 8);
@@ -196,24 +192,15 @@ public class AddressBookBindingImplTest {
 	 * AddressBookBindingImpl.GLOBAL_ADDRESS_BOOK_SYNC is set to false.
 	 */
 	@Test
-	public void testGetSyncNoGlobalAddressBookSync() throws ServerFault, SQLException {
-		Date timestamp = new Date();
+	public void testGetSyncNoGlobalAddressBookSync() throws Exception {
+		Date timestamp = DateUtils.getEpochCalendar().getTime();
 
 		Contact newContact = new Contact();
 		newContact.setLastname("newContact");
 
-		List<Contact> updatedContacts = ImmutableList.of(newContact);
-
-		Set<Integer> archivedContactIds = ImmutableSet.of(1, 2);
-
 		ContactUpdates contactUpdates = new ContactUpdates();
-		contactUpdates.setContacts(updatedContacts);
-		contactUpdates.setArchived(archivedContactIds);
-
-		Set<Integer> removalCandidates = ImmutableSet.of(3);
-
-		Set<Contact> allUpdatedContacts = new HashSet<Contact>();
-		allUpdatedContacts.addAll(updatedContacts);
+		contactUpdates.setContacts(ImmutableList.of(newContact));
+		contactUpdates.setArchived(ImmutableSet.of(1, 2));
 
 		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
@@ -222,68 +209,38 @@ public class AddressBookBindingImplTest {
 		Folder removedContactFolder1 = Folder.builder().uid(10).name("removedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder removedContactFolder2 = Folder.builder().uid(11).name("removedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
 		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
-		
-		removedContactFolders.add(removedContactFolder1);
-		removedContactFolders.add(removedContactFolder2);
 
-		ObmHelper helper = mockHelper();
-
-		ContactDao contactDao = createMock(ContactDao.class);
-		
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
-		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(removalCandidates).once();
-		expect(helper.getConnection()).andReturn(null);
-		helper.cleanup(null, null, null);
-		expect(helper.selectNow(null)).andReturn(new Date());
-
+		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(3)).once();
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
-		expect(helper.getConnection()).andReturn(null);
+		expect(configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
+		expect(helper.getConnection()).andReturn(null).anyTimes();
+		expect(helper.selectNow(null)).andReturn(new Date()).anyTimes();
 		helper.cleanup(null, null, null);
-		expect(helper.selectNow(null)).andReturn(new Date());
+		expectLastCall().anyTimes();
+		mocksControl.replay();
 		
-		ObmSyncConfigurationService configuration = createMock(ObmSyncConfigurationService.class);
-		expect(
-				configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
-
-		Object[] mocks = { helper, contactDao, configuration };
-		replay(mocks);
-
-		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, helper,
-				configuration, null, null);
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
-
-		verify(mocks);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact);
 		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3);
 		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2);
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
-	
+
 	@Test
-	public void testCreateContact() throws Exception {
-		Integer addressBookId = 1;
-		Contact contact = new Contact();
+	public void testCreateContactWithCommitedOperation() throws Exception {
+		Integer addressBookId = 1, entityId = 984;
+		Contact contact = new Contact(), expectedContact = new Contact();
 		String clientId = "6547";
 
-		IMocksControl control = EasyMock.createControl();
-		
-		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
-		expect(contactConfiguration.getAddressBookUserId())
-			.andReturn(2).once();
-		
-		Integer entityId = 984;
-		Contact expectedContact = new Contact();
 		expectedContact.setEntityId(entityId);
-		
-		ContactDao contactDao = control.createMock(ContactDao.class);
-		expect(contactDao.createContactInAddressBook(token, contact, addressBookId))
-			.andReturn(expectedContact).once();
-		
-		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsContact(token, clientId))
-			.andReturn(null).once();
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(expectedContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
+		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(null).once();
 		commitedOperationDao.store(token,
 				CommitedElement.builder()
 					.clientId(clientId)
@@ -291,73 +248,176 @@ public class AddressBookBindingImplTest {
 					.kind(Kind.VCONTACT)
 					.build());
 		expectLastCall().once();
+		mocksControl.replay();
 		
-		control.replay();
-		
-		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, null,
-				null, contactConfiguration , commitedOperationDao);
 		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
 		
-		control.verify();
 		assertThat(createdContact).isEqualTo(expectedContact);
 	}
-	
+
 	@Test
 	public void testCreateContactAlreadyCommited() throws Exception {
 		Integer addressBookId = 1;
 		Contact contact = new Contact();
 		String clientId = "6547";
 
-		IMocksControl control = EasyMock.createControl();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(contact).once();
+		mocksControl.replay();
 		
-		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
-		expect(contactConfiguration.getAddressBookUserId())
-			.andReturn(2).once();
-		
-		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsContact(token, clientId))
-			.andReturn(contact).once();
-		
-		control.replay();
-		
-		AddressBookBindingImpl binding = new AddressBookBindingImpl(null, null, null, null,
-				null, contactConfiguration , commitedOperationDao);
 		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
 		
-		control.verify();
 		assertThat(createdContact).isEqualTo(contact);
 	}
-	
+
 	@Test
 	public void testCreateContactWhenNullClientId() throws Exception {
-		Integer addressBookId = 1;
-		Contact contact = new Contact();
+		Integer addressBookId = 1, entityId = 984;
+		Contact contact = new Contact(), expectedContact = new Contact();
 
-		IMocksControl control = EasyMock.createControl();
-		
-		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
-		expect(contactConfiguration.getAddressBookUserId())
-			.andReturn(2).once();
-		
-		Integer entityId = 984;
-		Contact expectedContact = new Contact();
 		expectedContact.setEntityId(entityId);
 		
-		ContactDao contactDao = control.createMock(ContactDao.class);
-		expect(contactDao.createContactInAddressBook(token, contact, addressBookId))
-			.andReturn(expectedContact).once();
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(expectedContact).once();
+		expect(commitedOperationDao.findAsContact(token, null)).andReturn(null).once();
+		mocksControl.replay();
 		
-		CommitedOperationDao commitedOperationDao = control.createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsContact(token, null))
-			.andReturn(null).once();
-		
-		control.replay();
-		
-		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, null,
-				null, contactConfiguration , commitedOperationDao);
 		Contact createdContact = binding.createContact(token, addressBookId, contact, null);
 		
-		control.verify();
 		assertThat(createdContact).isEqualTo(expectedContact);
+	}
+
+	@Test
+	public void testCreateContact() throws Exception {
+		Contact contact = new Contact();
+		int addressBookId = 1;
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(contact).once();
+		expect(commitedOperationDao.findAsContact(token, null)).andReturn(null).once();
+		mocksControl.replay();
+
+		Contact createdContact = binding.createContact(token, addressBookId, contact, null);
+		
+		assertThat(createdContact).isNotNull();
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testCreateContactWithoutPermission() throws Exception {
+		Contact contact = new Contact();
+		int addressBookId = 1;
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(false);
+		mocksControl.replay();
+
+		binding.createContact(token, addressBookId, contact, null);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testCreateContactInAddressBookOfOBMUsers() throws Exception {
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		mocksControl.replay();
+		
+		binding.createContact(token, USERS_ADDRESS_BOOK_ID, new Contact(), null);
+	}
+
+	@Test
+	public void testModifyContact() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(true).once();
+		contactMerger.merge(oldContact, newContact);
+		expectLastCall().once();
+		expect(contactDao.modifyContact(token, newContact)).andReturn(newContact).once();
+		mocksControl.replay();
+
+		Contact modifiedContact = binding.modifyContact(token, addressBookId, newContact);
+		
+		assertThat(modifiedContact).isEqualTo(newContact);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testModifyContactWithoutPermission() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(false).once();
+		mocksControl.replay();
+
+		binding.modifyContact(token, addressBookId, newContact);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testModifyContactInAddressBookOfOBMUsers() throws Exception {
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		mocksControl.replay();
+		
+		binding.modifyContact(token, USERS_ADDRESS_BOOK_ID, new Contact());
+	}
+
+	@Test
+	public void testRemoveContact() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(true).once();
+		expect(contactDao.removeContact(token, oldContact)).andReturn(newContact).once();
+		mocksControl.replay();
+
+		Contact removedContact = binding.removeContact(token, addressBookId, newContact.getUid());
+		
+		assertThat(removedContact).isEqualTo(newContact);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testRemoveContactWithoutPermission() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(false).once();
+		mocksControl.replay();
+
+		binding.removeContact(token, addressBookId, newContact.getUid());
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testRemoveContactInAddressBookOfOBMUsers() throws Exception {
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		mocksControl.replay();
+		
+		binding.removeContact(token, USERS_ADDRESS_BOOK_ID, 1);
 	}
 }

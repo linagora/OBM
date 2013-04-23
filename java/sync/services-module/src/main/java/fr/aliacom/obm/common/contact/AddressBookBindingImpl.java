@@ -212,9 +212,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throws ServerFault, NoPermissionException {
 		
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
-				throw new NoPermissionException("no permission to add a contact to address book users.");
-			}
+			assertIsNotAddressBookOfOBMUsers(addressBookId);
+			assertHasRightsOnAddressBook(token, addressBookId);
 			
 			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
 			if (commitedContact != null) {
@@ -237,23 +236,26 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 
+	private void assertIsNotAddressBookOfOBMUsers(Integer addressBookId) throws NoPermissionException {
+		if (isUsersOBMAddressBook(addressBookId)) {
+			throw new NoPermissionException("Cannot edit the 'users' address book.");
+		}
+	}
+
 	@Override
 	@Transactional
 	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact)
 		throws ServerFault, NoPermissionException, ContactNotFoundException {
 
 		try {
-			if (isUsersOBMAddressBook(addressBookId)) {
-				throw new NoPermissionException("No permission to modify a contact in address book users.");
-			} else {
-				Contact previous = contactDao.findContact(token, contact.getUid());
-				if (!contactDao.hasRightsOn(token, contact.getUid())) {
-					throw new NoPermissionException("No permission to modify a contact in address book users.");
-				} else {
-					contactMerger.merge(previous, contact);
-					return contactDao.modifyContact(token, contact);
-				}
-			}
+			assertIsNotAddressBookOfOBMUsers(addressBookId);
+
+			Contact previous = contactDao.findContact(token, contact.getUid());
+
+			assertHasRightsOnAddressBook(token, previous.getFolderId());
+
+			contactMerger.merge(previous, contact);
+			return contactDao.modifyContact(token, contact);
 		} catch (SQLException ex) {
 			throw new ServerFault(ex.getMessage());
 		} catch (FindException ex) {
@@ -262,20 +264,28 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throw new ServerFault(ex.getMessage());
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public Contact removeContact(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		if (isUsersOBMAddressBook(addressBookId)) {
-			throw new NoPermissionException("no permission to delete an user obm contact.");
-		} else {
-			try {
-				return contactDao.removeContact(token, contactId);
-			} catch (SQLException e) {
-				throw new ServerFault(e);
-			}
+		assertIsNotAddressBookOfOBMUsers(addressBookId);
+
+		try {
+			Contact contact = contactDao.findContact(token, contactId);
+
+			assertHasRightsOnAddressBook(token, contact.getFolderId());
+
+			return contactDao.removeContact(token, contact);
+		} catch (SQLException e) {
+			throw new ServerFault(e);
+		}
+	}
+
+	private void assertHasRightsOnAddressBook(AccessToken token, Integer addressBookId) throws NoPermissionException {
+		if (!contactDao.hasRightsOnAddressBook(token, addressBookId)) {
+			throw new NoPermissionException("No rights on AddressBook " + addressBookId);
 		}
 	}
 
