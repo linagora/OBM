@@ -104,11 +104,7 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.alpha2.mysql.sql ${UPGRADE_SQL_DIR_
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta3.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.beta3
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta4.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.beta4
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.2~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.2~0
-<<<<<<< HEAD
-cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.5~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.5~1
-=======
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.9~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.9~0
->>>>>>> [OBMFULL-4100] alter trusttoken table schema
 
 #Upgrade My OBM 2.5.0
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.0~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.0~1
