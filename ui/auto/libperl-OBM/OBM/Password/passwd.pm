@@ -47,7 +47,6 @@ use Crypt::SmbHash;
 
 $VERSION = "1.0";
 @EXPORT_OK = qw(    _md5sumToMd5
-                    _plainToMd5sum
                     _toMd5
                     _toSsha
                     _convertPasswd
@@ -62,18 +61,6 @@ sub _md5sumToMd5 {
 
     return encode_base64( pack( "H*", $passwdMd5sum ) );
 }
-
-
-sub _plainToMd5sum {
-    my $self = shift;
-    my( $passwdPlain ) = @_;
-
-    my $md5 = Digest::MD5->new;
-    $md5->add( $passwdPlain );
-
-    return $md5->hexdigest;
-}
-
 
 sub _toMd5 {
     my $self = shift;
