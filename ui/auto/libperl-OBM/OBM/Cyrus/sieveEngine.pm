@@ -283,7 +283,7 @@ sub _sieveGetHeaders {
     my $self = shift;
     my( $oldSieveScript, $headers ) = @_;
 
-    while( ( $#{$oldSieveScript} >= 0 ) && ( $oldSieveScript->[0] =~ /^require\s+\[(.+)\];$/ ) ) {
+    while( ( $#{$oldSieveScript} >= 0 ) && ( $oldSieveScript->[0] =~ /^\s*require\s+(?:\[)?(.+?)(?:\])?;/ ) ) {
         my @requires = split(',', $1);
 
         push(@{$headers}, @requires);
