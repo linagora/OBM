@@ -46,8 +46,7 @@ use Digest::MD5;
 use Crypt::SmbHash;
 
 $VERSION = "1.0";
-@EXPORT_OK = qw(    _md5sumToMd5
-                    _toSsha
+@EXPORT_OK = qw(
                     _convertPasswd
                     _getNTLMPasswd
                );
