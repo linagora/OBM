@@ -91,6 +91,7 @@ public class ToolBox {
 		EasyMock.expect(accessToken.getConversationUid()).andReturn(1).anyTimes();
 		EasyMock.expect(accessToken.getSessionId()).andReturn("sessionId").anyTimes();
 		EasyMock.expect(accessToken.getVersion()).andReturn(new MavenVersion("0", "0", "0")).anyTimes();
+		EasyMock.expect(accessToken.getUserWithDomain()).andReturn(login + '@' + domain.getName()).anyTimes();
 		
 		return accessToken;
 	}
