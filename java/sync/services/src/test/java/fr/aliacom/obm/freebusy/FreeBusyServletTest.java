@@ -10,6 +10,7 @@ import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
@@ -87,7 +88,7 @@ public class FreeBusyServletTest {
 	
 	private final static String ICS = "ics";
 	private final static String REQUEST_URI = "/obm-sync/freebusy";
-	private final static String PARAM_ATTENDEE = "attendee";
+	private final static String PATHINFO_ATTENDEE = "attendee";
 	private final static String PARAM_ORGANIZER = "organizer";
 	private final static String DATASOURCE_PARAMETER = "datasource";
 	private final static String LOCAL_DATASOURCE = "local";
@@ -124,6 +125,24 @@ public class FreeBusyServletTest {
 		mocksControl.verify();
 		
 		assertThat(outputStream.toString()).isEqualTo(ICS);
+	}
+	
+	@Test
+	public void testDoGetWithNullPathInfo() throws IOException, ServletException {
+		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
+		expect(request.getPathInfo()).andReturn(null).once();
+		
+		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		freeBusyServlet.init(servletConfig);
+		freeBusyServlet.doGet(request, response);
+		
+		mocksControl.verify();
+		
+		assertThat(outputStream.toString()).isEqualTo(null);
 	}
 	
 	@Test
@@ -299,10 +318,16 @@ public class FreeBusyServletTest {
 		
 		assertThat(outputStream.toString()).isNull();
 	}
+	
+	@Test
+	public void testMakeFreeBusyRequestWithNullOrganizer() {
+		FreeBusyRequest fbr = freeBusyServlet.makeFreeBusyRequest(null, "attendee", new Date(), new Date());
+		assertThat(fbr.getOwner()).isEqualTo("attendee");
+	}
 
 	private void expectOnHttpRequest() {
 		expect(request.getRequestURI()).andReturn(REQUEST_URI).once();
-		expect(request.getParameter(PARAM_ATTENDEE)).andReturn(PARAM_ATTENDEE).once();
+		expect(request.getPathInfo()).andReturn(PATHINFO_ATTENDEE).once();
 		expect(request.getParameter(PARAM_ORGANIZER)).andReturn(PARAM_ORGANIZER).once();
 	}
 	

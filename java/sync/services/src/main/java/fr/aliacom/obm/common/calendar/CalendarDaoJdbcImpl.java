@@ -767,7 +767,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						+ fbr.getStart() + " dend: " + fbr.getEnd());
 
 				ObmUser attendee = userDao.findUser(att.getEmail(), domain);
-				ObmUser organizer = userDao.findUserByLogin(fbr.getOwner(), domain);
+				ObmUser organizer = userDao.findUser(fbr.getOwner(), domain);
 
 				Calendar cal = getGMTCalendar();
 				if (attendee != null) {

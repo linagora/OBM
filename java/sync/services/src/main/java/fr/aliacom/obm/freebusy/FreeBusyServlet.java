@@ -54,13 +54,15 @@ import org.obm.sync.exception.ObmUserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
 /*
- * /obm-sync/freebusy?organizer=...&attendee=firstname.lastname@obmdomain
+ * /obm-sync/freebusy/<email_of_attendee>?organizer=<login_of_organizer>
  */
 public class FreeBusyServlet extends HttpServlet {
 
@@ -95,8 +97,15 @@ public class FreeBusyServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		logger.info("FreeBusyServlet : reqString: '{}'", request.getRequestURI());
-
-		String attendee = request.getParameter("attendee");
+		
+		final String pathInfo = request.getPathInfo();
+		if (pathInfo == null) {
+			logger.warn("No email found in the freebusy request url.");
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
+		String attendee = extractAttendeeFrom(pathInfo);
 		String organizer = request.getParameter("organizer");
 
 		java.util.Calendar dnow = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -125,6 +134,10 @@ public class FreeBusyServlet extends HttpServlet {
 			logger.warn("FreeBusyServlet : user : '{}' was not found.", attendee);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
+	}
+
+	private String extractAttendeeFrom(String pathInfo) {
+		return pathInfo.replaceFirst("^/", "");
 	}
 
 	private String findFreeBusyIcs(FreeBusyRequest request, List<FreeBusyProvider> freeBusyProviders)
@@ -188,13 +201,13 @@ public class FreeBusyServlet extends HttpServlet {
 		return freeBusyQueryTypes;
 	}
 
-	private FreeBusyRequest makeFreeBusyRequest(String organizer, String attendee, Date dstart, Date dend) {
+	@VisibleForTesting FreeBusyRequest makeFreeBusyRequest(String organizer, String attendee, Date dstart, Date dend) {
 		FreeBusyRequest fbr = new FreeBusyRequest();
 		
 		fbr.setStart(dstart);
 		fbr.setEnd(dend);
 		fbr.addAttendee(UserAttendee.builder().email(attendee).build());
-		fbr.setOwner(organizer);
+		fbr.setOwner(Objects.firstNonNull(organizer, attendee));
 		return fbr;
 	}
 }
