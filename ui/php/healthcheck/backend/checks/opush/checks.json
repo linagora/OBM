@@ -25,7 +25,7 @@
             "id": "OpushFolderSyncStatus",
             "name": "Opush Folder Sync Check",
             "description": "Checks that a simple folder sync scenario runs on opush service",
-            "url": "http://obm.org/wiki/spushnik",
+            "url": "http://obm.org/content/spushnik",
             "parentId": null
         }
     ]

@@ -75,7 +75,7 @@ class OpushFolderSyncStatus extends AbstractUserStatus {
     $ini = parse_ini_file($confFile, true);
     
     if (!isset($ini['spushnik'])) {
-      throw new Exception("Configuration file '" . $confFile . "' doesn't contain a 'spushnik' section.<br />" .
+      throw new Exception("Configuration file '/etc/obm/healthcheck.ini' doesn't contain a 'spushnik' section.<br />" .
         "Example: " .
         "<br /> <br /> [spushnik] <br /> spushnikIp=127.0.0.1 <br /> spushnikPort=8082");
     }
@@ -83,7 +83,7 @@ class OpushFolderSyncStatus extends AbstractUserStatus {
     $spushnik = $ini['spushnik'];
     
     if (!isset($spushnik['spushnikIp']) || !isset($spushnik['spushnikPort'])) {
-      throw new Exception("Section 'spushnik' in configuration file '" . $confFile . "' should contain 'spushnikIp' and 'spushnikPort' entries. <br />" .
+      throw new Exception("Section 'spushnik' in configuration file '/etc/obm/healthcheck.ini' should contain 'spushnikIp' and 'spushnikPort' entries. <br />" .
         "Example: " .
         "<br /> <br /> [spushnik] <br /> spushnikIp=127.0.0.1 <br /> spushnikPort=8082");
     }
