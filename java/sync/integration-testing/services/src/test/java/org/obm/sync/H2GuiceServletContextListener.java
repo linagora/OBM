@@ -29,34 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.locators;
+package org.obm.sync;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 
-@Singleton
-public class Locator {
+import org.obm.dbcp.DatabaseConnectionProvider;
 
-	private final LocatorService locatorService;
-	private final ConfigurationService configurationService;
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.io.Resources;
+import com.google.inject.Injector;
 
-	@Inject
-	protected Locator(ConfigurationService configurationService, LocatorService locatorService) {
-		this.configurationService = configurationService;
-		this.locatorService = locatorService;
-	}
+public class H2GuiceServletContextListener extends GuiceServletContextListener {
+
+	public static final String INITIAL_DB_SCRIPT = "dbInitialScript.sql";
 	
-	public String backendUrl(String loginAtDomain) throws LocatorClientException {
-		String obmSyncHost = getObmSyncHost(loginAtDomain);
-		return configurationService.getObmSyncUrl(obmSyncHost);
+	@Override
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		super.contextInitialized(servletContextEvent);
+		initializeH2Database(servletContextEvent.getServletContext());
 	}
-	
-	private String getObmSyncHost(String loginAtDomain) throws LocatorClientException {
-		return locatorService.getServiceLocation("sync/obm_sync", loginAtDomain);
+
+	private void initializeH2Database(ServletContext servletContext) {
+		try {
+			Connection connection = getH2Connection(servletContext);
+			connection.prepareStatement(getInitialDBScript()).executeUpdate();
+		} catch (SQLException e) {
+			Throwables.propagate(e);
+		} catch (IOException e) {
+			Throwables.propagate(e);
+		}
+	}
+
+	private String getInitialDBScript() throws IOException {
+		URL initialDbScriptUrl = Resources.getResource(INITIAL_DB_SCRIPT);
+		return Resources.toString(initialDbScriptUrl, Charsets.UTF_8);
+	}
+
+	private Connection getH2Connection(ServletContext servletContext) throws SQLException {
+		Injector injector = (Injector)servletContext.getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
+		return injector.getInstance(DatabaseConnectionProvider.class).getConnection();
 	}
 	
 }

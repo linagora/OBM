@@ -388,7 +388,7 @@ public class ObmSyncArchiveUtils {
 	        	"<display-name>OBM Sync integration testing</display-name>" +
 	        	
 	        	"<listener>" +
-	                "<listener-class>org.obm.sync.GuiceServletContextListener</listener-class>" +
+	                "<listener-class>org.obm.sync.H2GuiceServletContextListener</listener-class>" +
                 "</listener>" +
 	                
                 "<context-param>" +

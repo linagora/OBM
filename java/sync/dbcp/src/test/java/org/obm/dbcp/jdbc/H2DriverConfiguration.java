@@ -65,7 +65,7 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 	}
 
 	private String getJDBCUrl(String dbName) {
-		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=3";
+		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=2";
 	}
 	
 	@Override

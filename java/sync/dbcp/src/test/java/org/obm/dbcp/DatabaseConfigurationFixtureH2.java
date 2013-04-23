@@ -44,7 +44,7 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
 	@Override
 	public DatabaseFlavour getDatabaseSystem() {
-		return DatabaseFlavour.PGSQL;
+		return DatabaseFlavour.MYSQL;
 	}
 
 	@Override

@@ -44,7 +44,7 @@ import com.google.inject.name.Named;
 public class CalendarClient extends AbstractEventSyncClient {
 	
 	@Inject
-	private CalendarClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+	protected CalendarClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		super("/calendar", syncClientException, locator, obmSyncLogger);
 	}
 

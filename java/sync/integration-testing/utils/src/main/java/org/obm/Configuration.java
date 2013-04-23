@@ -70,7 +70,7 @@ public class Configuration {
 		public String defaultTemplateFolder;
 		public String overrideTemplateFolder;
 		public String obmSyncMailer;
-		public String ldapServer = "ldap://localhost";
+		public String ldapServer = null;
 		public String ldapBaseDn = "dc=local";
 		public String ldapFilter;
 		public String ldapBindDn = "uid=uid=ldapadmin,ou=sysusers,dc=local";
@@ -91,7 +91,7 @@ public class Configuration {
 	public File dataDir;
 	public String locatorUrl = null;
 	public String obmUiBaseUrl = null;
-	public String obmSyncUrl = null;
+	public String obmSyncServices = "services";
 	public int locatorCacheTimeout = 10;
 	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
 	public String activeSyncServletUrl = null;

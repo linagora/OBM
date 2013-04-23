@@ -117,7 +117,7 @@ public class StaticConfigurationService implements ConfigurationService {
 
 	@Override
 	public String getObmSyncUrl(String obmSyncHost) {
-		return configuration.obmSyncUrl;
+		return obmSyncHost + configuration.obmSyncServices;
 	}
 
 	@Override
