@@ -158,6 +158,40 @@ public class DatabaseFreeBusyProviderTest {
 		
 		assertThat(ics).isNull();
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testFindFreeBusyIcsThrowExceptionOnEmptyAttendees()
+			throws ObmUserNotFoundException, FreeBusyException {
+		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
+		fbr.getAttendees().clear();
+		
+		mocksControl.replay();
+		
+		try {
+			databaseFreebusyProvider.findFreeBusyIcs(fbr);
+		} catch (IllegalArgumentException e) {
+			throw e;
+		} finally {
+			mocksControl.verify();
+		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testFindFreeBusyIcsThrowExceptionOnTwoAttendees()
+			throws ObmUserNotFoundException, FreeBusyException {
+		FreeBusyRequest fbr = buildFakeFreeBusyRequest();
+		fbr.addAttendee(UserAttendee.builder().email(ATTENDEE_EMAIL).build());
+		
+		mocksControl.replay();
+		
+		try {
+			databaseFreebusyProvider.findFreeBusyIcs(fbr);
+		} catch (IllegalArgumentException e) {
+			throw e;
+		} finally {
+			mocksControl.verify();
+		}
+	}
 
 	private FreeBusyRequest buildFakeFreeBusyRequest() {
 		FreeBusyRequest freeBusyRequest = new FreeBusyRequest();

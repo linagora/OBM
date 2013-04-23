@@ -40,6 +40,7 @@ import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.exception.ObmUserNotFoundException;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -77,7 +78,10 @@ public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
 	}
 
 	private FreeBusy findFreeBusy(FreeBusyRequest fbr) throws PrivateFreeBusyException, ObmUserNotFoundException {
-		Attendee attendee = fbr.getAttendees().get(0);
+		List<Attendee> attendees = fbr.getAttendees();
+		Preconditions.checkArgument(attendees.size() == 1);
+		
+		Attendee attendee = attendees.get(0);
 		String email = attendee.getEmail();
 		ObmUser user = userService.getUserFromEmail(email);
 		
