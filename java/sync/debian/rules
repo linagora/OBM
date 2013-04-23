@@ -40,7 +40,7 @@ binary-install-tomcat-webapp/% ::
 
 binary-install/obm-autoconf:: binary-install-tomcat-webapp/obm-autoconf
 
-install/obm-sync: WEB_INF = $(shell find $(CURDIR)/services/target -name WEB-INF)
+install/obm-sync: WEB_INF = $(shell find $(CURDIR)/services-webapp/target -name WEB-INF)
 install/obm-sync: INSTALL_DIR := $(CURDIR)/debian/obm-sync/usr/share/obm-sync/
 install/obm-sync::
 	cp -r $(WEB_INF) $(INSTALL_DIR)
