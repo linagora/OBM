@@ -49,6 +49,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -207,7 +208,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 
 	}
 
-	private void parseRecurrence(Event ev, Element rec) {
+	@VisibleForTesting void parseRecurrence(Event ev, Element rec) {
 		String kind = rec.getAttribute("kind");
 		EventRecurrence er = new EventRecurrence();
 		er.setKind(RecurrenceKind.lookup(kind));
@@ -229,11 +230,8 @@ public class CalendarItemsParser extends AbstractItemsParser {
 				er.addException(DateHelper.asDate(exDates[i]));
 
 			}
-		} else {
-			er.setEnd(new Date());
 		}
 		ev.setRecurrence(er);
-
 	}
 
 	public CalendarInfo[] parseInfos(Document doc) {

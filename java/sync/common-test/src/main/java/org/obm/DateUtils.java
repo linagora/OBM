@@ -34,6 +34,7 @@ package org.obm;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 public class DateUtils {
 
@@ -41,4 +42,7 @@ public class DateUtils {
 		return new DateTime(dateAsString).toDate();
 	}
 
+	public static Date dateUTC(String dateAsString) {
+		return new DateTime(dateAsString, DateTimeZone.UTC).toDate();
+	}
 }

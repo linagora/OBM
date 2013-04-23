@@ -32,6 +32,7 @@
 package org.obm.sync.calendar;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.dateUTC;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -479,5 +480,63 @@ public class CalendarItemsParserTest {
 		assertThat(resourceInfo.getDescription()).isNull();
 		assertThat(resourceInfo.isRead()).isTrue();
 		assertThat(resourceInfo.isWrite()).isFalse();
+	}
+
+	@Test
+	public void testParseRecurrenceWhenNone() throws SAXException, IOException {
+		Document doc = DOMUtils.parse("<recurrence kind=\"none\"/>");
+
+		Event event = new Event();
+		parser.parseRecurrence(event, doc.getDocumentElement());
+		
+		assertThat(event.getRecurrence()).isNotNull();
+		assertThat(event.getRecurrence().getExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getEventExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getDays()).isEmpty();
+		assertThat(event.getRecurrence().frequencyIsSpecified()).isFalse();
+		assertThat(event.getRecurrence().getKind()).isEqualTo(RecurrenceKind.none);
+		assertThat(event.getRecurrence().getEnd()).isNull();
+	}
+
+	@Test
+	public void testParseRecurrenceWhenWeeklyNoEnd() throws SAXException, IOException {
+		Document doc = DOMUtils.parse(
+			"<recurrence days=\"0001000\" freq=\"1\" kind=\"weekly\">" +
+				"<exceptions/>" +
+				"<eventExceptions/>" +
+			"</recurrence>");
+		
+		Event event = new Event();
+		parser.parseRecurrence(event, doc.getDocumentElement());
+		
+		assertThat(event.getRecurrence()).isNotNull();
+		assertThat(event.getRecurrence().getExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getEventExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getDays()).containsOnly(RecurrenceDay.Wednesday);
+		assertThat(event.getRecurrence().frequencyIsSpecified()).isTrue();
+		assertThat(event.getRecurrence().getFrequence()).isEqualTo(1);
+		assertThat(event.getRecurrence().getKind()).isEqualTo(RecurrenceKind.weekly);
+		assertThat(event.getRecurrence().getEnd()).isNull();
+	}
+
+	@Test
+	public void testParseRecurrenceWhenDailyWithEnd() throws SAXException, IOException {
+		Document doc = DOMUtils.parse(
+			"<recurrence days=\"\" end=\"1340708400000\" freq=\"2\" kind=\"daily\">" +
+				"<exceptions/>" +
+				"<eventExceptions/>" +
+			"</recurrence>");
+		
+		Event event = new Event();
+		parser.parseRecurrence(event, doc.getDocumentElement());
+		
+		assertThat(event.getRecurrence()).isNotNull();
+		assertThat(event.getRecurrence().getExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getEventExceptions()).isEmpty();
+		assertThat(event.getRecurrence().getDays()).isEmpty();
+		assertThat(event.getRecurrence().frequencyIsSpecified()).isTrue();
+		assertThat(event.getRecurrence().getFrequence()).isEqualTo(2);
+		assertThat(event.getRecurrence().getKind()).isEqualTo(RecurrenceKind.daily);
+		assertThat(event.getRecurrence().getEnd()).isEqualTo(dateUTC("2012-06-26T11:00:00"));
 	}
 }
