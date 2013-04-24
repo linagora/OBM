@@ -47,6 +47,8 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,49 +60,49 @@ import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 
-public class GuiceServletContextListener implements ServletContextListener { 
+public class GuiceServletContextListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
 	private static final String APPLICATION_NAME = "obm-locator";
-	
-	
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-    	
-        try {
-        	Injector injector = createInjector();
-        	if (injector == null) { 
-        		failStartup("Could not create injector: createInjector() returned null"); 
-        	} 
-        	XTrustProvider.install();
-        	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-        } catch (Exception e) {
-        	logger.error(e.getMessage(), e);
-        	failStartup(e.getMessage());
-        } 
-    } 
-    
-    private Injector createInjector() {
-        return Guice.createInjector(new AbstractModule() {
 
-            @Override
-            protected void configure() {
-            	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-            	bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-                bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
-            	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-            	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
-        		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
-                install(new TransactionalModule());
-                install(new LocatorServletModule());
-            }
-        });
-    }
-    
-    private void failStartup(String message) { 
-        throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
-    }
-    
-    public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-    }
-    
+	public void contextInitialized(ServletContextEvent servletContextEvent) {
+
+		try {
+			Injector injector = createInjector();
+			if (injector == null) {
+				failStartup("Could not create injector: createInjector() returned null");
+			}
+			XTrustProvider.install();
+			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			failStartup(e.getMessage());
+		}
+	}
+
+	private Injector createInjector() {
+		return Guice.createInjector(new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+				bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+				bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
+				bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
+				bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+				bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+				bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+				install(new TransactionalModule());
+				install(new LocatorServletModule());
+			}
+		});
+	}
+
+	private void failStartup(String message) {
+		throw new CreationException(Collections.nCopies(1, new Message(this, message)));
+	}
+
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+	}
+
 }
