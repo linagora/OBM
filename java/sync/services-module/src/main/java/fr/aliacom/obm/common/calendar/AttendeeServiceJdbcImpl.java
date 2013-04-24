@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -94,7 +96,8 @@ public class AttendeeServiceJdbcImpl implements AttendeeService {
 			}
 			
 			if (createIfNeeded) {
-				contact = contactDao.createCollectedContact(name, email, domain, ownerId);
+				String displayedName = Objects.firstNonNull(Strings.emptyToNull(name), email);
+				contact = contactDao.createCollectedContact(displayedName, email, domain, ownerId);
 				
 				return attendeeFromContact(contact);
 			}

@@ -35,6 +35,8 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.SQLException;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +47,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Attendee;
@@ -226,6 +229,28 @@ public class AttendeeServiceJdbcImplTest {
 		ContactAttendee attendee = attendeeService.findContactAttendee("external", "external.to@my.domain", false, domain, 1);
 		
 		assertThat(attendee).isNull();
+	}
+	
+	@Test
+	public void testFindContactAttendeeWithEmptyNameCreateCollected() throws SQLException, ServerFault {
+		expect(contactDao.findAttendeeContactFromEmailForUser("external.to@my.domain", 1)).andReturn(null).once();
+		expect(contactDao.createCollectedContact("external.to@my.domain", "external.to@my.domain", domain, 1)).andReturn(externalContact).once();
+		
+		mocksControl.replay();
+		
+		ContactAttendee attendee = attendeeService.findContactAttendee("", "external.to@my.domain", true, domain, 1);
+		assertThat(attendee).isNotNull();
+	}
+	
+	@Test
+	public void testFindContactAttendeeWithNullNameCreateCollected() throws SQLException, ServerFault {
+		expect(contactDao.findAttendeeContactFromEmailForUser("external.to@my.domain", 1)).andReturn(null).once();
+		expect(contactDao.createCollectedContact("external.to@my.domain", "external.to@my.domain", domain, 1)).andReturn(externalContact).once();
+		
+		mocksControl.replay();
+		
+		ContactAttendee attendee = attendeeService.findContactAttendee(null, "external.to@my.domain", true, domain, 1);
+		assertThat(attendee).isNotNull();
 	}
 	
 	@Test
