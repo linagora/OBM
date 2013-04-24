@@ -55,7 +55,7 @@ class OpushFolderSyncStatus extends AbstractUserStatus {
     foreach ($servers as $server) {
       $host = $server[0];      
       $url = str_replace("%OPUSH_HOST%", $host["ip"], $url);
-      $spushnikResult = self::callSpushnik($url, $user);
+      $spushnikResult = self::callSpushnik($url, $user, $domain);
 
       if (is_array($spushnikResult) && !empty($spushnikResult)) {
         return self::failure($host['ip'], $spushnikResult);
@@ -108,9 +108,9 @@ class OpushFolderSyncStatus extends AbstractUserStatus {
    * 
    * @return multitype:string
    */
-  private static function callSpushnik($url, $user) {
+  private static function callSpushnik($url, $user, $domain) {
     $messages = array();
-    $params = json_encode(array("loginAtDomain" => $user['login'], "password" => $user['password']));
+    $params = json_encode(array("loginAtDomain" => $user['login'] . '@' . $domain['name'], "password" => $user['password']));
     $curl = CheckHelper::curlPost($url, array('Accept: application/json', 'Content-type: application/json'), $params);
 
     if (!$curl['success'] || $curl['code'] != 200) {
