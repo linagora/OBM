@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm;
 
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,10 +51,6 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -216,32 +209,5 @@ public class ToolBox {
 		String fileContent = CharStreams.toString(new InputStreamReader(inputStream));
 		fileContent = fileContent.replaceAll("\n|\t", "");
 		return fileContent;
-	}
-
-	public static Document mockErrorDocument(Class<? extends Exception> exceptionClass,
-			String message, IMocksControl control) {
-		Element element = control.createMock(Element.class);
-		Document document = control.createMock(Document.class);
-
-		expect(document.getDocumentElement()).andReturn(element).anyTimes();
-		expect(element.getNodeName()).andReturn("error").anyTimes();
-
-		mockTextElement(element, "message", message, control);
-		mockTextElement(element, "type", exceptionClass.getName(), control);
-
-		return document;
-	}
-
-	private static void mockTextElement(Element root, String elementName,
-			String text, IMocksControl control) {
-		NodeList nodeList = control.createMock(NodeList.class);
-		Element element = control.createMock(Element.class);
-		Text textNode = control.createMock(Text.class);
-
-		expect(root.getElementsByTagName(eq(elementName))).andReturn(nodeList).anyTimes();
-		expect(nodeList.getLength()).andReturn(1).anyTimes();
-		expect(nodeList.item(eq(0))).andReturn(element).anyTimes();
-		expect(element.getFirstChild()).andReturn(textNode).anyTimes();
-		expect(textNode.getData()).andReturn(text).anyTimes();
 	}
 }

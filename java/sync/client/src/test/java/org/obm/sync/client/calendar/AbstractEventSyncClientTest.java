@@ -29,8 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.calendar;
 
-import static fr.aliacom.obm.ToolBox.mockAccessToken;
-import static fr.aliacom.obm.ToolBox.mockErrorDocument;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
@@ -57,8 +55,13 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.client.impl.SyncClientException;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 import com.google.common.collect.Multimap;
+
+import fr.aliacom.obm.ToolBox;
 
 @RunWith(SlowFilterRunner.class)
 public class AbstractEventSyncClientTest {
@@ -75,7 +78,7 @@ public class AbstractEventSyncClientTest {
 	public void setUp() {
 		control = createControl();
 		responder = control.createMock(Responder.class);
-		token = mockAccessToken(control);
+		token = ToolBox.mockAccessToken(control);
 		logger = control.createMock(Logger.class);
 		client = new AbstractEventSyncClient("/calendar", new SyncClientException(), null, logger) {
 			@Override
@@ -102,7 +105,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testCreateEvent(Class<? extends Exception> exceptionClass) throws Exception {
 		Event event = createEvent();
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/createEvent"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -117,7 +120,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testRemoveEventByExtId(Class<? extends Exception> exceptionClass) throws Exception {
 		EventExtId extId = new EventExtId("ExtId");
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/removeEventByExtId"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -137,7 +140,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testRemoveEventById(Class<? extends Exception> exceptionClass) throws Exception {
 		EventObmId id = new EventObmId(1);
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/removeEvent"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -152,7 +155,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testModifyEvent(Class<? extends Exception> exceptionClass) throws Exception {
 		Event event = createEvent();
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/modifyEvent"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -166,7 +169,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetSyncInRange(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getSyncInRange"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -180,7 +183,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetSyncWithSortedChanges(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getSyncWithSortedChanges"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -194,7 +197,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetSync(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getSync"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -208,7 +211,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetSyncEventDate(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getSyncEventDate"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -228,7 +231,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetEventFromId(Class<? extends Exception> exceptionClass) throws Exception {
 		EventObmId id = new EventObmId(1);
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getEventFromId"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -248,7 +251,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetEventObmIdFromExtId(Class<? extends Exception> exceptionClass) throws Exception {
 		EventExtId extId = new EventExtId("ExtId");
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getEventObmIdFromExtId"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -263,7 +266,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetEventTwinKeys(Class<? extends Exception> exceptionClass) throws Exception {
 		Event event = createEvent();
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getEventTwinKeys"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -277,7 +280,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetRefusedKeys(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getRefusedKeys"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -297,7 +300,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetEventFromExtId(Class<? extends Exception> exceptionClass) throws Exception {
 		EventExtId extId = new EventExtId("ExtId");
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getEventFromExtId"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -312,7 +315,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetListEventsFromIntervalDate(Class<? extends Exception> exceptionClass) throws Exception {
 		Date start = new Date(123456789), end = new Date(123456780);
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getListEventsFromIntervalDate"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -327,7 +330,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testGetEventTimeUpdateNotRefusedFromIntervalDate(Class<? extends Exception> exceptionClass) throws Exception {
 		Date start = new Date(123456789), end = new Date(123456780);
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getEventTimeUpdateNotRefusedFromIntervalDate"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -341,7 +344,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testGetLastUpdate(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/getLastUpdate"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -355,7 +358,7 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testIsWritableCalendar(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/isWritableCalendar"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -370,7 +373,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testChangeParticipationState(Class<? extends Exception> exceptionClass) throws Exception {
 		EventExtId extId = new EventExtId("ExtId");
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/changeParticipationState"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -386,7 +389,7 @@ public class AbstractEventSyncClientTest {
 	private void testChangeParticipationStateRec(Class<? extends Exception> exceptionClass) throws Exception {
 		EventExtId extId = new EventExtId("ExtId");
 		RecurrenceId recId = new RecurrenceId("RecId");
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/changeParticipationState"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -401,7 +404,7 @@ public class AbstractEventSyncClientTest {
 	
 	private void testImportICalendar(Class<? extends Exception> exceptionClass) throws Exception {
 		String ics = "ICS";
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/importICalendar"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
@@ -415,12 +418,37 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	private void testPurge(Class<? extends Exception> exceptionClass) throws Exception {
-		Document document = mockErrorDocument(exceptionClass, null, control);
+		Document document = mockErrorDocument(exceptionClass, null);
 		
 		expect(responder.execute(eq(token), eq("/calendar/purge"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 		
 		client.purge(token, CALENDAR);
+	}
+	
+	private Document mockErrorDocument(Class<? extends Exception> exceptionClass, String message) {
+		Document doc = control.createMock(Document.class);
+		Element root = control.createMock(Element.class);
+		
+		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
+		expect(root.getNodeName()).andReturn("error").anyTimes();
+		
+		mockTextElement(root, "message", message);
+		mockTextElement(root, "type", exceptionClass.getName());
+		
+		return doc;
+	}
+	
+	private void mockTextElement(Element root, String elementName, String text) {
+		NodeList list = control.createMock(NodeList.class);
+		Element element = control.createMock(Element.class);
+		Text textNode = control.createMock(Text.class);
+		
+		expect(root.getElementsByTagName(eq(elementName))).andReturn(list).anyTimes();
+		expect(list.getLength()).andReturn(1).anyTimes();
+		expect(list.item(eq(0))).andReturn(element).anyTimes();
+		expect(element.getFirstChild()).andReturn(textNode).anyTimes();
+		expect(textNode.getData()).andReturn(text).anyTimes();
 	}
 	
 	private Event createEvent() {
