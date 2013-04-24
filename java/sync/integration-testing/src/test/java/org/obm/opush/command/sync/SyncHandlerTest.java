@@ -64,10 +64,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.naming.NoPermissionException;
 
 import org.easymock.IMocksControl;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -108,7 +110,6 @@ import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
-import org.obm.push.exception.activesync.InvalidItemException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
@@ -659,7 +660,7 @@ public class SyncHandlerTest {
 
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
 	}
-	
+
 	@Test
 	public void testSyncOnHierarchyChangedException() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
@@ -738,6 +739,9 @@ public class SyncHandlerTest {
 
 	@Test
 	public void testAddLeadingToNoPermissionExceptionReplyNothing() throws Exception {
+		TimeZone defaultTimeZone = TimeZone.getDefault();
+		TimeZone.setDefault(DateTimeZone.UTC.toTimeZone());
+		
 		SyncKey syncKey = new SyncKey("13424");
 		int collectionId = 1;
 		List<Integer> existingCollections = ImmutableList.of(collectionId);
@@ -757,6 +761,9 @@ public class SyncHandlerTest {
 					.build())
 			.build();
 		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
 		
 		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
@@ -772,10 +779,14 @@ public class SyncHandlerTest {
 
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
 		checkMailFolderHasNoChange(syncResponse, String.valueOf(collectionId));
+		TimeZone.setDefault(defaultTimeZone);
 	}
 
 	@Test
 	public void testChangeLeadingToNoPermissionExceptionReplyNothing() throws Exception {
+		TimeZone defaultTimeZone = TimeZone.getDefault();
+		TimeZone.setDefault(DateTimeZone.UTC.toTimeZone());
+		
 		SyncKey syncKey = new SyncKey("13424");
 		int collectionId = 1;
 		List<Integer> existingCollections = ImmutableList.of(collectionId);
@@ -795,6 +806,9 @@ public class SyncHandlerTest {
 					.build())
 			.build();
 		
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
 		
 		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
@@ -806,87 +820,10 @@ public class SyncHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		SyncResponse syncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, singleUserFixture.jaures.device, 
-				syncKey, String.valueOf(collectionId), SyncCommand.CHANGE, serverId, clientId, clientData);
+				syncKey, String.valueOf(collectionId), SyncCommand.ADD, serverId, clientId, clientData);
 
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
 		checkMailFolderHasNoChange(syncResponse, String.valueOf(collectionId));
-	}
-	
-	@Test
-	public void testAddLeadingToInvalidItemExceptionReplySyncError() throws Exception {
-		SyncKey syncKey = new SyncKey("13424");
-		int collectionId = 1;
-		List<Integer> existingCollections = ImmutableList.of(collectionId);
-
-		String serverId = null;
-		String clientId = "156";
-		
-		DataDelta serverDataDelta = DataDelta.newEmptyDelta(date("2012-10-10T16:22:53"), syncKey);
-
-		MSEmail clientData = MSEmail.builder()
-				.header(MSEmailHeader.builder().build())
-				.body(MSEmailBody.builder()
-						.mimeData(new SerializableInputStream(new ByteArrayInputStream("obm".getBytes())))
-						.bodyType(MSEmailBodyType.PlainText)
-						.estimatedDataSize(0)
-						.charset(Charsets.UTF_8)
-						.truncated(false)
-						.build())
-				.build();
-		
-		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
-		
-		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
-		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
-			.andThrow(new InvalidItemException());
-		
-		mocksControl.replay();
-		opushServer.start();
-		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		SyncResponse syncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, singleUserFixture.jaures.device, 
-				syncKey, String.valueOf(collectionId), SyncCommand.ADD, serverId, clientId, clientData);
-		
-		assertThat(syncResponse).isNotNull();
-		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
-	}
-	
-	@Test
-	public void testChangeLeadingToInvalidItemExceptionReplySyncError() throws Exception {
-		SyncKey syncKey = new SyncKey("13424");
-		int collectionId = 1;
-		List<Integer> existingCollections = ImmutableList.of(collectionId);
-		
-		String serverId = "432:1456";
-		String clientId = null;
-
-		DataDelta serverDataDelta = DataDelta.newEmptyDelta(date("2012-10-10T16:22:53"), syncKey);
-		
-		MSEmail clientData = MSEmail.builder()
-				.header(MSEmailHeader.builder().build())
-				.body(MSEmailBody.builder()
-						.mimeData(new SerializableInputStream(new ByteArrayInputStream("obm".getBytes())))
-						.bodyType(MSEmailBodyType.PlainText)
-						.estimatedDataSize(0)
-						.charset(Charsets.UTF_8)
-						.truncated(false)
-						.build())
-				.build();
-		
-		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
-		
-		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
-		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
-			.andThrow(new InvalidItemException());
-		
-		mocksControl.replay();
-		opushServer.start();
-		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		SyncResponse syncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, singleUserFixture.jaures.device, 
-				syncKey, String.valueOf(collectionId), SyncCommand.CHANGE, serverId, clientId, clientData);
-		
-		assertThat(syncResponse).isNotNull();
-		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
+		TimeZone.setDefault(defaultTimeZone);
 	}
 }
