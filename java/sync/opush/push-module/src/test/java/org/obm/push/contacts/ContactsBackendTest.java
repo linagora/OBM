@@ -71,7 +71,6 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.InvalidItemException;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -83,8 +82,6 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.login.LoginService;
-import org.obm.sync.exception.ContactNotFoundException;
-import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 
@@ -362,74 +359,6 @@ public class ContactsBackendTest {
 		try {
 			contactsBackend.createOrUpdate(userDataRequest, contactCollectionUid, serverId, clientId, msContact);
 		} catch (NoPermissionException e) {
-			mocks.verify();
-			throw e;
-		}
-	}
-	
-	@Test(expected=InvalidItemException.class)
-	public void testModifyWithInvalidContactAsItem() throws AuthFault, ServerFault,
-	NoPermissionException, ContactNotFoundException, InvalidContactException {
-		int otherContactCollectionUid = 1;
-		int targetcontactCollectionUid = 2;
-		int serverId = 215;
-		String serverIdAsString = String.valueOf(serverId);
-		String clientId = "1";
-		MSContact msContact = new MSContact();
-
-		List<AddressBook> books = ImmutableList.of(
-				newAddressBookObject("folder", otherContactCollectionUid, false),
-				newAddressBookObject("folder_1", targetcontactCollectionUid, false));
-
-		expectLoginBehavior(token);
-		expectListAllBooks(token,books);
-		expectBuildCollectionPath("folder", otherContactCollectionUid);
-		expectBuildCollectionPath("folder_1", targetcontactCollectionUid);
-
-		Contact contact = newContactObject(serverId);
-		expect(bookClient.modifyContact(token, targetcontactCollectionUid, contact))
-			.andThrow(new InvalidContactException("Invalid"));
-
-		expect(mappingService.getItemIdFromServerId(serverIdAsString)).andReturn(serverId).once();
-
-		expectMappingServiceCollectionIdBehavior(books);
-
-		mocks.replay();
-		try {
-			contactsBackend.createOrUpdate(userDataRequest, targetcontactCollectionUid, serverIdAsString, clientId, msContact);
-		} catch (InvalidItemException e) {
-			mocks.verify();
-			throw e;
-		}
-	}
-
-	@Test(expected=InvalidItemException.class)
-	public void testCreateWithInvalidContactAsItem()
-			throws AuthFault, ServerFault, NoPermissionException, InvalidContactException {
-		int contactCollectionUid = 2;
-		int itemId = 215;
-		String serverId = null;
-		String clientId = "489654";
-		String clientIdHash = "78481484087";
-		MSContact msContact = new MSContact();
-
-		List<AddressBook> books = ImmutableList.of(
-				newAddressBookObject("folder", contactCollectionUid, false));
-		
-		expectLoginBehavior(token);
-		expectListAllBooks(token,books);
-		expectBuildCollectionPath("folder", contactCollectionUid);
-		expectMappingServiceCollectionIdBehavior(books);
-		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId).once();
-		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
-		
-		expect(bookClient.createContact(token, contactCollectionUid, new Contact(), clientIdHash))
-			.andThrow(new InvalidContactException("Invalid"));
-
-		mocks.replay();
-		try {
-			contactsBackend.createOrUpdate(userDataRequest, contactCollectionUid, serverId, clientId, msContact);
-		} catch (InvalidItemException e) {
 			mocks.verify();
 			throw e;
 		}

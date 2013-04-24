@@ -52,12 +52,12 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
-import org.obm.push.exception.activesync.InvalidItemException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
+import org.obm.sync.exception.InvalidContactException;
 
 public interface PIMBackend {
 
@@ -65,7 +65,7 @@ public interface PIMBackend {
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException, 
 			DaoException, UnexpectedObmSyncServerException, ItemNotFoundException,
-			ConversionException, HierarchyChangedException, NoPermissionException, InvalidItemException;
+			ConversionException, HierarchyChangedException, NoPermissionException, InvalidContactException;
 	
 	String move(UserDataRequest udr, String srcFolder, String dstFolder, String messageId)
 		throws CollectionNotFoundException, ProcessingEmailException, UnsupportedBackendFunctionException;

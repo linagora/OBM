@@ -69,7 +69,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.InvalidItemException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
@@ -386,7 +385,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
-			ItemNotFoundException, NoPermissionException, InvalidItemException {
+			ItemNotFoundException, NoPermissionException, InvalidContactException {
 
 		MSContact contact = (MSContact) data;
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
@@ -404,8 +403,6 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 		} catch (ContactNotFoundException e) {
 			throw new ItemNotFoundException(e);
-		} catch (InvalidContactException e) {
-			throw new InvalidItemException(e);
 		}
 		
 		return mappingService.getServerIdFor(collectionId, String.valueOf(contactId));
