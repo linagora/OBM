@@ -43,4 +43,5 @@ public interface IMergeable {
 	 * @param previous
 	 */
 	void merge(IMergeable previous);
+
 }

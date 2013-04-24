@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -54,7 +51,6 @@ import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -201,13 +197,5 @@ public class ToolBox {
 		}
 		return collection;
 	}
-
-	public static String loadXmlFile(String filename) throws IOException {
-		InputStream inputStream = ClassLoader.getSystemClassLoader()
-				.getResourceAsStream(filename);
-
-		String fileContent = CharStreams.toString(new InputStreamReader(inputStream));
-		fileContent = fileContent.replaceAll("\n|\t", "");
-		return fileContent;
-	}
+	
 }

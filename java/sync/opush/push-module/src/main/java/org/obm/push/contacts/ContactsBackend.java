@@ -84,7 +84,6 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.exception.ContactNotFoundException;
-import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
@@ -385,7 +384,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			String serverId, String clientId, IApplicationData data)
 			throws CollectionNotFoundException, ProcessingEmailException,
 			DaoException, UnexpectedObmSyncServerException,
-			ItemNotFoundException, NoPermissionException, InvalidContactException {
+			ItemNotFoundException, NoPermissionException {
 
 		MSContact contact = (MSContact) data;
 		Integer contactId = mappingService.getItemIdFromServerId(serverId);
@@ -409,8 +408,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private Contact modifyContact(UserDataRequest udr, Integer addressBookId, Contact contact) 
-			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException,
-			InvalidContactException {
+			throws UnexpectedObmSyncServerException, NoPermissionException, ContactNotFoundException {
 		
 		AccessToken token = login(udr);
 		try {
@@ -423,7 +421,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 	
 	private Contact createContact(UserDataRequest udr, Integer addressBookId, Contact contact, String clientId) 
-			throws UnexpectedObmSyncServerException, NoPermissionException, InvalidContactException {
+			throws UnexpectedObmSyncServerException, NoPermissionException {
 		
 		AccessToken token = login(udr);
 		try {

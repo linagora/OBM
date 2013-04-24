@@ -481,11 +481,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${commons-lang.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-validator</groupId>
-				<artifactId>commons-validator</artifactId>
-				<version>${commons-validator.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>javax.jms</groupId>
 				<artifactId>jms</artifactId>
 				<version>${jms.version}</version>

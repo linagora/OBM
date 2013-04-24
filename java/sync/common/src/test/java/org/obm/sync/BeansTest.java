@@ -99,8 +99,8 @@ public class BeansTest {
 				EmailAddress.class,
 				EmailLogin.class,
 				DomainName.class,
-				Phone.class,
 				Address.class,
+				Phone.class,
 				ParticipationChanges.class);
 	}
 	

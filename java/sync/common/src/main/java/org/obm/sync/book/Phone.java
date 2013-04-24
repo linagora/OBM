@@ -56,14 +56,14 @@ public class Phone implements IMergeable, Serializable {
 	public void merge(IMergeable previous) {
 		//do nothing on merge
 	}
-
+	
 	@Override
-	public final int hashCode(){
+	public int hashCode() {
 		return Objects.hashCode(number);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	public final boolean equals(Object object) {
 		if (object instanceof Phone) {
 			Phone that = (Phone) object;
 			return Objects.equal(this.number, that.number);
@@ -71,10 +71,4 @@ public class Phone implements IMergeable, Serializable {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("number", number)
-			.toString();
-	}
 }

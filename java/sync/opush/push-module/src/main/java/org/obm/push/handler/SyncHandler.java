@@ -99,7 +99,6 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.wbxml.WBXMLTools;
-import org.obm.sync.exception.InvalidContactException;
 import org.w3c.dom.Document;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -202,9 +201,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
 		} catch (ImapTimeoutException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
-		} catch (InvalidContactException e) {
-			sendError(udr.getDevice(), responder, SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM, continuation, e);
-		}
+		} 
 	}
 
 	private void sendResponse(Responder responder, Document document) {
@@ -262,7 +259,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 				.build();
 	}
 
-	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync syncRequest) throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException, InvalidContactException {
+	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync syncRequest) throws CollectionNotFoundException, DaoException, 
+		UnexpectedObmSyncServerException, ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 		
 		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 
@@ -295,8 +293,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	@VisibleForTesting SyncClientCommands processClientModification(UserDataRequest udr, AnalysedSyncCollection collection)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException,
-      InvalidContactException {
+			ProcessingEmailException, UnsupportedBackendFunctionException, ConversionException, HierarchyChangedException {
 
 		SyncClientCommands.Builder clientCommandsBuilder = SyncClientCommands.builder();
 		SyncCollectionCommands.Response commands = collection.getCommands();
@@ -327,8 +324,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Update updateServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change) 
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException,
-      InvalidContactException {
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException {
 
 		return new SyncClientCommands.Update(contentsImporter.importMessageChange(
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));
@@ -336,8 +332,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 
 	private Add addServerItem(UserDataRequest udr, AnalysedSyncCollection collection, SyncCollectionCommand.Response change)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException,
-			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException,
-			NoPermissionException, InvalidContactException {
+			ProcessingEmailException, ItemNotFoundException, ConversionException, HierarchyChangedException, NoPermissionException {
 
 		return new SyncClientCommands.Add(change.getClientId(), contentsImporter.importMessageChange(
 				udr, collection.getCollectionId(), change.getServerId(), change.getClientId(), change.getApplicationData()));

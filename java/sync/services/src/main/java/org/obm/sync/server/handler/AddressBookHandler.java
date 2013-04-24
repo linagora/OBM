@@ -48,7 +48,6 @@ import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.exception.ContactNotFoundException;
-import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -133,8 +132,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendBoolean(ret);
 	}
 
-	private void getContactTwinKeys(AccessToken at, Request request, XmlResponder responder)
-			throws SAXException, IOException, FactoryConfigurationError {
+	private void getContactTwinKeys(AccessToken at, Request request, XmlResponder responder) throws SAXException, IOException, FactoryConfigurationError {
 		Contact contact = getContactFromParams(request);
 		KeyList ret = binding.getContactTwinKeys(at, contact);
 		responder.sendKeyList(ret);
@@ -163,7 +161,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void modifyContact(AccessToken at, Request request, XmlResponder responder) 
-			throws NoPermissionException, ServerFault, ContactNotFoundException, InvalidContactException {
+			throws NoPermissionException, ServerFault, ContactNotFoundException {
 		
 		try {
 			Integer addressBookId = getBookId(request);
@@ -180,7 +178,7 @@ public class AddressBookHandler extends SecureSyncHandler {
 	}
 
 	private void createContact(AccessToken at, Request request, XmlResponder responder) 
-			throws ServerFault, NoPermissionException, InvalidContactException {
+			throws ServerFault, NoPermissionException {
 		
 		try {
 			Integer addressBookId = getBookId(request);	

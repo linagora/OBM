@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -45,86 +44,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.naming.NoPermissionException;
-
+import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
-import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
-import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Folder;
-import org.obm.sync.exception.ContactNotFoundException;
-import org.obm.sync.exception.InvalidContactException;
 import org.obm.sync.items.AddressBookChangesResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.ObmHelper;
 
 @RunWith(SlowFilterRunner.class)
 public class AddressBookBindingImplTest {
-
-	private static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
-
-		@Override
-		protected void configure() {
-			bind(IMocksControl.class).toInstance(mocksControl);
-
-			bindWithMock(ContactDao.class);
-			bindWithMock(ContactMerger.class);
-			bindWithMock(ContactConfiguration.class);
-			bindWithMock(DatabaseConnectionProvider.class);
-			bindWithMock(CommitedOperationDao.class);
-			bindWithMock(ObmSyncConfigurationService.class);
-			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
-		}
-
-		private <T> void bindWithMock(Class<T> cls) {
-			bind(cls).toInstance(mocksControl.createMock(cls));
-		}
-	}
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
-
-	@Inject
-	private IMocksControl mocksControl;
-	@Inject
-	private AddressBookBindingImpl binding;
-	@Inject
-	private ContactConfiguration contactConfiguration;
-	@Inject
-	private ContactMerger contactMerger;
-	@Inject
-	private ContactDao contactDao;
-	@Inject
-	private CommitedOperationDao commitedOperationDao;
-
-	private static final int ADDRESS_BOOK_USER_ID = -1;
-
+	
 	private AccessToken token;
 
 	@Before
@@ -315,12 +262,12 @@ public class AddressBookBindingImplTest {
 	}
 	
 	@Test
-	public void testCreateContactWithCommitedOperation() throws Exception {
+	public void testCreateContact() throws Exception {
 		Integer addressBookId = 1;
 		Contact contact = new Contact();
 		String clientId = "6547";
 
-		IMocksControl control = createControl();
+		IMocksControl control = EasyMock.createControl();
 		
 		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId())
@@ -361,7 +308,7 @@ public class AddressBookBindingImplTest {
 		Contact contact = new Contact();
 		String clientId = "6547";
 
-		IMocksControl control = createControl();
+		IMocksControl control = EasyMock.createControl();
 		
 		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId())
@@ -386,7 +333,7 @@ public class AddressBookBindingImplTest {
 		Integer addressBookId = 1;
 		Contact contact = new Contact();
 
-		IMocksControl control = createControl();
+		IMocksControl control = EasyMock.createControl();
 		
 		ContactConfiguration contactConfiguration = control.createMock(ContactConfiguration.class);
 		expect(contactConfiguration.getAddressBookUserId())
@@ -412,134 +359,5 @@ public class AddressBookBindingImplTest {
 		
 		control.verify();
 		assertThat(createdContact).isEqualTo(expectedContact);
-  }
-
-	@Test
-	public void testCreateContact()
-			throws NoPermissionException, ServerFault, InvalidContactException,
-			SQLException {
-		Contact newContact = new Contact();
-		int addressBookId = 1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1).once();
-		expect(contactDao.createContactInAddressBook(token, newContact, addressBookId)).andReturn(newContact).once();
-		expect(commitedOperationDao.findAsContact(token, "6547")).andReturn(null).once();
-
-		verifyCreateContact(newContact, addressBookId, "6547");
-	}
-
-	@Test(expected = NoPermissionException.class)
-	public void testCreateContactInAddressBookOfOBMUsers()
-			throws ServerFault, NoPermissionException, InvalidContactException {
-		Contact newContact = new Contact();
-		int addressBookId = -1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		verifyCreateContact(newContact, addressBookId, "6547");
-	}
-
-	@Test(expected = InvalidContactException.class)
-	public void testCreateContactWithInvalidEmail()
-			throws ServerFault, NoPermissionException, InvalidContactException {
-		Contact newContact = new Contact();
-		int addressBookId = 1;
-
-		newContact.addEmail("test", EmailAddress.loginAtDomain("test test @ foo.fr"));
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		verifyCreateContact(newContact, addressBookId, "6547");
-	}
-
-	private void verifyCreateContact(Contact newContact, int addressBookId, String clientId)
-			throws ServerFault, NoPermissionException, InvalidContactException {
-		mocksControl.replay();
-
-		binding.createContact(token, addressBookId, newContact, clientId);
-
-		mocksControl.verify();
-	}
-
-	@Test
-	public void testModifyContact()
-			throws NoPermissionException, ServerFault, InvalidContactException,
-			SQLException, ContactNotFoundException, FindException, EventNotFoundException {
-		Contact oldContact = new Contact();
-		oldContact.setUid(1);
-		Contact newContact = new Contact();
-		newContact.setUid(1);
-		int addressBookId = 1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		Integer oldContactUid = oldContact.getUid();
-		expect(contactDao.findContact(token, oldContactUid)).andReturn(oldContact).once();
-		expect(contactDao.hasRightsOn(token, oldContactUid)).andReturn(true).once();
-
-		contactMerger.merge(oldContact, newContact);
-		expectLastCall().once();
-
-		expect(contactDao.modifyContact(token, newContact)).andReturn(newContact).once();
-
-		verifyModifyContact(newContact, addressBookId);
-	}
-
-	@Test(expected = NoPermissionException.class)
-	public void testModifyContactWithoutDaoPermission()
-			throws ContactNotFoundException, SQLException, ServerFault,
-			NoPermissionException, InvalidContactException {
-		Contact oldContact = new Contact();
-		oldContact.setUid(1);
-		Contact newContact = new Contact();
-		newContact.setUid(1);
-		int addressBookId = 1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		Integer oldContactUid = oldContact.getUid();
-		expect(contactDao.findContact(token, oldContactUid)).andReturn(oldContact).once();
-		expect(contactDao.hasRightsOn(token, oldContactUid)).andReturn(false).once();
-
-		verifyModifyContact(newContact, addressBookId);
-	}
-
-	@Test(expected = NoPermissionException.class)
-	public void testModifyContactInAddressBookOfOBMUsers()
-			throws ContactNotFoundException,ServerFault, NoPermissionException, InvalidContactException {
-		Contact oldContact = new Contact();
-		oldContact.setUid(1);
-		Contact newContact = new Contact();
-		newContact.setUid(1);
-		int addressBookId = -1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		verifyModifyContact(newContact, addressBookId);
-	}
-
-	@Test(expected = InvalidContactException.class)
-	public void testModifyContactWithInvalidEmail()
-			throws ContactNotFoundException, ServerFault, NoPermissionException, InvalidContactException {
-		Contact oldContact = new Contact();
-		oldContact.setUid(1);
-		Contact newContact = new Contact();
-		newContact.setUid(1);
-		int addressBookId = 1;
-
-		newContact.addEmail("test", EmailAddress.loginAtDomain("test test @ foo.fr"));
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(ADDRESS_BOOK_USER_ID).once();
-
-		verifyModifyContact(newContact, addressBookId);
-	}
-
-	private void verifyModifyContact(Contact newContact, int addressBookId)
-			throws ServerFault, NoPermissionException,
-			ContactNotFoundException, InvalidContactException {
-		mocksControl.replay();
-
-		binding.modifyContact(token, addressBookId, newContact);
-
-		mocksControl.verify();
 	}
 }
