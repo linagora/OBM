@@ -409,16 +409,23 @@ class CAS_Auth extends Auth {
   
   function createClient() {
     global $obminclude, $cas_server, $cas_server_port, $cas_server_uri, $cas_debug;
+    global $cas_validation, $cas_cert;
     if ($this->client_inited) {
       return ;
     }
     require_once("$obminclude/lib/CAS/CAS.php");
     if ( $cas_debug ) {
-      phpCAS::setDebug('/tmp/obm-cas.log');
+      phpCAS::setDebug($cas_debug);
     }
 
     phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri, false);
     phpCAS::setNoCasServerValidation();
+    if ($cas_validation == 'ca') {
+        phpCAS::setCasServerCACert($cas_cert);
+    }
+    else {
+        phpCAS::setNoCasServerValidation();
+    }
     phpCAS::setPostAuthenticateCallback(array($this,"auth_validate_callback"));
 
     $this->client_inited = true;
