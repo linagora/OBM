@@ -30,12 +30,9 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-namespace checks\solr;
-use checks;
-
 require_once dirname(__FILE__) . '/../../ModuleInterface.php';
 
-class Module implements checks\ModuleInterface {
+class SolrModule implements ModuleInterface {
   
   public $id = "solr";
   public $name = "SOLR";

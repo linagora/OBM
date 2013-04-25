@@ -36,8 +36,8 @@ class IncludeModuleLoader implements ModuleLoader {
   
   function load($modulesFolderName, $moduleFolder) {
     require_once $modulesFolderName . "/" . $moduleFolder . "/Module.php";
-    $className = "\\" . Service::CHECKS . "\\" .str_replace("-", "", $moduleFolder). "\\Module";
-    $module = new $className;
+    $className = str_replace("-", "", $moduleFolder). "Module";
+    $module = new $className();
     return $module;
   }
   

@@ -30,12 +30,9 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-namespace checks\automaton;
-use checks;
-
 require_once dirname(__FILE__) . '/../../ModuleInterface.php';
 
-class Module implements checks\ModuleInterface {
+class AutomatonModule implements ModuleInterface {
   
   public $id = "automaton";
   public $name = "Automaton";

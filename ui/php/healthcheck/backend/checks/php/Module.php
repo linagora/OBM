@@ -30,12 +30,9 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-namespace checks\php;
-use checks;
-
 require_once dirname(__FILE__) . '/../../ModuleInterface.php';
 
-class Module implements checks\ModuleInterface {
+class PhpModule implements ModuleInterface {
   
   public $id = "php";
   public $name = "PHP Environment";

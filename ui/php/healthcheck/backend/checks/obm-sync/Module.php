@@ -30,12 +30,9 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-namespace checks\obmsync;
-use checks;
-
 require_once dirname(__FILE__) . '/../../ModuleInterface.php';
 
-class Module implements checks\ModuleInterface {
+class ObmsyncModule implements ModuleInterface {
   
   public $id = "obm-sync";
   public $name = "OBM-Sync";

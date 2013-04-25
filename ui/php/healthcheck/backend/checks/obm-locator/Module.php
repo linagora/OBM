@@ -30,12 +30,9 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
  
-namespace checks\obmlocator;
-use checks;
-
 require_once dirname(__FILE__) . '/../../ModuleInterface.php';
 
-class Module implements checks\ModuleInterface {
+class ObmlocatorModule implements ModuleInterface {
   
   public $id = "obm-locator";
   public $name = "OBM-Locator";

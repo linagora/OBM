@@ -29,8 +29,6 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
- 
-namespace checks;
 
 interface ModuleInterface {
   
