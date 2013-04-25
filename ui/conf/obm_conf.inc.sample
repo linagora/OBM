@@ -95,6 +95,14 @@ $cgp_sess_db = false;
 //$cas_server = 'sso.aliacom.local';
 //$cas_server_port = 8443;
 //$cas_server_uri = '';
+// CAS server SSL validation: 'ca' for
+//     certificate from a CA, empty for no SSL validation.
+//$cas_validation = "";
+// CAS server certificate in PEM format, used when CAS validation is set to
+//     'self' or 'ca'.
+//$cas_cert = '/etc/cas_server_cert.pem';
+// set this to a file to enable debug (eg. "/tmp/obm-cas.log")
+//$cas_debug="";
 //$auth_kind='ldap';
 
 // encyption used to store password : 'PLAIN', 'MD5SUM' or 'CRYPT'
