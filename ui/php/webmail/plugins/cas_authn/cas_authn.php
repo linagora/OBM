@@ -36,7 +36,7 @@ class cas_authn extends rcube_plugin {
         
         // add application hooks
         $this->add_hook('startup', array($this, 'startup'));
-        $this->add_hook('imap_connect', array($this, 'imap_connect'));
+        $this->add_hook('storage_connect', array($this, 'imap_connect'));
         $this->add_hook('smtp_connect', array($this, 'smtp_connect'));
         $this->add_hook('sieverules_connect', array($this, 'sieverules_connect'));
         $this->add_hook('template_object_loginform', array($this, 'add_cas_login_html'));
@@ -376,7 +376,14 @@ class cas_authn extends rcube_plugin {
                 $delm = '&';
             }
         }
-        return $protocol . '://' . $_SERVER['SERVER_NAME'] . $port . $path . $parsed_params;
+        $cfg = rcmail::get_instance()->config->all();
+        if ( $cfg['cas_webmail_server_name'] ) {
+          $serverName = $cfg['cas_webmail_server_name'];
+        } else {
+          $serverName=$_SERVER['SERVER_NAME'];
+        }
+        $url = $protocol . '://' . $serverName . $port . $path . $parsed_params;
+        return $url;
     }
 
     private function strleft($s1, $s2) {
