@@ -28,11 +28,9 @@ $query = "SELECT
 		    serviceproperty_property = 'imap_frontend' 
             OR serviceproperty_property = 'smtp_out'
             OR serviceproperty_property = 'obm_sync'";
-error_log($query);
 $obm_q = new DB_OBM;
 $obm_q->query($query);
 
-$rcmail_config = array();
 $rcmail_config['default_host'] = array();
 $rcmail_config['multiple_smtp_server'] = array();
 
@@ -64,6 +62,20 @@ $rcmail_config["plugins"][] = "multiple_smtp_server";
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
   $rcmail_config["plugins"][] = "cas_authn";
+  // CAS plugin configuration
+  set_include_path(get_include_path() . PATH_SEPARATOR . "../../obminclude/lib/CAS");
+  // force CAS authentication (doesn't fallback to roundcube db auth if CAS fails)
+  $rcmail_config['cas_force'] = true;
+  // CAS in proxy mode
+  $rcmail_config['cas_proxy'] = true;
+  // Cache CAS Proxy Tickets (this works if the cyrus saslauthd use the -c flag
+  $rcmail_config['cas_imap_caching'] = true;
+  // CAS server host name.
+  $rcmail_config['cas_hostname'] = $cas_server;
+  // CAS server port number.
+  $rcmail_config['cas_port'] = $cas_server_port;
+  // CAS service URI on the CAS server.
+  $rcmail_config['cas_uri'] = $cas_server_uri;
 }
 
 
