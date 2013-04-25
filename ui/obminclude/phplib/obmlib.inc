@@ -308,15 +308,10 @@ class CAS_Auth extends Auth {
   var $magic          = 'CASSimsalabim';  ## Challenge seed
   var $database_class = 'DB_OBM';
   var $database_table = 'UserObm';
+  var $client_inited  = false;
 
   function of_session_dis_login_page() {
-    global $obminclude, $cas_server, $cas_server_port, $cas_server_uri,$lock;
-    require_once("$obminclude/lib/CAS/CAS.php");
-    phpCAS::setDebug('/tmp/obm-cas.log');
-    if (!$lock) {
-      phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri, false);
-      $lock = true;
-    }
+    $this->createClient();
     phpCAS::forceAuthentication();
   }
 
@@ -395,16 +390,7 @@ class CAS_Auth extends Auth {
   }
 
   function auth_validatelogin () {
-    global $obm, $lock;
-    global $obminclude, $cas_server, $cas_server_port, $cas_server_uri;
-    require_once("$obminclude/lib/CAS/CAS.php");
-    if (!$lock) {
-      phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri,false);
-      $lock = 'true';
-    }
-
-    phpCAS::setNoCasServerValidation();
-    phpCAS::setPostAuthenticateCallback(array($this,"auth_validate_callback"));
+    $this->createClient();
 
     //valider le login CAS
     if (!phpCAS::checkAuthentication()) {
@@ -414,22 +400,29 @@ class CAS_Auth extends Auth {
   }
 
   function logout($nobody = '') {
-    global $lock;
-    global $obminclude, $cas_server, $cas_server_port, $cas_server_uri;
-    
-    require_once("$obminclude/lib/CAS/CAS.php");
     $_SESSION['auth'] = '';
     unset($this->auth['uname']);
     $this->unauth($nobody == '' ? $this->nobody : $nobody);
-    
-    if (!$lock) {
-      phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri, false);
-      $lock = 'true';
-    }
-
+    $this->createClient();
     phpCAS::logout();
   }
   
+  function createClient() {
+    global $obminclude, $cas_server, $cas_server_port, $cas_server_uri, $cas_debug;
+    if ($this->client_inited) {
+      return ;
+    }
+    require_once("$obminclude/lib/CAS/CAS.php");
+    if ( $cas_debug ) {
+      phpCAS::setDebug('/tmp/obm-cas.log');
+    }
+
+    phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri, false);
+    phpCAS::setNoCasServerValidation();
+    phpCAS::setPostAuthenticateCallback(array($this,"auth_validate_callback"));
+
+    $this->client_inited = true;
+  }
 }
 
 
