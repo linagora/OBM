@@ -379,7 +379,7 @@ class CAS_Auth extends Auth {
       $uid  = $this->db->f('userobm_id');
       $perm = $this->db->f('userobm_perms');
     } else {
-      header('location:'.phpCAS::getServerBaseURL());
+	die("Login ".htmlentities($login)." not found in OBM database. Aborting");
     }
     if (global_allow_access($perm)) {
       $obm['profile'] = $perm;
