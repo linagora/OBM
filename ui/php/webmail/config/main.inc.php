@@ -15,60 +15,13 @@
 
 */
 
-// OBM SPECIFIC
-// This queries the OBM database to retrieve the available domains and associated mail servers.
-// This then exposes the rcmail_x variables with the proper information.
-
-$path = '..';
-$module = "webmail";
-$obminclude = getenv('OBM_INCLUDE_VAR');
-if ($obminclude == '') {
-	$obminclude = 'obminclude';
-}
-require_once("$obminclude/global.inc");
-
-// Ugly hack for DB_OBM
-$GLOBALS['obmdb_host'] = $obmdb_host;
-$GLOBALS['obmdb_user'] = $obmdb_user;
-$GLOBALS['obmdb_password'] = $obmdb_password;
-$GLOBALS['obmdb_db'] = $obmdb_db;
-$GLOBALS['obmdb_dbtype'] = $obmdb_dbtype;
-
-$query = "SELECT 
-		    domain_name, serviceproperty_property, host_ip
-		    FROM Domain
-		    INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
-		    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
-		    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
-		    WHERE
-		    serviceproperty_property = 'imap_frontend' 
-            OR serviceproperty_property = 'smtp_out'
-            OR serviceproperty_property = 'obm_sync'";
-
-$obm_q = new DB_OBM;
-$obm_q->query($query);
-
 $rcmail_config = array();
-$rcmail_config['default_host'] = array();
-$rcmail_config['multiple_smtp_server'] = array();
-
-while ($obm_q->next_record()) {
-	if ($obm_q->f('serviceproperty_property') == 'imap_frontend') {
-		$rcmail_config['default_host'][$obm_q->f('host_ip')] = $obm_q->f('domain_name');
-	} else if ($obm_q->f('serviceproperty_property') == 'smtp_out') {
-		$rcmail_config['multiple_smtp_server'][$obm_q->f('domain_name')] = $obm_q->f('host_ip');
-	} else if ($obm_q->f('serviceproperty_property') == 'obm_sync') {
-      $rcmail_config["obmSyncIp"] = $obm_q->f('host_ip');
-    }
-}
-
-// OBM SPECIFIC
 
 // ----------------------------------
 // LOGGING/DEBUGGING
 // ----------------------------------
 
-// system error reporting: 1 = log; 2 = report (not implemented yet), 4 = show, 8 = trace
+// system error reporting, sum of: 1 = log; 4 = show, 8 = trace
 $rcmail_config['debug_level'] = 1;
 
 // log driver:  'syslog' or 'file'.
@@ -110,20 +63,24 @@ $rcmail_config['smtp_debug'] = false;
 // IMAP
 // ----------------------------------
 
-// the mail host chosen to perform the log-in
-// leave blank to show a textbox at login, give a list of hosts
+// The mail host chosen to perform the log-in.
+// Leave blank to show a textbox at login, give a list of hosts
 // to display a pulldown menu or set one host as string.
 // To use SSL/TLS connection, enter hostname with prefix ssl:// or tls://
 // Supported replacement variables:
-// %n - http hostname ($_SERVER['SERVER_NAME'])
-// %d - domain (http hostname without the first part)
+// %n - hostname ($_SERVER['SERVER_NAME'])
+// %t - hostname without the first part
+// %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
 // %s - domain name after the '@' from e-mail address provided at login screen
-// For example %n = mail.domain.tld, %d = domain.tld
+// For example %n = mail.domain.tld, %t = domain.tld
+// WARNING: After hostname change update of mail_host column in users table is
+//          required to match old user data records with the new host.
+$rcmail_config['default_host'] = '';
 
 // TCP port used for IMAP connections
 $rcmail_config['default_port'] = 143;
 
-// IMAP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or empty to use
+// IMAP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or null to use
 // best server supported one)
 $rcmail_config['imap_auth_type'] = null;
 
@@ -181,10 +138,11 @@ $rcmail_config['messages_cache'] = false;
 // If left blank, the PHP mail() function is used
 // Supported replacement variables:
 // %h - user's IMAP hostname
-// %n - http hostname ($_SERVER['SERVER_NAME'])
-// %d - domain (http hostname without the first part)
+// %n - hostname ($_SERVER['SERVER_NAME'])
+// %t - hostname without the first part
+// %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
-// For example %n = mail.domain.tld, %d = domain.tld
+// For example %n = mail.domain.tld, %t = domain.tld
 $rcmail_config['smtp_server'] = '';
 
 // SMTP port (default is 25; use 587 for STARTTLS or 465 for the
@@ -193,11 +151,11 @@ $rcmail_config['smtp_port'] = 25;
 
 // SMTP username (if required) if you use %u as the username Roundcube
 // will use the current username for login
-$rcmail_config['smtp_user'] = '%u';
+$rcmail_config['smtp_user'] = '';
 
 // SMTP password (if required) if you use %p as the password Roundcube
 // will use the current user's password for login
-$rcmail_config['smtp_pass'] = '%p';
+$rcmail_config['smtp_pass'] = '';
 
 // SMTP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or empty to use
 // best server supported one)
@@ -226,9 +184,12 @@ $rcmail_config['smtp_timeout'] = 0;
 // ONLY ENABLE IT IF YOU'RE REALLY SURE WHAT YOU'RE DOING!
 $rcmail_config['enable_installer'] = false;
 
+// don't allow these settings to be overriden by the user
+$rcmail_config['dont_override'] = array();
+
 // provide an URL where a user can get support for this Roundcube installation
 // PLEASE DO NOT LINK TO THE ROUNDCUBE.NET WEBSITE HERE!
-$rcmail_config['support_url'] = 'http://support.roundcube';
+$rcmail_config['support_url'] = '';
 
 // replace Roundcube logo with this image
 // specify an URL relative to the document root of this Roundcube installation
@@ -238,6 +199,9 @@ $rcmail_config['skin_logo'] = null;
 // a new user will be created once the IMAP login succeeds.
 // set to false if only registered users can use this service
 $rcmail_config['auto_create_user'] = true;
+
+// Enables possibility to log in using email address from user identities
+$rcmail_config['user_aliases'] = false;
 
 // use this folder to store log files (must be writeable for apache user)
 // This is used by the 'file' log driver.
@@ -267,26 +231,28 @@ $rcmail_config['login_autocomplete'] = 0;
 
 // Forces conversion of logins to lower case.
 // 0 - disabled, 1 - only domain part, 2 - domain and local part.
-// If users authentication is not case-sensitive this must be enabled.
-// After enabling it all user records need to be updated, e.g. with query:
-// UPDATE users SET username = LOWER(username);
-$rcmail_config['login_lc'] = 0;
+// If users authentication is case-insensitive this must be enabled.
+// Note: After enabling it all user records need to be updated, e.g. with query:
+//       UPDATE users SET username = LOWER(username);
+$rcmail_config['login_lc'] = 2;
 
 // Includes should be interpreted as PHP files
-$rcmail_config['skin_include_php'] = true;
+$rcmail_config['skin_include_php'] = false;
 
 // display software version on login screen
 $rcmail_config['display_version'] = false;
 
 // Session lifetime in minutes
-// must be greater than 'keep_alive'/60
-$rcmail_config['session_lifetime'] = 3600;
+$rcmail_config['session_lifetime'] = 10;
 
-// session domain: .example.org
+// Session domain: .example.org
 $rcmail_config['session_domain'] = '';
 
-// session name. Default: 'roundcube_sessid'
-$rcmail_config['session_name'] = 'roundcube_obm_sessid';
+// Session name. Default: 'roundcube_sessid'
+$rcmail_config['session_name'] = null;
+
+// Session path. Defaults to PHP session.cookie_path setting.
+$rcmail_config['session_path'] = null;
 
 // Backend to use for session storage. Can either be 'db' (default) or 'memcache'
 // If set to memcache, a list of servers need to be specified in 'memcache_hosts'
@@ -294,7 +260,7 @@ $rcmail_config['session_name'] = 'roundcube_obm_sessid';
 $rcmail_config['session_storage'] = 'db';
 
 // Use these hosts for accessing memcached
-// Define any number of hosts in the form of hostname:port or unix:///path/to/sock.file
+// Define any number of hosts in the form of hostname:port or unix:///path/to/socket.file
 $rcmail_config['memcache_hosts'] = null; // e.g. array( 'localhost:11211', '192.168.1.12:11211', 'unix:///var/tmp/memcached.sock' );
 
 // check client IP in session athorization
@@ -310,17 +276,18 @@ $rcmail_config['x_frame_options'] = 'sameorigin';
 // this key is used to encrypt the users imap password which is stored
 // in the session record (and the client cookie if remember password is enabled).
 // please provide a string of exactly 24 chars.
-$rcmail_config['des_key'] = 'NIZLhTml&d$sl=g=AHPfi7Jx';
+$rcmail_config['des_key'] = 'rcmail-!24ByteDESkey*Str';
 
 // Automatically add this domain to user names for login
 // Only for IMAP servers that require full e-mail addresses for login
 // Specify an array with 'host' => 'domain' values to support multiple hosts
 // Supported replacement variables:
 // %h - user's IMAP hostname
-// %n - http hostname ($_SERVER['SERVER_NAME'])
-// %d - domain (http hostname without the first part)
+// %n - hostname ($_SERVER['SERVER_NAME'])
+// %t - hostname without the first part
+// %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
-// For example %n = mail.domain.tld, %d = domain.tld
+// For example %n = mail.domain.tld, %t = domain.tld
 $rcmail_config['username_domain'] = '';
 
 // This domain will be used to form e-mail addresses of new users
@@ -330,7 +297,7 @@ $rcmail_config['username_domain'] = '';
 // %n - http hostname ($_SERVER['SERVER_NAME'])
 // %d - domain (http hostname without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
-// For example %n = mail.domain.tld, %d = domain.tld
+// For example %n = mail.domain.tld, %t = domain.tld
 $rcmail_config['mail_domain'] = '';
 
 // Password charset.
@@ -386,14 +353,16 @@ $rcmail_config['line_length'] = 72;
 // send plaintext messages as format=flowed
 $rcmail_config['send_format_flowed'] = true;
 
-// don't allow these settings to be overriden by the user
-$rcmail_config['dont_override'] = array();
+// According to RFC2298, return receipt envelope sender address must be empty.
+// If this option is true, Roundcube will use user's identity as envelope sender for MDN responses.
+$rcmail_config['mdn_use_from'] = false;
 
 // Set identities access level:
 // 0 - many identities with possibility to edit all params
 // 1 - many identities with possibility to edit all params but not email address
 // 2 - one identity with possibility to edit all params
 // 3 - one identity with possibility to edit all params but not email address
+// 4 - one identity with possibility to edit only signature
 $rcmail_config['identities_level'] = 0;
 
 // Mimetypes supported by the browser.
@@ -401,8 +370,15 @@ $rcmail_config['identities_level'] = 0;
 // either a comma-separated list or an array: 'text/plain,text/html,text/xml,image/jpeg,image/gif,image/png,application/pdf'
 $rcmail_config['client_mimetypes'] = null;  # null == default
 
-// mime magic database
-$rcmail_config['mime_magic'] = '/usr/share/misc/magic';
+// Path to a local mime magic database file for PHPs finfo extension.
+// Set to null if the default path should be used.
+$rcmail_config['mime_magic'] = null;
+
+// Absolute path to a local mime.types mapping table file.
+// This is used to derive mime-types from the filename extension or vice versa.
+// Such a file is usually part of the apache webserver. If you don't find a file named mime.types on your system,
+// download it from http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
+$rcmail_config['mime_types'] = null;
 
 // path to imagemagick identify binary
 $rcmail_config['im_identify_path'] = null;
@@ -410,18 +386,27 @@ $rcmail_config['im_identify_path'] = null;
 // path to imagemagick convert binary
 $rcmail_config['im_convert_path'] = null;
 
+// Size of thumbnails from image attachments displayed below the message content.
+// Note: whether images are displayed at all depends on the 'inline_images' option.
+// Set to 0 to display images in full size.
+$rcmail_config['image_thumbnail_size'] = 240;
+
 // maximum size of uploaded contact photos in pixel
 $rcmail_config['contact_photo_size'] = 160;
 
 // Enable DNS checking for e-mail address validation
 $rcmail_config['email_dns_check'] = false;
 
+// Disables saving sent messages in Sent folder (like gmail) (Default: false)
+// Note: useful when SMTP server stores sent mail in user mailbox
+$rcmail_config['no_save_sent_messages'] = false;
+
 // ----------------------------------
 // PLUGINS
 // ----------------------------------
 
 // List of active plugins (in plugins/ directory)
-$rcmail_config['plugins'] = array('multiple_smtp_server', 'obm_auth', 'obm_addressbook');
+$rcmail_config['plugins'] = array();
 
 // ----------------------------------
 // USER INTERFACE
@@ -532,9 +517,8 @@ $rcmail_config['recipients_separator'] = ',';
 // don't let users set pagesize to more than this value if set
 $rcmail_config['max_pagesize'] = 200;
 
-// Minimal value of user's 'keep_alive' setting (in seconds)
-// Must be less than 'session_lifetime'
-$rcmail_config['min_keep_alive'] = 72000;
+// Minimal value of user's 'refresh_interval' setting (in seconds)
+$rcmail_config['min_refresh_interval'] = 60;
 
 // Enables files upload indicator. Requires APC installed and enabled apc.rfc1867 option.
 // By default refresh time is set to 1 second. You can set this value to true
@@ -551,10 +535,12 @@ $rcmail_config['undo_timeout'] = 0;
 // ----------------------------------
 
 // This indicates which type of address book to use. Possible choises:
-// 'sql' (default) and 'ldap'.
+// 'sql' (default), 'ldap' and ''.
 // If set to 'ldap' then it will look at using the first writable LDAP
 // address book as the primary address book and it will not display the
 // SQL address book in the 'Address Book' view.
+// If set to '' then no address book will be displayed or only the
+// addressbook which is created by a plugin (like CardDAV).
 $rcmail_config['address_book_type'] = 'sql';
 
 // In order to enable public ldap search, configure an array like the Verisign
@@ -582,14 +568,16 @@ $rcmail_config['ldap_public']['Verisign'] = array(
   'name'          => 'Verisign.com',
   // Replacement variables supported in host names:
   // %h - user's IMAP hostname
-  // %n - http hostname ($_SERVER['SERVER_NAME'])
-  // %d - domain (http hostname without the first part)
+  // %n - hostname ($_SERVER['SERVER_NAME'])
+  // %t - hostname without the first part
+  // %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
   // %z - IMAP domain (IMAP hostname without the first part)
-  // For example %n = mail.domain.tld, %d = domain.tld
+  // For example %n = mail.domain.tld, %t = domain.tld
   'hosts'         => array('directory.verisign.com'),
   'port'          => 389,
   'use_tls'	      => false,
   'ldap_version'  => 3,       // using LDAPv3
+  'network_timeout' => 10,    // The timeout (in seconds) for connect + bind arrempts. This is only supported in PHP >= 5.3.0 with OpenLDAP 2.x
   'user_specific' => false,   // If true the base_dn, bind_dn and bind_pass default to the user's IMAP login.
   // %fu - The full username provided, assumes the username is an email
   //       address, uses the username_domain value if not an email address.
@@ -642,7 +630,7 @@ $rcmail_config['ldap_public']['Verisign'] = array(
     'name'        => 'cn',
     'surname'     => 'sn',
     'firstname'   => 'givenName',
-    'title'       => 'title',
+    'jobtitle'    => 'title',
     'email'       => 'mail:*',
     'phone:home'  => 'homePhone',
     'phone:work'  => 'telephoneNumber',
@@ -652,19 +640,25 @@ $rcmail_config['ldap_public']['Verisign'] = array(
     'zipcode'     => 'postalCode',
     'region'      => 'st',
     'locality'    => 'l',
-// if you uncomment country, you need to modify 'sub_fields' above
-//    'country'     => 'c',
-    'department'  => 'departmentNumber',
-    'notes'       => 'description',
-// these currently don't work:
-//    'phone:workfax' => 'facsimileTelephoneNumber',
-//    'photo'        => 'jpegPhoto',
-//    'organization' => 'o',
-//    'manager'      => 'manager',
-//    'assistant'    => 'secretary',
+    // if you country is a complex object, you need to configure 'sub_fields' below
+    'country'      => 'c',
+    'organization' => 'o',
+    'department'   => 'ou',
+    'jobtitle'     => 'title',
+    'notes'        => 'description',
+    // these currently don't work:
+    // 'phone:workfax' => 'facsimileTelephoneNumber',
+    // 'photo'         => 'jpegPhoto',
+    // 'manager'       => 'manager',
+    // 'assistant'     => 'secretary',
   ),
   // Map of contact sub-objects (attribute name => objectClass(es)), e.g. 'c' => 'country'
   'sub_fields' => array(),
+  // Generate values for the following LDAP attributes automatically when creating a new record
+  'autovalues' => array(
+  // 'uid'  => 'md5(microtime())',               // You may specify PHP code snippets which are then eval'ed 
+  // 'mail' => '{givenname}.{sn}@mydomain.com',  // or composite strings with placeholders for existing attributes
+  ),
   'sort'          => 'cn',    // The field to sort the listing by.
   'scope'         => 'sub',   // search mode: sub|base|list
   'filter'        => '(objectClass=inetOrgPerson)',      // used for basic listing (if not empty) and will be &'d with search queries. example: status=act
@@ -759,8 +753,14 @@ $rcmail_config['prefer_html'] = true;
 // 2 - Always show inline images
 $rcmail_config['show_images'] = 0;
 
+// open messages in new window
+$rcmail_config['message_extwin'] = false;
+
+// open message compose form in new window
+$rcmail_config['compose_extwin'] = false;
+
 // compose html formatted messages by default
-// 0 - never, 1 - always, 2 - on reply to HTML message only 
+// 0 - never, 1 - always, 2 - on reply to HTML message, 3 - on forward or reply to HTML message
 $rcmail_config['htmleditor'] = 0;
 
 // show pretty dates as standard
@@ -789,7 +789,7 @@ $rcmail_config['inline_images'] = true;
 // 0 - Full RFC 2231 compatible
 // 1 - RFC 2047 for 'name' and RFC 2231 for 'filename' parameter (Thunderbird's default)
 // 2 - Full 2047 compatible
-$rcmail_config['mime_param_folding'] = 0;
+$rcmail_config['mime_param_folding'] = 1;
 
 // Set true if deleted messages should not be displayed
 // This will make the application run slower
@@ -803,23 +803,27 @@ $rcmail_config['read_when_deleted'] = true;
 // Use 'Purge' to remove messages marked as deleted
 $rcmail_config['flag_for_deletion'] = false;
 
-// Default interval for keep-alive/check-recent requests (in seconds)
-// Must be greater than or equal to 'min_keep_alive' and less than 'session_lifetime'
-$rcmail_config['keep_alive'] = 60;
+// Default interval for auto-refresh requests (in seconds)
+// These are requests for system state updates e.g. checking for new messages, etc.
+// Setting it to 0 disables the feature.
+$rcmail_config['refresh_interval'] = 60;
 
 // If true all folders will be checked for recent messages
 $rcmail_config['check_all_folders'] = false;
 
 // If true, after message delete/move, the next message will be displayed
-$rcmail_config['display_next'] = false;
+$rcmail_config['display_next'] = true;
 
 // 0 - Do not expand threads 
 // 1 - Expand all threads automatically 
 // 2 - Expand only threads with unread messages 
 $rcmail_config['autoexpand_threads'] = 0;
 
-// When replying place cursor above original message (top posting)
-$rcmail_config['top_posting'] = false;
+// When replying:
+// -1 - don't cite the original message
+// 0  - place cursor below the original message
+// 1  - place cursor above original message (top posting)
+$rcmail_config['reply_mode'] = 0;
 
 // When replying strip original signature from message
 $rcmail_config['strip_existing_sig'] = true;
@@ -830,9 +834,6 @@ $rcmail_config['strip_existing_sig'] = true;
 // 2 - New messages only
 // 3 - Forwards and Replies only
 $rcmail_config['show_sig'] = 1;
-
-// When replying or forwarding place sender's signature above existing message
-$rcmail_config['sig_above'] = false;
 
 // Use MIME encoding (quoted-printable) for 8bit characters in message body
 $rcmail_config['force_7bit'] = false;
@@ -889,4 +890,6 @@ $rcmail_config['autocomplete_single'] = false;
 // Georgia, Helvetica, Impact, Tahoma, Terminal, Times New Roman, Trebuchet MS, Verdana
 $rcmail_config['default_font'] = '';
 
-// end of config file
+// OBM specific configuration
+require_once("config/obm.inc.php");
+// /OBM specific configuration
