@@ -27,11 +27,11 @@ $rcmail_config['cas_pgt_dir'] = '/tmp';
 
 // name of the IMAP service. Will only be used if cas_proxy is set to true.
 //     This service name must be authorized to be used with the CAS server.
-$rcmail_config['cas_imap_name'] = 'imap://obm-imap-server-name';
+//$rcmail_config['cas_imap_name'] = 'imap://obm-imap-server-name';
 
 // name of the SMTP service. Will only be used if cas_proxy is set to true.
 //     This service name must be authorized to be used with the CAS server.
-$rcmail_config['cas_smtp_name'] = 'imap://obm-imap-server-name';
+//$rcmail_config['cas_smtp_name'] = 'imap://obm-imap-server-name';
 
 // whether the IMAP server caches proxy tickets it has received for subsequent
 //    requests. Will only be used if cas_proxy is set to true. If set to true,
@@ -45,7 +45,7 @@ $rcmail_config['cas_smtp_name'] = 'imap://obm-imap-server-name';
 // password for logging into the IMAP server. Will only be used if cas_proxy
 //     is set to false. The IMAP backend must accept this password for all
 //     authorized users.
-$rcmail_config['cas_imap_password'] = '';
+//$rcmail_config['cas_imap_password'] = '';
 
 // CAS server host name.
 //$rcmail_config['cas_hostname'] = 'centos6.obm.team.services.par.lng';
@@ -58,15 +58,15 @@ $rcmail_config['cas_imap_password'] = '';
 
 // CAS server SSL validation: 'self' for self-signed certificate, 'ca' for
 //     certificate from a CA, empty for no SSL validation.
-$rcmail_config['cas_validation'] = '';
+//$rcmail_config['cas_validation'] = '';
 
 // CAS server certificate in PEM format, used when CAS validation is set to
 //     'self' or 'ca'.
-$rcmail_config['cas_cert'] = '/var/lib/obm-ca/cacert.pem';
+//$rcmail_config['cas_cert'] = '/var/lib/obm-ca/cacert.pem';
 
 // CAS service login URL.
-$rcmail_config['cas_login_url'] = '';
+//$rcmail_config['cas_login_url'] = '';
 
 // CAS service logout URL.
-$rcmail_config['cas_logout_url'] = 'https://somewhere/';
+//$rcmail_config['cas_logout_url'] = 'https://somewhere/';
 ?>
