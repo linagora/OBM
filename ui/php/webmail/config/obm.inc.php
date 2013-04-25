@@ -55,6 +55,9 @@ $rcmail_config['des_key'] = 'NIZLhTml&d$sl=g=AHPfi7Jx';
 // compose in new window
 $rcmail_config['compose_extwin'] = true;
 
+// session name.
+$rcmail_config['session_name'] = 'roundcube_obm_sessid';
+
 // setup required OBM modules
 $rcmail_config["plugins"][] = "multiple_smtp_server";
 //$rcmail_config["plugins"][] = "obm_addressbook";
@@ -76,6 +79,8 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
   $rcmail_config['cas_port'] = $cas_server_port;
   // CAS service URI on the CAS server.
   $rcmail_config['cas_uri'] = $cas_server_uri;
+} else {
+  $rcmail_config["plugins"][] = "obm_auth";
 }
 
 
