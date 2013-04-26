@@ -526,6 +526,9 @@ $autoloader->autoloaders['OBM'] =  new OBM_Autoloader_Standard();
 $autoloader->autoloaders['Stato'] =  new OBM_Autoloader_Standard();
 $autoloader->autoloaders['*'] = new OBM_Autoloader_Resource();
 
+require_once("$obminclude/lib/mustache.php/src/Mustache/Autoloader.php");
+Mustache_Autoloader::register();
+
 // Document root
 if (is_null($ini_array['documentRoot'])) {
     $cdocument_root = "/var/lib/obm/documents";
