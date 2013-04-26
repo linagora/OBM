@@ -2261,11 +2261,14 @@ Obm.CommentedDecisionPopup = new Class({
     if ( this.updateOnlyComment(decision) ) {
       return ;
     }
+    var ownerNotificationCheckBox = $('owner_notification');
     var options = {
       uriAction: this.uriAction,
-      success: Obm.responseHandlers.update_decision_and_comment,
-      owner_notification: $('owner_notification').checked
+      success: Obm.responseHandlers.update_decision_and_comment
     };
+    if (ownerNotificationCheckBox) {
+        options.owner_notification = ownerNotificationCheckBox.checked;
+    }
     if ( this.occurrenceDate && this.occurrenceDate.length ) {
       options.date_edit_occurrence = this.occurrenceDate;
     }
