@@ -419,7 +419,6 @@ class CAS_Auth extends Auth {
     }
 
     phpCAS::client(CAS_VERSION_2_0, $cas_server, $cas_server_port, $cas_server_uri, false);
-    phpCAS::setNoCasServerValidation();
     if ($cas_validation == 'ca') {
         phpCAS::setCasServerCACert($cas_cert);
     }
