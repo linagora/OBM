@@ -79,6 +79,11 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
   $rcmail_config['cas_port'] = $cas_server_port;
   // CAS service URI on the CAS server.
   $rcmail_config['cas_uri'] = $cas_server_uri;
+  // CAS validation type
+  if ( $cas_validation ) {
+    $rcmail_config['cas_validation'] = $cas_validation;
+    $rcmail_config['cas_cert'] = $cas_cert;
+  }
 } else {
   $rcmail_config["plugins"][] = "obm_auth";
 }
