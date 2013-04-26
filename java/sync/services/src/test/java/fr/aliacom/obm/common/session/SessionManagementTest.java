@@ -32,17 +32,28 @@
 package fr.aliacom.obm.common.session;
 
 
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import static org.easymock.EasyMock.*;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Login;
+import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
@@ -60,6 +71,8 @@ public class SessionManagementTest {
 	private AuthentificationServiceFactory authentificationServiceFactory;
 	private IMocksControl control;
 	private IAuthentificationService authenticationService;
+	private ObmDomain obmDomain;
+	private ObmUser obmUser;
 
 	@Before
 	public void setup() {
@@ -71,7 +84,12 @@ public class SessionManagementTest {
 		specialAccounts = control.createMock(SpecialAccounts.class);
 		helperService = control.createMock(HelperService.class);
 		authenticationService = control.createMock(IAuthentificationService.class);
-		sessionManagement = new SessionManagement(authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts, helperService);
+		sessionManagement = createMockBuilder(SessionManagement.class)
+				.withConstructor(authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts, helperService)
+				.addMockedMethod("getObmSyncVersion")
+				.createMock(control);
+		obmDomain = ToolBox.getDefaultObmDomain();
+		obmUser = ToolBox.getDefaultObmUser();
 	}
 	
 	@Test
@@ -153,5 +171,26 @@ public class SessionManagementTest {
 		Login actualLogin = sessionManagement.prepareLogin("login", null, null, authenticationService);
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("login").domain("domain").build());
+	}
+
+	@Test
+	public void testLoginWithoutPasswordFromTrustedLemonIP() {
+		String domain = "test.tlse.lng", trustedIp = "1.2.3.4", login = "user", email = "user@test";
+
+		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
+		expect(authenticationService.getType()).andReturn("TestAuthService");
+		expect(domainService.findDomainByName(domain)).andReturn(obmDomain);
+		expect(configurationService.getLemonLdapIps()).andReturn(ImmutableSet.of(trustedIp));
+		expect(userDao.findUserByLogin(login, obmDomain)).andReturn(obmUser);
+		expect(helperService.constructEmailFromList(email, domain)).andReturn(email);
+		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
+		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
+		control.replay();
+
+		AccessToken token = sessionManagement.login(login, null, "test", trustedIp, trustedIp, login, domain, false);
+
+		assertThat(token).isNotNull();
+
+		control.verify();
 	}
 }

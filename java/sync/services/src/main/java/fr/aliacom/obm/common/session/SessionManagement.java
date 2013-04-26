@@ -41,6 +41,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Credentials.Builder;
 import org.obm.sync.auth.Login;
+import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
@@ -199,12 +200,10 @@ public class SessionManagement {
 			return null;
 		}
 
-		Credentials credentials = buildCredentials(login, password, isPasswordHashed);
-		
 		if ((lemonLogin != null && lemonDomain != null
 				&& doAuthLemonLdap(remoteIP))
 			|| doAuthSpecialAccount(login.getLogin(), obmDomain, clientIP)
-			|| authService.doAuth(credentials)) {
+			|| authService.doAuth(buildCredentials(login, password, isPasswordHashed))) {
 
 			return login(origin, login.getLogin(), obmDomain, authService.getType());
 		}
@@ -292,11 +291,16 @@ public class SessionManagement {
 
 		token.setSessionId(newSessionId());
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
-		token.setVersion(ObmSyncVersion.current());
+		token.setVersion(getObmSyncVersion());
 		//FIXME: probably broken
 		token.setRootAccount(false);
 		token.setServiceProperties(userManagementDAO.loadUserProperties(token));
 		return token;
+	}
+
+	@VisibleForTesting
+	MavenVersion getObmSyncVersion() {
+		return ObmSyncVersion.current();
 	}
 
 	/**
