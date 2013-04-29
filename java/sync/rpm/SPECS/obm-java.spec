@@ -248,6 +248,8 @@ fi
 
 
 %changelog
+* Mon Apr 29 2013 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.5.0-0.rc3
+- New upstream release.
 * Fri Apr 26 2013 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.5.0-0.rc2
 - New upstream release.
 * Tue Apr 23 2013 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.5.0-0.rc1
