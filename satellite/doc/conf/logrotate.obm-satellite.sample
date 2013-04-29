@@ -5,4 +5,10 @@
     delaycompress
     create 640 root root
     missingok
+    postrotate
+if /etc/init.d/obm-satellite status
+then
+    /etc/init.d/obm-satellite restart
+fi
+    endscript
 }
