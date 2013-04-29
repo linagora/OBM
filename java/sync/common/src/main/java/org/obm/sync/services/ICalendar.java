@@ -157,6 +157,15 @@ public interface ICalendar {
 
 	/**
 	 * return every changes made to calendar since lastSync date. This service
+	 * treats participation changes as full changes. Logged user needs read
+	 * rights on calendar.
+	 * Deleted events are not returned.
+	 */
+	EventChanges getFirstSync(AccessToken token, String calendar, Date lastSync)
+			throws ServerFault, NotAllowedException;
+
+	/**
+	 * return every changes made to calendar since lastSync date. This service
 	 * treats participation changes as special changes in order to let client
 	 * know if the event itself has been modified or not. Logged user needs read
 	 * rights on calendar.
@@ -165,10 +174,18 @@ public interface ICalendar {
 			Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException;
 
 	/**
-	 * return every event in calendar the will happen after start date Logged
+	 * Returns every events in calendar which start after the @param start argument.
 	 * user needs read rights on calendar
 	 */
 	EventChanges getSyncEventDate(AccessToken token, String calendar, Date start)
+			throws ServerFault, NotAllowedException;
+
+	/**
+	 * Returns every events in calendar which start after the @param start argument.
+	 * user needs read rights on calendar
+	 * Deleted events are not returned.
+	 */
+	EventChanges getFirstSyncEventDate(AccessToken token, String calendar, Date start)
 			throws ServerFault, NotAllowedException;
 
 	/**

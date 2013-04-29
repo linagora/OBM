@@ -142,6 +142,17 @@ public interface IAddressBook {
 
 	ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
 
+	/**
+	 * list of updated and removed contacts sync given date
+	  * Deleted contacts are not returned.
+	 */
+	ContactChanges firstListContactsChanged(AccessToken token, Date lastSync) throws ServerFault;
+
+	 /** 
+	  * Deleted contacts are not returned.
+	  */
+	ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
+
 	List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault;
 	
 }

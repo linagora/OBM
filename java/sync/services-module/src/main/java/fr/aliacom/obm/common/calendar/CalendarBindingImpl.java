@@ -831,6 +831,14 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	@Override
 	@Transactional(readOnly=true)
+	public EventChanges getFirstSync(AccessToken token, String calendar,
+			Date lastSync) throws ServerFault, NotAllowedException {
+		// TODO: to implement
+		return null;
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
 	public EventChanges getSyncInRange(AccessToken token, String calendar,
 			Date lastSync, SyncRange syncRange) throws ServerFault, NotAllowedException {
 		return getSync(token, calendar, lastSync, syncRange, false);
@@ -901,6 +909,14 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventChanges getSyncEventDate(AccessToken token, String calendar,
 			Date lastSync) throws ServerFault, NotAllowedException {
 		return getSync(token, calendar, lastSync, null, true);
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public EventChanges getFirstSyncEventDate(AccessToken token, String calendar,
+			Date lastSync) throws ServerFault, NotAllowedException {
+		// TODO: to implement
+		return null;
 	}
 
 	private EventChanges getSync(AccessToken token, String calendar,
