@@ -70,6 +70,17 @@ abstract class abstractAuth implements obmSyncAuth {
    */
   protected abstract function getLoginUrl($requester);
 
+  protected function formatLoginParams($origin, $login, $password){
+    $loginParams = "?origin=" . urlencode($origin);
+    $loginParams .= "&login=" . urlencode($login);
+
+    if ( !empty($password) ) {
+      $loginParams .= "&password=" . urlencode($password);
+    }
+
+    return $loginParams;
+  }
+
   /**
    * Executes obmSync login and gets a session id. Must be executed before
    * calling a service from obm-sync.

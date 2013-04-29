@@ -12,7 +12,12 @@ class doTrustedLoginAuth extends abstractAuth {
     $userInfo = array('login' => $obm_login[0]);
     $token = get_trust_token($userInfo);
 
-    return $requester->getRootPath() . self::TRUSTED_LOGIN_PATH . "?origin=" . urlencode(self::$origin) . "&login=" . urlencode($obm_login[0]) . "&password=" . $token;
+    $method = self::TRUSTED_LOGIN_PATH;
+    $origin = self::$origin;
+    $login = $obm_login[0];
+    $password = $token;
+
+    return $requester->getRootPath() . $method . $this->formatLoginParams($origin, $login, $password);
   }
 
 }
