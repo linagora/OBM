@@ -254,6 +254,18 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 
 	@Override
+	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
+		// TODO: to implement
+		return null;
+	}
+	
+	@Override
+	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
+		// TODO: to implement
+		return null;
+	}
+
+	@Override
 	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		params.put("query", query);
