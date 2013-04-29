@@ -46,18 +46,18 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
-public class SSLHttpClientBuilderTest {
+public class Pkcs12HttpClientBuilderTest {
 
 	@SuppressWarnings("unused")
 	@Test(expected=IllegalArgumentException.class)
 	public void testRequirePKCS12() {
-		new SSLHttpClientBuilder(null, "password".toCharArray());
+		new Pkcs12HttpClientBuilder(null, "password".toCharArray());
 	}
 	
 	@SuppressWarnings("unused")
 	@Test(expected=IllegalArgumentException.class)
 	public void testRequirePKCS12Password() {
-		new SSLHttpClientBuilder(new ByteArrayInputStream("test".getBytes()), null);
+		new Pkcs12HttpClientBuilder(new ByteArrayInputStream("test".getBytes()), null);
 	}
 	
 	@Test(expected=EOFException.class)
@@ -65,7 +65,7 @@ public class SSLHttpClientBuilderTest {
 		InputStream pkcs12Stream = IOUtils.toInputStream("I'm not a pkcs12 key store");
 		char[] pkcs12Password = "toto".toCharArray();
 		
-		SSLHttpClientBuilder testee = new SSLHttpClientBuilder(pkcs12Stream, pkcs12Password);
+		Pkcs12HttpClientBuilder testee = new Pkcs12HttpClientBuilder(pkcs12Stream, pkcs12Password);
 		testee.loadPKCS12KeyStore(pkcs12Stream, pkcs12Password);
 	}
 	
@@ -74,7 +74,7 @@ public class SSLHttpClientBuilderTest {
 		InputStream pkcs12Stream = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_pwd_toto.p12");
 		char[] pkcs12Password = "toto".toCharArray();
 		
-		SSLHttpClientBuilder testee = new SSLHttpClientBuilder(pkcs12Stream, pkcs12Password);
+		Pkcs12HttpClientBuilder testee = new Pkcs12HttpClientBuilder(pkcs12Stream, pkcs12Password);
 		KeyStore keyStore = testee.loadPKCS12KeyStore(pkcs12Stream, pkcs12Password);
 		
 		InputStream pkcs12InnerX509 = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_inner_x509.crt");
