@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
 
@@ -54,9 +55,11 @@ import org.obm.push.utils.DateUtils;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.sync.items.ContactChanges;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
@@ -186,6 +189,89 @@ public class AddressBookBindingImplTest {
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
 
+	@Test
+	public void testFirstListContactsChangedUserBook() throws ServerFault, SQLException {
+		Integer addressBookId = 1;
+		Date date = DateUtils.getEpochCalendar().getTime();
+
+		Contact contact = new Contact();
+		contact.setLastname("Contact");
+		Contact contact2 = new Contact();
+		contact2.setLastname("Contact2");
+		
+		ContactUpdates contactUpdates = new ContactUpdates();
+		contactUpdates.setContacts(ImmutableList.<Contact> of(contact, contact2));
+		
+		expect(contactConfiguration.getAddressBookUserId())
+			.andReturn(addressBookId).once();
+		
+		expect(userDao.findUpdatedUsers(date, token))
+			.andReturn(contactUpdates).once();
+		expect(userDao.findRemovalCandidates(date, token))
+			.andReturn(ImmutableSet.<Integer> of(1, 2)).once();
+		
+		expect(helper.getConnection())
+			.andReturn(null).once();
+		helper.cleanup(null, null, null);
+		expectLastCall().once();
+		expect(helper.selectNow(null))
+			.andReturn(date).once();
+
+		mocksControl.replay();
+
+		AddressBookBindingImpl binding = new AddressBookBindingImpl(null, userDao, null, helper, 
+				null, contactConfiguration, null);
+		ContactChanges firstListContactsChanged = binding.firstListContactsChanged(token, date, addressBookId);
+
+		mocksControl.verify();
+
+		assertThat(firstListContactsChanged.getLastSync()).isEqualTo(date);
+		assertThat(firstListContactsChanged.getRemoved()).isEmpty();
+		assertThat(firstListContactsChanged.getUpdated()).containsOnly(contact, contact2);
+	}
+
+	@Test
+	public void testFirstListContactsChanged() throws ServerFault, SQLException {
+		Integer addressBookId = 1;
+		Integer otherAddressBookId = 2;
+		Date date = DateUtils.getEpochCalendar().getTime();
+
+		Contact contact = new Contact();
+		contact.setLastname("Contact");
+		Contact contact2 = new Contact();
+		contact2.setLastname("Contact2");
+		
+		ContactUpdates contactUpdates = new ContactUpdates();
+		contactUpdates.setContacts(ImmutableList.<Contact> of(contact, contact2));
+		
+		expect(contactConfiguration.getAddressBookUserId())
+			.andReturn(addressBookId).once();
+		
+		expect(contactDao.findUpdatedContacts(date, otherAddressBookId, token))
+			.andReturn(contactUpdates).once();
+		expect(contactDao.findRemovalCandidates(date, otherAddressBookId, token))
+			.andReturn(ImmutableSet.<Integer> of(1, 2)).once();
+		
+		expect(helper.getConnection())
+			.andReturn(null).once();
+		helper.cleanup(null, null, null);
+		expectLastCall().once();
+		expect(helper.selectNow(null))
+			.andReturn(date).once();
+
+		mocksControl.replay();
+
+		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, helper, 
+				null, contactConfiguration, null);
+		ContactChanges firstListContactsChanged = binding.firstListContactsChanged(token, date, otherAddressBookId);
+
+		mocksControl.verify();
+
+		assertThat(firstListContactsChanged.getLastSync()).isEqualTo(date);
+		assertThat(firstListContactsChanged.getRemoved()).isEmpty();
+		assertThat(firstListContactsChanged.getUpdated()).containsOnly(contact, contact2);
+	}
+	
 	/**
 	 * Tests that getSync() returns the updated contacts and address book, but
 	 * not the full list of users from the user DAO, when
