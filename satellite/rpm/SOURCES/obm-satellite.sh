@@ -34,7 +34,7 @@ REP_ETC_OBM_SATELITE="/etc/obm-satellite"
 REP_RUN="/var/run"
 obmconf="${REP_ETC_OBM}/obm-rpm.conf"
 NEWFILE="${REP_ETC_OBM}/obm_conf.ini"
-CMD_INIT_OBM_SATELITE="/etc/init.d/obmSatellite"
+CMD_INIT_OBM_SATELITE="/etc/init.d/obm-satellite"
 
 # check if the file exist
 

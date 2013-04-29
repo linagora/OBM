@@ -97,7 +97,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-available
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/mods-enabled
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/obm-satellite
 install -p -m 755 obmSatellite.pl $RPM_BUILD_ROOT%{_datadir}/obm-satellite
-install -p -m 755 init-obmSatellite.sample $RPM_BUILD_ROOT%{_sysconfdir}/init.d/obmSatellite
+install -p -m 755 init-obmSatellite.sample $RPM_BUILD_ROOT%{_sysconfdir}/init.d/obm-satellite
 install -p -m 600 obmSatellite.ini.sample $RPM_BUILD_ROOT%{_sysconfdir}/obm-satellite/obmSatellite.ini
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/obm-satellite
 install -p -m 755 osdismod $RPM_BUILD_ROOT%{_sbindir}/
@@ -118,12 +118,12 @@ install -p -m 755 mods-available/backupEntity $RPM_BUILD_ROOT%{_sysconfdir}/obm-
 rm -rf $RPM_BUILD_ROOT
 
 %post           -n obm-satellite
-/sbin/chkconfig --add obmSatellite
+/sbin/chkconfig --add obm-satellite
 
 %preun          -n obm-satellite
 if [ $1 = 0 ] ; then
-/sbin/service obmSatellite stop >/dev/null 2>&1
-/sbin/chkconfig --del obmSatellite
+/sbin/service obm-satellite stop >/dev/null 2>&1
+/sbin/chkconfig --del obm-satellite
 fi
 
 %post           -n perl-ObmSatellite
@@ -147,7 +147,7 @@ perl -MXML::SAX -e "XML::SAX->add_parser(q(XML::SAX::PurePerl))->save_parsers()"
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/cyrusPartition
 %config(noreplace) %{_sysconfdir}/obm-satellite/mods-available/backupEntity
 %{_sysconfdir}/obm-satellite/mods-enabled
-%{_sysconfdir}/init.d/obmSatellite
+%{_sysconfdir}/init.d/obm-satellite
 %config(noreplace) %{_sysconfdir}/logrotate.d/obm-satellite
 
 %changelog
