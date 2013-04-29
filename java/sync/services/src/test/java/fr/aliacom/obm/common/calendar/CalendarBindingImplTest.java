@@ -1932,6 +1932,124 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
+	public void testGetFirstSync() throws FindException, ServerFault, NotAllowedException {
+		String calendar = "bill.colby@cia.gov";
+		ObmUser user = ToolBox.getDefaultObmUser();
+
+		Date timeCreate = DateUtils.date("1974-09-04T14:00:00");
+		Date lastSync = DateUtils.date("1973-09-04T14:00:00");
+		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
+		
+		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
+		
+		Event publicEvent = new Event();
+		publicEvent.setExtId(new EventExtId("public_event"));
+		publicEvent.setTitle("public event");
+		publicEvent.setTimeCreate(timeCreate);
+		
+		Event confidentialEventWithAttendee = new Event();
+		confidentialEventWithAttendee.setUid(new EventObmId(3));
+		confidentialEventWithAttendee.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEventWithAttendee.setExtId(new EventExtId("confidential_event"));
+		confidentialEventWithAttendee.addAttendee(ContactAttendee.builder().email("user@test.tlse.lng").build());
+		confidentialEventWithAttendee.setTimeCreate(timeCreate);
+		
+		Event simpleConfidentialEvent = new Event();
+		simpleConfidentialEvent.setUid(new EventObmId(4));
+		simpleConfidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		simpleConfidentialEvent.setExtId(new EventExtId("confidential_event2"));
+		simpleConfidentialEvent.setTimeCreate(timeCreate);
+		
+		EventChanges eventChangesFromDao = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.deletes(ImmutableSet.of(deletedEvent1))
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(
+						publicEvent, confidentialEventWithAttendee, simpleConfidentialEvent))
+				.build();
+		
+		EventChanges expectedEventChanges = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(publicEvent, confidentialEventWithAttendee))
+				.build();
+		
+		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user).atLeastOnce();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true).once();
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
+		
+		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
+
+		mocksControl.replay();
+		
+		EventChanges actualEventChanges = binding.getFirstSync(token, calendar, lastSync);
+		
+		mocksControl.verify();
+		
+		assertThat(actualEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
+	@Test
+	public void testGetFirstSyncEventDate() throws FindException, ServerFault, NotAllowedException {
+		String calendar = "bill.colby@cia.gov";
+		ObmUser user = ToolBox.getDefaultObmUser();
+
+		Date timeCreate = DateUtils.date("1974-09-04T14:00:00");
+		Date lastSync = DateUtils.date("1973-09-04T14:00:00");
+		Date syncDateFromDao = new DateTime(lastSync).plusSeconds(5).toDate();
+		
+		DeletedEvent deletedEvent1 = DeletedEvent.builder().eventObmId(1).eventExtId("deleted event 1").build();
+		
+		Event publicEvent = new Event();
+		publicEvent.setExtId(new EventExtId("public_event"));
+		publicEvent.setTitle("public event");
+		publicEvent.setTimeCreate(timeCreate);
+		
+		Event confidentialEventWithAttendee = new Event();
+		confidentialEventWithAttendee.setUid(new EventObmId(3));
+		confidentialEventWithAttendee.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		confidentialEventWithAttendee.setExtId(new EventExtId("confidential_event"));
+		confidentialEventWithAttendee.addAttendee(ContactAttendee.builder().email("user@test.tlse.lng").build());
+		confidentialEventWithAttendee.setTimeCreate(timeCreate);
+		
+		Event simpleConfidentialEvent = new Event();
+		simpleConfidentialEvent.setUid(new EventObmId(4));
+		simpleConfidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		simpleConfidentialEvent.setExtId(new EventExtId("confidential_event2"));
+		simpleConfidentialEvent.setTimeCreate(timeCreate);
+		
+		EventChanges eventChangesFromDao = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.deletes(ImmutableSet.of(deletedEvent1))
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(
+						publicEvent, confidentialEventWithAttendee, simpleConfidentialEvent))
+				.build();
+		
+		EventChanges expectedEventChanges = EventChanges.builder()
+				.lastSync(syncDateFromDao)
+				.participationChanges(new ArrayList<ParticipationChanges>())
+				.updates(Lists.newArrayList(publicEvent, confidentialEventWithAttendee))
+				.build();
+		
+		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user).atLeastOnce();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true).once();
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
+		
+		expect(calendarDao.getSync(token, user, lastSync, null, null, true)).andReturn(eventChangesFromDao);
+
+		mocksControl.replay();
+		
+		EventChanges actualEventChanges = binding.getFirstSyncEventDate(token, calendar, lastSync);
+		
+		mocksControl.verify();
+		
+		assertThat(actualEventChanges).isEqualTo(expectedEventChanges);
+	}
+	
+	@Test
 	public void testGetSyncDoesNotMoveConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
 		String calendar = "user@test.tlse.lng";
 		ObmUser user =

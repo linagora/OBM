@@ -848,8 +848,13 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional(readOnly=true)
 	public EventChanges getFirstSync(AccessToken token, String calendar,
 			Date lastSync) throws ServerFault, NotAllowedException {
-		// TODO: to implement
-		return null;
+		
+		EventChanges allEventChanges = getSync(token, calendar, lastSync);
+		return EventChanges.builder()
+				.lastSync(allEventChanges.getLastSync())
+				.participationChanges(allEventChanges.getParticipationUpdated())
+				.updates(allEventChanges.getUpdated())
+				.build();
 	}
 	
 	@Override
@@ -930,8 +935,13 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional(readOnly=true)
 	public EventChanges getFirstSyncEventDate(AccessToken token, String calendar,
 			Date lastSync) throws ServerFault, NotAllowedException {
-		// TODO: to implement
-		return null;
+		
+		EventChanges allEventChanges = getSyncEventDate(token, calendar, lastSync);
+		return EventChanges.builder()
+				.lastSync(allEventChanges.getLastSync())
+				.participationChanges(allEventChanges.getParticipationUpdated())
+				.updates(allEventChanges.getUpdated())
+				.build();
 	}
 
 	private EventChanges getSync(AccessToken token, String calendar,
