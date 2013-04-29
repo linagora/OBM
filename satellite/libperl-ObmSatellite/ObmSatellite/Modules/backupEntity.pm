@@ -38,6 +38,8 @@ use constant QUOTA_CMD => 'quota';
 use constant MAIL_REPORT_RECIPIENT => 'x-obm-backup';
 use constant BACKUP_FTP_TIMEOUT => 10;
 
+use constant SOME_FILE_DIFFER_CODE => 1;
+
 
 sub _setUri {
     my $self = shift;
@@ -608,8 +610,9 @@ sub _writeArchive {
     my $cmd = $self->{'tarCmd'}.' --ignore-failed-read -C '.$entity->getTmpBackupPath().' -czhf '.$backupFullPath.' . > /dev/null 2>&1';
     $self->_log( 'Executing '.$cmd, 4 );
 
-    if( my $returnCode = system( $cmd ) ) {
-        $returnCode = ($returnCode >> 8) & 0xffff;
+    my $returnCode = system($cmd);
+    $returnCode = ($returnCode >> 8) & 0xffff;
+    if( $returnCode > SOME_FILE_DIFFER_CODE) {
         my $content = {
             content => [ 'Can\'t write backup archive '.$backupFullPath.' - Error: '.$returnCode ]
             };
