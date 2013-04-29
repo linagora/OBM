@@ -66,13 +66,13 @@ public class ItemSyncStateTest {
 				.syncKey(syncKey)
 				.syncDate(currentDate)
 				.id(id)
-				.syncFiltred(true)
+				.syncFiltered(true)
 				.build();
 		
 		assertThat(syncState.getSyncKey()).isEqualTo(syncKey);
 		assertThat(syncState.getSyncDate()).isEqualTo(currentDate);
 		assertThat(syncState.getId()).isEqualTo(id);
-		assertThat(syncState.isSyncFiltred()).isTrue();
+		assertThat(syncState.isSyncFiltered()).isTrue();
 	}
 	
 	@Test
@@ -85,12 +85,12 @@ public class ItemSyncStateTest {
 				.syncKey(syncKey)
 				.syncDate(currentDate)
 				.id(id)
-				.syncFiltred(false)
+				.syncFiltered(false)
 				.build();
 		
 		ItemSyncState newSyncState = syncState.newWindowedSyncState(null);
 		assertThat(newSyncState).isEqualTo(syncState);
-		assertThat(newSyncState.isSyncFiltred()).isFalse();
+		assertThat(newSyncState.isSyncFiltered()).isFalse();
 	}
 	
 	@Test
@@ -104,13 +104,13 @@ public class ItemSyncStateTest {
 				.syncKey(syncKey)
 				.syncDate(currentDate)
 				.id(id)
-				.syncFiltred(false)
+				.syncFiltered(false)
 				.build();
 		
 		ItemSyncState newSyncState = syncState.newWindowedSyncState(FilterType.ONE_DAY_BACK);
 		assertThat(newSyncState.getSyncKey()).isEqualTo(syncKey);
 		assertThat(newSyncState.getSyncDate()).isEqualTo(expectedDate);
 		assertThat(newSyncState.getId()).isEqualTo(id);
-		assertThat(newSyncState.isSyncFiltred()).isTrue();
+		assertThat(newSyncState.isSyncFiltered()).isTrue();
 	}
 }

@@ -292,7 +292,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		try {
 			
 			EventChanges changes = null;
-			if (newState.isSyncFiltred()) {
+			if (newState.isSyncFiltered()) {
 				changes = calendarClient.getSyncEventDate(token, collectionPath.backendName(), newState.getSyncDate());
 			} else {
 				changes = calendarClient.getSync(token, collectionPath.backendName(), newState.getSyncDate());

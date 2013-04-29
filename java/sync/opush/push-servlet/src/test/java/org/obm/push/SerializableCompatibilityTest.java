@@ -359,7 +359,7 @@ public class SerializableCompatibilityTest {
 		ItemSyncState itemSyncState = ItemSyncState.builder()
 				.id(25)
 				.syncDate(date("2005-10-15T11:15:10Z"))
-				.syncFiltred(false)
+				.syncFiltered(false)
 				.syncKey(syncKey)
 				.build();
 		
