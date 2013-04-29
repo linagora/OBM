@@ -1637,18 +1637,18 @@ sub _getFtpBackupHost {
     # Si on a rien trouve on prend les hotes ftp puis on compare leur delegation a
     #  celle de l'entity. On prend la plus proche
         if ( $#{$ldapEntity} < 0 ) {
-              $self->_log('They are not FTP backup with entity\'s delegation.Search for parent delegation',3);
+              $self->_log('There are no FTP backups with a delegation for this entity. Search for parent delegation',3);
           my $ldapEntities = $self->_getLdapValues(
             '(&(objectClass=obmHost)(ftpLogin=*)(obmDomain='.$entity->getRealm().'))'
                  ,['cn','delegation'] );
 
             my $best_deleg = _searchParentDelegation($ldapEntities,$entityDelegation) ;
             if ( defined($best_deleg) ) {
-                $self->_log("The best delegation candidate is $best_deleg",1 ) ;
+                $self->_log("The best delegation candidate is $best_deleg", 3);
                 $ldapEntity = $self->_getLdapValues(
                     '(&(objectClass=obmHost)(obmDomain='.$entity->getRealm().')
                    (delegation='.$best_deleg.'))',['cn'] ) ;
-                $self->_log("The FTP server is".$ldapEntity->[0]->get_value("cn")."for $entityDelegation",1 ) ;
+                $self->_log("The FTP server is ".$ldapEntity->[0]->get_value("cn")." for $entityDelegation", 3);
             }
         }
     }
