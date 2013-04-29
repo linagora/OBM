@@ -47,10 +47,13 @@ import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.push.client.HttpClientBuilder;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.Pkcs12HttpClientBuilder;
 import org.obm.sync.push.client.PoolingHttpClientBuilder;
 import org.obm.sync.push.client.SSLHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 
@@ -71,7 +74,7 @@ public abstract class Scenario {
 		try {
 			credentialsService.validate(credentials);
 			
-			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials),
+			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials, serviceUrl),
 				credentials.getLoginAtDomain(), credentials.getPassword(),
 				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
 		
@@ -81,11 +84,24 @@ public abstract class Scenario {
 		}
 	}
 
-	private HttpClientBuilder chooseHttpClientBuilder(Credentials credentials) {
-		if (credentials.getPkcs12() != null) {
-			return new SSLHttpClientBuilder(getPkcs12Stream(credentials), credentials.getPkcs12Password());
+	@VisibleForTesting HttpClientBuilder chooseHttpClientBuilder(Credentials credentials, String serviceUrl) {
+		Preconditions.checkNotNull(credentials);
+		Preconditions.checkNotNull(serviceUrl);
+		if (serviceDoesNotNeedSSL(serviceUrl)) {
+			return new PoolingHttpClientBuilder();
 		}
-		return new PoolingHttpClientBuilder();
+		if (serviceNeedsClientCertificate(credentials)) {
+			return new Pkcs12HttpClientBuilder(getPkcs12Stream(credentials), credentials.getPkcs12Password());
+		}
+		return new SSLHttpClientBuilder();
+	}
+
+	private boolean serviceNeedsClientCertificate(Credentials credentials) {
+		return credentials.getPkcs12() != null;
+	}
+
+	private boolean serviceDoesNotNeedSSL(String serviceUrl) {
+		return !serviceUrl.startsWith("https");
 	}
 
 	private InputStream getPkcs12Stream(Credentials credentials) {
