@@ -45,7 +45,7 @@ public class ItemSyncState implements Serializable {
 	
 	public static class Builder {
 		private Date syncDate;
-		private boolean syncFiltred;
+		private boolean syncFiltered;
 		private SyncKey syncKey;
 		private int id;
 		
@@ -56,8 +56,8 @@ public class ItemSyncState implements Serializable {
 			return this;
 		}
 		
-		public Builder syncFiltred(boolean syncFiltred) {
-			this.syncFiltred = syncFiltred;
+		public Builder syncFiltered(boolean syncFiltered) {
+			this.syncFiltered = syncFiltered;
 			return this;
 		}
 		
@@ -74,20 +74,20 @@ public class ItemSyncState implements Serializable {
 		public ItemSyncState build() {
 			Preconditions.checkArgument(syncKey != null, "syncKey can't be null or empty");
 			Preconditions.checkArgument(syncDate != null, "syncDate can't be null or empty");
-			return new ItemSyncState(syncDate, syncFiltred, syncKey, id);
+			return new ItemSyncState(syncDate, syncFiltered, syncKey, id);
 		}
 	}
 	
 	private static final long serialVersionUID = 133407493947001047L;
 	
 	private final Date syncDate;
-	private final boolean syncFiltred;
+	private final boolean syncFiltered;
 	private final SyncKey syncKey;
 	private final int id;
 	
-	private ItemSyncState(Date syncDate, boolean syncFiltred, SyncKey syncKey, int id) {
+	private ItemSyncState(Date syncDate, boolean syncFiltered, SyncKey syncKey, int id) {
 		this.syncDate = syncDate;
-		this.syncFiltred = syncFiltred;
+		this.syncFiltered = syncFiltered;
 		this.syncKey = syncKey;
 		this.id = id;
 	}
@@ -96,8 +96,8 @@ public class ItemSyncState implements Serializable {
 		return syncDate;
 	}
 
-	public boolean isSyncFiltred() {
-		return syncFiltred;
+	public boolean isSyncFiltered() {
+		return syncFiltered;
 	}
 
 	public SyncKey getSyncKey() {
@@ -114,7 +114,7 @@ public class ItemSyncState implements Serializable {
 			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
 				return ItemSyncState.builder()
 					.syncDate(filteredDate)
-					.syncFiltred(true)
+					.syncFiltered(true)
 					.syncKey(getSyncKey())
 					.id(getId())
 					.build();
@@ -125,7 +125,7 @@ public class ItemSyncState implements Serializable {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(syncDate, syncFiltred, syncKey, id);
+		return Objects.hashCode(syncDate, syncFiltered, syncKey, id);
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class ItemSyncState implements Serializable {
 		if (object instanceof ItemSyncState) {
 			ItemSyncState that = (ItemSyncState) object;
 			return Objects.equal(this.syncDate, that.syncDate)
-				&& Objects.equal(this.syncFiltred, that.syncFiltred)
+				&& Objects.equal(this.syncFiltered, that.syncFiltered)
 				&& Objects.equal(this.syncKey, that.syncKey)
 				&& Objects.equal(this.id, that.id);
 		}
@@ -144,7 +144,7 @@ public class ItemSyncState implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("syncDate", syncDate)
-			.add("syncFiltred", syncFiltred)
+			.add("syncFiltered", syncFiltered)
 			.add("syncKey", syncKey)
 			.add("id", id)
 			.toString();
