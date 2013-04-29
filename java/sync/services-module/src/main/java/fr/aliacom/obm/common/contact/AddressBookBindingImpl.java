@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
@@ -422,8 +423,11 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional(readOnly=true)
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		// TODO: to implement
-		return null;
+		
+		ContactChanges allContactsChanged = listContactsChanged(token, lastSync, addressBookId);
+		return new ContactChanges(allContactsChanged.getUpdated(), 
+				ImmutableSet.<Integer> of(), 
+				allContactsChanged.getLastSync());
 	}
 		
 	@Override
