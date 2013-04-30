@@ -52,6 +52,7 @@ $l_err_host_windows_not_global = "Un hôte windows ne peut pas appartenir au dom
 $l_check_samehost = "Ces hôtes semblent similaires à l'hôte saisi";
 
 $l_err_host_ip_exist = "L'adresse IP de l'hôte est déjà utilisée";
+$l_err_host_delegation_exist = "La délégation est déjà utilisée.";
 $l_err_host_ip = "L'adresse IP de l'hôte est incorrecte";
 $l_err_host_ip_not_in_lan="L'adresse IP de cet hôte n'appartient à aucun réseau local";
 $l_err_firewall_perms = "La syntaxe des permissions avancées n'est pas correcte";

@@ -646,14 +646,15 @@ function get_host_info($id) {
 }
 
 
-function get_host_delegations($ip) {
+function get_host_delegations($ip, $host_id) {
   global $cdg_sql;
   $obm_q = new DB_OBM;
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT host_delegation 
     FROM Host
-    WHERE host_ip='".$obm_q->escape($ip)."' $multidomain";
+    WHERE host_id <> ".$host_id." 
+    AND host_ip='".$obm_q->escape($ip)."' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_name_exists()');
   $obm_q->query($query);
@@ -893,7 +894,7 @@ function check_host_update_rights($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_data_form($host) {
   global $php_regexp_hostname, $l_err_host_name_empty, $l_err_host_name_exist;
-  global $cgp_use, $err, $l_err_host_name;
+  global $cgp_use, $err, $l_err_host_name, $l_err_host_delegation_exist;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist,$php_regexp_fqdn;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
   global $l_err_host_windows_not_global, $l_err_host_fqdn, $l_err_host_monitoring;
@@ -965,10 +966,15 @@ function check_host_data_form($host) {
     }
 
     $ips = get_ip_used($id);
-    $delegations = get_host_delegations($ip);
+    $delegations = get_host_delegations($ip, $id);
     // IP address not already used
     // for FTP servers, we can have two similar ips but with not same delegation (and not empty delegation)
     if (array_key_exists($ip, $ips) && (empty($backup_ftp) || empty($delegation) || in_array($delegation, $delegations))) {
+      if ( in_array($delegation, $delegations) ) {
+        $err['msg'] = "$l_err_host_delegation_exist " . $ips["$ip"] . " ($ip)";
+        $err['field'] = 'delegation';
+        return false;
+      }
       $err['msg'] = "$l_err_host_ip_exist : $ip (" . $ips["$ip"] . ")";
       $err['field'] = 'ip';
       return false;
