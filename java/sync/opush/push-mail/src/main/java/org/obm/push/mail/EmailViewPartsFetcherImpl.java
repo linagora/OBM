@@ -237,6 +237,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 				fetchICalendar(emailViewBuilder, mp, uid);
 				emailViewBuilder.invitationType(EmailViewInvitationType.CANCELED);
 			}
+			if (mp.isReplyInvitation()) {
+				fetchICalendar(emailViewBuilder, mp, uid);
+				emailViewBuilder.invitationType(EmailViewInvitationType.REPLY);
+			}
 		}
 	}
 

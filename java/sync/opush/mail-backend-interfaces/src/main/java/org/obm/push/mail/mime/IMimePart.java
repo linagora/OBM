@@ -120,4 +120,6 @@ public interface IMimePart {
 
 	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
 
+	boolean isReplyInvitation();
+
 }

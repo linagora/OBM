@@ -57,6 +57,7 @@ import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
@@ -66,6 +67,24 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class ICalendarEventTest {
+
+	@Test
+	public void testStatusValueNull() {
+		VEvent vevent = vEventWithProperty(new Status(null));
+		assertThat(new ICalendarEvent(vevent).status()).isNull();
+	}
+	
+	@Test
+	public void testStatusValueEmpty() {
+		VEvent vevent = vEventWithProperty(new Status(""));
+		assertThat(new ICalendarEvent(vevent).status()).isNull();
+	}
+	
+	@Test
+	public void testStatusValueCancelled() {
+		VEvent vevent = vEventWithProperty(new Status("CANCELLED"));
+		assertThat(new ICalendarEvent(vevent).status()).isEqualTo("CANCELLED");
+	}
 
 	@Test
 	public void testLocationNull() {

@@ -717,6 +717,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getSize()).andReturn(messageFixture.estimatedDataSize).anyTimes();
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
 		expect(mimePart.isCancelInvitation()).andReturn(false);
+		expect(mimePart.isReplyInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId);
 		expect(mimePart.isICSAttachment()).andReturn(messageFixture.isICSAttachment);
 		expect(mimePart.decodeMimeStream(anyObject(InputStream.class)))

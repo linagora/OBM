@@ -293,14 +293,20 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public boolean isNested() {
-		return getFullMimeType().equalsIgnoreCase("message/rfc822");
-	}
-	
-	@Override
 	public boolean isCancelInvitation() {
 		String method = retrieveMethodFromCalendarPart();
 		return "CANCEL".equalsIgnoreCase(method);
+	}
+	
+	@Override
+	public boolean isReplyInvitation() {
+		String method = retrieveMethodFromCalendarPart();
+		return "REPLY".equalsIgnoreCase(method);
+	}
+	
+	@Override
+	public boolean isNested() {
+		return getFullMimeType().equalsIgnoreCase("message/rfc822");
 	}
 	
 	@Override

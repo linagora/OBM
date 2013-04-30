@@ -213,6 +213,23 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 			if (emailView.getInvitationType() == EmailViewInvitationType.CANCELED) {
 				return MSMessageClass.SCHEDULE_MEETING_CANCELED;
 			}
+			if (emailView.getInvitationType() == EmailViewInvitationType.REPLY) {
+				return inferInvitationTypeFromReply(emailView);
+			}
+		}
+		return null;
+	}
+
+	private MSMessageClass inferInvitationTypeFromReply(EmailView emailView) {
+		String status = emailView.getICalendar().getICalendarEvent().status();
+		if (status != null) {
+			if ("CANCELLED".equals(status)) {
+				return MSMessageClass.SCHEDULE_MEETING_RESP_NEG;
+			} else if ("CONFIRMED".equals(status)) {
+				return MSMessageClass.SCHEDULE_MEETING_RESP_POS;
+			} else if ("TENTATIVE".equals(status)) {
+				return MSMessageClass.SCHEDULE_MEETING_RESP_TENT;
+			}
 		}
 		return null;
 	}

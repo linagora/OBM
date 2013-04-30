@@ -32,5 +32,5 @@
 package org.obm.push.mail.conversation;
 
 public enum EmailViewInvitationType {
-	REQUEST, CANCELED;
+	REQUEST, CANCELED, REPLY;
 }

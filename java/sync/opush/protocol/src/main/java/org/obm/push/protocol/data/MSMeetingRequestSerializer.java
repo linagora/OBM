@@ -128,8 +128,10 @@ public class MSMeetingRequestSerializer {
 	}
 	
 	private void serializeResponseRequested() {
-		DOMUtils.createElementAndText(meetingRequestElement, 
-				ASEmail.RESPONSE_REQUESTED.asASValue(), meetingRequest.isResponseRequested());
+		if (meetingRequest.isResponseRequested()) {
+			DOMUtils.createElementAndText(meetingRequestElement, 
+					ASEmail.RESPONSE_REQUESTED.asASValue(), meetingRequest.isResponseRequested());
+		}
 	}
 	
 	private void serializeSensitivity() {

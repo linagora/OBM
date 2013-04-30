@@ -49,6 +49,7 @@ import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.RecurrenceId;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
@@ -218,5 +219,13 @@ public class ICalendarEvent {
 	
 	public ICalendarRecur recur() {
 		return iCalendarRecur;
+	}
+
+	public String status() {
+		Status status = vEvent.getStatus();
+		if (status != null) {
+			return Strings.emptyToNull(status.getValue());
+		}
+		return null;
 	}
 }
