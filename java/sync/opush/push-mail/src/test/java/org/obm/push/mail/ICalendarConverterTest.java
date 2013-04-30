@@ -84,7 +84,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
 	}
@@ -104,7 +104,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.BUSY)
 					.build());
 	}
@@ -124,7 +124,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.OUT_OF_OFFICE)
 					.build());
 	}
@@ -144,7 +144,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.TENTATIVE)
 					.build());
 	}
@@ -171,7 +171,7 @@ public class ICalendarConverterTest {
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
 					.reminder(10l)
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
 	}
@@ -191,7 +191,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.msEventExtId(new MSEventExtId("3c428e8d-efee-413a-8a5b-d340feb21187"))
 					.reminder(10l)
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.BUSY)
 					.allDayEvent(true)
 					.build());
@@ -260,7 +260,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -285,7 +285,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -311,7 +311,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -342,7 +342,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -374,7 +374,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -402,7 +402,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-04-24T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -428,7 +428,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-05-12T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -457,7 +457,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -485,7 +485,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2012-07-10T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -512,7 +512,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.MASTER_RECURRING)
 					.timeZone(TimeZone.getTimeZone("Europe/Brussels"))
 					.msEventExtId(new MSEventExtId("f28d13af-a5b5-44cf-83c9-3e76aa743179"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.recurrenceId(new DateTime("2013-10-01T07:00:00").toDate())
 					.recurrences(Lists.newArrayList(
 							MSMeetingRequestRecurrence.builder()
@@ -546,7 +546,7 @@ public class ICalendarConverterTest {
 					.instanceType(MSMeetingRequestInstanceType.SINGLE)
 					.msEventExtId(new MSEventExtId("4ca827c0eb819956ede718d75cd4c7239f43950a1762a8a2d1378e9061bf2a" +
 							"ba3fabf0ed4247ad4d3068078724708ada16134995df87089a0250bfa0f7ff88cd3da9ee5ebc750260"))
-					.reponseRequested(true)
+					.responseRequested(true)
 					.intDBusyStatus(MSMeetingRequestIntDBusyStatus.FREE)
 					.build());
 	}

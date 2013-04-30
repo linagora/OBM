@@ -94,7 +94,7 @@ public class MSMeetingRequestDecoder extends ActiveSyncDecoder {
 					.organizer(uniqueStringFieldValue(data, ASEmail.ORGANIZER))
 					.location(uniqueStringFieldValue(data, ASEmail.LOCATION))
 					.reminder(uniqueLongFieldValue(data, ASEmail.REMINDER))
-					.reponseRequested(uniqueBooleanFieldValue(data, ASEmail.RESPONSE_REQUESTED, false))
+					.responseRequested(uniqueBooleanFieldValue(data, ASEmail.RESPONSE_REQUESTED, false))
 					.msEventUid(new MSEventUid(uniqueStringFieldValue(data, ASEmail.GLOBAL_OBJ_ID)))
 					.sensitivity(sensitivity(uniqueIntegerFieldValue(data, ASEmail.SENSITIVITY)))
 					.recurrenceId(recurrenceDate(uniqueStringFieldValue(data, ASEmail.RECURRENCE_ID)))

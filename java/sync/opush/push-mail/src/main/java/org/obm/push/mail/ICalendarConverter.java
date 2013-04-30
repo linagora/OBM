@@ -147,7 +147,7 @@ public class ICalendarConverter {
 			.location(iCalendarEvent.location())
 			.organizer(iCalendarEvent.organizer())
 			.reminder(reminder(iCalendarEvent))
-			.reponseRequested(true)
+			.responseRequested(true)
 			.sensitivity(sensitivity(iCalendarEvent))
 			.intDBusyStatus(transparency(iCalendarEvent))
 			.msEventExtId(extId(iCalendarEvent.uid()));

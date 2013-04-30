@@ -374,7 +374,7 @@ public class MSMeetingRequestSerializingTest {
 	@Test
 	public void testMeetingReponseRequestedTrue() {
 		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
-				.reponseRequested(true)
+				.responseRequested(true)
 				.build();
 		
 		Element encodedDocument = encode(meetingRequest);
@@ -385,7 +385,7 @@ public class MSMeetingRequestSerializingTest {
 	@Test
 	public void testMeetingReponseRequestedFalse() {
 		MSMeetingRequest meetingRequest = initializedRequiredFieldsMeetingRequestBuilder()
-				.reponseRequested(false)
+				.responseRequested(false)
 				.build();
 		
 		Element encodedDocument = encode(meetingRequest);

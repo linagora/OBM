@@ -119,7 +119,7 @@ public class MSMeetingRequest implements Serializable {
 			return this;
 		}
 		
-		public Builder reponseRequested(boolean responseRequested) {
+		public Builder responseRequested(boolean responseRequested) {
 			this.responseRequested = responseRequested;
 			return this;
 		}
@@ -174,7 +174,7 @@ public class MSMeetingRequest implements Serializable {
 				.recurrenceId(msMeetingRequest.getRecurrenceId())
 				.recurrences(msMeetingRequest.getRecurrences())
 				.reminder(msMeetingRequest.getReminder())
-				.reponseRequested(msMeetingRequest.isResponseRequested())
+				.responseRequested(msMeetingRequest.isResponseRequested())
 				.sensitivity(msMeetingRequest.getSensitivity())
 				.startTime(msMeetingRequest.getStartTime())
 				.timeZone(msMeetingRequest.getTimeZone());
