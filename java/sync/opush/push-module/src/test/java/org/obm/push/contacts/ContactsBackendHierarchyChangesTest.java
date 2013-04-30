@@ -100,7 +100,6 @@ public class ContactsBackendHierarchyChangesTest {
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	private BackendWindowingService backendWindowingService;
 	private ClientIdService clientIdService;
-	
 	private ContactsBackend contactsBackend;
 
 	@Before

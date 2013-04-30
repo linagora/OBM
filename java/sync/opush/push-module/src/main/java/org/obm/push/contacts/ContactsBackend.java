@@ -104,7 +104,6 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	private final IAddressBook bookClient;
 	private final BackendWindowingService backendWindowingService;
 	private final ClientIdService clientIdService;
-	
 	@Inject
 	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
 			LoginService login, ContactConfiguration contactConfiguration,
@@ -304,7 +303,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			Integer collectionId, SyncKey newSyncKey) {
 		
 		Integer addressBookId = findAddressBookIdFromCollectionId(udr, collectionId);
-		ContactChanges contactChanges = listContactsChanged(udr, state.getSyncDate(), addressBookId);
+		ContactChanges contactChanges = listContactsChanged(udr, state, addressBookId);
 		
 		List<ItemChange> addUpd = new LinkedList<ItemChange>();
 		for (Contact contact : contactChanges.getUpdated()) {
@@ -361,10 +360,13 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private ContactChanges listContactsChanged(UserDataRequest udr, Date lastSync, Integer addressBookId) throws UnexpectedObmSyncServerException {
+	private ContactChanges listContactsChanged(UserDataRequest udr, ItemSyncState state, Integer addressBookId) throws UnexpectedObmSyncServerException {
 		AccessToken token = login(udr);
 		try {
-			return bookClient.listContactsChanged(token, lastSync, addressBookId);
+			if (state.isInitial()) {
+				return bookClient.firstListContactsChanged(token, state.getSyncDate(), addressBookId);
+			}
+			return bookClient.listContactsChanged(token, state.getSyncDate(), addressBookId);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} finally {

@@ -43,6 +43,8 @@ import java.util.TreeSet;
 
 import javax.naming.NoPermissionException;
 
+import net.fortuna.ical4j.util.Strings;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +70,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
+import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -183,6 +186,65 @@ public class ContactsBackendTest {
 
 		assertThat(dataDelta).isEqualTo(DataDelta.builder()
 				.changes(ImmutableList.<ItemChange>of())
+				.deletions(ImmutableList.<ItemDeletion>of())
+				.syncDate(currentDate)
+				.syncKey(newSyncKey)
+				.build());
+	}
+
+	@Test
+	public void testGetAllChangesOnFirstSync() throws Exception {
+		int collectionId = 1;
+		Date currentDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		SyncKey newSyncKey = new SyncKey("789");
+		ItemSyncState lastKnownState = ItemSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(new SyncKey("1234567890a"))
+				.build();
+
+		List<AddressBook> books = ImmutableList.of(newAddressBookObject("folder", collectionId, false));
+		
+		expectLoginBehavior(token);
+		expectListAllBooks(token, books);
+		expectBuildCollectionPath("folder", collectionId);
+
+		Contact contact = new Contact();
+		contact.setFirstname("contact");
+		contact.setUid(1);
+		Contact contact2 = new Contact();
+		contact2.setFirstname("contact2");
+		contact2.setUid(2);
+		
+		ContactChanges contactChanges = new ContactChanges(ImmutableList.of(contact, contact2), ImmutableSet.<Integer> of(), currentDate);
+		expect(bookClient.firstListContactsChanged(token, currentDate, collectionId)).andReturn(contactChanges).once();
+		expectMappingServiceCollectionIdBehavior(books);
+		
+		expect(mappingService.getServerIdFor(collectionId, Strings.valueOf(contact.getUid())))
+			.andReturn("1:" + contact.getUid()).once();
+		expect(mappingService.getServerIdFor(collectionId, Strings.valueOf(contact2.getUid())))
+			.andReturn("1:" + contact2.getUid()).once();
+		
+		mocks.replay();
+		DataDelta dataDelta = contactsBackend.getAllChanges(userDataRequest, lastKnownState, collectionId, newSyncKey);
+		mocks.verify();
+
+		MSContact msContact = new MSContact();
+		msContact.setFirstName(contact.getFirstname());
+		msContact.setFileAs(contact.getFirstname());
+		ItemChange expectedItemChange = new ItemChangeBuilder()
+			.serverId("1:1")
+			.withApplicationData(msContact)
+			.build();
+		MSContact msContact2 = new MSContact();
+		msContact2.setFirstName(contact2.getFirstname());
+		msContact2.setFileAs(contact2.getFirstname());
+		ItemChange expectedItemChange2 = new ItemChangeBuilder()
+			.serverId("1:2")
+			.withApplicationData(msContact2)
+			.build();
+		
+		assertThat(dataDelta).isEqualTo(DataDelta.builder()
+				.changes(ImmutableList.of(expectedItemChange, expectedItemChange2))
 				.deletions(ImmutableList.<ItemDeletion>of())
 				.syncDate(currentDate)
 				.syncKey(newSyncKey)
