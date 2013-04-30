@@ -416,8 +416,11 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional(readOnly=true)
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
-		// TODO: to implement
-		return null;
+		
+		ContactChanges allContactsChanged = listContactsChanged(token, lastSync);
+		return new ContactChanges(allContactsChanged.getUpdated(), 
+				ImmutableSet.<Integer> of(), 
+				allContactsChanged.getLastSync());
 	}
 
 	@Override
