@@ -41,8 +41,10 @@ import net.fortuna.ical4j.data.UnfoldingReader;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Method;
 
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
+import org.obm.icalendar.ical4jwrapper.ICalendarMethod;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
 import org.obm.push.utils.FileUtils;
 
@@ -130,6 +132,14 @@ public class ICalendar {
 	
 	public ICalendarTimeZone getICalendarTimeZone() {
 		return iCalendarTimeZone;
+	}
+
+	public ICalendarMethod getICalendarMethod() {
+		Method method = calendar.getMethod();
+		if (method != null) {
+			return ICalendarMethod.fromSpecificationValue(method.getValue());
+		}
+		return null;
 	}
 	
 	@Override

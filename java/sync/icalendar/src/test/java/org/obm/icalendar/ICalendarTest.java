@@ -31,21 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.obm.icalendar.ical4jwrapper.ICalendarMethod;
 
 public class ICalendarTest {
 
 	@Test
 	public void testRightFormatICalendarBuilder() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("attendee.ics");
-		Assertions.assertThat(icalendar.getICalendar()).isNotNull();
+		assertThat(icalendar.getICalendar()).isNotNull();
 	}
 	
 	@Test(expected=IllegalStateException.class)
@@ -74,5 +76,30 @@ public class ICalendarTest {
 			Assert.fail("Cannot load " + filename);
 		}
 		return ICalendar.builder().inputStream(in).build();	
+	}
+	
+	@Test
+	public void testGetMethodWhenRequest() throws Exception {
+		assertThat(icalendar("methodRequest.ics").getICalendarMethod()).isEqualTo(ICalendarMethod.REQUEST);
+	}
+	
+	@Test
+	public void testGetMethodWhenCancel() throws Exception {
+		assertThat(icalendar("methodCancel.ics").getICalendarMethod()).isEqualTo(ICalendarMethod.CANCEL);
+	}
+	
+	@Test
+	public void testGetMethodWhenReply() throws Exception {
+		assertThat(icalendar("methodReply.ics").getICalendarMethod()).isEqualTo(ICalendarMethod.REPLY);
+	}
+	
+	@Test
+	public void testGetMethodWhenNone() throws Exception {
+		assertThat(icalendar("methodNone.ics").getICalendarMethod()).isNull();
+	}
+	
+	@Test
+	public void testGetMethodWhenPublish() throws Exception {
+		assertThat(icalendar("methodPublish.ics").getICalendarMethod()).isNull();
 	}
 }

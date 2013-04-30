@@ -46,6 +46,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
+import org.obm.icalendar.ical4jwrapper.ICalendarMethod;
 import org.obm.icalendar.ical4jwrapper.ICalendarRecur;
 import org.obm.icalendar.ical4jwrapper.ICalendarTimeZone;
 import org.obm.push.bean.MSEventExtId;
@@ -105,9 +106,10 @@ public class ICalendarConverter {
 		Builder builder = MSMeetingRequest.builder();
 		if (icalendar.hasEvent()) {
 			ICalendarEvent iCalendarEvent = icalendar.getICalendarEvent();
+			ICalendarMethod method = icalendar.getICalendarMethod();
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
-			fillMsMeetingRequestFromVEvent(iCalendarEvent, builder);
+			fillMsMeetingRequestFromVEvent(iCalendarEvent, method, builder);
 			
 			if (iCalendarEvent.hasRecur()) {
 				ICalendarRecur iCalendarRule = iCalendarEvent.recur();
@@ -134,7 +136,7 @@ public class ICalendarConverter {
 	}
 	
 	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, 
-			Builder msMeetingRequestBuilder) {
+			ICalendarMethod method, Builder msMeetingRequestBuilder) {
 		
 		Date startDate = iCalendarEvent.startDate();
 		Date endDate = endTime(iCalendarEvent);
@@ -147,12 +149,19 @@ public class ICalendarConverter {
 			.location(iCalendarEvent.location())
 			.organizer(iCalendarEvent.organizer())
 			.reminder(reminder(iCalendarEvent))
-			.responseRequested(true)
+			.responseRequested(responseRequested(method))
 			.sensitivity(sensitivity(iCalendarEvent))
 			.intDBusyStatus(transparency(iCalendarEvent))
 			.msEventExtId(extId(iCalendarEvent.uid()));
 	}
 	
+	@VisibleForTesting boolean responseRequested(ICalendarMethod method) {
+		if (method != null) {
+			return method == ICalendarMethod.REQUEST;
+		}
+		return true;
+	}
+
 	private Date endTime(ICalendarEvent iCalendarEvent) {
 		Date endDate = iCalendarEvent.endDate();
 		if (endDate == null 

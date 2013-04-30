@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
@@ -40,7 +42,6 @@ import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.easymock.EasyMock;
-import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +49,7 @@ import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
+import org.obm.icalendar.ical4jwrapper.ICalendarMethod;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
@@ -68,13 +70,33 @@ public class ICalendarConverterTest {
 	public void before() {
 		icalendarConverter = new ICalendarConverter();
 	}
+
+	@Test
+	public void testResponseRequestedWhenNull() {
+		assertThat(icalendarConverter.responseRequested(null)).isTrue();
+	}
+	
+	@Test
+	public void testResponseRequestedWhenRequest() {
+		assertThat(icalendarConverter.responseRequested(ICalendarMethod.REQUEST)).isTrue();
+	}
+	
+	@Test
+	public void testResponseRequestedWhenCancel() {
+		assertThat(icalendarConverter.responseRequested(ICalendarMethod.CANCEL)).isFalse();
+	}
+	
+	@Test
+	public void testResponseRequestedWhenReply() {
+		assertThat(icalendarConverter.responseRequested(ICalendarMethod.REPLY)).isFalse();
+	}
 	
 	@Test
 	public void testICalendarConverterSingleFreeEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_free.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
@@ -94,7 +116,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_busy.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
@@ -114,7 +136,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_busy-oof.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
@@ -134,7 +156,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_busy-tentative.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T12:26:16Z").toDate())
@@ -160,7 +182,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_valarm.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T07:57:33Z").toDate())
@@ -181,7 +203,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_valarm_allDay.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T02:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T09:44:07Z").toDate())
@@ -206,7 +228,7 @@ public class ICalendarConverterTest {
 		Long reminder = icalendarConverter.reminder(iCalendarEvent);
 		
 		EasyMock.verify(iCalendarEvent);
-		Assertions.assertThat(reminder).isNull();
+		assertThat(reminder).isNull();
 	}
 
 	@Test
@@ -218,7 +240,7 @@ public class ICalendarConverterTest {
 		Long reminder = icalendarConverter.reminder(iCalendarEvent);
 		
 		EasyMock.verify(iCalendarEvent);
-		Assertions.assertThat(reminder).isEqualTo(0);
+		assertThat(reminder).isEqualTo(0);
 	}
 
 	@Test
@@ -230,7 +252,7 @@ public class ICalendarConverterTest {
 		Long reminder = icalendarConverter.reminder(iCalendarEvent);
 		
 		EasyMock.verify(iCalendarEvent);
-		Assertions.assertThat(reminder).isEqualTo(10);
+		assertThat(reminder).isEqualTo(10);
 	}
 
 	@Test
@@ -242,7 +264,7 @@ public class ICalendarConverterTest {
 		Long reminder = icalendarConverter.reminder(iCalendarEvent);
 		
 		EasyMock.verify(iCalendarEvent);
-		Assertions.assertThat(reminder).isNull();
+		assertThat(reminder).isNull();
 	}
 	
 	@Test
@@ -250,7 +272,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T13:04:28Z").toDate())
@@ -275,7 +297,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_until.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T13:32:54Z").toDate())
@@ -301,7 +323,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_workingdays.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:04:23Z").toDate())
@@ -332,7 +354,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_workingdays_countoccurences.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:18:17Z").toDate())
@@ -364,7 +386,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-weekly_interval_byday.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:25:04Z").toDate())
@@ -392,7 +414,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-monthly_interval_bymonthday.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-04-24T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:28:46Z").toDate())
@@ -418,7 +440,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-monthly_interval_byday_bysetpos.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-05-12T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-23T15:51:05Z").toDate())
@@ -447,7 +469,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-weekly_interval_byday-1.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T07:57:07Z").toDate())
@@ -475,7 +497,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-yearly_interval_bymonthday_bymonth.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-07-10T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T08:08:09Z").toDate())
@@ -502,7 +524,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("recur_event_freq-yearly_interval_bymonthday_byday_byset.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2013-10-01T07:00:00").toDate())
 					.dtStamp(new DateTime("2012-04-24T08:19:39Z").toDate())
@@ -535,7 +557,7 @@ public class ICalendarConverterTest {
 		ICalendar icalendar = icalendar("single_event_allDay.obmui.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
 		
-		Assertions.assertThat(msMeetingRequest).isEqualTo(
+		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
 					.startTime(new DateTime("2012-06-15T02:00:00").toDate())
 					.dtStamp(new DateTime("2012-06-04T12:59:20Z").toDate())
@@ -555,7 +577,7 @@ public class ICalendarConverterTest {
 	public void testICalendarConverterOrphanedEventException() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("orphaned_event_exception.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
-		Assertions.assertThat(msMeetingRequest).isNull();
+		assertThat(msMeetingRequest).isNull();
 	}
 
 	@Test
@@ -566,7 +588,7 @@ public class ICalendarConverterTest {
 
 		int julyMonthIndex = 7;
 		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(msMeetingRequest.getRecurrences());
-		Assertions.assertThat(recurrence.getMonthOfYear()).isEqualTo(julyMonthIndex);
+		assertThat(recurrence.getMonthOfYear()).isEqualTo(julyMonthIndex);
 	}
 	
 	@Test
@@ -576,7 +598,7 @@ public class ICalendarConverterTest {
 
 		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(new ICalendarEvent(vEvent), iCalendarTimeZone);
 		
-		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(1);
+		assertThat(retreiveMonthFromStartTime).isEqualTo(1);
 	}
 	
 	@Test
@@ -588,7 +610,7 @@ public class ICalendarConverterTest {
 
 		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);
 		
-		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(12);
+		assertThat(retreiveMonthFromStartTime).isEqualTo(12);
 	}
 	
 	@Test
@@ -600,7 +622,7 @@ public class ICalendarConverterTest {
 
 		Integer retreiveMonthFromStartTime = icalendarConverter.retrieveMonthFromStartTime(iCalendarEvent, iCalendarTimeZone);
 		
-		Assertions.assertThat(retreiveMonthFromStartTime).isEqualTo(1);
+		assertThat(retreiveMonthFromStartTime).isEqualTo(1);
 	}
 	
 	private ICalendar icalendar(String filename) throws IOException, ParserException {
