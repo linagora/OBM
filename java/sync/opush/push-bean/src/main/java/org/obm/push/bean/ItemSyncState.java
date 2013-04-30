@@ -34,11 +34,15 @@ package org.obm.push.bean;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.obm.push.utils.DateUtils;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class ItemSyncState implements Serializable {
 
+	private final static Date INITIAL_DATE = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -108,19 +112,18 @@ public class ItemSyncState implements Serializable {
 		return id;
 	}
 	
-	public ItemSyncState newWindowedSyncState(FilterType filterType) {
+	public boolean isInitial() {
+		return INITIAL_DATE.equals(syncDate);
+	}
+	
+	public Date getFilteredSyncDate(FilterType filterType) {
 		if (filterType != null) {
 			Date filteredDate = filterType.getFilteredDateTodayAtMidnight();
 			if (getSyncDate() != null && filteredDate.after(getSyncDate())) {
-				return ItemSyncState.builder()
-					.syncDate(filteredDate)
-					.syncFiltered(true)
-					.syncKey(getSyncKey())
-					.id(getId())
-					.build();
+				return filteredDate;
 			}
 		}
-		return this;
+		return getSyncDate();
 	}	
 
 	@Override

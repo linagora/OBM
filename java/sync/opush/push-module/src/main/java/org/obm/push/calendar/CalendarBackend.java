@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -116,7 +117,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final EventExtId.Factory eventExtIdFactory;
 	private final BackendWindowingService backendWindowingService;
 	private final ClientIdService clientIdService;
-
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
@@ -287,15 +287,16 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		AccessToken token = login(udr);
 		
 		DataDelta delta = null;
-		ItemSyncState newState = state.newWindowedSyncState(collectionOptions.getFilterType());
 
 		try {
 			
 			EventChanges changes = null;
-			if (newState.isSyncFiltered()) {
-				changes = calendarClient.getSyncEventDate(token, collectionPath.backendName(), newState.getSyncDate());
+			Date filteredSyncDate = state.getFilteredSyncDate(collectionOptions.getFilterType());
+			boolean syncFiltered = filteredSyncDate != state.getSyncDate();
+			if (state.isInitial()) {
+				changes = initialSync(collectionPath, token, filteredSyncDate, syncFiltered);
 			} else {
-				changes = calendarClient.getSync(token, collectionPath.backendName(), newState.getSyncDate());
+				changes = sync(collectionPath, token, filteredSyncDate, syncFiltered);
 			}
 			
 			consistencyLogger.log(logger, changes);
@@ -305,7 +306,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			delta = buildDataDelta(udr, collectionId, token, changes, newSyncKey);
 			
 			logger.info("getContentChanges( {}, lastSync = {} ) => {}",
-				collectionPath.backendName(), newState.getSyncDate(), delta.statistics());
+				collectionPath.backendName(), filteredSyncDate, delta.statistics());
 			
 			return delta;
 		} catch (org.obm.sync.NotAllowedException e) {
@@ -316,6 +317,24 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} finally {
 			logout(token);
 		}
+	}
+
+	private EventChanges initialSync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered)
+			throws ServerFault, org.obm.sync.NotAllowedException {
+		
+		if (syncFiltered) {
+			return calendarClient.getFirstSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
+		} 
+		return calendarClient.getFirstSync(token, collectionPath.backendName(), filteredSyncDate);
+	}
+
+	private EventChanges sync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered) 
+			throws ServerFault, org.obm.sync.NotAllowedException {
+		
+		if (syncFiltered) {
+			return calendarClient.getSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
+		} 
+		return calendarClient.getSync(token, collectionPath.backendName(), filteredSyncDate);
 	}
 	
 	@VisibleForTesting DataDelta buildDataDelta(UserDataRequest udr, Integer collectionId,
