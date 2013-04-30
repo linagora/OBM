@@ -43,6 +43,7 @@ $l_err_host_name = "Invalid host name";
 $l_err_host_windows_not_global = "A Windows host can notbe in the Global domain !"; 
 $l_check_samehost = "This host seems similar to the new one"; 
 $l_err_host_ip_exist = "Host IP address already used";
+$l_err_host_delegation_exist = "Host Delegation already used.";
 $l_err_host_ip = "Invalid host IP address";
 $l_err_host_ip_not_in_lan = "Host IP address is not in the local network"; 
 $l_err_firewall_perms = "Invalid advanced perms syntax";
