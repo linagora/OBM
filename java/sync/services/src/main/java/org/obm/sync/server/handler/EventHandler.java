@@ -135,12 +135,16 @@ public class EventHandler extends SecureSyncHandler {
 		String method = request.getMethod();
 		if (method.equals("getSync")) {
 			return getSync(at, request, responder);
+		} else if (method.equals("getFirstSync")) {
+			return getFirstSync(at, request, responder);
 		} else if (method.equals("getSyncInRange")) {
 			return getSyncInRange(at, request, responder);
 		} else if (method.equals("getSyncWithSortedChanges")) {
 			return getSyncWithSortedChanges(at, request, responder);
 		} else if (method.equals("getSyncEventDate")) {
 			return getSyncEventDate(at, request, responder);
+		} else if (method.equals("getFirstSyncEventDate")) {
+			return getFirstSyncEventDate(at, request, responder);
 		} else if (method.equals("removeEvent")) {
 			return removeEvent(at, request, responder);
 		} else if (method.equals("removeEventByExtId")) {
@@ -473,6 +477,15 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarChanges(ret);
 	}
 
+	private String getFirstSyncEventDate(
+			AccessToken at, Request request, XmlResponder responder)
+		throws ServerFault, NotAllowedException {
+		EventChanges ret = binding.getFirstSyncEventDate(at, 
+				getCalendar(request),
+				DateHelper.asDate(request.getParameter("lastSync")));
+		return responder.sendCalendarChanges(ret);
+	}
+
 	private String getSyncWithSortedChanges(AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, NotAllowedException {
 		SyncRange syncRange = null;
@@ -494,6 +507,15 @@ public class EventHandler extends SecureSyncHandler {
 			AccessToken at, Request request, XmlResponder responder)
 			throws ServerFault, NotAllowedException {
 			EventChanges ret = binding.getSync(at, 
+					getCalendar(request),
+					DateHelper.asDate(request.getParameter("lastSync")));
+			return responder.sendCalendarChanges(ret);
+	}
+
+	private String getFirstSync(
+			AccessToken at, Request request, XmlResponder responder)
+			throws ServerFault, NotAllowedException {
+			EventChanges ret = binding.getFirstSync(at, 
 					getCalendar(request),
 					DateHelper.asDate(request.getParameter("lastSync")));
 			return responder.sendCalendarChanges(ret);

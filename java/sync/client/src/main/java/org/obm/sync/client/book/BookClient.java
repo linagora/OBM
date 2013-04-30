@@ -255,14 +255,21 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
-		// TODO: to implement
-		return null;
+		Multimap<String, String> params = initParams(token);
+		params.put("lastSync", DateHelper.asString(lastSync));
+		Document doc = execute(token, "/book/firstListAllChanges", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseChanges(doc);
 	}
 	
 	@Override
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		// TODO: to implement
-		return null;
+		Multimap<String, String> params = initParams(token);
+		params.put("lastSync", DateHelper.asString(lastSync));
+		params.put("bookId", String.valueOf(addressBookId));
+		Document doc = execute(token, "/book/firstListAllChanges", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return respParser.parseChanges(doc);
 	}
 
 	@Override

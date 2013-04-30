@@ -144,8 +144,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	@Override
 	public EventChanges getFirstSync(AccessToken token, String calendar,
 			Date lastSync) throws ServerFault, NotAllowedException {
-		// TODO: to implement
-		return null;
+		return getSync(token, calendar, lastSync, null, "getFirstSync");
 	}
 	
 	@Override
@@ -202,8 +201,21 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	
 	@Override
 	public EventChanges getFirstSyncEventDate(AccessToken token, String calendar, Date lastSync) throws ServerFault, NotAllowedException {
-		// TODO: to implement
-		return null;
+		if (logger.isDebugEnabled()) {
+			logger.debug("getSyncEventDate(" + token.getSessionId() + ", " + calendar
+					+ ", " + lastSync + ")");
+		}
+		Multimap<String, String> params = initParams(token);
+		params.put("calendar", calendar);
+		if (lastSync != null) {
+			params.put("lastSync", DateHelper.asString(lastSync));
+		} else {
+			params.put("lastSync", "0");
+		}
+
+		Document doc = execute(token, type + "/getFirstSyncEventDate", params);
+		exceptionFactory.checkNotAllowedException(doc);
+		return respParser.parseChanges(doc);
 	}
 
 	@Override

@@ -95,6 +95,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			listAllBooks(token, responder);
 		} else if ("listAllChanges".equals(method)) {
 			listContactsChanged(token, request, responder);
+		} else if ("firstListAllChanges".equals(method)) {
+			firstListContactsChanged(token, request, responder);
 		} else if ("createContact".equals(method)) {
 			createContact(token, request, responder);
 		} else if ("createContactInBook".equals(method)) {
@@ -212,6 +214,18 @@ public class AddressBookHandler extends SecureSyncHandler {
 			contactChanges = binding.listContactsChanged(at, lastSync);
 		} else {
 			contactChanges = binding.listContactsChanged(at, lastSync, Integer.valueOf(addressBookId));
+		}
+		responder.sendContactChanges(contactChanges);
+	}
+
+    private void firstListContactsChanged(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		Date lastSync = getLastSyncFromRequest(request);
+		String addressBookId = p(request, "bookId");
+		ContactChanges contactChanges = null;
+		if (addressBookId == null) {
+			contactChanges = binding.firstListContactsChanged(at, lastSync);
+		} else {
+			contactChanges = binding.firstListContactsChanged(at, lastSync, Integer.valueOf(addressBookId));
 		}
 		responder.sendContactChanges(contactChanges);
 	}
