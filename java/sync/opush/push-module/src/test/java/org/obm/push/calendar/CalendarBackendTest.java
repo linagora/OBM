@@ -44,6 +44,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import net.fortuna.ical4j.util.Strings;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -515,7 +517,7 @@ public class CalendarBackendTest {
 		expectLoginBehavior();
 
 		
-		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate);
+		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, 11, 12, 21, 22);
 		
 		expect(calendarClient.getSync(token, "test@test", currentDate))
 			.andReturn(eventChanges).once();
@@ -557,7 +559,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 
-		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate);
+		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, 11, 12, 21, 22);
 		expect(calendarClient.getSync(token, "test@test", currentDate)).andReturn(eventChanges).once();
 		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
@@ -582,18 +584,74 @@ public class CalendarBackendTest {
 				.syncKey(syncKey)
 				.build());
 	}
+	
+	@Test 
+	public void testGetAllChangesOnFirstSync() throws Exception {
+		Date currentDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		SyncKey syncKey = new SyncKey("1234567890a");
+		ItemSyncState lastKnownState = ItemSyncState.builder()
+				.syncDate(currentDate)
+				.syncKey(syncKey)
+				.build();
 
-	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate) {
+		int collectionId = 1;
+
+		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(userCalendarCollectionPath.collectionPath());
+		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
+		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
+		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
+		
+		expectLoginBehavior();
+
+		EventChanges eventChanges = expectTwoUpdatedEventChanges(currentDate, 21, 22);
+		expect(calendarClient.getFirstSync(token, "test@test", currentDate)).andReturn(eventChanges).once();
+		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
+		expectConvertUpdatedEventsToMSEvents(eventChanges);
+		
+		mockControl.replay();
+		
+		BodyPreference.Builder bodyPreferenceBuilder = BodyPreference.builder();
+		BodyPreference bodyPreference = bodyPreferenceBuilder.build();
+		SyncCollectionOptions syncCollectionOptions = new SyncCollectionOptions(ImmutableList.<BodyPreference> of(bodyPreference));
+		syncCollectionOptions.setFilterType(FilterType.ALL_ITEMS);
+		
+		DataDelta dataDelta = calendarBackend.getAllChanges(userDataRequest, lastKnownState, collectionId, syncCollectionOptions, syncKey);
+		
+		mockControl.verify();
+		
+		assertThat(dataDelta).isEqualTo(DataDelta.builder()
+				.changes(ImmutableList.of(new ItemChange("1:21"), new ItemChange("1:22")))
+				.deletions(ImmutableList.<ItemDeletion> of())
+				.syncDate(currentDate)
+				.syncKey(syncKey)
+				.build());
+	}
+
+	private EventChanges expectTwoDeletedAndTwoUpdatedEventChanges(Date currentDate, int deletedObmId, int deletedObmId2,
+			int createdObmId, int createdObmId2) {
 		Set<DeletedEvent> deletedEvents = ImmutableSet.of(
-				createDeletedEvent(new EventObmId(11), new EventExtId("11")),
-				createDeletedEvent(new EventObmId(12), new EventExtId("12")));		
+				createDeletedEvent(new EventObmId(deletedObmId), new EventExtId(Strings.valueOf(deletedObmId))),
+				createDeletedEvent(new EventObmId(deletedObmId2), new EventExtId(Strings.valueOf(deletedObmId2))));		
 		List<Event> updated = new ArrayList<Event>();
-		updated.add(createEvent(21));
-		updated.add(createEvent(22));
+		updated.add(createEvent(createdObmId));
+		updated.add(createEvent(createdObmId2));
 		
 		return EventChanges.builder()
 					.lastSync(currentDate)
 					.deletes(deletedEvents)
+					.updates(updated)
+					.participationChanges(ImmutableList.<ParticipationChanges> of())
+					.build();
+	}
+
+	private EventChanges expectTwoUpdatedEventChanges(Date currentDate, int createdObmId, int createdObmId2) {
+		List<Event> updated = new ArrayList<Event>();
+		updated.add(createEvent(createdObmId));
+		updated.add(createEvent(createdObmId2));
+		
+		return EventChanges.builder()
+					.lastSync(currentDate)
+					.deletes(ImmutableList.<DeletedEvent> of())
 					.updates(updated)
 					.participationChanges(ImmutableList.<ParticipationChanges> of())
 					.build();

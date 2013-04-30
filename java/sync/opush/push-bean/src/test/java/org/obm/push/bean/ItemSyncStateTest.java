@@ -76,7 +76,7 @@ public class ItemSyncStateTest {
 	}
 	
 	@Test
-	public void testNewWindowedSyncStateSameFilterType() {
+	public void testGetFilteredSyncDateSameFilterType() {
 		SyncKey syncKey = new SyncKey("123");
 		Date currentDate = DateUtils.getCurrentDate();
 		int id = 1;
@@ -88,13 +88,12 @@ public class ItemSyncStateTest {
 				.syncFiltered(false)
 				.build();
 		
-		ItemSyncState newSyncState = syncState.newWindowedSyncState(null);
-		assertThat(newSyncState).isEqualTo(syncState);
-		assertThat(newSyncState.isSyncFiltered()).isFalse();
+		Date filteredDate = syncState.getFilteredSyncDate(null);
+		assertThat(filteredDate).isEqualTo(syncState.getSyncDate());
 	}
 	
 	@Test
-	public void testNewWindowedSyncStateDifferentFilterType() {
+	public void testGetFilteredSyncDateDifferentFilterType() {
 		SyncKey syncKey = new SyncKey("123");
 		Date currentDate = new DateTime(DateUtils.getCurrentDate()).minusDays(2).toDate();
 		Date expectedDate = new DateTime(DateUtils.getMidnightCalendar()).minusDays(1).toDate();
@@ -107,10 +106,7 @@ public class ItemSyncStateTest {
 				.syncFiltered(false)
 				.build();
 		
-		ItemSyncState newSyncState = syncState.newWindowedSyncState(FilterType.ONE_DAY_BACK);
-		assertThat(newSyncState.getSyncKey()).isEqualTo(syncKey);
-		assertThat(newSyncState.getSyncDate()).isEqualTo(expectedDate);
-		assertThat(newSyncState.getId()).isEqualTo(id);
-		assertThat(newSyncState.isSyncFiltered()).isTrue();
+		Date filteredDate = syncState.getFilteredSyncDate(FilterType.ONE_DAY_BACK);
+		assertThat(filteredDate).isEqualTo(expectedDate);
 	}
 }

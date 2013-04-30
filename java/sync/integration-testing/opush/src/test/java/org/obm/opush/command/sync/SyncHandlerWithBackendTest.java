@@ -385,7 +385,7 @@ public class SyncHandlerWithBackendTest {
 		Event event2 = new Event();
 		event2.setUid(new EventObmId(2));
 		event2.setTitle("event2");
-		expect(calendarClient.getSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+		expect(calendarClient.getFirstSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
 			.andReturn(EventChanges.builder()
 					.lastSync(secondDate)
 					.updates(Lists.newArrayList(event, event2))
@@ -434,7 +434,7 @@ public class SyncHandlerWithBackendTest {
 				new ServerId(serverId2)))
 			.andReturn(false);
 		
-		expect(calendarClient.getSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+		expect(calendarClient.getFirstSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
 			.andReturn(EventChanges.builder()
 					.lastSync(secondDate)
 					.updates(Lists.newArrayList(event, event2))
