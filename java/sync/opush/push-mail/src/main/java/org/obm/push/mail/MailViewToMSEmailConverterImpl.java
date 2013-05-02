@@ -200,7 +200,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	
 	private MSMeetingRequest convertICalendar(EmailView emailView) {
 		if (isSupportedICalendar(emailView)) {
-			return new ICalendarConverter().convertToMSMeetingRequest(emailView.getICalendar());
+			return new ICalendarConverter().convertToMSMeetingRequest(emailView.getICalendar(), emailView.getFrom());
 		}
 		return null;
 	}

@@ -58,6 +58,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestSensitivity;
+import org.obm.push.mail.bean.Address;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -100,7 +101,7 @@ public class ICalendarConverter {
 		.put(Recur.MONTHLY, MSMeetingRequestRecurrenceType.MONTHLY)
 		.put(Recur.YEARLY, MSMeetingRequestRecurrenceType.YEARLY).build();
 	
-	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar) {
+	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar, List<Address> from) {
 		Preconditions.checkNotNull(icalendar, "ICalendar is null");
 		
 		Builder builder = MSMeetingRequest.builder();
@@ -109,7 +110,7 @@ public class ICalendarConverter {
 			ICalendarMethod method = icalendar.getICalendarMethod();
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
-			fillMsMeetingRequestFromVEvent(iCalendarEvent, method, builder);
+			fillMsMeetingRequestFromVEvent(iCalendarEvent, method, builder, from);
 			
 			if (iCalendarEvent.hasRecur()) {
 				ICalendarRecur iCalendarRule = iCalendarEvent.recur();
@@ -136,7 +137,7 @@ public class ICalendarConverter {
 	}
 	
 	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, 
-			ICalendarMethod method, Builder msMeetingRequestBuilder) {
+			ICalendarMethod method, Builder msMeetingRequestBuilder, List<Address> from) {
 		
 		Date startDate = iCalendarEvent.startDate();
 		Date endDate = endTime(iCalendarEvent);
@@ -147,7 +148,7 @@ public class ICalendarConverter {
 			.dtStamp(iCalendarEvent.dtStamp())
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.location(iCalendarEvent.location())
-			.organizer(iCalendarEvent.organizer())
+			.organizer(organizer(iCalendarEvent.organizer(), from))
 			.reminder(reminder(iCalendarEvent))
 			.responseRequested(responseRequested(method))
 			.sensitivity(sensitivity(iCalendarEvent))
@@ -155,6 +156,14 @@ public class ICalendarConverter {
 			.msEventExtId(extId(iCalendarEvent.uid()));
 	}
 	
+	@VisibleForTesting String organizer(String organizer, List<Address> fromList) {
+		Address from = Iterables.getFirst(fromList, null);
+		if (from != null) {
+			return Objects.firstNonNull(Strings.emptyToNull(organizer), from.getMail());
+		}
+		return organizer;
+	}
+
 	@VisibleForTesting boolean responseRequested(ICalendarMethod method) {
 		if (method != null) {
 			return method == ICalendarMethod.REQUEST;

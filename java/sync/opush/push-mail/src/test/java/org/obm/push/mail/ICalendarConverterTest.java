@@ -57,7 +57,9 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrence;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceDayOfWeek;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestRecurrenceType;
+import org.obm.push.mail.bean.Address;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -92,9 +94,26 @@ public class ICalendarConverterTest {
 	}
 	
 	@Test
+	public void testOrganizerWhenNone() {
+		assertThat(icalendarConverter.organizer(null, ImmutableList.<Address>of())).isNull();
+	}
+	
+	@Test
+	public void testOrganizerWhenInICS() {
+		assertThat(icalendarConverter.organizer("user@domain.org", ImmutableList.<Address>of()))
+			.isEqualTo("user@domain.org");
+	}
+	
+	@Test
+	public void testOrganizerWhenInICSAndFromExists() {
+		assertThat(icalendarConverter.organizer("user@domain.org", ImmutableList.of(new Address("user2@domain.org"))))
+			.isEqualTo("user@domain.org");
+	}
+	
+	@Test
 	public void testICalendarConverterSingleFreeEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_free.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -114,7 +133,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterSingleBusyEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_busy.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -134,7 +153,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterSingleBusyOOFEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_busy-oof.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -154,7 +173,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterSingleBusyTentativeEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_busy-tentative.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -174,13 +193,13 @@ public class ICalendarConverterTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void testICalendarConverterSingleEventBadOrganizerFormat() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_organizer-bad-format.zimbra.ics");
-		icalendarConverter.convertToMSMeetingRequest(icalendar);
+		icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 	}
 	
 	@Test
 	public void testICalendarConverterSingleEventWithAlarm() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_valarm.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -201,7 +220,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterSingleEventWithAlarmAndAllDay() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_valarm_allDay.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -270,7 +289,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterDailyEventWithInterval() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -295,7 +314,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterDailyEventWithUntil() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_until.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -321,7 +340,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterDailyEventWithIntervalAndWorkingDays() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_workingdays.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -352,7 +371,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterDailyEventWithIntervalAndWorkingDaysAndCountOccurences() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-daily_interval_workingdays_countoccurences.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -384,7 +403,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterWeeklyEventWithByDay() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-weekly_interval_byday.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -412,7 +431,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterMonthlyEventWithByMonthDay() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-monthly_interval_bymonthday.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -438,7 +457,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterMonthlyEventWithByDayAndBySetPos() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-monthly_interval_byday_bysetpos.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -467,7 +486,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterMonthlyEventWithByDayNumber() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-weekly_interval_byday-1.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -495,7 +514,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterYearlyEventByMonthDayAndByMonth() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-yearly_interval_bymonthday_bymonth.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -522,7 +541,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterYearlyEventWithByMonthAndByDayAndBySetPos() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-yearly_interval_bymonthday_byday_byset.zimbra.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -555,7 +574,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterSingleAllDayEventFromOBMUI() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_allDay.obmui.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		
 		assertThat(msMeetingRequest).isEqualTo(
 				MSMeetingRequest.builder()
@@ -576,7 +595,7 @@ public class ICalendarConverterTest {
 	@Test
 	public void testICalendarConverterOrphanedEventException() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("orphaned_event_exception.ics");
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 		assertThat(msMeetingRequest).isNull();
 	}
 
@@ -584,7 +603,7 @@ public class ICalendarConverterTest {
 	public void testICalendarConverterYearlyWithoutBYMONTHGetTheStartDateOne() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("recur_event_freq-yearly_bymonth_unset.ics");
 
-		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar);
+		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
 
 		int julyMonthIndex = 7;
 		MSMeetingRequestRecurrence recurrence = Iterables.getOnlyElement(msMeetingRequest.getRecurrences());
