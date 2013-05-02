@@ -34,6 +34,7 @@ package org.obm.push.mail;
 import java.util.Collection;
 import java.util.List;
 
+import org.obm.icalendar.ICalendar;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.UidMSEmail;
@@ -77,5 +78,11 @@ public class MSEmailFetcher {
 		}
 		return msEmails;
 	}
-	
+
+	public ICalendar fetchInvitation(UserDataRequest udr, Integer collectionId, String collectionPath, Long uid) throws EmailViewPartsFetcherException, DaoException {
+		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
+				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, null, udr, collectionPath, collectionId);
+		
+		return emailViewPartsFetcherImpl.fetchInvitation(uid);
+	}
 }

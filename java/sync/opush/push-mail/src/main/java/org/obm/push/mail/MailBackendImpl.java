@@ -719,6 +719,30 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
+	public org.obm.icalendar.ICalendar getInvitation(UserDataRequest udr, Integer collectionId, String serverId) 
+			throws CollectionNotFoundException, ProcessingEmailException {
+		
+		try {
+			return fetchInvitation(udr, collectionId, getEmailUidFromServerId(serverId));
+			
+		} catch (MailException e) {
+			throw new ProcessingEmailException(e);
+		} catch (DaoException e) {
+			throw new ProcessingEmailException(e);
+		} catch (LocatorClientException e) {
+			throw new ProcessingEmailException(e);
+		} catch (EmailViewPartsFetcherException e) {
+			throw new ProcessingEmailException(e);
+		}
+	}
+	
+	private org.obm.icalendar.ICalendar fetchInvitation(UserDataRequest udr, Integer collectionId, Long uid) throws DaoException, EmailViewPartsFetcherException {
+		
+		final String collectionPath = mappingService.getCollectionPathFor(collectionId);
+		return msEmailFetcher.fetchInvitation(udr, collectionId, collectionPath, uid);
+	}
+
+	@Override
 	public MSAttachementData getAttachment(UserDataRequest udr, String attachmentId) 
 			throws AttachementNotFoundException, CollectionNotFoundException, ProcessingEmailException {
 		

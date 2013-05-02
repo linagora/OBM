@@ -47,6 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
@@ -96,6 +97,7 @@ public class MailBackendImplTest {
 	private MappingService mappingService;
 	private SnapshotService snapshotService;
 	private EmailChangesFetcher serverEmailChangesBuilder;
+	private MSEmailFetcher msEmailFetcher;
 	private MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private WindowingService windowingService;
 
@@ -116,12 +118,13 @@ public class MailBackendImplTest {
 		snapshotService = control.createMock(SnapshotService.class);
 		mappingService = control.createMock(MappingService.class);
 		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
+		msEmailFetcher = control.createMock(MSEmailFetcher.class);
 		mailBackendSyncDataFactory = control.createMock(MailBackendSyncDataFactory.class);
 		windowingService = control.createMock(WindowingService.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, snapshotService,
-				serverEmailChangesBuilder, mappingService, null, null, null, mailBackendSyncDataFactory,
+				serverEmailChangesBuilder, mappingService, null, msEmailFetcher, null, mailBackendSyncDataFactory,
 				windowingService);
 	}
 	
@@ -804,5 +807,25 @@ public class MailBackendImplTest {
 				.syncKey(syncKey)
 				.build());
 		expectLastCall();
+	}
+
+	@Test
+	public void testGetInvitation() throws Exception {
+		int serverId = 1;
+		
+		expect(mappingService.getItemIdFromServerId(collectionPath))
+			.andReturn(serverId).once();
+		
+		ICalendar expectedCalendar = control.createMock(ICalendar.class);
+		
+		expect(msEmailFetcher.fetchInvitation(udr, collectionId, collectionPath, Long.valueOf(serverId)))
+			.andReturn(expectedCalendar);
+		
+		control.replay();
+		
+		ICalendar ics = testee.getInvitation(udr, collectionId, collectionPath);
+		
+		control.verify();
+		assertThat(ics).isEqualTo(expectedCalendar);
 	}
 }

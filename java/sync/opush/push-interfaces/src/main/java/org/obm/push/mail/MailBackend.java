@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
@@ -60,4 +61,6 @@ public interface MailBackend extends PIMBackend {
 			ProcessingEmailException;
 
 	Long getEmailUidFromServerId(String serverId);
+
+	ICalendar getInvitation(UserDataRequest udr, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException;
 }
