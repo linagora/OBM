@@ -31,11 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.fortuna.ical4j.data.ParserException;
+
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
+import org.obm.icalendar.Ical4jUser.Factory;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
@@ -50,7 +56,6 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
@@ -67,6 +72,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.HierarchyChangesException;
+import org.obm.push.exception.ICalendarConverterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
@@ -117,6 +123,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private final EventExtId.Factory eventExtIdFactory;
 	private final BackendWindowingService backendWindowingService;
 	private final ClientIdService clientIdService;
+	private final Ical4jHelper ical4jHelper;
+	private final Factory ical4jUserFactory;
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
@@ -126,7 +134,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger,
 			EventExtId.Factory eventExtIdFactory,
 			BackendWindowingService backendWindowingService,
-			ClientIdService clientIdService) {
+			ClientIdService clientIdService,
+			Ical4jHelper ical4jHelper, 
+			Ical4jUser.Factory ical4jUserFactory) {
 		
 		super(mappingService, login, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
@@ -136,6 +146,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		this.eventExtIdFactory = eventExtIdFactory;
 		this.backendWindowingService = backendWindowingService;
 		this.clientIdService = clientIdService;
+		this.ical4jHelper = ical4jHelper;
+		this.ical4jUserFactory = ical4jUserFactory;
 	}
 	
 	@Override
@@ -587,17 +599,17 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	public String handleMeetingResponse(UserDataRequest udr, MSEmail invitation, AttendeeStatus status) 
+	public String handleMeetingResponse(UserDataRequest udr, org.obm.icalendar.ICalendar iCalendar, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
-			ItemNotFoundException, ConversionException, HierarchyChangedException {
+			ItemNotFoundException, ConversionException, HierarchyChangedException, ICalendarConverterException {
 		
-		MSEvent event = invitation.getInvitation();
 		CollectionPath collectionPath = defaultCalendar(udr);
 		
 		AccessToken at = login(udr);
 		try {
-			logger.info("handleMeetingResponse = {}", event.getUid());
-			Event obmEvent = createOrModifyInvitationEvent(udr, at, event, collectionPath);
+			Event event = convertICalendarToEvent(udr, at, iCalendar);
+			logger.info("handleMeetingResponse = {}", event.getExtId());
+			Event obmEvent = createOrModifyInvitationEvent(at, event, collectionPath);
 			updateUserStatus(obmEvent, status, at, collectionPath);
 			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 			return getServerIdFor(collectionId, obmEvent.getObmId());
@@ -613,36 +625,32 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		}
 	}
 
-	private Event createOrModifyInvitationEvent(UserDataRequest udr, AccessToken at, 
-			MSEvent event, CollectionPath collectionPath) 
+	private Event createOrModifyInvitationEvent(AccessToken at, Event event, CollectionPath collectionPath) 
 		throws UnexpectedObmSyncServerException, EventNotFoundException, 
 			ConversionException, DaoException, org.obm.sync.NotAllowedException {
 		
 		try {
+			boolean internalEvent = event.isInternalEvent();
+			if (internalEvent) {
+				return calendarClient.getEventFromExtId(at, collectionPath.backendName(), event.getExtId());
+			}
 			
-			EventExtId extId = getEventExtId(udr, event);
-			Event previousEvent = getEventFromExtId(at, extId, collectionPath);
-			
-			boolean isInternal = eventConverter.isInternalEvent(previousEvent, false);
-			Event newEvent = convertMSObjectToObmObject(udr, event, previousEvent, isInternal);
-			newEvent.setExtId(extId);
-			
+			Event previousEvent = getEventFromExtId(at, event.getExtId(), collectionPath);
 			if (previousEvent == null) {
 				try {
-					logger.info("createOrModifyInvitationEvent : create new event {}", newEvent.getObmId());
-					EventObmId id = calendarClient.createEvent(at, collectionPath.backendName(), newEvent, isInternal, null);
+					logger.info("createOrModifyInvitationEvent : create new event {}", event.getObmId());
+					EventObmId id = calendarClient.createEvent(at, collectionPath.backendName(), event, internalEvent, null);
 					return calendarClient.getEventFromId(at, collectionPath.backendName(), id);
 				} catch (EventAlreadyExistException e) {
 					throw new UnexpectedObmSyncServerException("it's not possible because getEventFromExtId == null");
 				}
 				
 			} else {
-			
-				newEvent.setUid(previousEvent.getObmId());
-				newEvent.setSequence(previousEvent.getSequence());
+				event.setUid(previousEvent.getObmId());
+				event.setSequence(previousEvent.getSequence());
 				if (!previousEvent.isInternalEvent()) {
-					logger.info("createOrModifyInvitationEvent : update event {}", newEvent.getObmId());
-					previousEvent = calendarClient.modifyEvent(at, collectionPath.backendName(), newEvent, true, false);
+					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
+					previousEvent = calendarClient.modifyEvent(at, collectionPath.backendName(), event, true, false);
 				}
 				return previousEvent;
 			}	
@@ -650,6 +658,26 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (ServerFault fault) {
 			throw new UnexpectedObmSyncServerException(fault);
 		}		
+	}
+
+	private Event convertICalendarToEvent(UserDataRequest udr, AccessToken accessToken, org.obm.icalendar.ICalendar iCalendar) throws ICalendarConverterException {
+		if (iCalendar == null) {
+			return null;
+		}
+		try {
+			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
+			List<Event> obmEvents = ical4jHelper.parseICSEvent(iCalendar.getICalendar(), ical4jUser, accessToken.getObmId());
+			if (!obmEvents.isEmpty()) {
+				return obmEvents.get(0);
+			}
+		} catch (IOException e) {
+			logger.warn(e.getMessage(), e);
+			throw new ICalendarConverterException("ICS can't be converted to Event", e);
+		} catch (ParserException e) {
+			logger.warn(e.getMessage(), e);
+			throw new ICalendarConverterException("ICS can't be converted to Event", e);
+		}
+		throw new ICalendarConverterException("ICS can't be converted to Event");
 	}
 
 	private Event getEventFromExtId(AccessToken at, EventExtId eventExtId, 

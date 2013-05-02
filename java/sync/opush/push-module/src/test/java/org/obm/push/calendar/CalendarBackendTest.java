@@ -38,19 +38,26 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.util.Strings;
 
 import org.easymock.IMocksControl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.icalendar.ICalendar;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jUser;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
@@ -81,6 +88,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ICalendarConverterException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.service.ClientIdService;
@@ -134,6 +142,8 @@ public class CalendarBackendTest {
 	private EventExtId.Factory eventExtIdFactory;
 	private BackendWindowingService backendWindowingService;
 	private ClientIdService clientIdService;
+	private Ical4jHelper ical4jHelper;
+	private Ical4jUser.Factory ical4jUserFactory;
 	
 	private CalendarBackend calendarBackend;
 	private IMocksControl mockControl;
@@ -171,6 +181,8 @@ public class CalendarBackendTest {
 		this.eventExtIdFactory = mockControl.createMock(EventExtId.Factory.class);
 		this.backendWindowingService = mockControl.createMock(BackendWindowingService.class);
 		this.clientIdService = mockControl.createMock(ClientIdService.class);
+		this.ical4jHelper = mockControl.createMock(Ical4jHelper.class);
+		this.ical4jUserFactory = mockControl.createMock(Ical4jUser.Factory.class);
 		
 		consistencyLogger.log(anyObject(Logger.class), anyObject(EventChanges.class));
 		expectLastCall().anyTimes();
@@ -182,7 +194,9 @@ public class CalendarBackendTest {
 				loginService, 
 				collectionPathBuilderProvider, consistencyLogger, eventExtIdFactory, 
 				backendWindowingService,
-				clientIdService);
+				clientIdService,
+				ical4jHelper,
+				ical4jUserFactory);
 	}
 	
 	@Test
@@ -982,7 +996,7 @@ public class CalendarBackendTest {
 	}
 	
 	@Test
-	public void testHandleMettingResponse() throws Exception {
+	public void testHandleMettingResponseOnExternalEvent() throws Exception {
 		String calendarDisplayName = user.getLoginAtDomain();
 		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
 		
@@ -992,23 +1006,24 @@ public class CalendarBackendTest {
 		MSEmail invitation  = new MSEmail();
 		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
 
-		expectLoginBehavior();
-		
 		EventExtId eventExtId = new EventExtId("1");
-		expect(eventService.getEventExtIdFor(msEventUid, device))
-			.andReturn(eventExtId).once();
-
-		
 		Event event = new Event();
 		event.setUid(new EventObmId(1));
+		event.setInternalEvent(false);
+		event.setExtId(eventExtId);
 
-		expect(eventConverter.isInternalEvent(event, false)).andReturn(false).once();
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
+		
+		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
+			.andReturn(null).once();
+		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
+			.andReturn(ImmutableList.of(event)).once();
+		expectLoginBehavior();
 		
 		expectGetAndModifyEvent(eventExtId, event);
 		expect(calendarClient.changeParticipationState(token, user.getLoginAtDomain(), eventExtId, null, 0, true))
 			.andReturn(true);
 		
-		expectEventConvertion(event);
 		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
 			.andReturn(null).once();
 		
@@ -1019,7 +1034,58 @@ public class CalendarBackendTest {
 		
 		mockControl.replay();
 
-		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
+		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
+		
+		mockControl.verify();
+		assertThat(serverIdResponse).isEqualTo("1:1");
+	}
+	
+	@Test
+	public void testHandleMettingResponseOnInternalEvent() throws Exception {
+		String calendarDisplayName = user.getLoginAtDomain();
+		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
+		
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		MSEmail invitation  = new MSEmail();
+		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
+
+		EventExtId eventExtId = new EventExtId("1");
+		Event iCSEvent = new Event();
+		iCSEvent.setInternalEvent(true);
+		iCSEvent.setExtId(eventExtId);
+
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
+		
+		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
+			.andReturn(null).once();
+		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
+			.andReturn(ImmutableList.of(iCSEvent)).once();
+		expectLoginBehavior();
+		
+		Event oBMEvent = new Event();
+		oBMEvent.setUid(new EventObmId(1));
+		oBMEvent.setInternalEvent(true);
+		oBMEvent.setExtId(eventExtId);
+		
+		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
+			.andReturn(oBMEvent).once();
+		
+		expect(calendarClient.changeParticipationState(token, user.getLoginAtDomain(), eventExtId, null, 0, true))
+			.andReturn(true);
+		
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
+			.andReturn(null).once();
+		
+		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
+			.andReturn(1).once();
+		
+		expectBuildCollectionPath(calendarDisplayName);
+		
+		mockControl.replay();
+
+		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
 		
 		mockControl.verify();
 		assertThat(serverIdResponse).isEqualTo("1:1");
@@ -1365,6 +1431,18 @@ public class CalendarBackendTest {
 
 		Event event = new Event();
 		event.setUid(new EventObmId(1));
+		event.setExtId(eventExtId);
+
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
+		
+		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
+			.andReturn(null).once();
+		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
+			.andReturn(ImmutableList.of(event)).once();
+		expectLoginBehavior();
+		
+		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
+			.andReturn(event).once();
 
 		expect(eventConverter.isInternalEvent(event, false)).andReturn(false).once();
 		expectGetAndModifyEvent(eventExtId, event);
@@ -1385,7 +1463,42 @@ public class CalendarBackendTest {
 		
 		mockControl.replay();
 
-		calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
+		calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
+	}
+	
+	@Test (expected=ICalendarConverterException.class)
+	public void testHandleMettingResponseErrorWhenParsingICS() throws Exception {
+		String calendarDisplayName = user.getLoginAtDomain();
+		
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		MSEmail invitation  = new MSEmail();
+		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
+
+		EventExtId eventExtId = new EventExtId("1");
+
+		Event event = new Event();
+		event.setUid(new EventObmId(1));
+		event.setExtId(eventExtId);
+
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
+		
+		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
+			.andReturn(null).once();
+		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
+			.andThrow(new ParserException(1));
+		expectLoginBehavior();
+		
+		expectBuildCollectionPath(calendarDisplayName);
+		
+		mockControl.replay();
+
+		try {
+			calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
+		} finally {
+			mockControl.verify();
+		}
 	}
 	
 	@Test 
@@ -1443,5 +1556,14 @@ public class CalendarBackendTest {
 		mockControl.replay();
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isFalse();
 		mockControl.verify();
+	}
+	
+	
+	private ICalendar icalendar(String filename) throws IOException, ParserException {
+		InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream("icsFiles/" + filename);
+		if (in == null) {
+			Assert.fail("Cannot load " + filename);
+		}
+		return ICalendar.builder().inputStream(in).build();	
 	}
 }
