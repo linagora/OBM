@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -44,6 +45,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ICalendarConverterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -159,7 +161,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			MSEmail email = retrieveMailWithMeetingRequest(udr, item);
 		
 			if (email != null) {
-				handleEmail(udr, item, email, builder);
+				handleEmail(udr, item, builder);
 			} else {
 				builder.status(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 			}
@@ -171,9 +173,9 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		return builder.build();
 	}
 
-	private void handleEmail(UserDataRequest udr, MeetingResponse item, MSEmail email, ItemChangeMeetingResponse.Builder builder) {
+	private void handleEmail(UserDataRequest udr, MeetingResponse item, ItemChangeMeetingResponse.Builder builder) {
 		try {
-			String serverId = handle(udr, email, item.getUserResponse());
+			String serverId = handle(udr, item);
 			builder.status(MeetingResponseStatus.SUCCESS);
 			
 			if (!AttendeeStatus.DECLINE.equals(item.getUserResponse())) {
@@ -197,13 +199,17 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		} catch (HierarchyChangedException e) {
 			logger.error(e.getMessage(), e);
 			builder.status(MeetingResponseStatus.SERVER_ERROR);
+		} catch (ICalendarConverterException e) {
+			logger.error(e.getMessage(), e);
+			builder.status(MeetingResponseStatus.SERVER_ERROR);
 		}
 	}
 
-	private String handle(UserDataRequest udr, MSEmail email, AttendeeStatus userResponse) 
-			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException, HierarchyChangedException {
+	private String handle(UserDataRequest udr, MeetingResponse item) 
+			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException, HierarchyChangedException, ICalendarConverterException {
 		
-		return calendarBackend.handleMeetingResponse(udr, email, userResponse);
+		ICalendar invitation = mailBackend.getInvitation(udr, item.getCollectionId(), item.getReqId());
+		return calendarBackend.handleMeetingResponse(udr, invitation, item.getUserResponse());
 	}
 
 	@VisibleForTesting void deleteInvitationEmail(UserDataRequest udr, MeetingResponse item) {

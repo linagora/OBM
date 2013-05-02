@@ -56,6 +56,7 @@ import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.icalendar.ICalendar;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.DefaultOpushModule;
@@ -70,6 +71,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ICalendarConverterException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -266,6 +268,16 @@ public class MeetingResponseHandlerTest {
 		assertMeetingResponseIsFailure(serverResponse);
 	}
 
+	@Test
+	public void testICalendarConverterExceptionInMeetingResponseHandlingMakesTheCommandFail() throws Exception {
+		prepareMockForMeetingResponseHandlingError(new ICalendarConverterException());
+		opushServer.start();
+
+		Document serverResponse = postMeetingAcceptedResponse();
+		
+		assertMeetingResponseIsFailure(serverResponse);
+	}
+
 	private Document postMeetingAcceptedResponse()
 			throws TransformerException, WBXmlException, IOException, HttpRequestException, SAXException  {
 		
@@ -317,6 +329,7 @@ public class MeetingResponseHandlerTest {
 		mockUsersAccess(classToInstanceMap, Sets.newHashSet(singleUserFixture.jaures));
 		expectCollectionDaoUnchange(classToInstanceMap.get(CollectionDao.class));
 		expectMailbackendGiveEmailForAnyIds(classToInstanceMap.get(MailBackend.class));
+		expectMailbackendGettingInvitation(classToInstanceMap.get(MailBackend.class));
 	}
 	
 	private void expectMailbackendDeleteInvitationProcessCorrectly(MailBackend mailBackend) throws Exception {
@@ -337,7 +350,7 @@ public class MeetingResponseHandlerTest {
 		
 		expect(calendarBackend.handleMeetingResponse(
 				anyObject(UserDataRequest.class),
-				anyObject(MSEmail.class),
+				anyObject(ICalendar.class),
 				anyObject(AttendeeStatus.class)))
 			.andReturn(serverId(meetingCollectionId, meetingItemId));
 	}
@@ -347,7 +360,7 @@ public class MeetingResponseHandlerTest {
 		
 		expect(calendarBackend.handleMeetingResponse(
 				anyObject(UserDataRequest.class),
-				anyObject(MSEmail.class),
+				anyObject(ICalendar.class),
 				anyObject(AttendeeStatus.class)))
 			.andThrow(triggeredException);
 	}
@@ -357,6 +370,13 @@ public class MeetingResponseHandlerTest {
 		
 		expect(mailBackend.getEmail(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class)))
 			.andReturn(new MSEmail());
+	}
+
+	private void expectMailbackendGettingInvitation(MailBackend mailBackend)
+			throws CollectionNotFoundException, ProcessingEmailException {
+		
+		expect(mailBackend.getInvitation(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class)))
+			.andReturn(null);
 	}
 
 	private void expectCollectionDaoUnchange(CollectionDao collectionDao) throws DaoException {
