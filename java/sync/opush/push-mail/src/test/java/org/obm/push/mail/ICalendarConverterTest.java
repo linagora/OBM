@@ -111,6 +111,18 @@ public class ICalendarConverterTest {
 	}
 	
 	@Test
+	public void testOrganizerWhenNullInICSAndFromExists() {
+		assertThat(icalendarConverter.organizer(null, ImmutableList.of(new Address("user2@domain.org"))))
+			.isEqualTo("user2@domain.org");
+	}
+	
+	@Test
+	public void testOrganizerWhenEmptyInICSAndFromExists() {
+		assertThat(icalendarConverter.organizer("", ImmutableList.of(new Address("user2@domain.org"))))
+			.isEqualTo("user2@domain.org");
+	}
+	
+	@Test
 	public void testICalendarConverterSingleFreeEvent() throws IOException, ParserException {
 		ICalendar icalendar = icalendar("single_event_free.zimbra.ics");
 		MSMeetingRequest msMeetingRequest = icalendarConverter.convertToMSMeetingRequest(icalendar, ImmutableList.<Address>of());
