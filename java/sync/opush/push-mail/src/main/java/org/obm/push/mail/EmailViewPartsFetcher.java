@@ -31,10 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import org.obm.icalendar.ICalendar;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.conversation.EmailView;
 
 public interface EmailViewPartsFetcher {
 
 	EmailView fetch(long uid) throws EmailViewPartsFetcherException;
+	
+	ICalendar fetchInvitation(long uid) throws EmailViewPartsFetcherException;
 }

@@ -90,6 +90,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		this.bodyPreferences = bodyPreferences;
 	}
 
+	@Override
 	public EmailView fetch(long uid) throws EmailViewPartsFetcherException {
 		try {
 			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
@@ -107,6 +108,31 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			fetchInvitation(emailViewBuilder, mimeMessage, uid);
 			
 			return emailViewBuilder.build();
+		} catch (MailException e) {
+			throw new EmailViewPartsFetcherException(e);
+		} catch (IOException e) {
+			throw new EmailViewPartsFetcherException(e);
+		} catch (ParserException e) {
+			throw new EmailViewPartsFetcherException(e);
+		} catch (EmailViewBuildException e) {
+			logger.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@Override
+	public ICalendar fetchInvitation(long uid) throws EmailViewPartsFetcherException {
+		try {
+			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
+			
+			MimeMessage mimeMessage = emailViewResponse.getMimeMessage();
+			IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
+			for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+				if (mp.isInvitation()) {
+					return fetchICalendar(mp, uid);
+				}
+			}
+			return null;
 		} catch (MailException e) {
 			throw new EmailViewPartsFetcherException(e);
 		} catch (IOException e) {
@@ -247,10 +273,14 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid)
 			throws MailException, IOException, ParserException {
 
-		InputStream inputStream = mailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());
-		ICalendar iCalendar = ICalendar.builder()
-			.inputStream(mp.decodeMimeStream(inputStream)).build();
-		emailViewBuilder.iCalendar(iCalendar);
+		emailViewBuilder.iCalendar(fetchICalendar(mp, uid));
 	}
 
+	private ICalendar fetchICalendar(IMimePart mp, long uid)
+			throws MailException, IOException, ParserException {
+
+		InputStream inputStream = mailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());
+		return ICalendar.builder()
+			.inputStream(mp.decodeMimeStream(inputStream)).build();
+	}
 }
