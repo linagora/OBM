@@ -48,5 +48,6 @@ public class ObmSyncModule extends AbstractModule {
 		install(new SolrJmsModule());
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
+    install(new DatabaseMetadataModule());
 	}
 }
