@@ -143,6 +143,14 @@ public class SendEmailTest {
 
 		assertThat(sendEmail.isInvitation()).isFalse();
 	}
+
+	@Test
+	public void testForwardedEmbeddedInvitation() throws MimeException, IOException{
+		Message message = loadMimeMessage("forwardEmbeddedInvitation.eml");
+		SendEmail sendEmail = new SendEmail("john@test.opush", message);
+
+		assertThat(sendEmail.isInvitation()).isTrue();
+	}
 	
 	@Test
 	public void testEmailWithEmbeddedImage() throws MimeException, IOException {
