@@ -2894,9 +2894,31 @@ public class CalendarBindingImplTest {
 		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/4Events.ics"));
 
 		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(true).anyTimes();
-		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser); // Once
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser).once();
 		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
 		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(obmUser).anyTimes();
+		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null).times(4);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
+		mocksControl.replay();
+
+		binding.importICalendar(token, calendar, ics, null);
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testImportICSPerformsOnlyOneLookupPerAttendee() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String domainName = "test.tlse.lng", calendar = "user";
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/4Events.ics"));
+		UserAttendee userAttendee = UserAttendee.builder().email("user@test.tlse.lng").build();
+		UserAttendee organizerAttendee = UserAttendee.builder().email("organizer@test.tlse.lng").build();
+
+		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(true).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser);
+		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
+		expect(userService.getUserFromAttendee(userAttendee, domainName)).andReturn(obmUser).once();
+		expect(userService.getUserFromAttendee(organizerAttendee, domainName)).andReturn(obmUser).once();
 		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null).times(4);
 		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
 		mocksControl.replay();
