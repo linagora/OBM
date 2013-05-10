@@ -91,7 +91,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1444,18 +1448,20 @@ public class CalendarBindingImpl implements ICalendar {
 		catch (Exception e) {
 			throw new ServerFault(e);
 		}
-		
-		final List<Event> events = parseICSEvent(token, ics, calendarUser.getUid());
+
 		int countEvent = 0;
+		List<Event> events = parseICSEvent(token, ics, calendarUser.getUid());
+		LoadingCache<Attendee, Optional<ObmUser>> cache = newObmUserCache(token.getDomain().getName());
+
 		for (final Event event: events) {
 
 			removeAttendeeWithNoEmail(event);
-			if (!isAttendeeExistForCalendarOwner(token, calendar, event.getAttendees())) {
+			if (!isAttendeeExistForCalendarOwner(calendarUser, event.getAttendees(), cache)) {
 				addAttendeeForCalendarOwner(token, calendar, event);
 			}
 			
 			if(event.isEventInThePast()){
-				changeCalendarOwnerAttendeeParticipationToAccepted(token, calendar, event);
+				changeCalendarOwnerAttendeeParticipationToAccepted(calendarUser, event, cache);
 			}
 
 			if (createEventIfNotExists(token, calendarUser, event)) {
@@ -1465,10 +1471,18 @@ public class CalendarBindingImpl implements ICalendar {
 		return countEvent;
 	}
 
-	private void changeCalendarOwnerAttendeeParticipationToAccepted(
-			AccessToken at, String calendar, Event event) {
-		for (final Attendee attendee: event.getAttendees()) {
-			if (isAttendeeExistForCalendarOwner(at, calendar, attendee)) {
+	private LoadingCache<Attendee, Optional<ObmUser>> newObmUserCache(final String domainName) {
+		return CacheBuilder.newBuilder().build(new CacheLoader<Attendee, Optional<ObmUser>>() {
+			@Override
+			public Optional<ObmUser> load(Attendee key) throws Exception {
+				return Optional.fromNullable(userService.getUserFromAttendee(key, domainName));
+			}
+		});
+	}
+
+	private void changeCalendarOwnerAttendeeParticipationToAccepted(ObmUser calendarUser, Event event, LoadingCache<Attendee, Optional<ObmUser>> cache) {
+		for (Attendee attendee: event.getAttendees()) {
+			if (isAttendeeExistForCalendarOwner(calendarUser, attendee, cache)) {
 				attendee.setParticipation(Participation.accepted());
 			}	
 		}
@@ -1551,23 +1565,25 @@ public class CalendarBindingImpl implements ICalendar {
 		event.getAttendees().add(attendee);
 	}
 
-	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final List<Attendee> attendees) {
-		for (final Attendee attendee: attendees) {
-			if (isAttendeeExistForCalendarOwner(at, calendar, attendee)) {
+	private boolean isAttendeeExistForCalendarOwner(ObmUser calendarUser, List<Attendee> attendees, LoadingCache<Attendee, Optional<ObmUser>> cache) {
+		for (Attendee attendee: attendees) {
+			if (isAttendeeExistForCalendarOwner(calendarUser, attendee, cache)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 	
-	private boolean isAttendeeExistForCalendarOwner(final AccessToken at, final String calendar, final Attendee attendee) {
-		final ObmUser obmUser = userService.getUserFromAttendee(attendee,
-				at.getDomain().getName());
+	private boolean isAttendeeExistForCalendarOwner(ObmUser calendarUser, Attendee attendee, LoadingCache<Attendee, Optional<ObmUser>> cache) {
+		ObmUser obmUser = cache.getUnchecked(attendee).orNull();
+
 		if (obmUser != null) {
-			if (obmUser.getLogin().equals(calendar)) {
+			if (obmUser.getLogin().equals(calendarUser.getLogin())) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
