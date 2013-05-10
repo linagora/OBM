@@ -1484,7 +1484,7 @@ public class CalendarBindingImpl implements ICalendar {
 				changeCalendarOwnerAttendeeParticipationToAccepted(token, calendar, event);
 			}
 
-			if (createEventIfNotExists(token, calendar, event)) {
+			if (createEventIfNotExists(token, calendarUser, event)) {
 				countEvent += 1;
 			}
 		}
@@ -1510,11 +1510,11 @@ public class CalendarBindingImpl implements ICalendar {
 		event.setAttendees(newAttendees);
 	}
 
-	private boolean createEventIfNotExists(final AccessToken token, final String calendar, final Event event)
+	private boolean createEventIfNotExists(final AccessToken token, ObmUser calendarUser, final Event event)
 			throws ImportICalendarException {
 		try {
-			if (!isEventExists(token, calendar, event)) {
-				final Event newEvent = calendarDao.createEvent(token, calendar, event, true);
+			if (!isEventExists(token, calendarUser, event)) {
+				final Event newEvent = calendarDao.createEvent(token, calendarUser.getLogin(), event, true);
 				if (newEvent != null) {
 					return true;
 				}
@@ -1531,13 +1531,18 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private boolean isEventExists(final AccessToken token, final String calendar, final Event event) throws FindException {
 		final ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
+
+		return isEventExists(token, calendarUser, event);
+	}
+
+	private boolean isEventExists(AccessToken token, ObmUser calendarUser, Event event) {
 		if (event.getExtId() != null && event.getExtId().getExtId() != null) {
-			final Event findEventByExtId = calendarDao.findEventByExtId(token, calendarUser, event.getExtId());
-			return findEventByExtId != null;
+			return calendarDao.findEventByExtId(token, calendarUser, event.getExtId()) != null;
 		}
+	
 		return false;
 	}
-	
+
 	private List<Event> parseICSEvent(final AccessToken token, final String icsToString, Integer ownerId) throws ImportICalendarException {
 		try {
 			return ical4jHelper.parseICS(icsToString, createIcal4jUserFrom(token), ownerId);
