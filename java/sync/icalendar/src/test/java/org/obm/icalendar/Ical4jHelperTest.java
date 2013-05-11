@@ -31,8 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
+import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -125,7 +129,10 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.obm.sync.services.AttendeeService;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -379,6 +386,7 @@ public class Ical4jHelperTest {
 		DtStart dtStart = new DtStart(new net.fortuna.ical4j.model.Date(cal.getTime()));
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 1);
 
+		Cache<String, Optional<Attendee>> cache = newCache();
 		DtEnd dtEnd = new DtEnd(new net.fortuna.ical4j.model.Date(cal.getTime()));
 
 		VEvent vEvent = new VEvent();
@@ -386,7 +394,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtEnd);
 		AccessToken token = new AccessToken(0, null);
 		token.setUserEmail("adrien@zz.com");
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, cache);
 		assertTrue(event.isAllday());
 
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
@@ -396,7 +404,7 @@ public class Ical4jHelperTest {
 		vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, cache);
 		assertFalse(event1.isAllday());
 	}
 
@@ -415,7 +423,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(172800, event.getDuration());
 
 	}
@@ -424,7 +432,7 @@ public class Ical4jHelperTest {
 	public void testGetPrivacyPublic() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PUBLIC);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(EventPrivacy.PUBLIC, event.getPrivacy());
 	}
 
@@ -432,7 +440,7 @@ public class Ical4jHelperTest {
 	public void testGetPrivacyPrivate() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PRIVATE);
-		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(EventPrivacy.PRIVATE, event1.getPrivacy());
 	}
 
@@ -440,7 +448,7 @@ public class Ical4jHelperTest {
 	public void testGetPrivacyConfidential() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.CONFIDENTIAL);
-		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(EventPrivacy.CONFIDENTIAL, event1.getPrivacy());
 	}
 
@@ -448,14 +456,14 @@ public class Ical4jHelperTest {
 	public void testGetPrivacyIsPublicWhenOther() {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(new Clazz("other"));
-		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
 	}
 
 	@Test
 	public void testGetPrivacyIsPublicWhenNull() {
 		VEvent vEvent = new VEvent();
-		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
 	}
 	
@@ -466,7 +474,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals("Adrien Poupard", event.getOwner());
 	}
 
@@ -476,7 +484,7 @@ public class Ical4jHelperTest {
 		orga.setValue("mailto:" + "adrien@zz.com");
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals("adrien@zz.com", event.getOwner());
 	}
 
@@ -490,7 +498,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertNull(event.getAlert());
 	}
 	
@@ -503,7 +511,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -519,7 +527,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertNull(event.getAlert());
 	}
 	
@@ -534,7 +542,7 @@ public class Ical4jHelperTest {
 
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertFalse(
 				new Integer(-1).equals(event.getAlert())
 		);
@@ -548,7 +556,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		EventRecurrence er = event.getRecurrence();
 		assertNotNull(er);
 		assertEquals(1, er.getFrequence());
@@ -568,7 +576,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(3, event.getAttendees().size());
 	}
 
@@ -582,7 +590,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -603,7 +611,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		Attendee organizer = null;
 		for(Attendee att : event.getAttendees()){
 			if(att.isOrganizer()){
@@ -623,7 +631,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertTrue(event.isInternalEvent());
 
 	}
@@ -636,7 +644,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(1244470973000L, event.getTimeCreate().getTime());
 	}
 
@@ -648,7 +656,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertEquals(1244470995000L, event.getTimeUpdate().getTime());
 
 	}
@@ -661,7 +669,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertNull(event.getTimeUpdate());
 
 	}
@@ -674,7 +682,7 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertFalse(event.isInternalEvent());
 
 	}
@@ -687,9 +695,13 @@ public class Ical4jHelperTest {
 		ComponentList vEvents = ical4jHelper.getComponents(calendar,
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
-		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0);
+		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		assertFalse(event.isInternalEvent());
 
+	}
+
+	private Cache<String, Optional<Attendee>> newCache() {
+		return CacheBuilder.newBuilder().build();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1941,5 +1953,77 @@ public class Ical4jHelperTest {
 				DateUtils.date("2005-02-01T21:00:00Z"));
 
 		assertThat(event.getRecurrence().getExceptions()).isEqualTo(expectedExceptions);
+	}
+
+	@Test
+	public void testParseIcsUsesAttendeeCache() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("4Events.ics"));
+		AttendeeService attendeeService = createMock(AttendeeService.class);
+		Ical4jHelper ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
+		UserAttendee userAttendee = UserAttendee.builder().email("user@test.tlse.lng").build();
+		UserAttendee organizerAttendee = UserAttendee.builder().email("organizer@test.tlse.lng").build();
+
+		expect(attendeeService.findAttendee(isNull(String.class), eq("user@test.tlse.lng"), anyBoolean(), isA(ObmDomain.class), isA(Integer.class))).andReturn(userAttendee).once();
+		expect(attendeeService.findAttendee(isNull(String.class), eq("organizer@test.tlse.lng"), anyBoolean(), isA(ObmDomain.class), isA(Integer.class))).andReturn(organizerAttendee).once();
+		replay(attendeeService);
+
+		List<Event> events = ical4jHelper.parseICS(ics, ical4jUser, 1);
+
+		verify(attendeeService);
+
+		assertThat(events).hasSize(4);
+	}
+
+	@Test
+	public void testParseIcsSetsCorrectPropertiesOnAttendees() throws Exception {
+		Ical4jUser ical4jUser = getDefaultObmUser();
+		String ics = IOUtils.toString(getStreamICS("4Events.ics"));
+		List<Event> events = ical4jHelper.parseICS(ics, ical4jUser, 1);
+		String organizerEmail = "organizer@test.tlse.lng", userEmail = "user@test.tlse.lng";
+
+		Event event1 = new Event(), event2 = new Event(), event3 = new Event(), event4 = new Event();
+
+		event1.setTitle("Event1");
+		event1.setDuration(3600);
+		event1.setExtId(new EventExtId("1"));
+		event1.setStartDate(DateUtils.date("2013-04-18T11:00:00Z"));
+		event1.setTimezoneName("Etc/GMT");
+		event1.setOwner(organizerEmail);
+		event1.setOwnerEmail(organizerEmail);
+		event1.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.accepted()).asOrganizer().build());
+		event1.addAttendee(UserAttendee.builder().email(userEmail).build());
+
+		event2.setTitle("Event2");
+		event2.setDuration(3600);
+		event2.setExtId(new EventExtId("2"));
+		event2.setStartDate(DateUtils.date("2013-04-18T12:00:00Z"));
+		event2.setTimezoneName("Etc/GMT");
+		event2.setOwner(organizerEmail);
+		event2.setOwnerEmail(organizerEmail);
+		event2.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.accepted()).asOrganizer().build());
+		event2.addAttendee(UserAttendee.builder().email(userEmail).participation(Participation.accepted()).build());
+
+		event3.setTitle("Event3");
+		event3.setDuration(3600);
+		event3.setExtId(new EventExtId("3"));
+		event3.setStartDate(DateUtils.date("2013-04-18T13:00:00Z"));
+		event3.setTimezoneName("Etc/GMT");
+		event3.setOwner(organizerEmail);
+		event3.setOwnerEmail(organizerEmail);
+		event3.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.accepted()).asOrganizer().build());
+		event3.addAttendee(UserAttendee.builder().email(userEmail).build());
+
+		event4.setTitle("Event4");
+		event4.setDuration(3600);
+		event4.setExtId(new EventExtId("4"));
+		event4.setStartDate(DateUtils.date("2013-04-18T14:00:00Z"));
+		event4.setTimezoneName("Etc/GMT");
+		event4.setOwner(userEmail);
+		event4.setOwnerEmail(userEmail);
+		event4.addAttendee(UserAttendee.builder().email(userEmail).participation(Participation.accepted()).asOrganizer().build());
+		event4.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.declined()).build());
+
+		assertThat(events).containsOnly(event1, event2, event3, event4);
 	}
 }
