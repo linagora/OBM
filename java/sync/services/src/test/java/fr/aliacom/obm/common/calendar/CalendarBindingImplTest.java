@@ -176,6 +176,14 @@ public class CalendarBindingImplTest {
 	private EventChangeHandler eventChangeHandler;
 	@Inject
 	private CommitedOperationDao commitedOperationDao;
+	@Inject
+	private CategoryDao categoryDao;
+	@Inject
+	private DomainService domainService;
+	@Inject
+	private ICalendarFactory calendarFactory;
+	@Inject
+	private EventExtId.Factory eventExtIdFactory;
 	
 	private AccessToken token;
 	
@@ -2801,6 +2809,33 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
 		expect(userService.getUserFromAttendee(userAttendee, domainName)).andReturn(obmUser).once();
 		expect(userService.getUserFromAttendee(organizerAttendee, domainName)).andReturn(obmUser).once();
+		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null).times(4);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
+		mocksControl.replay();
+
+		binding.importICalendar(token, calendar, ics, null);
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testImportICSCachesAttendeeLookups() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String domainName = "test.tlse.lng", calendar = "user";
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/4Events.ics"));
+		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
+		Ical4jHelper ical4jHelper = new Ical4jHelper(mocksControl.createMock(DateProvider.class), eventExtIdFactory, attendeeService);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, domainService, userService, calendarDao, categoryDao, commitedOperationDao, helperService, ical4jHelper, calendarFactory, attendeeService);
+		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
+		UserAttendee organizerAttendee = UserAttendee.builder().email("organizer@test.tlse.lng").build();
+
+		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(true).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(obmUser);
+		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
+		expect(userService.getUserFromAttendee(userAttendee, domainName)).andReturn(obmUser);
+		expect(userService.getUserFromAttendee(organizerAttendee, domainName)).andReturn(obmUser);
+		expect(attendeeService.findAttendee(null, "user@test.tlse.lng", true, obmUser.getDomain(), obmUser.getUid())).andReturn(userAttendee).once();
+		expect(attendeeService.findAttendee(null, "organizer@test.tlse.lng", true, obmUser.getDomain(), obmUser.getUid())).andReturn(organizerAttendee).once();
 		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null).times(4);
 		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
 		mocksControl.replay();
