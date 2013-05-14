@@ -653,4 +653,28 @@ org.eclipse.jdt.core.compiler.source=1.6
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<profiles>
+		<profile>
+<!-- Usage
+mvn -P graph graph:reactor
+dot reactor-graph.png.dot -Tpng -oobm.png -Gsplines=ortho -Glandscape=true
+-->
+			<id>graph</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.fusesource.mvnplugins</groupId>
+						<artifactId>maven-graph-plugin</artifactId>
+						<version>1.29</version>
+						<configuration>
+                                                	<hideTransitive>true</hideTransitive>
+                                                	<hideScopes>test</hideScopes>
+                                                	<hideExternal>true</hideExternal>
+                                                	<keepDot>true</keepDot>
+                                        	</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
