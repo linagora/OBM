@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.annotations.database.DatabaseField;
 import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
 
@@ -61,6 +62,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	public static final int DATABASE_TITLE_MAX_LENGTH = 255;
+	public static final String EVENT_TABLE = "Event";
 	
 	private String title;
 	private String description;
@@ -109,6 +111,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		opacity = EventOpacity.OPAQUE;
 	}
 
+	@DatabaseField(table = EVENT_TABLE, column = "event_title")
 	public String getTitle() {
 		return title;
 	}
@@ -231,6 +234,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		this.ownerEmail = ownerEmail;
 	}
 
+	@DatabaseField(table = EVENT_TABLE, column = "event_location")
 	public String getLocation() {
 		return location;
 	}
@@ -240,6 +244,26 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	}
 
 	public EventObmId getObmId() {
+		return uid;
+	}
+
+	public Date getCompletion() {
+		return completion;
+	}
+
+	public void setCompletion(Date completion) {
+		this.completion = completion;
+	}
+
+	public Integer getPercent() {
+		return percent;
+	}
+
+	public void setPercent(Integer percent) {
+		this.percent = percent;
+	}
+
+	public EventObmId getUid() {
 		return uid;
 	}
 
@@ -378,6 +402,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		return copyOfAttendees;
 	}
 
+	@DatabaseField(table = EVENT_TABLE, column = "event_timezone")
 	public String getTimezoneName() {
 		return timezoneName;
 	}
