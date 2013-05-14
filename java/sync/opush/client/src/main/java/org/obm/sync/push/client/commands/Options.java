@@ -53,11 +53,11 @@ public class Options implements IEasCommand<OptionsResponse> {
 	
 	@Override
 	public OptionsResponse run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception {
-		HttpOptions request = new HttpOptions(ai.getUrl() + "?User=" + ai.getLogin()
-				+ "&DeviceId=" + ai.getDevId().getDeviceId() + "&DeviceType=" + ai.getDevType());
-		request.setHeaders(new Header[] { new BasicHeader("User-Agent", ai.getUserAgent()),
+		HttpOptions request = new HttpOptions(opc.buildUrl(ai.getUrl(), ai.getLogin(), ai.getDevId(), ai.getDevType()));
+		request.setHeaders(new Header[] { 
+				new BasicHeader("User-Agent", ai.getUserAgent()),
 				new BasicHeader("Authorization", ai.authValue())
-				});
+			});
 		synchronized (hc) {
 			try {
 				HttpResponse response = hc.execute(request);

@@ -208,10 +208,8 @@ public abstract class OPClient {
 	}
 
 	public byte[] postGetAttachment(String attachmentName) throws Exception {
-		HttpPost request = new HttpPost(ai.getUrl() + "?User=" + ai.getLogin()
-				+ "&DeviceId=" + ai.getDevId() + "&DeviceType="
-				+ ai.getDevType() + "&Cmd=GetAttachment&AttachmentName="
-				+ attachmentName);
+		String url = buildUrl(ai.getUrl(), ai.getLogin(), ai.getDevId(), ai.getDevType(), "GetAttachment", "&AttachmentName=" + attachmentName);
+		HttpPost request = new HttpPost(url);
 		request.setHeaders(new Header[] { new BasicHeader("Authorization", ai.authValue()),
 				new BasicHeader("User-Agent", ai.getUserAgent()),
 				new BasicHeader("Ms-Asprotocolversion", protocolVersion.toString()),
@@ -247,5 +245,20 @@ public abstract class OPClient {
 
 	public void setProtocolVersion(ProtocolVersion protocolVersion) {
 		this.protocolVersion = protocolVersion;
+	}
+
+	public String buildUrl(String url, String login, DeviceId deviceId, String devType, String cmd, String extra) {
+		return buildUrl(url, login, deviceId, devType, cmd) + extra;
+	}
+	
+	public String buildUrl(String url, String login, DeviceId deviceId, String devType, String cmd) {
+		return buildUrl(url, login, deviceId, devType) + "&Cmd=" + cmd;
+	}
+	
+	public String buildUrl(String url, String login, DeviceId deviceId, String devType) {
+		return url 
+				+ "?User=" + login
+				+ "&DeviceId=" + deviceId.getDeviceId()
+				+ "&DeviceType=" + devType;
 	}
 }
