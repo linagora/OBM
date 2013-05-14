@@ -149,7 +149,7 @@ cp -r opush/push/target/opush/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush/
 # spushnik
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/spushnik
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/spushnik
-cp opush/spushnik/target/spushnik.war $RPM_BUILD_ROOT/%{jetty_home}/webapps/
+cp opush/spushnik-webapp/target/spushnik.war $RPM_BUILD_ROOT/%{jetty_home}/webapps/
 
 # obm-locator
 
