@@ -1,0 +1,22 @@
+Message-ID: <0F1E2F68-0DE4-4E96-8B95-31488164613E@domain>
+To: "=?utf-8?B?SmVhbiBKYXVyZXM=?=" <test@domain>
+Subject: =?utf-8?B?UmUgOiBtYWlsIGRlIHRlc3Q=?=
+Importance: Normal
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+        boundary="----=_Part_2_1320656625672"
+
+------=_Part_2_1320656625672
+Content-Type: text/plain;
+        charset= utf-8
+Content-Disposition: inline
+
+bodydata
+------=_Part_2_1320656625672
+Content-Type: text/html;
+        charset= utf-8
+Content-Disposition: inline
+
+<b>bodydata</b>
+------=_Part_2_1320656625672--
+

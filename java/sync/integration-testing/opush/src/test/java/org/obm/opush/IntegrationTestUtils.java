@@ -37,11 +37,14 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
+import javax.mail.Session;
 
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.IContentsExporter;
@@ -76,6 +79,8 @@ import org.obm.sync.push.client.XMLOPClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.ByteStreams;
+import com.icegreen.greenmail.user.GreenMailUser;
 
 public class IntegrationTestUtils {
 
@@ -178,12 +183,31 @@ public class IntegrationTestUtils {
 		return buildCollectionPath(opushUser, "email", "INBOX");
 	}
 	
+	public static String buildEmailSentCollectionPath(OpushUser opushUser) {
+		return buildCollectionPath(opushUser, "email", "Sent");
+	}
+	
 	public static String buildEmailTrashCollectionPath(OpushUser opushUser) {
 		return buildCollectionPath(opushUser, "email", "Trash");
 	}
 	
 	private static String buildCollectionPath(OpushUser opushUser, String dataType, String relativePath) {
 		return "obm:\\\\" + opushUser.user.getLoginAtDomain() + "\\" + dataType + "\\" + relativePath;
+	}
+
+	public static void appendToINBOX(GreenMailUser greenMailUser, String emailPath) throws Exception {
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props, null);
+		javax.mail.internet.MimeMessage mimeMessage = new javax.mail.internet.MimeMessage(session, streamEmail(emailPath));
+		greenMailUser.deliver(mimeMessage);
+	}
+
+	public static byte[] loadEmail(String emailPath) throws IOException {
+		return ByteStreams.toByteArray(streamEmail(emailPath));
+	}
+
+	public static InputStream streamEmail(String emailPath) {
+		return ClassLoader.getSystemResourceAsStream(emailPath);
 	}
 
 	public static void expectFetchFlags(LinagoraMailboxService mailboxService, UserDataRequest udr, String collectionName, long uid, FlagsList value) {

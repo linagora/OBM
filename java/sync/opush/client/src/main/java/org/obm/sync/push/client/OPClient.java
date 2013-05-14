@@ -49,6 +49,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.protocol.PingProtocol;
@@ -79,6 +80,7 @@ import org.obm.sync.push.client.commands.PingCommand;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.SimpleSyncCommand;
+import org.obm.sync.push.client.commands.SmartReply;
 import org.obm.sync.push.client.commands.Sync;
 import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.obm.sync.push.client.commands.SyncWithDataCommand;
@@ -111,6 +113,10 @@ public abstract class OPClient {
 
 	public OptionsResponse options() throws Exception {
 		return run(new Options());
+	}
+
+	public Boolean emailReply(byte[] emailData, int collectionId, ServerId serverId) throws Exception {
+		return run(new SmartReply(emailData, collectionId, serverId));
 	}
 
 	public FolderSyncResponse folderSync(SyncKey key) throws Exception {
