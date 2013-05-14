@@ -170,9 +170,24 @@ def launch_packager(packager):
         logging.info("\tBUILD START: %s" % packager.package.name)
         packager.build()
         logging.info("\tBUILD COMPLETE: %s" % packager.package.name)
+
+        logging.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        logging.debug("Displaying log file for %s " % packager.package.name)
+        try:
+            logging.debug(open(packager.logfile).read())
+        except:
+            logging.exception("Error while displaying the log file")
+        logging.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         return True
     except (Exception, SystemExit, KeyboardInterrupt) as ex:
         logging.exception("\tBUILD ERROR: %s" % packager.package.name)
+        logging.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        logging.error("Displaying log file for %s " % packager.package.name)
+        try:
+            logging.error(open(packager.logfile).read())
+        except:
+            logging.exception("Error while displaying the log file")
+        logging.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         return False
 
 def exit_failure(pool):
