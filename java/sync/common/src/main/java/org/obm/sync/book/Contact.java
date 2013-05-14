@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.annotations.database.DatabaseField;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.utils.DisplayNameUtils;
@@ -45,6 +46,8 @@ import org.obm.sync.utils.DisplayNameUtils;
 import com.google.common.base.Objects;
 
 public class Contact implements Serializable {
+
+	public static final String CONTACT_TABLE = "Contact";
 
 	private Integer uid;
 
@@ -93,6 +96,7 @@ public class Contact implements Serializable {
 		collected = false;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_commonname")
 	public String getCommonname() {
 		return commonname;
 	}
@@ -101,6 +105,7 @@ public class Contact implements Serializable {
 		this.commonname = commonname;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_firstname")
 	public String getFirstname() {
 		return firstname;
 	}
@@ -109,6 +114,7 @@ public class Contact implements Serializable {
 		this.firstname = firstname;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_lastname")
 	public String getLastname() {
 		return lastname;
 	}
@@ -125,6 +131,7 @@ public class Contact implements Serializable {
 		this.uid = uid;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_title")
 	public String getTitle() {
 		return title;
 	}
@@ -133,6 +140,7 @@ public class Contact implements Serializable {
 		this.title = title;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_service")
 	public String getService() {
 		return service;
 	}
@@ -141,6 +149,7 @@ public class Contact implements Serializable {
 		this.service = service;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_aka")
 	public String getAka() {
 		return aka;
 	}
@@ -157,6 +166,7 @@ public class Contact implements Serializable {
 		this.comment = comment;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_company")
 	public String getCompany() {
 		return company;
 	}
@@ -236,6 +246,7 @@ public class Contact implements Serializable {
 		this.birthdayId = birthdayId;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_middlename")
 	public String getMiddlename() {
 		return middlename;
 	}
@@ -244,6 +255,7 @@ public class Contact implements Serializable {
 		this.middlename = middlename;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_suffix")
 	public String getSuffix() {
 		return suffix;
 	}
@@ -268,6 +280,7 @@ public class Contact implements Serializable {
 		this.anniversaryId = anniversaryId;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_assistant")
 	public String getAssistant() {
 		return assistant;
 	}
@@ -276,6 +289,7 @@ public class Contact implements Serializable {
 		this.assistant = assistant;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_manager")
 	public String getManager() {
 		return manager;
 	}
@@ -284,6 +298,7 @@ public class Contact implements Serializable {
 		this.manager = manager;
 	}
 
+	@DatabaseField(table = CONTACT_TABLE, column = "contact_spouse")
 	public String getSpouse() {
 		return spouse;
 	}
