@@ -55,7 +55,6 @@ import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
 
 
@@ -175,14 +174,6 @@ public class WBXMLOPClient extends OPClient {
 			request.releaseConnection();
 		}
 		return xml;
-	}
-
-	@VisibleForTesting
-	static String buildUrl(String url, String login, DeviceId deviceId, String devType, String cmd) {
-		return url + "?User=" + login
-				+ "&DeviceId=" + deviceId.getDeviceId()
-				+ "&DeviceType=" + devType
-				+ "&Cmd=" + cmd;
 	}
 
 	private byte[] getResponse(HttpResponse response) throws IOException {
