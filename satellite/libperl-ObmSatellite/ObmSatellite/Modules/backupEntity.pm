@@ -1246,12 +1246,19 @@ sub _backupCurrentMailbox {
 
     my $currentMailboxDir = $entity->getMailboxRestorePath();
     my $backupCurrentMailboxDir = $entity->getTmpBackupCurrentMailboxPath();
+
     $self->_log("Backing up $currentMailboxDir to $backupCurrentMailboxDir", 2);
+    if ($self->_mkdir($backupCurrentMailboxDir)) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Can\'t create \''.$backupCurrentMailboxDir.'\'' ]
+        });
+    }
+
     my $moveSuccessful;
     # OBMFULL-4521 : We cannot use the Perl move function here
     # because move from Perl 5.8.8 does not work well when moving directory
     # between different partitions or devices.
-    my $cmd = 'mv "'.$currentMailboxDir.'" "'.$backupCurrentMailboxDir.'"';
+    my $cmd = 'cp -rp "'.$currentMailboxDir.'" "'.$backupCurrentMailboxDir.'"';
     if (-e $currentMailboxDir) {
         $self->_log( 'Executing '.$cmd, 4 );
         $moveSuccessful = system($cmd);
