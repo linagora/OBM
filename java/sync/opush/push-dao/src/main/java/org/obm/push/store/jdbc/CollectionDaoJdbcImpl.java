@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.ChangedCollections;
@@ -55,6 +56,7 @@ import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.calendar.EventType;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -131,10 +133,12 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=? AND collection_id=?");
 			ps.setInt(1, devDbId);
 			ps.setInt(2, collectionId);
+			Stopwatch stopwatch = new Stopwatch().start();
 			ps.executeUpdate();
 
 			logger.warn("mappings & states cleared for sync of collection {} of device {}",
 					collectionId, device.getDevId());
+			logger.warn("Deletion time: {} ms", stopwatch.elapsed(TimeUnit.MILLISECONDS));
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
