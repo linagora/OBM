@@ -36,6 +36,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
@@ -49,6 +50,7 @@ import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
@@ -229,6 +231,22 @@ public class DOMUtilsTest {
 		assertThat(attributes).hasSize(2);
 		assertThat(Arrays.asList(attributes[0])).containsExactly("a1", "b1", ""); // Empty attribute
 		assertThat(Arrays.asList(attributes[1])).containsExactly("a2", "b2", ""); // Missing attribute
+	}
+	
+	@Test
+	public void testParsedHtmlWithInlineNamespaceCanBeSerialized() throws Exception {
+		String html = "<root><style>w\\:* {behavior:url(#default#VML);}</style><el w:st=\"on\">data</el></root>";
+		Document htmlDoc = DOMUtils.parseHtmlAsDocument(new InputSource(new StringReader(html)));
+		
+		assertThat(DOMUtils.serializeHtmlDocument(htmlDoc)).isEqualTo(
+			"<HTML><HEAD xmlns=\"http://www.w3.org/1999/xhtml\"/>\n" +
+				"<BODY>\n" +
+					"<ROOT>\n" +
+						"<STYLE>w\\:* {behavior:url(#default#VML);}</STYLE>\n" +
+						"<EL w:st=\"on\">data</EL>\n" +
+					"</ROOT>\n" +
+				"</BODY>\n" +
+			"</HTML>\n");
 	}
 }
 

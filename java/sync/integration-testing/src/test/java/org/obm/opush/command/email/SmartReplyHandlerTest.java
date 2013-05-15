@@ -53,8 +53,6 @@ import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.bean.ServerId;
-import org.obm.push.mail.MailBackend;
-import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -77,9 +75,7 @@ public class SmartReplyHandlerTest {
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-	@Inject MailBackend mailBackend;
 	@Inject GreenMail greenMail;
-	@Inject SyncDecoder decoder;
 
 	private OpushUser user;
 	private GreenMailUser greenMailUser;
@@ -148,6 +144,20 @@ public class SmartReplyHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		boolean success = opClient().emailReply(loadEmail("eml/textHtml.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+	}	
+	
+	@Test
+	public void testOBMFULL4924() throws Exception {
+		appendToINBOX(greenMailUser, "eml/OBMFULL-4924-inboxEmail.eml");
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailReply(loadEmail("eml/OBMFULL-4924-replyingEmail.eml"), inboxCollectionId, serverId);
 		mocksControl.verify();
 		
 		assertThat(success).isTrue();

@@ -58,6 +58,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.html.dom.HTMLDocumentImpl;
+import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.cyberneko.html.parsers.DOMParser;
 import org.obm.push.utils.xml.XmlCharacterFilter;
@@ -79,6 +80,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 
+
 public final class DOMUtils {
 
 	private static final Logger logger = LoggerFactory
@@ -89,7 +91,8 @@ public final class DOMUtils {
 	private static ThreadLocal<DocumentBuilder> builder = new ThreadLocal<DocumentBuilder>();
 
 	static {
-		fac = TransformerFactory.newInstance();
+		Class<TransformerFactoryImpl> factoryClass = TransformerFactoryImpl.class;
+		fac = TransformerFactory.newInstance(factoryClass.getName(), factoryClass.getClassLoader());
 		dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setValidating(false);
