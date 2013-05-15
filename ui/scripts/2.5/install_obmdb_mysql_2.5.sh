@@ -66,4 +66,7 @@ echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_opt
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
   < "updates/update-2.5.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
 
+mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+  < "updates/update-2.5.1~alpha1.mysql.sql" >> /tmp/data_insert.log 2>&1
+
 echo "DONE."
