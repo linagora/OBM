@@ -352,11 +352,8 @@ public class ReplyEmailTest {
 	
 	private String buildReplyEmailWithEndLineCharacter(String endCharacter) {
 		StringBuilder str = new StringBuilder();
-		str.append("<HTML>").append(endCharacter);
-		str.append("<HEAD>").append(endCharacter);
-		str.append("<META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">").append(endCharacter);
-		str.append("</HEAD>").append(endCharacter);
-		str.append("<BODY xmlns=\"http://www.w3.org/1999/xhtml\">Test<BR>").append(endCharacter);
+		str.append("<HTML><HEAD xmlns=\"http://www.w3.org/1999/xhtml\"/>").append(endCharacter);
+		str.append("<BODY>Test<BR>").append(endCharacter);
 		str.append("<BR>Envoy&eacute; depuis mon HTC<BR>").append(endCharacter);
 		str.append("<BR>").append(endCharacter);
 		str.append("<DIV id=\"htc_header\" style=\"\">----- Reply message -----<BR>De : \"Jean Jaures\" &lt;jaures@obm.matthieu.lng&gt;<BR>Pour&nbsp;: \"L&eacute;on Blum\" &lt;blum@obm.matthieu.lng&gt;<BR>Objet : mail de test<BR>Date : lun., nov. 7, 2011 09:32<BR>").append(endCharacter);

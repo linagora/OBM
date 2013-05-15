@@ -61,7 +61,7 @@ public class GreenMailEmailConfiguration implements EmailConfiguration {
 
 	@Override
 	public int getMessageMaxSize() {
-		return 1024;
+		return 102400;
 	}
 
 	@Override

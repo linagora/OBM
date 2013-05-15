@@ -1,0 +1,107 @@
+From matthieu@obm.matthieu.lng Fri Oct  1 10:50:40 2010
+Return-Path: <from@linagora.com>
+Received: from alderaan.linagora.com (alderaan.mailinterco.tech.par.lng
+ [10.92.65.101]) by mail (Cyrus v2.2.13-Debian-2.2.13-19+squeeze3) with
+ LMTPA; Mon, 13 May 2013 18:14:21 +0200
+X-Sieve: CMU Sieve 2.2
+Received: from debian.local
+ (nap13-9-78-223-143-27.fbx.proxad.net [78.223.143.27]) (using TLSv1 with
+ cipher DHE-RSA-AES256-SHA (256/256 bits)) (No client certificate requested)
+ by alderaan.linagora.com (Postfix) with ESMTPSA id 19BE0429ED9 for
+ <to@linagora.com>; Mon, 13 May 2013 18:14:22 +0200 (CEST)
+Message-ID: <5191115D.3030209@linagora.com>
+Date: Mon, 13 May 2013 18:14:21 +0200
+From: From <from@linagora.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:17.0)
+ Gecko/20130328 Thunderbird/17.0.5
+MIME-Version: 1.0
+To: To <to@linagora.com>
+Subject: Fwd: buggy email
+X-Forwarded-Message-Id:
+ <17BA31EDBD79B44BBD1F484FD6B34FE513A7C2D1@ando.cirra.net>
+Content-Type: multipart/alternative; boundary="------------030108070605060800080101"
+
+
+--------------030108070605060800080101
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
+
+text
+-------------------------------
+
+
+
+-------- Message original --------
+text
+
+
+--------------030108070605060800080101
+Content-Type: multipart/related; boundary="------------040603050003020100020005"
+
+
+--------------040603050003020100020005
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  </head>
+  <body bgcolor="#FFFFFF" text="#000000">
+    text
+      <meta http-equiv="Content-Type" content="text/html;
+        charset=ISO-8859-1">
+      <meta name="Generator" content="Microsoft Word 11 (filtered
+        medium)">
+      <!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]--><o:smarttagtype
+        namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+        name="PersonName">
+        <!--[if !mso]>
+<style>
+st1\:*{behavior:url(#default#ieooui) }
+</style>
+<![endif]-->
+        <style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+span.style521
+	{font-family:Arial;
+	color:#505457;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style><st1:personname
+                  productid="tutu" w:st="on">tata</st1:personname>
+      </o:smarttagtype><br>
+    </div>
+    <br>
+  </body>
+</html>
+
+--------------030108070605060800080101--
