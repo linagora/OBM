@@ -53,6 +53,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import javax.naming.NoPermissionException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -875,38 +877,49 @@ public class ContactDao {
 		return c;
 	}
 
-	public boolean hasRightsOnAddressBook(AccessToken token, int addressBookId) {
-		String q = "SELECT owner = ? or ur.entityright_write = 1 or gr.entityright_write = 1 or pr.entityright_write = 1 " +
-				"FROM AddressBook " +
-				"INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id = id " +
-				"LEFT JOIN EntityRight ur ON ur.entityright_entity_id = addressbookentity_entity_id AND ur.entityright_consumer_id = (SELECT userentity_entity_id FROM UserEntity WHERE userentity_user_id = ?) " +
-				"LEFT JOIN EntityRight gr ON gr.entityright_entity_id = addressbookentity_entity_id AND gr.entityright_consumer_id IN (" + MY_GROUPS_QUERY + ") " +
-				"LEFT JOIN EntityRight pr ON pr.entityright_entity_id = addressbookentity_entity_id AND pr.entityright_consumer_id IS NULL " +
-				"WHERE id = ?";
+	public boolean hasRightsOn(AccessToken token, int contactUid) {
+		
+		String q = "select contact_usercreate=? or a.owner=? "
+			+ "or urights.entityright_write=1 or grights.entityright_write=1 or prights.entityright_write=1 "
+			+ "FROM Contact "
+			+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
+			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
+			+ "LEFT JOIN EntityRight urights ON "
+			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
+			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
+			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
+			+ "AND grights.entityright_consumer_id IN ("
+			+ MY_GROUPS_QUERY
+			+ ") "
+			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
+			+ "WHERE contact_id=?";
+
+		boolean ret = false;
 
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
+			int idx = 1;
 
-			ps.setInt(1, token.getObmId());
-			ps.setInt(2, token.getObmId());
-			ps.setInt(3, token.getObmId());
-			ps.setInt(4, addressBookId);
+			ps.setInt(idx++, token.getObmId());
+			ps.setInt(idx++, token.getObmId());
+			ps.setInt(idx++, token.getObmId());
+			ps.setInt(idx++, token.getObmId());
+			ps.setInt(idx++, contactUid);
 
 			rs = ps.executeQuery();
-
-			return rs.next() && rs.getBoolean(1);
+			if (rs.next()) {
+				ret = rs.getBoolean(1);
+			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-
-		return false;
+		return ret;
 	}
 
 	/**
@@ -1137,7 +1150,7 @@ public class ContactDao {
 		}
 	}
 
-	public Contact removeContact(AccessToken at, Contact c) throws ServerFault, SQLException {
+	private Contact removeContact(AccessToken at, Contact c) throws ServerFault, SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
@@ -1162,6 +1175,14 @@ public class ContactDao {
 		} catch (Exception e) {
 			throw new ServerFault("Indexing server is unavailable", e);
 		}
+	}
+
+	public Contact removeContact(AccessToken at, int contactId) throws ServerFault, SQLException, ContactNotFoundException, NoPermissionException {
+		Contact c = findContact(at, contactId);
+		if (!hasRightsOn(at, contactId)) {
+			throw new NoPermissionException("Contact " + contactId + " removal not permitted for " + at.getUserEmail());
+		}
+		return removeContact(at, c);
 	}
 
 	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
