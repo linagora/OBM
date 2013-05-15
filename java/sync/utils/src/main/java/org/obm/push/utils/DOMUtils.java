@@ -365,15 +365,33 @@ public final class DOMUtils {
 		serialize(doc, out, pretty, XMLVersion.XML_10);
 	}
 	
+
+	public static void serialize(Element element, OutputStream out, boolean pretty)
+			throws TransformerException {
+		serialize(element, out, pretty, XMLVersion.XML_10);
+	}
+	
 	public static void serialize(Document doc, OutputStream out, XMLVersion xmlVersion)
 			throws TransformerException {
 		serialize(doc, out, false, xmlVersion);
+	}
+	
+	public static void serialize(Element element, OutputStream out, XMLVersion xmlVersion)
+			throws TransformerException {
+		serialize(element, out, false, xmlVersion);
 	}
 	
 	public static String serialize(Document doc)
 			throws TransformerException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		serialize(doc, byteArrayOutputStream, false);
+		return new String(byteArrayOutputStream.toByteArray());
+	}
+	
+	public static String prettySerialize(Element element)
+			throws TransformerException {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		serialize(element, byteArrayOutputStream, true);
 		return new String(byteArrayOutputStream.toByteArray());
 	}
 	
@@ -384,7 +402,11 @@ public final class DOMUtils {
 		return new String(byteArrayOutputStream.toByteArray());
 	}
 	
-	public static void serialize(Document doc, OutputStream out, boolean pretty, XMLVersion xmlVersion) 
+	public static void serialize(Document doc, OutputStream out, boolean pretty, XMLVersion xmlVersion) throws TransformerException {
+		serialize(doc.getDocumentElement(), out, pretty, xmlVersion);
+	}
+	
+	public static void serialize(Element element, OutputStream out, boolean pretty, XMLVersion xmlVersion) 
 			throws TransformerException {
 		Transformer tf = fac.newTransformer();
 		if (pretty) {
@@ -393,7 +415,7 @@ public final class DOMUtils {
 			tf.setOutputProperty(OutputKeys.INDENT, "no");
 		}
 		tf.setOutputProperty(OutputKeys.VERSION, xmlVersion.version());
-		Source input = new DOMSource(doc.getDocumentElement());
+		Source input = new DOMSource(element);
 		Result output = new StreamResult(out);
 		tf.transform(input, output);
 	}
