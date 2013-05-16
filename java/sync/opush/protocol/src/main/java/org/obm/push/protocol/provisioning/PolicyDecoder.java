@@ -42,11 +42,6 @@ public class PolicyDecoder {
 	public final static BigDecimal EVERY_PROTOCOL_VERSION_ACCEPTED = new BigDecimal(0.0);
 	
 	public static Policy decode(Element data) {
-		Element wap = DOMUtils.getUniqueElement(data, "wap-provisioningdoc");
-		if (wap != null) {
-			return new MSWAPProvisioningXML();
-		}
-		
 		Element allowStorageCard = DOMUtils.getUniqueElement(data, "AllowStorageCard");
 		if (allowStorageCard != null) {
 			return new MSEASProvisioingWBXML(CURRENT_AS_RELEASE);

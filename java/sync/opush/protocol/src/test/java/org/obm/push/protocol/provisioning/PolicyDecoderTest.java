@@ -44,16 +44,6 @@ import org.w3c.dom.Element;
 public class PolicyDecoderTest {
 	
 	@Test
-	public void testDecodeMSWAP() {
-		Document doc = DOMUtils.createDoc(null, "decode");
-		Element root = doc.getDocumentElement();
-		DOMUtils.createElement(root, "wap-provisioningdoc");
-		
-		Policy msWAP = PolicyDecoder.decode(root);
-		assertThat(msWAP).isInstanceOf(MSWAPProvisioningXML.class);
-	}
-	
-	@Test
 	public void testDecodeMSEASZeroVersion() {
 		Document doc = DOMUtils.createDoc(null, "decode");
 		Element root = doc.getDocumentElement();

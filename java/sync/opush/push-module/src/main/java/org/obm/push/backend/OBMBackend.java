@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +50,6 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
 import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
-import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
@@ -146,11 +144,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(UserDataRequest udr) {
-		if (udr.getDevice().getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
-			return new MSWAPProvisioningXML();
-		} else {
-			return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
-		}
+		return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
 	}
 
 	@Override

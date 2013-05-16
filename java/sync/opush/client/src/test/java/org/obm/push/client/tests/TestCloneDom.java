@@ -36,13 +36,13 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 
-import org.junit.Ignore;
+import org.junit.Test;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-@Ignore
 public class TestCloneDom extends AbstractPushTest {
 
+	@Test
 	public void testCloneDom() throws Exception {
 		InputStream in = loadDataFile("FullSyncCalAdd.xml");
 		Document doc = DOMUtils.parse(in);
