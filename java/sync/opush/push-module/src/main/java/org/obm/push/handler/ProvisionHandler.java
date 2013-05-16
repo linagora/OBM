@@ -51,7 +51,6 @@ import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.ProvisionResponse.Builder;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
-import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -60,8 +59,6 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
-
-import java.math.BigDecimal;
 
 @Singleton
 public class ProvisionHandler extends WbxmlRequestHandler {
@@ -130,15 +127,10 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		return provisionResponseBuilder.build();
 	}
 
-
 	private Policy getDevicePolicy(UserDataRequest udr) {
-		if (udr.getDevice().getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
-			return new MSWAPProvisioningXML();
-		} else {
-			return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
-		}
+		return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
 	}
-	
+
 	private boolean isInitialProvisionRequest(Long policyKey) {
 		return policyKey == null || policyKey == INITIAL_POLICYKEY;
 	}

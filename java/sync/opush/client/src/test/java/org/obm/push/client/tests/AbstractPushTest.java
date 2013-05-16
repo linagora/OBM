@@ -32,103 +32,22 @@
 package org.obm.push.client.tests;
 
 import java.io.InputStream;
-import java.util.Properties;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXMLTools;
-import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.WBXMLOPClient;
-import org.obm.sync.push.client.beans.ProtocolVersion;
-import org.w3c.dom.Document;
 
-@Ignore("It's necessary to do again all tests")
-public class AbstractPushTest {
+public abstract class AbstractPushTest {
 
-	protected OPClient opc;
 	protected WBXMLTools wbxmlTools;
 
-	protected AbstractPushTest() {
-	}
-
-	// "POST /Microsoft-Server-ActiveSync?User=thomas@zz.com&DeviceId=Appl87837L1XY7H&DeviceType=iPhone&Cmd=Sync HTTP/1.1"
-
-	private String p(Properties p, String k) {
-		return p.getProperty(k);
-	}
-
 	@Before
-	protected void setUp() throws Exception {
-
-		InputStream in = loadDataFile("test.properties.sample");
-		Properties p = new Properties();
-		p.load(in);
-		in.close();
-
-		String login = p(p, "login");
-		String password = p(p, "password");
-		String devId = p(p, "devId");
-		String devType = p(p, "devType");
-		String userAgent = p(p, "userAgent");
-
+	public void setUp() {
 		wbxmlTools = new WBXMLTools();
-		opc = new WBXMLOPClient(login, password, new DeviceId(devId), devType, userAgent, "localhost", 9142, "/ActiveSyncServlet/", wbxmlTools);
-	}
-
-	@After
-	protected void tearDown() {
-		opc = null;
 	}
 
 	protected InputStream loadDataFile(String name) {
 		return AbstractPushTest.class.getClassLoader().getResourceAsStream(
 				"data/" + name);
-	}
-
-	public void optionsQuery() throws Exception {
-		opc.options();
-	}
-
-	public Document postXml(String namespace, Document doc, String cmd,
-			String policyKey, String pv, boolean multipart) throws Exception {
-		if ("2.5".equals(pv)) {
-			opc.setProtocolVersion(ProtocolVersion.V25);
-		} else if ("12.0".equals(pv)) {
-			opc.setProtocolVersion(ProtocolVersion.V120);
-		} else {
-			opc.setProtocolVersion(ProtocolVersion.V121);
-		}
-		return opc.postXml(namespace, doc, cmd, policyKey, multipart);
-	}
-
-	public Document postXml(String namespace, Document doc, String cmd)
-			throws Exception {
-		opc.setProtocolVersion(ProtocolVersion.V121);
-		return opc.postXml(namespace, doc, cmd, null, false);
-	}
-
-	public Document postMultipartXml(String namespace, Document doc, String cmd)
-			throws Exception {
-		opc.setProtocolVersion(ProtocolVersion.V121);
-		return opc.postXml(namespace, doc, cmd, null, true);
-	}
-
-	public Document postXml25(String namespace, Document doc, String cmd)
-			throws Exception {
-		opc.setProtocolVersion(ProtocolVersion.V25);
-		return opc.postXml(namespace, doc, cmd, null, false);
-	}
-
-	public Document postXml120(String namespace, Document doc, String cmd)
-			throws Exception {
-		opc.setProtocolVersion(ProtocolVersion.V120);
-		return opc.postXml(namespace, doc, cmd, null, false);
-	}
-
-	public byte[] postGetAttachment(String attachmentName) throws Exception {
-		return opc.postGetAttachment(attachmentName);
 	}
 
 }
