@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import com.google.common.base.Objects;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -50,7 +47,7 @@ import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.ProvisionResponse.Builder;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
+import org.obm.push.protocol.provisioning.MSEASProvisioningWBXML;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
@@ -59,6 +56,10 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
+
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ProvisionHandler extends WbxmlRequestHandler {
@@ -128,7 +129,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	}
 
 	private Policy getDevicePolicy(UserDataRequest udr) {
-		return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
+		return new MSEASProvisioningWBXML(udr.getDevice().getProtocolVersion());
 	}
 
 	private boolean isInitialProvisionRequest(Long policyKey) {
