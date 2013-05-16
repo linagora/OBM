@@ -1629,4 +1629,39 @@ public class EventTest {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		assertThat(publicEvent.findOwner()).isNull();
 	}
+
+	@Test
+	public void testFindAttendeeFromEmail() {
+		String email = "user@obm.com";
+		Event event = createNonRecurrentEventWithMostFields();
+		Attendee organizer = UserAttendee.builder().email(email).asOrganizer().build();
+
+		event.addAttendee(organizer);
+		event.addAttendee(UserAttendee.builder().email("user2@obm.com").build());
+
+		assertThat(event.findAttendeeFromEmail(email)).isEqualTo(organizer);
+	}
+
+	@Test
+	public void testFindAttendeeFromEmailWithNullEmail() {
+		Event event = createNonRecurrentEventWithMostFields();
+
+		event.addAttendee(UserAttendee.builder().email("user@obm.com").asOrganizer().build());
+		event.addAttendee(UserAttendee.builder().email("user2@obm.com").build());
+
+		assertThat(event.findAttendeeFromEmail(null)).isNull();
+	}
+
+	@Test
+	public void testFindAttendeeFromEmailWhenFirstAttendeeHasNoEmail() {
+		String email = "user@obm.com";
+		Event event = createNonRecurrentEventWithMostFields();
+		UserAttendee organizer = UserAttendee.builder().email(email).asOrganizer().build();
+
+		event.addAttendee(ContactAttendee.builder().build());
+		event.addAttendee(organizer);
+		event.addAttendee(UserAttendee.builder().email("user2@obm.com").build());
+
+		assertThat(event.findAttendeeFromEmail(email)).isEqualTo(organizer);
+	}
 }
