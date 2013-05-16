@@ -49,7 +49,7 @@ import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
-import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
+import org.obm.push.protocol.provisioning.MSEASProvisioningWBXML;
 import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
@@ -144,7 +144,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(UserDataRequest udr) {
-		return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
+		return new MSEASProvisioningWBXML(udr.getDevice().getProtocolVersion());
 	}
 
 	@Override

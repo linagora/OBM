@@ -42,11 +42,11 @@ import com.google.common.annotations.VisibleForTesting;
  * Policy type for protocol 12.x (windows mobile 6, iPhone, etc)
  */
 
-public class MSEASProvisioingWBXML extends Policy {
+public class MSEASProvisioningWBXML extends Policy {
 
 	private BigDecimal protocolVersion;
 
-	public MSEASProvisioingWBXML(BigDecimal bigDecimal) {
+	public MSEASProvisioningWBXML(BigDecimal bigDecimal) {
 		this.protocolVersion = bigDecimal;
 	}
 

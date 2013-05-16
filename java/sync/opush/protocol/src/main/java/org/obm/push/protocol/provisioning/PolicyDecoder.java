@@ -44,8 +44,8 @@ public class PolicyDecoder {
 	public static Policy decode(Element data) {
 		Element allowStorageCard = DOMUtils.getUniqueElement(data, "AllowStorageCard");
 		if (allowStorageCard != null) {
-			return new MSEASProvisioingWBXML(CURRENT_AS_RELEASE);
+			return new MSEASProvisioningWBXML(CURRENT_AS_RELEASE);
 		}
-		return new MSEASProvisioingWBXML(EVERY_PROTOCOL_VERSION_ACCEPTED);
+		return new MSEASProvisioningWBXML(EVERY_PROTOCOL_VERSION_ACCEPTED);
 	}
 }

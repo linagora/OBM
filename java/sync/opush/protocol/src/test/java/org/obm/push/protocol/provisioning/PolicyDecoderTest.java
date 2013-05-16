@@ -48,7 +48,7 @@ public class PolicyDecoderTest {
 		Document doc = DOMUtils.createDoc(null, "decode");
 		Element root = doc.getDocumentElement();
 		
-		MSEASProvisioingWBXML msEAS = (MSEASProvisioingWBXML) PolicyDecoder.decode(root);
+		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
 		assertThat(msEAS.getProtocolVersion()).isEqualTo(new BigDecimal(0.0));
 	}
 	
@@ -58,7 +58,7 @@ public class PolicyDecoderTest {
 		Element root = doc.getDocumentElement();
 		DOMUtils.createElement(root, "AllowStorageCard");
 		
-		MSEASProvisioingWBXML msEAS = (MSEASProvisioingWBXML) PolicyDecoder.decode(root);
+		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
 		assertThat(msEAS.getProtocolVersion()).isEqualTo(new BigDecimal(12.1));
  	}
 }
