@@ -43,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 
 @RunWith(SlowFilterRunner.class)
@@ -59,7 +60,7 @@ public class OPClientTest {
 		String devType = "devType";
 		String userAgent = "userAgent";
 		String url = "url";
-		opClient = new OPClient(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, url) {
+		opClient = new OPClient(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, url, ProtocolVersion.V121) {
 			
 			@Override
 			public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart) throws TransformerException,

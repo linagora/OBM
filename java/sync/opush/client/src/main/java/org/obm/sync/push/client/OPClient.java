@@ -100,9 +100,9 @@ public abstract class OPClient {
 			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
 	protected OPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
-			DeviceId devId, String devType, String userAgent, String url) {
+			DeviceId devId, String devType, String userAgent, String url, ProtocolVersion protocolVersion) {
 
-		setProtocolVersion(ProtocolVersion.V121);
+		setProtocolVersion(protocolVersion);
 		this.ai = new AccountInfos(loginAtDomain, password, devId, devType, url, userAgent);
 		this.hc = httpClientBuilder.build();
 	}

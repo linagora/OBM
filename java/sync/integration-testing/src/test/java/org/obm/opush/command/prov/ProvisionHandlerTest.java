@@ -38,6 +38,7 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.expectUserLoginFromOpush;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -70,6 +71,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProvisionResponse;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -121,7 +123,115 @@ public class ProvisionHandlerTest {
 
 		assertOnProvisionResponseSendPolicy(nextPolicyKeyGenerated, provisionResponse);
 	}
+
+	@Test
+	public void testCheckDefault12Dot1Policy() throws Exception {
+		long nextPolicyKeyGenerated = 115l;
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121);
+		ProvisionResponse provisionResponse = opClient.provisionStepOne();
+
+		assertThat(provisionResponse.policyData()).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+						"<Data>\n" +
+						"<EASProvisionDoc>\n" +
+						"<DevicePasswordEnabled>0</DevicePasswordEnabled>\n" +
+						"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>\n" +
+						"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>\n" +
+						"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>\n" +
+						"<AttachmentsEnabled>1</AttachmentsEnabled>\n" +
+						"<MinDevicePasswordLength>4</MinDevicePasswordLength>\n" +
+						"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>\n" +
+						"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>\n" +
+						"<MaxAttachmentSize/>\n" +
+						"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>\n" +
+						"<DevicePasswordExpiration/>\n" +
+						"<DevicePasswordHistory>0</DevicePasswordHistory>\n" +
+						"<AllowStorageCard>1</AllowStorageCard>\n" +
+						"<AllowCamera>1</AllowCamera>\n" +
+						"<RequireDeviceEncryption>0</RequireDeviceEncryption>\n" +
+						"<AllowUnsignedApplications>1</AllowUnsignedApplications>\n" +
+						"<AllowUnsignedInstallationPackages>1</AllowUnsignedInstallationPackages>\n" +
+						"<MinDevicePasswordComplexCharacters>3</MinDevicePasswordComplexCharacters>\n" +
+						"<AllowWiFi>1</AllowWiFi>\n" +
+						"<AllowTextMessaging>1</AllowTextMessaging>\n" +
+						"<AllowPOPIMAPEmail>1</AllowPOPIMAPEmail>\n" +
+						"<AllowBluetooth>2</AllowBluetooth>\n" +
+						"<AllowIrDA>1</AllowIrDA>\n" +
+						"<RequireManualSyncWhenRoaming>0</RequireManualSyncWhenRoaming>\n" +
+						"<AllowDesktopSync>1</AllowDesktopSync>\n" +
+						"<MaxCalendarAgeFilter>0</MaxCalendarAgeFilter>\n" +
+						"<AllowHTMLEmail>1</AllowHTMLEmail>\n" +
+						"<MaxEmailAgeFilter>0</MaxEmailAgeFilter>\n" +
+						"<MaxEmailBodyTruncationSize>-1</MaxEmailBodyTruncationSize>\n" +
+						"<MaxEmailHTMLBodyTruncationSize>-1</MaxEmailHTMLBodyTruncationSize>\n" +
+						"<RequireSignedSMIMEMessages>0</RequireSignedSMIMEMessages>\n" +
+						"<RequireEncryptedSMIMEMessages>0</RequireEncryptedSMIMEMessages>\n" +
+						"<RequireSignedSMIMEAlgorithm>0</RequireSignedSMIMEAlgorithm>\n" +
+						"<RequireEncryptionSMIMEAlgorithm>0</RequireEncryptionSMIMEAlgorithm>\n" +
+						"<AllowSMIMEEncryptionAlgorithmNegotiation>2</AllowSMIMEEncryptionAlgorithmNegotiation>\n" +
+						"<AllowSMIMESoftCerts>1</AllowSMIMESoftCerts>\n" +
+						"<AllowBrowser>1</AllowBrowser>\n" +
+						"<AllowConsumerEmail>1</AllowConsumerEmail>\n" +
+						"<AllowRemoteDesktop>1</AllowRemoteDesktop>\n" +
+						"<AllowInternetSharing>1</AllowInternetSharing>\n" +
+						"<UnapprovedInROMApplicationList/>\n" +
+						"<ApprovedApplicationList/>\n" +
+						"</EASProvisionDoc>\n" +
+						"</Data>\n");
+	}
 	
+	@Test
+	public void testCheckDefault12Dot0Policy() throws Exception {
+		long nextPolicyKeyGenerated = 115l;
+		OpushUser user = singleUserFixture.jaures;
+		user.deviceProtocolVersion = new BigDecimal(ProtocolVersion.V120.toString());
+		user.device = new Device.Factory().create(1, user.deviceType, user.userAgent, user.deviceId, user.deviceProtocolVersion);
+		mockProvisionNeeds(user);
+
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V120);
+		ProvisionResponse provisionResponse = opClient.provisionStepOne();
+
+		assertThat(provisionResponse.policyData()).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+						"<Data>\n" +
+						"<EASProvisionDoc>\n" +
+						"<DevicePasswordEnabled>0</DevicePasswordEnabled>\n" +
+						"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>\n" +
+						"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>\n" +
+						"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>\n" +
+						"<AttachmentsEnabled>1</AttachmentsEnabled>\n" +
+						"<MinDevicePasswordLength>4</MinDevicePasswordLength>\n" +
+						"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>\n" +
+						"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>\n" +
+						"<MaxAttachmentSize/>\n" +
+						"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>\n" +
+						"<DevicePasswordExpiration/>\n" +
+						"<DevicePasswordHistory>0</DevicePasswordHistory>\n" +
+						"</EASProvisionDoc>\n" +
+						"</Data>\n");
+	}
+
 	@Test
 	public void testFirstProvisionWithNotAllowedUnknownDevice() throws Exception {
 		configuration.syncPerms.allowUnknownDevice = false;

@@ -31,11 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import javax.xml.transform.TransformerException;
+
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
+import org.obm.sync.push.client.ProvisionResponse.Builder;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public abstract class Provision extends AbstractCommand<ProvisionResponse> {
@@ -45,28 +49,27 @@ public abstract class Provision extends AbstractCommand<ProvisionResponse> {
 	}
 
 	@Override
-	protected ProvisionResponse parseResponse(Document root) {
-		Node statusNode = root.getDocumentElement().getFirstChild();
+	protected ProvisionResponse parseResponse(Document root) throws TransformerException {
 		
+		
+		Node statusNode = root.getDocumentElement().getFirstChild();
 		Node policiesNode = statusNode.getNextSibling();
 		Node policyNode = policiesNode.getFirstChild();
 		Node policyTypeNode = policyNode.getFirstChild();
 		Node policyStatusNode = policyTypeNode.getNextSibling();
 		Node policyKeyNode = policyStatusNode.getNextSibling();
+		
+		Builder provisionResponseBuilder = ProvisionResponse.builder()
+			.policyType(policyTypeNode.getTextContent())
+			.policyKey(policyStatusValue(policyKeyNode))
+			.provisionStatus(provisionStatus(statusNode.getTextContent()))
+			.policyStatus(policyStatus(policyStatusNode.getTextContent())); 
 
-		Long policyStatusValue = policyStatusValue(policyKeyNode);
-		boolean policyDataIsPresent = (policyKeyNode != null) && (policyKeyNode.getNextSibling() != null);
-
-		ProvisionStatus provisionStatus = provisionStatus(statusNode.getTextContent());
-		ProvisionPolicyStatus policyStatus = policyStatus(policyStatusNode.getTextContent()); 
-
-		return ProvisionResponse.builder()
-				.provisionStatus(provisionStatus)
-				.policyStatus(policyStatus)
-				.policyKey(policyStatusValue)
-				.policyType(policyTypeNode.getTextContent())
-				.hasPolicyData(policyDataIsPresent)
-				.build();
+		if (policyKeyNode != null) {
+			provisionResponseBuilder.policyData((Element) policyKeyNode.getNextSibling());
+		}
+		
+		return provisionResponseBuilder	.build();
 	}
 
 	private ProvisionPolicyStatus policyStatus(String textContent) {

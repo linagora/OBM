@@ -53,6 +53,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 
 import com.google.common.io.ByteStreams;
@@ -63,15 +64,15 @@ public class WBXMLOPClient extends OPClient {
 	private final WBXMLTools wbxmlTools;
 	
 	public WBXMLOPClient(String loginAtDomain, String password,
-			DeviceId devId, String devType, String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools) {
+			DeviceId devId, String devType, String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools, ProtocolVersion protocolVersion) {
 
-		this(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools);
+		this(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools, protocolVersion);
 	}
 
 	public WBXMLOPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
-			DeviceId devId, String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools) {
+			DeviceId devId, String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools, ProtocolVersion protocolVersion) {
 
-		super(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, serviceUrl);
+		super(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, serviceUrl, protocolVersion);
 		this.wbxmlTools = wbxmlTools;
 	}
 	
