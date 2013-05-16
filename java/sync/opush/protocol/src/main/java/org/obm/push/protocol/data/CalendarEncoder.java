@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.math.BigDecimal;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,6 +40,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
@@ -66,7 +66,6 @@ public class CalendarEncoder extends Encoder {
 			"AAAAAAAAAAAAAAAAAoAAAAFAAMAAAAAAAAAAAAAAFIAbwBtAGEAbgBjAGUAIABEAGEAeQBsAGkAZw" +
 			"BoAHQAIABUAGkAbQBlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAFAAIAAAAAAAAAxP///w==";
 	
-	private static final BigDecimal TWELVE = BigDecimal.valueOf(12);
 	private final TimeZoneEncoder timeZoneEncoder;
 	private final TimeZoneConverter timeZoneConverter;
 	
@@ -137,12 +136,8 @@ public class CalendarEncoder extends Encoder {
 					
 					s(ae, ASCalendar.ATTENDEE_NAME.asASValue(), ma.getName());
 
-					if (device.getProtocolVersion().compareTo(TWELVE) >= 0) {
-						s(ae, ASCalendar.ATTENDEE_STATUS.asASValue(), ma.getAttendeeStatus()
-							.asSpecificationValue());
-						s(ae, ASCalendar.ATTENDEE_TYPE.asASValue(), ma.getAttendeeType()
-							.getId());
-					}
+					s(ae, ASCalendar.ATTENDEE_STATUS.asASValue(), ma.getAttendeeStatus().asSpecificationValue());
+					s(ae, ASCalendar.ATTENDEE_TYPE.asASValue(), ma.getAttendeeType().getId());
 				}
 			}
 		}
@@ -151,7 +146,7 @@ public class CalendarEncoder extends Encoder {
 		s(p, ASCalendar.END_TIME.asASValue(), 
 				ev.getEndTime(), sdf);
 
-		encodeBody(device, p, ev.getDescription());
+		encodeBody(p, ev.getDescription());
 
 		encodeCategories(p, ev.getCategories());
 		
@@ -178,7 +173,7 @@ public class CalendarEncoder extends Encoder {
 					CalendarMeetingStatus.IS_NOT_A_MEETING.asIntString());
 		}
 
-		if (isResponse && device.getProtocolVersion().compareTo(TWELVE) > 0) {
+		if (isResponse && device.getProtocolVersion().compareTo(ProtocolVersion.V120) > 0) {
 			s(p, "AirSyncBase:NativeBodyType", Type.PLAIN_TEXT.toString());
 		}
 
@@ -249,7 +244,7 @@ public class CalendarEncoder extends Encoder {
 							.asIntString());
 					}
 
-					encodeBody(device, e, ex.getDescription());
+					encodeBody(e, ex.getDescription());
 
 					s(e, ASCalendar.LOCATION.asASValue(), ex.getLocation());
 					s(e, ASCalendar.SENSITIVITY.asASValue(), ex.getSensitivity().asIntString());
@@ -273,16 +268,13 @@ public class CalendarEncoder extends Encoder {
 		}
 	}
 
-	private void encodeBody(Device device, Element p,
-			String description) {
+	private void encodeBody(Element p, String description) {
 		String body = Strings.nullToEmpty(description).trim();
-		if (device.getProtocolVersion().compareTo(TWELVE) >= 0) {
-			Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
-			s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
-			s(d, "AirSyncBase:EstimatedDataSize", body.length());
-			if (body.length() > 0) {
-				DOMUtils.createElementAndText(d, "AirSyncBase:Data", body);
-			}
+		Element d = DOMUtils.createElement(p, "AirSyncBase:Body");
+		s(d, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
+		s(d, "AirSyncBase:EstimatedDataSize", body.length());
+		if (body.length() > 0) {
+			DOMUtils.createElementAndText(d, "AirSyncBase:Data", body);
 		}
 	}
 

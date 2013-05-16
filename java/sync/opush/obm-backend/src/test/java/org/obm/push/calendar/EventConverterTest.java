@@ -38,7 +38,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Properties;
 
@@ -53,6 +52,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -69,8 +69,8 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ParticipationRole;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -227,7 +227,7 @@ public class EventConverterTest {
 	
 	private UserDataRequest buildUserDataRequest(Credentials credentials) {
 		UserDataRequest udr = new UserDataRequest(credentials,
-				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5")));
+				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121));
 		return udr;
 	}
 	

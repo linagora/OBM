@@ -38,6 +38,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.spushnik.bean.CheckResult;
 import org.obm.push.spushnik.bean.CheckStatus;
@@ -51,7 +52,6 @@ import org.obm.sync.push.client.Pkcs12HttpClientBuilder;
 import org.obm.sync.push.client.PoolingHttpClientBuilder;
 import org.obm.sync.push.client.SSLHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;

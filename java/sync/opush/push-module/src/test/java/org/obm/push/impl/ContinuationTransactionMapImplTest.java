@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import net.sf.ehcache.Cache;
@@ -48,6 +47,7 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -62,7 +62,7 @@ public class ContinuationTransactionMapImplTest {
 	
 	@Before
 	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
+		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 	}
 	
 	@Test

@@ -40,7 +40,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TimeZone;
@@ -171,7 +170,7 @@ public class SerializableCompatibilityTest {
 	public void setUp() {
 		User user = User.Factory.create().createUser("userId@domain", "email@domain", "displayName");
 		DeviceId deviceId = new DeviceId("device id");
-		Device device = new Device.Factory().create(156, "dev", "userAgent", deviceId, new BigDecimal("12.1"));
+		Device device = new Device.Factory().create(156, "dev", "userAgent", deviceId, ProtocolVersion.V121);
 		Credentials credentials = new Credentials(user, "pass");
 
 		SyncKey syncKey = new SyncKey("1234");

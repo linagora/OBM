@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.junit.Test;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -57,7 +57,7 @@ public class SerializableTest {
 	public void monitoredCollectionDaoEhcacheImplKey() {
 		Key key = new MonitoredCollectionDaoEhcacheImpl.Key(
 				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
-				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), BigDecimal.valueOf(12)));
+				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), ProtocolVersion.V120));
 		
 		SerializableTester.reserializeAndAssert(key);
 	}

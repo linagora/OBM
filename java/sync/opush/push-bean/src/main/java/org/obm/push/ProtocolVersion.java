@@ -29,21 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.beans;
+package org.obm.push;
 
-public enum ProtocolVersion {
+import java.math.BigDecimal;
 
-	V121, V120;
+public enum ProtocolVersion implements Comparable<ProtocolVersion> {
 
-	@Override
-	public String toString() {
-		switch (this) {
-		case V120:
-			return "12.0";
-		case V121:
-			return "12.1";
-		}
-		throw new IllegalStateException();
+	V120(new BigDecimal("12.0")),
+	V121(new BigDecimal("12.1"));
+
+	private BigDecimal value;
+	
+	private ProtocolVersion(BigDecimal value) {
+		this.value = value;
 	}
 
+	public String asSpecificationValue() {
+		return value.toPlainString();
+	}
+
+	public BigDecimal asDecimalValue() {
+		return value;
+	}
+	
+	public static ProtocolVersion fromSpecificationValue(String value) {
+		for (ProtocolVersion version: values()) {
+			if (version.asSpecificationValue().equals(value)) {
+				return version;
+			}
+		}
+		throw new IllegalArgumentException();
+	}
+	
 }

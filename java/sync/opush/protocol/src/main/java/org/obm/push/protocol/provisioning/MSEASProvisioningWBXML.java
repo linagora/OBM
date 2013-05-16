@@ -31,8 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.provisioning;
 
-import java.math.BigDecimal;
-
+import org.obm.push.ProtocolVersion;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
@@ -44,17 +43,17 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class MSEASProvisioningWBXML extends Policy {
 
-	private BigDecimal protocolVersion;
+	private ProtocolVersion protocolVersion;
 
-	public MSEASProvisioningWBXML(BigDecimal bigDecimal) {
-		this.protocolVersion = bigDecimal;
+	public MSEASProvisioningWBXML(ProtocolVersion protocolVersion) {
+		this.protocolVersion = protocolVersion;
 	}
 
 	private void p(Element provDoc, String field, String value) {
 		DOMUtils.createElementAndText(provDoc, field, value);
 	}
 
-	@VisibleForTesting BigDecimal getProtocolVersion() {
+	@VisibleForTesting ProtocolVersion getProtocolVersion() {
 		return protocolVersion;
 	}
 	
@@ -79,7 +78,7 @@ public class MSEASProvisioningWBXML extends Policy {
 		DOMUtils.createElement(provDoc, "DevicePasswordExpiration");
 		p(provDoc, "DevicePasswordHistory", "0");
 
-		if (protocolVersion.compareTo(new BigDecimal("12.0")) > 0) {
+		if (protocolVersion.compareTo(ProtocolVersion.V120) > 0) {
 			p(provDoc, "AllowStorageCard", "1");
 			p(provDoc, "AllowCamera", "1");
 			p(provDoc, "RequireDeviceEncryption", "0");

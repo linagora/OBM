@@ -78,7 +78,7 @@ public class EncoderFactory {
 				contactProvider.get().encode(device, parent, data);
 				break;
 			case TASKS:
-				taskEncoder.get().encode(device, parent, data);
+				taskEncoder.get().encode(parent, data);
 				break;
 			case EMAIL:
 				if (data instanceof MSEmail) {
@@ -102,7 +102,7 @@ public class EncoderFactory {
 			case CONTACTS:
 				return contactProvider.get().encodedApplicationData(device, data);
 			case TASKS:
-				return taskEncoder.get().encodedApplicationData(device, data);
+				return taskEncoder.get().encodedApplicationData(data);
 			case EMAIL:
 				if (data instanceof MSEmail) {
 					return emailEncoder.get().encodedApplicationData(data);

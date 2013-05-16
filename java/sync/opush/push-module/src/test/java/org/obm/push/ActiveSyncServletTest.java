@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -76,7 +75,7 @@ public class ActiveSyncServletTest {
 	private DeviceId deviceId;
 	private String deviceType;
 	private String userAgent;
-	private BigDecimal protocolVersion;
+	private ProtocolVersion protocolVersion;
 	private int requestId;
 	private String command;
 	private Credentials credentials;
@@ -93,7 +92,7 @@ public class ActiveSyncServletTest {
 		deviceId = new DeviceId("devId");
 		deviceType = "devType";
 		userAgent = user.getLoginAtDomain();
-		protocolVersion = new BigDecimal("12.1");
+		protocolVersion = ProtocolVersion.V121;
 		requestId = 1;
 		command = "cmd";
 		
@@ -113,7 +112,7 @@ public class ActiveSyncServletTest {
 		expect(activeSyncRequest.getUserAgent()).andReturn(userAgent).anyTimes();
 		expect(activeSyncRequest.getMsPolicyKey()).andReturn(null).anyTimes();
 		expect(activeSyncRequest.getHttpServletRequest()).andReturn(request).anyTimes();
-		expect(activeSyncRequest.getMSASProtocolVersion()).andReturn(protocolVersion.toPlainString()).anyTimes();
+		expect(activeSyncRequest.getMSASProtocolVersion()).andReturn(protocolVersion.asSpecificationValue()).anyTimes();
 		
 		policyService = mocksControl.createMock(PolicyService.class);
 		expect(policyService.needProvisionning(activeSyncRequest, user)).andReturn(false);

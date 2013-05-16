@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -183,7 +182,7 @@ public class TechnicalLoggingBinderTest {
 	}
 
 	private Device getFakeDevice() {
-		return new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
+		return new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 	}
 	
 	@Test

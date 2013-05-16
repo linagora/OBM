@@ -49,11 +49,11 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 
 import com.google.common.io.ByteStreams;
@@ -95,7 +95,7 @@ public class WBXMLOPClient extends OPClient {
 		request.setHeaders(new Header[] { new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
 				new BasicHeader("Authorization", ai.authValue()),
 				new BasicHeader("User-Agent", ai.getUserAgent()),
-				new BasicHeader("Ms-Asprotocolversion", protocolVersion.toString()),
+				new BasicHeader("Ms-Asprotocolversion", protocolVersion.asSpecificationValue()),
 				new BasicHeader("Accept", "*/*"),
 				new BasicHeader("Accept-Language", "fr-fr"),
 				new BasicHeader("Connection", "keep-alive")

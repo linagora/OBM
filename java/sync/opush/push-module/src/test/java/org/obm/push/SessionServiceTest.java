@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.junit.Before;
@@ -63,7 +62,7 @@ public class SessionServiceTest {
 	private DeviceId deviceId;
 	private String command;
 	private Device device;
-	private BigDecimal protocolVersion;
+	private ProtocolVersion protocolVersion;
 	private UserDataRequest userDataRequest;
 
 	@Before
@@ -72,7 +71,7 @@ public class SessionServiceTest {
 		credentials = new Credentials(user, "test");
 		deviceId = new DeviceId("devId");
 		command = "autodiscover";
-		protocolVersion = new BigDecimal("12.1");
+		protocolVersion = ProtocolVersion.V121;
 		device = new Device(1, "devType", deviceId, new Properties(), protocolVersion);
 		bindActiveSyncRequest();
 	}

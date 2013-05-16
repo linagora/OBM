@@ -41,9 +41,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXmlException;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 
 @RunWith(SlowFilterRunner.class)

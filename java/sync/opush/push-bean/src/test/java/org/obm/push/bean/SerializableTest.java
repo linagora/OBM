@@ -37,7 +37,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -46,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.ms.UidMSEmail;
@@ -312,7 +312,7 @@ public class SerializableTest {
 	
 	@Test
 	public void testDevice() throws IOException {
-		Device obj = new Device(1, "toto", new DeviceId("toto"), new Properties(), new BigDecimal("12.1"));
+		Device obj = new Device(1, "toto", new DeviceId("toto"), new Properties(), ProtocolVersion.V121);
 		objectOutputStream.writeObject(obj);
 	}
 

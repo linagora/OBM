@@ -31,8 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.math.BigDecimal;
-
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -50,7 +49,7 @@ public class SingleUserFixture {
 		public String password;
 		public String deviceType;
 		public DeviceId deviceId;
-		public BigDecimal deviceProtocolVersion;
+		public ProtocolVersion deviceProtocolVersion;
 		public String userAgent;
 		public AccessToken accessToken;
 		public Credentials credentials;
@@ -68,7 +67,7 @@ public class SingleUserFixture {
 		jaures.password = "jaures";
 		jaures.deviceType = "BellLabsWiredPhone";
 		jaures.deviceId = new DeviceId("blwp123");
-		jaures.deviceProtocolVersion = new BigDecimal("12.1");
+		jaures.deviceProtocolVersion = ProtocolVersion.V121;
 		jaures.userAgent = "BellLabsWiredPhoneAgent";
 		jaures.accessToken = new AccessToken(1, "o-push");
 		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());

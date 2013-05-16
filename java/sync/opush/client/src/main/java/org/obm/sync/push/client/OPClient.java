@@ -43,6 +43,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHeader;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
@@ -62,7 +63,6 @@ import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Folder;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.obm.sync.push.client.commands.DocumentProvider;
 import org.obm.sync.push.client.commands.EmailDeleteSyncRequest;
 import org.obm.sync.push.client.commands.EmailSyncCommand;
@@ -218,7 +218,7 @@ public abstract class OPClient {
 		HttpPost request = new HttpPost(url);
 		request.setHeaders(new Header[] { new BasicHeader("Authorization", ai.authValue()),
 				new BasicHeader("User-Agent", ai.getUserAgent()),
-				new BasicHeader("Ms-Asprotocolversion", protocolVersion.toString()),
+				new BasicHeader("Ms-Asprotocolversion", protocolVersion.asSpecificationValue()),
 				new BasicHeader("Accept", "*/*"),
 				new BasicHeader("Accept-Language", "fr-fr"),
 				new BasicHeader("Connection", "keep-alive")

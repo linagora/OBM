@@ -35,7 +35,6 @@ package org.obm.push.protocol.data;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -48,6 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
@@ -327,7 +327,7 @@ public class CalendarEncoderTest {
 	}
 
 	private Device getFakeDevice() {
-		return new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
+		return new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 	}
 	
 	@Test

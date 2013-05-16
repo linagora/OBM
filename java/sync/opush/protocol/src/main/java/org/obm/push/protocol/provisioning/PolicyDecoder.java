@@ -31,21 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.provisioning;
 
-import java.math.BigDecimal;
-
+import org.obm.push.ProtocolVersion;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 public class PolicyDecoder {
 	
-	public final static BigDecimal CURRENT_AS_RELEASE = new BigDecimal(12.1);
-	public final static BigDecimal EVERY_PROTOCOL_VERSION_ACCEPTED = new BigDecimal(0.0);
+	public final static ProtocolVersion CURRENT_AS_RELEASE = ProtocolVersion.V121;
+	public final static ProtocolVersion OLDER_PROTOCOL_VERSION_ACCEPTED = ProtocolVersion.V120;
 	
 	public static Policy decode(Element data) {
 		Element allowStorageCard = DOMUtils.getUniqueElement(data, "AllowStorageCard");
 		if (allowStorageCard != null) {
 			return new MSEASProvisioningWBXML(CURRENT_AS_RELEASE);
 		}
-		return new MSEASProvisioningWBXML(EVERY_PROTOCOL_VERSION_ACCEPTED);
+		return new MSEASProvisioningWBXML(OLDER_PROTOCOL_VERSION_ACCEPTED);
 	}
 }
