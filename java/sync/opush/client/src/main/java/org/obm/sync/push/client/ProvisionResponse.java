@@ -31,9 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
+import org.obm.push.utils.DOMUtils;
+import org.w3c.dom.Element;
 
 import com.google.common.base.Objects;
 
@@ -48,7 +52,7 @@ public class ProvisionResponse {
 		private ProvisionPolicyStatus policyStatus;
 		private Long policyKey;
 		private String policyType;
-		private boolean hasPolicyData;
+		private Element policyData;
 
 		private Builder() {
 			super();
@@ -74,13 +78,21 @@ public class ProvisionResponse {
 			return this;
 		}
 
-		public Builder hasPolicyData(boolean hasPolicyData) {
-			this.hasPolicyData = hasPolicyData;
+		public Builder policyData(Element policyData) {
+			this.policyData = policyData;
 			return this;
 		}
 		
-		public ProvisionResponse build() {
-			return new ProvisionResponse(provisionStatus, policyStatus, policyKey, policyType, hasPolicyData);
+		public ProvisionResponse build() throws TransformerException {
+			String policyValue = serializePolicy();
+			return new ProvisionResponse(provisionStatus, policyStatus, policyKey, policyType, policyValue);
+		}
+
+		private String serializePolicy() throws TransformerException {
+			if (policyData != null) {
+				return DOMUtils.prettySerialize(policyData);
+			}
+			return null;
 		}
 		
 	}
@@ -89,16 +101,16 @@ public class ProvisionResponse {
 	private final ProvisionPolicyStatus policyStatus;
 	private final Long policyKey;
 	private final String policyType;
-	private final boolean hasPolicyData;
+	private final String policyData;
 	
 	private ProvisionResponse(ProvisionStatus provisionStatus, ProvisionPolicyStatus policyStatus,
-			Long policyKey, String policyType, boolean hasPolicyData) {
+			Long policyKey, String policyType, String policyData) {
 		
 		this.provisionStatus = provisionStatus;
 		this.policyKey = policyKey;
 		this.policyStatus =  policyStatus;
 		this.policyType = policyType;
-		this.hasPolicyData = hasPolicyData;
+		this.policyData = policyData;
 	}
 
 	public ProvisionStatus getProvisionStatus() {
@@ -118,12 +130,16 @@ public class ProvisionResponse {
 	}
 
 	public boolean hasPolicyData() {
-		return hasPolicyData;
+		return policyData != null;
 	}
 
+	public String policyData() {
+		return policyData;
+	}
+	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(provisionStatus, policyStatus, policyKey, policyType, hasPolicyData);
+		return Objects.hashCode(provisionStatus, policyStatus, policyKey, policyType, policyData);
 	}
 	
 	@Override
@@ -135,7 +151,7 @@ public class ProvisionResponse {
 				.append(policyStatus, other.policyStatus)
 				.append(policyKey, other.policyKey)
 				.append(policyType, other.policyType)
-				.append(hasPolicyData, other.hasPolicyData)
+				.append(policyData, other.policyData)
 				.isEquals();
 		}
 		return false;

@@ -49,6 +49,7 @@ import org.apache.http.message.BasicHeader;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.wbxml.WBXmlException;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -58,7 +59,7 @@ public class XMLOPClient extends OPClient {
 	public XMLOPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, int port) {
 		
-		super(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port));
+		super(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port), ProtocolVersion.V121);
 	}
 
 	private ByteArrayEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {

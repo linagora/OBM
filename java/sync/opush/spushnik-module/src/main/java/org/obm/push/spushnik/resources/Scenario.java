@@ -51,6 +51,7 @@ import org.obm.sync.push.client.Pkcs12HttpClientBuilder;
 import org.obm.sync.push.client.PoolingHttpClientBuilder;
 import org.obm.sync.push.client.SSLHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -76,7 +77,7 @@ public abstract class Scenario {
 			
 			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials, serviceUrl),
 				credentials.getLoginAtDomain(), credentials.getPassword(),
-				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools());
+				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools(), ProtocolVersion.V121);
 		
 			return scenarii(client);
 		} catch (Exception e) {

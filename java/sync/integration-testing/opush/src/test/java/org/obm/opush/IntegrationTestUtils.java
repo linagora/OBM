@@ -75,6 +75,7 @@ import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
+import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -165,14 +166,19 @@ public class IntegrationTestUtils {
 			);
 	}
 	
-	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port) {
+	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port, ProtocolVersion protocolVersion) {
 		return new WBXMLOPClient(
 				user.user.getLoginAtDomain(), 
 				user.password, 
 				user.deviceId, 
 				user.deviceType, 
 				user.userAgent, "localhost", port, "/ActiveSyncServlet/",
-				new WBXMLTools());
+				new WBXMLTools(),
+				protocolVersion);
+	}
+	
+	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port) {
+		return buildWBXMLOpushClient(user, port, ProtocolVersion.V121);
 	}
 
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {
