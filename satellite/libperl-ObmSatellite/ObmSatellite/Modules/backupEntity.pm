@@ -333,6 +333,13 @@ sub _postMethodRestoreEntity {
 
     my $response = $self->_restoreFromArchive( $entity, $data );
 
+    if (!$response->isError()) {
+        $self->_removeCurrentMailboxBackup( $entity );
+    } else {
+        $response->setExtraContent({
+            content => ['Find here a backup of the last mailbox : '.$entity->getTmpBackupCurrentMailboxPath()] });
+    }
+
     $self->_removeTmpArchive( $entity );
     $self->_sendMailRestoreReport($entity, $xmlContent->{'options'}, $response);
 
@@ -779,6 +786,18 @@ sub _removeTmpArchive {
     return undef;
 }
 
+sub _removeCurrentMailboxBackup {
+    my $self = shift;
+    my( $entity ) = @_;
+
+    if( $self->_rmdir( $entity->getBackupBeforeRestorePath() ) ) {
+        return $self->_response( RC_INTERNAL_SERVER_ERROR, {
+            content => [ 'Fail to remove '.$entity->getBackupBeforeRestorePath() ]
+            } );
+    }
+
+    return undef;
+}
 
 sub _prepareTmpArchive {
     my $self = shift;

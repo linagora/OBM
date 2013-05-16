@@ -234,10 +234,16 @@ sub getTmpVcardPath {
     return undef;
 }
 
+sub getBackupBeforeRestorePath {
+    my $self = shift;
+
+    return $self->getTmpBackupPath().'_before_restore';
+}
+
 sub getTmpBackupCurrentMailboxPath {
     my $self = shift;
 
-    return $self->getTmpBackupArchiveRoot().'/mailbox_before_restore';
+    return $self->getBackupBeforeRestorePath().'/'.$self->getLogin().'@'.$self->getRealm().'/mailbox';
 }
 
 sub getTmpMailboxPath {
