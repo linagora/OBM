@@ -38,7 +38,6 @@ import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.expectUserLoginFromOpush;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -59,6 +58,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.AbstractOpushEnv;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
@@ -73,7 +73,6 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProvisionResponse;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -198,7 +197,7 @@ public class ProvisionHandlerTest {
 	public void testCheckDefault12Dot0Policy() throws Exception {
 		long nextPolicyKeyGenerated = 115l;
 		OpushUser user = singleUserFixture.jaures;
-		user.deviceProtocolVersion = new BigDecimal(ProtocolVersion.V120.toString());
+		user.deviceProtocolVersion = ProtocolVersion.V120;
 		user.device = new Device.Factory().create(1, user.deviceType, user.userAgent, user.deviceId, user.deviceProtocolVersion);
 		mockProvisionNeeds(user);
 

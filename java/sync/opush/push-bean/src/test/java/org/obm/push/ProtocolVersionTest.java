@@ -29,35 +29,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.provisioning;
+package org.obm.push;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+
 import org.junit.Test;
-import org.obm.push.ProtocolVersion;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
+@RunWith(SlowFilterRunner.class)
+public class ProtocolVersionTest {
 
-public class PolicyDecoderTest {
-	
 	@Test
-	public void testDecodeMSEASZeroVersion() {
-		Document doc = DOMUtils.createDoc(null, "decode");
-		Element root = doc.getDocumentElement();
-		
-		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
-		assertThat(msEAS.getProtocolVersion()).isEqualTo(ProtocolVersion.V120);
+	public void test12Dot0LesserThan12Dot1() {
+		assertThat(ProtocolVersion.V120.compareTo(ProtocolVersion.V121)).isEqualTo(-1);
+	}
+
+	@Test
+	public void test12Dot1GreaterThan12Dot0() {
+		assertThat(ProtocolVersion.V121.compareTo(ProtocolVersion.V120)).isEqualTo(1);
 	}
 	
 	@Test
-	public void testDecodeMSEASCurrentVersion() {
-		Document doc = DOMUtils.createDoc(null, "decode");
-		Element root = doc.getDocumentElement();
-		DOMUtils.createElement(root, "AllowStorageCard");
+	public void test12Dot1CompareItself() {
+		assertThat(ProtocolVersion.V121.compareTo(ProtocolVersion.V121)).isEqualTo(0);
+	}
+	
+	@Test
+	public void test12Dot0CompareItself() {
+		assertThat(ProtocolVersion.V120.compareTo(ProtocolVersion.V120)).isEqualTo(0);
+	}
+
+	@Test
+	public void test12Dot0SpecificationValue() {
+		assertThat(ProtocolVersion.V120.asSpecificationValue()).isEqualTo("12.0");
+	}
+	
+	@Test
+	public void test12Dot1SpecificationValue() {
+		assertThat(ProtocolVersion.V121.asSpecificationValue()).isEqualTo("12.1");
+	}
 		
-		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
-		assertThat(msEAS.getProtocolVersion()).isEqualTo(ProtocolVersion.V121);
- 	}
+	@Test
+	public void test12Dot0DecimalValue() {
+		assertThat(ProtocolVersion.V120.asDecimalValue()).isEqualTo(new BigDecimal("12.0"));
+	}
+	
+	@Test
+	public void test12Dot1DecimalValue() {
+		assertThat(ProtocolVersion.V121.asDecimalValue()).isEqualTo(new BigDecimal("12.1"));
+	}
+	
+	@Test
+	public void test12Dot1FromSpecificationValue() {
+		assertThat(ProtocolVersion.fromSpecificationValue("12.1")).isEqualTo(ProtocolVersion.V121);
+	}
+	
+	@Test
+	public void test12Dot0FromSpecificationValue() {
+		assertThat(ProtocolVersion.fromSpecificationValue("12.0")).isEqualTo(ProtocolVersion.V120);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testUnsupportedFromSpecificationValue() {
+		ProtocolVersion.fromSpecificationValue("12.2");
+	}
 }

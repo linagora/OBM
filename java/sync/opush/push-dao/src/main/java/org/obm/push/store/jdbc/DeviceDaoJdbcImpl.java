@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.jdbc;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
 import org.obm.push.bean.DeviceId;
@@ -61,7 +61,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	}
 
 	@Override
-	public Device getDevice(User user, DeviceId deviceId, String userAgent, BigDecimal protocolVersion) 
+	public Device getDevice(User user, DeviceId deviceId, String userAgent, ProtocolVersion protocolVersion) 
 			throws DaoException {
 	
 		Connection con = null;

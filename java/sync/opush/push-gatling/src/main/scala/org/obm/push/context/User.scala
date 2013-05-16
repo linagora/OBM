@@ -36,6 +36,7 @@ import org.obm.push.bean.Device
 import org.obm.push.helper.SessionHelper
 import com.excilys.ebi.gatling.core.session.Session
 import org.apache.james.mime4j.dom.address.Mailbox
+import org.obm.push.ProtocolVersion
 
 class User(userNumber: Int, configuration: Configuration) {
 	
@@ -54,7 +55,7 @@ class User(userNumber: Int, configuration: Configuration) {
 			deviceType,
 			"Mozilla/5.0 (X11; Linux x86_64; rv:10.0.7) Gecko/20100101 Firefox/10.0.7 Iceweasel/10.0.7",
 			deviceId,
-			new BigDecimal(ActiveSyncConfiguration.activeSyncVersion))
+			ActiveSyncConfiguration.activeSyncVersion)
 }
 
 class UserKey (val key: String) {

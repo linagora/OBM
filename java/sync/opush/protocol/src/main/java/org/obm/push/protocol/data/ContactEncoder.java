@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSContact;
@@ -153,7 +153,7 @@ public class ContactEncoder {
 		if(c.getData() != null){
 			dataBody = c.getData().trim();
 		}
-		if (device.getProtocolVersion().compareTo(BigDecimal.valueOf(12)) > 0) {
+		if (device.getProtocolVersion().compareTo(ProtocolVersion.V120) > 0) {
 			Element body = DOMUtils.createElement(parent, "AirSyncBase:Body");
 			e(body, "AirSyncBase:Type", Type.PLAIN_TEXT.toString());
 			e(body, "AirSyncBase:EstimatedDataSize", ""+dataBody.length());

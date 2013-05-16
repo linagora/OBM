@@ -41,8 +41,6 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
-
 import javax.xml.transform.TransformerException;
 
 import org.easymock.IMocksControl;
@@ -52,6 +50,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
@@ -122,7 +121,7 @@ public class SyncProtocolTest {
 	    mailbox = "to@localhost.com";
 	    password = "password";
 		user = Factory.create().createUser(mailbox, mailbox, "displayName");
-		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), new BigDecimal("12.1"));
+		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), ProtocolVersion.V121);
 		credentials = new Credentials(user, password);
 		udr = new UserDataRequest(credentials, "noCommand", device);
 		

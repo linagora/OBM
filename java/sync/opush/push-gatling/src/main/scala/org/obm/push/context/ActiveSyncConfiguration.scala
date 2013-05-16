@@ -33,11 +33,12 @@ package org.obm.push.context
 
 import org.obm.push.context.http.HttpHeaders
 import org.obm.push.context.http.HttpQueryParams
+import org.obm.push.ProtocolVersion
 
 object ActiveSyncConfiguration {
   
 	val postUrl = "/Microsoft-Server-ActiveSync"
 	val wbXmlContentType = "application/vnd.ms-sync.wbxml"
-	val activeSyncVersion = "12.1"
+	val activeSyncVersion = ProtocolVersion.V121
 	
 }

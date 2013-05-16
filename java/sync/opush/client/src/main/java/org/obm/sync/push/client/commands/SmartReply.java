@@ -35,11 +35,11 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ByteArrayEntity;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.ServerId;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.AccountInfos;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 
 public class SmartReply implements IEasCommand<Boolean> {
 
@@ -59,7 +59,7 @@ public class SmartReply implements IEasCommand<Boolean> {
 			.Post(opc.buildUrl(ai.getUrl(), ai.getLogin(), ai.getDevId(), ai.getDevType(), "SmartReply", commandParams()))
 				.addHeader("User-Agent", ai.getUserAgent())
 				.addHeader("Authorization", ai.authValue())
-				.addHeader("Ms-Asprotocolversion", ProtocolVersion.V121.toString())
+				.addHeader("Ms-Asprotocolversion", ProtocolVersion.V121.asSpecificationValue())
 				.addHeader("Accept", "*/*")
 				.addHeader("Accept-Language", "fr-fr")
 				.addHeader("Connection", "keep-alive")

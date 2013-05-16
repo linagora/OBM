@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import java.math.BigDecimal;
-
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -82,18 +80,18 @@ public class SessionService {
 		return udr;
 	}
 
-	private BigDecimal getProtocolVersion(ActiveSyncRequest request) {
+	private ProtocolVersion getProtocolVersion(ActiveSyncRequest request) {
 		final String proto = request.getMSASProtocolVersion();
 		if (proto != null) {
 			try {
-				BigDecimal protocolVersion = new BigDecimal(proto);
+				ProtocolVersion protocolVersion = ProtocolVersion.fromSpecificationValue(proto);
 				logger.debug("Client supports protocol = {}", protocolVersion);
 				return protocolVersion;
-			} catch (NumberFormatException nfe) {
+			} catch (IllegalArgumentException nfe) {
 				logger.warn("invalid MS-ASProtocolVersion = {}", proto);
 			}
 		}
-		return new BigDecimal("12.1");
+		return ProtocolVersion.V121;
 	}
 
 }

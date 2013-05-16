@@ -42,7 +42,6 @@ import static org.obm.push.TestUtils.getXml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Properties;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -51,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -90,7 +90,7 @@ public class ItemOperationsProtocolTest {
 	@Before
 	public void setup() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
-		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), new BigDecimal("12.5"));
+		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 		Credentials credentials = new Credentials(user, "test");
 		udr = new UserDataRequest(credentials, "Sync", device);
 		itemOperationsProtocol = new ItemOperationsProtocol.Factory(null).create(device, true);

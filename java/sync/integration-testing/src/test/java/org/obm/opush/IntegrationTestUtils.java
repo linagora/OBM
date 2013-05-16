@@ -47,6 +47,7 @@ import java.util.Properties;
 import javax.mail.Session;
 
 import org.obm.opush.SingleUserFixture.OpushUser;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ChangedCollections;
@@ -75,7 +76,6 @@ import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
-import org.obm.sync.push.client.beans.ProtocolVersion;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

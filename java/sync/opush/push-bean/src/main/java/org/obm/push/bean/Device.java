@@ -31,12 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.obm.push.ProtocolVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +53,7 @@ public class Device implements Serializable {
 	public static class Factory {
 	
 		public Device create(Integer databaseId, String devType, String userAgent,
-				DeviceId devId, BigDecimal protocolVersion) {
+				DeviceId devId, ProtocolVersion protocolVersion) {
 			
 			Properties hints = getHints(userAgent, devType);
 			String rewritenDevType = rewriteDevType(userAgent, devType);
@@ -102,13 +106,13 @@ public class Device implements Serializable {
 	
 	private static final long serialVersionUID = 8923456296693539537L;
 	
-	private final String devType;
-	private final Properties hints;
-	private final DeviceId devId;
-	private final Integer databaseId;
-	private final BigDecimal protocolVersion;
+	private String devType;
+	private Properties hints;
+	private DeviceId devId;
+	private Integer databaseId;
+	private ProtocolVersion protocolVersion;
 	
-	public Device(Integer databaseId, String devType, DeviceId devId, Properties hints, BigDecimal protocolVersion) {
+	public Device(Integer databaseId, String devType, DeviceId devId, Properties hints, ProtocolVersion protocolVersion) {
 		this.databaseId = databaseId;
 		this.devType = devType;
 		this.devId = devId;
@@ -136,7 +140,7 @@ public class Device implements Serializable {
 		return databaseId;
 	}
 
-	public BigDecimal getProtocolVersion() {
+	public ProtocolVersion getProtocolVersion() {
 		return protocolVersion;
 	}
 
@@ -168,5 +172,23 @@ public class Device implements Serializable {
 			.add("protocolVersion", protocolVersion)
 			.toString();
 	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeObject(databaseId);
+		out.writeObject(devId);
+		out.writeObject(devType);
+		out.writeObject(hints);
+		out.writeObject(protocolVersion.asDecimalValue());
+	}
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		databaseId = (Integer) in.readObject();
+		devId = (DeviceId) in.readObject();
+		devType = (String) in.readObject();
+		hints = (Properties) in.readObject();
+		BigDecimal protocolVersionDecimal = (BigDecimal) in.readObject();
+		protocolVersion = ProtocolVersion.fromSpecificationValue(protocolVersionDecimal.toPlainString());
+	}
+
 	
 }
