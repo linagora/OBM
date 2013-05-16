@@ -553,6 +553,31 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
+	public void testPurgeWhenAnAttendeeHasNoEmail() throws Exception {
+		Event event = new Event();
+		String calendar = "user@test.tlse.lng";
+		ObmUser user = ToolBox.getDefaultObmUser();
+		EventExtId extId = new EventExtId("ExtId");
+
+		event.setExtId(extId);
+		event.addAttendee(ContactAttendee.builder().displayName("Contact 1").participation(Participation.needsAction()).build());
+		event.addAttendee(UserAttendee.builder().displayName("Owner").email(user.getEmail()).participation(Participation.accepted()).build());
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).times(3);
+		expect(calendarDao.listEventsByIntervalDate(eq(token), eq(user), isA(Date.class), isA(Date.class), isNull(EventType.class))).andReturn(ImmutableList.of(event));
+		expect(calendarDao.findEventByExtId(token, user, extId)).andReturn(event).times(2);
+		expect(calendarDao.changeParticipation(token, user, extId, Participation.declined())).andReturn(true);
+		messageQueueService.writeIcsInvitationReply(token, event, user);
+		expectLastCall();
+		mocksControl.replay();
+
+		binding.purge(token, calendar);
+
+		mocksControl.verify();
+	}
+
+	@Test
 	public void testCommentResettedOnChangeParticipationState() throws SQLException {
 		Participation participation = Participation.builder()
 				.state(State.ACCEPTED)

@@ -496,7 +496,9 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	public Attendee findAttendeeFromEmail(String userEmail) {
 		for (Attendee at: attendees) {
-			if (at.getEmail().equalsIgnoreCase(userEmail)) {
+			String attendeeEmail = at.getEmail();
+
+			if (attendeeEmail != null && attendeeEmail.equalsIgnoreCase(userEmail)) {
 				return at;
 			}
 		}
