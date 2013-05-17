@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ICalendarBackend;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -51,7 +52,6 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.protocol.MeetingProtocol;
@@ -78,7 +78,7 @@ public class MeetingResponseHandlerTest {
 	private CollectionDao collectionDao;
 	private MailBackend mailBackend;
 	private WBXMLTools wbxmlTools;
-	private CalendarBackend calendarBackend;
+	private ICalendarBackend calendarBackend;
 	private DOMDumper domDumper;
 	
 	@Before
@@ -93,7 +93,7 @@ public class MeetingResponseHandlerTest {
 		collectionDao = control.createMock(CollectionDao.class);
 		mailBackend = control.createMock(MailBackend.class);
 		wbxmlTools = control.createMock(WBXMLTools.class);
-		calendarBackend = control.createMock(CalendarBackend.class);
+		calendarBackend = control.createMock(ICalendarBackend.class);
 		domDumper = control.createMock(DOMDumper.class);
 		
 		meetingResponseHandler = new MeetingResponseHandler(backend, encoderFactory, contentsImporter,
