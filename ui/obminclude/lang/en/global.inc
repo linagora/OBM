@@ -331,6 +331,7 @@ $l_section_admin  = "Administration";
 $l_section_dic    = "Dictionary";
 $l_section_my  = "My account";
 $l_section_webmail= "Webmail";
+$l_section_more   = "More";
 $l_module_company = "Companies";
 $l_module_contact = "Contacts";
 $l_module_lead = "Leads";

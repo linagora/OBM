@@ -1313,11 +1313,10 @@ function display_menu($module) {
 
 function display_unified_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show, $modules;
-  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
-  global $l_logout, $l_profile, $l_scope_update, $l_waiting_events;
+  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope, $ico_user, $ico_calendar, $ico_contact;
+  global $l_logout, $l_profile, $l_scope_update, $l_waiting_events, $l_section_webmail, $l_module_calendar, $l_module_contact, $l_section_more;
   global $perm, $cright_write_admin;
 
-  $obm['uid'];
   $login = $obm['login'];
   $profil = $obm['profile'];
   $p = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
@@ -1331,70 +1330,112 @@ function display_unified_menu($module) {
   $display['last'] = display_last_visited();
   $display['todo'] = display_todos();
   $display['action'] = display_actions($section, $module);
+  $dis_scope = false;
   $update_state = get_update_state($domain_id);
   if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
-    $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
+    $dis_scope = true;
   }
+  $dis_printer = false;
   if ($display['print_url'] != '') {
-    $url = $display['print_url']."&amp;output_target=print";
-    $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
+    $printer_url = str_replace("&amp;", "&", $display['print_url']);
+    $dis_printer = true;
   }
 
-  $wait_event = "<span id=\"bannerWaitingEvent\" class='notification_popup'></span>";
+  if(!isset($user_photo_id)){
+    $user_infos = get_user_info($obm["uid"]);
+    $user_photo_id = $user_infos["photo_id"];
+  }
 
-  $block = "
-    <!-- Bandeau -->
-    <div id='banner'>
+  $m = new Mustache_Engine(array(
+    'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/mustache"),
+    'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . '/mustache/partials'),
+  ));
 
-    <div style='float:left;'>
-      <a href=\"$path/obm.php?redirect=false\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
-      <ul id='section'>
-        <li><a href=\"$path/webmail/webmail_index.php\">Mail $mail_notif</a></li>
-        <li><a href=\"$path/calendar/calendar_index.php\">Agenda<a/> <a href=\"$path/calendar/calendar_index.php?action=waiting_events\">$wait_event</a></li>
-        <li><a href=\"$path/contact/contact_index.php\">Contact</a></li>
-      </ul>
-      <!-- ".$display['section']." -->
-    </div>
+  $data = array("template");
+  $data["template"]["logo_ico"] = $ico_obm;
+  $data["template"]["logo_url"] = "$path/obm.php?redirect=false";
 
-    <div style='float:right;'> 
-    <ul id='information'>
-      <li id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></li>
-      $dis_scope
-      <li style='font-size:13px;'>
-      <a href=\"$path/settings/settings_index.php\" style='text-decoration:none;margin-right:0;'>
-      $login <img src='http://icdn.pro/images/en/u/s/user-gray-icone-7895-32.png' style='width:25px;border:2px solid #AAA; border-radius:5px;background-color:#FFF;'/>
-      </a>
-      </li>
-      <li style='font-size:13px;'>
-      <a href='#' style='text-decoration:none;margin-right:0;' onclick='showAllInOneMenu();'>
-      <img src='http://icongal.com/gallery/image/81019/format_indent_more_submenu.png' style='margin-top:-1px;width:33px;'/>
-      </a>
-      </li>  
-      <li style='text-decoration:none;'>
-        <a href='".$path."/obm.php?action=logout' style='text-decoration:none;'>
-        <img src='http://www.azerty.be/icones/img101gr.gif
-        ' alt='$l_logout' style='width:32px;text-decoration:none;margin-top:-4px;margin-left:0;'/>
-        </a>
-      </li>
-    </ul>
-    </div>
-    ".dis_all_in_one_menu()."
+  $data["template"]["ico_obm"] = $ico_obm;
+  $data["template"]["ico_spinner"] = $GLOBALS[ico_spinner];
 
-    </div>
-    <script type='text/javascript'>
-    /*
-      function logout_roundcube() {
-        var url = 'https://' + window.location.hostname + '/webmail/index.php?_task=logout';
-        
-        var rcLogoutRequest = new Request({
-          method: 'get',
-          url: url,
-          onComplete: function(response) { confirm('Response: ' + response); }
-        }).send();
-      }
-      */
-    </script>
-    ".$display['module'];
+  $data[] = array("user_infos");
+  $data["user_infos"]["login"] = $login;
+
+  if ($user_photo_id > 0) {
+    $data["user_infos"]["photo_url"] = "$path/document/document_index.php?action=accessfile&document_id=$user_photo_id";
+  } else {
+    $data["user_infos"]["photo_url"] = $ico_user;
+  }
+
+  $data[] = array("scope");
+  $data["scope"]["dis_scope"] = $dis_scope;
+  $data["scope"]["url"] = "$path/tools/tools_index.php?action=update_index";
+  $data["scope"]["ico"] = $ico_scope;
+  $data["scope"]["title"] =$l_scope_update;
+
+  $data[] = array("printer");
+  $data["printer"]["dis_printer"] = $dis_printer;
+  $data["printer"]["url"] = $printer_url;
+  $data["printer"]["ico"] = $ico_print;
+
+  $data[] = array("buttons");
+  $data["buttons"] = array (
+    array(
+      "name" => $l_section_webmail, 
+      "url" => "$path/webmail/webmail_index.php", 
+      "notifier" => true, 
+      "notifier_url" => "$path/webmail/webmail_index.php",
+      "notifier_id" => "bannerUnreadMail"
+    ),
+    array(
+      "name" => $l_module_calendar, 
+      "url" => "$path/calendar/calendar_index.php", 
+      "notifier" => true, 
+      "notifier_url" => "$path/calendar/calendar_index.php?action=waiting_events", 
+      "notifier_id" => "bannerWaitingEvent"
+    ),
+    array(
+      "name" => $l_module_contact, 
+      "url" => "$path/contact/contact_index.php", 
+      "notifier" => false
+    ),
+    array(
+      "name" => $l_section_more, 
+      "url" => "#", 
+      "notifier" => false, 
+      "onclick" => "showAllInOneMenu()"
+    )
+  );
+
+  $data[] = array("sections");
+  
+  /* /////////////////////////
+    Examples of Sections Data
+    Need get Sections Links 
+  ///////////////////////// */
+  $data["sections"][] = array(
+    "section_name" => "gw",
+    "name" => "Collaboratif",
+    "links" => array( 
+      array( 'url' => "$path/calendar/calendar_index.php", "ico" => $ico_calendar, "title" => "Agenda" ),
+      array( 'url' => "$path/contact/contact_index.php", "ico" => $ico_contact, "title" => "Contact" )
+    )
+  );
+
+  $data["sections"][] = array(
+    "section_name" => "dic",
+    "name" => "Dictionnaire",
+    "links" => array( 
+      array( 'url' => "$path/user/user_index.php", "ico" => $GLOBALS[ico_user], "title" => "User" ),
+      array( 'url' => "$path/project/project_index.php", "ico" => $GLOBALS[ico_project], "title" => "Project" )
+    )
+  );
+
+  $data[] = array("user_settings");
+
+
+  $block = $m->render('topbar', $data);
+  //$block .= dis_all_in_one_menu().$display['module'];
 
   return $block;
 }

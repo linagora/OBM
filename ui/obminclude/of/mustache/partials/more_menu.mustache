@@ -1,0 +1,21 @@
+<div style="display:none;" id="allinonemenu" class="allinonemenu">
+
+	{{#sections}}
+
+	<h3>{{name}}</h3>
+	<ul id="section-{{section_name}}-items" style="list-style-type:none;">
+
+		{{#links}}
+
+		<li>
+			<a href="{{url}}" class="ico" title="{{title}}"><img src="{{ico}}" alt="{{title}}"></a>
+			<a href="{{url}}" title="{{title}}">{{title}}</a>
+		</li>
+
+		{{/links}}
+
+	<ul>
+
+	{{/sections}}
+
+</div>

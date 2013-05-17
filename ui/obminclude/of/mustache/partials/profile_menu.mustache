@@ -1,0 +1,21 @@
+<div id="profileMenu" class="profileMenu">
+
+	{{#user_settings}}
+
+	<h3>{{name}}</h3>
+	<ul id="section-{{section-name}}-items" style="list-style-type:none;">
+
+		{{#links}}
+
+		<li>
+			<a href="{{url}}" class="ico" title="{{title}}"><img src="{{ico}}" alt="{{title}}">
+			</a><a href="{{url}}" title="{{title}}">{{title}}</a>
+		</li>
+		
+		{{/link}}
+
+	<ul>
+
+	{{/user_settings}}
+
+</div>

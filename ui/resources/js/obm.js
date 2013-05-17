@@ -560,6 +560,7 @@ function popup(url,name,height,width) {
   window.open(url,name,'height='+height+',width='+width+',scrollbars=yes,menubar=yes');
   return false;
 }
+
 function showAllInOneMenu(){
   if ( $('allinonemenu').isVisible() ){
     $('allinonemenu').setStyle('display', 'none');

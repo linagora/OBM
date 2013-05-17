@@ -1,0 +1,56 @@
+<div id="banner">
+  <div style="float:left;">
+    {{#template}}
+    <a href="{{logo_url}}" id="obmLogo"><img src="{{logo_ico}}" alt="Logo OBM"/></a>
+    {{/template}}
+    <ul id="section">
+
+      {{#buttons}}
+
+        {{#notifier}}
+        <li><a href="{{url}}">{{name}}</a> <a href="{{notifier_url}}"> <span id="{{notifier_id}}" class="notification_popup"></span></a></li>
+        {{/notifier}}
+
+        {{^notifier}}
+          <li><a href="{{url}}" onclick="{{onclick}}">{{name}}</a>
+        {{/notifier}}
+
+      {{/buttons}}
+
+    </ul>
+  </div>
+  <div style="float:right;"> 
+    <ul id="information">
+
+      {{#user_infos}}
+
+      <li id="spinner" style="display:none;" ><img src="{{template.ico_spinner}}" alt="" /></li>
+
+      {{#scope}}
+        {{#dis_scope}}
+        <li>
+          <a href="{{url}}" ><img src="{{ico}}" title="{{title}}" alt="Commit update" /></a>
+        </li>
+        {{/dis_scope}}
+      {{/scope}}
+
+      {{#printer}}
+        {{#dis_printer}}
+        <li><a href="#" onclick="popup(\'{{url}}\');" ><img src="{{ico}}" alt="Print" id="print" /></a></li>
+        {{/dis_printer}}
+      {{/printer}}
+
+      <li style="font-size:13px;">
+
+      <a href="#">
+        {{login}}
+        <img src="{{user_infos.photo_url}}" style="width:25px;border:2px solid #AAA; border-radius:5px;margin-top:-5px;"/>
+      </a>
+      </li>
+      {{/user_infos}}
+
+    </ul>
+  </div>
+  
+</div>
+{{>more_menu}}
