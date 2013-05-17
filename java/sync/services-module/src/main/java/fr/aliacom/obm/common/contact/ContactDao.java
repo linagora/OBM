@@ -61,6 +61,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.obm.annotations.database.AutoTruncate;
+import org.obm.annotations.database.DatabaseEntity;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
@@ -110,6 +112,7 @@ import fr.aliacom.obm.utils.ObmHelper;
  * SQL queries for contact for sync
  */
 @Singleton
+@AutoTruncate
 public class ContactDao {
 
 	private static final Logger logger = LoggerFactory
@@ -350,7 +353,8 @@ public class ContactDao {
 		return c;
 	}
 
-	private Contact createContactInAddressBook(Connection con, AccessToken at, Contact c, int addressBookId) 
+	@AutoTruncate
+	protected Contact createContactInAddressBook(Connection con, AccessToken at, @DatabaseEntity Contact c, int addressBookId) 
 			throws ServerFault, SQLException {
 		
 		try {
@@ -802,7 +806,8 @@ public class ContactDao {
 		}
 	}
 
-	public Contact modifyContact(AccessToken token, Contact c) throws SQLException, FindException, EventNotFoundException, ServerFault {
+	@AutoTruncate
+	public Contact modifyContact(AccessToken token, @DatabaseEntity Contact c) throws SQLException, FindException, EventNotFoundException, ServerFault {
 
 		String q = "update Contact SET "
 			+ "contact_commonname=?, contact_firstname=?, "
