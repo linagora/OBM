@@ -53,6 +53,8 @@ import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.DateTime;
 
+import org.obm.annotations.database.AutoTruncate;
+import org.obm.annotations.database.DatabaseEntity;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
@@ -128,6 +130,7 @@ import fr.aliacom.obm.utils.RFC2445;
  * Calendar data access functions
  */
 @Singleton
+@AutoTruncate
 public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private static final Logger logger = LoggerFactory
@@ -270,7 +273,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(Connection con, AccessToken editor, String calendar, Event ev,
+	@AutoTruncate
+	public Event createEvent(Connection con, AccessToken editor, String calendar, @DatabaseEntity Event ev,
 			Boolean useObmUser) throws SQLException, FindException, ServerFault {
 		Integer ownerId = null;
 		logger.info("try to create with calendar owner:"
@@ -1697,7 +1701,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar, Event ev, 
+	@AutoTruncate
+	public void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar, @DatabaseEntity Event ev, 
 			boolean updateAttendees, int sequence, Boolean useObmUser)
 			throws SQLException, FindException, ServerFault, EventNotFoundException {
 		
