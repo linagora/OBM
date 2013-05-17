@@ -38,8 +38,15 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.obm.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
+import org.obm.sync.base.EmailAddress;
+import org.obm.sync.book.Address;
+import org.obm.sync.book.Contact;
+import org.obm.sync.book.InstantMessagingId;
+import org.obm.sync.book.Phone;
+import org.obm.sync.book.Website;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -198,5 +205,35 @@ public class ToolBox {
 		}
 		return collection;
 	}
-	
+
+	public static Contact getFakeContact(int id) {
+		Contact c = new Contact();
+
+		c.setLastname("Last");
+		c.setFirstname("First");
+		c.setCommonname("Common");
+		c.setMiddlename("Middle");
+		c.setBirthday(DateUtils.date("2000-01-01T00:00:00"));
+		c.setUid(id);
+		c.setEntityId(id);
+		c.setAka("Aka");
+		c.setTitle("Title");
+		c.setManager("Manager");
+		c.setAssistant("Assistant");
+		c.setAnniversary(DateUtils.date("2000-01-01T00:00:00"));
+		c.setCalUri("CalURI");
+		c.setComment("Comment");
+		c.setCompany("Company");
+		c.setService("Service");
+		c.setSpouse("Spouse");
+		c.setSuffix("Suffix");
+		c.addEmail("EmailLabel", EmailAddress.loginAtDomain("contact@obm.com"));
+		c.addPhone("PhoneLabel", new Phone("PhoneNumber"));
+		c.addAddress("AddressLabel", new Address("Street", "Zip", "ExpressPostal", "Town", "Country", "State"));
+		c.addIMIdentifier("IMLabel", new InstantMessagingId("imProtocol", "imAddress"));
+		c.addWebsite(new Website("WebsiteLabel", "WebsiteUrl"));
+
+		return c;
+	}
+
 }
