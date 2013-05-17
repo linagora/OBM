@@ -1504,7 +1504,7 @@ function run_query_group_ext_search($group) {
   $limit = $group['limit'];
   if (isset($group['first_row'])) $first_row = $group['first_row'] - 1;
   else $first_row = 0;
-  $uid = sql_parse_id($uid, true);
+  $uid = sql_parse_id($obm['uid'], true);
   $where_privacy = "AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate $uid ))";
 
   if ($restriction == 'user') {
