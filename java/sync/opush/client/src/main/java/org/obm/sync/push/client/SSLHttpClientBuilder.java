@@ -43,6 +43,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
 public class SSLHttpClientBuilder extends PoolingHttpClientBuilder {
@@ -60,7 +61,7 @@ public class SSLHttpClientBuilder extends PoolingHttpClientBuilder {
 			httpClient
 					.getConnectionManager()
 					.getSchemeRegistry()
-					.register(new Scheme("https", 443, new SSLSocketFactory(sslContext)));
+					.register(new Scheme("https", 443, new SSLSocketFactory(sslContext, new AllowAllHostnameVerifier())));
 			
 		} catch (KeyManagementException e) {
 			throw new IllegalArgumentException("Could not initialize a ssl context", e);
