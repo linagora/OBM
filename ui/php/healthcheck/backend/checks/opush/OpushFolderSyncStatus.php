@@ -34,7 +34,7 @@ require_once dirname(__FILE__) . '/../AbstractUserStatus.php';
 
 class OpushFolderSyncStatus extends AbstractUserStatus {
   
-  const SPUSHNIK_URL = "http://%SPUSHNIK_HOST%:%SPUSHNIK_PORT%/spushnik/foldersync?serviceUrl=http://%OPUSH_HOST%/Microsoft-Server-ActiveSync/";
+  const SPUSHNIK_URL = "http://%SPUSHNIK_HOST%:%SPUSHNIK_PORT%/spushnik/foldersync?serviceUrl=https://%OPUSH_HOST%/Microsoft-Server-ActiveSync/";
   
   public function executeForDomain($domain) {
     $user = $this->getTestUser();
