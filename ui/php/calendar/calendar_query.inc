@@ -7422,6 +7422,9 @@ Class CalendarView {
   }
 
   public function set_group($group_id) {
+    if ( !is_numeric($group_id) || !ctype_digit($group_id) ) {
+      $group_id = null;
+    }
     $this->group = (empty($group_id) ? $GLOBALS['c_all'] : $group_id);
     if ($this->group!=$GLOBALS['c_all']) {
       foreach ($this->resources as $resource_id) {
