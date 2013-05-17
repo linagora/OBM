@@ -36,7 +36,7 @@ package org.obm.configuration;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ContactConfiguration extends AbstractConfigurationService{
+public class ContactConfiguration {
 	
 	private static final String DEFAULT_ADDRESS_BOOK_NAME = "contacts";
 	private static final String COLLECTED_ADDRESS_BOOK_NAME = "collected_contacts";

@@ -38,6 +38,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
@@ -94,6 +95,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 				bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 				install(new TransactionalModule());
 				install(new LocatorServletModule());
+				install(new ConfigurationModule());
 			}
 		});
 	}

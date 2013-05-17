@@ -32,6 +32,7 @@
 package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
@@ -45,7 +46,6 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
-import org.obm.push.configuration.ConfigurationModule;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ContinuationServiceImpl;
 import org.obm.push.impl.ContinuationTransactionMapImpl;
@@ -118,6 +118,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new TechnicalLogServletModule());
 		install(new ObmSyncHttpClientModule());
 		install(new ConfigurationModule());
+		install(new org.obm.push.configuration.ConfigurationModule());
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);

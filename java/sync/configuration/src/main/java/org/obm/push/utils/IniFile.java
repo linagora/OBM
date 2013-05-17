@@ -35,13 +35,16 @@ package org.obm.push.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -50,6 +53,8 @@ public class IniFile {
 	@Singleton
 	public static class Factory {
 
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+		
 		@Inject
 		public Factory() {
 			super();
@@ -60,25 +65,48 @@ public class IniFile {
 		}
 		
 		public IniFile build(String path, String category) {
-			return new IniFile(path, category);
+			return new IniFile(loadFileContent(path), category);
 		}
 		
+		private Map<String, String> loadFileContent(String path) {
+			Map<String, String> settings = Maps.newHashMap();
+			File f = new File(path);
+			if (f.exists()) {
+				loadIniFile(f, settings);
+			} else {
+				logger.warn(path+ " does not exist.");
+			}
+			return ImmutableMap.copyOf(settings);
+		}
+		
+		private void loadIniFile(File f, Map<String, String> settings) {
+			FileInputStream in = null;
+			try {
+				Properties p = new Properties();
+				in = new FileInputStream(f);
+				p.load(in);
+				for (Object key : p.keySet()) {
+					settings.put((String) key, p.getProperty((String) key));
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			} finally {
+				if (in != null) {
+					try {
+						in.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
 	}
 	
 	private final Map<String, String> settings;
-	private final Logger logger;
 	private final String category;
 	
-	private IniFile(String path, String category) {
+	@VisibleForTesting IniFile(Map<String, String> settings, String category) {
+		this.settings = settings;
 		this.category = category;
-		logger = LoggerFactory.getLogger(getClass());
-		settings = new HashMap<String, String>();
-		File f = new File(path);
-		if (f.exists()) {
-			loadIniFile(f);
-		} else {
-			logger.warn(path+ " does not exist.");
-		}
 	}
 
 	protected String getSetting(String settingName) {
@@ -86,32 +114,39 @@ public class IniFile {
 	}
 	
 	public Map<String, String> getData() {
-		return settings;
+		return ImmutableMap.copyOf(settings);
 	}
 
 	public String getCategory() {
 		return category;
 	}
+
+	public String getStringValue(String prop) {
+		return getSetting(prop);
+	}
 	
-	private void loadIniFile(File f) {
-		FileInputStream in = null;
+	public String getStringValue(String prop, String defaultValue) {
+		return Objects.firstNonNull(getStringValue(prop), defaultValue);
+	}
+
+	public boolean getBooleanValue(String prop) {
+		return Boolean.valueOf(getStringValue(prop)).booleanValue();
+	}
+
+	public boolean getBooleanValue(String prop, boolean defaultValue) {
+		String valueString = getStringValue(prop);
+		boolean value = valueString != null ? Boolean.valueOf(valueString).booleanValue()
+				: defaultValue;
+		return value;
+	}
+
+	public int getIntValue(String prop, int defaultValue) {
 		try {
-			Properties p = new Properties();
-			in = new FileInputStream(f);
-			p.load(in);
-			for (Object key : p.keySet()) {
-				settings.put((String) key, p.getProperty((String) key));
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-				}
-			}
+			return Integer.parseInt(getStringValue(prop));
+		} catch (NumberFormatException nfe) {
+			return defaultValue;
 		}
 	}
 
+	
 }

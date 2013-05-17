@@ -38,6 +38,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
@@ -82,13 +83,14 @@ public class GuiceServletContextListener implements ServletContextListener{
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-               bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-               bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-               bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-               bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-               bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
-               bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
-               bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+            	install(new ConfigurationModule());
+            	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+            	bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
+            	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+            	bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+            	bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
+            	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+            	bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             }
         }, new TransactionalModule());
 

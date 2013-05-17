@@ -31,31 +31,31 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.configuration;
 
-import org.obm.configuration.AbstractConfigurationService;
 import org.obm.push.utils.IniFile;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class RemoteConsoleConfigurationFileImpl extends AbstractConfigurationService
-	implements RemoteConsoleConfiguration {
+public class RemoteConsoleConfigurationFileImpl implements RemoteConsoleConfiguration {
 
 	private static final String configFilePath = "/etc/opush/remote_console.ini";
+	private final IniFile iniFile;
+	
 	
 	@Inject
 	private RemoteConsoleConfigurationFileImpl(IniFile.Factory factory) {
-		super(factory.build(configFilePath));
+		iniFile = factory.build(configFilePath);
 	}
 	
 	@Override
 	public boolean enable() {
-		return getBooleanValue("console.enable", DEFAULT_ENABLE);
+		return iniFile.getBooleanValue("console.enable", DEFAULT_ENABLE);
 	}
 
 	@Override
 	public int port() {
-		return getIntValue("console.ssh.port", DEFAULT_PORT);
+		return iniFile.getIntValue("console.ssh.port", DEFAULT_PORT);
 	}
 
 }

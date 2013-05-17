@@ -63,7 +63,6 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalInterceptor;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.AbstractConfigurationService;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.ContactConfiguration;
@@ -539,7 +538,6 @@ public class ObmSyncArchiveUtils {
 
 	public static Class<?>[] projectConfigurationClasses() {
 		return new Class<?>[] {
-				AbstractConfigurationService.class,
 				ConfigurationServiceImpl.class,
 				ConfigurationService.class,
 				ContactConfiguration.class,

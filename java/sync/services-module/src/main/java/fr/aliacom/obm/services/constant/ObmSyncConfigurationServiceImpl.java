@@ -34,6 +34,8 @@ package fr.aliacom.obm.services.constant;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.push.utils.IniFile;
 import org.obm.sync.auth.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
@@ -51,11 +53,21 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 
 	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
 	private static final String OVERRIDE_TEMPLATE_FOLDER = "/etc/obm-sync/resources/template/";
+	private static final String OBM_SYNC_MAILER = "x-obm-sync";
+	private static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
+	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
+	
+	private static final String DB_AUTO_TRUNCATE_PARAMETER = "database-auto-truncate";
+	private static final boolean DB_AUTO_TRUNCATE_DEFAULT_VALUE = true;
+	private static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
+	private static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Inject
 	@VisibleForTesting
-	ObmSyncConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName) {
-		super(iniFileFactory, applicationName);
+	ObmSyncConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, @Named("globalConfigurationFile") String globalConfigurationFile) {
+		super(iniFileFactory, applicationName, globalConfigurationFile);
 	}
 
 	@Override
@@ -75,22 +87,22 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 
 	@Override
 	public String getLdapServer() {
-		return getStringValue("auth-ldap-server");
+		return iniFile.getStringValue("auth-ldap-server");
 	}
 
 	@Override
 	public String getLdapBaseDn() {
-		return getStringValue("auth-ldap-basedn").replace("\"", "");
+		return iniFile.getStringValue("auth-ldap-basedn").replace("\"", "");
 	}
 
 	@Override
 	public String getLdapFilter() {
-		return getStringValue("auth-ldap-filter").replace("\"", "");
+		return iniFile.getStringValue("auth-ldap-filter").replace("\"", "");
 	}
 
 	@Override
 	public String getLdapBindDn() {
-		String bindDn = getStringValue("auth-ldap-binddn");
+		String bindDn = iniFile.getStringValue("auth-ldap-binddn");
 		if (bindDn != null) {
 			return bindDn.replace("\"", "");
 		}
@@ -99,7 +111,7 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 
 	@Override
 	public String getLdapBindPassword() {
-		String bindPassword = getStringValue("auth-ldap-bindpw");
+		String bindPassword = iniFile.getStringValue("auth-ldap-bindpw");
 		if (bindPassword != null) {
 			return bindPassword.replace("\"", "");
 		}
@@ -108,28 +120,28 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 
 	@Override
 	public Iterable<String> getLemonLdapIps() {
-		String lemonIPs = getStringValue("lemonLdapIps");
+		String lemonIPs = iniFile.getStringValue("lemonLdapIps");
 		return Splitter.on(',').trimResults().split(lemonIPs);
 	}
 
 	@Override
 	public String getRootAccounts() {
-		return getStringValue("rootAccounts");
+		return iniFile.getStringValue("rootAccounts");
 	}
 
 	@Override
 	public String getAppliAccounts() {
-		return getStringValue("appliAccounts");
+		return iniFile.getStringValue("appliAccounts");
 	}
 
 	@Override
 	public String getAnyUserAccounts() {
-		return getStringValue("anyUserAccounts");
+		return iniFile.getStringValue("anyUserAccounts");
 	}
 
 	@Override
 	public boolean syncUsersAsAddressBook() {
-		return getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
+		return iniFile.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
 				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE);
 	}
 	
@@ -140,7 +152,7 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 
 	@Override
 	public CalendarEncoding getEmailCalendarEncoding() {
-		String strEncoding = getStringValue(EMAIL_CALENDAR_ENCODING_PARAMETER);
+		String strEncoding = iniFile.getStringValue(EMAIL_CALENDAR_ENCODING_PARAMETER);
 		
 		if (strEncoding == null) {
 			return DEFAULT_EMAIL_CALENDAR_ENCODING;
@@ -157,6 +169,6 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	
 	@Override
 	public boolean isAutoTruncateEnabled() {
-		return getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
+		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
 	}
 }

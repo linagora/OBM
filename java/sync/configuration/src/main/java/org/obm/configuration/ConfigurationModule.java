@@ -31,53 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import java.util.Map;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-import org.obm.push.utils.IniFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Objects;
-
-public abstract class AbstractConfigurationService {
-
-	protected static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
-
-	protected Map<String, String> props;
-
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
-
-	protected AbstractConfigurationService() {}
-
-	protected AbstractConfigurationService(IniFile iniFile) {
-		props = iniFile.getData();
-	}
+public class ConfigurationModule extends AbstractModule {
 	
-	protected String getStringValue(String prop) {
-		return props.get(prop);
-	}
-	
-	protected String getStringValue(String prop, String defaultValue) {
-		return Objects.firstNonNull(getStringValue(prop), defaultValue);
+	@Override
+	protected void configure() {
+		bind(String.class).annotatedWith(Names.named("globalConfigurationFile")).toInstance("/etc/obm/obm_conf.ini");
 	}
 
-	protected boolean getBooleanValue(String prop) {
-		return Boolean.valueOf(getStringValue(prop)).booleanValue();
-	}
-
-	protected boolean getBooleanValue(String prop, boolean defaultValue) {
-		String valueString = getStringValue(prop);
-		boolean value = valueString != null ? Boolean.valueOf(valueString).booleanValue()
-				: defaultValue;
-		return value;
-	}
-
-	protected int getIntValue(String prop, int defaultValue) {
-		try {
-			return Integer.parseInt(getStringValue(prop));
-		} catch (NumberFormatException nfe) {
-			return defaultValue;
-		}
-	}
-	
 }
