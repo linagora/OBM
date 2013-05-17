@@ -37,10 +37,10 @@ import org.obm.push.utils.IniFile;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
-public class DatabaseConfigurationImpl extends AbstractConfigurationService
-        implements DatabaseConfiguration {
+public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 
     private static final String DB_TYPE_KEY = "dbtype";
     private static final String DB_HOST_KEY = "host";
@@ -51,35 +51,36 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
     private static final String DB_PG_SSL = "database-postgres-ssl-enabled";
     private static final String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
+	private IniFile iniFile;
 
     @Inject
-    DatabaseConfigurationImpl(IniFile.Factory iniFileFactory) {
-        super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
+    DatabaseConfigurationImpl(IniFile.Factory iniFileFactory, @Named("globalConfigurationFile") String globalConfigurationFile) {
+        iniFile = iniFileFactory.build(globalConfigurationFile);
     }
 
     @Override
     public Integer getDatabaseMaxConnectionPoolSize() {
-        return getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
+        return iniFile.getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
     }
 
     @Override
     public DatabaseFlavour getDatabaseSystem() {
-        return DatabaseFlavour.valueOf(getStringValue(DB_TYPE_KEY).trim());
+        return DatabaseFlavour.valueOf(iniFile.getStringValue(DB_TYPE_KEY).trim());
     }
 
     @Override
     public String getDatabaseName() {
-        return getStringValue(DB_NAME_KEY);
+        return iniFile.getStringValue(DB_NAME_KEY);
     }
 
     @Override
     public String getDatabaseHost() {
-        return getStringValue(DB_HOST_KEY);
+        return iniFile.getStringValue(DB_HOST_KEY);
     }
 
     @Override
     public String getDatabaseLogin() {
-        return getStringValue(DB_USER_KEY);
+        return iniFile.getStringValue(DB_USER_KEY);
     }
 
     @VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
@@ -89,16 +90,16 @@ public class DatabaseConfigurationImpl extends AbstractConfigurationService
 
     @Override
     public String getDatabasePassword() {
-        return removeEnclosingDoubleQuotes(getStringValue(DB_PASSWORD_KEY));
+        return removeEnclosingDoubleQuotes(iniFile.getStringValue(DB_PASSWORD_KEY));
     }
 
     @Override
     public boolean isPostgresSSLEnabled() {
-        return getBooleanValue(DB_PG_SSL, false);
+        return iniFile.getBooleanValue(DB_PG_SSL, false);
     }
 
     @Override
     public boolean isPostgresSSLNonValidating() {
-        return getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
+        return iniFile.getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
     }
 }

@@ -42,6 +42,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
@@ -126,41 +127,42 @@ public class GuiceServletContextListener implements ServletContextListener {
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-                bind(DomainService.class).to(DomainCache.class);
-                bind(UserService.class).to(UserServiceImpl.class);
-                bind(SettingsService.class).to(SettingsServiceImpl.class);
-                bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
-                bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-                bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
-                bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
-                bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-                bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-                bind(LocatorService.class).to(LocatorCache.class);
-                bind(HelperService.class).to(HelperServiceImpl.class);
-                bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-                bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
-                bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-                bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
-                bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
-                bind(ICalendar.class).to(CalendarBindingImpl.class);
+            	install(new ConfigurationModule());
+            	bind(DomainService.class).to(DomainCache.class);
+            	bind(UserService.class).to(UserServiceImpl.class);
+            	bind(SettingsService.class).to(SettingsServiceImpl.class);
+            	bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
+            	bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+            	bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
+            	bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
+            	bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
+            	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+            	bind(LocatorService.class).to(LocatorCache.class);
+            	bind(HelperService.class).to(HelperServiceImpl.class);
+            	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+            	bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
+            	bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+            	bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
+            	bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
+            	bind(ICalendar.class).to(CalendarBindingImpl.class);
 
-                ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
-                        .load(FreeBusyPluginModule.class);
+            	ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
+            			.load(FreeBusyPluginModule.class);
 
-                List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
-                for (FreeBusyPluginModule pluginModule : pluginModules) {
-                    pluginModulesList.add(pluginModule);
-                }
+            	List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
+            	for (FreeBusyPluginModule pluginModule : pluginModules) {
+            		pluginModulesList.add(pluginModule);
+            	}
 
-                Collections.sort(pluginModulesList, Collections.reverseOrder());
-                for (FreeBusyPluginModule pluginModule : pluginModulesList) {
-                    this.install(pluginModule);
-                }
-                
-        		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
-        		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
-        		bind(DateProvider.class).to(ObmHelper.class);
-        		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
+            	Collections.sort(pluginModulesList, Collections.reverseOrder());
+            	for (FreeBusyPluginModule pluginModule : pluginModulesList) {
+            		this.install(pluginModule);
+            	}
+
+            	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+            	bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+            	bind(DateProvider.class).to(ObmHelper.class);
+            	bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
             }
         },
         new MessageQueueModule(), new TransactionalModule(),

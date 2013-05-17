@@ -57,7 +57,7 @@ public class DatabaseConfigurationImplTest {
 		Factory factory = control.createMock(IniFile.Factory.class);
 		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		control.replay();
-		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory);
+		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory, "fakeFilePath");
 	}
 	
     @Test

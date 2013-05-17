@@ -39,7 +39,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class EmailConfigurationImpl extends AbstractConfigurationService implements EmailConfiguration {
+public class EmailConfigurationImpl implements EmailConfiguration {
 	
 	private static final int IMAP_PORT = 143;
 	private static final int MESSAGE_DEFAULT_MAX_SIZE = 10485760;
@@ -56,14 +56,15 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	private static final String BACKEND_IMAP_DRAFTS_PATH = "imap.mailbox.draft";
 	private static final String BACKEND_IMAP_SENT_PATH = "imap.mailbox.sent";
 	private static final String BACKEND_IMAP_TRASH_PATH = "imap.mailbox.trash";
+	private final IniFile iniFile;
 	
 	@Inject
 	private EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
-		super(iniFileFactory.build(BACKEND_CONF_FILE));
+		iniFile = iniFileFactory.build(BACKEND_CONF_FILE);
 	}	
 	
 	private boolean isOptionEnabled(String option) {
-		String entryContent = getStringValue(option);
+		String entryContent = iniFile.getStringValue(option);
 		return !"false".equals(entryContent);
 	}
 	
@@ -79,7 +80,7 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 	
 	@Override
 	public int getMessageMaxSize() {
-		return getIntValue(BACKEND_MESSAGE_MAX_SIZE, MESSAGE_DEFAULT_MAX_SIZE);
+		return iniFile.getIntValue(BACKEND_MESSAGE_MAX_SIZE, MESSAGE_DEFAULT_MAX_SIZE);
 	}
 	
 	@Override
@@ -89,26 +90,26 @@ public class EmailConfigurationImpl extends AbstractConfigurationService impleme
 
 	@Override
 	public int imapTimeoutInMilliseconds() {
-		return getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
+		return iniFile.getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
 	}
 
 	@Override
 	public int getImapFetchBlockSize() {
-		return getIntValue(BACKEND_MESSAGE_BLOCK_SIZE, IMAP_FETCH_BLOCK_SIZE);
+		return iniFile.getIntValue(BACKEND_MESSAGE_BLOCK_SIZE, IMAP_FETCH_BLOCK_SIZE);
 	}
 
 	@Override
 	public String imapMailboxDraft() {
-		return getStringValue(BACKEND_IMAP_DRAFTS_PATH, IMAP_DRAFTS_NAME);
+		return iniFile.getStringValue(BACKEND_IMAP_DRAFTS_PATH, IMAP_DRAFTS_NAME);
 	}
 
 	@Override
 	public String imapMailboxSent() {
-		return getStringValue(BACKEND_IMAP_SENT_PATH, IMAP_SENT_NAME);
+		return iniFile.getStringValue(BACKEND_IMAP_SENT_PATH, IMAP_SENT_NAME);
 	}
 
 	@Override
 	public String imapMailboxTrash() {
-		return getStringValue(BACKEND_IMAP_TRASH_PATH, IMAP_TRASH_NAME);
+		return iniFile.getStringValue(BACKEND_IMAP_TRASH_PATH, IMAP_TRASH_NAME);
 	}
 }

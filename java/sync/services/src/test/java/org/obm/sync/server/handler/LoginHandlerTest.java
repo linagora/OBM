@@ -293,6 +293,7 @@ public class LoginHandlerTest {
 		@Override
 		protected void configure() {
 			bind(String.class).annotatedWith(Names.named("application-name")).toInstance("obm-sync");
+			bind(String.class).annotatedWith(Names.named("globalConfigurationFile")).toInstance("discarded");
 			Connection connection = control.createMock(Connection.class);
 			PreparedStatement ps = control.createMock(PreparedStatement.class);
 			ResultSet rs = control.createMock(ResultSet.class);

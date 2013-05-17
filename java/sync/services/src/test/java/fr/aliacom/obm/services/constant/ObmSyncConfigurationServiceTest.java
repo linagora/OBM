@@ -42,8 +42,6 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.IniFile.Factory;
 
-import com.google.common.collect.ImmutableMap;
-
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
 @RunWith(SlowFilterRunner.class)
@@ -64,105 +62,77 @@ public class ObmSyncConfigurationServiceTest {
 
 	@Test
 	public void testGetEmailCalendarEncodingInvalidEncoding() {
-		expect(configuration.getData()).andReturn(
-				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "InvalidEncoding"));
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("InvalidEncoding");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingEmptyPropertyDefined() {
-		expect(configuration.getData()).andReturn(
-				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, ""));
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
 
 	@Test
 	public void testGetEmailCalendarEncodingNoPropertyDefined() {
-		expect(configuration.getData()).andReturn(ImmutableMap.<String, String>of());
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn(null);
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingBase64() {
-		expect(configuration.getData()).andReturn(
-				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "Base64"));
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("Base64");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Base64);
 		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingQuotedPrintable() {
-		expect(configuration.getData()).andReturn(
-				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "QuotedPrintable"));
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("QuotedPrintable");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.QuotedPrintable);
 		control.verify();
 	}
 	
 	@Test
 	public void testGetEmailCalendarEncodingSevenBit() {
-		expect(configuration.getData()).andReturn(
-				ImmutableMap.of(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER, "SevenBit"));
+		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("SevenBit");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
 		control.verify();
 	}
 
 	@Test
 	public void testIsAutoTruncateEnabled() {
-		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "true"));
+		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(true);
 		control.replay();
 
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConf");
 
 		assertThat(service.isAutoTruncateEnabled()).isTrue();
 
 		control.verify();
 	}
 
-	@Test
-	public void testIsAutoTruncateEnabledWhenNotDefined() {
-		expect(configuration.getData()).andReturn(ImmutableMap.<String, String> of());
-		control.replay();
-
-		service = new ObmSyncConfigurationService(factory, "test");
-
-		assertThat(service.isAutoTruncateEnabled()).isTrue();
-
-		control.verify();
-	}
-
-	@Test
-	public void testIsAutoTruncateEnabledWhenNotABoolean() {
-		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "NotABoolean"));
-		control.replay();
-
-		service = new ObmSyncConfigurationService(factory, "test");
-
-		assertThat(service.isAutoTruncateEnabled()).isFalse();
-
-		control.verify();
-	}
 
 	@Test
 	public void testIsAutoTruncateEnabledWhenDisabled() {
-		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "false"));
+		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(false);
 		control.replay();
 
-		service = new ObmSyncConfigurationService(factory, "test");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConf");
 
 		assertThat(service.isAutoTruncateEnabled()).isFalse();
 

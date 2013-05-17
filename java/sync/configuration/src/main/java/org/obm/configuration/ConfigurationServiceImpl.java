@@ -49,8 +49,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ConfigurationServiceImpl extends AbstractConfigurationService
-        implements ConfigurationService {
+public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
@@ -84,10 +83,12 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 	private final ImmutableMap<String, TimeUnit> timeUnits;
 
 	private final String applicationName;
+	protected final IniFile iniFile;
 
-	@Inject
-	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName) {
-		super(iniFileFactory.build(GLOBAL_CONFIGURATION_FILE));
+    @Inject
+	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, 
+			@Named("globalConfigurationFile") String globalConfigurationFile) {
+		this.iniFile = iniFileFactory.build(globalConfigurationFile);
 		this.applicationName = applicationName;
 		this.timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,
@@ -97,7 +98,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
 	@Override
 	public String getLocatorUrl() throws ConfigurationException {
-		String locatorHost = getStringValue(LOCATOR_HOST_KEY);
+		String locatorHost = iniFile.getStringValue(LOCATOR_HOST_KEY);
 		if (locatorHost == null) {
 			throw new ConfigurationException(
 					"Missing host key in configuration");
@@ -107,9 +108,9 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
 	@Override
 	public String getObmUIBaseUrl() {
-		String protocol = getStringValue("external-protocol");
+		String protocol = iniFile.getStringValue("external-protocol");
 		String hostname = getExternalUrl();
-		String path = getStringValue("obm-prefix");
+		String path = iniFile.getStringValue("obm-prefix");
 		return protocol + "://" + hostname + path;
 	}
 
@@ -120,21 +121,21 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
 	@Override
 	public int getLocatorCacheTimeout() {
-		return getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);
+		return iniFile.getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);
 	}
 
 	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
-		String key = getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
+		String key = iniFile.getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
 	private int getTransactionTimeout() {
-		return getIntValue(TRANSACTION_TIMEOUT_KEY, TRANSACTION_TIMEOUT_DEFAULT);
+		return iniFile.getIntValue(TRANSACTION_TIMEOUT_KEY, TRANSACTION_TIMEOUT_DEFAULT);
 	}
 
 	private TimeUnit getTransactionTimeoutUnit() {
-		String key = getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
+		String key = iniFile.getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
 		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
@@ -172,7 +173,7 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 	}
 
 	private String getExternalUrl() {
-		return getStringValue(EXTERNAL_URL_KEY);
+		return iniFile.getStringValue(EXTERNAL_URL_KEY);
 	}
 
 
@@ -183,12 +184,12 @@ public class ConfigurationServiceImpl extends AbstractConfigurationService
 
 	@Override
 	public int trustTokenTimeoutInSeconds() {
-		return getIntValue(TRUST_TOKEN_TIMEOUT_KEY, TRUST_TOKEN_TIMEOUT_DEFAULT);
+		return iniFile.getIntValue(TRUST_TOKEN_TIMEOUT_KEY, TRUST_TOKEN_TIMEOUT_DEFAULT);
 	}
 
 	@Override
 	public int solrCheckingInterval() {
-		return getIntValue(SOLR_CHECKING_INTERVAL_KEY, SOLR_CHECKING_INTERVAL_DEFAULT);
+		return iniFile.getIntValue(SOLR_CHECKING_INTERVAL_KEY, SOLR_CHECKING_INTERVAL_DEFAULT);
 	}
 
 	@Override

@@ -32,6 +32,7 @@
 package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.BackendWindowingService;
@@ -46,7 +47,6 @@ import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.calendar.EventConverterImpl;
 import org.obm.push.calendar.EventServiceImpl;
-import org.obm.push.configuration.ConfigurationModule;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ContinuationServiceImpl;
@@ -120,6 +120,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new TechnicalLogServletModule());
 		install(new ObmSyncHttpClientModule());
 		install(new ConfigurationModule());
+		install(new org.obm.push.configuration.ConfigurationModule());
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
