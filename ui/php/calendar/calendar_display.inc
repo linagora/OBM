@@ -4038,6 +4038,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities, $curre
       $groups = (is_array($calendar['new_group_id'])) ? get_calendar_group_from_ids($calendar['new_group_id']) : array();
       $resources = (is_array($calendar['new_resource_id'])) ? get_calendar_resource_from_ids($calendar['new_resource_id']) : array();
       $contacts = (is_array($calendar['new_contact_id'])) ? get_contact_from_ids($calendar['new_contact_id'], false) : array();
+      if (isset($calendar['organizer'])) $organizer_id = $calendar['organizer'];
     }
     
   } else {
