@@ -27,32 +27,48 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.sync.metadata;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
-import org.obm.annotations.database.AutoTruncate;
-import org.obm.sync.metadata.AutoTruncateMethodInterceptor;
-import org.obm.sync.metadata.DatabaseMetadataDao;
-import org.obm.sync.metadata.DatabaseMetadataService;
-import org.obm.sync.metadata.DatabaseMetadataServiceImpl;
-import org.obm.sync.metadata.DatabaseTruncationService;
-import org.obm.sync.metadata.DatabaseTruncationServiceImpl;
+import org.aopalliance.intercept.MethodInvocation;
+import org.obm.annotations.database.DatabaseEntity;
+import org.obm.annotations.database.DatabaseField;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
+import com.google.inject.Inject;
 
-public class DatabaseMetadataModule extends AbstractModule {
+public class AutoTruncateMethodInterceptor implements MethodInterceptor {
+
+	@Inject
+	private DatabaseTruncationService truncationService;
 
 	@Override
-	protected void configure() {
-		bind(DatabaseMetadataDao.class);
-		bind(DatabaseMetadataService.class).to(DatabaseMetadataServiceImpl.class);
-		bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
-		
-		MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
-		
-		requestInjection(interceptor);
-		bindInterceptor(Matchers.annotatedWith(AutoTruncate.class), Matchers.annotatedWith(AutoTruncate.class), interceptor);
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		Method method = invocation.getMethod();
+		Object[] args = invocation.getArguments();
+		Class<?>[] paramTypes = method.getParameterTypes();
+		Annotation[][] paramsAnnotations = method.getParameterAnnotations();
+
+		for (int i = 0; i < args.length; i++) {
+			Annotation[] annotations = paramsAnnotations[i];
+
+			for (Annotation annotation : annotations) {
+				Object arg = args[i];
+
+				if (annotation instanceof DatabaseEntity) {
+					args[i] = truncationService.getTruncatingEntity(arg);
+				}
+				else if (annotation instanceof DatabaseField && String.class.equals(paramTypes[i])) {
+					DatabaseField dbField = (DatabaseField) annotation;
+
+					args[i] = truncationService.truncate((String) arg, dbField.table(), dbField.column());
+				}
+			}
+		}
+
+		return invocation.proceed();
 	}
 
 }
