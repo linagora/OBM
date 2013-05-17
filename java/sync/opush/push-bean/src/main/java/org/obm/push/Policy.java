@@ -29,15 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.protocol.provisioning;
+package org.obm.push;
 
-import org.obm.push.DefaultPolicy;
-import org.obm.push.Policy;
+import org.joda.time.Duration;
 
-public class PolicyDecoder {
+public interface Policy {
+
+	boolean devicePasswordEnabled();
+	boolean alphaNumericDevicePasswordRequired();
+	boolean passwordRecoveryEnabled();
+	boolean deviceEncryptionEnabled();
+	boolean attachmentsEnabled();
+	int minDevicePasswordLength();
+	Duration maxInactivityTimeDeviceLock();
+	int maxDevicePasswordFailedAttempts();
+	Integer maxAttachmentSize();
+	boolean allowSimpleDevicePassword();
+	Boolean devicePasswordExpiration();
+	boolean devicePasswordHistory();
+	boolean allowStorageCard();
+	boolean allowCamera();
+	boolean requireStorageCardEncryption();
+	boolean requireDeviceEncryption();
+	boolean allowUnsignedApplications();
+	boolean allowUnsignedInstallationPackages();
+	int minDevicePasswordComplexCharacters();
+	boolean allowWiFi();
+	boolean allowTextMessaging();
+	boolean allowPOPIMAPEmail();
+	int allowBluetooth();
+	boolean allowIrDA();
+	boolean requireManualSyncWhenRoaming();
+	boolean allowDesktopSync();
+	int maxCalendarAgeFilter();
+	boolean allowHTMLEmail();
+	int maxEmailAgeFilter();
+	int maxEmailBodyTruncationSize();
+	int maxEmailHTMLBodyTruncationSize();
+	boolean requireSignedSMIMEMessages();
+	boolean requireEncryptedSMIMEMessages();
+	boolean requireSignedSMIMEAlgorithm();
+	boolean requireEncryptionSMIMEAlgorithm();
+	int allowSMIMEEncryptionAlgorithmNegotiation();
+	boolean allowSMIMESoftCerts();
+	boolean allowBrowser();
+	boolean allowConsumerEmail();
+	boolean allowRemoteDesktop();
+	boolean allowInternetSharing();
 	
-	
-	public static Policy decode() {
-		return new DefaultPolicy();
-	}
 }

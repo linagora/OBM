@@ -31,33 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.provisioning;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
-import org.junit.Test;
-import org.obm.push.ProtocolVersion;
+import org.obm.push.Policy;
 import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+public class MSEAS12Dot0PolicyProtocol implements PolicyProtocol {
 
-public class PolicyDecoderTest {
-	
-	@Test
-	public void testDecodeMSEASZeroVersion() {
-		Document doc = DOMUtils.createDoc(null, "decode");
-		Element root = doc.getDocumentElement();
-		
-		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
-		assertThat(msEAS.getProtocolVersion()).isEqualTo(ProtocolVersion.V120);
+	@Override
+	public void appendPolicy(Element data, Policy policy) {
+		Element provDoc = DOMUtils.createElement(data, "EASProvisionDoc");
+
+		DOMUtils.createElementAndText(provDoc, "DevicePasswordEnabled", policy.devicePasswordEnabled());
+		DOMUtils.createElementAndText(provDoc, "AlphanumericDevicePasswordRequired", policy.alphaNumericDevicePasswordRequired());
+		DOMUtils.createElementAndText(provDoc, "PasswordRecoveryEnabled", policy.passwordRecoveryEnabled());
+		DOMUtils.createElementAndText(provDoc, "DeviceEncryptionEnabled", policy.deviceEncryptionEnabled());
+		DOMUtils.createElementAndText(provDoc, "AttachmentsEnabled", policy.attachmentsEnabled());
+		DOMUtils.createElementAndText(provDoc, "MinDevicePasswordLength", policy.minDevicePasswordLength());
+		DOMUtils.createElementAndText(provDoc, "MaxInactivityTimeDeviceLock", policy.maxInactivityTimeDeviceLock().toStandardSeconds().getSeconds());
+		DOMUtils.createElementAndText(provDoc, "MaxDevicePasswordFailedAttempts", policy.maxDevicePasswordFailedAttempts());
+		if (policy.maxAttachmentSize() != null) {
+			DOMUtils.createElementAndText(provDoc, "MaxAttachmentSize", policy.maxAttachmentSize()); 
+		} else {
+			DOMUtils.createElement(provDoc, "MaxAttachmentSize");
+		}
+
+		DOMUtils.createElementAndText(provDoc, "AllowSimpleDevicePassword", policy.allowSimpleDevicePassword());
+		if (policy.devicePasswordExpiration() != null) {
+			DOMUtils.createElementAndText(provDoc, "DevicePasswordExpiration", policy.devicePasswordExpiration());
+		} else {
+			DOMUtils.createElement(provDoc, "DevicePasswordExpiration");
+		}
+		DOMUtils.createElementAndText(provDoc, "DevicePasswordHistory", policy.devicePasswordHistory());
 	}
 	
-	@Test
-	public void testDecodeMSEASCurrentVersion() {
-		Document doc = DOMUtils.createDoc(null, "decode");
-		Element root = doc.getDocumentElement();
-		DOMUtils.createElement(root, "AllowStorageCard");
-		
-		MSEASProvisioningWBXML msEAS = (MSEASProvisioningWBXML) PolicyDecoder.decode(root);
-		assertThat(msEAS.getProtocolVersion()).isEqualTo(ProtocolVersion.V121);
- 	}
 }

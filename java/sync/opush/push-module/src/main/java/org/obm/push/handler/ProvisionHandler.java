@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import org.obm.push.DefaultPolicy;
+import org.obm.push.Policy;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -47,8 +49,6 @@ import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.ProvisionResponse.Builder;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.provisioning.MSEASProvisioningWBXML;
-import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
@@ -65,38 +65,39 @@ import com.google.inject.Singleton;
 public class ProvisionHandler extends WbxmlRequestHandler {
 
 	private static final int INITIAL_POLICYKEY = 0;
-	private final ProvisionProtocol protocol;
+	private final ProvisionProtocol.Factory protocolFactory;
 	private final DeviceDao deviceDao;
 
 	@Inject
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			DeviceDao deviceDao, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
-			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			ProvisionProtocol.Factory provisionProtocolFactory, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.deviceDao = deviceDao;
-		this.protocol = provisionProtocol;
+		this.protocolFactory = provisionProtocolFactory;
 	}
 	
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
+		ProvisionProtocol provisioningProtocol = protocolFactory.createProtocol(udr.getDevice().getProtocolVersion());
 		try {
-			ProvisionRequest provisionRequest = protocol.decodeRequest(doc);
+			ProvisionRequest provisionRequest = provisioningProtocol.decodeRequest(doc);
 			logger.info("required {}", provisionRequest.toString());
 			ProvisionResponse provisionResponse = doTheJob(provisionRequest, udr);
-			Document ret = protocol.encodeResponse(provisionResponse);
+			Document ret = provisioningProtocol.encodeResponse(provisionResponse);
 			sendResponse(responder, ret);
 		} catch (InvalidPolicyKeyException e) {
-			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e);
+			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e, provisioningProtocol);
 		} catch (DaoException e) {
-			sendErrorResponse(responder, ProvisionStatus.GENERAL_SERVER_ERROR, e);
+			sendErrorResponse(responder, ProvisionStatus.GENERAL_SERVER_ERROR, e, provisioningProtocol);
 		}
 	}
 
-	private void sendErrorResponse(Responder responder, ProvisionStatus status, Exception e) {
+	private void sendErrorResponse(Responder responder, ProvisionStatus status, Exception e, ProvisionProtocol protocol) {
 		logger.error("Error creating provision response", e);
 		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}
@@ -113,7 +114,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 
 		if (isInitialProvisionRequest(policyKey)) {
 			provisionResponseBuilder
-				.policy(getDevicePolicy(udr))
+				.policy(getDevicePolicy())
 				.policyKey(retrievePendingPolicyKey(udr))
 				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else if (isPendingPolicyKey(udr, policyKey)) {
@@ -128,8 +129,8 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		return provisionResponseBuilder.build();
 	}
 
-	private Policy getDevicePolicy(UserDataRequest udr) {
-		return new MSEASProvisioningWBXML(udr.getDevice().getProtocolVersion());
+	private Policy getDevicePolicy() {
+		return new DefaultPolicy();
 	}
 
 	private boolean isInitialProvisionRequest(Long policyKey) {

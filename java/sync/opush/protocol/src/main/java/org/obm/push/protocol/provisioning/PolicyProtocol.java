@@ -31,13 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.provisioning;
 
-import org.obm.push.DefaultPolicy;
 import org.obm.push.Policy;
+import org.w3c.dom.Element;
 
-public class PolicyDecoder {
-	
-	
-	public static Policy decode() {
-		return new DefaultPolicy();
-	}
+public interface PolicyProtocol {
+
+	void appendPolicy(Element data, Policy policy);
+
 }
