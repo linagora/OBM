@@ -46,6 +46,7 @@
 		<module>push-gatling</module>
 		<module>spushnik-module</module>
 		<module>spushnik-webapp</module>
+		<module>obm-backend</module>
 	</modules>
 
 	<dependencyManagement>

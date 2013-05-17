@@ -32,22 +32,20 @@
 package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.BackendWindowingService;
-import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
-import org.obm.push.backend.OBMBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.calendar.EventConverter;
-import org.obm.push.calendar.EventConverterImpl;
-import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.configuration.ConfigurationModule;
-import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ContinuationServiceImpl;
 import org.obm.push.impl.ContinuationTransactionMapImpl;
@@ -60,10 +58,11 @@ import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 import org.obm.push.qos.OpushQoSKeyProvider;
+import org.obm.push.search.ISearchSource;
+import org.obm.push.search.ldap.BookSource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.DateService;
 import org.obm.push.service.DeviceService;
-import org.obm.push.service.EventService;
 import org.obm.push.service.PushPublishAndSubscribe;
 import org.obm.push.service.impl.ClientIdServiceImpl;
 import org.obm.push.service.impl.DateServiceImpl;
@@ -82,7 +81,6 @@ import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
-import org.obm.push.task.TaskBackend;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilterModule;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
@@ -124,7 +122,9 @@ public class OpushImplModule extends AbstractModule {
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(IStateMachine.class).to(StateMachine.class);
-		bind(IBackend.class).to(OBMBackend.class);
+		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);
 		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
@@ -133,8 +133,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(DeviceService.class).to(DeviceServiceImpl.class);
 		bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
 		bind(LocatorService.class).to(LocatorCache.class);
-		bind(EventService.class).to(EventServiceImpl.class);
-		bind(EventConverter.class).to(EventConverterImpl.class);
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
@@ -149,12 +147,8 @@ public class OpushImplModule extends AbstractModule {
 		bind(ClientIdService.class).to(ClientIdServiceImpl.class);
 		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
-		
-		Multibinder<PIMBackend> pimBackends = 
-				Multibinder.newSetBinder(binder(), PIMBackend.class);
-		pimBackends.addBinding().to(TaskBackend.class);
-		pimBackends.addBinding().to(CalendarBackend.class);
-		pimBackends.addBinding().to(ContactsBackend.class);
+		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
+		searchSources.addBinding().to(BookSource.class);
 	}
 	
 	private Module qosModule() {

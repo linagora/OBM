@@ -110,7 +110,6 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;

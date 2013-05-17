@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.calendar;
+package org.obm.push.calendar;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createStrictMock;
@@ -45,13 +45,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.calendar.ConsistencyEventChangesLogger;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.client.calendar.ConsistencyEventChangesLogger.NotConsistentEventChanges;
+import org.obm.push.calendar.ConsistencyEventChangesLogger.NotConsistentEventChanges;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.slf4j.Logger;

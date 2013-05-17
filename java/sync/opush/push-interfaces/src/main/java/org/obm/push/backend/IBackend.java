@@ -29,57 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
-import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.push.java.mail.ImapModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.obm.push.backend;
 
-import com.google.common.base.Strings;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import java.util.Set;
 
-public class OpushModule extends AbstractModule {
+import org.obm.push.bean.SyncCollectionResponse;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
+public interface IBackend {
+
+	String getWasteBasket();
+
+	void startMonitoring();
 	
-	@Override
-	protected void configure() {
-		installImapModule();
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new ObmBackendModule());
-		install(new LoggerModule());
-		install(new OpushCrashModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
+	/**
+	 * Push support
+	 * 
+	 * @param ccl
+	 * @return a registration that the caller can use to cancel monitor of a
+	 *         ressource
+	 */
+	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
 
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
-	}
+	void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException;
+
+	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
+
+	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+
+	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ConversionException, FilterTypeChangedException, HierarchyChangedException;
 	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
-		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
-		}
-		
-		return defaultImapModule();
-	}
-	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
-	}
 }

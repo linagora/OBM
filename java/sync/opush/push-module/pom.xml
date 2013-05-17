@@ -15,10 +15,10 @@
 
 	<dependencies>
  		<dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>common-test</artifactId>
-                        <version>${obm.version}</version>
-                </dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
@@ -97,12 +97,12 @@
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm-util</artifactId>
-				<version>4.1</version>
+			<version>4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm-analysis</artifactId>
-				<version>4.1</version>
+			<version>4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
@@ -183,7 +183,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>2.5.16</version>

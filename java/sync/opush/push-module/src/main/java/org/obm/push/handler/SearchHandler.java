@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
+import java.util.Set;
+
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -48,14 +50,14 @@ import org.obm.push.protocol.bean.SearchResponse;
 import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.search.ISearchSource;
-import org.obm.push.search.ObmSearchContact;
-import org.obm.push.search.ldap.BookSource;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimaps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -67,7 +69,7 @@ public class SearchHandler extends WbxmlRequestHandler {
 	
 	@Inject
 	protected SearchHandler(IBackend backend, EncoderFactory encoderFactory,
-			BookSource bookSource, ObmSearchContact obmSearchContact,
+			Set<ISearchSource> searchSources,
 			IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			SearchProtocol searchProtocol, CollectionDao collectionDao,
@@ -77,10 +79,14 @@ public class SearchHandler extends WbxmlRequestHandler {
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.protocol = searchProtocol;
-		this.sources = ImmutableMultimap.of(
-				bookSource.getStoreName(), bookSource, 
-				obmSearchContact.getStoreName(), obmSearchContact);
-	}
+		this.sources =
+			Multimaps.index(searchSources, new Function<ISearchSource, StoreName>() {
+				@Override
+				public StoreName apply(ISearchSource input) {
+					return input.getStoreName();
+				}
+			});
+   	}
 	
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr,

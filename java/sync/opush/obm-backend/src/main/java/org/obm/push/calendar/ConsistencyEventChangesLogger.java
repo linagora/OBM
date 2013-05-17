@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.calendar;
+package org.obm.push.calendar;
 
 import java.util.Collection;
 import java.util.Map;

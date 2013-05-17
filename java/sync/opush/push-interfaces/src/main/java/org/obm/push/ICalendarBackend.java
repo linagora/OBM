@@ -30,56 +30,21 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
-import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.push.java.mail.ImapModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
+import org.obm.push.backend.PIMBackend;
+import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.ICalendarConverterException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.ItemNotFoundException;
 
-public class OpushModule extends AbstractModule {
+public interface ICalendarBackend extends PIMBackend {
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
-	
-	@Override
-	protected void configure() {
-		installImapModule();
-		install(new OpushImplModule());
-		install(new OpushMailModule());
-		install(new ObmBackendModule());
-		install(new LoggerModule());
-		install(new OpushCrashModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
- 	}
-
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
-	}
-	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
-		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
-		}
-		
-		return defaultImapModule();
-	}
-	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
-	}
+	String handleMeetingResponse(UserDataRequest udr, org.obm.icalendar.ICalendar iCalendar, AttendeeStatus status) 
+			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
+			ItemNotFoundException, ConversionException, HierarchyChangedException, ICalendarConverterException;
 }
