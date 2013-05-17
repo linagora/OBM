@@ -29,24 +29,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.dao;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 import org.aopalliance.intercept.MethodInterceptor;
-import org.obm.annotations.database.AutoTruncate;
+import org.aopalliance.intercept.MethodInvocation;
+import org.obm.annotations.database.DatabaseEntity;
+import org.obm.annotations.database.DatabaseField;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
+import com.google.inject.Inject;
 
-public class DatabaseMetadataModule extends AbstractModule {
+public class AutoTruncateMethodInterceptor implements MethodInterceptor {
+
+	@Inject
+	private DatabaseTruncationService truncationService;
 
 	@Override
-	protected void configure() {
-		bind(DatabaseMetadataDao.class);
-		bind(DatabaseMetadataService.class).to(DatabaseMetadataServiceImpl.class);
-		bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		Method method = invocation.getMethod();
+		Object[] args = invocation.getArguments();
+		Class<?>[] paramTypes = method.getParameterTypes();
+		Annotation[][] paramsAnnotations = method.getParameterAnnotations();
 
-		MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
+		for (int i = 0; i < args.length; i++) {
+			Annotation[] annotations = paramsAnnotations[i];
 
-		requestInjection(interceptor);
-		bindInterceptor(Matchers.annotatedWith(AutoTruncate.class), Matchers.annotatedWith(AutoTruncate.class), interceptor);
+			for (Annotation annotation : annotations) {
+				Object arg = args[i];
+
+				if (annotation instanceof DatabaseEntity) {
+					args[i] = truncationService.getTruncatingEntity(arg);
+				}
+				else if (annotation instanceof DatabaseField && String.class.equals(paramTypes[i])) {
+					DatabaseField dbField = (DatabaseField) annotation;
+
+					args[i] = truncationService.truncate((String) arg, dbField.table(), dbField.column());
+				}
+			}
+		}
+
+		return invocation.proceed();
 	}
 
 }
