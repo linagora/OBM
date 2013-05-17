@@ -29,48 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.backend;
-
-import java.util.Set;
+package org.obm.push.protocol.provisioning;
 
 import org.obm.push.Policy;
-import org.obm.push.bean.SyncCollectionResponse;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.HierarchyChangedException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
+import org.w3c.dom.Element;
 
-public interface IBackend {
+public interface PolicyProtocol {
 
-	String getWasteBasket();
+	void appendPolicy(Element data, Policy policy);
 
-	Policy getDevicePolicy(UserDataRequest udr);
-
-	void startMonitoring();
-	
-	/**
-	 * Push support
-	 * 
-	 * @param ccl
-	 * @return a registration that the caller can use to cancel monitor of a
-	 *         ressource
-	 */
-	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
-
-	void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException;
-
-	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
-
-	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
-
-	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException, FilterTypeChangedException, HierarchyChangedException;
-	
 }

@@ -38,12 +38,12 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +57,7 @@ public class ProvisionProtocolTest {
 	
 	@Before
 	public void init() {
-		provisionProtocol = new ProvisionProtocol();
+		provisionProtocol = new ProvisionProtocol.Factory().createProtocol(ProtocolVersion.V121);
 	}
 	
 	@Test

@@ -36,6 +36,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.DefaultPolicy;
+import org.obm.push.Policy;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.UserDataRequest;
@@ -49,8 +51,6 @@ import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
-import org.obm.push.protocol.provisioning.MSEASProvisioningWBXML;
-import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.service.DateService;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
@@ -144,7 +144,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(UserDataRequest udr) {
-		return new MSEASProvisioningWBXML(udr.getDevice().getProtocolVersion());
+		return new DefaultPolicy();
 	}
 
 	@Override

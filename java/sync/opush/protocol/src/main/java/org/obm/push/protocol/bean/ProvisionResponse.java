@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.bean;
 
+import org.obm.push.Policy;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
-import org.obm.push.protocol.provisioning.Policy;
 
 import com.google.common.base.Objects;
 

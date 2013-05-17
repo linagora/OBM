@@ -31,20 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.provisioning;
 
-import org.obm.push.ProtocolVersion;
-import org.obm.push.utils.DOMUtils;
-import org.w3c.dom.Element;
+import org.obm.push.DefaultPolicy;
+import org.obm.push.Policy;
 
 public class PolicyDecoder {
 	
-	public final static ProtocolVersion CURRENT_AS_RELEASE = ProtocolVersion.V121;
-	public final static ProtocolVersion OLDER_PROTOCOL_VERSION_ACCEPTED = ProtocolVersion.V120;
 	
-	public static Policy decode(Element data) {
-		Element allowStorageCard = DOMUtils.getUniqueElement(data, "AllowStorageCard");
-		if (allowStorageCard != null) {
-			return new MSEASProvisioningWBXML(CURRENT_AS_RELEASE);
-		}
-		return new MSEASProvisioningWBXML(OLDER_PROTOCOL_VERSION_ACCEPTED);
+	public static Policy decode() {
+		return new DefaultPolicy();
 	}
 }

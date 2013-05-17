@@ -33,19 +33,45 @@ package org.obm.push.protocol;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.push.Policy;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.exception.InvalidPolicyKeyException;
 import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
-import org.obm.push.protocol.provisioning.Policy;
+import org.obm.push.protocol.provisioning.MSEAS12Dot0PolicyProtocol;
+import org.obm.push.protocol.provisioning.MSEAS12Dot1PolicyProtocol;
 import org.obm.push.protocol.provisioning.PolicyDecoder;
+import org.obm.push.protocol.provisioning.PolicyProtocol;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.inject.Singleton;
+
 public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, ProvisionResponse> {
 
+	@Singleton
+	public static class Factory {
+		
+		public ProvisionProtocol createProtocol(ProtocolVersion protocolVersion) {
+			switch (protocolVersion) {
+			case V120:
+				return new ProvisionProtocol(new MSEAS12Dot0PolicyProtocol());
+			case V121:
+				return new ProvisionProtocol(new MSEAS12Dot1PolicyProtocol());
+			}
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private final PolicyProtocol policyProtocol;
+
+	private ProvisionProtocol(PolicyProtocol policyProtocol) {
+		this.policyProtocol = policyProtocol;
+	}
+	
 	@Override
 	public ProvisionRequest decodeRequest(Document doc) throws InvalidPolicyKeyException {
 		String policyType = DOMUtils.getUniqueElement(doc.getDocumentElement(),	"PolicyType").getTextContent();
@@ -89,7 +115,7 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 		Policy policy = null;
 		Element datae = DOMUtils.getUniqueElement(policyElement, "Data");
 		if (datae != null) {
-			policy = PolicyDecoder.decode(datae);
+			policy = PolicyDecoder.decode();
 		}
 		
 		return ProvisionResponse.builder()
@@ -119,7 +145,7 @@ public class ProvisionProtocol implements ActiveSyncProtocol<ProvisionRequest, P
 		Policy policy = provisionResponse.getPolicy();
 		if (policy != null) {
 			Element data = DOMUtils.createElement(policyNode, "Data");
-			policy.serialize(data);
+			policyProtocol.appendPolicy(data, policy);
 		}
 		return ret;
 	}

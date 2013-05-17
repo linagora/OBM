@@ -63,38 +63,39 @@ import com.google.inject.Singleton;
 public class ProvisionHandler extends WbxmlRequestHandler {
 
 	private static final int INITIAL_POLICYKEY = 0;
-	private final ProvisionProtocol protocol;
+	private final ProvisionProtocol.Factory protocolFactory;
 	private final DeviceDao deviceDao;
 
 	@Inject
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			DeviceDao deviceDao, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
-			ProvisionProtocol provisionProtocol, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			ProvisionProtocol.Factory provisionProtocolFactory, WBXMLTools wbxmlTools, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.deviceDao = deviceDao;
-		this.protocol = provisionProtocol;
+		this.protocolFactory = provisionProtocolFactory;
 	}
 	
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, Document doc, ActiveSyncRequest request, Responder responder) {
+		ProvisionProtocol provisioningProtocol = protocolFactory.createProtocol(udr.getDevice().getProtocolVersion());
 		try {
-			ProvisionRequest provisionRequest = protocol.decodeRequest(doc);
+			ProvisionRequest provisionRequest = provisioningProtocol.decodeRequest(doc);
 			logger.info("required {}", provisionRequest.toString());
 			ProvisionResponse provisionResponse = doTheJob(provisionRequest, udr);
-			Document ret = protocol.encodeResponse(provisionResponse);
+			Document ret = provisioningProtocol.encodeResponse(provisionResponse);
 			sendResponse(responder, ret);
 		} catch (InvalidPolicyKeyException e) {
-			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e);
+			sendErrorResponse(responder, ProvisionStatus.PROTOCOL_ERROR, e, provisioningProtocol);
 		} catch (DaoException e) {
-			sendErrorResponse(responder, ProvisionStatus.GENERAL_SERVER_ERROR, e);
+			sendErrorResponse(responder, ProvisionStatus.GENERAL_SERVER_ERROR, e, provisioningProtocol);
 		}
 	}
 
-	private void sendErrorResponse(Responder responder, ProvisionStatus status, Exception e) {
+	private void sendErrorResponse(Responder responder, ProvisionStatus status, Exception e, ProvisionProtocol protocol) {
 		logger.error("Error creating provision response", e);
 		sendResponse(responder, protocol.encodeErrorResponse(status));
 	}

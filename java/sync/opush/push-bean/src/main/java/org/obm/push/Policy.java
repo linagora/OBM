@@ -29,48 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.backend;
+package org.obm.push;
 
-import java.util.Set;
+import org.joda.time.Duration;
 
-import org.obm.push.Policy;
-import org.obm.push.bean.SyncCollectionResponse;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ConversionException;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.exception.activesync.HierarchyChangedException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
+public interface Policy {
 
-public interface IBackend {
-
-	String getWasteBasket();
-
-	Policy getDevicePolicy(UserDataRequest udr);
-
-	void startMonitoring();
-	
-	/**
-	 * Push support
-	 * 
-	 * @param ccl
-	 * @return a registration that the caller can use to cancel monitor of a
-	 *         ressource
-	 */
-	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
-
-	void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException;
-
-	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
-
-	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
-
-	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
-			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
-			ConversionException, FilterTypeChangedException, HierarchyChangedException;
+	boolean devicePasswordEnabled();
+	boolean alphaNumericDevicePasswordRequired();
+	boolean passwordRecoveryEnabled();
+	boolean deviceEncryptionEnabled();
+	boolean attachmentsEnabled();
+	int minDevicePasswordLength();
+	Duration maxInactivityTimeDeviceLock();
+	int maxDevicePasswordFailedAttempts();
+	Integer maxAttachmentSize();
+	boolean allowSimpleDevicePassword();
+	Boolean devicePasswordExpiration();
+	boolean devicePasswordHistory();
+	boolean allowStorageCard();
+	boolean allowCamera();
+	boolean requireStorageCardEncryption();
+	boolean requireDeviceEncryption();
+	boolean allowUnsignedApplications();
+	boolean allowUnsignedInstallationPackages();
+	int minDevicePasswordComplexCharacters();
+	boolean allowWiFi();
+	boolean allowTextMessaging();
+	boolean allowPOPIMAPEmail();
+	int allowBluetooth();
+	boolean allowIrDA();
+	boolean requireManualSyncWhenRoaming();
+	boolean allowDesktopSync();
+	int maxCalendarAgeFilter();
+	boolean allowHTMLEmail();
+	int maxEmailAgeFilter();
+	int maxEmailBodyTruncationSize();
+	int maxEmailHTMLBodyTruncationSize();
+	boolean requireSignedSMIMEMessages();
+	boolean requireEncryptedSMIMEMessages();
+	boolean requireSignedSMIMEAlgorithm();
+	boolean requireEncryptionSMIMEAlgorithm();
+	int allowSMIMEEncryptionAlgorithmNegotiation();
+	boolean allowSMIMESoftCerts();
+	boolean allowBrowser();
+	boolean allowConsumerEmail();
+	boolean allowRemoteDesktop();
+	boolean allowInternetSharing();
 	
 }
