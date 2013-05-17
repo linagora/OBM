@@ -33,9 +33,13 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import org.obm.annotations.database.DatabaseField;
+
 import com.google.common.base.Objects;
 
 public class Address implements IMergeable, Serializable {
+
+	public static final String ADDRESS_TABLE = "Address";
 
 	private String street;
 	private String zipCode;
@@ -43,6 +47,9 @@ public class Address implements IMergeable, Serializable {
 	private String town;
 	private String country;
 	private String state;
+
+	public Address() {
+	}
 
 	public Address(String street, String zipCode, String expressPostal,
 			String town, String country, String state) {
@@ -55,22 +62,27 @@ public class Address implements IMergeable, Serializable {
 		this.state = state;
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_country")
 	public String getCountry() {
 		return country;
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_expresspostal")
 	public String getExpressPostal() {
 		return expressPostal;
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_street")
 	public String getStreet() {
 		return street;
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_town")
 	public String getTown() {
 		return town;
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_zipcode")
 	public String getZipCode() {
 		return zipCode;
 	}
@@ -117,6 +129,7 @@ public class Address implements IMergeable, Serializable {
 		}
 	}
 
+	@DatabaseField(table = ADDRESS_TABLE, column = "address_state")
 	public String getState() {
 		return state;
 	}
@@ -127,19 +140,19 @@ public class Address implements IMergeable, Serializable {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(street, zipCode, expressPostal, town, country, state);
+		return Objects.hashCode(getStreet(), getZipCode(), getExpressPostal(), getTown(), getCountry(), getState());
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof Address) {
 			Address that = (Address) object;
-			return Objects.equal(this.street, that.street)
-				&& Objects.equal(this.zipCode, that.zipCode)
-				&& Objects.equal(this.expressPostal, that.expressPostal)
-				&& Objects.equal(this.town, that.town)
-				&& Objects.equal(this.country, that.country)
-				&& Objects.equal(this.state, that.state);
+			return Objects.equal(this.getStreet(), that.getStreet())
+				&& Objects.equal(this.getZipCode(), that.getZipCode())
+				&& Objects.equal(this.getExpressPostal(), that.getExpressPostal())
+				&& Objects.equal(this.getTown(), that.getTown())
+				&& Objects.equal(this.getCountry(), that.getCountry())
+				&& Objects.equal(this.getState(), that.getState());
 		}
 		return false;
 	}
@@ -147,12 +160,12 @@ public class Address implements IMergeable, Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("street", street)
-			.add("zipCode", zipCode)
-			.add("expressPostal", expressPostal)
-			.add("town", town)
-			.add("country", country)
-			.add("state", state)
+			.add("street", getStreet())
+			.add("zipCode", getZipCode())
+			.add("expressPostal", getExpressPostal())
+			.add("town", getTown())
+			.add("country", getCountry())
+			.add("state", getState())
 			.toString();
 	}
 }

@@ -33,17 +33,25 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import org.obm.annotations.database.DatabaseField;
+
 import com.google.common.base.Objects;
 
 public class Phone implements IMergeable, Serializable {
 
+	public static final String PHONE_TABLE = "Phone";
+
 	private String number;
+
+	public Phone() {
+	}
 
 	public Phone(String number) {
 		super();
 		this.number = number;
 	}
 
+	@DatabaseField(table = PHONE_TABLE, column = "phone_number")
 	public String getNumber() {
 		return number;
 	}
@@ -59,14 +67,14 @@ public class Phone implements IMergeable, Serializable {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(number);
+		return Objects.hashCode(getNumber());
 	}
 	
 	@Override
 	public final boolean equals(Object object) {
 		if (object instanceof Phone) {
 			Phone that = (Phone) object;
-			return Objects.equal(this.number, that.number);
+			return Objects.equal(this.getNumber(), that.getNumber());
 		}
 		return false;
 	}

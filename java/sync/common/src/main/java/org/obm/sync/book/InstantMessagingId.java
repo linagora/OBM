@@ -33,10 +33,19 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import org.obm.annotations.database.DatabaseField;
+
+import com.google.common.base.Objects;
+
 public class InstantMessagingId implements IMergeable, Serializable {
+
+	public static final String IM_TABLE = "IM";
 
 	private String protocol;
 	private String id;
+
+	public InstantMessagingId() {
+	}
 
 	public InstantMessagingId(String protocol, String address) {
 		super();
@@ -48,10 +57,12 @@ public class InstantMessagingId implements IMergeable, Serializable {
 		return id;
 	}
 
+	@DatabaseField(table = IM_TABLE, column = "im_protocol")
 	public String getProtocol() {
 		return protocol;
 	}
 
+	@DatabaseField(table = IM_TABLE, column = "im_address")
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -71,6 +82,31 @@ public class InstantMessagingId implements IMergeable, Serializable {
 				setProtocol(prev.getProtocol());
 			}
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getProtocol(), getId());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof InstantMessagingId)) {
+			return false;
+		}
+
+		InstantMessagingId other = (InstantMessagingId) obj;
+
+		return Objects.equal(getProtocol(), other.getProtocol())
+				&& Objects.equal(getId(), other.getId());
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("protocol", getProtocol())
+				.add("id", getId())
+				.toString();
 	}
 
 }

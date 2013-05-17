@@ -112,7 +112,7 @@ public class ContactMerger {
 		mergeMap(actualC.getImIdentifiers(), updateC.getImIdentifiers());
 		
 		HashSet<Website> websites = mergeWebSite(actualC, updateC);
-		updateC.updateWebSites(websites);
+		updateC.setWebsites(websites);
 	}	
 	
 	private HashSet<Website> mergeWebSite(Contact actualC, Contact updateC) {

@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.calendar.EventObmId;
@@ -183,10 +184,16 @@ public class Contact implements Serializable {
 		this.birthday = birthday;
 	}
 
+	@DatabaseEntity
 	public Map<String, Phone> getPhones() {
 		return phones;
 	}
 
+	public void setPhones(Map<String, Phone> phones) {
+		this.phones = phones;
+	}
+
+	@DatabaseEntity
 	public HashSet<Website> getWebsites() {
 		return websites;
 	}
@@ -202,12 +209,26 @@ public class Contact implements Serializable {
 		return emails;
 	}
 
+	public void setEmails(Map<String, EmailAddress> emails) {
+		this.emails = emails;
+	}
+
+	@DatabaseEntity
 	public Map<String, InstantMessagingId> getImIdentifiers() {
 		return imIdentifiers;
 	}
 
+	public void setImIdentifiers(Map<String, InstantMessagingId> imIdentifiers) {
+		this.imIdentifiers = imIdentifiers;
+	}
+
+	@DatabaseEntity
 	public Map<String, Address> getAddresses() {
 		return addresses;
+	}
+
+	public void setAddresses(Map<String, Address> addresses) {
+		this.addresses = addresses;
 	}
 
 	public void addPhone(String lbl, Phone p) {
@@ -343,7 +364,7 @@ public class Contact implements Serializable {
 		return labels;
 	}
 	
-	public void updateWebSites(HashSet<Website> websites) {
+	public void setWebsites(HashSet<Website> websites) {
 		this.websites = websites;
 	}
 
