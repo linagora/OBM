@@ -46,6 +46,7 @@ import org.obm.sync.base.EmailLogin;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
 import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
@@ -101,7 +102,8 @@ public class BeansTest {
 				DomainName.class,
 				Address.class,
 				Phone.class,
-				ParticipationChanges.class);
+				ParticipationChanges.class,
+				InstantMessagingId.class);
 	}
 	
 	@Test

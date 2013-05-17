@@ -33,18 +33,26 @@ package org.obm.sync.book;
 
 import java.io.Serializable;
 
+import org.obm.annotations.database.DatabaseField;
+
 
 public class Website implements Serializable {
+
+	public static final String WEBSITE_TABLE = "Website";
 
 	private String url;
 	private String label;
 	
+	public Website() {
+	}
+
 	public Website(String label, String url) {
 		super();
 		this.label = label;
 		this.url = url;
 	}
 
+	@DatabaseField(table = WEBSITE_TABLE, column = "website_url")
 	public String getUrl() {
 		return url;
 	}
@@ -52,7 +60,8 @@ public class Website implements Serializable {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
+	@DatabaseField(table = WEBSITE_TABLE, column = "website_label")
 	public String getLabel() {
 		return label;
 	}
@@ -62,7 +71,7 @@ public class Website implements Serializable {
 	}
 	
 	public boolean isCalendarUrl() {
-		if (label.toLowerCase().startsWith("caluri")) {
+		if (getLabel().toLowerCase().startsWith("caluri")) {
 			return true;
 		}
 		return false;
