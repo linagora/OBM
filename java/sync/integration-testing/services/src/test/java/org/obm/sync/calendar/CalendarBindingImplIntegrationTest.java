@@ -82,9 +82,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
-import fr.aliacom.obm.ServicesToolBox;
-import fr.aliacom.obm.common.user.ObmUser;
-
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
 public class CalendarBindingImplIntegrationTest {
 	
@@ -117,18 +114,16 @@ public class CalendarBindingImplIntegrationTest {
 	
 	@Test @RunAsClient
 	public void testImportICS() throws Exception {
-		ObmUser defaultUser = ServicesToolBox.getSpecificObmUserFrom("user@domain.org", "Firstname", "Lastname");
-		String calendar = defaultUser.getEmail();
-		
+		String calendar = "user1@domain.org";
 		InputStream icsData = ClassLoader.getSystemClassLoader().getResourceAsStream("importICalendar.sample.ics");
-       
-		AccessToken accessToken = loginClient.login(calendar, "user");
+
+		AccessToken accessToken = loginClient.login(calendar, "user1");
 		int importCount = calendarClient.importICalendar(accessToken, calendar, IOUtils.toString(icsData), UUID.randomUUID().toString());
 		EventChanges eventsInDB = calendarClient.getSync(accessToken, calendar, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		
 		UnidentifiedAttendee organizer = UnidentifiedAttendee.builder()
 				.asOrganizer()
-				.email("user@domain.org")
+				.email("user1@domain.org")
 				.displayName("Firstname Lastname")
 				.participation(Participation.accepted())
 				.participationRole(ParticipationRole.REQ)
@@ -139,9 +134,9 @@ public class CalendarBindingImplIntegrationTest {
 		event1.setPrivacy(EventPrivacy.PUBLIC);
 		event1.setDuration(3600);
 		event1.setInternalEvent(true);
-		event1.setOwner("user");
-		event1.setOwnerDisplayName("user");
-		event1.setOwnerEmail("user@domain.org");
+		event1.setOwner("user1");
+		event1.setOwnerDisplayName("user1");
+		event1.setOwnerEmail("user1@domain.org");
 		event1.setDescription("");
 		event1.setLocation("");
 		event1.setCategory("");
@@ -157,9 +152,9 @@ public class CalendarBindingImplIntegrationTest {
 		event2.setPrivacy(EventPrivacy.PUBLIC);
 		event2.setDuration(3600);
 		event2.setInternalEvent(true);
-		event2.setOwner("user");
-		event2.setOwnerDisplayName("user");
-		event2.setOwnerEmail("user@domain.org");
+		event2.setOwner("user1");
+		event2.setOwnerDisplayName("user1");
+		event2.setOwnerEmail("user1@domain.org");
 		event2.setDescription("description");
 		event2.setLocation("location");
 		event2.setCategory("existing_category");
@@ -175,9 +170,9 @@ public class CalendarBindingImplIntegrationTest {
 		event3.setPrivacy(EventPrivacy.PRIVATE);
 		event3.setDuration(3600);
 		event3.setInternalEvent(true);
-		event3.setOwner("user");
-		event3.setOwnerDisplayName("user");
-		event3.setOwnerEmail("user@domain.org");
+		event3.setOwner("user1");
+		event3.setOwnerDisplayName("user1");
+		event3.setOwnerEmail("user1@domain.org");
 		event3.setDescription("");
 		event3.setLocation("");
 		event3.setCategory("");
@@ -193,9 +188,9 @@ public class CalendarBindingImplIntegrationTest {
 		event4.setPrivacy(EventPrivacy.CONFIDENTIAL);
 		event4.setDuration(3600);
 		event4.setInternalEvent(true);
-		event4.setOwner("user");
-		event4.setOwnerDisplayName("user");
-		event4.setOwnerEmail("user@domain.org");
+		event4.setOwner("user1");
+		event4.setOwnerDisplayName("user1");
+		event4.setOwnerEmail("user1@domain.org");
 		event4.setDescription("");
 		event4.setLocation("");
 		event4.setCategory("");

@@ -527,6 +527,14 @@ CREATE TABLE groupentity (
 ALTER TABLE groupentity ADD CONSTRAINT groupentity_pkey PRIMARY KEY (groupentity_entity_id, groupentity_group_id);
 
 --
+-- Table calendarentity
+--
+CREATE TABLE calendarentity (
+    calendarentity_entity_id integer NOT NULL,
+    calendarentity_calendar_id integer NOT NULL
+);
+
+--
 -- Cascades
 --
 ALTER TABLE contactentity
@@ -658,13 +666,19 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 	VALUES  (NOW(), 'Test domain', 'Test domain', 'domain.org', FALSE, 'b55911e6-6848-4f16-abd4-52d94b6901a6');
 
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email) 
-	VALUES ((SELECT domain_id From Domain), 'user','user','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user');
+	VALUES
+        (1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1'),
+        (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2');
 
+INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE);
+INSERT INTO userentity (userentity_entity_id, userentity_user_id) VALUES (1, 1), (2, 2);
+INSERT INTO calendarentity (calendarentity_entity_id, calendarentity_calendar_id) VALUES (1, 1), (2, 2);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
+    VALUES (1, 2, 1, 1, 1, 0);
 
-INSERT INTO entity (entity_mailing) VALUES (TRUE);
-INSERT INTO userentity (userentity_entity_id, userentity_user_id)
- VALUES ((SELECT entity_id From entity),(SELECT userobm_id From UserObm));
 INSERT INTO addressbook (domain_id, timeupdate, timecreate, userupdate, usercreate, owner, origin, name, is_default)
- VALUES ((SELECT domain_id From Domain), now(), now(), (SELECT userobm_id From UserObm), (SELECT userobm_id From UserObm), (SELECT userobm_id From UserObm), 'integration-testing', 'collected_contacts', TRUE);
-
-INSERT INTO eventcategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'existing_category');
+    VALUES
+        (1, now(), now(), 1, 1, 1, 'integration-testing', 'collected_contacts', TRUE),
+        (1, now(), now(), 2, 2, 2, 'integration-testing', 'collected_contacts', TRUE);
+INSERT INTO eventcategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label)
+    VALUES (1, NULL,NULL,NULL,NULL,'existing_category');
