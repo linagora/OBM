@@ -50,19 +50,18 @@ import com.google.common.io.Resources;
 
 public final class ManagedTomcatInstaller {
 
+	private static final File TMP_DIR = new File(System.getProperty("java.io.tmpdir"));
 	private final static String TOMCAT_VERSION = "6.0.20";
-	private final static String TOMCAT_ARCHIVE_PATH = "../../../tomcat/obm-tomcat-" + TOMCAT_VERSION + ".tar.bz2";
+	private final static File TOMCAT_ARCHIVE = new File("../../../tomcat/obm-tomcat-" + TOMCAT_VERSION + ".tar.bz2");
 	private final static String TOMCAT_USERS_RESOURCE = "tomcat-users.xml";
 	private final static String TOMCAT_MANAGER_RESOURCE = "tomcat-manager.tar.bz2";
-	private final static String TOMCAT_TEMPORARY_MAIN_FOLDER = "/tmp/tomcat";
-	private final static String TOMCAT_TEMPORARY_VERSION_FOLDER = TOMCAT_TEMPORARY_MAIN_FOLDER + "/apache-tomcat-" + TOMCAT_VERSION + "/";
-	private static File tomcatFolder;
+	private final static File TOMCAT_TEMPORARY_MAIN_FOLDER = new File(TMP_DIR, "tomcat");
+	private final static File TOMCAT_TEMPORARY_VERSION_FOLDER = new File(TOMCAT_TEMPORARY_MAIN_FOLDER, "apache-tomcat-" + TOMCAT_VERSION);
 	
 	public static void install() {
-		tomcatFolder = new File(TOMCAT_TEMPORARY_MAIN_FOLDER);
-		if (!tomcatFolder.exists()) {
+		if (!TOMCAT_TEMPORARY_MAIN_FOLDER.exists()) {
 			try {
-				tomcatFolder.mkdir();
+				TOMCAT_TEMPORARY_MAIN_FOLDER.mkdir();
 				
 				uncompressTomcat();
 				copyTomcatUsers();
@@ -81,7 +80,7 @@ public final class ManagedTomcatInstaller {
 	}
 	
 	private static void replaceFileByFolder(String fileName) {
-		File file = new File(TOMCAT_TEMPORARY_VERSION_FOLDER + fileName);
+		File file = new File(TOMCAT_TEMPORARY_VERSION_FOLDER, fileName);
 		if (!file.exists()) {
 			file.mkdir();
 			return;
@@ -94,7 +93,7 @@ public final class ManagedTomcatInstaller {
 
 	private static void copyTomcatUsers() throws IOException {
 		URL resource = Resources.getResource(TOMCAT_USERS_RESOURCE);
-		File tomcatUsers = new File(TOMCAT_TEMPORARY_VERSION_FOLDER + "conf/tomcat-users.xml");
+		File tomcatUsers = new File(TOMCAT_TEMPORARY_VERSION_FOLDER, "conf/tomcat-users.xml");
 		if (tomcatUsers.exists()) {
 			tomcatUsers.delete();
 		}
@@ -106,15 +105,15 @@ public final class ManagedTomcatInstaller {
 		URL resource = Resources.getResource(TOMCAT_MANAGER_RESOURCE);
 		File tarFile = uncompressBZ2File(new FileInputStream(new File(resource.getFile())));
 
-		File tomcatWebapps = new File(TOMCAT_TEMPORARY_VERSION_FOLDER + "webapps/");
+		File tomcatWebapps = new File(TOMCAT_TEMPORARY_VERSION_FOLDER, "webapps/");
 		uncompressTarFile(tomcatWebapps, tarFile);
 	}
 
 	private static void uncompressTomcat() throws IOException, ArchiveException {
-		FileInputStream input = new FileInputStream(TOMCAT_ARCHIVE_PATH);
+		FileInputStream input = new FileInputStream(TOMCAT_ARCHIVE);
 		File tarFile = uncompressBZ2File(input);
 
-		uncompressTarFile(tomcatFolder, tarFile);
+		uncompressTarFile(TOMCAT_TEMPORARY_MAIN_FOLDER, tarFile);
 	}
 	
 	private static File uncompressBZ2File(FileInputStream inputStream) throws IOException {
