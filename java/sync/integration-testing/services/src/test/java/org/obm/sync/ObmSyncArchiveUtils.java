@@ -31,14 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import java.io.File;
+import java.util.Arrays;
+
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
-import org.obm.DateUtils;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
+import org.obm.StaticConfigurationService;
 import org.obm.annotations.technicallogging.DefaultTechnicalLoggingBinder;
 import org.obm.annotations.technicallogging.ITechnicalLoggingBinder;
 import org.obm.annotations.technicallogging.KindToBeLogged;
@@ -66,15 +72,18 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.configuration.LogConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckHandler;
 import org.obm.healthcheck.HealthCheckModule;
@@ -95,6 +104,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.utils.DOMUtils;
+import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.IntEncoder;
@@ -276,6 +286,9 @@ import org.obm.sync.utils.DateHelper;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
@@ -373,11 +386,81 @@ public class ObmSyncArchiveUtils {
 			throws IllegalArgumentException, IllegalStateException, ResolutionException,
 			CoordinateParseException, UnknownExtensionTypeException {
 
+		JavaArchive wholeObmSyncArchive = ShrinkWrap
+				.create(JavaArchive.class, "services-integration-testing-classes.jar")
+				.addAsManifestResource("MANIFEST.MF")
+				.addAsResource("bitronix-default-config.properties")
+				.addAsResource("hornetq-configuration.xml")
+				.addAsResource("hornetq-jms.xml")
+				.addAsResource("ical4j.properties")
+				.addAsResource("logback.xml")
+				.addAsResource("Messages_en.properties")
+				.addAsResource("Messages_fr.properties")
+				.addClasses(ObmSyncArchiveUtils.projectAnnotationsClasses())
+				.addClasses(ObmSyncArchiveUtils.projectConfigurationClasses())
+				.addClasses(ObmSyncArchiveUtils.projectDBCPClasses())
+				.addClasses(ObmSyncArchiveUtils.projectICalendarClasses())
+				.addClasses(ObmSyncArchiveUtils.projectMessageQueueClasses())
+				.addClasses(ObmSyncArchiveUtils.projectUtilsClasses())
+				.addClasses(ObmSyncArchiveUtils.projectLocatorClasses())
+				.addClasses(ObmSyncArchiveUtils.projectServicesCommonClasses())
+				.addClasses(ObmSyncArchiveUtils.projectCommonClasses());
+			
 		return ShrinkWrap
-			.create(WebArchive.class)
-			.addAsWebInfResource(webXml(guiceModule), "web.xml");
+				.create(WebArchive.class)
+				.addAsWebInfResource(webXml(guiceModule), "web.xml")
+				.addAsLibraries(projectDependencies())
+				.addAsLibraries(wholeObmSyncArchive)
+				.addClasses(
+						ModuleUtils.class,
+						org.obm.Configuration.class,
+						org.obm.ConfigurationModule.class,
+						DatabaseConfigurationFixtureH2.class,
+						StaticConfigurationService.class,
+						ObmSyncStaticConfigurationService.class,
+						TestTransactionConfiguration.class,
+						H2DriverConfiguration.class,
+						H2GuiceServletContextListener.class);
 	}
 
+	private static File[] projectDependencies() {
+		return filterObmDependencies(allObmSyncDependencies());
+	}
+
+	private static MavenResolvedArtifact[] allObmSyncDependencies() {
+		return Maven.resolver()
+			.offline()
+			.loadPomFromFile("pom.xml")
+			.importRuntimeDependencies()
+			.asResolvedArtifact();
+	}
+
+	private static File[] filterObmDependencies(MavenResolvedArtifact[] allObmSyncDependencies) {
+		return FluentIterable.from(Arrays.asList(
+				allObmSyncDependencies))
+				.filter(obmDependencyPredicate())
+				.transform(artifactAsFile()).toArray(File.class);
+	}
+
+	private static Function<MavenResolvedArtifact, File> artifactAsFile() {
+		return new Function<MavenResolvedArtifact, File>() {
+			@Override
+			public File apply(MavenResolvedArtifact input) {
+				return input.asFile();
+			}
+		};
+	}
+
+	private static Predicate<MavenResolvedArtifact> obmDependencyPredicate() {
+		return new Predicate<MavenResolvedArtifact>() {
+
+			@Override
+			public boolean apply(MavenResolvedArtifact input) {
+				String groupId = input.getCoordinate().getGroupId();
+				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
+			}
+		};
+	}
 
 	private static Asset webXml(Class<? extends Module> guiceModule) {
 		return new StringAsset(

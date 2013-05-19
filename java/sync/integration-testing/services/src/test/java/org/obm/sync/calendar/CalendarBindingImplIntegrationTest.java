@@ -34,10 +34,8 @@ package org.obm.sync.calendar;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.dateUTC;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.UUID;
 
@@ -45,27 +43,17 @@ import org.apache.commons.io.IOUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
-import org.obm.StaticConfigurationService;
-import org.obm.configuration.TestTransactionConfiguration;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.filter.Slow;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.H2GuiceServletContextListener;
-import org.obm.sync.ModuleUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
-import org.obm.sync.ObmSyncStaticConfigurationService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
@@ -77,10 +65,7 @@ import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
 public class CalendarBindingImplIntegrationTest {
@@ -252,80 +237,10 @@ public class CalendarBindingImplIntegrationTest {
 
 	@Deployment
 	public static WebArchive deployArchive() {
-		JavaArchive wholeObmSyncArchive = ShrinkWrap
-			.create(JavaArchive.class, "services-integration-testing-classes.jar")
-			.addAsManifestResource("MANIFEST.MF")
-			.addAsResource("bitronix-default-config.properties")
-			.addAsResource("hornetq-configuration.xml")
-			.addAsResource("hornetq-jms.xml")
-			.addAsResource("ical4j.properties")
-			.addAsResource("logback.xml")
-			.addAsResource("Messages_en.properties")
-			.addAsResource("Messages_fr.properties")
-			.addClasses(ObmSyncArchiveUtils.projectAnnotationsClasses())
-			.addClasses(ObmSyncArchiveUtils.projectConfigurationClasses())
-			.addClasses(ObmSyncArchiveUtils.projectDBCPClasses())
-			.addClasses(ObmSyncArchiveUtils.projectICalendarClasses())
-			.addClasses(ObmSyncArchiveUtils.projectMessageQueueClasses())
-			.addClasses(ObmSyncArchiveUtils.projectUtilsClasses())
-			.addClasses(ObmSyncArchiveUtils.projectLocatorClasses())
-			.addClasses(ObmSyncArchiveUtils.projectServicesCommonClasses())
-			.addClasses(ObmSyncArchiveUtils.projectCommonClasses());
-		
-		return ObmSyncArchiveUtils.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)
+		return ObmSyncArchiveUtils
+				.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)
 				.addAsResource("sql/org/obm/sync/calendar/h2.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT)
-				.addAsLibraries(projectDependencies())
-				.addAsLibraries(wholeObmSyncArchive)
-				.addClasses(
-						CalendarBindingImplIntegrationTestModule.class,
-						ModuleUtils.class,
-						org.obm.Configuration.class,
-						org.obm.ConfigurationModule.class,
-						DatabaseConfigurationFixtureH2.class,
-						StaticConfigurationService.class,
-						ObmSyncStaticConfigurationService.class,
-						TestTransactionConfiguration.class,
-						H2DriverConfiguration.class,
-						H2GuiceServletContextListener.class);
-	}
-
-	private static File[] projectDependencies() {
-		return filterObmDependencies(allObmSyncDependencies());
-	}
-
-	private static MavenResolvedArtifact[] allObmSyncDependencies() {
-		return Maven.resolver()
-			.offline()
-			.loadPomFromFile("pom.xml")
-			.importRuntimeDependencies()
-			.asResolvedArtifact();
-	}
-
-	private static File[] filterObmDependencies(MavenResolvedArtifact[] allObmSyncDependencies) {
-		return FluentIterable.from(Arrays.asList(
-				allObmSyncDependencies))
-				.filter(obmDependencyPredicate())
-				.transform(artifactAsFile()).toArray(File.class);
-	}
-
-	private static Function<MavenResolvedArtifact, File> artifactAsFile() {
-		return new Function<MavenResolvedArtifact, File>() {
-			@Override
-			public File apply(MavenResolvedArtifact input) {
-				return input.asFile();
-			}
-		};
-	}
-
-	private static Predicate<MavenResolvedArtifact> obmDependencyPredicate() {
-		return new Predicate<MavenResolvedArtifact>() {
-
-			@Override
-			public boolean apply(MavenResolvedArtifact input) {
-				String groupId = input.getCoordinate().getGroupId();
-				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
-			}
-		};
+				.addClasses(CalendarBindingImplIntegrationTestModule.class);
 	}
 	
 }
