@@ -35,67 +35,20 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.dateUTC;
 
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Comparator;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.Configuration;
 import org.obm.filter.Slow;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.DateUtils;
-import org.obm.sync.H2GuiceServletContextListener;
-import org.obm.sync.ObmSyncArchiveUtils;
-import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.items.EventChanges;
-import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Objects;
 
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
-public class ImportICalendarIntegrationTest {
-	
-	@ArquillianResource URL baseURL;
-
-	private LoginClient loginClient;
-	private CalendarClient calendarClient;
-
-	@Before
-	public void setUp() {
-		Logger logger = LoggerFactory.getLogger(getClass());
-		ObmSyncConfiguration configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
-		SyncClientException exceptionFactory = new SyncClientException();
-		LocatorService locatorService = arquillianLocatorService();
-		Locator locator = new Locator(configuration, locatorService) {};
-		
-		loginClient = new LoginClient("integration-testing", configuration, exceptionFactory, locator, logger) {};
-		calendarClient = new CalendarClient(exceptionFactory, locator, logger) {};
-	}
-
-	private LocatorService arquillianLocatorService() {
-		return new LocatorService() {
-			
-			@Override
-			public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
-				return baseURL.toExternalForm();
-			}
-		};
-	}
+public class ImportICalendarIntegrationTest extends CalendarIntegrationTest {
 	
 	@Test @RunAsClient
 	public void testImportICS() throws Exception {
@@ -194,53 +147,4 @@ public class ImportICalendarIntegrationTest {
 			.containsOnly(event1, event2, event3, event4);
 	}
 
-	private Comparator<? super Event> ignoreDatabaseElementsComparator() {
-		return new Comparator<Event>() {
-
-			@Override
-			public int compare(Event one, Event two) {
-				boolean equalityIgnoringDatabaseElements = 
-					Objects.equal(one.getTitle(), two.getTitle())
-					&& Objects.equal(one.getDescription(), two.getDescription())
-					&& Objects.equal(one.getExtId(), two.getExtId())
-					&& Objects.equal(one.getPrivacy(), two.getPrivacy())
-					&& Objects.equal(one.getMeetingStatus(), two.getMeetingStatus())
-					&& Objects.equal(one.getOwner(), two.getOwner())
-					&& Objects.equal(one.getOwnerDisplayName(), two.getOwnerDisplayName())
-					&& Objects.equal(one.getOwnerEmail(), two.getOwnerEmail())
-					&& Objects.equal(one.getCreatorDisplayName(), two.getCreatorDisplayName())
-					&& Objects.equal(one.getCreatorEmail(), two.getCreatorEmail())
-					&& Objects.equal(one.getLocation(), two.getLocation())
-					&& Objects.equal(one.getStartDate(), two.getStartDate())
-					&& Objects.equal(one.getDuration(), two.getDuration())
-					&& Objects.equal(one.getAlert(), two.getAlert())
-					&& Objects.equal(one.getCategory(), two.getCategory())
-					&& Objects.equal(one.getPriority(), two.getPriority())
-					&& Objects.equal(one.isAllday(), two.isAllday())
-					&& Objects.equal(one.getAttendees(), two.getAttendees())
-					&& Objects.equal(one.getRecurrence(), two.getRecurrence())
-					&& Objects.equal(one.getType(), two.getType())
-					&& Objects.equal(one.getOpacity(), two.getOpacity())
-					&& Objects.equal(one.getEntityId(), two.getEntityId())
-					&& Objects.equal(one.getTimezoneName(), two.getTimezoneName())
-					&& Objects.equal(one.getRecurrenceId(), two.getRecurrenceId())
-					&& Objects.equal(one.isInternalEvent(), two.isInternalEvent())
-					&& Objects.equal(one.getSequence(), two.getSequence());
-					
-				if (equalityIgnoringDatabaseElements) {
-					return 0;
-				}
-				return 1;
-			}
-		};
-	}
-
-	@Deployment
-	public static WebArchive deployArchive() {
-		return ObmSyncArchiveUtils
-				.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)
-				.addAsResource("sql/org/obm/sync/calendar/h2.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT)
-				.addClasses(CalendarBindingImplIntegrationTestModule.class);
-	}
-	
 }
