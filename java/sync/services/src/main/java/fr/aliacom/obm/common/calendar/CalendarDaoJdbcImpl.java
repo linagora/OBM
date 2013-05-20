@@ -2162,14 +2162,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		insertAttendees(token, event, con, toInsert);
 	}
 
-	private void updateAlerts(AccessToken token, Connection con, Event event, int ownerId)
-			throws SQLException {
-		if (event.getAlert() == null) {
-			deleteEventAlert(con, token, ownerId, event.getObmId());
-		} else {
-			if (!updateEventAlert(con, token, ownerId, event)) {
-				insertEventAlert(con, token, ownerId, event);
-			}
+	private void updateAlerts(AccessToken token, Connection con, Event event, int ownerId) throws SQLException {
+		deleteEventAlert(con, token, ownerId, event.getObmId());
+
+		if (event.getAlert() != null) {
+			insertEventAlert(con, token, ownerId, event);
 		}
 	}
 
@@ -2202,30 +2199,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(8, tokenId);
 			}
 			ps.executeUpdate();
-		} finally {
-			obmHelper.cleanup(null, ps, null);
-		}
-	}
-
-	private boolean updateEventAlert(Connection con, AccessToken token, Integer ownerId, Event event) throws SQLException {
-
-		IntegerSQLCollectionHelper userIds = new IntegerSQLCollectionHelper(Sets.newHashSet(ownerId, token.getObmId()));
-
-		String updateAlertQuery = "UPDATE EventAlert "
-				+ "SET eventalert_duration = ?, eventalert_userupdate = ? "
-				+ "WHERE eventalert_user_id IN ("+ userIds.asPlaceHolders() +") "
-				+ "AND eventalert_event_id = ?";
-
-		PreparedStatement ps = null;
-
-		try {
-			ps = con.prepareStatement(updateAlertQuery);
-			ps.setInt(1, event.getAlert());
-			ps.setInt(2, token.getObmId());
-			int nextId = userIds.insertValues(ps, 3);
-			ps.setInt(nextId, event.getObmId().getObmId());
-
-			return (ps.executeUpdate() > 0);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
