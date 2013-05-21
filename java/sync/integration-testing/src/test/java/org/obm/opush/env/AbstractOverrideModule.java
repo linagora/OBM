@@ -49,9 +49,10 @@ public abstract class AbstractOverrideModule extends AbstractModule {
 		this.mockMap = MutableClassToInstanceMap.create();
 	}
 	
-	protected <T extends Object> void bindWithMock(Class<T> clazz) {
+	protected <T extends Object> T bindWithMock(Class<T> clazz) {
 		T mock = createAndRegisterMock(clazz);
 		bind(clazz).toInstance(mock);
+		return mock;
 	}
 
 	protected <T> T createAndRegisterMock(Class<T> clazz) {

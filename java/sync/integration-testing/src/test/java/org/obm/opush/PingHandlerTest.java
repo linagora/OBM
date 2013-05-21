@@ -61,16 +61,14 @@ import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.opush.env.DefaultOpushModule;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
@@ -93,6 +91,8 @@ import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.push.client.OPClient;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -101,18 +101,17 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(DefaultOpushModule.class)
 public class PingHandlerTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private List<OpushUser> fakeTestUsers;
 	private int pingOnCollectionId;
 
@@ -120,6 +119,8 @@ public class PingHandlerTest {
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
 		pingOnCollectionId = 1432;
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After

@@ -58,6 +58,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -117,6 +118,7 @@ public class MailBackendHandlerTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject SyncDecoder decoder;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private ServerSetup smtpServerSetup;
 	private String mailbox;
@@ -133,6 +135,8 @@ public class MailBackendHandlerTest {
 		greenMailUser = greenMail.setUser(mailbox, singleUserFixture.jaures.password);
 		imapHostManager = greenMail.getManagers().getImapHostManager();
 		imapHostManager.createMailbox(greenMailUser, "Trash");
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	@After

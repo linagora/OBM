@@ -43,6 +43,8 @@ import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.OBMBackend;
 import org.obm.push.backend.PIMBackend;
+import org.obm.push.backend.PolicyConfigurationService;
+import org.obm.push.backend.PolicyConfigurationServiceFileImpl;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.calendar.EventConverter;
 import org.obm.push.calendar.EventConverterImpl;
@@ -150,6 +152,8 @@ public class OpushImplModule extends AbstractModule {
 		bind(ClientIdService.class).to(ClientIdServiceImpl.class);
 		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
+		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toInstance("/etc/opush/policy.ini");
+		bind(PolicyConfigurationService.class).to(PolicyConfigurationServiceFileImpl.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);

@@ -31,16 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 
 import org.apache.http.Header;
 import org.easymock.IMocksControl;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.OptionsResponse;
@@ -58,7 +61,13 @@ public class OptionsHandlerTest {
 	@Inject	SingleUserFixture user;
 	@Inject	OpushServer opushServer;
 	@Inject IMocksControl mocksControl;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
+	@Before
+	public void init() {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
+	}
+	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();

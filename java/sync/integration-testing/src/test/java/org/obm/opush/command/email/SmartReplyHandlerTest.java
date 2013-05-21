@@ -52,6 +52,7 @@ import org.obm.opush.MailBackendTestModule;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.ServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -76,7 +77,8 @@ public class SmartReplyHandlerTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject GreenMail greenMail;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private OpushUser user;
 	private GreenMailUser greenMailUser;
 	private String inboxCollectionPath;
@@ -100,6 +102,7 @@ public class SmartReplyHandlerTest {
 		mockUsersAccess(classToInstanceMap, Lists.newArrayList(user));
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(iCalendar.getUserEmail(user.accessToken)).andReturn(user.user.getLoginAtDomain()).anyTimes();
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration").anyTimes();
 	}
 	
 	@After

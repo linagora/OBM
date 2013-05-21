@@ -35,9 +35,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.DefaultPolicy;
 import org.obm.push.Policy;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.UserDataRequest;
@@ -78,6 +77,7 @@ public class OBMBackend implements IBackend {
 	private final MailMonitoringBackend emailBackend;
 	private final DateService dateService;
 	private final StateMachine stateMachine;
+	private final PolicyConfigurationService policyConfigurationService;
 	private final boolean enablePush;
 	
 	@Inject
@@ -89,6 +89,7 @@ public class OBMBackend implements IBackend {
 			MailMonitoringBackend emailBackend,
 			DateService dateService,
 			StateMachine stateMachine,
+			PolicyConfigurationService policyConfigurationService, 
 			@Named("enable-push") boolean enablePush) {
 		
 		this.collectionDao = collectionDao;
@@ -97,6 +98,7 @@ public class OBMBackend implements IBackend {
 		this.emailBackend = emailBackend;
 		this.dateService = dateService;
 		this.stateMachine = stateMachine;
+		this.policyConfigurationService = policyConfigurationService;
 		this.enablePush = enablePush;
 		
 		this.registeredListeners = Collections
@@ -144,7 +146,7 @@ public class OBMBackend implements IBackend {
 
 	@Override
 	public Policy getDevicePolicy(UserDataRequest udr) {
-		return new DefaultPolicy();
+		return policyConfigurationService.getPolicy();
 	}
 
 	@Override

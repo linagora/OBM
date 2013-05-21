@@ -154,6 +154,6 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	}
 
 	public boolean isAutoTruncateEnabled() {
-		return getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
+		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
 	}
 }

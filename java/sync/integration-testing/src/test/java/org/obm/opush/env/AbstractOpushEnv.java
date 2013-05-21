@@ -85,7 +85,8 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 			dao(),
 			email(),
 			obmSync(),
-			backendsModule()
+			backendsModule(),
+			configuration()
 		);
 		for (AbstractOverrideModule module: modules) {
 			mockMap.addMap(module.getMockMap());
@@ -93,7 +94,6 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 		return Modules.combine(
 				ImmutableList.<Module>builder()
 					.addAll(modules)
-					.add(configuration())
 					.add(emailConfiguration())
 					.build());
 	}
@@ -115,7 +115,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	protected ConfigurationModule configuration() {
-		return new ConfigurationModule(configuration);
+		return new ConfigurationModule(configuration, mocksControl);
 	}
 
 	protected Module emailConfiguration() {

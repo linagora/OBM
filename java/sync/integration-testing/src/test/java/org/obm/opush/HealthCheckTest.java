@@ -32,6 +32,7 @@
 package org.obm.opush;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.easymock.EasyMock.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,11 +42,13 @@ import org.apache.http.client.fluent.Request;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
@@ -60,7 +63,13 @@ public class HealthCheckTest {
 	@Inject OpushServer opushServer;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
+	@Before
+	public void setup() {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig");
+	}
+	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();

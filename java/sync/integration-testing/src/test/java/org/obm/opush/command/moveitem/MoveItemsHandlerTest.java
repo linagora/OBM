@@ -55,6 +55,7 @@ import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -84,6 +85,7 @@ public class MoveItemsHandlerTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private CollectionDao collectionDao;
 
@@ -113,6 +115,8 @@ public class MoveItemsHandlerTest {
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

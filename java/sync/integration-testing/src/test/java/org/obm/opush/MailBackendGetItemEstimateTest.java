@@ -59,6 +59,7 @@ import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
 import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
@@ -101,6 +102,7 @@ public class MailBackendGetItemEstimateTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject SyncDecoder decoder;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
@@ -136,6 +138,8 @@ public class MailBackendGetItemEstimateTest {
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

@@ -55,6 +55,7 @@ import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.store.CollectionDao;
@@ -86,6 +87,7 @@ public class ItemOperationHandlerTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private CollectionDao collectionDao;
 
@@ -111,6 +113,8 @@ public class ItemOperationHandlerTest {
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 
 		bindCollectionIdToPath();
+		
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

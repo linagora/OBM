@@ -47,17 +47,15 @@ import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.opush.env.AbstractOpushEnv;
 import org.obm.opush.env.Configuration;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
+import org.obm.opush.env.DefaultOpushModule;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ProvisionPolicyStatus;
@@ -73,23 +71,22 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProvisionResponse;
+import org.obm.test.GuiceModule;
+import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(DefaultOpushModule.class)
 public class ProvisionHandlerTest {
-
-	private static class ProvisionHandlerTestModule extends AbstractOpushEnv {}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ProvisionHandlerTestModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
 	private List<OpushUser> fakeTestUsers;
 
@@ -97,7 +94,7 @@ public class ProvisionHandlerTest {
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
 	}
-	
+		
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
@@ -110,6 +107,8 @@ public class ProvisionHandlerTest {
 		OpushUser user = singleUserFixture.jaures;
 		mockProvisionNeeds(user);
 
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();		
+		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
 		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
@@ -130,7 +129,8 @@ public class ProvisionHandlerTest {
 		long nextPolicyKeyGenerated = 115l;
 		OpushUser user = singleUserFixture.jaures;
 		mockProvisionNeeds(user);
-
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
+		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
 		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
@@ -194,13 +194,83 @@ public class ProvisionHandlerTest {
 	}
 	
 	@Test
+	public void testCheckModified12Dot1Policy() throws Exception {
+		long nextPolicyKeyGenerated = 115l;
+		OpushUser user = singleUserFixture.jaures;
+		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn(getClass().getResource("modifiedPolicy.properties").getFile());
+
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
+		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
+		expectLastCall().once();
+		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(nextPolicyKeyGenerated).once();
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121);
+		ProvisionResponse provisionResponse = opClient.provisionStepOne();
+
+		assertThat(provisionResponse.policyData()).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+						"<Data>\n" +
+						"<EASProvisionDoc>\n" +
+						"<DevicePasswordEnabled>0</DevicePasswordEnabled>\n" +
+						"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>\n" +
+						"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>\n" +
+						"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>\n" +
+						"<AttachmentsEnabled>1</AttachmentsEnabled>\n" +
+						"<MinDevicePasswordLength>4</MinDevicePasswordLength>\n" +
+						"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>\n" +
+						"<MaxDevicePasswordFailedAttempts>2</MaxDevicePasswordFailedAttempts>\n" +
+						"<MaxAttachmentSize/>\n" +
+						"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>\n" +
+						"<DevicePasswordExpiration/>\n" +
+						"<DevicePasswordHistory>0</DevicePasswordHistory>\n" +
+						"<AllowStorageCard>1</AllowStorageCard>\n" +
+						"<AllowCamera>1</AllowCamera>\n" +
+						"<RequireDeviceEncryption>0</RequireDeviceEncryption>\n" +
+						"<AllowUnsignedApplications>1</AllowUnsignedApplications>\n" +
+						"<AllowUnsignedInstallationPackages>1</AllowUnsignedInstallationPackages>\n" +
+						"<MinDevicePasswordComplexCharacters>3</MinDevicePasswordComplexCharacters>\n" +
+						"<AllowWiFi>1</AllowWiFi>\n" +
+						"<AllowTextMessaging>1</AllowTextMessaging>\n" +
+						"<AllowPOPIMAPEmail>1</AllowPOPIMAPEmail>\n" +
+						"<AllowBluetooth>2</AllowBluetooth>\n" +
+						"<AllowIrDA>1</AllowIrDA>\n" +
+						"<RequireManualSyncWhenRoaming>0</RequireManualSyncWhenRoaming>\n" +
+						"<AllowDesktopSync>1</AllowDesktopSync>\n" +
+						"<MaxCalendarAgeFilter>0</MaxCalendarAgeFilter>\n" +
+						"<AllowHTMLEmail>1</AllowHTMLEmail>\n" +
+						"<MaxEmailAgeFilter>0</MaxEmailAgeFilter>\n" +
+						"<MaxEmailBodyTruncationSize>-1</MaxEmailBodyTruncationSize>\n" +
+						"<MaxEmailHTMLBodyTruncationSize>-1</MaxEmailHTMLBodyTruncationSize>\n" +
+						"<RequireSignedSMIMEMessages>0</RequireSignedSMIMEMessages>\n" +
+						"<RequireEncryptedSMIMEMessages>0</RequireEncryptedSMIMEMessages>\n" +
+						"<RequireSignedSMIMEAlgorithm>0</RequireSignedSMIMEAlgorithm>\n" +
+						"<RequireEncryptionSMIMEAlgorithm>0</RequireEncryptionSMIMEAlgorithm>\n" +
+						"<AllowSMIMEEncryptionAlgorithmNegotiation>2</AllowSMIMEEncryptionAlgorithmNegotiation>\n" +
+						"<AllowSMIMESoftCerts>1</AllowSMIMESoftCerts>\n" +
+						"<AllowBrowser>1</AllowBrowser>\n" +
+						"<AllowConsumerEmail>1</AllowConsumerEmail>\n" +
+						"<AllowRemoteDesktop>1</AllowRemoteDesktop>\n" +
+						"<AllowInternetSharing>1</AllowInternetSharing>\n" +
+						"<UnapprovedInROMApplicationList/>\n" +
+						"<ApprovedApplicationList/>\n" +
+						"</EASProvisionDoc>\n" +
+						"</Data>\n");
+	}
+	
+	@Test
 	public void testCheckDefault12Dot0Policy() throws Exception {
 		long nextPolicyKeyGenerated = 115l;
 		OpushUser user = singleUserFixture.jaures;
 		user.deviceProtocolVersion = ProtocolVersion.V120;
 		user.device = new Device.Factory().create(1, user.deviceType, user.userAgent, user.deviceId, user.deviceProtocolVersion);
 		mockProvisionNeeds(user);
-
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
+		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
 		deviceDao.removeUnknownDeviceSyncPerm(user.user, user.device);
@@ -239,6 +309,7 @@ public class ProvisionHandlerTest {
 		long nextPolicyKeyGenerated = 115l;
 		OpushUser user = singleUserFixture.jaures;
 		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.syncAuthorized(user.user, user.deviceId)).andReturn(true);
@@ -269,6 +340,7 @@ public class ProvisionHandlerTest {
 		long nextPolicyKeyGenerated = 115l;
 		OpushUser user = singleUserFixture.jaures;
 		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
@@ -296,6 +368,7 @@ public class ProvisionHandlerTest {
 		long acknowledgedPolicyKey = 321l;
 		OpushUser user = singleUserFixture.jaures;
 		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(null).once();
@@ -336,6 +409,7 @@ public class ProvisionHandlerTest {
 		expect(deviceDao.allocateNewPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED)).andReturn(nextPolicyKeyGenerated);
 		
 		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
 		
 		mocksControl.replay();
 		opushServer.start();
@@ -360,6 +434,7 @@ public class ProvisionHandlerTest {
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.PENDING)).andReturn(userRegistredPolicyKey).once();
 		
 		mockProvisionNeeds(user);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig").anyTimes();
 
 		mocksControl.replay();
 		opushServer.start();

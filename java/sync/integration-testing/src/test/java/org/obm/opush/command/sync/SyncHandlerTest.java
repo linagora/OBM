@@ -82,6 +82,7 @@ import org.obm.opush.IntegrationUserAccessUtils;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -147,12 +148,14 @@ public class SyncHandlerTest {
 	@Inject Configuration configuration;
 	@Inject IContentsImporter contentsImporter;
 	@Inject SyncWithDataCommand.Factory syncWithDataCommandFactory;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private List<OpushUser> fakeTestUsers;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After

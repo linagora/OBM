@@ -56,6 +56,7 @@ import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
@@ -122,6 +123,7 @@ public class MailBackendImapTimeoutTest {
 	@Inject CalendarBackend calendarBackend;
 	@Inject SyncDecoder syncDecoder;
 	@Inject PingProtocol pingProtocol;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
@@ -163,6 +165,8 @@ public class MailBackendImapTimeoutTest {
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

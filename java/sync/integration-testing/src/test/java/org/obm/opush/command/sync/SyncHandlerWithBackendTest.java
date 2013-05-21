@@ -65,6 +65,7 @@ import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
+import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
@@ -122,6 +123,7 @@ public class SyncHandlerWithBackendTest {
 	@Inject MailboxService mailboxService;
 	@Inject EventService eventService;
 	@Inject SyncDecoder decoder;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
@@ -162,6 +164,8 @@ public class SyncHandlerWithBackendTest {
 		eventService = classToInstanceMap.get(EventService.class);
 
 		bindCollectionIdToPath();
+		
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {
