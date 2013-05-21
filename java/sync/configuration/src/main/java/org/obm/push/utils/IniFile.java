@@ -56,7 +56,7 @@ public class IniFile {
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		
 		@Inject
-		public Factory() {
+		protected Factory() {
 			super();
 		}
 		
