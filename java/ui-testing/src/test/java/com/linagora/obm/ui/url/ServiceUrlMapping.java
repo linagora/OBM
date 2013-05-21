@@ -40,7 +40,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.obm.ui.ioc.Module;
+import com.linagora.obm.ui.page.CalendarPage;
 import com.linagora.obm.ui.page.ContactPage;
+import com.linagora.obm.ui.page.CreateCalendarPage;
 import com.linagora.obm.ui.page.CreateContactPage;
 import com.linagora.obm.ui.page.CreateUserPage;
 import com.linagora.obm.ui.page.HomePage;
@@ -62,6 +64,8 @@ public class ServiceUrlMapping {
 				.put(CreateUserPage.class, new URL(serverUrl, "/user/user_index.php?action=new"))
 				.put(ContactPage.class, new URL(serverUrl, "/contact/contact_index.php"))
 				.put(CreateContactPage.class, new URL(serverUrl, "/contact/contact_index.php"))
+				.put(CalendarPage.class, new URL(serverUrl, "/calendar/calendar_index.php"))
+				.put(CreateCalendarPage.class, new URL(serverUrl, "/calendar/calendar_index.php"))
 				.build();
 	}
 	

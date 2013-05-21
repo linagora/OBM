@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.bean;
 
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -47,10 +49,10 @@ public class UIEvent {
 		private boolean force;
 		private boolean privacy;
 		private boolean allday;
-		private String dateBegin;
+		private Date dateBegin;
 		private Integer hourBegin;
 		private Integer minBegin;
-		private String dateEnd;
+		private Date dateEnd;
 		private Integer hourEnd;
 		private Integer minEnd;
 		private boolean isBusy;
@@ -60,6 +62,11 @@ public class UIEvent {
 		private boolean showUserCalendar;
 		private String description;
 		private boolean attendeesNotification;
+		private boolean daily;
+		private boolean weekly;
+		private boolean monthlybydate;
+		private boolean monthlybyday;
+		private boolean yearly;
 		
 		
 		private Builder() {
@@ -91,7 +98,7 @@ public class UIEvent {
 			return this;
 		}
 		
-		public Builder dateBegin(String dateBegin) {
+		public Builder dateBegin(Date dateBegin) {
 			this.dateBegin = dateBegin;
 			return this;
 		}
@@ -106,7 +113,7 @@ public class UIEvent {
 			return this;
 		}
 		
-		public Builder dateEnd(String dateEnd) {
+		public Builder dateEnd(Date dateEnd) {
 			this.dateEnd = dateEnd;
 			return this;
 		}
@@ -155,7 +162,31 @@ public class UIEvent {
 			this.attendeesNotification=attendeesNotification;
 			return this;
 		}
-		
+
+		public Builder daily(boolean daily) {
+			this.daily = daily;
+			return this;
+		}
+
+		public Builder weekly(boolean weekly) {
+			this.weekly = weekly;
+			return this;
+		}
+
+		public Builder monthlybydate(boolean monthlybydate) {
+			this.monthlybydate = monthlybydate;
+			return this;
+		}
+
+		public Builder monthlybyday(boolean monthlybyday) {
+			this.monthlybyday = monthlybyday;
+			return this;
+		}
+
+		public Builder yearly(boolean yearly) {
+			this.yearly = yearly;
+			return this;
+		}
 		
 		public UIEvent build() {
 			return new UIEvent(
@@ -163,7 +194,8 @@ public class UIEvent {
 					dateBegin, hourBegin, minBegin, dateEnd,
 					hourEnd, minEnd, isBusy, isFree,
 					tagLabel, userSearch,  showUserCalendar,
-					description, attendeesNotification);
+					description, attendeesNotification,
+					daily, weekly, monthlybydate, monthlybyday, yearly);
 		}
 	}
 
@@ -172,10 +204,10 @@ public class UIEvent {
 	private final boolean force;
 	private final boolean privacy;
 	private final boolean allday;
-	private final String dateBegin;
+	private final Date dateBegin;
 	private final Integer hourBegin;
 	private final Integer minBegin;
-	private final String dateEnd;
+	private final Date dateEnd;
 	private final Integer hourEnd;
 	private final Integer minEnd;
 	private final boolean isBusy;
@@ -185,6 +217,13 @@ public class UIEvent {
 	private final boolean showUserCalendar;
 	private final String description;
 	private final boolean attendeesNotification;
+	private final boolean daily;
+	private final boolean weekly;
+	private final boolean monthlybydate;
+	private final boolean monthlybyday;
+	private final boolean yearly;
 	
-		
+	public boolean isRecurent() {
+		return daily || weekly || monthlybydate || monthlybyday || yearly;
+	}
 }

@@ -31,20 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.linagora.obm.ui.bean.UIContact;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 
 public class CalendarPage extends RootPage {
 	
-	private WebElement newEvent;
+	@FindBy(tagName="p")
+	private List<WebElement> messages;
+	
+	private WebElement newEventCalendar;
 	protected WebElement calendarTitle;
-	protected WebElement new_event_form;
+	protected WebElement calendarHeader;
 	
 	public CalendarPage(WebDriver driver) {
 		super(driver);
@@ -55,13 +62,98 @@ public class CalendarPage extends RootPage {
 		driver.get(mapping.lookup(CalendarPage.class).toExternalForm());
 	}
 
-	public CreateEventPage createNewEventPage() {
-		newEvent.click();
+	public CreateCalendarPage createCalendarPage() {
+		newEventCalendar.click();
 		
 		new WebDriverWait(driver, 10).until(
 				ExpectedConditions.presenceOfElementLocated(By.id("tf_title")));
 		
-		return pageFactory.create(driver, CreateEventPage.class);
+		return pageFactory.create(driver, CreateCalendarPage.class);
 	}
 
+	@Override
+	public List<WebElement> elMessagesOk() {
+		return messagesByClass("message ok");
+	}
+
+	@Override
+	public List<WebElement> elMessagesError() {
+		return messagesByClass("message error");
+	}
+	
+	private List<WebElement> messagesByClass(String clazz) {
+		Builder<WebElement> builder = ImmutableList.builder();
+		for (WebElement message : messages) {
+			if (clazz.equals(message.getAttribute("class"))) {
+				builder.add(message);
+			}
+		}
+		return builder.build();
+	}
+	
+	public void navigateToNextPage() {
+		if (isInAgendaView()) {
+			navigateToNextPageOnCalendarView();
+		} else {
+			navigateToNextPageOnOtherViews();
+		}
+	}
+
+	private void navigateToNextPageOnCalendarView() {
+		WebElement navigatorElement = getNavigatorElement();
+		List<WebElement> buttonElements = navigatorElement.findElements(new ByCssSelector("a"));
+		for (WebElement webElement : buttonElements) {
+			if (webElement.getAttribute("onclick").contains("showNext")) {
+				webElement.click();
+				waitForPageToLoad();
+				return;
+			}
+		}
+	}
+	
+	private void navigateToNextPageOnOtherViews() {
+		WebElement navigatorElement = getNavigatorElement();
+		List<WebElement> buttonElements = navigatorElement.findElements(new ByCssSelector("img"));
+		for (WebElement webElement : buttonElements) {
+			if (webElement.getAttribute("src").contains("next.png")) {
+				webElement.click();
+				waitForPageToLoad();
+				return;
+			}
+		}
+	}
+	
+	private WebElement getNavigatorElement() {
+		WebElement navigatorElement = driver.findElement(By.id("calendarNavBar"));
+		return navigatorElement;
+	}
+	
+	private boolean isInAgendaView() {
+		WebElement currentViewElement = driver.findElement(new ByCssSelector("img[title='Vue calendrier, cette vue est éditable']"));
+		return currentViewElement.getAttribute("src").contains("current.gif");
+	}
+	
+	public void listView() {
+		WebElement calendarViewElement = driver.findElement(new ByCssSelector(".LF.NM"));
+		List<WebElement> buttonElements = calendarViewElement.findElements(new ByCssSelector("a"));
+		for (WebElement webElement : buttonElements) {
+			if (webElement.getAttribute("href").contains("list")) {
+				webElement.click();
+				waitForPageToLoad();
+				return;
+			}
+		}
+	}
+	
+	public void monthlyEvents() {
+		WebElement calendarViewElement = driver.findElement(By.id("calendarCalRange"));
+		List<WebElement> buttonElements = calendarViewElement.findElements(new ByCssSelector("a"));
+		for (WebElement webElement : buttonElements) {
+			if (webElement.getAttribute("href").contains("month")) {
+				webElement.click();
+				waitForPageToLoad();
+				return;
+			}
+		}
+	}
 }

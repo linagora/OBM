@@ -1817,7 +1817,8 @@ function get_calendar_action() {
     'Name'     => $l_header_new_event,
     'Url'      => "$path/calendar/calendar_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('all')
+    'Condition'=> array ('all'),
+    'Id'       => "newEventCalendar"
   );
 
   // Detail Consult

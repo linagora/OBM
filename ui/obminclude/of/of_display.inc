@@ -1447,8 +1447,9 @@ function display_actions($section, $module) {
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value['Name']."</a> &nbsp;";
 	  } else {
-	    $content = "
-               <a href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
+            $id = isset($value['Id']) ? 'id="$value['Id']"' : '';
+            $content = "
+              <a $id href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
           }
           $block .= "<li onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" >$content</li>";
 	}

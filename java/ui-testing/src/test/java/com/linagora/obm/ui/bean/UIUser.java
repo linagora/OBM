@@ -35,6 +35,8 @@ import java.util.Date;
 
 import lombok.Data;
 
+import com.google.common.base.Objects;
+
 @Data
 public class UIUser {
 	
@@ -46,11 +48,13 @@ public class UIUser {
 	}
 	
 	public static UIUser admin() { 
-		return builder().login("admin").password("admin").commonName("admin").profile(UIUserProfile.ADMIN).build();
+		String admin = Objects.firstNonNull(System.getProperty("admin"), "admin");
+		return builder().login(admin).password(admin).commonName(admin).profile(UIUserProfile.ADMIN).build();
 	}
 	
 	public static UIUser user() {
-		return builder().login("userb").password("userb").commonName("Utilisateur b").profile(UIUserProfile.USER).build();		
+		String user = Objects.firstNonNull(System.getProperty("user"), "userb");
+		return builder().login(user).password(user).commonName(user).profile(UIUserProfile.USER).build();		
 	}
 	
 	public static class Builder {

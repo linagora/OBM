@@ -2,7 +2,9 @@ package com.linagora.obm.ui.page;
 
 import java.util.List;
 
+import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverCommandProcessor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -15,6 +17,7 @@ public abstract class RootPage implements Page {
 	@Inject protected ServiceUrlMapping mapping;
 	@Inject protected PageFactory pageFactory;
 	protected final WebDriver driver;
+	private String timeout = "30";
 	
 	@FindBy(name="displayMessageOk")
 	private List<WebElement> messagesOk;
@@ -71,5 +74,14 @@ public abstract class RootPage implements Page {
 			field.click();
 		}
 		return hasToBeClicked;
+	}
+	
+	public WebElement getDivByTitle(String title) {
+		return driver.findElement(new ByCssSelector("div[title*='" + title + "']"));
+	}
+	
+	public void waitForPageToLoad() {
+		WebDriverCommandProcessor webDriverCommandProcessor = new WebDriverCommandProcessor(driver.getCurrentUrl(), driver);
+		webDriverCommandProcessor.doCommand("waitForPageToLoad", new String[] {timeout});
 	}
 }

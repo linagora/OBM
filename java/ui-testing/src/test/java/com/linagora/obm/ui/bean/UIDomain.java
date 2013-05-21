@@ -43,8 +43,8 @@ public class UIDomain {
 	}
 	
 	public static UIDomain obmDomain() {
-		// @TODO search domain name
-		return builder().name("obm15").selectValue(2).build();
+		String domain = Objects.firstNonNull(System.getProperty("domain"), "obm15");
+		return builder().name(domain).selectValue(2).build();
 	}
 	
 	public static class Builder {

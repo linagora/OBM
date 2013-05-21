@@ -72,7 +72,7 @@ public class LoginPage extends RootPage {
 		loginField.sendKeys(user.getLogin());
 		passwordField.sendKeys(user.getPassword());
 		for (WebElement domainOption : selectDropdown.findElements(By.tagName("option"))) {
-			if (domainOption.getAttribute("value").equals(String.valueOf(domain.getSelectValue()))) {
+			if (domainOption.getText().startsWith(domain.getName() + " ")) {
 				domainOption.click();
 			}
 		}
