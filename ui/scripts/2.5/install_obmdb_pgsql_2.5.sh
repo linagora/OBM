@@ -87,6 +87,6 @@ psql -U ${user} -h ${host} ${db} -f \
   "updates/update-2.5.0~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 psql -U ${user} -h ${host} ${db} -f \
-  "updates/update-2.5.1~alpha1.pgsql.sql" >> /tmp/data_insert.log 2>&1
+  "updates/update-2.5.1~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 echo "DONE."
