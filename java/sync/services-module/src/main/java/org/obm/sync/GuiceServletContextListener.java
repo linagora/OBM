@@ -38,14 +38,19 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import bitronix.tm.TransactionManagerServices;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.internal.Errors;
 import com.google.inject.spi.Message;
+import com.linagora.obm.sync.QueueManager;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -97,6 +102,26 @@ public class GuiceServletContextListener implements ServletContextListener {
     
     @Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-    	servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null); 
+		Errors errors = new Errors();
+		Injector injector = (Injector) servletContextEvent.getServletContext().getAttribute(ATTRIBUTE_NAME);
+
+		try {
+			if (injector != null) {
+				injector.getInstance(QueueManager.class).stop();
+			}
+		}
+		catch (Exception e) {
+			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop QueueManager.", e));
+		}
+
+		try {
+			TransactionManagerServices.getTransactionManager().shutdown();
+		}
+		catch (Exception e) {
+			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop TransactionManager.", e));
+		}
+
+		servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null);
+		errors.throwConfigurationExceptionIfErrorsExist();
     }
 }
