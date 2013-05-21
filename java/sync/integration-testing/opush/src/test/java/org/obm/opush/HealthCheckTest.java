@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +42,11 @@ import org.apache.http.client.fluent.Request;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -60,7 +63,13 @@ public class HealthCheckTest {
 	@Inject OpushServer opushServer;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
+	@Before
+	public void setup() {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfig");
+	}
+	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();

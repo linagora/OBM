@@ -31,28 +31,33 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import static org.obm.opush.env.OpushStaticConfigurationService.*;
-
+import org.easymock.IMocksControl;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.guice.AbstractOverrideModule;
+import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
+import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-public final class OpushConfigurationModule extends AbstractModule {
+public final class OpushConfigurationModule extends AbstractOverrideModule {
 
 	private final Configuration configuration;
 
-	public OpushConfigurationModule(Configuration configuration) {
+	public OpushConfigurationModule(Configuration configuration, IMocksControl mocksControl) {
+		super(mocksControl);
 		this.configuration = configuration;
 	}
 	
 	@Override
-	protected void configure() {
+	protected void configureImpl() {
 		install(new ConfigurationModule(configuration));
 		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
 		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
+		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
 	}
 	
 }

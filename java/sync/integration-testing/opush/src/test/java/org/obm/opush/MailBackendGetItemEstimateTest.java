@@ -54,6 +54,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -101,6 +102,7 @@ public class MailBackendGetItemEstimateTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject SyncDecoder decoder;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
@@ -136,6 +138,8 @@ public class MailBackendGetItemEstimateTest {
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -76,7 +77,8 @@ public class SmartReplyHandlerTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject GreenMail greenMail;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private OpushUser user;
 	private GreenMailUser greenMailUser;
 	private String inboxCollectionPath;
@@ -100,6 +102,7 @@ public class SmartReplyHandlerTest {
 		mockUsersAccess(classToInstanceMap, Lists.newArrayList(user));
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(iCalendar.getUserEmail(user.accessToken)).andReturn(user.user.getLoginAtDomain()).anyTimes();
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration").anyTimes();
 	}
 	
 	@After

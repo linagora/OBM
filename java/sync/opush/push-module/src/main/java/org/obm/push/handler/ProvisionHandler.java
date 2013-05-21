@@ -31,12 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import org.obm.push.DefaultPolicy;
-import org.obm.push.Policy;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.backend.PolicyConfigurationService;
 import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -67,18 +66,21 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 	private static final int INITIAL_POLICYKEY = 0;
 	private final ProvisionProtocol.Factory protocolFactory;
 	private final DeviceDao deviceDao;
+	private final PolicyConfigurationService policyConfigurationService;
 
 	@Inject
 	protected ProvisionHandler(IBackend backend, EncoderFactory encoderFactory,
 			DeviceDao deviceDao, IContentsImporter contentsImporter,
 			IContentsExporter contentsExporter, StateMachine stMachine, CollectionDao collectionDao, 
-			ProvisionProtocol.Factory provisionProtocolFactory, WBXMLTools wbxmlTools, DOMDumper domDumper) {
+			ProvisionProtocol.Factory provisionProtocolFactory, WBXMLTools wbxmlTools, DOMDumper domDumper,
+			PolicyConfigurationService policyConfigurationService) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
 		
 		this.deviceDao = deviceDao;
 		this.protocolFactory = provisionProtocolFactory;
+		this.policyConfigurationService = policyConfigurationService;
 	}
 	
 	@Override
@@ -114,7 +116,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 
 		if (isInitialProvisionRequest(policyKey)) {
 			provisionResponseBuilder
-				.policy(getDevicePolicy())
+				.policy(policyConfigurationService.getPolicy())
 				.policyKey(retrievePendingPolicyKey(udr))
 				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else if (isPendingPolicyKey(udr, policyKey)) {
@@ -127,10 +129,6 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		}
 		
 		return provisionResponseBuilder.build();
-	}
-
-	private Policy getDevicePolicy() {
-		return new DefaultPolicy();
 	}
 
 	private boolean isInitialProvisionRequest(Long policyKey) {

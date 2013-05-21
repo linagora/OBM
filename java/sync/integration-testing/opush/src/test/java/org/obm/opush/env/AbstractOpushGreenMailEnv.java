@@ -49,14 +49,15 @@ public abstract class AbstractOpushGreenMailEnv extends AbstractOpushEnv {
 				dao(),
 				obmSync(),
 				backendsModule(),
-				greenMail()
+				greenMail(),
+				configuration()
 				);
 		for (AbstractOverrideModule module: modules) {
 			getMockMap().addMap(module.getMockMap());
 		}
-		return Modules.combine(ImmutableList.<Module>builder().addAll(modules).add(configuration()).build());
+		return Modules.combine(ImmutableList.<Module>builder().addAll(modules).build());
 	}
-	
+
 	protected GreenMailEnvModule greenMail() {
 		return new GreenMailEnvModule(getMocksControl());
 	}

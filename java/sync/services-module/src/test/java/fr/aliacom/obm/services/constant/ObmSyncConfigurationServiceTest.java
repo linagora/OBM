@@ -126,7 +126,6 @@ public class ObmSyncConfigurationServiceTest {
 		control.verify();
 	}
 
-
 	@Test
 	public void testIsAutoTruncateEnabledWhenDisabled() {
 		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(false);

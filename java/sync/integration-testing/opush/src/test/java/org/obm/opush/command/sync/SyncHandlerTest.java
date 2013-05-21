@@ -76,6 +76,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -147,12 +148,14 @@ public class SyncHandlerTest {
 	@Inject Configuration configuration;
 	@Inject IContentsImporter contentsImporter;
 	@Inject SyncWithDataCommand.Factory syncWithDataCommandFactory;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private List<OpushUser> fakeTestUsers;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After

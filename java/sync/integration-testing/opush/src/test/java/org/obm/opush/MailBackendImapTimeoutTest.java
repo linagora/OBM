@@ -53,6 +53,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -122,6 +123,7 @@ public class MailBackendImapTimeoutTest {
 	@Inject CalendarBackend calendarBackend;
 	@Inject SyncDecoder syncDecoder;
 	@Inject PingProtocol pingProtocol;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
@@ -163,6 +165,8 @@ public class MailBackendImapTimeoutTest {
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

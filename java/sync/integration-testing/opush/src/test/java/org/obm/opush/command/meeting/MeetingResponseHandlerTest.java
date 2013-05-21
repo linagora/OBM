@@ -50,17 +50,17 @@ import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.env.DefaultOpushModule;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
@@ -98,11 +98,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(DefaultOpushModule.class)
 public class MeetingResponseHandlerTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
@@ -110,7 +108,8 @@ public class MeetingResponseHandlerTest {
 	@Inject MeetingProtocol protocol;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private int meetingCollectionId;
 	private int meetingItemId;
 	private int invitationCollectionId;
@@ -122,6 +121,8 @@ public class MeetingResponseHandlerTest {
 		meetingItemId = 8;
 		invitationCollectionId = 5;
 		invitationItemId = 10;
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After

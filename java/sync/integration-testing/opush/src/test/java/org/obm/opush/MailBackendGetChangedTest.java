@@ -59,6 +59,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -113,6 +114,7 @@ public class MailBackendGetChangedTest {
 	@Inject Configuration configuration;
 	@Inject MailboxService mailboxService;
 	@Inject SyncDecoder decoder;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
@@ -150,6 +152,8 @@ public class MailBackendGetChangedTest {
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

@@ -36,9 +36,12 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 
 public final class ConfigurationModule extends AbstractModule {
 
+	public interface PolicyConfigurationProvider extends Provider<String> {}
+	
 	private final Configuration configuration;
 	private final Class<? extends TransactionConfiguration> transactionConfigurationImpl;
 

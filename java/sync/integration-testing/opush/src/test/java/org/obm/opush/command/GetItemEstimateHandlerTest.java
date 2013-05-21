@@ -53,17 +53,17 @@ import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.command.sync.EmailSyncTestUtils;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -90,23 +90,24 @@ import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(GetIemEstimateTestModule.class)
 public class GetItemEstimateHandlerTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(GetIemEstimateTestModule.class);
 
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private List<OpushUser> fakeTestUsers;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After

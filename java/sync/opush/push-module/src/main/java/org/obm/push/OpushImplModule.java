@@ -46,6 +46,8 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
+import org.obm.push.backend.PolicyConfigurationService;
+import org.obm.push.backend.PolicyConfigurationServiceFileImpl;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ContinuationServiceImpl;
 import org.obm.push.impl.ContinuationTransactionMapImpl;
@@ -148,6 +150,8 @@ public class OpushImplModule extends AbstractModule {
 		bind(ClientIdService.class).to(ClientIdServiceImpl.class);
 		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
+		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toInstance("/etc/opush/policy.ini");
+		bind(PolicyConfigurationService.class).to(PolicyConfigurationServiceFileImpl.class);
 		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
 		searchSources.addBinding().to(BookSource.class);
 	}

@@ -41,16 +41,17 @@ import java.util.Properties;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.SingleUserFixture;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
@@ -69,19 +70,24 @@ import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@Slow
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(ScenarioTestModule.class)
 public class FolderSyncScenarioMockTest {
 	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ScenarioTestModule.class);
-
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject FolderSyncScenario folderSyncScenario;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
+	@Before
+	public void setup() {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration").anyTimes();
+	}
+	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();

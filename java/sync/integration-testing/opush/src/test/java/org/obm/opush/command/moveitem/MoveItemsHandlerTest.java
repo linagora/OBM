@@ -47,6 +47,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -84,6 +85,7 @@ public class MoveItemsHandlerTest {
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject Configuration configuration;
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private CollectionDao collectionDao;
 
@@ -113,6 +115,8 @@ public class MoveItemsHandlerTest {
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 
 		bindCollectionIdToPath();
+
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
 	private void bindCollectionIdToPath() throws Exception {

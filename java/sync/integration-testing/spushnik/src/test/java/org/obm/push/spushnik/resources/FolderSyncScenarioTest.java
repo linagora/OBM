@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.InputStream;
@@ -55,6 +56,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -69,7 +71,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceArquillianRunner.class) @Slow
+@Slow
+@RunWith(SlowGuiceArquillianRunner.class)
 @GuiceModule(ScenarioTestModule.class)
 public class FolderSyncScenarioTest {
 
@@ -78,7 +81,8 @@ public class FolderSyncScenarioTest {
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
 	private DefaultHttpClient httpClient;
 
 	@After
@@ -89,6 +93,7 @@ public class FolderSyncScenarioTest {
 	
 	@Before
 	public void setUp() throws Exception {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration").anyTimes();
 		SpushnikScenarioTestUtils.mockWorkingFolderSync(classToInstanceMap, singleUserFixture.jaures);
 		mocksControl.replay();
 		opushServer.start();

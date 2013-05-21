@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.easymock.EasyMock.expect;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Locale;
@@ -41,15 +43,16 @@ import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
 import org.junit.After;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.DefaultOpushModule;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -65,18 +68,22 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) @Slow
+@GuiceModule(DefaultOpushModule.class)
 public class AutodiscoverHandlerTest {
 	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(DefaultOpushModule.class);
-
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
-
+	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	
+	@Before
+	public void init() {
+		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
+	}
+	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
