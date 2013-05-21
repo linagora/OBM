@@ -104,7 +104,6 @@
 		<module>webapp-common-dependencies</module>
     		<module>icalendar</module>
     		<module>qos-filter</module>
-    		<module>ui-testing</module>
 	        <module>healthcheck-api</module>
   </modules>
 

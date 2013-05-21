@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.bean;
 
-import java.util.Date;
-
 import lombok.Data;
 
 @Data

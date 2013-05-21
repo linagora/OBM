@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -61,15 +63,7 @@ public class CreateContactPage extends ContactPage {
 	public ContactPage createContact(UIContact contactToCreate) {
 		doCreateContact(contactToCreate);
 		
-		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
-			@Override
-			public boolean apply(WebDriver input) {
-				return !informationGrid.isDisplayed() 
-					&& "expanded".equals(dataGrid.getAttribute("class"));
-			}
-		});
-		
-		return pageFactory.create(driver, ContactPage.class);
+		return createContactPage();
 	}
 	
 	public ContactPage createContactAndRespondOKTOConfirmCreation(UIContact contactToCreate) {
@@ -107,12 +101,14 @@ public class CreateContactPage extends ContactPage {
 	}
 
 	private ContactPage createContactPage() {
-		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
-			@Override
-			public boolean apply(WebDriver input) {
-				return !informationGrid.isDisplayed() 
-					&& "expanded".equals(dataGrid.getAttribute("class"));
-			}
+		new FluentWait<WebDriver>(driver)
+			.withTimeout(2, TimeUnit.SECONDS)
+			.until(new Predicate<WebDriver>() {
+				@Override
+				public boolean apply(WebDriver input) {
+					return !informationGrid.isDisplayed() 
+						&& "expanded".equals(dataGrid.getAttribute("class"));
+				}
 		});
 		
 		return pageFactory.create(driver, ContactPage.class);
