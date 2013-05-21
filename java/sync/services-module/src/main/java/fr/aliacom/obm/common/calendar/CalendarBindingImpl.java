@@ -482,7 +482,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			assignDelegationRightsOnAttendees(token, event);
 			initDefaultParticipation(event);
-			inheritsParticipationFromExistingEvent(before, event);
+			inheritsParticipationFromExistingEventForObmUsers(before, event);
 			applyParticipationModifications(before, event);
 			
 			Event after = calendarDao.modifyEventForcingSequence(
@@ -512,7 +512,9 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		if (attendees != null) {
 			for (Attendee attendee : attendees) {
-				attendee.setParticipation(Participation.needsAction());
+				if ( attendee.isObmUser() ) {
+					attendee.setParticipation(Participation.needsAction());
+				}
 			}
 		}
 	}
@@ -542,10 +544,12 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	@VisibleForTesting void inheritsParticipationFromExistingEvent(Event before, Event event) {
+	@VisibleForTesting void inheritsParticipationFromExistingEventForObmUsers(Event before, Event event) {
 		if (before.getAttendees() != null && event.getAttendees() != null) {
 			for (Attendee beforeAttendee : before.getAttendees()) {
-				inheritsParticipationForSpecificAttendee(event, beforeAttendee);
+				if( beforeAttendee.isObmUser() ) {
+					inheritsParticipationForSpecificAttendee(event, beforeAttendee);
+				}
 			}
 		}
 		
@@ -566,7 +570,7 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		for (Event beforeException : beforeExceptions) {
 			if (eventExceptions.containsKey(beforeException)) {
-				inheritsParticipationFromExistingEvent(beforeException, eventExceptions.get(beforeException));
+				inheritsParticipationFromExistingEventForObmUsers(beforeException, eventExceptions.get(beforeException));
 			}
 		}
 	}

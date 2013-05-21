@@ -2193,7 +2193,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEmpty();
 	}
 
@@ -2207,7 +2207,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
 	}
 
@@ -2221,7 +2221,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEmpty();
 	}
 
@@ -2235,7 +2235,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
 	}
 
@@ -2259,7 +2259,7 @@ public class CalendarBindingImplTest {
 		List<Attendee> expectedAttendeesException = createOrganiserAndContactAttendees(Participation.declined());
 		Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-		Event afterException = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(1).toDate());
+		Event afterException = createEventException(createOrganiserAndContactAttendees(Participation.declined()), eventDate.plusDays(1).toDate());
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
 		before.addEventException(createEventException(expectedAttendeesException, eventDate.plusDays(1).toDate()));
@@ -2279,9 +2279,9 @@ public class CalendarBindingImplTest {
 		List<Attendee> expectedAttendeesException_2 = createOrganiserAndContactAttendees(Participation.needsAction());
 		List<Attendee> expectedAttendeesException_3 = createOrganiserAndContactAttendees(Participation.tentative());
 		Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-		Event afterException_1 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(1).toDate());
-		Event afterException_2 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(2).toDate());
-		Event afterException_3 = createEventException(createOrganiserAndContactAttendees(Participation.accepted()), eventDate.plusDays(3).toDate());
+		Event afterException_1 = createEventException(createOrganiserAndContactAttendees(Participation.declined()), eventDate.plusDays(1).toDate());
+		Event afterException_2 = createEventException(createOrganiserAndContactAttendees(Participation.needsAction()), eventDate.plusDays(2).toDate());
+		Event afterException_3 = createEventException(createOrganiserAndContactAttendees(Participation.tentative()), eventDate.plusDays(3).toDate());
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
@@ -2329,7 +2329,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2350,7 +2350,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
 	}
 
@@ -2374,7 +2374,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2404,7 +2404,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2431,7 +2431,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		calendarService.inheritsParticipationFromExistingEvent(before, after);
+		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendees);
 	}
 	
