@@ -140,6 +140,15 @@ public class IniFile {
 		return value;
 	}
 
+	public Boolean getNullableBooleanValue(String prop, Boolean defaultValue) {
+		String valueString = getStringValue(prop);
+		if (valueString != null)  {
+			return Boolean.valueOf(valueString).booleanValue();
+		} else {
+			return defaultValue;
+		}
+	}
+	
 	public int getIntValue(String prop, int defaultValue) {
 		try {
 			return Integer.parseInt(getStringValue(prop));
@@ -148,5 +157,11 @@ public class IniFile {
 		}
 	}
 
-	
+	public Integer getIntegerValue(String prop, Integer defaultValue) {
+		try {
+			return Integer.parseInt(getStringValue(prop));
+		} catch (NumberFormatException nfe) {
+			return defaultValue;
+		}
+	}
 }

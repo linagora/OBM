@@ -142,6 +142,50 @@ public class IniFileTest {
 	}
 
 	@Test
+	public void testGetNullableTrueWithDefault() {
+		settings.put("key", "true");
+		assertThat(iniFile.getNullableBooleanValue("key", false)).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetNullableFalseWithDefault() {
+		settings.put("key", "false");
+		assertThat(iniFile.getNullableBooleanValue("key", true)).isEqualTo(false);
+	}
+
+	
+	@Test
+	public void testGetNullableRandomCaseTrueWithDefault() {
+		settings.put("key", "tRuE");
+		assertThat(iniFile.getNullableBooleanValue("key", false)).isEqualTo(true);
+	}
+
+	@Test
+	public void testGetNullableRandomCaseFalseWithDefault() {
+		settings.put("key", "fAlSe");
+		assertThat(iniFile.getNullableBooleanValue("key", true)).isEqualTo(false);
+	}
+
+	
+	@Test
+	public void testGetOneAsNullableBooleanWithDefault() {
+		settings.put("key", "1");
+		assertThat(iniFile.getNullableBooleanValue("key", true)).isEqualTo(false);
+	}
+	
+	@Test
+	public void testGetZeroAsNullableBooleanWithDefault() {
+		settings.put("key", "0");
+		assertThat(iniFile.getNullableBooleanValue("key", true)).isEqualTo(false);
+	}
+	
+
+	@Test
+	public void testGetNullAsNullableBooleanWithNullDefault() {
+		assertThat(iniFile.getNullableBooleanValue("key", null)).isNull();
+	}
+	
+	@Test
 	public void testGetCategory() {
 		assertThat(iniFile.getCategory()).isEqualTo("discarded");
 	}
@@ -180,6 +224,35 @@ public class IniFileTest {
 	public void testGetNullInt() {
 		assertThat(iniFile.getIntValue("key", 2)).isEqualTo(2);
 	}
+	
+	@Test
+	public void testGetInteger() {
+		settings.put("key", "1");
+		assertThat(iniFile.getIntegerValue("key", 2)).isEqualTo(1);
+	}
+	
+	@Test
+	public void testGetUnparsableInteger() {
+		settings.put("key", "one");
+		assertThat(iniFile.getIntegerValue("key", 2)).isEqualTo(2);
+	}
+	
+	@Test
+	public void testGetTooBigInteger() {
+		settings.put("key", "111111111111");
+		assertThat(iniFile.getIntegerValue("key", 2)).isEqualTo(2);
+	}
+	
+	@Test
+	public void testGetNullInteger() {
+		assertThat(iniFile.getIntegerValue("key", 2)).isEqualTo(2);
+	}
+	
+	@Test
+	public void testGetNullIntegerWithNullDefault() {
+		assertThat(iniFile.getIntegerValue("key", null)).isNull();
+	}
+	
 	
 	@Test
 	public void testGetNullString() {
