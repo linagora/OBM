@@ -107,7 +107,6 @@ public class DefaultPolicy implements Policy {
 
 	@Override
 	public boolean requireStorageCardEncryption() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
