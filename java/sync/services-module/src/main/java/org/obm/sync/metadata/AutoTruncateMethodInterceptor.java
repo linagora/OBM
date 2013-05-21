@@ -39,31 +39,36 @@ import org.obm.annotations.database.DatabaseField;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+
 public class AutoTruncateMethodInterceptor implements MethodInterceptor {
 
 	@Inject
 	private DatabaseTruncationService truncationService;
+	@Inject
+	private ObmSyncConfigurationService configurationService;
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		Method method = invocation.getMethod();
-		Object[] args = invocation.getArguments();
-		Class<?>[] paramTypes = method.getParameterTypes();
-		Annotation[][] paramsAnnotations = method.getParameterAnnotations();
+		if (configurationService.isAutoTruncateEnabled()) {
+			Method method = invocation.getMethod();
+			Object[] args = invocation.getArguments();
+			Class<?>[] paramTypes = method.getParameterTypes();
+			Annotation[][] paramsAnnotations = method.getParameterAnnotations();
 
-		for (int i = 0; i < args.length; i++) {
-			Annotation[] annotations = paramsAnnotations[i];
+			for (int i = 0; i < args.length; i++) {
+				Annotation[] annotations = paramsAnnotations[i];
 
-			for (Annotation annotation : annotations) {
-				Object arg = args[i];
+				for (Annotation annotation : annotations) {
+					Object arg = args[i];
 
-				if (annotation instanceof DatabaseEntity) {
-					args[i] = truncationService.getTruncatingEntity(arg);
-				}
-				else if (annotation instanceof DatabaseField && String.class.equals(paramTypes[i])) {
-					DatabaseField dbField = (DatabaseField) annotation;
+					if (annotation instanceof DatabaseEntity) {
+						args[i] = truncationService.getTruncatingEntity(arg);
+					} else if (annotation instanceof DatabaseField && String.class.equals(paramTypes[i])) {
+						DatabaseField dbField = (DatabaseField) annotation;
 
-					args[i] = truncationService.truncate((String) arg, dbField.table(), dbField.column());
+						args[i] = truncationService.truncate((String) arg, dbField.table(), dbField.column());
+					}
 				}
 			}
 		}

@@ -120,4 +120,52 @@ public class ObmSyncConfigurationServiceTest {
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
 		control.verify();
 	}
+
+	@Test
+	public void testIsAutoTruncateEnabled() {
+		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "true"));
+		control.replay();
+
+		service = new ObmSyncConfigurationServiceImpl(factory, "test");
+
+		assertThat(service.isAutoTruncateEnabled()).isTrue();
+
+		control.verify();
+	}
+
+	@Test
+	public void testIsAutoTruncateEnabledWhenNotDefined() {
+		expect(configuration.getData()).andReturn(ImmutableMap.<String, String> of());
+		control.replay();
+
+		service = new ObmSyncConfigurationServiceImpl(factory, "test");
+
+		assertThat(service.isAutoTruncateEnabled()).isTrue();
+
+		control.verify();
+	}
+
+	@Test
+	public void testIsAutoTruncateEnabledWhenNotABoolean() {
+		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "NotABoolean"));
+		control.replay();
+
+		service = new ObmSyncConfigurationServiceImpl(factory, "test");
+
+		assertThat(service.isAutoTruncateEnabled()).isFalse();
+
+		control.verify();
+	}
+
+	@Test
+	public void testIsAutoTruncateEnabledWhenDisabled() {
+		expect(configuration.getData()).andReturn(ImmutableMap.of(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, "false"));
+		control.replay();
+
+		service = new ObmSyncConfigurationServiceImpl(factory, "test");
+
+		assertThat(service.isAutoTruncateEnabled()).isFalse();
+
+		control.verify();
+	}
 }

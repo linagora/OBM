@@ -44,6 +44,8 @@ public interface ObmSyncConfigurationService extends ConfigurationService {
 	
 	static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
 	static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
+	static final String DB_AUTO_TRUNCATE_PARAMETER = "database-auto-truncate";
+	static final boolean DB_AUTO_TRUNCATE_DEFAULT_VALUE = true;
 	
 	String getDefaultTemplateFolder();
 	String getOverrideTemplateFolder();
@@ -59,4 +61,5 @@ public interface ObmSyncConfigurationService extends ConfigurationService {
 	String getAnyUserAccounts();
 	boolean syncUsersAsAddressBook();
 	CalendarEncoding getEmailCalendarEncoding();
+	boolean isAutoTruncateEnabled();
 }

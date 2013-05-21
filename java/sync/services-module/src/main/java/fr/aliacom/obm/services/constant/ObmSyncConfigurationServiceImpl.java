@@ -154,4 +154,9 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 			return DEFAULT_EMAIL_CALENDAR_ENCODING;
 		}
 	}
+	
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
+	}
 }
