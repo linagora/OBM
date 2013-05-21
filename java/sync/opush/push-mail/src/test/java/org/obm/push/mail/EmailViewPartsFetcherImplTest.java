@@ -45,10 +45,13 @@ import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import net.fortuna.ical4j.model.property.Organizer;
 
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
@@ -862,5 +865,88 @@ public class EmailViewPartsFetcherImplTest {
 			builder.truncationSize(messageFixture.estimatedDataSize);
 		}
 		return Lists.newArrayList(builder.build());
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testOrganizerFallbackWithNullEmailMetadata() {
+		EmailMetadata emailMetadata = null;
+		noDependencyTestee().organizerFallback(emailMetadata);
+	}
+
+	@Test
+	public void testOrganizerFallbackWithEmptyFromList() {
+		Envelope envelope = Envelope.builder().build();
+		EmailMetadata emailMetadata = createMock(EmailMetadata.class);
+		expect(emailMetadata.getEnvelope()).andReturn(envelope);
+		
+		replay(emailMetadata);
+		Organizer organizerFallback = noDependencyTestee().organizerFallback(emailMetadata);
+		verify(emailMetadata);
+		
+		assertThat(organizerFallback).isNull();
+	}
+
+	@Test
+	public void testOrganizerFallbackWithNotEmptyFromListButNoEmail() {
+		Envelope envelope = Envelope.builder().from(ImmutableList.of(new Address(null))).build();
+		EmailMetadata emailMetadata = createMock(EmailMetadata.class);
+		expect(emailMetadata.getEnvelope()).andReturn(envelope);
+		
+		replay(emailMetadata);
+		Organizer organizerFallback = noDependencyTestee().organizerFallback(emailMetadata);
+		verify(emailMetadata);
+		
+		assertThat(organizerFallback).isNull();
+	}
+
+	@Test
+	public void testOrganizerFallbackWithNotEmptyFromList() throws URISyntaxException {
+		Envelope envelope = Envelope.builder().from(ImmutableList.of(new Address("login@domain"))).build();
+		EmailMetadata emailMetadata = createMock(EmailMetadata.class);
+		expect(emailMetadata.getEnvelope()).andReturn(envelope);
+		
+		replay(emailMetadata);
+		Organizer organizerFallback = noDependencyTestee().organizerFallback(emailMetadata);
+		verify(emailMetadata);
+		
+		assertThat(organizerFallback).isEqualTo(new Organizer("MAILTO:login@domain"));
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testAddressToOrganizerWithNullFrom() {
+		Address from = null;
+		noDependencyTestee().addressToOrganizer(from);
+	}
+	
+	@Test
+	public void testAddressToOrganizerWithNullEmail() {
+		Address from = new Address(null);
+		
+		Organizer organizer = noDependencyTestee().addressToOrganizer(from);
+		
+		assertThat(organizer).isNull();
+	}
+	
+	@Test
+	public void testAddressToOrganizerWithFrom() throws URISyntaxException {
+		Address from = new Address("login@domain");
+		Organizer organizer = noDependencyTestee().addressToOrganizer(from);
+		
+		assertThat(organizer).isEqualTo(new Organizer("MAILTO:login@domain"));
+	}
+	
+	@Test
+	public void testAddressToOrganizerWithBadFromSyntax() throws URISyntaxException {
+		Address from = new Address("login@@domain");
+		Organizer organizer = noDependencyTestee().addressToOrganizer(from);
+		
+		assertThat(organizer).isEqualTo(new Organizer("MAILTO:login@@domain"));
+	}
+
+	private EmailViewPartsFetcherImpl noDependencyTestee() {
+		TransformersFactory transformer = null;
+		MailboxService mailboxService = null;
+		List<BodyPreference> preferences = null;
+		return new EmailViewPartsFetcherImpl(transformer, mailboxService, preferences, udr, "collectionPath", 15);
 	}
 }

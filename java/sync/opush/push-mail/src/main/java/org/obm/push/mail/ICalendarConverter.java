@@ -101,7 +101,7 @@ public class ICalendarConverter {
 		.put(Recur.MONTHLY, MSMeetingRequestRecurrenceType.MONTHLY)
 		.put(Recur.YEARLY, MSMeetingRequestRecurrenceType.YEARLY).build();
 	
-	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar, List<Address> from) {
+	public MSMeetingRequest convertToMSMeetingRequest(ICalendar icalendar) {
 		Preconditions.checkNotNull(icalendar, "ICalendar is null");
 		
 		Builder builder = MSMeetingRequest.builder();
@@ -110,7 +110,7 @@ public class ICalendarConverter {
 			ICalendarMethod method = icalendar.getICalendarMethod();
 			
 			TimeZone timeZone = getTimeZone(icalendar.getICalendarTimeZone());
-			fillMsMeetingRequestFromVEvent(iCalendarEvent, method, builder, from);
+			fillMsMeetingRequestFromVEvent(iCalendarEvent, method, builder);
 			
 			if (iCalendarEvent.hasRecur()) {
 				ICalendarRecur iCalendarRule = iCalendarEvent.recur();
@@ -137,7 +137,7 @@ public class ICalendarConverter {
 	}
 	
 	private void fillMsMeetingRequestFromVEvent(ICalendarEvent iCalendarEvent, 
-			ICalendarMethod method, Builder msMeetingRequestBuilder, List<Address> from) {
+			ICalendarMethod method, Builder msMeetingRequestBuilder) {
 		
 		Date startDate = iCalendarEvent.startDate();
 		Date endDate = endTime(iCalendarEvent);
@@ -148,7 +148,7 @@ public class ICalendarConverter {
 			.dtStamp(iCalendarEvent.dtStamp())
 			.instanceType(MSMeetingRequestInstanceType.SINGLE)
 			.location(iCalendarEvent.location())
-			.organizer(organizer(iCalendarEvent.organizer(), from))
+			.organizer(iCalendarEvent.organizer())
 			.reminder(reminder(iCalendarEvent))
 			.responseRequested(responseRequested(method))
 			.sensitivity(sensitivity(iCalendarEvent))

@@ -34,12 +34,14 @@ package org.obm.push.mail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.property.Organizer;
 
 import org.apache.commons.io.IOUtils;
 import org.obm.icalendar.ICalendar;
@@ -47,6 +49,7 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.conversation.EmailView.Builder;
@@ -65,6 +68,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 
@@ -105,7 +109,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 				fetchBody(emailViewBuilder, fetchInstruction, uid);
 				fetchAttachments(emailViewBuilder, fetchInstruction, uid);
 			}
-			fetchInvitation(emailViewBuilder, mimeMessage, uid);
+			fetchInvitation(emailViewBuilder, mimeMessage, uid, emailViewResponse);
 			
 			return emailViewBuilder.build();
 		} catch (MailException e) {
@@ -129,7 +133,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
 			for (IMimePart mp : parentMessage.listLeaves(true, true)) {
 				if (mp.isInvitation()) {
-					return fetchICalendar(mp, uid);
+					return fetchICalendar(mp, uid, emailViewResponse);
 				}
 			}
 			return null;
@@ -250,37 +254,58 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		return Optional.absent();
 	}
 	
-	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage, long uid) 
+	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage, long uid, EmailMetadata emailMetadata) 
 			throws MailException, IOException, ParserException {
 		
 		IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isInvitation()) {
-				fetchICalendar(emailViewBuilder, mp, uid);
+				fetchICalendar(emailViewBuilder, mp, uid, emailMetadata);
 				emailViewBuilder.invitationType(EmailViewInvitationType.REQUEST);
 			}
 			if (mp.isCancelInvitation()) {
-				fetchICalendar(emailViewBuilder, mp, uid);
+				fetchICalendar(emailViewBuilder, mp, uid, emailMetadata);
 				emailViewBuilder.invitationType(EmailViewInvitationType.CANCELED);
 			}
 			if (mp.isReplyInvitation()) {
-				fetchICalendar(emailViewBuilder, mp, uid);
+				fetchICalendar(emailViewBuilder, mp, uid, emailMetadata);
 				emailViewBuilder.invitationType(EmailViewInvitationType.REPLY);
 			}
 		}
 	}
 
-	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid)
+	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid, EmailMetadata emailMetadata)
 			throws MailException, IOException, ParserException {
 
-		emailViewBuilder.iCalendar(fetchICalendar(mp, uid));
+		emailViewBuilder.iCalendar(fetchICalendar(mp, uid, emailMetadata));
 	}
 
-	private ICalendar fetchICalendar(IMimePart mp, long uid)
+	private ICalendar fetchICalendar(IMimePart mp, long uid, EmailMetadata emailMetadata)
 			throws MailException, IOException, ParserException {
 
 		InputStream inputStream = mailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());
 		return ICalendar.builder()
-			.inputStream(mp.decodeMimeStream(inputStream)).build();
+			.organizerFallback(organizerFallback(emailMetadata))
+			.inputStream(mp.decodeMimeStream(inputStream))
+			.build();
+	}
+
+	@VisibleForTesting Organizer organizerFallback(EmailMetadata emailMetadata) {
+		List<Address> fromList = emailMetadata.getEnvelope().getFrom();
+		if (!fromList.isEmpty()) {
+			return addressToOrganizer(Iterables.getLast(fromList));
+		}
+		return null;
+	}
+
+	@VisibleForTesting Organizer addressToOrganizer(Address from) {
+		if (from.isDefined()) {
+			try {
+				return new Organizer(from.asICSAttendee());
+			} catch (URISyntaxException e) {
+				logger.error("Invalid From email syntax : " + from.getMail(), e);
+			}
+		}
+		return null;
 	}
 }

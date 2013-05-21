@@ -29,85 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.mail.bean;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public final class Address {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-	private static final String ICS_MAILTO = "MAILTO:"; 
-	
-	private final String mail;
-	private final String displayName;
+@RunWith(SlowFilterRunner.class)
+public class AddressTest {
 
-	public Address() {
-		this(null, null);
-	}
-	
-	public Address(String mail) {
-		this(null, mail);
+	@Test
+	public void testIsDefinedWhenNoMail() {
+		assertThat(new Address(null).isDefined()).isFalse();
 	}
 	
-	public Address(String displayName, String mail) {
-		this.displayName = formatString(displayName);
-		this.mail = formatMail(mail);
-	}
-
-	private String formatString(String str) {
-		if (str != null) {
-			return str.replace("\"", "").replace("<", "").replace(">", "");
-		}
-		return str;
+	@Test
+	public void testIsDefinedWhenEmptyMail() {
+		assertThat(new Address("").isDefined()).isFalse();
 	}
 	
-	private String formatMail(String mail) {
-		if (mail != null && mail.contains("@")) {
-			return formatString(mail);
-		}
-		return mail;
+	@Test
+	public void testIsDefinedWhenMail() {
+		assertThat(new Address("login@domain").isDefined()).isTrue();
 	}
 	
-	public String getMail() {
-		return mail;
-	}
-
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	public boolean isDefined() {
-		return !Strings.isNullOrEmpty(mail);
+	@Test(expected=IllegalStateException.class)
+	public void testAsICSWhenNotDefined() {
+		new Address(null).asICSAttendee();
 	}
 	
-	public String asICSAttendee() {
-		Preconditions.checkState(isDefined(), "this address cannot be serialized as ICS");
-		return ICS_MAILTO + mail;
-	}
-
-	@Override
-	public int hashCode(){
-		return Objects.hashCode(mail, displayName);
+	@Test
+	public void testAsICSWhenEmailOnly() {
+		assertThat(new Address("login@domain").asICSAttendee()).isEqualTo("MAILTO:login@domain");
 	}
 	
-	@Override
-	public boolean equals(Object object){
-		if (object instanceof Address) {
-			Address that = (Address) object;
-			return Objects.equal(this.mail, that.mail)
-				&& Objects.equal(this.displayName, that.displayName);
-		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("mail", mail)
-			.add("displayName", displayName)
-			.toString();
-	}
-
 }

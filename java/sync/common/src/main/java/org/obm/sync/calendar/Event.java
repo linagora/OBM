@@ -847,5 +847,15 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendarName));
 		return calendarName.equalsIgnoreCase(ownerEmail);
 	}
+
+	public Event withOrganizerIfNone(Attendee organizerFallback) {
+		Preconditions.checkNotNull(organizerFallback);
+		Preconditions.checkArgument(organizerFallback.isOrganizer(), "the given attendee is not an organizer");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(organizerFallback.getEmail()), "the given organizer has no email address");
+		if (findOrganizer() == null) {
+			addOrReplaceAttendee(organizerFallback.getEmail(), organizerFallback);
+		}
+		return this;
+	}
 	
 }

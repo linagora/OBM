@@ -42,6 +42,7 @@ import net.fortuna.ical4j.data.ParserException;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.icalendar.Ical4jUser.Factory;
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
@@ -88,6 +89,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -99,7 +101,11 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -664,10 +670,9 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			return null;
 		}
 		try {
-			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
-			List<Event> obmEvents = ical4jHelper.parseICSEvent(iCalendar.getICalendar(), ical4jUser, accessToken.getObmId());
-			if (!obmEvents.isEmpty()) {
-				return obmEvents.get(0);
+			Iterable<Event> obmEvents = convertICalendarToEvents(udr, accessToken, iCalendar);
+			if (!Iterables.isEmpty(obmEvents)) {
+				return Iterables.getFirst(obmEvents, null);
 			}
 		} catch (IOException e) {
 			logger.warn(e.getMessage(), e);
@@ -677,6 +682,30 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			throw new ICalendarConverterException("ICS can't be converted to Event", e);
 		}
 		throw new ICalendarConverterException("ICS can't be converted to Event");
+	}
+
+	private Iterable<Event> convertICalendarToEvents(UserDataRequest udr, AccessToken accessToken, org.obm.icalendar.ICalendar iCalendar)
+			throws IOException, ParserException {
+		
+		Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
+		List<Event> parsedEvents = ical4jHelper.parseICSEvent(iCalendar.getICalendar(), ical4jUser, accessToken.getObmId());
+		return appendOrganizerIfNone(parsedEvents, iCalendar.getICalendarEvent());
+	}
+
+	@VisibleForTesting Iterable<Event> appendOrganizerIfNone(Iterable<Event> events, ICalendarEvent iCalendarEvent) {
+		String organizerEmail = iCalendarEvent.organizer();
+		if (Strings.isNullOrEmpty(organizerEmail)) {
+			return events;
+		}
+
+		final ContactAttendee organizerFallback = ContactAttendee.builder().asOrganizer().email(organizerEmail).build();
+		return FluentIterable.from(events)
+				.transform(new Function<Event, Event>() {
+					@Override
+					public Event apply(Event input) {
+						return input.withOrganizerIfNone(organizerFallback);
+					}
+				});
 	}
 
 	private Event getEventFromExtId(AccessToken at, EventExtId eventExtId, 

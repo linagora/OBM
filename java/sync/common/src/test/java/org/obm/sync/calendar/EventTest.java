@@ -1664,4 +1664,59 @@ public class EventTest {
 
 		assertThat(event.findAttendeeFromEmail(email)).isEqualTo(organizer);
 	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testWithOrganizerIfNoneOnNullOrganizer() {
+		new Event().withOrganizerIfNone(null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testWithOrganizerIfNoneOnNotOrganizerAttendee() {
+		Attendee organizer = ContactAttendee.builder().asAttendee().email("organizer@domain").build();
+		new Event().withOrganizerIfNone(organizer);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testWithOrganizerIfNoneOnNullEmailOrganizer() {
+		Attendee organizer = ContactAttendee.builder().asOrganizer().email(null).build();
+		new Event().withOrganizerIfNone(organizer);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testWithOrganizerIfNoneOnEmptyEmailOrganizer() {
+		Attendee organizer = ContactAttendee.builder().asOrganizer().email("").build();
+		new Event().withOrganizerIfNone(organizer);
+	}
+	
+	@Test
+	public void testWithOrganizerIfNoneOnEventWithOrgnanizer() {
+		Attendee organizer = ContactAttendee.builder().asOrganizer().email("organizer@domain").build();
+		Attendee initialOrganizer = ContactAttendee.builder().asOrganizer().email("initialOrganizer@domain").build();
+		Event event = new Event();
+		event.addAttendee(initialOrganizer);
+		
+		assertThat(event.withOrganizerIfNone(organizer).findOrganizer()).isEqualTo(initialOrganizer);
+	}
+	
+	@Test
+	public void testWithOrganizerIfNoneOnEventWithAttendeeButNoOrgnanizer() {
+		Attendee organizer = ContactAttendee.builder().asOrganizer().email("organizer@domain").build();
+		Attendee attendee = ContactAttendee.builder().asAttendee().email("notorganizer@domain").build();
+		Event event = new Event();
+		event.addAttendee(attendee);
+		
+		assertThat(event.withOrganizerIfNone(organizer).findOrganizer()).isEqualTo(organizer);
+	}
+	
+	@Test
+	public void testWithOrganizerIfNoneOnEventWithAttendeeWithSameEmail() {
+		Attendee organizer = ContactAttendee.builder().asOrganizer().email("will_be_organizer@domain").build();
+		Attendee attendee = ContactAttendee.builder().asAttendee().email("will_be_organizer@domain").build();
+		Event event = new Event();
+		event.addAttendee(attendee);
+		
+		Attendee newEventOrganizer = event.withOrganizerIfNone(organizer).findOrganizer();
+		
+		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualsToByComparingFields(organizer);
+	}
 }

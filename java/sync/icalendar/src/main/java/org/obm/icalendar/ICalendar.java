@@ -42,6 +42,7 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Method;
+import net.fortuna.ical4j.model.property.Organizer;
 
 import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.icalendar.ical4jwrapper.ICalendarMethod;
@@ -60,6 +61,7 @@ public class ICalendar {
 	public static class Builder {
 		private InputStream inputStream;
 		private String iCalendar;
+		private Organizer organizerFallback;
 
 		private Builder() {
 		}
@@ -74,6 +76,11 @@ public class ICalendar {
 			return this;
 		}
 		
+		public Builder organizerFallback(Organizer organizerFallback) {
+			this.organizerFallback = organizerFallback;
+			return this;
+		}
+		
 		public ICalendar build() throws IOException, ParserException {
 			Preconditions.checkState(inputStream != null || iCalendar != null, 
 					"Either the inputStream or the iCalendar field must be present");
@@ -85,7 +92,7 @@ public class ICalendar {
 				iCalendar = FileUtils.streamString(inputStream, true);
 			}
 			validateICalendar();
-			return new ICalendar(iCalendar);
+			return new ICalendar(iCalendar, organizerFallback);
 		}
 
 		private void validateICalendar() {
@@ -99,20 +106,20 @@ public class ICalendar {
 	private final ICalendarTimeZone iCalendarTimeZone;
 	private final String iCalendar;
 	
-	private ICalendar(String iCalendar) throws IOException, ParserException {
+	private ICalendar(String iCalendar, Organizer organizerFallback) throws IOException, ParserException {
 		this.calendar = new CalendarBuilder()
 			.build(new UnfoldingReader(new StringReader(iCalendar), true));
 		
-		this.iCalendarEvent = buildCalendarEvent();
+		this.iCalendarEvent = buildCalendarEvent(organizerFallback);
 		this.iCalendarTimeZone = new ICalendarTimeZone(calendar);
 
 		this.iCalendar = iCalendar;
 	}
 
-	private ICalendarEvent buildCalendarEvent() {
+	private ICalendarEvent buildCalendarEvent(Organizer organizerFallback) {
 		VEvent vEvent = (VEvent)calendar.getComponent(Component.VEVENT);
 		if (vEvent != null) {
-			return new ICalendarEvent(vEvent);
+			return new ICalendarEvent(vEvent, organizerFallback);
 		} else {
 			return null;
 		}

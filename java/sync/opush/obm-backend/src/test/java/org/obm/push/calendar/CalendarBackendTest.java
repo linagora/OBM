@@ -58,6 +58,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.icalendar.ical4jwrapper.ICalendarEvent;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
@@ -103,6 +104,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.DeletedEvent;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -115,8 +117,10 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.slf4j.Logger;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.inject.Provider;
 
 @RunWith(SlowFilterRunner.class)
@@ -1564,5 +1568,136 @@ public class CalendarBackendTest {
 			Assert.fail("Cannot load " + filename);
 		}
 		return ICalendar.builder().inputStream(in).build();	
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testAppendOrganizerIfNoneOnNullList() throws Exception {
+		Iterable<Event> events = null;
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		try {
+			calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		} catch (Exception e) {
+			mockControl.verify();
+			throw e;
+		}
+	}
+	
+	@Test
+	public void testAppendOrganizerIfNoneOnEmptyList() {
+		Iterable<Event> events = ImmutableList.of();
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		Iterable<Event> changedEvents = calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		mockControl.verify();
+		
+		assertThat(changedEvents).isEmpty();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testAppendOrganizerIfNoneOnNullICalendarEvent() throws Exception {
+		Iterable<Event> events = ImmutableList.of();
+		ICalendarEvent iCalendarEvent = null;
+		
+		mockControl.replay();
+		try {
+			calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		} catch (Exception e) {
+			mockControl.verify();
+			throw e;
+		}
+	}
+	
+	@Test
+	public void testAppendOrganizerIfNoneOnOneEventWithoutAttendee() {
+		Event event = new Event();
+		Iterable<Event> events = ImmutableList.of(event);
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		Iterable<Event> changedEvents = calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		mockControl.verify();
+		
+		assertThat(changedEvents).hasSize(1);
+		assertThat(Iterables.getOnlyElement(changedEvents).getAttendees())
+			.containsOnly(ContactAttendee.builder().asOrganizer().email("organizer@domain").build());
+	}
+	
+	@Test
+	public void testAppendOrganizerIfNoneOnOneEventWithoutOrganizer() {
+		Event event = new Event();
+		event.addAttendee(ContactAttendee.builder().asAttendee().email("attendee@domain").build());
+		Iterable<Event> events = ImmutableList.of(event);
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		Iterable<Event> changedEvents = calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		mockControl.verify();
+		
+		assertThat(changedEvents).hasSize(1);
+		assertThat(Iterables.getOnlyElement(changedEvents).getAttendees())
+			.containsOnly(
+					ContactAttendee.builder().asAttendee().email("attendee@domain").build(),
+					ContactAttendee.builder().asOrganizer().email("organizer@domain").build());
+	}
+	
+	@Test
+	public void testAppendOrganizerIfNoneOnOneEventWithOrganizer() {
+		Event event = new Event();
+		event.addAttendee(ContactAttendee.builder().asAttendee().email("attendee@domain").build());
+		event.addAttendee(ContactAttendee.builder().asOrganizer().email("initialorganizer@domain").build());
+		Iterable<Event> events = ImmutableList.of(event);
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		Iterable<Event> changedEvents = calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		mockControl.verify();
+		
+		assertThat(changedEvents).hasSize(1);
+		assertThat(Iterables.getOnlyElement(changedEvents).getAttendees())
+			.containsOnly(
+					ContactAttendee.builder().asAttendee().email("attendee@domain").build(),
+					ContactAttendee.builder().asOrganizer().email("initialorganizer@domain").build());
+	}
+	
+	@Test
+	public void testAppendOrganizerIfNoneOnTwoDifferentEvent() {
+		Event event = new Event();
+		event.setTitle("one");
+		event.addAttendee(ContactAttendee.builder().asAttendee().email("attendee@domain").build());
+		Event event2 = new Event();
+		event2.setTitle("two");
+		event2.addAttendee(ContactAttendee.builder().asOrganizer().email("initialorganizer@domain").build());
+		
+		Iterable<Event> events = ImmutableList.of(event, event2);
+		ICalendarEvent iCalendarEvent = mockControl.createMock(ICalendarEvent.class);
+		expect(iCalendarEvent.organizer()).andReturn("organizer@domain");
+		
+		mockControl.replay();
+		Iterable<Event> changedEvents = calendarBackend.appendOrganizerIfNone(events, iCalendarEvent);
+		mockControl.verify();
+		
+		assertThat(changedEvents).hasSize(2);
+		assertThat(findEventByTitle(changedEvents, "one").getAttendees()).containsOnly(
+				ContactAttendee.builder().asAttendee().email("attendee@domain").build(),
+				ContactAttendee.builder().asOrganizer().email("organizer@domain").build());
+		assertThat(findEventByTitle(changedEvents, "two").getAttendees()).containsOnly(
+				ContactAttendee.builder().asOrganizer().email("initialorganizer@domain").build());
+	}
+
+	private Event findEventByTitle(Iterable<Event> changedEvents, final String title) {
+		return Iterables.find(changedEvents, new Predicate<Event>() {
+			@Override
+			public boolean apply(Event input) {
+				return input.getTitle().equals(title);
+			}
+		});
 	}
 }

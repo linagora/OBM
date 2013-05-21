@@ -67,9 +67,15 @@ public class ICalendarEvent {
 
 	private final VEvent vEvent;
 	private final ICalendarRecur iCalendarRecur;
-	
+	private final Organizer organizerFallback;
+
 	public ICalendarEvent(VEvent vEvent) {
+		this(vEvent, null);
+	}
+	
+	public ICalendarEvent(VEvent vEvent, Organizer organizerFallback) {
 		Preconditions.checkNotNull(vEvent);
+		this.organizerFallback = organizerFallback;
 		this.vEvent = vEvent;
 		this.iCalendarRecur = createRRule();
 	}
@@ -117,8 +123,23 @@ public class ICalendarEvent {
 		return null;
 	}
 	
+	public Organizer organizerFallback() {
+		return organizerFallback;
+	}
+
 	public String organizer() {
-		Organizer organizer = vEvent.getOrganizer();
+		String icsOrganizer = organizerEmailOrNull(vEvent.getOrganizer());
+		if (!Strings.isNullOrEmpty(icsOrganizer)) {
+			return icsOrganizer;
+		}
+		String fallbackOrganizer = organizerEmailOrNull(organizerFallback);
+		if (!Strings.isNullOrEmpty(fallbackOrganizer)) {
+			return fallbackOrganizer;
+		}
+		return null;
+	}
+	
+	private String organizerEmailOrNull(Organizer organizer) {
 		if (organizer != null) {
 			URI calAddress = organizer.getCalAddress();
 			if (calAddress != null) {
@@ -127,7 +148,7 @@ public class ICalendarEvent {
 		}
 		return null;
 	}
-	
+
 	public Long firstAlarmInSeconds() {
 		VAlarm vAlarm = firstVAlarm(vEvent);
 		if (vAlarm != null && vAlarm.getTrigger() != null) {

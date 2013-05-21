@@ -63,34 +63,44 @@ import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.XProperty;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class ICalendarEventTest {
 
+	private Organizer organizer;
+	private String organizerEmail;
+
+	@Before
+	public void setUp() throws URISyntaxException {
+		organizer = new Organizer("login@domain.org");
+		organizerEmail = organizer.getCalAddress().getSchemeSpecificPart();
+	}
+	
 	@Test
 	public void testStatusValueNull() {
 		VEvent vevent = vEventWithProperty(new Status(null));
-		assertThat(new ICalendarEvent(vevent).status()).isNull();
+		assertThat(new ICalendarEvent(vevent, organizer).status()).isNull();
 	}
 	
 	@Test
 	public void testStatusValueEmpty() {
 		VEvent vevent = vEventWithProperty(new Status(""));
-		assertThat(new ICalendarEvent(vevent).status()).isNull();
+		assertThat(new ICalendarEvent(vevent, organizer).status()).isNull();
 	}
 	
 	@Test
 	public void testStatusValueCancelled() {
 		VEvent vevent = vEventWithProperty(new Status("CANCELLED"));
-		assertThat(new ICalendarEvent(vevent).status()).isEqualTo("CANCELLED");
+		assertThat(new ICalendarEvent(vevent, organizer).status()).isEqualTo("CANCELLED");
 	}
 
 	@Test
 	public void testLocationNull() {
 		VEvent vevent = vEventWithProperty(new Location(null));
 		
-		String location = new ICalendarEvent(vevent).location();
+		String location = new ICalendarEvent(vevent, organizer).location();
 		
 		assertThat(location).isNull();
 	}
@@ -99,7 +109,7 @@ public class ICalendarEventTest {
 	public void testLocationEmpty() {
 		VEvent vevent = vEventWithProperty(new Location(""));
 		
-		String location = new ICalendarEvent(vevent).location();
+		String location = new ICalendarEvent(vevent, organizer).location();
 		
 		assertThat(location).isNull();
 	}
@@ -108,7 +118,7 @@ public class ICalendarEventTest {
 	public void testLocationValue() {
 		VEvent vevent = vEventWithProperty(new Location("aValue"));
 		
-		String location = new ICalendarEvent(vevent).location();
+		String location = new ICalendarEvent(vevent, organizer).location();
 		
 		assertThat(location).isEqualTo("aValue");
 	}
@@ -117,7 +127,7 @@ public class ICalendarEventTest {
 	public void testUidNull() {
 		VEvent vevent = vEventWithProperty(new Uid(null));
 		
-		String uid = new ICalendarEvent(vevent).uid();
+		String uid = new ICalendarEvent(vevent, organizer).uid();
 		
 		assertThat(uid).isNull();
 	}
@@ -126,7 +136,7 @@ public class ICalendarEventTest {
 	public void testUidEmpty() {
 		VEvent vevent = vEventWithProperty(new Uid(""));
 		
-		String uid = new ICalendarEvent(vevent).uid();
+		String uid = new ICalendarEvent(vevent, organizer).uid();
 		
 		assertThat(uid).isNull();
 	}
@@ -135,7 +145,7 @@ public class ICalendarEventTest {
 	public void testUidValue() {
 		VEvent vevent = vEventWithProperty(new Uid("aValue"));
 		
-		String uid = new ICalendarEvent(vevent).uid();
+		String uid = new ICalendarEvent(vevent, organizer).uid();
 		
 		assertThat(uid).isEqualTo("aValue");
 	}
@@ -144,7 +154,7 @@ public class ICalendarEventTest {
 	public void testTransparencyNull() {
 		VEvent vevent = vEventWithProperty(new Transp(null));
 		
-		String transparency = new ICalendarEvent(vevent).transparency();
+		String transparency = new ICalendarEvent(vevent, organizer).transparency();
 		
 		assertThat(transparency).isNull();
 	}
@@ -153,7 +163,7 @@ public class ICalendarEventTest {
 	public void testTransparencyEmpty() {
 		VEvent vevent = vEventWithProperty(new Transp(""));
 		
-		String transparency = new ICalendarEvent(vevent).transparency();
+		String transparency = new ICalendarEvent(vevent, organizer).transparency();
 		
 		assertThat(transparency).isNull();
 	}
@@ -162,7 +172,7 @@ public class ICalendarEventTest {
 	public void testTransparencyValue() {
 		VEvent vevent = vEventWithProperty(new Transp("aValue"));
 		
-		String transparency = new ICalendarEvent(vevent).transparency();
+		String transparency = new ICalendarEvent(vevent, organizer).transparency();
 		
 		assertThat(transparency).isEqualTo("aValue");
 	}
@@ -171,7 +181,7 @@ public class ICalendarEventTest {
 	public void testPropertyNull() {
 		VEvent vevent = vEventWithProperty(new XProperty("aName", null));
 		
-		String property = new ICalendarEvent(vevent).property("aName");
+		String property = new ICalendarEvent(vevent, organizer).property("aName");
 		
 		assertThat(property).isNull();
 	}
@@ -180,7 +190,7 @@ public class ICalendarEventTest {
 	public void testPropertyEmpty() {
 		VEvent vevent = vEventWithProperty(new XProperty("aName", ""));
 		
-		String property = new ICalendarEvent(vevent).property("aName");
+		String property = new ICalendarEvent(vevent, organizer).property("aName");
 		
 		assertThat(property).isNull();
 	}
@@ -189,7 +199,7 @@ public class ICalendarEventTest {
 	public void testPropertyValue() {
 		VEvent vevent = vEventWithProperty(new XProperty("aName", "aValue"));
 		
-		String property = new ICalendarEvent(vevent).property("aName");
+		String property = new ICalendarEvent(vevent, organizer).property("aName");
 		
 		assertThat(property).isEqualTo("aValue");
 	}
@@ -227,14 +237,14 @@ public class ICalendarEventTest {
 	@Test(expected=NullPointerException.class)
 	public void nullEvent() {
 		@SuppressWarnings("unused")
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(null);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(null, organizer);
 	}
 	
 	@Test
 	public void nullDtStamp() {
 		VEvent vEvent = new VEvent();
 		vEvent.getDateStamp().setDate(null);
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.dtStamp()).isNull();
 	}
 	
@@ -244,7 +254,7 @@ public class ICalendarEventTest {
 		VEvent vEvent = new VEvent(
 				properties(
 						new DtStamp(new DateTime(expectedDate))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.dtStamp()).isEqualTo(expectedDate);
 	}
 
@@ -269,7 +279,7 @@ public class ICalendarEventTest {
 	public void nullUidValue() {
 		VEvent vEvent = new VEvent(
 				properties(new Uid(null)));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.uid()).isNull();
 	}
 	
@@ -278,7 +288,7 @@ public class ICalendarEventTest {
 		String uid = "UIDXX111222333FEAFEAZ";
 		VEvent vEvent = new VEvent(
 				properties(new Uid(uid)));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.uid()).isEqualTo(uid);
 	}
 	
@@ -286,7 +296,7 @@ public class ICalendarEventTest {
 	public void confidentialClassification() {
 		VEvent vEvent = new VEvent(
 				properties(Clazz.CONFIDENTIAL));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.classification()).isEqualTo(Clazz.CONFIDENTIAL);
 	}
 
@@ -294,7 +304,7 @@ public class ICalendarEventTest {
 	public void hasOneRecur() {
 		VEvent vEvent = new VEvent(
 				properties(new RRule(new Recur(Recur.WEEKLY, 3))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.hasRecur()).isTrue();
 	}
 
@@ -302,7 +312,7 @@ public class ICalendarEventTest {
 	public void nullLocationValue() {
 		VEvent vEvent = new VEvent(
 				properties(new Location(null)));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.location()).isNull();
 	}
 	
@@ -311,25 +321,53 @@ public class ICalendarEventTest {
 		String expectedLocation = "at home";
 		VEvent vEvent = new VEvent(
 				properties(new Location(expectedLocation)));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.location()).isEqualTo(expectedLocation);
 	}
 	
-
 	@Test
 	public void nullOrganizerValue() {
-		VEvent vEvent = new VEvent(
-				properties(new Organizer()));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
-		assertThat(iCalendarEvent.organizer()).isNull();
+		VEvent vEvent = new VEvent(properties(new Organizer()));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
+		assertThat(iCalendarEvent.organizer()).isEqualTo(organizerEmail);
 	}
 	
 	@Test
 	public void organizer() throws URISyntaxException {
 		String expectedOrganizer = "karl.marx@ussr";
-		VEvent vEvent = new VEvent(
-				properties(new Organizer(expectedOrganizer)));
+		VEvent vEvent = new VEvent(properties(new Organizer(expectedOrganizer)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
+		assertThat(iCalendarEvent.organizer()).isEqualTo(expectedOrganizer);
+	}
+	
+	@Test
+	public void organizerWithMailto() throws URISyntaxException {
+		String expectedOrganizer = "karl.marx@ussr";
+		VEvent vEvent = new VEvent(properties(new Organizer("MAILTO:" + expectedOrganizer)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
+		assertThat(iCalendarEvent.organizer()).isEqualTo(expectedOrganizer);
+	}
+	
+	@Test
+	public void organizerFallback() {
+		String expectedOrganizer = organizerEmail;
+		VEvent vEvent = new VEvent(properties());
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
+		assertThat(iCalendarEvent.organizer()).isEqualTo(expectedOrganizer);
+	}
+	
+	@Test
+	public void nullOrganizerAndFallback() {
+		VEvent vEvent = new VEvent(properties(new Organizer()));
 		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		assertThat(iCalendarEvent.organizer()).isNull();
+	}
+	
+	@Test
+	public void nullOrganizerFallbackIsSameAsAbsent() throws URISyntaxException {
+		String expectedOrganizer = "karl.marx@ussr";
+		VEvent vEvent = new VEvent(properties(new Organizer(expectedOrganizer)));
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, null);
 		assertThat(iCalendarEvent.organizer()).isEqualTo(expectedOrganizer);
 	}
 	
@@ -338,7 +376,7 @@ public class ICalendarEventTest {
 		Date expectedRecurrenceId = date("2012-01-01T11:22:33");
 		VEvent vEvent = new VEvent(
 				properties(new RecurrenceId(new DateTime(expectedRecurrenceId))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.recurrenceId()).isEqualTo(expectedRecurrenceId);
 	}
 	
@@ -347,7 +385,7 @@ public class ICalendarEventTest {
 		Date expectedStartDate = date("2012-01-01T11:22:33");
 		VEvent vEvent = new VEvent(
 				properties(new DtStart(new DateTime(expectedStartDate))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.startDate()).isEqualTo(expectedStartDate);
 	}
 	
@@ -355,7 +393,7 @@ public class ICalendarEventTest {
 	public void transparencyOpaque() {
 		VEvent vEvent = new VEvent(
 				properties(Transp.OPAQUE));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.transparency()).isEqualTo("OPAQUE");
 	}
 	
@@ -364,7 +402,7 @@ public class ICalendarEventTest {
 		Date expectedEndDate = date("2012-01-01T11:22:33");
 		VEvent vEvent = new VEvent(
 				properties(new DtEnd(new DateTime(expectedEndDate))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
 	}
 	
@@ -376,7 +414,7 @@ public class ICalendarEventTest {
 				properties(
 						new DtStart(new DateTime(startDate)),
 						new Duration(new Dur("1H"))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
 	}
 	
@@ -389,7 +427,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(startDate)),
 						new Duration(new Dur("2H")),
 						new DtEnd(new DateTime(expectedEndDate))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.endDate()).isEqualTo(expectedEndDate);
 	}
 	
@@ -400,7 +438,7 @@ public class ICalendarEventTest {
 		VEvent vEvent = new VEvent(
 				properties(
 						new DtStart(new DateTime(startDate))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.endDate()).isNull();
 	}
 	
@@ -410,14 +448,14 @@ public class ICalendarEventTest {
 		VEvent vEvent = new VEvent(
 				properties(
 						new Duration(new Dur("2H"))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.endDate()).isNull();
 	}
 
 	@Test
 	public void firstAlarmInSecondsNoAlarm() {
 		VEvent vEvent = new VEvent(properties());
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isNull();
 	}
 	
@@ -428,7 +466,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(
 						new VAlarm()));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isNull();
 	}
 	
@@ -439,7 +477,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(
 						new VAlarm(new DateTime(date("2012-01-01T20:22:33")))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isZero();
 	}
 	
@@ -450,7 +488,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(
 						new VAlarm(new DateTime(date("2012-01-01T10:22:33")))));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-36000);
 	}
 
@@ -466,7 +504,7 @@ public class ICalendarEventTest {
 				properties(
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(vAlarm));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-36000);
 	}
@@ -483,7 +521,7 @@ public class ICalendarEventTest {
 				properties(
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(vAlarm));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(-95400);
 	}
@@ -500,7 +538,7 @@ public class ICalendarEventTest {
 				properties(
 						new DtStart(new DateTime(date("2012-01-01T20:22:33")))),
 				alarms(vAlarm));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(7200);
 	}
@@ -518,7 +556,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(date("2012-01-01T20:22:33"))),
 						new DtEnd(new DateTime(date("2012-01-01T23:22:33")))),
 				alarms(vAlarm));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(7200);
 	}
@@ -536,7 +574,7 @@ public class ICalendarEventTest {
 						new DtStart(new DateTime(date("2012-01-01T20:22:33"))),
 						new DtEnd(new DateTime(date("2012-01-01T23:22:33")))),
 				alarms(vAlarm));
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.firstAlarmInSeconds()).isEqualTo(46800);
 	}
@@ -544,7 +582,7 @@ public class ICalendarEventTest {
 	@Test
 	public void summaryNull() {
 		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), null);
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.summary()).isNull();
 	}
@@ -552,7 +590,7 @@ public class ICalendarEventTest {
 	@Test
 	public void summaryEmpty() {
 		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), "");
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.summary()).isEmpty();
 	}
@@ -560,7 +598,7 @@ public class ICalendarEventTest {
 	@Test
 	public void summary() {
 		VEvent vEvent = new VEvent(new DateTime(date("2012-01-01T20:22:33")), "I'm the summary");
-		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent);
+		ICalendarEvent iCalendarEvent = new ICalendarEvent(vEvent, organizer);
 		
 		assertThat(iCalendarEvent.summary()).isEqualTo("I'm the summary");
 	}
