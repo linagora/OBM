@@ -49,6 +49,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.matcher.Matchers;
 
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(AutoTruncateMethodInterceptorTest.Env.class)
 public class AutoTruncateMethodInterceptorTest {
@@ -65,6 +67,7 @@ public class AutoTruncateMethodInterceptorTest {
 			bind(IMocksControl.class).toInstance(control);
 			bindWithMock(DatabaseMetadataService.class);
 			bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
+			bindWithMock(ObmSyncConfigurationService.class);
 
 			MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
 
@@ -86,6 +89,8 @@ public class AutoTruncateMethodInterceptorTest {
 	private AutoTruncateTestService service;
 	@Inject
 	private AutoTruncateTestServiceNoAnnotation serviceWithoutTruncation;
+	@Inject
+	private ObmSyncConfigurationService configuration;
 
 	private TableDescription tableDescription;
 
@@ -124,6 +129,7 @@ public class AutoTruncateMethodInterceptorTest {
 	public void testMethodAnnotatedWithDatabaseEntityOnAnnotatedClass() throws Exception {
 		expect(metadataService.getTableDescriptionOf(TABLE)).andReturn(tableDescription);
 		expect(tableDescription.getMaxAllowedBytesOf("LongString")).andReturn(10);
+		expect(configuration.isAutoTruncateEnabled()).andReturn(true);
 		control.replay();
 
 		assertThat(service.getTestObjectString(new TestObject(LONG_STRING))).isEqualTo(LONG_STRING.substring(0, 10));
@@ -133,9 +139,26 @@ public class AutoTruncateMethodInterceptorTest {
 	public void testMethodAnnotatedWithDatabaseFieldOnAnnotatedClass() throws Exception {
 		expect(metadataService.getTableDescriptionOf(TABLE)).andReturn(tableDescription);
 		expect(tableDescription.getMaxAllowedBytesOf("Str")).andReturn(10);
+		expect(configuration.isAutoTruncateEnabled()).andReturn(true);
 		control.replay();
 
 		assertThat(service.getTruncatedString(LONG_STRING)).isEqualTo(LONG_STRING.substring(0, 10));
+	}
+
+	@Test
+	public void testMethodAnnotatedWithDatabaseEntityOnAnnotatedClassWhenDisabled() {
+		expect(configuration.isAutoTruncateEnabled()).andReturn(false);
+		control.replay();
+
+		assertThat(service.getTestObjectString(new TestObject(LONG_STRING))).isEqualTo(LONG_STRING);
+	}
+
+	@Test
+	public void testMethodAnnotatedWithDatabaseFieldOnAnnotatedClassWhenDisabled() {
+		expect(configuration.isAutoTruncateEnabled()).andReturn(false);
+		control.replay();
+
+		assertThat(service.getTruncatedString(LONG_STRING)).isEqualTo(LONG_STRING);
 	}
 
 	public static class TestObject {
