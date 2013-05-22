@@ -123,6 +123,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
@@ -1274,7 +1275,6 @@ public class CalendarBindingImplTest {
 		eventFromIcs.setExtId(extId);
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
-		int accessTokenId = 0;
 		HelperService helper = mockRightsHelper(calendar, accessToken);
 		
 		UserService userService = createMock(UserService.class);
@@ -1284,7 +1284,7 @@ public class CalendarBindingImplTest {
 		ICalendarFactory calendarFactory = createMock(ICalendarFactory.class);
 		expect(calendarFactory.createIcal4jUserFromObmUser(obmUser)).andReturn(ical4jUser).anyTimes();
 		
-		Ical4jHelper ical4jHelper = mockIcal4jHelper(accessTokenId, ical4jUser, ics, eventFromIcs);
+		Ical4jHelper ical4jHelper = mockIcal4jHelper(1, ical4jUser, ics, eventFromIcs);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(accessToken, obmUser, extId)).andReturn(eventFromDao).once();
@@ -2036,7 +2036,7 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromCalendar(calendar, "test.tlse.lng")).andReturn(user).atLeastOnce();
 
 		expect(helperService.canReadCalendar(token, calendar)).andReturn(true).once();
-		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false).once();
 		
 		expect(calendarDao.getSync(token, user, lastSync, null, null, true)).andReturn(eventChangesFromDao);
 
@@ -3192,7 +3192,204 @@ public class CalendarBindingImplTest {
 		
 		assertThat(sortedEventChanges).isEqualTo(expectedEventChanges);
 	}
-	
+
+	@Test
+	public void testGetSyncWithSortedChangesInheritsAlertFromEventOwnerIfNotSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventChanges eventChanges = EventChanges.builder().updates(Sets.newHashSet(event)).lastSync(new Date()).build();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
+		expect(calendarDao.getEventAlertForUser(null, 2)).andReturn(30);
+		mocksControl.replay();
+
+		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
+
+		assertThat(Iterables.getFirst(changesFromService.getUpdated(), null).getAlert()).isEqualTo(30);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetSyncWithSortedChangesDoesntInheritAlertFromEventOwnerIfNotInDelegation() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventChanges eventChanges = EventChanges.builder().updates(Sets.newHashSet(event)).lastSync(new Date()).build();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false);
+		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
+		mocksControl.replay();
+
+		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
+
+		assertThat(Iterables.getFirst(changesFromService.getUpdated(), null).getAlert()).isNull();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetSyncWithSortedChangesDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+
+		event.setAlert(10);
+
+		EventChanges eventChanges = EventChanges.builder().updates(Sets.newHashSet(event)).lastSync(new Date()).build();
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
+		mocksControl.replay();
+
+		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
+
+		assertThat(Iterables.getFirst(changesFromService.getUpdated(), null).getAlert()).isEqualTo(10);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromIdInheritsAlertFromEventOwnerIfNotSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventObmId eventId = new EventObmId(1);
+
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(calendarDao.findEventById(token, eventId)).andReturn(event);
+		expect(userService.getUserFromLogin(calendar, domain.getName())).andReturn(calendarUser);
+		expect(calendarDao.getEventAlertForUser(null, 2)).andReturn(30);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isEqualTo(30);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromIdDoesntInheritAlertFromEventOwnerIfNotInDelegation() throws Exception {
+		String calendar = "user";
+		Event event = new Event();
+		EventObmId eventId = new EventObmId(1);
+
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false);
+		expect(calendarDao.findEventById(token, eventId)).andReturn(event);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isNull();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromIdDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventObmId eventId = new EventObmId(1);
+
+		event.setAlert(10);
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(calendarDao.findEventById(token, eventId)).andReturn(event);
+		expect(userService.getUserFromLogin(calendar, domain.getName())).andReturn(calendarUser);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isEqualTo(10);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromExtIdInheritsAlertFromEventOwnerIfNotSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventExtId eventId = new EventExtId("1");
+
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(calendarDao.findEventByExtId(token, calendarUser, eventId)).andReturn(event);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		expect(calendarDao.getEventAlertForUser(null, 2)).andReturn(30);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromExtId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isEqualTo(30);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromExtIdDoesntInheritAlertFromEventOwnerIfNotInDelegation() throws Exception {
+		String calendar = "user";
+		Event event = new Event();
+		EventExtId eventId = new EventExtId("1");
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(calendarDao.findEventByExtId(token, calendarUser, eventId)).andReturn(event);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromExtId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isNull();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetEventFromExtIdDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
+		String calendar = "user";
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		Event event = new Event();
+		EventExtId eventId = new EventExtId("1");
+
+		event.setAlert(10);
+		event.setOwner(calendar);
+
+		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
+		expect(calendarDao.findEventByExtId(token, calendarUser, eventId)).andReturn(event);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
+		mocksControl.replay();
+
+		Event eventFromService = binding.getEventFromExtId(token, calendar, eventId);
+
+		assertThat(eventFromService.getAlert()).isEqualTo(10);
+		mocksControl.verify();
+	}
+
 	private void expectNoRightsForCalendar(String calendar) {
 		expect(helperService.canWriteOnCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();
 		expect(helperService.canReadCalendar(eq(token), eq(calendar))).andReturn(false).anyTimes();

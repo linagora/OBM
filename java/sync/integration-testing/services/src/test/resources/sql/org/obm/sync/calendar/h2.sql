@@ -668,17 +668,21 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email) 
 	VALUES
         (1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1'),
-        (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2');
+        (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2'),
+        (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3');
 
-INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE);
-INSERT INTO userentity (userentity_entity_id, userentity_user_id) VALUES (1, 1), (2, 2);
-INSERT INTO calendarentity (calendarentity_entity_id, calendarentity_calendar_id) VALUES (1, 1), (2, 2);
+INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE), (TRUE);
+INSERT INTO userentity (userentity_entity_id, userentity_user_id) VALUES (1, 1), (2, 2), (3, 3);
+INSERT INTO calendarentity (calendarentity_entity_id, calendarentity_calendar_id) VALUES (1, 1), (2, 2), (3, 3);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
-    VALUES (1, 2, 1, 1, 1, 0);
+    VALUES
+        (1, 2, 1, 1, 1, 0),
+        (1, 3, 1, 1, 0, 0);
 
 INSERT INTO addressbook (domain_id, timeupdate, timecreate, userupdate, usercreate, owner, origin, name, is_default)
     VALUES
         (1, now(), now(), 1, 1, 1, 'integration-testing', 'collected_contacts', TRUE),
-        (1, now(), now(), 2, 2, 2, 'integration-testing', 'collected_contacts', TRUE);
+        (1, now(), now(), 2, 2, 2, 'integration-testing', 'collected_contacts', TRUE),
+        (1, now(), now(), 3, 3, 3, 'integration-testing', 'collected_contacts', TRUE);
 INSERT INTO eventcategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label)
     VALUES (1, NULL,NULL,NULL,NULL,'existing_category');

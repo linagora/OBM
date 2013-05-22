@@ -34,7 +34,8 @@ package org.obm.sync.calendar;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
-import java.util.UUID;
+import java.util.Date;
+import java.util.List;
 
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.junit.Test;
@@ -42,6 +43,9 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.items.EventChanges;
+
+import com.google.common.collect.Iterables;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -51,7 +55,7 @@ public class EventAlertHandlingIntegrationTest extends CalendarIntegrationTest {
 	@RunAsClient
 	public void testCreateEventCreatesAlert() throws Exception {
 		String calendar = "user1@domain.org";
-		Event event = newEventWithAlert(calendar, 30);
+		Event event = newEventWithAlert(calendar, "1", 30);
 
 		AccessToken token = loginClient.login(calendar, "user1");
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -64,7 +68,7 @@ public class EventAlertHandlingIntegrationTest extends CalendarIntegrationTest {
 	@RunAsClient
 	public void testCreateEventInDelegationCreatesAlertForBothUsers() throws Exception {
 		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, 30);
+		Event event = newEventWithAlert(user1Calendar, "2", 30);
 
 		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
@@ -80,7 +84,7 @@ public class EventAlertHandlingIntegrationTest extends CalendarIntegrationTest {
 	@RunAsClient
 	public void testModifyEventModifiesAlert() throws Exception {
 		String calendar = "user1@domain.org";
-		Event event = newEventWithAlert(calendar, 30);
+		Event event = newEventWithAlert(calendar, "3", 30);
 
 		AccessToken token = loginClient.login(calendar, "user1");
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -97,7 +101,7 @@ public class EventAlertHandlingIntegrationTest extends CalendarIntegrationTest {
 	@RunAsClient
 	public void testModifyEventInDelegationModifiesAlertForBothUsers() throws Exception {
 		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, 30);
+		Event event = newEventWithAlert(user1Calendar, "4", 30);
 
 		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
@@ -113,14 +117,164 @@ public class EventAlertHandlingIntegrationTest extends CalendarIntegrationTest {
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(60);
 	}
 
-	private Event newEventWithAlert(String calendar, int alert) {
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromId() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "5", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		EventObmId eventObmId = calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
+		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, user1Calendar, eventObmId);
+
+		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
+		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSync() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "6", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		Date lastSync = calendarClient.getSync(user1Token, user1Calendar, null).getLastSync();
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSync(user1Token, user1Calendar, lastSync);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSync(user2Token, user1Calendar, lastSync);
+
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncWithSortedChanges() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "7", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		Date lastSync = calendarClient.getSync(user1Token, user1Calendar, null).getLastSync();
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncWithSortedChanges(user1Token, user1Calendar, lastSync, null);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncWithSortedChanges(user2Token, user1Calendar, lastSync, null);
+
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromExtId() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "8", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		Event eventFromServerAsUser1 = calendarClient.getEventFromExtId(user1Token, user1Calendar, event.getExtId());
+		Event eventFromServerAsUser2 = calendarClient.getEventFromExtId(user2Token, user1Calendar, event.getExtId());
+
+		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
+		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetListEventsFromIntervalDate() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "9", 30, "2013-07-01T12:00:00Z");
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		Date start = date("2013-07-01T11:00:00Z"), end = date("2013-07-01T13:00:00Z");
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		List<Event> eventsFromServerAsUser1 = calendarClient.getListEventsFromIntervalDate(user1Token, user1Calendar, start, end);
+		List<Event> eventsFromServerAsUser2 = calendarClient.getListEventsFromIntervalDate(user2Token, user1Calendar, start, end);
+
+		assertThat(eventsFromServerAsUser1.get(0).getAlert()).isEqualTo(30);
+		assertThat(eventsFromServerAsUser2.get(0).getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_ModifyEvent() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "10", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		event.setTitle("ModifiedTitle");
+
+		Event eventFromServerAsUser2 = calendarClient.modifyEvent(user2Token, user1Calendar, event, false, false);
+
+		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithReadOnlyAccessDoesntInheritAlertFromEventOwner() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "11", 30);
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user3Token = loginClient.login("user3@domain.org", "user3");
+		EventObmId eventObmId = calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
+		Event eventFromServerAsUser3 = calendarClient.getEventFromId(user3Token, user1Calendar, eventObmId);
+
+		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
+		assertThat(eventFromServerAsUser3.getAlert()).isNull();
+	}
+
+	@Test
+	@RunAsClient
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncEventDate() throws Exception {
+		String user1Calendar = "user1@domain.org";
+		Event event = newEventWithAlert(user1Calendar, "12", 30, "2013-07-01T12:00:00Z");
+
+		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		Date start = date("2013-07-01T11:00:00Z");
+
+		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncEventDate(user1Token, user1Calendar, start);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncEventDate(user2Token, user1Calendar, start);
+
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
+		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
+	}
+
+	private Event newEventWithAlert(String calendar, String extIdString, int alert) {
+		return newEventWithAlert(calendar, extIdString, alert, "2013-06-01T12:00:00");
+	}
+
+	private Event newEventWithAlert(String calendar, String extIdString, int alert, String date) {
 		Event event = new Event();
-		EventExtId extId = new EventExtId(UUID.randomUUID().toString());
+		EventExtId extId = new EventExtId(extIdString);
 
 		event.setOwnerEmail(calendar);
 		event.setExtId(extId);
-		event.setTitle("Event_" + extId.serializeToString());
-		event.setStartDate(date("2013-06-01T12:00:00"));
+		event.setTitle("Event_" + extIdString);
+		event.setStartDate(date(date));
 		event.setDuration(3600);
 		event.addAttendee(UnidentifiedAttendee.builder().email(calendar).asOrganizer().build());
 		event.setAlert(alert);

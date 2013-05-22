@@ -137,4 +137,6 @@ public interface CalendarDao {
 	boolean changeParticipation(AccessToken token, ObmUser calendar,
 			EventExtId extId, Participation participation)
 			throws SQLException;
+
+	Integer getEventAlertForUser(EventObmId eventId, Integer userId);
 }
