@@ -38,8 +38,8 @@
 		<module>push-mail</module>
 		<module>push-service</module>
 		<module>push-servlet</module>
+		<module>push-core</module>
 		<module>protocol</module>
-		<module>push-module</module>
 		<module>mail-backend-interfaces</module>
 		<module>mail-backend-tools</module>
 		<module>mail-backend-testsuite</module>

@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-module</artifactId>
+			<artifactId>push-core</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
@@ -29,11 +29,11 @@
 			<artifactId>linagora-mail</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.linagora.obm.opush</groupId>
-            <artifactId>obm-backend</artifactId>
-            <version>${obm.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>obm-backend</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>java-mail</artifactId>

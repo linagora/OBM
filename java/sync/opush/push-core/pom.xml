@@ -8,9 +8,9 @@
 		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>push-module</artifactId>
+	<artifactId>push-core</artifactId>
 	<packaging>jar</packaging>
-	<name>OPush Module Manager</name>
+	<name>OPush Core</name>
 	<url>http://www.obm.org/</url>
 
 	<dependencies>
