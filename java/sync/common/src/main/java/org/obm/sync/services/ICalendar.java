@@ -140,6 +140,30 @@ public interface ICalendar {
 					throws ServerFault, EventAlreadyExistException, NotAllowedException;
 
 	/**
+	 * Stores an {@link Event}.<br />
+	 * This endpoint behaves as follows:
+	 * <ul>
+	 * <li>If the event already exists (same ext_id) in the target calendar, does a {@link #modifyEvent(AccessToken, String, Event, boolean, boolean) modifyEvent}.</li>
+	 * <li>If the event doesn't exist yet, does a {@link #createEvent(AccessToken, String, Event, boolean, String) createEvent}.</li>
+	 * </ul>
+	 * 
+	 * @param token The {@link AccessToken} of the user storing the {@link Event}.
+	 * @param calendar The target calendar to store the {@link Event} in.
+	 * @param event The {@link Event} to store in the target calendar.
+	 * @param notification Whether to send notifications for this operation.
+	 * @param clientId The clientId parameter prevents creating the same {@link Event} multiple times , as per 
+	 * 			{@link #createEvent(AccessToken, String, Event, boolean, String) createEvent}. This parameter
+	 * 			is ignored if the event already exists and is modified by this method.
+	 * 
+	 * @return The stored {@link Event}.
+	 * 
+	 * @see #modifyEvent(AccessToken, String, Event, boolean, boolean)
+	 * @see #createEvent(AccessToken, String, Event, boolean, String)
+	 */
+	Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
+			throws ServerFault, NotAllowedException;
+
+	/**
 	 * return every changes made to calendar since lastSync date for events into
 	 * the sync range. This service treats participation changes as full
 	 * changes. Logged user needs read rights on calendar.

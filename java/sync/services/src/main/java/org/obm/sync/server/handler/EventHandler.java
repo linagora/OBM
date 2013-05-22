@@ -206,6 +206,8 @@ public class EventHandler extends SecureSyncHandler {
 		}
 		else if (method.equals("getResourceMetadata")) {
 			return getResourceMetadata(at, request, responder);
+		} else if (method.equals("storeEvent")) {
+			return storeEvent(at, request, responder);
 		}
 		else {
 			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
@@ -590,4 +592,10 @@ public class EventHandler extends SecureSyncHandler {
 							.build();
 	}
 
+	private String storeEvent(AccessToken at, Request request, XmlResponder responder)
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException {
+		Event event = binding.storeEvent(at, getCalendar(request), getEvent(request), getNotificationOption(request), getClientId(request));
+
+		return responder.sendEvent(event);
+	}
 }

@@ -538,6 +538,26 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
+	public Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException {
+		Multimap<String, String> params = initParams(token);
+
+		params.put("calendar", calendar);
+		try {
+			params.put("event", ciw.getEventString(event));
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException(e);
+		}
+		params.put("notification", String.valueOf(notification));
+		params.put("clientId", clientId);
+
+		Document doc = execute(token, type + "/storeEvent", params);
+
+		exceptionFactory.checkNotAllowedException(doc);
+
+		return respParser.parseEvent(doc.getDocumentElement());
+	}
+
+	@Override
 	protected Locator getLocator() {
 		return locator;
 	}

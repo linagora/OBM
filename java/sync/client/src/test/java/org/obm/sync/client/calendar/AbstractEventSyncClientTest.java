@@ -46,6 +46,7 @@ import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -416,7 +417,27 @@ public class AbstractEventSyncClientTest {
 	public void testPurgeNotAllowed() throws Exception {
 		testPurge(NotAllowedException.class);
 	}
-	
+
+	@Test(expected = NotAllowedException.class)
+	public void testStoreEventNotAllowed() throws Exception {
+		storeEvent(NotAllowedException.class);
+	}
+
+	@Test(expected = ServerFault.class)
+	public void testStoreEventServerFault() throws Exception {
+		storeEvent(ServerFault.class);
+	}
+
+	private void storeEvent(Class<? extends Exception> exceptionClass) throws ServerFault, NotAllowedException {
+		Event event = createEvent();
+		Document document = mockErrorDocument(exceptionClass, null);
+
+		expect(responder.execute(eq(token), eq("/calendar/storeEvent"), isA(Multimap.class))).andReturn(document).once();
+		control.replay();
+
+		client.storeEvent(token, CALENDAR, event, false, null);
+	}
+
 	private void testPurge(Class<? extends Exception> exceptionClass) throws Exception {
 		Document document = mockErrorDocument(exceptionClass, null);
 		
