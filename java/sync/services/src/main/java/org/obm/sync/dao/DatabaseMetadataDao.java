@@ -31,12 +31,12 @@ package org.obm.sync.dao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.dao.TableDescription;
 
 import com.google.inject.Inject;
 
@@ -45,7 +45,7 @@ public class DatabaseMetadataDao {
 	@Inject
 	DatabaseConnectionProvider dbcp;
 	
-	public ResultSetMetaData getResultSetMetadata(String tableName) throws SQLException {
+	public TableDescription getResultSetMetadata(String tableName) throws SQLException {
 		Connection connection = null;
 		ResultSet rs = null;
 		Statement st = null;
@@ -55,7 +55,7 @@ public class DatabaseMetadataDao {
 			st = connection.createStatement();
 			
 			rs = st.executeQuery("SELECT * FROM " + tableName + " LIMIT 1");
-			return rs.getMetaData();
+			return new TableDescription(rs.getMetaData());
 		} catch (SQLException e) {
 			throw e;
 		} finally {

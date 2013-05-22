@@ -75,14 +75,17 @@ public class TableDescriptionTest {
 	private ResultSetMetaData resultSetMetaData;
 	
 	private static final String COLUMN = "event_description";
+	private static final String COLUMN2 = "event_description2";
 	private static int MAX_BYTES = 16;
+	private static int MAX_BYTES2 = 32;
 	
 	@Test
 	public void testGetMaxAllowedBytesOf() throws SQLException {
 		expect(resultSetMetaData.getColumnCount()).andReturn(2).once();
-		expect(resultSetMetaData.getColumnName(1)).andReturn("").once();
-		expect(resultSetMetaData.getColumnName(2)).andReturn(COLUMN).once();
-		expect(resultSetMetaData.getColumnDisplaySize(2)).andReturn(MAX_BYTES).once();
+		expect(resultSetMetaData.getColumnName(1)).andReturn(COLUMN).once();
+		expect(resultSetMetaData.getColumnName(2)).andReturn(COLUMN2).once();
+		expect(resultSetMetaData.getColumnDisplaySize(1)).andReturn(MAX_BYTES).once();
+		expect(resultSetMetaData.getColumnDisplaySize(2)).andReturn(MAX_BYTES2).once();
 		
 		mocksControl.replay();
 		TableDescription tableDescription = new TableDescription(resultSetMetaData);
@@ -110,7 +113,9 @@ public class TableDescriptionTest {
 	public void testGetMaxAllowedBytesWithNotFoundColumn() throws SQLException {
 		expect(resultSetMetaData.getColumnCount()).andReturn(2).once();
 		expect(resultSetMetaData.getColumnName(1)).andReturn("").once();
-		expect(resultSetMetaData.getColumnName(2)).andReturn("event_description2").once();
+		expect(resultSetMetaData.getColumnDisplaySize(1)).andReturn(MAX_BYTES).once();
+		expect(resultSetMetaData.getColumnName(2)).andReturn(COLUMN2).once();
+		expect(resultSetMetaData.getColumnDisplaySize(2)).andReturn(MAX_BYTES2).once();
 		
 		mocksControl.replay();
 		TableDescription tableDescription = new TableDescription(resultSetMetaData);
