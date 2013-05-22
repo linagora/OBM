@@ -75,8 +75,6 @@ import org.obm.push.service.impl.PushPublishAndSubscribeImpl;
 import org.obm.push.state.IStateMachine;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.DaoModule;
-import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.jdbc.ItemTrackingDaoJdbcImpl;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilterModule;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
@@ -123,7 +121,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);
 		bind(DeviceService.class).to(DeviceServiceImpl.class);
-		bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
