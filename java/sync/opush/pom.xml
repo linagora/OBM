@@ -36,7 +36,6 @@
 		<module>push-bean</module>
 		<module>push-interfaces</module>
 		<module>push-mail</module>
-		<module>push-service</module>
 		<module>push-servlet</module>
 		<module>push-core</module>
 		<module>protocol</module>

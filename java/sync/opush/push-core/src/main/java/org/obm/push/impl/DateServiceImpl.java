@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.impl;
 
 import java.util.Date;
 

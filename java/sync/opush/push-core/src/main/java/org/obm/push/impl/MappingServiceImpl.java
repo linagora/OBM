@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.impl;
 
 import java.util.Collection;
 import java.util.Date;
@@ -46,6 +46,7 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.service.impl.MappingService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;

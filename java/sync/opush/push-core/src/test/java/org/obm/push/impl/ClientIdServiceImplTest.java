@@ -29,32 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service.impl;
+package org.obm.push.impl;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.service.ClientIdService;
+import org.obm.push.impl.ClientIdServiceImpl;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.hash.Hashing;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+@RunWith(SlowFilterRunner.class)
+public class ClientIdServiceImplTest {
 
-@Singleton
-public class ClientIdServiceImpl implements ClientIdService {
+	private UserDataRequest udr;
 
-	@Inject
-	@VisibleForTesting ClientIdServiceImpl() {
-		super();
+	@Before
+	public void setup() {
+		User user = User.Factory.create().createUser("test@test", "test@domain", "displayName");
+		Device device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 	}
 	
-	@Override
-	public String hash(UserDataRequest udr, String clientId) {
-		return Hashing.sha1().newHasher()
-				.putString(udr.getCredentials().getUser().getLoginAtDomain())
-				.putString(udr.getDevType())
-				.putString(clientId)
-				.hash()
-				.toString();
+	@Test
+	public void testGetHashClientId() {
+		String clientId = "123";
+		String expectedHashClientId = "429ceb34c4b664d63da6cee8fd40ce0d4b2532aa";
+		
+		String hashClientId = new ClientIdServiceImpl().hash(udr, clientId);
+
+		assertThat(hashClientId).isEqualTo(expectedHashClientId);
 	}
 
+	@Test
+	public void testGetHashClientIdOtherValue() {
+		String clientId = "456";
+		String expectedHashClientId = "574394a967e7c3db37d5b74b649fba31f899c7a2";
+		
+		String hashClientId = new ClientIdServiceImpl().hash(udr, clientId);
+
+		assertThat(hashClientId).isEqualTo(expectedHashClientId);
+	}
 }

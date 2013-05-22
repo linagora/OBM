@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service;
+package org.obm.push.impl;
 
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.utils.IniFile;

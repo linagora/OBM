@@ -38,7 +38,7 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.push.service.OpushSyncPermsConfigurationService;
+import org.obm.push.impl.OpushSyncPermsConfigurationService;
 
 import com.google.inject.AbstractModule;
 

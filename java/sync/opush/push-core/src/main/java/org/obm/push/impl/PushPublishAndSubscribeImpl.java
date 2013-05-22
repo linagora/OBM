@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.service.impl;
+package org.obm.push.impl;
 
 import java.util.Collection;
 import java.util.LinkedList;

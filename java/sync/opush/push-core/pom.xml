@@ -151,11 +151,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-service</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
