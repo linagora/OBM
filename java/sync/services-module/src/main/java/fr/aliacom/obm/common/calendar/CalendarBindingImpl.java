@@ -645,8 +645,16 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
 			throws ServerFault, EventAlreadyExistException, NotAllowedException {
 
+		assertEventNotNull(token, event);
+		assertEventIsNew(token, calendar, event);
+
+		return createEventNoExistenceCheck(token, calendar, event, notification, clientId).getObmId();
+	}
+
+	private Event createEventNoExistenceCheck(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException {
+		assertUserCanWriteOnCalendar(token, calendar);
+
 		try {
-			assertCanCreateEvent(token, calendar, event);
 			convertAttendees(event, calendar, token.getDomain());
 			assignDelegationRightsOnAttendees(token, event);
 			Event ev = null;
@@ -669,18 +677,11 @@ public class CalendarBindingImpl implements ICalendar {
 							.build());
 			}
 			
-			return ev.getObmId();
+			return ev;
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
-	}
-
-	private void assertCanCreateEvent(AccessToken token, String calendar,
-			Event event) throws ServerFault, EventAlreadyExistException, NotAllowedException {
-		assertEventNotNull(token, event);
-		assertEventIsNew(token, calendar, event);
-		assertUserCanWriteOnCalendar(token, calendar);
 	}
 
 	private void assertEventIsNew(AccessToken token, String calendar, Event event) throws ServerFault, EventAlreadyExistException {
@@ -1780,4 +1781,23 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e);
 		}
 	}
+
+	@Override
+	@Transactional
+	public Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException {
+		assertEventNotNull(token, event);
+
+		ObmUser calendarUser = userService.getUserFromLogin(calendar, token.getDomain().getName());
+
+		if (calendarUser == null) {
+			throw new ServerFault("Invalid calendar '" + calendar + "'.");
+		}
+
+		if (isEventExists(token, calendarUser, event)) {
+			return modifyEvent(token, calendar, event, true, notification);
+		}
+
+		return createEventNoExistenceCheck(token, calendar, event, notification, clientId);
+	}
+
 }

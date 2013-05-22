@@ -3429,4 +3429,134 @@ public class CalendarBindingImplTest {
 	private ResourceInfo buildResourceInfo2() {
 		return ResourceInfo.builder().id(1).name("resource2").mail("res-2@domain.com").read(true).write(false).domainName("domain").build();
 	}
+
+	@Test
+	public void testStoreEventCreatesEventIfNotPresent() throws Exception {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+
+		event.setExtId(new EventExtId("ExtId"));
+		event.setInternalEvent(true);
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(null);
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
+		expect(commitedOperationDao.findAsEvent(token, null)).andReturn(null);
+		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
+		messageQueueService.writeIcsInvitationRequest(token, event);
+		expectLastCall();
+		expect(calendarDao.findEventById(token, null)).andReturn(event);
+		mocksControl.replay();
+
+		binding.storeEvent(token, calendar, event, false, null);
+
+		mocksControl.verify();
+	}
+
+	@Test(expected = ServerFault.class)
+	public void testStoreEventWithNullEvent() throws Exception {
+		mocksControl.replay();
+
+		try {
+			binding.storeEvent(token, "calendar", null, false, null);
+		} finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test(expected = NotAllowedException.class)
+	public void testStoreEventWhenNotAllowedToCreateEvent() throws Exception {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+
+		event.setExtId(new EventExtId("ExtId"));
+		event.setInternalEvent(true);
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(null);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false).anyTimes();
+		mocksControl.replay();
+
+		try {
+			binding.storeEvent(token, calendar, event, false, null);
+		} finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test(expected = NotAllowedException.class)
+	public void testStoreEventWhenNotAllowedToModifyEvent() throws Exception {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+
+		event.setExtId(new EventExtId("ExtId"));
+		event.setInternalEvent(true);
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(event).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false).anyTimes();
+		mocksControl.replay();
+
+		try {
+			binding.storeEvent(token, calendar, event, false, null);
+		} finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test(expected = NotAllowedException.class)
+	public void testStoreEventWhenModifiedEventDoesntBelongToUserOrCalendar() throws Exception {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+
+		event.setOwnerEmail("another@test");
+		event.setExtId(new EventExtId("ExtId"));
+		event.setInternalEvent(true);
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(event).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(helperService.eventBelongsToCalendar(event, calendar)).andReturn(false);
+		mocksControl.replay();
+
+		try {
+			binding.storeEvent(token, calendar, event, false, null);
+		} finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test
+	public void testStoreEventModifiesEventIfPresent() throws Exception {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+
+		event.setExtId(new EventExtId("ExtId"));
+		event.setInternalEvent(true);
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(event).anyTimes();
+		expect(helperService.eventBelongsToCalendar(event, calendar)).andReturn(true);
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
+		expect(calendarDao.modifyEventForcingSequence(token, calendar, event, true, 0, true)).andReturn(event);
+		mocksControl.replay();
+
+		binding.storeEvent(token, calendar, event, false, null);
+
+		mocksControl.verify();
+	}
 }
