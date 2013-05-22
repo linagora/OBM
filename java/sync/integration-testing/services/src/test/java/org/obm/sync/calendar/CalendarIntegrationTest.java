@@ -42,6 +42,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.sync.H2GuiceServletContextListener;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
+import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.client.login.LoginClient;
@@ -58,6 +59,7 @@ public abstract class CalendarIntegrationTest {
 	
 	protected LoginClient loginClient;
 	protected CalendarClient calendarClient;
+	protected BookClient bookClient;
 
 	@Before
 	public void setUp() {
@@ -69,6 +71,7 @@ public abstract class CalendarIntegrationTest {
 		
 		loginClient = new LoginClient("integration-testing", configuration, exceptionFactory, locator, logger) {};
 		calendarClient = new CalendarClient(exceptionFactory, locator, logger) {};
+		bookClient = new BookClient(exceptionFactory, locator, logger) {};
 	}
 
 	private LocatorService arquillianLocatorService() {

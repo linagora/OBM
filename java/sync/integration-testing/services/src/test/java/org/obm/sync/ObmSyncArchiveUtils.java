@@ -45,6 +45,9 @@ import org.jboss.shrinkwrap.resolver.api.ResolutionException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
 import org.obm.StaticConfigurationService;
+import org.obm.annotations.database.AutoTruncate;
+import org.obm.annotations.database.DatabaseEntity;
+import org.obm.annotations.database.DatabaseField;
 import org.obm.annotations.technicallogging.DefaultTechnicalLoggingBinder;
 import org.obm.annotations.technicallogging.ITechnicalLoggingBinder;
 import org.obm.annotations.technicallogging.KindToBeLogged;
@@ -204,6 +207,7 @@ import org.obm.sync.calendar.UnidentifiedAttendee;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
+import org.obm.sync.dao.TableDescription;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
@@ -225,6 +229,12 @@ import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
 import org.obm.sync.mailingList.MailingListItemsParser;
 import org.obm.sync.mailingList.MailingListItemsWriter;
+import org.obm.sync.metadata.AutoTruncateMethodInterceptor;
+import org.obm.sync.metadata.DatabaseMetadataDao;
+import org.obm.sync.metadata.DatabaseMetadataService;
+import org.obm.sync.metadata.DatabaseMetadataServiceImpl;
+import org.obm.sync.metadata.DatabaseTruncationService;
+import org.obm.sync.metadata.DatabaseTruncationServiceImpl;
 import org.obm.sync.resource.ResourceServlet;
 import org.obm.sync.server.MailingListHandler;
 import org.obm.sync.server.QueryFormatException;
@@ -404,7 +414,8 @@ public class ObmSyncArchiveUtils {
 				.addClasses(ObmSyncArchiveUtils.projectUtilsClasses())
 				.addClasses(ObmSyncArchiveUtils.projectLocatorClasses())
 				.addClasses(ObmSyncArchiveUtils.projectServicesCommonClasses())
-				.addClasses(ObmSyncArchiveUtils.projectCommonClasses());
+				.addClasses(ObmSyncArchiveUtils.projectCommonClasses())
+				.addClasses(ObmSyncArchiveUtils.projectDatabaseMetadataClasses());
 			
 		return ShrinkWrap
 				.create(WebArchive.class)
@@ -519,7 +530,10 @@ public class ObmSyncArchiveUtils {
 				Transactional.class,
 				TransactionalModule.class,
 				TransactionException.class,
-				TransactionProvider.class,	
+				TransactionProvider.class,
+				AutoTruncate.class,
+				DatabaseField.class,
+				DatabaseEntity.class
 		};
 	}
 
@@ -562,6 +576,19 @@ public class ObmSyncArchiveUtils {
 				HealthCheckDefaultHandlersModule.class,
 				HealthCheckHandler.class,
 				HealthCheckModule.class,
+		};
+	}
+	
+	public static Class<?>[] projectDatabaseMetadataClasses() {
+		return new Class<?>[] {
+				DatabaseMetadataDao.class,
+				DatabaseMetadataService.class,
+				DatabaseMetadataServiceImpl.class,
+				AutoTruncateMethodInterceptor.class,
+				DatabaseTruncationService.class,
+				DatabaseTruncationServiceImpl.class,
+				DatabaseMetadataModule.class,
+				TableDescription.class
 		};
 	}
 	

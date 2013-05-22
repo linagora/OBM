@@ -32,6 +32,7 @@
 package org.obm.sync.calendar;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
 import org.obm.sync.MessageQueueModule;
 import org.obm.sync.ModuleUtils;
@@ -52,7 +53,8 @@ public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 				new MessageQueueModule(),
 				new TransactionalModule(),
 				new DatabaseModule(),
-				new SolrJmsModule());
+				new SolrJmsModule(),
+				new DatabaseMetadataModule());
 		try {
 			install(override.with(overrideModule()));
 		} catch (Exception e) {

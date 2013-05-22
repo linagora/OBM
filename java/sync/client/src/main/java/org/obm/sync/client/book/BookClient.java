@@ -72,7 +72,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	private final Locator Locator;
 
 	@Inject
-	private BookClient(SyncClientException syncClientException, Locator Locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+	protected BookClient(SyncClientException syncClientException, Locator Locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		super(syncClientException, obmSyncLogger);
 		this.Locator = Locator;
 		this.respParser = new BookItemsParser();

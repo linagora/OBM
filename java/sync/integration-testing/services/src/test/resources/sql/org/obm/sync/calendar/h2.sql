@@ -684,5 +684,8 @@ INSERT INTO addressbook (domain_id, timeupdate, timecreate, userupdate, usercrea
         (1, now(), now(), 1, 1, 1, 'integration-testing', 'collected_contacts', TRUE),
         (1, now(), now(), 2, 2, 2, 'integration-testing', 'collected_contacts', TRUE),
         (1, now(), now(), 3, 3, 3, 'integration-testing', 'collected_contacts', TRUE);
+INSERT INTO AddressBookEntity (addressbookentity_entity_id, addressbookentity_addressbook_id)
+	VALUES (1, 1);
+
 INSERT INTO eventcategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label)
     VALUES (1, NULL,NULL,NULL,NULL,'existing_category');
