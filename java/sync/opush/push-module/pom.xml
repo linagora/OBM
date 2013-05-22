@@ -122,10 +122,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
 			<version>${obm.version}</version>
 		</dependency>

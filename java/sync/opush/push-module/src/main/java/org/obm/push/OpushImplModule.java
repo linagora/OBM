@@ -89,7 +89,6 @@ import org.obm.servlet.filter.qos.QoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
-import org.obm.sync.ObmSyncHttpClientModule;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.services.AttendeeService;
 
@@ -118,7 +117,6 @@ public class OpushImplModule extends AbstractModule {
 		install(qosModule());
 		install(new OpushServletModule());
 		install(new TechnicalLogServletModule());
-		install(new ObmSyncHttpClientModule());
 		install(new ConfigurationModule());
 		install(new org.obm.push.configuration.ConfigurationModule());
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);

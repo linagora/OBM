@@ -46,9 +46,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.service.AuthenticationService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,13 +62,13 @@ public class AuthenticationFilter implements Filter {
 	
 	private final LoggerService loggerService;
 	private final User.Factory userFactory;
-	private final LoginService loginService;
+	private final AuthenticationService authenticationService;
 	private final HttpErrorResponder httpErrorResponder;
 	
 	@Inject
-	private AuthenticationFilter(LoginService loginService, 
+	private AuthenticationFilter(AuthenticationService authenticationService, 
 			LoggerService loggerService, User.Factory userFactory, HttpErrorResponder httpErrorResponder) {
-		this.loginService = loginService;
+		this.authenticationService = authenticationService;
 		this.loggerService = loggerService;
 		this.userFactory = userFactory;
 		this.httpErrorResponder = httpErrorResponder;
@@ -131,7 +131,7 @@ public class AuthenticationFilter implements Filter {
 	}
 	
 	private AccessToken login(String userId, String password) throws AuthFault {
-		return loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
+		return authenticationService.authenticate(userFactory.getLoginAtDomain(userId), password);
 	}
 	
 	private User createUser(String userId, AccessToken accessToken) {

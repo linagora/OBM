@@ -29,43 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.service;
 
-import org.obm.push.auth.AuthenticationServiceImpl;
-import org.obm.push.backend.IBackend;
-import org.obm.push.backend.OBMBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.calendar.EventConverter;
-import org.obm.push.calendar.EventConverterImpl;
-import org.obm.push.calendar.EventServiceImpl;
-import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.search.ISearchSource;
-import org.obm.push.search.ObmSearchContact;
-import org.obm.push.service.AuthenticationService;
-import org.obm.push.service.EventService;
-import org.obm.push.task.TaskBackend;
-import org.obm.sync.ObmSyncHttpClientModule;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+public interface AuthenticationService {
 
-public class ObmBackendModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
-    	install(new ObmSyncHttpClientModule());
-    	bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-    	bind(IBackend.class).to(OBMBackend.class);
-    	bind(ICalendarBackend.class).to(CalendarBackend.class);
-    	bind(EventService.class).to(EventServiceImpl.class);
-    	bind(EventConverter.class).to(EventConverterImpl.class);
-
-    	Multibinder<PIMBackend> pimBackends = Multibinder.newSetBinder(binder(), PIMBackend.class);
-    	pimBackends.addBinding().to(CalendarBackend.class);
-    	pimBackends.addBinding().to(ContactsBackend.class);
-    	pimBackends.addBinding().to(TaskBackend.class);
-    	Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
-    	searchSources.addBinding().to(ObmSearchContact.class);
-    }
+	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+	
 }
