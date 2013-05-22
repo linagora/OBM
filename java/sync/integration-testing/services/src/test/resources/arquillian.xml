@@ -6,6 +6,7 @@
         
     <container qualifier="tomcat-managed-6" default="true">
         <configuration>
+<!--             <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property>  -->
             <property name="catalinaHome">${java.io.tmpdir}/tomcat/apache-tomcat-6.0.20</property>
             <property name="user">arquillian</property>
             <property name="pass">arquillian</property>
