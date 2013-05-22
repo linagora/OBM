@@ -33,12 +33,6 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.BackendWindowingService;
@@ -115,9 +109,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(IStateMachine.class).to(StateMachine.class);
-		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);
 		bind(DeviceService.class).to(DeviceServiceImpl.class);
