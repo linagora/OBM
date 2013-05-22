@@ -31,22 +31,28 @@ package org.obm.sync.dao;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 public class TableDescription {
 	
-	private final ResultSetMetaData tableDescription;
+	private final Map<String, Integer> maxBytesByColumn;
 	
-	public TableDescription(ResultSetMetaData tableDescription) {
-		this.tableDescription = tableDescription;
+	public TableDescription(ResultSetMetaData metadata) throws SQLException {
+		maxBytesByColumn = Maps.newHashMap();
+		int columnCount = metadata.getColumnCount();
+		for (int i = 1; i <= columnCount; i++) {
+			maxBytesByColumn.put(
+					metadata.getColumnName(i).toLowerCase(),
+					metadata.getColumnDisplaySize(i));
+		}
 	}
 	
 	public int getMaxAllowedBytesOf(String columnName) throws SQLException {
-		int columnCount = tableDescription.getColumnCount();
-		for (int i = 1; i <= columnCount; i++) {
-			if (tableDescription.getColumnName(i).equalsIgnoreCase(columnName)) {
-				return tableDescription.getColumnDisplaySize(i);
-			}
+		if(!maxBytesByColumn.containsKey(columnName)) {
+			throw new SQLException(String.format("Could not find column %s.", columnName));
 		}
-		throw new SQLException(String.format("Could not find column %s.", columnName));
+		return maxBytesByColumn.get(columnName);
 	}
 }

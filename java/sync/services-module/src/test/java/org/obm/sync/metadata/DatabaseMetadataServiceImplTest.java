@@ -33,7 +33,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
@@ -45,8 +44,6 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.dao.TableDescription;
-import org.obm.sync.metadata.DatabaseMetadataDao;
-import org.obm.sync.metadata.DatabaseMetadataServiceImpl;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.AbstractModule;
@@ -65,7 +62,7 @@ public class DatabaseMetadataServiceImplTest {
 			
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DatabaseMetadataDao.class);
-			bindWithMock(ResultSetMetaData.class);
+			bindWithMock(TableDescription.class);
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {
@@ -84,14 +81,11 @@ public class DatabaseMetadataServiceImplTest {
 	private DatabaseMetadataDao metadataDao;
 	
 	@Inject
-	private ResultSetMetaData rsmd;
+	private TableDescription tableDescription;
 	
 	private DatabaseMetadataServiceImpl dms;
 	
 	private static final String TABLE = "event";
-	private static final String COLUMN_NAME = "event_description";
-	private static int COLUMN = 1;
-	private static int MAX_BYTES = 16;
 	
 	@After
 	public void tearDown() {
@@ -100,11 +94,7 @@ public class DatabaseMetadataServiceImplTest {
 	
 	@Test
 	public void testGetTableDescription() throws SQLException {
-		
-		expect(metadataDao.getResultSetMetadata(TABLE)).andReturn(rsmd).once();
-		expect(rsmd.getColumnCount()).andReturn(COLUMN).once();
-		expect(rsmd.getColumnName(COLUMN)).andReturn(COLUMN_NAME).once();
-		expect(rsmd.getColumnDisplaySize(COLUMN)).andReturn(MAX_BYTES).once();
+		expect(metadataDao.getResultSetMetadata(TABLE)).andReturn(tableDescription).once();
 		
 		mocksControl.replay();
 		
@@ -112,15 +102,12 @@ public class DatabaseMetadataServiceImplTest {
 		
 		TableDescription tableDescription = dms.getTableDescriptionOf(TABLE);
 		
-		assertThat(tableDescription.getMaxAllowedBytesOf(COLUMN_NAME)).isEqualTo(16);
+		assertThat(tableDescription).isNotNull();
 	}
 	
 	@Test
-	public void testGetTableDescriptionTwiceInARow() throws SQLException {
-		expect(metadataDao.getResultSetMetadata(TABLE)).andReturn(rsmd).once();
-		expect(rsmd.getColumnCount()).andReturn(COLUMN).times(2);
-		expect(rsmd.getColumnName(COLUMN)).andReturn(COLUMN_NAME).times(2);
-		expect(rsmd.getColumnDisplaySize(COLUMN)).andReturn(MAX_BYTES).times(2);
+	public void testGetTableDescriptionTwiceInARowCallDaoOnce() throws SQLException {
+		expect(metadataDao.getResultSetMetadata(TABLE)).andReturn(tableDescription).once();
 		
 		mocksControl.replay();
 		
@@ -129,8 +116,8 @@ public class DatabaseMetadataServiceImplTest {
 		TableDescription tableDescription = dms.getTableDescriptionOf(TABLE);
 		TableDescription tableDescription2 = dms.getTableDescriptionOf(TABLE);
 		
-		assertThat(tableDescription.getMaxAllowedBytesOf(COLUMN_NAME)).isEqualTo(MAX_BYTES);
-		assertThat(tableDescription2.getMaxAllowedBytesOf(COLUMN_NAME)).isEqualTo(MAX_BYTES);
+		assertThat(tableDescription).isNotNull();
+		assertThat(tableDescription2).isEqualTo(tableDescription);
 	}
 	
 	@Test(expected=UncheckedExecutionException.class)

@@ -29,7 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.metadata;
 
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.obm.sync.dao.TableDescription;
@@ -49,7 +48,7 @@ public final class DatabaseMetadataServiceImpl implements DatabaseMetadataServic
 	private static final Logger logger = LoggerFactory
 			.getLogger(DatabaseMetadataServiceImpl.class);
 	
-	private LoadingCache<String, ResultSetMetaData> cache;
+	private LoadingCache<String, TableDescription> cache;
 	private DatabaseMetadataDao metadataDao;
 	
 	@Inject
@@ -60,14 +59,14 @@ public final class DatabaseMetadataServiceImpl implements DatabaseMetadataServic
 
 	@Override
 	public TableDescription getTableDescriptionOf(String tableName) throws SQLException {
-		return new TableDescription(cache.getUnchecked(tableName));
+		return cache.getUnchecked(tableName);
 	}
 	
-	private LoadingCache<String, ResultSetMetaData> newColumnDescriptionsCache() {
-		return CacheBuilder.newBuilder().build(new CacheLoader<String, ResultSetMetaData>() {
+	private LoadingCache<String, TableDescription> newColumnDescriptionsCache() {
+		return CacheBuilder.newBuilder().build(new CacheLoader<String, TableDescription>() {
 
 			@Override
-			public ResultSetMetaData load(String tableName) throws SQLException {
+			public TableDescription load(String tableName) throws SQLException {
 				logger.info("Caching metadata for table {}.", tableName);
 				return metadataDao.getResultSetMetadata(tableName);
 			}
