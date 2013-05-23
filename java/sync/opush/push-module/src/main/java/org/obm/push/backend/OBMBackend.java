@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,8 +50,11 @@ import org.obm.push.impl.ListenerRegistration;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.monitor.CalendarMonitoringThread;
 import org.obm.push.monitor.ContactsMonitoringThread;
+import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
+import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
+import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.service.DateService;
-import org.obm.push.state.IStateMachine;
+import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -75,7 +79,7 @@ public class OBMBackend implements IBackend {
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final MailMonitoringBackend emailBackend;
 	private final DateService dateService;
-	private final IStateMachine stateMachine;
+	private final StateMachine stateMachine;
 	private final boolean enablePush;
 	
 	@Inject
@@ -86,7 +90,7 @@ public class OBMBackend implements IBackend {
 			LoginService loginService,
 			MailMonitoringBackend emailBackend,
 			DateService dateService,
-			IStateMachine stateMachine,
+			StateMachine stateMachine,
 			@Named("enable-push") boolean enablePush) {
 		
 		this.collectionDao = collectionDao;
@@ -138,6 +142,15 @@ public class OBMBackend implements IBackend {
 	@Override
 	public String getWasteBasket() {
 		return "Trash";
+	}
+
+	@Override
+	public Policy getDevicePolicy(UserDataRequest udr) {
+		if (udr.getDevice().getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
+			return new MSWAPProvisioningXML();
+		} else {
+			return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
+		}
 	}
 
 	@Override

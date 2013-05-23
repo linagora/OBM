@@ -34,6 +34,7 @@ package org.obm.push.bean;
 import java.util.Date;
 import java.util.List;
 
+
 public class MSEventExceptionBuilder {
 
 	private final MSEventException msEventException;

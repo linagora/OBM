@@ -52,7 +52,6 @@ public class OpushModule extends AbstractModule {
 		installImapModule();
 		install(new OpushImplModule());
 		install(new OpushMailModule());
-		install(new ObmBackendModule());
 		install(new LoggerModule());
 		install(new OpushCrashModule());
 		install(new HealthCheckModule());

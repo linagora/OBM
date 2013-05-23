@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import com.google.common.base.Objects;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -50,9 +47,6 @@ import org.obm.push.protocol.bean.ProvisionRequest;
 import org.obm.push.protocol.bean.ProvisionResponse;
 import org.obm.push.protocol.bean.ProvisionResponse.Builder;
 import org.obm.push.protocol.data.EncoderFactory;
-import org.obm.push.protocol.provisioning.MSEASProvisioingWBXML;
-import org.obm.push.protocol.provisioning.MSWAPProvisioningXML;
-import org.obm.push.protocol.provisioning.Policy;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
@@ -61,7 +55,9 @@ import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.wbxml.WBXMLTools;
 import org.w3c.dom.Document;
 
-import java.math.BigDecimal;
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ProvisionHandler extends WbxmlRequestHandler {
@@ -115,7 +111,7 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 
 		if (isInitialProvisionRequest(policyKey)) {
 			provisionResponseBuilder
-				.policy(getDevicePolicy(udr))
+				.policy(backend.getDevicePolicy(udr))
 				.policyKey(retrievePendingPolicyKey(udr))
 				.policyStatus(ProvisionPolicyStatus.SUCCESS);
 		} else if (isPendingPolicyKey(udr, policyKey)) {
@@ -130,15 +126,6 @@ public class ProvisionHandler extends WbxmlRequestHandler {
 		return provisionResponseBuilder.build();
 	}
 
-
-	private Policy getDevicePolicy(UserDataRequest udr) {
-		if (udr.getDevice().getProtocolVersion().compareTo(new BigDecimal("2.5")) <= 0) {
-			return new MSWAPProvisioningXML();
-		} else {
-			return new MSEASProvisioingWBXML(udr.getDevice().getProtocolVersion());
-		}
-	}
-	
 	private boolean isInitialProvisionRequest(Long policyKey) {
 		return policyKey == null || policyKey == INITIAL_POLICYKEY;
 	}

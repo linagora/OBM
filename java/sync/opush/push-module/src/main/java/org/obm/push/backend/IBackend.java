@@ -29,40 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.backend;
 
-import org.obm.push.backend.IBackend;
-import org.obm.push.backend.OBMBackend;
-import org.obm.push.backend.PIMBackend;
-import org.obm.push.calendar.CalendarBackend;
-import org.obm.push.calendar.EventConverter;
-import org.obm.push.calendar.EventConverterImpl;
-import org.obm.push.calendar.EventServiceImpl;
-import org.obm.push.contacts.ContactsBackend;
-import org.obm.push.search.ISearchSource;
-import org.obm.push.search.ObmSearchContact;
-import org.obm.push.service.EventService;
-import org.obm.push.task.TaskBackend;
+import java.util.Set;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import org.obm.push.bean.SyncCollectionResponse;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.ConversionException;
+import org.obm.push.exception.DaoException;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
+import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.activesync.HierarchyChangedException;
+import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.mail.exception.FilterTypeChangedException;
+import org.obm.push.protocol.provisioning.Policy;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 
-public class ObmBackendModule extends AbstractModule {
+public interface IBackend {
 
+	String getWasteBasket();
 
-    @Override
-    protected void configure() {
-        bind(IBackend.class).to(OBMBackend.class);
-        bind(ICalendarBackend.class).to(CalendarBackend.class);
-        bind(EventService.class).to(EventServiceImpl.class);
-        bind(EventConverter.class).to(EventConverterImpl.class);
+	Policy getDevicePolicy(UserDataRequest udr);
 
-        Multibinder<PIMBackend> pimBackends =
-                Multibinder.newSetBinder(binder(), PIMBackend.class);
-        pimBackends.addBinding().to(CalendarBackend.class);
-        pimBackends.addBinding().to(ContactsBackend.class);
-        pimBackends.addBinding().to(TaskBackend.class);
-        Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
-        searchSources.addBinding().to(ObmSearchContact.class);
-    }
+	void startMonitoring();
+	
+	/**
+	 * Push support
+	 * 
+	 * @param ccl
+	 * @return a registration that the caller can use to cancel monitor of a
+	 *         ressource
+	 */
+	IListenerRegistration addChangeListener(ICollectionChangeListener ccl);
+
+	void startEmailMonitoring(UserDataRequest udr, Integer collectionId) throws CollectionNotFoundException, DaoException;
+
+	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
+
+	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+
+	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
+			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
+			ConversionException, FilterTypeChangedException, HierarchyChangedException;
+	
 }

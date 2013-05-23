@@ -32,7 +32,6 @@
 package org.obm.push.handler;
 
 import org.obm.icalendar.ICalendar;
-import org.obm.push.ICalendarBackend;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -43,6 +42,7 @@ import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ICalendarConverterException;
@@ -80,7 +80,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 
 	private final MeetingProtocol meetingProtocol;
 	private final MailBackend mailBackend;
-	private final ICalendarBackend calendarBackend;
+	private final CalendarBackend calendarBackend;
 	
 	@Inject
 	protected MeetingResponseHandler(IBackend backend,
@@ -88,7 +88,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter,	StateMachine stMachine, 
 			MeetingProtocol meetingProtocol, CollectionDao collectionDao,
 			MailBackend mailBackend, WBXMLTools wbxmlTools,
-			ICalendarBackend calendarBackend, DOMDumper domDumper) {
+			CalendarBackend calendarBackend, DOMDumper domDumper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);

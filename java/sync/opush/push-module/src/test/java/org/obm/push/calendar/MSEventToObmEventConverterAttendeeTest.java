@@ -37,8 +37,8 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -49,10 +49,12 @@ import org.obm.push.bean.User;
 import org.obm.push.exception.ConversionException;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.Participation;
 
 import com.google.common.collect.Sets;
+
+import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class MSEventToObmEventConverterAttendeeTest {

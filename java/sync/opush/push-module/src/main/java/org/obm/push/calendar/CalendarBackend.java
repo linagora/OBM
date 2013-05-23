@@ -47,6 +47,7 @@ import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushCollection;
+import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -94,6 +95,7 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.CalendarType;
+import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
 import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
@@ -108,7 +110,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICalendarBackend {
+public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 
 	private static final String DEFAULT_CALENDAR_PARENT_ID = "0";
@@ -597,7 +599,6 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		}
 	}
 
-	@Override
 	public String handleMeetingResponse(UserDataRequest udr, org.obm.icalendar.ICalendar iCalendar, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
 			ItemNotFoundException, ConversionException, HierarchyChangedException, ICalendarConverterException {
