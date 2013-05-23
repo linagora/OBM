@@ -562,18 +562,20 @@ function popup(url,name,height,width) {
 }
 
 function showAllInOneMenu(){
-  if ( $('allinonemenu').isVisible() ){
-    $('allinonemenu').setStyle('display', 'none');
+  var allinonemenu = $('allinonemenu');
+  if ( allinonemenu.isVisible() ){
+    allinonemenu.setStyle('display', 'none');
   }else{
-    $('allinonemenu').setStyle('display', 'block');
+    allinonemenu.setStyle('display', 'block');
   }
 }
 
 function showProfileMenu(){
-  if ( $('profileMenu').isVisible() ){
-    $('profileMenu').setStyle('display', 'none');
+  var profileMenu = $('profileMenu');
+  if ( profileMenu.isVisible() ){
+    profileMenu.setStyle('display', 'none');
   } else {
-    $('profileMenu').setStyle('display', 'block');
+    profileMenu.setStyle('display', 'block');
   }
 }
 
