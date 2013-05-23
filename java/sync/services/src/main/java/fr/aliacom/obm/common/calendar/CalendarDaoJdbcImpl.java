@@ -1486,6 +1486,33 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		defineEventsInternalStatus(eventById.values());
 	}
 
+	public Integer getEventAlertForUser(EventObmId eventId, Integer userId) {
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		Connection connection = null;
+		String query = "SELECT eventalert_duration FROM EventAlert WHERE eventalert_event_id = ? AND eventalert_user_id = ?";
+
+		try {
+			connection = obmHelper.getConnection();
+			ps = connection.prepareStatement(query);
+
+			ps.setInt(1, eventId.getObmId());
+			ps.setInt(2, userId);
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error("Failed to get event alert.", e);
+		} finally {
+			obmHelper.cleanup(connection, ps, rs);
+		}
+
+		return null;
+	}
+
 	private void loadAlerts(Connection con, AccessToken token, Map<EventObmId, Event> eventById,
 			IntegerSQLCollectionHelper eventIds) throws SQLException {
 

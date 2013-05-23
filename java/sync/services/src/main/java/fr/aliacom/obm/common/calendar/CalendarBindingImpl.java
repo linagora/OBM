@@ -419,11 +419,9 @@ public class CalendarBindingImpl implements ICalendar {
 			assertEventCanBeModified(token, calendarUser, before);
 			convertAttendees(event, calendarUser);
 			
-			if (before.isInternalEvent()) {
-				return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
-			} else {
-				return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
-			}
+			Event toReturn = modifyEvent(token, calendar, event, updateAttendees, notification, before);
+
+			return inheritAlertFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), toReturn);
 		} catch (Throwable e) {
 			Throwables.propagateIfInstanceOf(e, NotAllowedException.class);
 			
@@ -431,6 +429,14 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e);
 		}
 
+	}
+
+	private Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification, Event before) throws ServerFault {
+		if (before.isInternalEvent()) {
+			return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
+		} else {
+			return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
+		}
 	}
 	
 	private void assertUserCanWriteOnCalendar(AccessToken token, String calendar) throws NotAllowedException {
@@ -928,9 +934,10 @@ public class CalendarBindingImpl implements ICalendar {
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
 			
 			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
-			
 			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
-			return userHasReadOnlyDelegation ? changesToSend.anonymizePrivateItems() : changesToSend;
+
+			return userHasReadOnlyDelegation
+					? changesToSend.anonymizePrivateItems(): inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), changesToSend);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -947,6 +954,32 @@ public class CalendarBindingImpl implements ICalendar {
 		return changesToSend;
 	}
 
+	private EventChanges inheritAlertsFromOwnerIfNotSet(Integer userId, Integer ownerId, EventChanges eventChanges) {
+		return EventChanges
+				.builder()
+				.lastSync(eventChanges.getLastSync())
+				.deletes(eventChanges.getDeletedEvents())
+				.updates(inheritAlertsFromOwnerIfNotSet(userId, ownerId, eventChanges.getUpdated()))
+				.participationChanges(eventChanges.getParticipationUpdated())
+				.build();
+	}
+
+	private <T extends Iterable<Event>> T inheritAlertsFromOwnerIfNotSet(Integer userId, Integer ownerId, T events) {
+		for (Event event : events) {
+			inheritAlertFromOwnerIfNotSet(userId, ownerId, event);
+		}
+
+		return events;
+	}
+
+	private Event inheritAlertFromOwnerIfNotSet(Integer userId, Integer ownerId, Event event) {
+		if (event.getAlert() == null && userId != ownerId) {
+			event.setAlert(calendarDao.getEventAlertForUser(event.getObmId(), ownerId));
+		}
+
+		return event;
+	}
+
 	@Override
 	@Transactional(readOnly=true)
 	public Event getEventFromId(AccessToken token, String calendar, EventObmId eventId) throws ServerFault, EventNotFoundException, NotAllowedException {
@@ -958,6 +991,16 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		if (!helperService.canReadCalendar(token, owner) && !helperService.attendeesContainsUser(event.getAttendees(), token)) {
 			throwNotAllowedException(token, owner, Right.READ);
+		}
+
+		boolean delegation = helperService.canWriteOnCalendar(token, calendar);
+
+		if (delegation) {
+			ObmUser calendarUser = userService.getUserFromLogin(calendar, token.getDomain().getName());
+
+			if (calendarUser != null) {
+				return inheritAlertFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), event);
+			}
 		}
 		
 		return event;
@@ -1045,10 +1088,13 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 			Event event = calendarDao.findEventByExtId(token, calendarUser, extId);
+			boolean delegation = helperService.canWriteOnCalendar(token, calendar);
+
 			if (event == null) {
 				throw new EventNotFoundException("Event from extId " + extId + " not found.");
-			} 
-			return event;
+			}
+
+			return delegation ? inheritAlertFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), event) : event;
 		} catch (FindException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -1062,14 +1108,17 @@ public class CalendarBindingImpl implements ICalendar {
 		assertUserCanReadCalendar(token, calendar);
 		
 		ObmUser calendarUser = null;
+
 		try {
 			calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 		} catch (FindException e1) {
 			throw new ServerFault(e1.getMessage());
 		}
 		try {
-			return calendarDao.listEventsByIntervalDate(token,
-					calendarUser, start, end, type);
+			List<Event> events = calendarDao.listEventsByIntervalDate(token, calendarUser, start, end, type);
+			boolean delegation = helperService.canWriteOnCalendar(token, calendar);
+
+			return delegation ? inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), events) : events;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -1084,8 +1133,10 @@ public class CalendarBindingImpl implements ICalendar {
 			assertUserCanReadCalendar(token, calendar);
 			
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
+			List<Event> events = calendarDao.findAllEvents(token, calendarUser, eventType);
+			boolean delegation = helperService.canWriteOnCalendar(token, calendar);
 			
-			return calendarDao.findAllEvents(token, calendarUser, eventType);
+			return delegation ? inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), events) : events;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
