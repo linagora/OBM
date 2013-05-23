@@ -59,6 +59,11 @@ a:hover {
   text-decoration: underline;  
 }
 
+.ico{
+  width:15px;
+  height:15px;
+}
+
 #banner a { 
   text-decoration: none;  
   font-family: 'Lato',sans-serif, arial;
@@ -347,25 +352,142 @@ form {
 
 #allinonemenu{
   overflow-y: auto;
-  position: fixed;
-  width:200px;
-  max-height:92%;
-  right:0px;
-  top:33px;
-  background-color: rgba(250,250,250, 0.88);
+  position: relative;
+  width: 200px;
+  right:55px;
+  top:34px;
+  background-color: #FAFAFA;
   line-height: 18px;
   padding-left: 5px;
   padding-bottom:10px;
-  border-left: 2px solid #EEE;
+  border: 1px solid #CCC;
   z-index: 999999;
   display: none;
-  box-shadow: -5px 5px 15px #AAA;
+  box-shadow: 0px 0px 5px #999;
 }
 
 #allinonemenu ul {
   margin:0;
   padding:0;
   font-size:13px;
+}
+
+#profileMenu{
+  position: absolute;
+  width:350px;
+  right:10px;
+  top:50px;
+  background-color: #FAFAFA;
+  border: 1px solid #CCC;
+  z-index: 999;
+  line-height: 11px;
+  display: none;
+  box-shadow: 0px 0px 5px #999;
+}
+
+.arrow_box { 
+  position: relative; 
+  background: #fafafa;
+  border: 4px solid #CCC; 
+}
+
+.arrow_box:after, .arrow_box:before { 
+  bottom: 100%; 
+  border: solid transparent; 
+  content: " "; 
+  height: 0; 
+  width: 0;
+  position: absolute; 
+  pointer-events: none; 
+}
+
+.arrow_box:after { 
+  border-color: rgba(250, 250, 250, 0); 
+  border-bottom-color: #fafafa; 
+  border-width: 12px; 
+  left: 90%; 
+  margin-left: -12px; 
+}
+
+.arrow_box:before { 
+  border-color: rgba(204, 204, 204, 0); 
+  border-bottom-color: #CCC; 
+  border-width: 15px; 
+  left: 90%; 
+  margin-left: -15px; 
+}
+
+#shinnyUserInfos{
+  margin-bottom: 15px;
+}
+
+#shinnyUserInfos #avatar{
+  position: absolute;
+  top:10px;
+  left:10px;
+  border-radius:10px;
+  border:2px solid #CCC;
+
+  width: 90px;
+  height: 90px;
+}
+
+#avatar img{
+  width: 80px;
+  height: 80px;
+  margin: 5px 5px 5px 5px;
+}
+
+#shinnyUserInfos #infos{
+  margin-left: 110px;
+  margin-top: 20px;
+  line-height: 20px;
+}
+
+#shinnyUserInfos #infos p{
+  font-size:18px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+#shinnyUserInfos #infos p+p{
+  font-weight: normal;
+  font-size:15px;
+  color: #999;
+}
+
+#shinnyUserInfos #infos .buttons{
+  text-align: right;
+  margin-right: 10px;
+  color:#FFF;
+}
+
+#shinnyUserInfos #infos .buttons a{
+  color:#FFF;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+#profileMenu #settings{
+  border-top: 1px solid #CCC;
+  padding: 0;
+  margin: 15px;
+}
+
+#settings h3{
+  font-size: 15px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+#settings ul{
+  list-style: none;
+  column-count: 2;
+  -moz-column-count: 2;
+  -webkit-column-count: 2;
+  padding-left:5px;
+  margin:0;
 }
 
 #information {

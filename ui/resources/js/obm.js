@@ -569,6 +569,14 @@ function showAllInOneMenu(){
   }
 }
 
+function showProfileMenu(){
+  if ( $('profileMenu').isVisible() ){
+    $('profileMenu').setStyle('display', 'none');
+  } else {
+    $('profileMenu').setStyle('display', 'block');
+  }
+}
+
 function showOkMessage(message) {
   showMessage('ok',message);
 }

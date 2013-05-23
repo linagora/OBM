@@ -1,21 +1,49 @@
-<div id="profileMenu" class="profileMenu">
+<div style="display:none;" id="profileMenu" class="arrow_box">
 
-	{{#user_settings}}
+	<div id="shinnyUserInfos">
 
-	<h3>{{name}}</h3>
-	<ul id="section-{{section-name}}-items" style="list-style-type:none;">
+		{{#user_infos}}
 
-		{{#links}}
+		<div id="avatar">
 
-		<li>
-			<a href="{{url}}" class="ico" title="{{title}}"><img src="{{ico}}" alt="{{title}}">
-			</a><a href="{{url}}" title="{{title}}">{{title}}</a>
-		</li>
-		
-		{{/link}}
+			<img src="{{photo_url}}" alt="{{commonname}}"/>
 
-	<ul>
+		</div>
 
-	{{/user_settings}}
+		<div id="infos">
+			<p>{{commonname}}</p>
+			<p>{{email}}</p>
+			<p>{{profil}} : ({{domain}}) </p>
+
+			<p class="buttons"><a href="../obm.php?action=logout" alt="{{l_logout}}" id="logout" class="button">{{l_logout}}</a></p>
+		</div>
+
+		{{/user_infos}}
+
+	</div>
+
+	<div id="settings">
+
+		{{#user_settings}}
+
+		<h3>{{name}}</h3>
+		<ul id="section-{{section_name}}-items">
+
+			{{#links}}
+
+			<li>
+				<a href="{{url}}" target="{{target}}" class="ico" title="{{tooltip}}">
+				{{#ico}} <img src="{{ico}}" alt="{{tooltip}}"> {{/ico}}
+				{{title}}
+				</a>
+			</li>
+
+			{{/links}}
+
+		<ul>
+
+		{{/user_settings}}
+
+	</div>
 
 </div>
