@@ -63,12 +63,17 @@ import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.TransactionManagerServices;
+
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.internal.Errors;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
+import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
@@ -165,6 +170,26 @@ public class GuiceServletContextListener implements ServletContextListener {
     
     @Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-    	servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null); 
+		Errors errors = new Errors();
+		Injector injector = (Injector) servletContextEvent.getServletContext().getAttribute(ATTRIBUTE_NAME);
+
+		try {
+			if (injector != null) {
+				injector.getInstance(QueueManager.class).stop();
+			}
+		}
+		catch (Exception e) {
+			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop QueueManager.", e));
+		}
+
+		try {
+			TransactionManagerServices.getTransactionManager().shutdown();
+		}
+		catch (Exception e) {
+			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop TransactionManager.", e));
+		}
+
+		servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null);
+		errors.throwConfigurationExceptionIfErrorsExist();
     }
 }
