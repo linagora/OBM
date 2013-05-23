@@ -126,6 +126,7 @@ $ico_big_time       = "$theme_path/ico_big_time.gif";
 $ico_very_big_time  = "$theme_path/ico_very_big_time.png";
 $ico_todo           = "$theme_path/ico_todo.gif";
 $ico_user           = "$theme_path/ico_user.gif";
+$ico_big_user       = "$theme_path/ico_user.png";
 $ico_vacation       = "$theme_path/ico_vacation.gif";
 $ico_organizationalchart = "$theme_path/ico_organizational_chart.gif";
 $ico_load            = "$theme_path/ico_load.gif";
