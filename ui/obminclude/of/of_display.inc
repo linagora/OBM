@@ -1313,7 +1313,7 @@ function display_menu($module) {
 
 function display_unified_menu($module) {
   global $path, $obm, $display, $obm_version, $cgp_show, $modules;
-  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope, $ico_user, $ico_calendar, $ico_contact;
+  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope, $ico_big_user;
   global $l_logout, $l_profile, $l_scope_update, $l_waiting_events, $l_section_webmail, $l_module_calendar, $l_module_contact, $l_section_more;
   global $perm, $cright_write_admin;
 
@@ -1344,6 +1344,8 @@ function display_unified_menu($module) {
   if(!isset($user_photo_id)){
     $user_infos = get_user_info($obm["uid"]);
     $user_photo_id = $user_infos["photo_id"];
+    $common_name = $user_infos["commonname"];
+    $email = $user_infos["email"];
   }
 
   $m = new Mustache_Engine(array(
@@ -1360,11 +1362,17 @@ function display_unified_menu($module) {
 
   $data[] = array("user_infos");
   $data["user_infos"]["login"] = $login;
+  $data["user_infos"]["commonname"] = $common_name;
+  $data["user_infos"]["email"] = $email;
+  $data["user_infos"]["profil"] = $profil;
+  $data["user_infos"]["domain"] = $domain;
+
+  $data["user_infos"]["l_logout"] = $l_logout;
 
   if ($user_photo_id > 0) {
     $data["user_infos"]["photo_url"] = "$path/document/document_index.php?action=accessfile&document_id=$user_photo_id";
   } else {
-    $data["user_infos"]["photo_url"] = $ico_user;
+    $data["user_infos"]["photo_url"] = $ico_big_user;
   }
 
   $data[] = array("scope");
@@ -1407,35 +1415,12 @@ function display_unified_menu($module) {
     )
   );
 
-  $data[] = array("sections");
-  
-  /* /////////////////////////
-    Examples of Sections Data
-    Need get Sections Links 
-  ///////////////////////// */
-  $data["sections"][] = array(
-    "section_name" => "gw",
-    "name" => "Collaboratif",
-    "links" => array( 
-      array( 'url' => "$path/calendar/calendar_index.php", "ico" => $ico_calendar, "title" => "Agenda" ),
-      array( 'url' => "$path/contact/contact_index.php", "ico" => $ico_contact, "title" => "Contact" )
-    )
-  );
+  $data["sections"] = get_sections_data();
 
-  $data["sections"][] = array(
-    "section_name" => "dic",
-    "name" => "Dictionnaire",
-    "links" => array( 
-      array( 'url' => "$path/user/user_index.php", "ico" => $GLOBALS[ico_user], "title" => "User" ),
-      array( 'url' => "$path/project/project_index.php", "ico" => $GLOBALS[ico_project], "title" => "Project" )
-    )
-  );
-
-  $data[] = array("user_settings");
+  $data["user_settings"] = get_module_data('my', null);
 
 
   $block = $m->render('topbar', $data);
-  //$block .= dis_all_in_one_menu().$display['module'];
 
   return $block;
 }
@@ -1981,26 +1966,91 @@ function display_document_form($params, $label='') {
 
 }
 
-function dis_all_in_one_menu() {
-  global $uid, $ico_big_settings, $path, $cgp_show, $perm, $cright_read;
-  global $l_module_settings, $cright_write, $sections;
+function get_sections_data() {
+  global $cgp_show;
 
-  $block = '<div id="allinonemenu" class="allinonemenu">';
+  $sections_data = array();
 
   foreach($cgp_show['section'] as $section => $value){
-    //var_dump($value['url']);
-    $portlet_need = array('gw', 'admin', 'user', 'dic','my');
-    if( in_array($section, $portlet_need) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
+    $exceptions = array('my', 'webmail');
+    if( !in_array($section, $exceptions) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
       if (display_modules($section, null, true) !=''){
-        $portlet_title = "l_section_".$section;
-        $block .= "<h3>".$sections[$section]['Name']."</h3>";
-        $block .= display_modules($section, null, true);
+        $sections_data[] = get_module_data($section, null);
       }
     }
   }
-  $block.= "</div>";
-  return $block;
+
+  return $sections_data;
 }
 
+/*//////////////////////////////////////////////////////////////////////////////
+// Templating : Returns the section menus
+// Parameters:
+//   - $section : selected section
+//   - $module  : selected module
+
+  $data[] = array(
+    "section_name" => "section-key",
+    "name" => "section-name",
+    "links" => array( 
+      array( 'url' => "uri", "ico" => src_to_ico, "title" => "TxT", "tooltip" => "TxT"),
+      array( 'url' => "uri", "ico" => src_to_ico, "title" => "TxT",  "tooltip" => "TxT"),
+    )
+  );
+//////////////////////////////////////////////////////////////////////////////*/
+function get_module_data($section, $module) {
+  global $cme_txt, $cme_ico, $cme_both;
+  global $path, $perm, $modules, $cgp_show, $sections;
+
+  if (($_SESSION['set_menu'] == $cme_ico) || ($_SESSION['set_menu'] == $cme_both))
+    $fico = true;
+  else $fico = false;
+
+  if (($_SESSION['set_menu'] == $cme_txt) || ($_SESSION['set_menu'] == $cme_both))
+    $ftext = true;
+  else $ftext = false;
+
+  $section_link = array_keys($cgp_show['module'],$section);
+  if (is_array($section_link)) {
+    $id = $section.'Items';
+
+    $module_data = array();
+
+    $module_data["name"] = $sections[$section]['Name'];
+    $module_data["section_name"] = $section;
+
+    $module_data["links"] = array();
+
+
+    foreach ($section_link as $mod) {
+      $link_name = $modules[$mod]['Name'];
+      $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
+      $link_url = $modules[$mod]['Url'];
+
+      $link_right = $perm->get_module_rights($mod); 
+      if (($link_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
+
+        $link_target = $modules[$mod]['Target'];
+        if (!isset($link_target)) {
+          $link_target = "_self";
+        }
+
+        if ($fico) {
+          $link_ico = $modules[$mod]['Ico'];
+        }
+
+        $module_data["links"][] = array(
+          "url"     => $link_url, 
+          "target"  => $link_target, 
+          "ico"     => $link_ico, 
+          "title"   => $link_name, 
+          "tooltip" => $link_tooltip
+        );
+      }
+    }
+  }
+
+  return $module_data;
+}
 
 ?>

@@ -8,8 +8,10 @@
 		{{#links}}
 
 		<li>
-			<a href="{{url}}" class="ico" title="{{title}}"><img src="{{ico}}" alt="{{title}}"></a>
-			<a href="{{url}}" title="{{title}}">{{title}}</a>
+			<a href="{{url}}" target="{{target}}" title="{{tooltip}}">
+			{{#ico}} <img src="{{ico}}" class="ico" alt="{{tooltip}}"> {{/ico}}
+			{{title}}
+			</a>
 		</li>
 
 		{{/links}}

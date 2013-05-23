@@ -36,13 +36,13 @@
 
       {{#printer}}
         {{#dis_printer}}
-        <li><a href="#" onclick="popup(\'{{url}}\');" ><img src="{{ico}}" alt="Print" id="print" /></a></li>
+        <li><a href="#" onclick="popup(\'{{url}}\');" ><img src="{{ico}}" alt="Print" id="print" style="width:25px;margin-top:-5px;"/></a></li>
         {{/dis_printer}}
       {{/printer}}
 
       <li style="font-size:13px;">
 
-      <a href="#">
+      <a href="#" onclick="showProfileMenu()">
         {{login}}
         <img src="{{user_infos.photo_url}}" style="width:25px;border:2px solid #AAA; border-radius:5px;margin-top:-5px;"/>
       </a>
@@ -51,6 +51,7 @@
 
     </ul>
   </div>
-  
-</div>
 {{>more_menu}}
+
+{{>profile_menu}}
+</div>
