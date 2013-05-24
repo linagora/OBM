@@ -461,6 +461,13 @@ public final class DOMUtils {
 		return document;
 	}
 
+	public static Document createDocFromElement(Element el) {
+		Document doc = createDoc(el.getNamespaceURI(), el.getNodeName());
+		Node adoptedNode = doc.importNode(el, true);
+		doc.replaceChild(adoptedNode, doc.getFirstChild());
+		return doc;
+	}
+
 	public static void saxParse(InputStream is, DefaultHandler handler)
 			throws SAXException, IOException {
 		XMLReader reader = XMLReaderFactory.createXMLReader();

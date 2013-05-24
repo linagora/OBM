@@ -85,7 +85,7 @@ public class ProvisionResponse {
 		
 		public ProvisionResponse build() throws TransformerException {
 			String policyValue = serializePolicy();
-			return new ProvisionResponse(provisionStatus, policyStatus, policyKey, policyType, policyValue);
+			return new ProvisionResponse(provisionStatus, policyStatus, policyKey, policyType, policyData, policyValue);
 		}
 
 		private String serializePolicy() throws TransformerException {
@@ -102,14 +102,16 @@ public class ProvisionResponse {
 	private final Long policyKey;
 	private final String policyType;
 	private final String policyData;
+	private final Element policyDataEl;
 	
 	private ProvisionResponse(ProvisionStatus provisionStatus, ProvisionPolicyStatus policyStatus,
-			Long policyKey, String policyType, String policyData) {
+			Long policyKey, String policyType, Element policyDataEl, String policyData) {
 		
 		this.provisionStatus = provisionStatus;
 		this.policyKey = policyKey;
 		this.policyStatus =  policyStatus;
 		this.policyType = policyType;
+		this.policyDataEl = policyDataEl;
 		this.policyData = policyData;
 	}
 
@@ -137,6 +139,10 @@ public class ProvisionResponse {
 		return policyData;
 	}
 	
+	public Element getPolicyDataEl() {
+		return policyDataEl;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(provisionStatus, policyStatus, policyKey, policyType, policyData);
