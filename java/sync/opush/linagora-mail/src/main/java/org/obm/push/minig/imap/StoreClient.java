@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -49,7 +50,6 @@ import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
-import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.impl.MailThread;
 

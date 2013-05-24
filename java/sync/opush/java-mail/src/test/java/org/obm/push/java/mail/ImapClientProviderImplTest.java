@@ -48,8 +48,6 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.OpushImapFolder;
 
 @RunWith(SlowFilterRunner.class)
 public class ImapClientProviderImplTest {

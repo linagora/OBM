@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.command;
+package org.obm.push.java.mail;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
@@ -41,6 +41,7 @@ import com.sun.mail.iap.Response;
 
 
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.java.mail.UIDCopyMessage;
 
 @RunWith(SlowFilterRunner.class)
 public class UIDCopyMessageTest {

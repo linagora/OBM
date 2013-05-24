@@ -29,41 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.command;
+package org.obm.push.java.mail;
 
-import com.sun.mail.iap.Argument;
-import com.sun.mail.iap.ProtocolException;
-import com.sun.mail.iap.Response;
-import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
-import com.sun.mail.imap.protocol.BASE64MailboxEncoder;
-import com.sun.mail.imap.protocol.IMAPProtocol;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 
-public abstract class IMAPCommand<T> implements ProtocolCommand {
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
-	public Response doCommandThenGetLastResponse(IMAPProtocol protocol, String commandName, Argument commandArgs) throws ProtocolException {
-		Response[] responses = doCommandThenGetResponses(protocol, commandName, commandArgs);
-		return getLastResponse(responses);
+public class StreamMimeMessage extends MimeMessage {
+
+	private final InputStream messageStream;
+	private final int messageSize;
+	private final Date date;
+	
+	public StreamMimeMessage(Session session, InputStream message, int messageSize, Date date) {
+		super(session);
+		this.messageStream = message;
+		this.messageSize = messageSize;
+		this.date = date;
 	}
 	
-	public Response[] doCommandThenGetResponses(IMAPProtocol protocol, String commandName, Argument commandArgs) throws ProtocolException {
-		Response[] responses = protocol.command(commandName, commandArgs);
-
-		protocol.notifyResponseHandlers(responses);
-		protocol.handleResult(getLastResponse(responses));
-		
-		return responses;
-	}
-
-	private Response getLastResponse(Response[] responses) throws ProtocolException {
-		if (responses.length > 0) {
-			return responses[responses.length-1];
-		}
-		throw new ProtocolException("No response received from the IMAP Server");
+	@Override
+	public int getSize() throws MessagingException {
+		return messageSize;
 	}
 	
-	public String encodeMailboxForIMAP(final String mailbox) {
-		// encode the mbox as per RFC2060
-		return BASE64MailboxEncoder.encode(mailbox);
+	@Override
+	public Date getReceivedDate() throws MessagingException {
+		return date;
 	}
-
+	
+	@Override
+	public InputStream getInputStream() throws IOException, MessagingException {
+		return messageStream;
+	}
+	
+	@Override
+	protected InputStream getContentStream() throws MessagingException {
+		return messageStream;
+	}
+	
+	@Override
+	protected synchronized void updateHeaders() throws MessagingException {
+		// Do nothing, this message should already have its headers 
+	}
 }

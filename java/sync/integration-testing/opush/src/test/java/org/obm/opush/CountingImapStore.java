@@ -35,10 +35,10 @@ import javax.mail.Session;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.java.mail.ImapMailBoxUtils;
+import org.obm.push.java.mail.ImapStore;
 import org.obm.push.java.mail.ImapStoreImpl;
-import org.obm.push.mail.exception.ImapLoginException;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
+import org.obm.push.java.mail.exception.ImapLoginException;
+import org.obm.push.mail.MessageInputStreamProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

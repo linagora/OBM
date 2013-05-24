@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
+import org.obm.push.mail.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;

@@ -29,40 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail.exception;
 
-import java.io.InputStream;
-
-import org.obm.push.mail.mime.MimeAddress;
-
-import com.google.common.io.ByteStreams;
-import com.google.inject.Singleton;
-import com.sun.mail.imap.IMAPInputStream;
-import com.sun.mail.imap.IMAPMessage;
-
-@Singleton
-public class MessageInputStreamProviderImpl implements MessageInputStreamProvider {
-
-	private final static int NO_MAX_BYTE_COUNT = -1;
-	private final static boolean USE_PEEK = true;
+public class ImapLoginException extends ImapCommandException {
 	
-	@Override
-	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress) {
-		return new IMAPInputStream(messageToFetch, address(mimePartAddress), NO_MAX_BYTE_COUNT, USE_PEEK);
+	public ImapLoginException(String message, Throwable cause) {
+		super(message, cause);
 	}
 	
-	@Override
-	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit) {
-		IMAPInputStream imapInputStream = 
-				new IMAPInputStream(messageToFetch, address(mimePartAddress), NO_MAX_BYTE_COUNT, USE_PEEK);
-		return ByteStreams.limit(imapInputStream, limit);
-	}
-	
-	private String address(MimeAddress mimeAddress) {
-		if (mimeAddress != null) {
-			return mimeAddress.getAddress();
-		} else {
-			return null;
-		}
-	}	
 }

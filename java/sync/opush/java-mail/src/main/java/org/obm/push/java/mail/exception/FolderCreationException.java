@@ -29,12 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
+package org.obm.push.java.mail.exception;
 
-public class NoImapClientAvailableException extends Exception {
-
-	public NoImapClientAvailableException(String message, Throwable cause) {
+public class FolderCreationException extends ImapCommandException {
+	
+	public FolderCreationException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public FolderCreationException(String message) {
+		super(message);
 	}
 	
 }

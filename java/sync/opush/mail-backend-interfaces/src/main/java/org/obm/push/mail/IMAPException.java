@@ -29,12 +29,27 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
 
-public class ImapLogoutException extends RuntimeException {
+package org.obm.push.mail;
+
+public class IMAPException extends Exception {
 	
-	public ImapLogoutException(String message, Throwable cause) {
-		super(message, cause);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 673222847178210893L;
+
+	public IMAPException(Throwable e) {
+		super(e);
 	}
 	
+	public IMAPException(String s, Throwable e) {
+		super(s, e);
+	}
+	
+	public IMAPException(String s) {
+		super(s);
+	}
+	
+
 }

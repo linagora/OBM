@@ -43,6 +43,7 @@ import org.obm.push.backend.PushMonitoringManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;

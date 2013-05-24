@@ -29,11 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
+package org.obm.push.java.mail.exception;
 
-public class ImapLoginException extends ImapCommandException {
+public class ImapLogoutException extends RuntimeException {
 	
-	public ImapLoginException(String message, Throwable cause) {
+	public ImapLogoutException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	

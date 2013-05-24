@@ -86,6 +86,7 @@
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail-backend-testsuite</artifactId>
 			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

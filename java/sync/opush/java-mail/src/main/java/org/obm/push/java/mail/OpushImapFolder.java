@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.InputStream;
 import java.util.Date;

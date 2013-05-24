@@ -32,6 +32,7 @@
 package org.obm.push.mail.imap;
 
 import org.obm.push.bean.Resource;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 
 public interface MinigStoreClient extends Resource {

@@ -29,10 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap.command;
+package org.obm.push.java.mail;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;

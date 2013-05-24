@@ -34,7 +34,7 @@ package org.obm.push.minig.imap;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.obm.push.mail.imap.IMAPException;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.idle.IdleClientCallback;

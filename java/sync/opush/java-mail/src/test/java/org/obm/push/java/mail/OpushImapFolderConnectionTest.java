@@ -42,8 +42,6 @@ import javax.mail.MessagingException;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.OpushImapFolder;
 
 import com.sun.mail.imap.IMAPFolder;
 

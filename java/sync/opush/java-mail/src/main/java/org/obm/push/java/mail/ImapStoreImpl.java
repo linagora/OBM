@@ -43,21 +43,17 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.java.mail.exception.FolderCreationException;
+import org.obm.push.java.mail.exception.ImapCommandException;
+import org.obm.push.java.mail.exception.ImapLoginException;
+import org.obm.push.java.mail.exception.ImapLogoutException;
 import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MessageInputStreamProvider;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.ImapCapability;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.mail.exception.FolderCreationException;
-import org.obm.push.mail.exception.ImapCommandException;
-import org.obm.push.mail.exception.ImapLoginException;
-import org.obm.push.mail.exception.ImapLogoutException;
-import org.obm.push.mail.imap.ImapCapability;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.OpushImapFolder;
-import org.obm.push.mail.imap.StreamMimeMessage;
-import org.obm.push.mail.imap.StreamedLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

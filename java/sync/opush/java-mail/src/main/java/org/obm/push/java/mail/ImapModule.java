@@ -1,9 +1,8 @@
 package org.obm.push.java.mail;
 
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
+import org.obm.push.mail.MessageInputStreamProvider;
+import org.obm.push.mail.MessageInputStreamProviderImpl;
 
 import com.google.inject.AbstractModule;
 

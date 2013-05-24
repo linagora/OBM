@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
+package org.obm.push.java.mail.exception;
 
 public class ImapCommandException extends Exception {
 	

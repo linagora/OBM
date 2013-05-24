@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.idle;
 
-import org.obm.push.mail.imap.IMAPException;
+import org.obm.push.mail.IMAPException;
 
 public interface IdleClient {
 	

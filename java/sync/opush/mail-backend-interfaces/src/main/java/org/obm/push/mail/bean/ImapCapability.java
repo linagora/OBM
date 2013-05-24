@@ -29,27 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.push.mail.bean;
 
-package org.obm.push.mail.imap;
+public enum ImapCapability {
 
-public class IMAPException extends Exception {
+	UIDPLUS("UIDPLUS");
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 673222847178210893L;
+	private final String capability;
 
-	public IMAPException(Throwable e) {
-		super(e);
+	private ImapCapability(String capability) {
+		this.capability = capability;
 	}
 	
-	public IMAPException(String s, Throwable e) {
-		super(s, e);
+	public String capability() {
+		return capability;
 	}
-	
-	public IMAPException(String s) {
-		super(s);
-	}
-	
-
 }

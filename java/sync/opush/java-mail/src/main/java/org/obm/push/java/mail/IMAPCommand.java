@@ -29,16 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
+package org.obm.push.java.mail;
 
-public class FolderCreationException extends ImapCommandException {
+import com.sun.mail.iap.Argument;
+import com.sun.mail.iap.ProtocolException;
+import com.sun.mail.iap.Response;
+import com.sun.mail.imap.IMAPFolder.ProtocolCommand;
+import com.sun.mail.imap.protocol.BASE64MailboxEncoder;
+import com.sun.mail.imap.protocol.IMAPProtocol;
+
+public abstract class IMAPCommand<T> implements ProtocolCommand {
+
+	public Response doCommandThenGetLastResponse(IMAPProtocol protocol, String commandName, Argument commandArgs) throws ProtocolException {
+		Response[] responses = doCommandThenGetResponses(protocol, commandName, commandArgs);
+		return getLastResponse(responses);
+	}
 	
-	public FolderCreationException(String message, Throwable cause) {
-		super(message, cause);
+	public Response[] doCommandThenGetResponses(IMAPProtocol protocol, String commandName, Argument commandArgs) throws ProtocolException {
+		Response[] responses = protocol.command(commandName, commandArgs);
+
+		protocol.notifyResponseHandlers(responses);
+		protocol.handleResult(getLastResponse(responses));
+		
+		return responses;
 	}
 
-	public FolderCreationException(String message) {
-		super(message);
+	private Response getLastResponse(Response[] responses) throws ProtocolException {
+		if (responses.length > 0) {
+			return responses[responses.length-1];
+		}
+		throw new ProtocolException("No response received from the IMAP Server");
 	}
 	
+	public String encodeMailboxForIMAP(final String mailbox) {
+		// encode the mbox as per RFC2060
+		return BASE64MailboxEncoder.encode(mailbox);
+	}
+
 }

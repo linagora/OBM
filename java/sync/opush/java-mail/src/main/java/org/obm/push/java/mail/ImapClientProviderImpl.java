@@ -42,13 +42,10 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.mail.exception.ImapLoginException;
-import org.obm.push.mail.exception.NoImapClientAvailableException;
-import org.obm.push.mail.imap.IMAPException;
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.ImapStore.Factory;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.java.mail.exception.ImapLoginException;
+import org.obm.push.java.mail.exception.NoImapClientAvailableException;
+import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.MessageInputStreamProvider;
 import org.obm.push.service.OpushLocatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +63,7 @@ public class ImapClientProviderImpl {
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
 
 	
-	private final Factory imapStoreFactory;
+	private final ImapStore.Factory imapStoreFactory;
 	private final OpushLocatorService locatorService;
 	private final MessageInputStreamProvider messageInputStreamProvider;
 	private final boolean loginWithDomain;

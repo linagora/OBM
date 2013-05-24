@@ -32,9 +32,9 @@
 package org.obm.push;
 
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.MessageInputStreamProvider;
+import org.obm.push.mail.MessageInputStreamProviderImpl;
 import org.obm.push.mail.imap.LinagoraMailboxService;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.mail.imap.idle.IdleClient;

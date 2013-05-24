@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -40,14 +40,16 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 
 import org.obm.push.bean.Resource;
+import org.obm.push.java.mail.exception.FolderCreationException;
+import org.obm.push.java.mail.exception.ImapCommandException;
+import org.obm.push.java.mail.exception.ImapLoginException;
 import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.mail.MessageInputStreamProvider;
 import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.ImapCapability;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.mail.exception.FolderCreationException;
-import org.obm.push.mail.exception.ImapCommandException;
-import org.obm.push.mail.exception.ImapLoginException;
 
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;

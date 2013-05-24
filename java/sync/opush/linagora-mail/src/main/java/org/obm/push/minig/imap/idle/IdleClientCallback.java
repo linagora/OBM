@@ -35,7 +35,7 @@ package org.obm.push.minig.imap.idle;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.obm.push.mail.imap.IMAPException;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleLine;
 import org.obm.push.minig.imap.impl.ClientSupport;

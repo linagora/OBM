@@ -35,6 +35,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.OpushLocatorException;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.service.OpushLocatorService;

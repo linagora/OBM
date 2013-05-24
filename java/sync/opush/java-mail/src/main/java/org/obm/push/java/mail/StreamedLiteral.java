@@ -29,51 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
+import java.io.OutputStream;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import com.google.common.io.ByteStreams;
+import com.sun.mail.iap.Literal;
 
-public class StreamMimeMessage extends MimeMessage {
+public class StreamedLiteral implements Literal {
 
-	private final InputStream messageStream;
-	private final int messageSize;
-	private final Date date;
-	
-	public StreamMimeMessage(Session session, InputStream message, int messageSize, Date date) {
-		super(session);
-		this.messageStream = message;
-		this.messageSize = messageSize;
-		this.date = date;
+	private final InputStream message;
+	private final int length;
+    
+	public StreamedLiteral(InputStream messageStream, int length) {
+		this.message = messageStream;
+		this.length = length;
 	}
-	
+
 	@Override
-	public int getSize() throws MessagingException {
-		return messageSize;
+	public int size() {
+		return length;
 	}
-	
+
 	@Override
-	public Date getReceivedDate() throws MessagingException {
-		return date;
+	public void writeTo(OutputStream os) throws IOException {
+		ByteStreams.copy(message, os);
 	}
-	
-	@Override
-	public InputStream getInputStream() throws IOException, MessagingException {
-		return messageStream;
-	}
-	
-	@Override
-	protected InputStream getContentStream() throws MessagingException {
-		return messageStream;
-	}
-	
-	@Override
-	protected synchronized void updateHeaders() throws MessagingException {
-		// Do nothing, this message should already have its headers 
-	}
+
 }

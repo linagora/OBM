@@ -29,19 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.java.mail.exception;
 
-public enum ImapCapability {
+public class NoImapClientAvailableException extends Exception {
 
-	UIDPLUS("UIDPLUS");
-	
-	private final String capability;
-
-	private ImapCapability(String capability) {
-		this.capability = capability;
+	public NoImapClientAvailableException(String message, Throwable cause) {
+		super(message, cause);
 	}
 	
-	public String capability() {
-		return capability;
-	}
 }

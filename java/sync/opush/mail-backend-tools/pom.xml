@@ -34,6 +34,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
 		</dependency>

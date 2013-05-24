@@ -34,8 +34,6 @@ package org.obm.push.java.mail;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 
-import org.obm.push.mail.imap.ImapStore;
-import org.obm.push.mail.imap.OpushImapFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

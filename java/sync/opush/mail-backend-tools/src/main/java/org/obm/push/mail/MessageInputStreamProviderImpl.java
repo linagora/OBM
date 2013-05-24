@@ -29,33 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+
+import org.obm.push.mail.mime.MimeAddress;
 
 import com.google.common.io.ByteStreams;
-import com.sun.mail.iap.Literal;
+import com.google.inject.Singleton;
+import com.sun.mail.imap.IMAPInputStream;
+import com.sun.mail.imap.IMAPMessage;
 
-public class StreamedLiteral implements Literal {
+@Singleton
+public class MessageInputStreamProviderImpl implements MessageInputStreamProvider {
 
-	private final InputStream message;
-	private final int length;
-    
-	public StreamedLiteral(InputStream messageStream, int length) {
-		this.message = messageStream;
-		this.length = length;
-	}
-
+	private final static int NO_MAX_BYTE_COUNT = -1;
+	private final static boolean USE_PEEK = true;
+	
 	@Override
-	public int size() {
-		return length;
+	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress) {
+		return new IMAPInputStream(messageToFetch, address(mimePartAddress), NO_MAX_BYTE_COUNT, USE_PEEK);
 	}
-
+	
 	@Override
-	public void writeTo(OutputStream os) throws IOException {
-		ByteStreams.copy(message, os);
+	public InputStream createMessageInputStream(IMAPMessage messageToFetch, MimeAddress mimePartAddress, Integer limit) {
+		IMAPInputStream imapInputStream = 
+				new IMAPInputStream(messageToFetch, address(mimePartAddress), NO_MAX_BYTE_COUNT, USE_PEEK);
+		return ByteStreams.limit(imapInputStream, limit);
 	}
-
+	
+	private String address(MimeAddress mimeAddress) {
+		if (mimeAddress != null) {
+			return mimeAddress.getAddress();
+		} else {
+			return null;
+		}
+	}	
 }
