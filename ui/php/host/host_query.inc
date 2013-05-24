@@ -650,11 +650,16 @@ function get_host_delegations($ip, $host_id) {
   global $cdg_sql;
   $obm_q = new DB_OBM;
 
+  $where = "";
+
+  if( !empty($host_id) ){
+    $where = " host_id <> ".$host_id." AND ";
+  }
+
   $multidomain = sql_multidomain('host');
   $query = "SELECT host_delegation 
     FROM Host
-    WHERE host_id <> ".$host_id." 
-    AND host_ip='".$obm_q->escape($ip)."' $multidomain";
+    WHERE $where host_ip='".$obm_q->escape($ip)."' $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_name_exists()');
   $obm_q->query($query);
