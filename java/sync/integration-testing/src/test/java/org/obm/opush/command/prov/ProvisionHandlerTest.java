@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -66,6 +67,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
+import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
@@ -142,54 +144,54 @@ public class ProvisionHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
-		assertThat(provisionResponse.policyData()).isEqualTo(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-						"<Data>\n" +
-						"<EASProvisionDoc>\n" +
-						"<DevicePasswordEnabled>0</DevicePasswordEnabled>\n" +
-						"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>\n" +
-						"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>\n" +
-						"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>\n" +
-						"<AttachmentsEnabled>1</AttachmentsEnabled>\n" +
-						"<MinDevicePasswordLength>4</MinDevicePasswordLength>\n" +
-						"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>\n" +
-						"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>\n" +
-						"<MaxAttachmentSize/>\n" +
-						"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>\n" +
-						"<DevicePasswordExpiration/>\n" +
-						"<DevicePasswordHistory>0</DevicePasswordHistory>\n" +
-						"<AllowStorageCard>1</AllowStorageCard>\n" +
-						"<AllowCamera>1</AllowCamera>\n" +
-						"<RequireDeviceEncryption>0</RequireDeviceEncryption>\n" +
-						"<AllowUnsignedApplications>1</AllowUnsignedApplications>\n" +
-						"<AllowUnsignedInstallationPackages>1</AllowUnsignedInstallationPackages>\n" +
-						"<MinDevicePasswordComplexCharacters>3</MinDevicePasswordComplexCharacters>\n" +
-						"<AllowWiFi>1</AllowWiFi>\n" +
-						"<AllowTextMessaging>1</AllowTextMessaging>\n" +
-						"<AllowPOPIMAPEmail>1</AllowPOPIMAPEmail>\n" +
-						"<AllowBluetooth>2</AllowBluetooth>\n" +
-						"<AllowIrDA>1</AllowIrDA>\n" +
-						"<RequireManualSyncWhenRoaming>0</RequireManualSyncWhenRoaming>\n" +
-						"<AllowDesktopSync>1</AllowDesktopSync>\n" +
-						"<MaxCalendarAgeFilter>0</MaxCalendarAgeFilter>\n" +
-						"<AllowHTMLEmail>1</AllowHTMLEmail>\n" +
-						"<MaxEmailAgeFilter>0</MaxEmailAgeFilter>\n" +
-						"<MaxEmailBodyTruncationSize>-1</MaxEmailBodyTruncationSize>\n" +
-						"<MaxEmailHTMLBodyTruncationSize>-1</MaxEmailHTMLBodyTruncationSize>\n" +
-						"<RequireSignedSMIMEMessages>0</RequireSignedSMIMEMessages>\n" +
-						"<RequireEncryptedSMIMEMessages>0</RequireEncryptedSMIMEMessages>\n" +
-						"<RequireSignedSMIMEAlgorithm>0</RequireSignedSMIMEAlgorithm>\n" +
-						"<RequireEncryptionSMIMEAlgorithm>0</RequireEncryptionSMIMEAlgorithm>\n" +
-						"<AllowSMIMEEncryptionAlgorithmNegotiation>2</AllowSMIMEEncryptionAlgorithmNegotiation>\n" +
-						"<AllowSMIMESoftCerts>1</AllowSMIMESoftCerts>\n" +
-						"<AllowBrowser>1</AllowBrowser>\n" +
-						"<AllowConsumerEmail>1</AllowConsumerEmail>\n" +
-						"<AllowRemoteDesktop>1</AllowRemoteDesktop>\n" +
-						"<AllowInternetSharing>1</AllowInternetSharing>\n" +
-						"<UnapprovedInROMApplicationList/>\n" +
-						"<ApprovedApplicationList/>\n" +
-						"</EASProvisionDoc>\n" +
-						"</Data>\n");
+		XMLAssert.assertXMLEqual(DOMUtils.createDocFromElement(provisionResponse.getPolicyDataEl()), DOMUtils.parse(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+					"<Data>" +
+					"<EASProvisionDoc>" +
+					"<DevicePasswordEnabled>0</DevicePasswordEnabled>" +
+					"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>" +
+					"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>" +
+					"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>" +
+					"<AttachmentsEnabled>1</AttachmentsEnabled>" +
+					"<MinDevicePasswordLength>4</MinDevicePasswordLength>" +
+					"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>" +
+					"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>" +
+					"<MaxAttachmentSize/>" +
+					"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>" +
+					"<DevicePasswordExpiration/>" +
+					"<DevicePasswordHistory>0</DevicePasswordHistory>" +
+					"<AllowStorageCard>1</AllowStorageCard>" +
+					"<AllowCamera>1</AllowCamera>" +
+					"<RequireDeviceEncryption>0</RequireDeviceEncryption>" +
+					"<AllowUnsignedApplications>1</AllowUnsignedApplications>" +
+					"<AllowUnsignedInstallationPackages>1</AllowUnsignedInstallationPackages>" +
+					"<MinDevicePasswordComplexCharacters>3</MinDevicePasswordComplexCharacters>" +
+					"<AllowWiFi>1</AllowWiFi>" +
+					"<AllowTextMessaging>1</AllowTextMessaging>" +
+					"<AllowPOPIMAPEmail>1</AllowPOPIMAPEmail>" +
+					"<AllowBluetooth>2</AllowBluetooth>" +
+					"<AllowIrDA>1</AllowIrDA>" +
+					"<RequireManualSyncWhenRoaming>0</RequireManualSyncWhenRoaming>" +
+					"<AllowDesktopSync>1</AllowDesktopSync>" +
+					"<MaxCalendarAgeFilter>0</MaxCalendarAgeFilter>" +
+					"<AllowHTMLEmail>1</AllowHTMLEmail>" +
+					"<MaxEmailAgeFilter>0</MaxEmailAgeFilter>" +
+					"<MaxEmailBodyTruncationSize>-1</MaxEmailBodyTruncationSize>" +
+					"<MaxEmailHTMLBodyTruncationSize>-1</MaxEmailHTMLBodyTruncationSize>" +
+					"<RequireSignedSMIMEMessages>0</RequireSignedSMIMEMessages>" +
+					"<RequireEncryptedSMIMEMessages>0</RequireEncryptedSMIMEMessages>" +
+					"<RequireSignedSMIMEAlgorithm>0</RequireSignedSMIMEAlgorithm>" +
+					"<RequireEncryptionSMIMEAlgorithm>0</RequireEncryptionSMIMEAlgorithm>" +
+					"<AllowSMIMEEncryptionAlgorithmNegotiation>2</AllowSMIMEEncryptionAlgorithmNegotiation>" +
+					"<AllowSMIMESoftCerts>1</AllowSMIMESoftCerts>" +
+					"<AllowBrowser>1</AllowBrowser>" +
+					"<AllowConsumerEmail>1</AllowConsumerEmail>" +
+					"<AllowRemoteDesktop>1</AllowRemoteDesktop>" +
+					"<AllowInternetSharing>1</AllowInternetSharing>" +
+					"<UnapprovedInROMApplicationList/>" +
+					"<ApprovedApplicationList/>" +
+					"</EASProvisionDoc>" +
+					"</Data>"));
 	}
 	
 	@Test
@@ -212,24 +214,24 @@ public class ProvisionHandlerTest {
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V120);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
-		assertThat(provisionResponse.policyData()).isEqualTo(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-						"<Data>\n" +
-						"<EASProvisionDoc>\n" +
-						"<DevicePasswordEnabled>0</DevicePasswordEnabled>\n" +
-						"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>\n" +
-						"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>\n" +
-						"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>\n" +
-						"<AttachmentsEnabled>1</AttachmentsEnabled>\n" +
-						"<MinDevicePasswordLength>4</MinDevicePasswordLength>\n" +
-						"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>\n" +
-						"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>\n" +
-						"<MaxAttachmentSize/>\n" +
-						"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>\n" +
-						"<DevicePasswordExpiration/>\n" +
-						"<DevicePasswordHistory>0</DevicePasswordHistory>\n" +
-						"</EASProvisionDoc>\n" +
-						"</Data>\n");
+		XMLAssert.assertXMLEqual(DOMUtils.createDocFromElement(provisionResponse.getPolicyDataEl()), DOMUtils.parse(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+					"<Data>" +
+					"<EASProvisionDoc>" +
+					"<DevicePasswordEnabled>0</DevicePasswordEnabled>" +
+					"<AlphanumericDevicePasswordRequired>0</AlphanumericDevicePasswordRequired>" +
+					"<PasswordRecoveryEnabled>0</PasswordRecoveryEnabled>" +
+					"<DeviceEncryptionEnabled>0</DeviceEncryptionEnabled>" +
+					"<AttachmentsEnabled>1</AttachmentsEnabled>" +
+					"<MinDevicePasswordLength>4</MinDevicePasswordLength>" +
+					"<MaxInactivityTimeDeviceLock>900</MaxInactivityTimeDeviceLock>" +
+					"<MaxDevicePasswordFailedAttempts>8</MaxDevicePasswordFailedAttempts>" +
+					"<MaxAttachmentSize/>" +
+					"<AllowSimpleDevicePassword>1</AllowSimpleDevicePassword>" +
+					"<DevicePasswordExpiration/>" +
+					"<DevicePasswordHistory>0</DevicePasswordHistory>" +
+					"</EASProvisionDoc>" +
+					"</Data>"));
 	}
 
 	@Test
@@ -283,7 +285,10 @@ public class ProvisionHandlerTest {
 		ProvisionResponse provisionResponse1 = opClient.provisionStepOne();
 		ProvisionResponse provisionResponse2 = opClient.provisionStepOne();
 
-		assertThat(provisionResponse1).isNotNull().isEqualTo(provisionResponse2).isEqualsToByComparingFields(provisionResponse2);
+		assertThat(provisionResponse1).isNotNull().isEqualTo(provisionResponse2);
+		XMLAssert.assertXMLEqual(
+				DOMUtils.createDocFromElement(provisionResponse1.getPolicyDataEl()),
+				DOMUtils.createDocFromElement(provisionResponse2.getPolicyDataEl()));
 	}
 
 	@Test

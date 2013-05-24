@@ -43,6 +43,7 @@ import java.util.Arrays;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
+import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -51,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
@@ -247,6 +249,60 @@ public class DOMUtilsTest {
 					"</ROOT>\n" +
 				"</BODY>\n" +
 			"</HTML>\n");
+	}
+	
+	@Test
+	public void testCreateDocFromElement() throws SAXException, IOException {
+		Document initialDoc = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FirstNode>" +
+					"<SubNode>text</SubNode>" +
+				"</FirstNode>");
+		Element subNode = DOMUtils.getUniqueElement(initialDoc.getDocumentElement(), "SubNode");
+		
+		Document subNodeAsDoc = DOMUtils.createDocFromElement(subNode);
+		
+		XMLAssert.assertXMLEqual(subNodeAsDoc, DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<SubNode>text</SubNode>"));
+	}
+	
+	@Test
+	public void testCreateDocFromElementDeeply() throws SAXException, IOException {
+		Document initialDoc = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FirstNode>" +
+					"<SubNode>" +
+						"<SubSubOne>one</SubSubOne>" +
+						"<SubSubTwo>two</SubSubTwo>" +
+					"</SubNode>" +
+				"</FirstNode>");
+		Element subNode = DOMUtils.getUniqueElement(initialDoc.getDocumentElement(), "SubNode");
+		
+		Document subNodeAsDoc = DOMUtils.createDocFromElement(subNode);
+		
+		XMLAssert.assertXMLEqual(subNodeAsDoc, DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<SubNode>" +
+					"<SubSubOne>one</SubSubOne>" +
+					"<SubSubTwo>two</SubSubTwo>" +
+				"</SubNode>"));
+	}
+	
+	@Test
+	public void testCreateDocFromElementWithNamespace() throws SAXException, IOException {
+		Document initialDoc = DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<FirstNode xmlns=\"http://www.w3.org/1999/xhtml\">" +
+					"<SubNode>text</SubNode>" +
+				"</FirstNode>");
+		Element subNode = DOMUtils.getUniqueElement(initialDoc.getDocumentElement(), "SubNode");
+		
+		Document subNodeAsDoc = DOMUtils.createDocFromElement(subNode);
+		
+		XMLAssert.assertXMLEqual(subNodeAsDoc, DOMUtils.parse(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<SubNode xmlns=\"http://www.w3.org/1999/xhtml\">text</SubNode>"));
 	}
 }
 
