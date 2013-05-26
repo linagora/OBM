@@ -107,27 +107,29 @@ public class TransactionalBinderTest {
 		
 		Assert.assertEquals(mockTransactional, transactionalReturned);
 	}
-	
-	@Test(expected=TransactionException.class)
-	public void testGetCurrentTransactionalWithoutExistingTransaction() throws SystemException, TransactionException{
-		
+
+	@Test
+	public void testGetCurrentTransactionalWithoutExistingTransaction() throws Exception {
 		expect(mockTransactionManager.getTransaction()).andReturn(null).once();
 		
 		control.replay();
 		
-		attributeBinder.getTransactionalInCurrentTransaction();
+		Transactional transactional = attributeBinder.getTransactionalInCurrentTransaction();
 		control.verify();
+
+		Assert.assertNull(transactional);
 	}
-	
-	@Test(expected=TransactionException.class)
-	public void testGetCurrentTransactionalWithUnknownTransaction() throws SystemException, TransactionException{
-		
+
+	@Test
+	public void testGetCurrentTransactionalWithUnknownTransaction() throws Exception {
 		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
 		
 		control.replay();
 		
-		attributeBinder.getTransactionalInCurrentTransaction();
+		Transactional transactional = attributeBinder.getTransactionalInCurrentTransaction();
 		control.verify();
+
+		Assert.assertNull(transactional);
 	}
 	
 	@Test
@@ -153,20 +155,19 @@ public class TransactionalBinderTest {
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
 		control.verify();
 	}
-	
-	@Test(expected=TransactionException.class)
-	public void testGetCurrentTransactionalWithInvalidateTransaction() throws SystemException, TransactionException {
-		
-		
+
+	@Test
+	public void testGetCurrentTransactionalWithInvalidateTransaction() throws Exception {
 		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(3);
-		
 		
 		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
-		attributeBinder.getTransactionalInCurrentTransaction();
+		Transactional transactional = attributeBinder.getTransactionalInCurrentTransaction();
 		control.verify();
+
+		Assert.assertNull(transactional);
 	}
 	
 	@Test(expected=TransactionException.class)

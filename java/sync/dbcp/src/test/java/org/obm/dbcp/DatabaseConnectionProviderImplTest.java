@@ -68,11 +68,7 @@ public class DatabaseConnectionProviderImplTest {
 		transactional = control.createMock(Transactional.class);
 		connection = control.createMock(Connection.class);
 
-		dbConnProvider = new DatabaseConnectionProviderImpl(
-				transactionAttributeBinder,
-				new DatabaseConfigurationFixturePostgreSQL(),
-				new PostgresDriverConfiguration(),
-				createNiceMock(Logger.class));
+		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, new DatabaseConfigurationFixturePostgreSQL(), new PostgresDriverConfiguration(), createNiceMock(Logger.class));
 	}
 
 	@After
@@ -98,6 +94,23 @@ public class DatabaseConnectionProviderImplTest {
 	}
 
 	@Test
+	public void testIsReadOnlyTransactionWhenFalse() throws TransactionException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		control.replay();
+
+		assertThat(dbConnProvider.isReadOnlyTransaction()).isFalse();
+	}
+
+	@Test
+	public void testIsReadOnlyTransactionWhenNoTransactional() throws TransactionException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(null).once();
+		control.replay();
+
+		assertThat(dbConnProvider.isReadOnlyTransaction()).isTrue();
+	}
+
+	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyButConnectionReadWrite() throws TransactionException, SQLException {
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(true).once();
@@ -109,4 +122,35 @@ public class DatabaseConnectionProviderImplTest {
 		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
 	}
 
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteButConnectionReadOnly() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		expect(connection.isReadOnly()).andReturn(true).once();
+		connection.setReadOnly(false);
+		expectLastCall().once();
+		control.replay();
+
+		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+	}
+
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyAndConnectionReadOnly() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(true).once();
+		expect(connection.isReadOnly()).andReturn(true).once();
+		control.replay();
+
+		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+	}
+
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteAndConnectionReadWrite() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		expect(connection.isReadOnly()).andReturn(false).once();
+		control.replay();
+
+		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+	}
 }

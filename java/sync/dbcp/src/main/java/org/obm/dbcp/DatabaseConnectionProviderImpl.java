@@ -160,7 +160,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 	@VisibleForTesting boolean isReadOnlyTransaction() throws TransactionException {
 		Transactional transactional = transactionAttributeBinder.getTransactionalInCurrentTransaction();
-		return transactional.readOnly();
+		return transactional == null || transactional.readOnly();
 	}
 
 	public void cleanup() {
