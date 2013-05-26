@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
@@ -57,36 +56,48 @@ public class TransactionalBinder implements ITransactionAttributeBinder {
 	@Override
 	public Transactional getTransactionalInCurrentTransaction() throws TransactionException {
 		Transaction transaction = getCurrentTransaction();
-		Transactional transactional = transactionAttributeCache.get(transaction);
-		if(transactional == null){
-			throw new TransactionException(
-					"Nothing is linked to the current transaction");
+
+		if (transaction == null) {
+			return null;
 		}
+
+		Transactional transactional = transactionAttributeCache.get(transaction);
+
+		if(transactional == null){
+			return null;
+		}
+
 		return transactional;
 	}
 
 	@Override
 	public void bindTransactionalToCurrentTransaction(Transactional transactional)
 			throws TransactionException {
-		Transaction transaction = getCurrentTransaction();
+		Transaction transaction = getRequiredCurrentTransaction();
 		transactionAttributeCache.put(transaction, transactional);
 	}
 
 	@Override
 	public void invalidateTransactionalInCurrentTransaction() throws TransactionException {
-		Transaction transaction = getCurrentTransaction();
+		Transaction transaction = getRequiredCurrentTransaction();
 		transactionAttributeCache.remove(transaction);
+	}
+
+	private Transaction getRequiredCurrentTransaction() throws TransactionException {
+		Transaction transaction = getCurrentTransaction();
+
+		if (transaction == null) {
+			throw new TransactionException("No active transaction have been found");
+		}
+
+		return transaction;
 	}
 
 	private Transaction getCurrentTransaction() throws TransactionException {
 		try {
-			Transaction transaction = transactionManager.getTransaction();
-			if (transaction == null) {
-				throw new TransactionException(
-						"No active transaction have been found");
-			}
-			return transaction;
-		} catch (SystemException e) {
+			return transactionManager.getTransaction();
+		}
+		catch (Exception e) {
 			throw new TransactionException(e);
 		}
 

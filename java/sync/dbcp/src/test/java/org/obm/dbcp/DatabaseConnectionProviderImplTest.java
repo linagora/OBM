@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -107,6 +107,23 @@ public class DatabaseConnectionProviderImplTest {
 	}
 
 	@Test
+	public void testIsReadOnlyTransactionWhenFalse() throws TransactionException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		control.replay();
+
+		assertThat(databaseConnectionProvider().isReadOnlyTransaction()).isFalse();
+	}
+
+	@Test
+	public void testIsReadOnlyTransactionWhenNoTransactional() throws TransactionException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(null).once();
+		control.replay();
+
+		assertThat(databaseConnectionProvider().isReadOnlyTransaction()).isTrue();
+	}
+
+	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyButConnectionReadWrite() throws TransactionException, SQLException {
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(true).once();
@@ -118,4 +135,35 @@ public class DatabaseConnectionProviderImplTest {
 		databaseConnectionProvider().setConnectionReadOnlyIfNecessary(connection);
 	}
 
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteButConnectionReadOnly() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		expect(connection.isReadOnly()).andReturn(true).once();
+		connection.setReadOnly(false);
+		expectLastCall().once();
+		control.replay();
+
+		databaseConnectionProvider().setConnectionReadOnlyIfNecessary(connection);
+	}
+
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyAndConnectionReadOnly() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(true).once();
+		expect(connection.isReadOnly()).andReturn(true).once();
+		control.replay();
+
+		databaseConnectionProvider().setConnectionReadOnlyIfNecessary(connection);
+	}
+
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteAndConnectionReadWrite() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(false).once();
+		expect(connection.isReadOnly()).andReturn(false).once();
+		control.replay();
+
+		databaseConnectionProvider().setConnectionReadOnlyIfNecessary(connection);
+	}
 }
