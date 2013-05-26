@@ -32,69 +32,81 @@
 
 package org.obm.dbcp;
 
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
+import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 
-
+@RunWith(SlowFilterRunner.class)
 public class DatabaseConnectionProviderImplTest {
 
+	private IMocksControl control = createControl();
 	private DatabaseConnectionProviderImpl dbConnProvider;
 	private ITransactionAttributeBinder transactionAttributeBinder;
-	private DatabaseConfiguration databaseConfiguration;
-	private PostgresDriverConfiguration databaseDriverConfiguration;
+	private Transactional transactional;
+	private Connection connection;
 
 	@Before
 	public void setUp() {
-		Logger logger = EasyMock.createNiceMock(Logger.class);
-		transactionAttributeBinder = EasyMock.createMock(ITransactionAttributeBinder.class);
-		databaseConfiguration = new DatabaseConfigurationFixturePostgreSQL();
-		databaseDriverConfiguration = new PostgresDriverConfiguration();
+		transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
+		transactional = control.createMock(Transactional.class);
+		connection = control.createMock(Connection.class);
+
 		dbConnProvider = new DatabaseConnectionProviderImpl(
-				transactionAttributeBinder, 
-				databaseConfiguration, 
-				databaseDriverConfiguration,
-				logger);
+				transactionAttributeBinder,
+				new DatabaseConfigurationFixturePostgreSQL(),
+				new PostgresDriverConfiguration(),
+				createNiceMock(Logger.class));
 	}
 
-	@Test(expected=SQLException.class)
-	public void testGetConnection() throws SQLException {
-			dbConnProvider.getConnection();
-	}
-	
-	@Test
-	public void testIsReadOnlyTransactionWhenTrue() throws TransactionException {
-	    Transactional transactional = EasyMock.createMock(Transactional.class);
-	    EasyMock.expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
-	    EasyMock.expect(transactional.readOnly()).andReturn(true).once();
-	    EasyMock.replay(transactionAttributeBinder, transactional);
-	    Assert.assertTrue(dbConnProvider.isReadOnlyTransaction());
-	}
-	
-	@Test
-	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyButConnectionReadWrite() throws TransactionException, SQLException {
-	    Connection connection = EasyMock.createMock(Connection.class);
-	    Transactional transactional = EasyMock.createMock(Transactional.class);
-	    EasyMock.expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
-	    EasyMock.expect(transactional.readOnly()).andReturn(true).once();
-	    EasyMock.expect(connection.isReadOnly()).andReturn(false).once();
-	    connection.setReadOnly(true);
-	    EasyMock.expectLastCall().once();
-	}
-	
 	@After
 	public void tearDown() {
-	    dbConnProvider.cleanup();
+		dbConnProvider.cleanup();
+		control.verify();
 	}
+
+	@Test(expected = SQLException.class)
+	public void testGetConnection() throws SQLException {
+		control.replay();
+
+		dbConnProvider.getConnection();
+	}
+
+	@Test
+	public void testIsReadOnlyTransactionWhenTrue() throws TransactionException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(true).once();
+		control.replay();
+
+		assertThat(dbConnProvider.isReadOnlyTransaction()).isTrue();
+	}
+
+	@Test
+	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyButConnectionReadWrite() throws TransactionException, SQLException {
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
+		expect(transactional.readOnly()).andReturn(true).once();
+		expect(connection.isReadOnly()).andReturn(false).once();
+		connection.setReadOnly(true);
+		expectLastCall().once();
+		control.replay();
+
+		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+	}
+
 }
