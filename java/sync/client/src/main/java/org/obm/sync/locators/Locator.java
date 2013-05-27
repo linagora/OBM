@@ -32,15 +32,21 @@
 package org.obm.sync.locators;
 
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class Locator {
 
+	protected static final String OBM_SYNC_SERVICE = "sync/obm_sync";
+	protected static final String OBM_SYNC_HOST = "obmSyncHost";
+	
 	private final LocatorService locatorService;
 	private final ConfigurationService configurationService;
 
@@ -55,8 +61,12 @@ public class Locator {
 		return configurationService.getObmSyncUrl(obmSyncHost);
 	}
 	
-	private String getObmSyncHost(String loginAtDomain) throws LocatorClientException {
-		return locatorService.getServiceLocation("sync/obm_sync", loginAtDomain);
+	@VisibleForTesting String getObmSyncHost(String loginAtDomain) throws LocatorClientException {
+		String obmSyncHost = VMArgumentsUtils.stringArgumentValue(OBM_SYNC_HOST);
+		if (Strings.isNullOrEmpty(obmSyncHost)) {
+			return locatorService.getServiceLocation(OBM_SYNC_SERVICE, loginAtDomain);
+		}
+		return obmSyncHost;
 	}
 	
 }
