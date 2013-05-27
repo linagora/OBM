@@ -7660,6 +7660,10 @@ Class CalendarView {
     return $message;
   }
 
+  public function useCalendarTimeForCreationWithTemplate() {
+    return $this->cal_range != 'month';
+  }
+
   protected function insert() {
     global $cdg_sql, $obm;
 
