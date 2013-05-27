@@ -93,6 +93,16 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>mail-backend-interfaces</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>mail-backend-tools</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-mail</artifactId>
 			<version>${obm.version}</version>
 			<type>test-jar</type>

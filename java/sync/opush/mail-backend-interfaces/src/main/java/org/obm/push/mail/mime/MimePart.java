@@ -29,385 +29,97 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.mail.mime;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
+import org.obm.push.mail.bean.IMAPHeaders;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
-public class MimePart extends AbstractMimePart implements IMimePart {
+public interface MimePart {
 
-	private static final String BASE64 = "BASE64";
-	private static final String QUOTED_PRINTABLE = "QUOTED-PRINTABLE";
-	
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static Builder embeddedMessageBuilder() {
-		return new EmbeddedMessageBuilder();
-	}
-	
-	public static class Builder implements IMimePart.Builder<MimePart> {
+	interface Builder<T extends MimePart> {
 		
-		protected String multipartSubType;
-		protected String contentId;
-		protected String encoding;
-		protected Integer size;
-		protected List<IMimePart> children;
-		protected org.obm.push.mail.mime.ContentType.Builder contentTypeBuilder;
-
-		private Builder() {
-			children = Lists.newArrayList();
-			contentTypeBuilder = ContentType.builder();
-		}
+		Builder<T> addChild(MimePart mimePart);
 		
-		public Builder primaryMimeType(String primaryMimeType) {
-			this.contentTypeBuilder.primaryType(primaryMimeType);
-			return this;
-		}
-		
-		public Builder subMimeType(String subMimeType) {
-			this.contentTypeBuilder.subType(subMimeType);
-			return this;
-		}
-		
-		public Builder contentId(String contentId) {
-			this.contentId = contentId;
-			return this;
-		}
-		
-		public Builder encoding(String encoding) {
-			this.encoding = encoding;
-			return this;
-		}
-		
-		public Builder size(Integer size) {
-			this.size = size;
-			return this;
-		}
-		
-		public Builder bodyParams(BodyParams bodyParams) {
-			this.contentTypeBuilder.add(bodyParams);
-			return this;
-		}
-
-		public Builder contentDisposition(String contentDisposition) {
-			this.contentTypeBuilder.contentDisposition(contentDisposition);
-			return this;
-		}
-
-		public Builder contentType(	String contentType) {
-			this.contentTypeBuilder.contentType(contentType);
-			return this;
-		}
-		
-		@Override
-		public Builder addChild(IMimePart mimePart) {
-			this.children.add(mimePart);
-			return this;
-		}
-		
-		public Builder addChildren(MimePart... mimeParts) {
-			return addChildren(Arrays.asList(mimeParts));
-		}
-		
-		public Builder addChildren(Iterable<MimePart> mimeParts) {
-			for (MimePart mimePart: mimeParts) {
-				addChild(mimePart);
-			}
-			return this;
-		}
-		
-		public MimePart build() {
-			return new MimePart(contentTypeBuilder.build(), children, contentId, encoding, size, multipartSubType);
-		}
-
 	}
 
-	public static class EmbeddedMessageBuilder extends Builder {
-		
-		private void mergeMultipartWithMessage() {
-			IMimePart firstChild = Iterables.getFirst(children, null);
-			if (firstChild == null) {
-				throw new IllegalStateException("Embedded Message/RFC822 must have at least one mime part");
-			}
-			if (firstChild.isMultipart()) {
-				bodyParams(firstChild.getBodyParams());
-				this.children = firstChild.getChildren();
-				this.multipartSubType = firstChild.getSubtype();
-			}
-		}
-		
-		@Override
-		public MimePart build() {
-			mergeMultipartWithMessage();
-			return super.build();
-		}
-	}
+	ContentType getContentType();
 	
-	private IMimePart parent;
-	private int idx;
-	private final ContentType contentType;
-	private final String contentTransfertEncoding;
-	private final String contentId;
-	private final Integer size;
-	private final String multipartSubType;
-	
-	private MimePart(ContentType contentType, List<IMimePart> children, String contentId, String encoding, Integer size, String multipartSubType) {
-		super(children, contentType.getBodyParams());
-		this.contentType = contentType;
-		this.contentId = contentId;
-		this.contentTransfertEncoding = encoding;
-		this.size = size;
-		this.multipartSubType = multipartSubType;
-	}
+	String getPrimaryType();
 
-	@Override
-	public void defineParent(IMimePart parent, int index) {
-		idx = index;
-		this.parent = parent;
-	}
-	
-	@Override
-	public ContentType getContentType() {
-		return contentType;
-	}
-	
-	@Override
-	public String getPrimaryType() {
-		return contentType.getPrimaryType();
-	}
-	
-	@Override
-	public String getSubtype() {
-		return contentType.getSubType();
-	}
+	String getSubtype();
 
-	@Override
-	public MimeAddress getAddressInternal() {
-		return MimeAddress.concat(getParentAddressInternal(), selfAddress());
-	}
+	List<MimePart> getChildren();
 
-	private MimeAddress getParentAddressInternal() {
-		if (parent != null) {
-			return parent.getAddressInternal();
-		}
-		return null;
-	}
+	List<MimePart> getSibling();
 	
-	@Override
-	public MimeAddress getAddress() {
-		if (!isMultipart()) {
-			return getAddressInternal();
-		}
-		return null;
-	}
+	MimeAddress getAddress();
+	
+	MimeAddress getAddressInternal();
 
-	@Override
-	public boolean isMultipart() {
-		return getPrimaryType() == null || getPrimaryType().equals("multipart");
-	}
-	
-	private Integer selfAddress() {
-		if (parent == null) {
-			if (isMultipart()) {
-				return null;
-			}
-			return 1;
-		}
-		return idx;
-	}
+	BodyParams getBodyParams();
 
-	@Override
-	public String getFullMimeType() {
-		return contentType.getFullMimeType();
-	}
+	BodyParam getBodyParam(final String param);
 
-	@Override
-	public String getContentTransfertEncoding() {
-		return contentTransfertEncoding;
-	}
+	MimePart getParent();
 
-	@Override
-	public String getCharset() {
-		BodyParam bodyParam = getBodyParam("charset");
-		if (bodyParam != null) {
-			return bodyParam.getValue();
-		}
-		return null;
-	}
-	
-	@Override
-	public boolean isAttachment() {
-		return (idx > 1	
-				&& !isMultipart()
-				&& contentTypeIsAttachment());
-	}
+	Collection<MimePart> listLeaves(boolean depthFirst, boolean filterNested);
 
-	private boolean contentTypeIsAttachment() {
-		if (contentType.getContentDisposition() == ContentDisposition.ATTACHMENT) {
-			return true;
-		}
-		if (contentType.getPrimaryType().equalsIgnoreCase("message")
-			|| contentType.getPrimaryType().equalsIgnoreCase("application")) {
-			return true;
-		}
-		return false;
-	}
+	void defineParent(MimePart parent, int index);
 
-	@Override
-	public String getContentId() {
-		return contentId;
-	}
+	String getFullMimeType();
 
-	@Override
-	public IMimePart getParent() {
-		return parent;
-	}
+	boolean isInvitation();
 
-	private String retrieveMethodFromCalendarPart() {
-		if ("text/calendar".equals(getFullMimeType())) {
-			BodyParam method = getBodyParam("method");
-			if (method != null) {
-				return method.getValue();
-			}
-		}
-		return null;
-	}
+	String getContentTransfertEncoding();
+	
+	String getCharset();
 
-	@Override
-	public boolean isInvitation() {
-		String method = retrieveMethodFromCalendarPart();
-		return "REQUEST".equalsIgnoreCase(method);
-	}
-	
-	@Override
-	public boolean isCancelInvitation() {
-		String method = retrieveMethodFromCalendarPart();
-		return "CANCEL".equalsIgnoreCase(method);
-	}
-	
-	@Override
-	public boolean isReplyInvitation() {
-		String method = retrieveMethodFromCalendarPart();
-		return "REPLY".equalsIgnoreCase(method);
-	}
-	
-	@Override
-	public boolean isNested() {
-		return getFullMimeType().equalsIgnoreCase("message/rfc822");
-	}
-	
-	@Override
-	public String getName() {
-		BodyParam name = getBodyParam("name");
-		if (name != null && name.getValue() != null) {
-			return name.getValue();
-		}
-		BodyParam filename = getBodyParam("filename");
-		if (filename != null && filename.getValue() != null) {
-			return filename.getValue();
-		}
-		return null;
-	}
-	
-	@Override
-	public String getMultipartSubtype() {
-		if (multipartSubType != null) {
-			return multipartSubType;
-		}
-		return getSubtype();
-	}
-	
-	@Override
-	public List<IMimePart> getSibling() {
-		if (parent != null) {
-			ArrayList<IMimePart> copy = Lists.newArrayList(parent.getChildren());
-			copy.remove(this);
-			return copy;
-		}
-		return ImmutableList.of();
-	}
-	
-	@Override
-	public Integer getSize() {
-		return size;
-	}
+	String getContentId();
 
-	@Override
-	public boolean hasMultiPartMixedParent() {
-		return getParent() != null && getParent().isMultiPartMixed();
-	}
-	
-	@Override
-	public boolean isMultiPartMixed() {
-		return isMultipart() && getSubtype().equalsIgnoreCase("mixed");
-	}
+	boolean isCancelInvitation();
 
-	@Override
-	public boolean isFirstElementInParent() {
-		MimeAddress mimeAddress = getAddressInternal();
-		return mimeAddress != null && mimeAddress.getLastIndex() == 1;
-	}
+	String getName();
 
-	@Override
-	public boolean hasMimePart(ContentType contentType) {
-		return this.getFullMimeType().
-				equalsIgnoreCase(contentType.getFullMimeType());
-	}
-	
-	@Override
-	public boolean isICSAttachment() {
-		return contentType.getFullMimeType().equalsIgnoreCase("application/ics");
-	}
-	
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(
-				parent, idx, contentType, contentTransfertEncoding, contentId, size, multipartSubType);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof MimePart) {
-			MimePart that = (MimePart) object;
-			return Objects.equal(this.parent, that.parent)
-					&& Objects.equal(this.idx, that.idx)
-					&& Objects.equal(this.contentType, that.contentType)
-					&& Objects.equal(this.contentTransfertEncoding, that.contentTransfertEncoding)
-					&& Objects.equal(this.contentId, that.contentId)
-					&& Objects.equal(this.size, that.size)
-					&& Objects.equal(this.multipartSubType, that.multipartSubType);
-		}
-		return false;
-	}
+	boolean isMultipart();
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(getClass())
-			.add("contentType", contentType)
-			.add("idx", idx).toString();
-	}
+	String getMultipartSubtype();
+
+	boolean isAttachment();
+
+	boolean isNested();
 	
-	@Override
-	public InputStream decodeMimeStream(InputStream rawStream) {
-		if (QUOTED_PRINTABLE.equalsIgnoreCase(getContentTransfertEncoding())) {
-			return new QuotedPrintableInputStream(rawStream);
-		} else if (BASE64.equalsIgnoreCase(getContentTransfertEncoding())) {
-			return new Base64InputStream(rawStream);
-		} else {
-			return rawStream;
-		}
-	}
+	MimePart getInvitation();
+
+	MimePart findRootMimePartInTree();
+
+	MimePart findMainMessage(ContentType contentType);
+
+	Integer getSize();
+
+	boolean hasMultiPartMixedParent();
+
+	boolean isMultiPartMixed();
+
+	boolean isFirstElementInParent();
+
+	boolean hasMimePart(ContentType contentType);
+	
+	boolean isICSAttachment();
+	
+	
+	/**
+	 * This method decodes an InputStream representing itself
+	 * by using Content-Transfer-Encoding header
+	 */
+	InputStream decodeMimeStream(InputStream rawStream);
+
+	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
+
+	boolean isReplyInvitation();
+
 }

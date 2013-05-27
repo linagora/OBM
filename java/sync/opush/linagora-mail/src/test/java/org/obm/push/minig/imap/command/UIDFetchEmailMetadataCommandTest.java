@@ -43,14 +43,14 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.bean.Address;
-import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.BodyParams;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimeMessageImpl;
+import org.obm.push.mail.mime.MimePartImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
@@ -307,10 +307,10 @@ public class UIDFetchEmailMetadataCommandTest {
 					.to(addresses("zadmin@thilaire.lng.org", "zadmin zadmin"))
 					.messageID("<615111.5.1341253062499.JavaMail.root@thilaireOBM01>")
 					.build())
-				.mimeMessage(MimeMessage.builder()
+				.mimeMessage(MimeMessageImpl.builder()
 					.uid(41l)
 					.size(5179)
-					.from(MimePart.builder()
+					.from(MimePartImpl.builder()
 						.bodyParams(BodyParams.builder()
 							.add(new BodyParam("charset", "ISO-8859-1"))
 							.add(new BodyParam("format", "flowed"))
@@ -351,10 +351,10 @@ public class UIDFetchEmailMetadataCommandTest {
 					.to(addresses("zadmin@thilaire.lng.org", "zadmin zadmin"))
 					.messageID("<615111.5.1341253062499.JavaMail.root@thilaireOBM01>")
 					.build())
-				.mimeMessage(MimeMessage.builder()
+				.mimeMessage(MimeMessageImpl.builder()
 					.uid(41l)
 					.size(5179)
-					.from(MimePart.builder()
+					.from(MimePartImpl.builder()
 						.bodyParams(BodyParams.builder()
 							.add(new BodyParam("charset", "ISO-8859-1"))
 							.add(new BodyParam("format", "flowed"))
@@ -396,10 +396,10 @@ public class UIDFetchEmailMetadataCommandTest {
 					.to(addresses("zadmin@thilaire.lng.org", "zadmin zadmin"))
 					.messageID("<messageId@thilaireOBM01>")
 					.build())
-				.mimeMessage(MimeMessage.builder()
+				.mimeMessage(MimeMessageImpl.builder()
 					.uid(4052013l)
 					.size(1337)
-					.from(MimePart.builder()
+					.from(MimePartImpl.builder()
 						.bodyParams(BodyParams.builder()
 							.add(new BodyParam("format", "flowed"))
 							.build())
@@ -453,10 +453,10 @@ public class UIDFetchEmailMetadataCommandTest {
 							new Address(null, "userfive@thilaire.lng.org")))
 					.messageID("<50F5B132.5000203@domain.org>")
 					.build());
-		assertThat(data.getMimeMessage()).isEqualTo(MimeMessage.builder()
+		assertThat(data.getMimeMessage()).isEqualTo(MimeMessageImpl.builder()
 					.uid(741144l)
 					.size(5516)
-					.from(MimePart.builder()
+					.from(MimePartImpl.builder()
 						.bodyParams(BodyParams.builder()
 							.add(new BodyParam("charset", "UTF-8"))
 							.build())

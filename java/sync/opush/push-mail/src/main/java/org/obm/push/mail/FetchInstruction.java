@@ -32,7 +32,7 @@
 package org.obm.push.mail;
 
 import org.obm.push.bean.MSEmailBodyType;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -45,14 +45,14 @@ public class FetchInstruction {
 	}
 	
 	public static class Builder {
-		private IMimePart mimePart;
+		private MimePart mimePart;
 		private Integer truncation;
 		private MSEmailBodyType bodyType;
 		private MailTransformation mailTransformation;
 		
 		private Builder() {}
 		
-		public Builder mimePart(IMimePart mimePart) {
+		public Builder mimePart(MimePart mimePart) {
 			this.mimePart = mimePart;
 			return this;
 		}
@@ -81,19 +81,19 @@ public class FetchInstruction {
 
 	}
 	
-	private final IMimePart mimePart;
+	private final MimePart mimePart;
 	private final Integer truncation;
 	private final MSEmailBodyType bodyType;
 	private final MailTransformation mailTransformation;
 	
-	private FetchInstruction(IMimePart mimePart, Integer truncation, MSEmailBodyType bodyType, MailTransformation mailTransformation) {
+	private FetchInstruction(MimePart mimePart, Integer truncation, MSEmailBodyType bodyType, MailTransformation mailTransformation) {
 		this.mimePart = mimePart;
 		this.truncation = truncation;
 		this.bodyType = bodyType;
 		this.mailTransformation = mailTransformation;
 	}
 	
-	public IMimePart getMimePart() {
+	public MimePart getMimePart() {
 		return mimePart;
 	}
 	

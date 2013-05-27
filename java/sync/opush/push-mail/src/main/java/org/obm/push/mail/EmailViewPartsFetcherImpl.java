@@ -55,7 +55,7 @@ import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.conversation.EmailView.Builder;
 import org.obm.push.mail.conversation.EmailViewAttachment;
 import org.obm.push.mail.conversation.EmailViewInvitationType;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.transformer.Transformer;
@@ -130,8 +130,8 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
 			
 			MimeMessage mimeMessage = emailViewResponse.getMimeMessage();
-			IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
-			for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+			MimePart parentMessage = mimeMessage.findRootMimePartInTree();
+			for (MimePart mp : parentMessage.listLeaves(true, true)) {
 				if (mp.isInvitation()) {
 					return fetchICalendar(mp, uid, emailViewResponse);
 				}
@@ -160,7 +160,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		
 		Transformer transformedMail = transformersFactory.create(fetchInstruction);
 		
-		IMimePart mimePart = fetchInstruction.getMimePart();
+		MimePart mimePart = fetchInstruction.getMimePart();
 		emailViewBuilder.bodyMimePartData(transformedMail.transform(mimePart.decodeMimeStream(bodyData), transformationCharset(mimePart)));
 		emailViewBuilder.bodyType(transformedMail.targetType());
 		emailViewBuilder.estimatedDataSize(fetchInstruction.getMimePart().getSize());
@@ -168,7 +168,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.charset(fetchInstruction.getMimePart().getCharset());
 	}
 
-	private Charset transformationCharset(IMimePart mimePart) {
+	private Charset transformationCharset(MimePart mimePart) {
 		try {
 			String charset = mimePart.getCharset();
 			if (charset != null) {
@@ -214,9 +214,9 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	
 	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstruction fetchInstruction, long uid) {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
-		IMimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
+		MimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
 		int nbAttachments = 0;
-		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+		for (MimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isAttachment() && !mp.isICSAttachment()) {
 				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, nbAttachments++, uid);
 				if (emailViewAttachment != null) {
@@ -227,7 +227,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.attachments(attachments);
 	}
 	
-	private EmailViewAttachment extractEmailViewAttachment(IMimePart mp, int nbAttachments, long uid) {
+	private EmailViewAttachment extractEmailViewAttachment(MimePart mp, int nbAttachments, long uid) {
 		String id = "at_" + uid + "_" + nbAttachments;
 		String fileReference = AttachmentHelper.getAttachmentId(String.valueOf(collectionId), String.valueOf(uid), 
 				mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
@@ -245,7 +245,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		return null;
 	}
 
-	@VisibleForTesting Optional<String> selectAttachmentDisplayName(IMimePart attachment) {
+	@VisibleForTesting Optional<String> selectAttachmentDisplayName(MimePart attachment) {
 		String partName = attachment.getName();
 		String contentId = attachment.getContentId();
 		if (!Strings.isNullOrEmpty(partName) || !Strings.isNullOrEmpty(contentId)) {
@@ -257,8 +257,8 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage, long uid, EmailMetadata emailMetadata) 
 			throws MailException, IOException, ParserException {
 		
-		IMimePart parentMessage = mimeMessage.findRootMimePartInTree();
-		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+		MimePart parentMessage = mimeMessage.findRootMimePartInTree();
+		for (MimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isInvitation()) {
 				fetchICalendar(emailViewBuilder, mp, uid, emailMetadata);
 				emailViewBuilder.invitationType(EmailViewInvitationType.REQUEST);
@@ -274,13 +274,13 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		}
 	}
 
-	private void fetchICalendar(Builder emailViewBuilder, IMimePart mp, long uid, EmailMetadata emailMetadata)
+	private void fetchICalendar(Builder emailViewBuilder, MimePart mp, long uid, EmailMetadata emailMetadata)
 			throws MailException, IOException, ParserException {
 
 		emailViewBuilder.iCalendar(fetchICalendar(mp, uid, emailMetadata));
 	}
 
-	private ICalendar fetchICalendar(IMimePart mp, long uid, EmailMetadata emailMetadata)
+	private ICalendar fetchICalendar(MimePart mp, long uid, EmailMetadata emailMetadata)
 			throws MailException, IOException, ParserException {
 
 		InputStream inputStream = mailboxService.findAttachment(udr, collectionPath, uid, mp.getAddress());

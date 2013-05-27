@@ -60,7 +60,9 @@ import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -189,9 +191,9 @@ public class ImapMailBoxUtils {
 		return mimeMessageCollection;
 	}
 
-	public MimeMessage buildMimeMessageFromIMAPMessage(long uid, IMAPMessage message) {
+	public MimeMessageImpl buildMimeMessageFromIMAPMessage(long uid, IMAPMessage message) {
 		MimePart mimePart = buildMimePartTree(message);
-		return MimeMessage.builder().from(mimePart).uid(uid).build();
+		return MimeMessageImpl.builder().from(mimePart).uid(uid).build();
 	}
 
 	private MimePart buildMimePartTree(javax.mail.internet.MimePart mimePart) throws MailException {
@@ -234,8 +236,8 @@ public class ImapMailBoxUtils {
 		return parts;
 	}
 
-	private MimePart.Builder mimePartBuilder(javax.mail.internet.MimePart mimePart) throws MessagingException {
-		return MimePart.builder()
+	private MimePartImpl.Builder mimePartBuilder(javax.mail.internet.MimePart mimePart) throws MessagingException {
+		return MimePartImpl.builder()
 			.contentType(mimePart.getContentType())
 			.contentId(mimePart.getContentID())
 			.encoding(mimePart.getEncoding())

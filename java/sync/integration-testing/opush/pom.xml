@@ -76,9 +76,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
+			<artifactId>mail-backend-testsuite</artifactId>
 			<version>${obm.version}</version>
-			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

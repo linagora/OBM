@@ -42,23 +42,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.minig.imap.command.parser.BodyStructureParser;
+import org.obm.push.mail.mime.MimeMessageImpl;
+import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class BodyStructureParserTest {
 
-	private MimeMessage parseStringAsBodyStructure(String bs) {
+	private MimeMessageImpl parseStringAsBodyStructure(String bs) {
 		return new BodyStructureParser().parseBodyStructure(bs).build();
 	}
 	
 	@Test
 	public void testRFC3501Ex1() {
 		String bs = "(\"TEXT\" \"PLAIN\" (\"CHARSET\" \"US-ASCII\") NIL NIL \"7BIT\" 2279 48)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(createSimpleMimeMessage("TEXT", "PLAIN", null, "7BIT", 2279, ImmutableMap.of("CHARSET", "US-ASCII")),
 				result);
 	}
@@ -69,7 +69,7 @@ public class BodyStructureParserTest {
 						"(\"TEXT\" \"PLAIN\" (\"CHARSET\" \"US-ASCII\" \"NAME\" \"cc.diff\") " +
 							"\"<960723163407.20117h@cac.washington.edu>\" \"Compiler diff\" " +
 							"\"BASE64\" 4554 73) \"MIXED\")";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, new HashMap<String, String>(), 
 						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 1152, ImmutableMap.of("CHARSET", "US-ASCII")),
@@ -80,7 +80,7 @@ public class BodyStructureParserTest {
 	@Test
 	public void testBugzilla1502SimpleImagePart() {
 		String bs = "(\"IMAGE\" \"PJPEG\" NIL NIL NIL \"BASE64\" 97418)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(createSimpleMimeMessage("IMAGE", "PJPEG", null, "BASE64", 97418, new HashMap<String, String>()),
 				result);
 	}
@@ -89,7 +89,7 @@ public class BodyStructureParserTest {
 	public void testBugzilla1502ImagePart() {
 		String bs = "(\"IMAGE\" \"PJPEG\" NIL NIL NIL \"BASE64\" 97418 NIL " +
 			"(\"ATTACHMENT\" (\"FILENAME\" \"=?UTF-8?Q?Coucher=20de=20soleil.jpg?=\")) NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(createSimpleMimeMessage("IMAGE", "PJPEG", null, "BASE64", 97418, ImmutableMap.of("FILENAME", "Coucher de soleil.jpg")),
 				result);
 	}
@@ -101,7 +101,7 @@ public class BodyStructureParserTest {
 				"(\"IMAGE\" \"PJPEG\" NIL NIL NIL \"BASE64\" 97418 NIL " +
 					"(\"ATTACHMENT\" (\"FILENAME\" \"=?UTF-8?Q?Coucher=20de=20soleil.jpg?=\")) NIL NIL) " +
 					"\"MIXED\" (\"BOUNDARY\" \"-=Part.2.4e8359a545e8f099.12be7d033d7.ddfb59d71741cd3a=-\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "-=Part.2.4e8359a545e8f099.12be7d033d7.ddfb59d71741cd3a=-"), 
 						createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 6, ImmutableMap.of("CHARSET", "UTF-8")),
@@ -124,7 +124,7 @@ public class BodyStructureParserTest {
 						"(\"TEXT\" \"HTML\" (\"CHARSET\" \"UTF-8\") NIL NIL \"QUOTED-PRINTABLE\" 919 23 NIL (\"INLINE\" NIL) NIL NIL)" +
 						" \"ALTERNATIVE\" (\"BOUNDARY\" \"mimepart_4cd7f7e7d342a_65d43fe5dce001bc430\") NIL NIL NIL) 106 NIL (\"ATTACHMENT\" (\"FILENAME\" \"forwarded_message_0.eml\")) NIL NIL) " +
 					"\"MIXED\" (\"BOUNDARY\" \"-=Part.821.826e37e719e7f9f6.12c2f8e482d.f6034b7c2622b555=-\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "-=Part.821.826e37e719e7f9f6.12c2f8e482d.f6034b7c2622b555=-"), 
 						createSimpleMimePart("TEXT", "HTML", null, "QUOTED-PRINTABLE", 489, ImmutableMap.of("CHARSET", "UTF-8")),
@@ -153,7 +153,7 @@ public class BodyStructureParserTest {
 			   "(\"TEXT\" \"PLAIN\" (\"CHARSET\" \"ISO-8859-1\" \"FORMAT\" \"flowed\") NIL NIL \"BASE64\" 1498 21 NIL NIL NIL) 35 NIL " +
 			  "(\"INLINE\" (\"FILENAME\" {51}Re: Suggestion de renommage de 'OBM sur mesure\".eml)) NIL) " +
 			 "\"MIXED\" (\"BOUNDARY\" \"------------090508070608040004010708\") NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------090508070608040004010708"),
 					createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 235,
@@ -185,7 +185,7 @@ public class BodyStructureParserTest {
 			  "\"MIXED\" (\"BOUNDARY\" \"2JFYz.4GCHzc7Eh.t1JsN.8ipKmXd\") NIL NIL) 63 NIL " +
 			  "(\"INLINE\" (\"FILENAME*\" {294}ISO-8859-1''%41%4C%45%52%54%20%50%52%4F%58%59%32%2F%70%72%6F%78%79%3A%20%4C%65%20%73%65%72%76%65%75%72%20%50%72%6F%78%79%32%20%65%73%74%20%74%6F%6D%62%E9%20%2D%20%42%61%73%63%75%6C%65%20%76%65%72%73%20%50%72%6F%78%79%31%20%28%53%61%74%20%44%65%63%20%38%20%31%32%3A%31%36%3A%31%31%29%2E%65%6D%6C)) NIL) " +
 			 "\"MIXED\" (\"BOUNDARY\" \"------------090506050700020806090002\") NIL NIL";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------090506050700020806090002"),
 					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 1071,
@@ -206,7 +206,7 @@ public class BodyStructureParserTest {
 			"((\"TEXT\" \"PLAIN\" (\"CHARSET\" \"iso-8859-1\" \"FORMAT\" \"flowed\") NIL NIL \"QUOTED-PRINTABLE\" 4295 114 NIL NIL NIL)" +
 			"(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"QUOTED-PRINTABLE\" 5429 123 NIL NIL NIL) " +
 			"\"ALTERNATIVE\" (\"BOUNDARY\" \"=====================_4229656==.ALT\") NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "=====================_4229656==.ALT"),
 					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 4295,
@@ -222,7 +222,7 @@ public class BodyStructureParserTest {
 			"((\"TEXT\" \"PLAIN\" (\"CHARSET\" \"iso-8859-15\") NIL NIL \"8BIT\" 1202 32 NIL NIL NIL)" +
 			"(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-15\") NIL NIL \"8BIT\" 8761 131 NIL NIL NIL) " +
 			"\"ALTERNATIVE\" (\"BOUNDARY\" \"618027128011279051\") NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "ALTERNATIVE", null, null, ImmutableMap.of("BOUNDARY", "618027128011279051"),
 					createSimpleMimePart("TEXT", "PLAIN", null, "8BIT", 1202,
@@ -243,7 +243,7 @@ public class BodyStructureParserTest {
 			  "\"MIXED\" (\"BOUNDARY\" \"MGYHOYXEY6WxJCY8\") (\"INLINE\" NIL) NIL NIL)" +
 			 "(\"APPLICATION\" \"PGP-SIGNATURE\" NIL NIL NIL \"7BIT\" 203 NIL (\"INLINE\" NIL) NIL NIL) " +
 			 "\"SIGNED\" (\"MICALG\" \"pgp-sha1\" \"PROTOCOL\" \"application/pgp-signature\" \"BOUNDARY\" \"hHWLQfXTYDoKhP50\") (\"INLINE\" NIL) NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "SIGNED", null, null,
 						ImmutableMap.of("BOUNDARY", "hHWLQfXTYDoKhP50",
@@ -292,7 +292,7 @@ public class BodyStructureParserTest {
 					 		  "\"MIXED\" (\"BOUNDARY\" \"-=Part.e5.7a00b7a55124f47f.12b1ed45c88.99ded3b40b1821b4=-\") NIL NIL NIL) 34360 NIL " +
 					 		  "(\"ATTACHMENT\" (\"FILENAME\" \"forwarded_message_0.eml\")) NIL NIL) " +
 					 		  "\"MIXED\" (\"BOUNDARY\" \"-=Part.1bc.1c1bae7fc5abaefb.12b1f2d8ba0.24d31e725226dabf=-\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 			createSimpleMimeTree("multipart", "MIXED", null, null,
 					ImmutableMap.of("BOUNDARY", "-=Part.1bc.1c1bae7fc5abaefb.12b1f2d8ba0.24d31e725226dabf=-"),
@@ -339,7 +339,7 @@ public class BodyStructureParserTest {
 						"\"ALTERNATIVE\" (\"BOUNDARY\" \"AGENTID00688986-=_HrKq2VwID3ocQY0E4wYbwX4wB\") NIL NIL) " +
 				"281 NIL (\"ATTACHMENT\" (\"FILENAME\" \"Your travel information.eml\")) NIL) " +
 					"\"MIXED\" (\"BOUNDARY\" \"------------060906090906080602020903\") NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "------------060906090906080602020903"), 
 						createSimpleMimePart("TEXT", "PLAIN", null, "8BIT", 446,
@@ -375,7 +375,7 @@ public class BodyStructureParserTest {
 						"(\"APPLICATION\" \"ICS\" (\"NAME\" \"meeting.ics\") NIL NIL \"BASE64\" 1178 NIL (\"ATTACHMENT\" (\"FILENAME\" \"meeting.ics\")) NIL NIL) " + //3.2
 					"\"MIXED\" (\"BOUNDARY\" \"7d1ea5ebf3d19eeb5e039c3b99dbda5c\") NIL NIL NIL) 142 NIL NIL NIL NIL) " +
 					"\"REPORT\" (\"REPORT-TYPE\" \"delivery-status\" \"BOUNDARY\" \"5A7C5697BD.1286371801/debian-lenny-amd64.matthieu.lng\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "REPORT", null, null,
 						ImmutableMap.of("REPORT-TYPE", "delivery-status", "BOUNDARY", "5A7C5697BD.1286371801/debian-lenny-amd64.matthieu.lng"), 
@@ -413,7 +413,7 @@ public class BodyStructureParserTest {
 					"\"MIXED\" (\"BOUNDARY\" \"----_=_NextPart_000_01C92EC3.599812EE\") NIL NIL NIL) 751 NIL " +
 					"(\"ATTACHMENT\" (\"FILENAME\" \" =?iso-8859-1?Q?[Pr=E9fecture_de_Police]_-_Assistance_m=E9t	hodologique_po?= ur les =?iso-8859-1?Q?d=E9veloppements_PHP_/_Zend_Framew	ork.msg?=\")) NIL NIL) " +
 			"\"MIXED\" (\"BOUNDARY\" \"----=_20081016144512_83167\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "----=_20081016144512_83167"),
 					createSimpleMimePart("TEXT", "PLAIN", null, "QUOTED-PRINTABLE", 1090,
@@ -441,7 +441,7 @@ public class BodyStructureParserTest {
 					"(\"ATTACHMENT\" (\"FILENAME\" {72}Screenshot-SFR - Parametrage : parametrez  votre mobile ! - Chromium.png)) " +
 					"NIL NIL" +
 				") \"MIXED\" (\"BOUNDARY\" \"JQXYJlTd9koAxLsisBpF/IX+AhDOQibtZgGtSogfOJM=\") NIL NIL NIL)";
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, ImmutableMap.of("BOUNDARY", "JQXYJlTd9koAxLsisBpF/IX+AhDOQibtZgGtSogfOJM="), 
 						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 36,
@@ -566,7 +566,7 @@ public class BodyStructureParserTest {
 					createSimpleMimePart("APPLICATION", "ATOMICMAIL", null, "7BIT", 4924, new HashMap<String, String>()),
 					createSimpleMimePart("MESSAGE", "RFC822", null, "7BIT", 75980, new HashMap<String, String>(),
 						createSimpleMimePart("AUDIO", "X-SUN", null, "BASE64", 75682, new HashMap<String, String>())))));
-		IMimePart result = parseStringAsBodyStructure(bs);
+		MimePart result = parseStringAsBodyStructure(bs);
 		result.toString();
 		checkMimeTree(message, result);
 	}

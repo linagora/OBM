@@ -38,28 +38,23 @@ import java.io.InputStream;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
-import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.IMimePart;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimePart;
 
 public class MimeMessageTest {
 
 	@Test
 	public void testGetInvitationOnMimeMessageWithoutInvitation() {
 		MimePart mimePart = buildMimePart("text/plain;");
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.getInvitation()).isNull();
 	}
 
 	@Test
 	public void testGetInvitationOnMimeMessageWithRequestInvitation() {
-		MimePart parentMimePart = MimePart.builder().contentType("multipart/alternative;")
+		MimePart parentMimePart = MimePartImpl.builder().contentType("multipart/alternative;")
 				.addChildren(buildMimePart("text/plain;"), buildInvitationContentType("REQUEST")).build(); 
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(parentMimePart).build();
-		IMimePart invitation = mimeMessage.getInvitation();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(parentMimePart).build();
+		MimePart invitation = mimeMessage.getInvitation();
 		Assertions.assertThat(invitation).isNotNull();
 		Assertions.assertThat(invitation.getFullMimeType()).isEqualTo("text/calendar");
 		Assertions.assertThat(invitation.getBodyParam("method")).isEqualTo(new BodyParam("method", "REQUEST"));
@@ -67,11 +62,11 @@ public class MimeMessageTest {
 
 	@Test
 	public void testGetInvitationOnMimeMessagetWithCancelInvitation() {
-		MimePart parentMimePart = MimePart.builder().contentType("multipart/alternative;")
+		MimePart parentMimePart = MimePartImpl.builder().contentType("multipart/alternative;")
 				.addChildren(buildMimePart("text/plain;"), buildInvitationContentType("CANCEL")).build();
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(parentMimePart).build();
-		IMimePart invitation = mimeMessage.getInvitation();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(parentMimePart).build();
+		MimePart invitation = mimeMessage.getInvitation();
 		Assertions.assertThat(invitation).isNotNull();
 		Assertions.assertThat(invitation.getFullMimeType()).isEqualTo("text/calendar");
 		Assertions.assertThat(invitation.getBodyParam("method")).isEqualTo(new BodyParam("method", "CANCEL"));
@@ -79,10 +74,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testGetInvitationOnParentMimePartWithInvitation() {
-		MimePart parentMimePart = MimePart.builder().contentType("multipart/alternative;")
+		MimePart parentMimePart = MimePartImpl.builder().contentType("multipart/alternative;")
 				.addChildren(buildMimePart("text/plain;"), buildInvitationContentType("REQUEST")).build();
 
-		IMimePart invitation = parentMimePart.getInvitation();
+		MimePart invitation = parentMimePart.getInvitation();
 		Assertions.assertThat(invitation).isNotNull();
 		Assertions.assertThat(invitation.getFullMimeType()).isEqualTo("text/calendar");
 		Assertions.assertThat(invitation.getBodyParam("method")).isEqualTo(new BodyParam("method", "REQUEST"));
@@ -92,10 +87,10 @@ public class MimeMessageTest {
 	public void testGetInvitationOnChildMimePartWithInvitation() {
 		MimePart textPlain = buildMimePart("text/plain;");
 
-		MimePart.builder().contentType("multipart/alternative;").addChildren(
+		MimePartImpl.builder().contentType("multipart/alternative;").addChildren(
 				textPlain, buildInvitationContentType("REQUEST")).build();
 
-		IMimePart invitation = textPlain.getInvitation();
+		MimePart invitation = textPlain.getInvitation();
 		Assertions.assertThat(invitation).isNotNull();
 		Assertions.assertThat(invitation.getFullMimeType()).isEqualTo("text/calendar");
 		Assertions.assertThat(invitation.getBodyParam("method")).isEqualTo(new BodyParam("method", "REQUEST"));
@@ -104,7 +99,7 @@ public class MimeMessageTest {
 	@Test
 	public void testGetInvitationOnChildMimePartWithoutInvitation() {
 		MimePart textHtml = buildMimePart("text/html;");
-		MimePart.builder().contentType("multipart/alternative;")
+		MimePartImpl.builder().contentType("multipart/alternative;")
 				.addChildren(buildMimePart("text/plain;"), textHtml).build();
 
 		Assertions.assertThat(textHtml.getInvitation()).isNull();
@@ -114,7 +109,7 @@ public class MimeMessageTest {
 	public void testFindMainMessageNullContentType() {
 		MimePart mimePart = buildMimePart("text/plain");
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(null)).isNull();
 	}
 
@@ -122,7 +117,7 @@ public class MimeMessageTest {
 	public void testFindMainMessageUnknowContentType() {
 		MimePart mimePart = buildMimePart("text/plain");
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/html"))).isNull();
 	}
 
@@ -130,7 +125,7 @@ public class MimeMessageTest {
 	public void testFindMainMessageSimpleMimePart() {
 		MimePart mimePart = buildMimePart("text/plain");
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/plain"))).isSameAs(mimePart);
 	}
 
@@ -138,17 +133,17 @@ public class MimeMessageTest {
 	public void testFindMainMessageSimpleMimePartCaseInsensitive() {
 		MimePart mimePart = buildMimePart("text/plain");
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("TEXT/PLAIN"))).isSameAs(mimePart);
 	}
 
 	@Test
 	public void testFindMainMessageInMultiPartAlternativeTree() {
 		MimePart textHtml = buildMimePart("text/html;");
-		MimePart mimePart = MimePart.builder().contentType("multipart/alternative")
+		MimePart mimePart = MimePartImpl.builder().contentType("multipart/alternative")
 				.addChildren(textHtml).build();
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(mimePart).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(mimePart).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/html"))).isSameAs(textHtml);
 	}
 
@@ -156,48 +151,48 @@ public class MimeMessageTest {
 	public void testFindMainMessageInMultiPartMixedTree() {
 		MimePart textHtml = buildMimePart("text/html;");
 		
-		MimePart multiPartMixed = MimePart.builder().contentType("multipart/mixed")
+		MimePart multiPartMixed = MimePartImpl.builder().contentType("multipart/mixed")
 			.addChildren(
-				MimePart.builder().contentType("multipart/alternative")
+				MimePartImpl.builder().contentType("multipart/alternative")
 					.addChildren(buildMimePart("text/plain;"), textHtml).build(),
 				buildMimePart("application/octet-stream")).build();
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(multiPartMixed).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(multiPartMixed).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/html"))).isSameAs(textHtml);
 	}
 
 	@Test
 	public void testFindMainMessageWithNestedMessage() {
-		MimePart multiPartMixed = MimePart.builder().contentType("multipart/mixed")
+		MimePart multiPartMixed = MimePartImpl.builder().contentType("multipart/mixed")
 				.addChildren(
 					buildMimePart("text/plain;"),
-					MimePart.builder().contentType("message/rfc822")
+					MimePartImpl.builder().contentType("message/rfc822")
 						.addChildren(
 							buildMimePart("text/plain;"),
 							buildMimePart("text/html;"))
 						.build())
 				.build();
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(multiPartMixed).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(multiPartMixed).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/html"))).isNull();
 	}
 
 	@Test
 	public void testFindMainMessageWithAttachmentMimePart() {
-		MimePart multiPartMixed = MimePart.builder().contentType("multipart/mixed")
+		MimePart multiPartMixed = MimePartImpl.builder().contentType("multipart/mixed")
 				.addChildren(buildMimePart("text/plain;"), buildMimePart("text/html;")).build();
 
-		MimeMessage mimeMessage = MimeMessage.builder().from(multiPartMixed).build();
+		MimeMessage mimeMessage = MimeMessageImpl.builder().from(multiPartMixed).build();
 		Assertions.assertThat(mimeMessage.findMainMessage(contentType("text/html"))).isNull();
 	}
 
 
 	@Test
 	public void testIsAttachmentIsFalseWhenTextPlain() {
-		IMimePart mimePart = buildMimePart("text/plain");
+		MimePart mimePart = buildMimePart("text/plain");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -205,10 +200,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsFalseWhenTextHtml() {
-		IMimePart mimePart = buildMimePart("text/html");
+		MimePart mimePart = buildMimePart("text/html");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -216,10 +211,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsFalseWhenTextCalendar() {
-		IMimePart mimePart = buildMimePart("text/calendar");
+		MimePart mimePart = buildMimePart("text/calendar");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -227,10 +222,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentWhenTwoMixedTextParts() {
-		IMimePart firstPart = buildMimePart("text/plain");
-		IMimePart secondPart = buildMimePart("text/plain;Content-Disposition=attachment");
+		MimePart firstPart = buildMimePart("text/plain");
+		MimePart secondPart = buildMimePart("text/plain;Content-Disposition=attachment");
 
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		firstPart.defineParent(parentMimePart, 1);
 		secondPart.defineParent(parentMimePart, 2);
 
@@ -241,10 +236,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsFalseWhenMultipartAlternative() {
-		IMimePart mimePart = buildMimePart("multipart/alternative");
+		MimePart mimePart = buildMimePart("multipart/alternative");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -252,10 +247,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsFalseWhenMultipartMixed() {
-		IMimePart mimePart = buildMimePart("multipart/mixed");
+		MimePart mimePart = buildMimePart("multipart/mixed");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -263,10 +258,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsFalseWhenMultipartReport() {
-		IMimePart mimePart = buildMimePart("multipart/report");
+		MimePart mimePart = buildMimePart("multipart/report");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isFalse();
@@ -274,10 +269,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsTrueWhenMessageRfc822() {
-		IMimePart mimePart = buildMimePart("message/rfc822");
+		MimePart mimePart = buildMimePart("message/rfc822");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isTrue();
@@ -285,10 +280,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsTrueWhenMessageDeliveryStatus() {
-		IMimePart mimePart = buildMimePart("message/delivery-status");
+		MimePart mimePart = buildMimePart("message/delivery-status");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isTrue();
@@ -296,10 +291,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsTrueWhenApplicationICS() {
-		IMimePart mimePart = buildMimePart("application/ics");
+		MimePart mimePart = buildMimePart("application/ics");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isTrue();
@@ -307,10 +302,10 @@ public class MimeMessageTest {
 
 	@Test
 	public void testIsAttachmentIsTrueWhenApplicationPDF() {
-		IMimePart mimePart = buildMimePart("application/pdf");
+		MimePart mimePart = buildMimePart("application/pdf");
 
 		int mimePartIndex = 5;
-		IMimePart parentMimePart = buildMimePart("multipart/mixed");
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
 		Assertions.assertThat(mimePart.isAttachment()).isTrue();
@@ -319,7 +314,7 @@ public class MimeMessageTest {
 	@Test
 	public void testContentTransfertEncodingBase64() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("BASE64").build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding("BASE64").build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -327,7 +322,7 @@ public class MimeMessageTest {
 	@Test
 	public void testContentTransfertEncodingBaSe64IgnoreCase() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("BaSe64").build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding("BaSe64").build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -335,7 +330,7 @@ public class MimeMessageTest {
 	@Test
 	public void testContentTransfertEncodingQuotedPrintable() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("QUOTED-PRINTABLE").build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding("QUOTED-PRINTABLE").build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -343,7 +338,7 @@ public class MimeMessageTest {
 	@Test
 	public void testContentTransfertEncodingQuotedPrinTableIgnoreCase() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("Quoted-PrinTable").build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding("Quoted-PrinTable").build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -351,7 +346,7 @@ public class MimeMessageTest {
 	@Test
 	public void testBadContentTransfert() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding("Toto").build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding("Toto").build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -359,13 +354,13 @@ public class MimeMessageTest {
 	@Test
 	public void testDefaultContentTransfert() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding(null).build()).build();
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding(null).build()).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
 
 	private MimePart buildMimePart(String contentType) {
-		return MimePart.builder().contentType(contentType).build();
+		return MimePartImpl.builder().contentType(contentType).build();
 	}
 
 	private MimePart buildInvitationContentType(String method) {

@@ -61,8 +61,8 @@ import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
@@ -73,9 +73,9 @@ import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.minig.imap.CommandIOException;
 import org.obm.push.minig.imap.StoreClient;
@@ -572,7 +572,7 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet messages, IMimePart mimePart) throws IOException {
+	public Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet messages, MimePart mimePart) throws IOException {
 		ImmutableMap.Builder<Long, IMAPHeaders> builder = ImmutableMap.builder();
 		for (long uid: messages) {
 			builder.put(uid, fetchPartHeaders(udr, collectionPath, uid, mimePart));
@@ -580,7 +580,7 @@ public class LinagoraMailboxService implements MailboxService {
 		return builder.build();
 	}
 
-	private IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart) throws IOException {
+	private IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, MimePart mimePart) throws IOException {
 		MimeAddress address = mimePart.getAddress();
 		String part = null;
 		if (address == null) {

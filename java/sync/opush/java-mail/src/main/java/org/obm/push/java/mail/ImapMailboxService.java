@@ -81,9 +81,9 @@ import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.ImapCapability;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.OpushImapFolder;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
@@ -666,7 +666,7 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet messages, IMimePart mimePart) throws IOException {
+	public Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet messages, MimePart mimePart) throws IOException {
 		ImmutableMap.Builder<Long, IMAPHeaders> headers = ImmutableMap.builder();
 		for (long uid: messages) {
 			headers.put(uid, fetchPartHeaders(udr, collectionPath, uid, mimePart));
@@ -674,7 +674,7 @@ public class ImapMailboxService implements MailboxService {
 		return headers.build();
 	}
 
-	private IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, IMimePart mimePart)
+	private IMAPHeaders fetchPartHeaders(UserDataRequest udr, String collectionPath, long uid, MimePart mimePart)
 			throws IOException {
 		MimeAddress address = mimePart.getAddress();
 		String part = null;

@@ -40,7 +40,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.mime.MimeAddress;
 
 @RunWith(SlowFilterRunner.class)
@@ -48,7 +48,7 @@ public class FetchInstructionTest {
 
 	@Test
 	public void testHasMimePartAddressDefined() {
-		IMimePart mimePart = createStrictMock(IMimePart.class);
+		MimePart mimePart = createStrictMock(MimePart.class);
 		expect(mimePart.getAddress()).andReturn(new MimeAddress("address"));
 		
 		replay(mimePart);
@@ -61,7 +61,7 @@ public class FetchInstructionTest {
 
 	@Test
 	public void testHasNoMimePartAddressDefined() {
-		IMimePart mimePart = createStrictMock(IMimePart.class);
+		MimePart mimePart = createStrictMock(MimePart.class);
 		expect(mimePart.getAddress()).andReturn(null);
 		
 		replay(mimePart);
@@ -74,7 +74,7 @@ public class FetchInstructionTest {
 
 	@Test
 	public void testMustTruncate() {
-		IMimePart mimePart = createStrictMock(IMimePart.class);
+		MimePart mimePart = createStrictMock(MimePart.class);
 		expect(mimePart.getSize()).andReturn(10000);
 		
 		replay(mimePart);
@@ -87,7 +87,7 @@ public class FetchInstructionTest {
 
 	@Test
 	public void testNullTruncation() {
-		IMimePart mimePart = createStrictMock(IMimePart.class);
+		MimePart mimePart = createStrictMock(MimePart.class);
 		
 		replay(mimePart);
 		
@@ -99,7 +99,7 @@ public class FetchInstructionTest {
 
 	@Test
 	public void testNotTruncated() {
-		IMimePart mimePart = createStrictMock(IMimePart.class);
+		MimePart mimePart = createStrictMock(MimePart.class);
 		expect(mimePart.getSize()).andReturn(10);
 		
 		replay(mimePart);
@@ -110,7 +110,7 @@ public class FetchInstructionTest {
 		verify(mimePart);
 	}
 
-	private FetchInstruction createFetchInstruction(Integer truncation, IMimePart mimePart) {
+	private FetchInstruction createFetchInstruction(Integer truncation, MimePart mimePart) {
 		return FetchInstruction.builder()
 			.truncation(truncation)
 			.mimePart(mimePart)

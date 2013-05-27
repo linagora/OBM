@@ -29,97 +29,41 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.mime;
+package org.obm.push.mail;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.BodyParams;
+import org.obm.push.mail.mime.MimeMessageImpl;
+import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
-import org.obm.push.mail.bean.IMAPHeaders;
+import com.google.common.collect.ImmutableList;
 
+@RunWith(SlowFilterRunner.class)
+public class BeansTest {
 
-public interface IMimePart {
-
-	interface Builder<T extends IMimePart> {
+	@Test
+	public void test() {
+		EqualsVerifierBuilder.builder()
+			.equalsVerifiers(ImmutableList.<Class<?>>of(
+					MimePartImpl.class))
+			.prefabValue(BodyParams.class, 
+					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
+					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
+			.withSuperClass(true)
+			.verify();
 		
-		Builder<T> addChild(IMimePart mimePart);
-		
+		EqualsVerifierBuilder.builder()
+			.equalsVerifiers(ImmutableList.<Class<?>>of(
+					MimeMessageImpl.class))
+			.prefabValue(MimePart.class,
+					MimePartImpl.builder().contentType("text/plain").encoding("7BIT").build(),
+					MimePartImpl.builder().contentType("text/html").encoding("8BIT").build())
+			.verify();
 	}
-
-	ContentType getContentType();
 	
-	String getPrimaryType();
-
-	String getSubtype();
-
-	List<IMimePart> getChildren();
-
-	List<IMimePart> getSibling();
-	
-	MimeAddress getAddress();
-	
-	MimeAddress getAddressInternal();
-
-	BodyParams getBodyParams();
-
-	BodyParam getBodyParam(final String param);
-
-	IMimePart getParent();
-
-	Collection<IMimePart> listLeaves(boolean depthFirst, boolean filterNested);
-
-	void defineParent(IMimePart parent, int index);
-
-	String getFullMimeType();
-
-	boolean isInvitation();
-
-	String getContentTransfertEncoding();
-	
-	String getCharset();
-
-	String getContentId();
-
-	boolean isCancelInvitation();
-
-	String getName();
-
-	boolean isMultipart();
-
-	String getMultipartSubtype();
-
-	boolean isAttachment();
-
-	boolean isNested();
-	
-	IMimePart getInvitation();
-
-	IMimePart findRootMimePartInTree();
-
-	IMimePart findMainMessage(ContentType contentType);
-
-	Integer getSize();
-
-	boolean hasMultiPartMixedParent();
-
-	boolean isMultiPartMixed();
-
-	boolean isFirstElementInParent();
-
-	boolean hasMimePart(ContentType contentType);
-	
-	boolean isICSAttachment();
-	
-	
-	/**
-	 * This method decodes an InputStream representing itself
-	 * by using Content-Transfer-Encoding header
-	 */
-	InputStream decodeMimeStream(InputStream rawStream);
-
-	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
-
-	boolean isReplyInvitation();
-
 }

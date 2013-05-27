@@ -36,16 +36,16 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.mime.MimePart;
 
 public class MimeMessageTestUtils {
 
-	private static String prefixMessage(IMimePart expected) {
+	private static String prefixMessage(MimePart expected) {
 		return "part with address " + expected.getAddress();
 	}
 	
-	public static void checkMimeTree(IMimePart expected, IMimePart actual) {
+	public static void checkMimeTree(MimePart expected, MimePart actual) {
 		assertThat(actual.getChildren().size()).isEqualTo(expected.getChildren().size()).describedAs(prefixMessage(expected) + "has wrong number of children"); 
 		assertThat(actual.getPrimaryType()).isEqualTo(expected.getPrimaryType()).describedAs(prefixMessage(expected));
 		assertThat(actual.getSubtype()).isEqualTo(expected.getSubtype()).describedAs(prefixMessage(expected));
@@ -53,20 +53,20 @@ public class MimeMessageTestUtils {
 		assertThat(actual.getContentId()).isEqualTo(expected.getContentId()).describedAs(prefixMessage(expected));
 		assertThat(actual.getBodyParams()).isEqualTo(expected.getBodyParams()).as(prefixMessage(expected));
 		assertThat(actual.getSize()).isEqualTo(expected.getSize()).describedAs(prefixMessage(expected));
-		Iterator<IMimePart> expectedParts = expected.getChildren().iterator();
-		Iterator<IMimePart> actualParts = actual.getChildren().iterator();
+		Iterator<MimePart> expectedParts = expected.getChildren().iterator();
+		Iterator<MimePart> actualParts = actual.getChildren().iterator();
 		while (actualParts.hasNext()) {
 			checkMimeTree(expectedParts.next(), actualParts.next());
 		}
 	}
 
-	public static IMimePart getPartByAddress(IMimePart message, MimeAddress addr) {
-		Collection<IMimePart> children = message.getChildren();
-		for (IMimePart part: children) {
+	public static MimePart getPartByAddress(MimePart message, MimeAddress addr) {
+		Collection<MimePart> children = message.getChildren();
+		for (MimePart part: children) {
 			if (addr.equals(part.getAddress())) {
 				return part;
 			}
-			IMimePart result = getPartByAddress(part, addr);
+			MimePart result = getPartByAddress(part, addr);
 			if (result != null) {
 				return result;
 			}

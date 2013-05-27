@@ -46,6 +46,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.ContentType;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -63,7 +64,7 @@ public class MimePartSelectorTest {
 	
 	@Test
 	public void testSelectPlainText() {
-		MimePart expectedMimePart = MimePart.builder().contentType("text/plain").build();
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/plain").build();
 	
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
@@ -79,7 +80,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectHtml() {
-		MimePart expectedMimePart = MimePart.builder().contentType("text/html").build();
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/html").build();
 	
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
@@ -96,7 +97,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectRtf() {
-		MimePart expectedMimePart = MimePart.builder().contentType("text/rtf").build();
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/rtf").build();
 	
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
@@ -112,7 +113,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectMime() {
-		MimePart expectedMimePart = MimePart.builder().contentType("text/plain").build();
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/plain").build();
 	
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(expectedMimePart);
@@ -127,7 +128,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectEmptyBodyPreferencesTextPlain() {
-		MimePart mimePart = MimePart.builder().contentType("text/plain").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(mimePart);
@@ -143,7 +144,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectEmptyBodyPreferencesTextHtml() {
-		MimePart mimePart = MimePart.builder().contentType("text/html").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/html").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
@@ -159,7 +160,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectNullBodyPreferencesTextHtml() {
-		MimePart mimePart = MimePart.builder().contentType("text/html").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/html").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
@@ -175,7 +176,7 @@ public class MimePartSelectorTest {
 	
 	@Test
 	public void testSelectEmptyBodyPreferencesApplicationPdf() {
-		MimePart mimePart = MimePart.builder().contentType("application/pdf").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("application/pdf").build();
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
@@ -209,7 +210,7 @@ public class MimePartSelectorTest {
 	
 	@Test
 	public void testSelectSeveralBodyPreferences() {
-		MimePart expectedMimePart = MimePart.builder().contentType("text/html").build();
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/html").build();
 	
 		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
 		expect(mimeMessage.getMimePart()).andReturn(null);
@@ -249,7 +250,7 @@ public class MimePartSelectorTest {
 
 	@Test
 	public void testSelectLargerThanQueryPreferencesWithAllOrNone() {
-		MimePart mimePart = MimePart.builder().contentType("text/html").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/html").build();
 	
 		MimePart expectedMimePart = EasyMock.createStrictMock(MimePart.class);
 		expect(expectedMimePart.getSize()).andReturn(50);

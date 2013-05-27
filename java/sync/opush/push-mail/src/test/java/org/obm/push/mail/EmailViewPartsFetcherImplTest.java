@@ -82,10 +82,11 @@ import org.obm.push.mail.conversation.EmailViewInvitationType;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.BodyParams;
 import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
 import org.obm.push.mail.transformer.TestIdentityTransformerFactory;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 
@@ -531,10 +532,10 @@ public class EmailViewPartsFetcherImplTest {
 			.andReturn(shouldGetEmptyAttachmentListViewBuilder)
 			.once();
 		
-		IMimePart multipartLeaf = MimePart.builder().contentType(contentType).build();
+		MimePart multipartLeaf = MimePartImpl.builder().contentType(contentType).build();
 		int multipartLeafIndex = 5;
 
-		IMimePart parentMimePart = createMock(IMimePart.class);
+		MimePart parentMimePart = createMock(MimePart.class);
 		expect(parentMimePart.findRootMimePartInTree()).andReturn(parentMimePart);
 		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf));
 		multipartLeaf.defineParent(parentMimePart, multipartLeafIndex);
@@ -560,20 +561,20 @@ public class EmailViewPartsFetcherImplTest {
 		int attachmentCollection = 12;
 		int attachmentSize = 1337;
 		
-		MimePart textPlain = MimePart.builder().contentType("text/plain").build();
-		MimePart rfc822EmbeddedAttachment = MimePart.builder()
+		MimePart textPlain = MimePartImpl.builder().contentType("text/plain").build();
+		MimePart rfc822EmbeddedAttachment = MimePartImpl.builder()
 				.contentType("message/rfc822")
 				.contentDisposition("attachment")
 				.size(attachmentSize)
 				.bodyParams(BodyParams.builder().add(new BodyParam("name", attachmentName)).build())
-				.addChild(MimePart.builder()
+				.addChild(MimePartImpl.builder()
 						.contentType("multipart/alternative")
-						.addChild(MimePart.builder().contentType("text/plain").build())
-						.addChild(MimePart.builder().contentType("text/html").build())
+						.addChild(MimePartImpl.builder().contentType("text/plain").build())
+						.addChild(MimePartImpl.builder().contentType("text/html").build())
 						.build())
 				.build();
-		MimeMessage message = MimeMessage.builder().addChild(
-				MimePart.builder()
+		MimeMessage message = MimeMessageImpl.builder().addChild(
+				MimePartImpl.builder()
 					.contentType("multipart/mixed")
 					.addChild(textPlain)
 					.addChild(rfc822EmbeddedAttachment)
@@ -611,7 +612,7 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testDisplayNameWhenNoNameNoContentId() {
-		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePartImpl.builder()
 				.contentType("text/plain")
 				.build());
 		
@@ -620,7 +621,7 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testDisplayNameWhenName() {
-		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePartImpl.builder()
 				.contentType("text/plain")
 				.bodyParams(BodyParams.builder().add(
 						new BodyParam("name", "hello"))
@@ -633,7 +634,7 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testDisplayNameWhenContentId() {
-		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePartImpl.builder()
 				.contentType("text/plain")
 				.contentId("hello")
 				.build());
@@ -644,7 +645,7 @@ public class EmailViewPartsFetcherImplTest {
 	
 	@Test
 	public void testDisplayNameGetNameWhenBoth() {
-		Optional<String> displayName = getDisplayNameOfMimePart(MimePart.builder()
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePartImpl.builder()
 				.contentType("text/plain")
 				.contentId("hello contentId")
 				.bodyParams(BodyParams.builder().add(
@@ -704,7 +705,7 @@ public class EmailViewPartsFetcherImplTest {
 
 		MimeMessage mimeMessage = createMock(MimeMessage.class);
 		expect(mimeMessage.findRootMimePartInTree()).andReturn(mimeMessage);
-		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));
+		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart));
 
 		replay(mimeMessage, mimePart);
 
@@ -724,7 +725,7 @@ public class EmailViewPartsFetcherImplTest {
 		return mailboxService;
 	}
 
-	private Optional<String> getDisplayNameOfMimePart(IMimePart attachment) {
+	private Optional<String> getDisplayNameOfMimePart(MimePart attachment) {
 		IMocksControl mocks = createControl();
 		TransformersFactory transformer = mocks.createMock(TransformersFactory.class);
 		MailboxService mailboxService = mocks.createMock(MailboxService.class);
@@ -812,7 +813,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getPrimaryType()).andReturn(messageFixture.bodyPrimaryType).anyTimes();
 		expect(mimePart.getSubtype()).andReturn(messageFixture.bodySubType).anyTimes();
 		expect(mimePart.findRootMimePartInTree()).andReturn(mimePart);
-		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));
+		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart));
 		expect(mimePart.isAttachment()).andReturn(messageFixture.isAttachment);
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
@@ -834,7 +835,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimeMessage.getMimePart()).andReturn(null);
 		expect(mimeMessage.findMainMessage(anyObject(ContentType.class))).andReturn(mimePart).anyTimes();
 		expect(mimeMessage.findRootMimePartInTree()).andReturn(mimeMessage);
-		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<IMimePart> of(mimePart));
+		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart));
 
 		replay(mimeMessage, mimePart);
 		return mimeMessage;

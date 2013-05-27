@@ -62,7 +62,7 @@ import org.obm.push.mail.conversation.MessageId;
 import org.obm.push.mail.imap.StoreException;
 import org.obm.push.mail.message.MailMessageAttachment;
 import org.obm.push.mail.message.MessageLoader;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
@@ -159,7 +159,7 @@ public class MailMessageLoader {
 		return msEmail;
 	}
 
-	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final IMimePart mimePart, final String collectionPath, final long messageId)
+	private void setInvitation(final MSEmail msEmail, final UserDataRequest udr, final MimePart mimePart, final String collectionPath, final long messageId)
 			throws ConversionException {
 		
 		try {	
@@ -175,7 +175,7 @@ public class MailMessageLoader {
 		}
 	}
 	
-	private InputStream extractInputStreamInvitation(final IMimePart mp, final UserDataRequest udr, final String collectionPath, final long messageId) 
+	private InputStream extractInputStreamInvitation(final MimePart mp, final UserDataRequest udr, final String collectionPath, final long messageId) 
 			throws IOException {
 		
 		final InputStream part = mailboxService.fetchMimePartStream(udr, collectionPath, messageId, mp.getAddress());
@@ -204,7 +204,7 @@ public class MailMessageLoader {
 		Set<MSAttachement> msAttachements = new HashSet<MSAttachement>();
 		for (MailMessageAttachment mailMessageAttachment: mailMessage.getAttachments()) {			
 			
-			IMimePart part = mailMessageAttachment.getPart();
+			MimePart part = mailMessageAttachment.getPart();
 			if (part != null && !part.isInvitation()) {
 				MSAttachement extractAttachments = extractAttachmentData(part, uid, collectionId, messageId, udr, collectionPath);
 				if (isNotICSAttachments(extractAttachments)) {
@@ -262,11 +262,11 @@ public class MailMessageLoader {
 		}
 	}
 	
-	private byte[] extractPartData(final IMimePart mp, final InputStream bodyText) throws IOException {
+	private byte[] extractPartData(final MimePart mp, final InputStream bodyText) throws IOException {
 		return ByteStreams.toByteArray(mp.decodeMimeStream(bodyText));
 	}
 	
-	private MSAttachement extractAttachmentData(final IMimePart mp, final long uid, 
+	private MSAttachement extractAttachmentData(final MimePart mp, final long uid, 
 			final Integer collectionId, final long messageId, final UserDataRequest udr, final String collectionPath) {
 		try {
 			

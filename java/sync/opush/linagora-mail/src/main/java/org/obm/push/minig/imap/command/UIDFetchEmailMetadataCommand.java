@@ -34,7 +34,7 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.bean.EmailMetadata;
-import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
@@ -104,7 +104,7 @@ public class UIDFetchEmailMetadataCommand extends Command<EmailMetadata> {
 		}
 	}
 
-	private MimeMessage buildBodyStructure(String fullPayload, long uid, int size) {
+	private MimeMessageImpl buildBodyStructure(String fullPayload, long uid, int size) {
 		return bodyStructureParser
 	                .parseBodyStructure(UIDFetchBodyStructureCommand.getBodyStructurePayload(fullPayload))
 	                .uid(uid)

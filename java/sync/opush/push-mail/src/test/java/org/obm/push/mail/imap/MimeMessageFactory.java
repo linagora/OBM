@@ -35,12 +35,14 @@ import java.util.Map;
 
 import org.obm.push.mail.mime.BodyParams;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
 
 public class MimeMessageFactory {
 
 	public static MimePart createSimpleMimePart(String mimeType, String mimeSubtype, String contentId, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
-		return MimePart.builder()
+		return MimePartImpl.builder()
 			.primaryMimeType(mimeType)
 			.subMimeType(mimeSubtype)
 			.contentId(contentId)
@@ -52,12 +54,12 @@ public class MimeMessageFactory {
 	}
 
 	public static MimeMessage createSimpleMimeMessage(String mimeType, String mimeSubtype, String contentId, String encoding, int size, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = MimeMessage.builder().from(createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, size, bodyParams, parts)).build();
+		MimeMessage tree = MimeMessageImpl.builder().from(createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, size, bodyParams, parts)).build();
 		return tree;
 	}
 	
 	public static MimeMessage createSimpleMimeTree(String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = MimeMessage.builder().from((createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, null, bodyParams, parts))).build();
+		MimeMessage tree = MimeMessageImpl.builder().from((createSimpleMimePart(mimeType, mimeSubtype, contentId, encoding, null, bodyParams, parts))).build();
 		return tree;
 	}
 

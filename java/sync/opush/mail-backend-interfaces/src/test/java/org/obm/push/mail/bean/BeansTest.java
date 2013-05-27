@@ -38,10 +38,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.BodyParams;
 import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimePart;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
@@ -75,6 +72,7 @@ public class BeansTest {
 					.add(SnapshotKey.class)
 					.add(MessageSet.class)
 					.add(WindowingIndexKey.class)
+					.add(EmailMetadata.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		
@@ -91,24 +89,6 @@ public class BeansTest {
 					ImmutableMap.of("key", "value"),
 					ImmutableMap.of("first", "second"))
 			.verify();
-
-		EqualsVerifierBuilder.builder()
-			.equalsVerifiers(ImmutableList.<Class<?>>of(
-					MimePart.class))
-			.prefabValue(BodyParams.class, 
-					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
-					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
-			.withSuperClass(true)
-			.verify();
-		
-		EqualsVerifierBuilder.builder()
-		.equalsVerifiers(ImmutableList.<Class<?>>of(
-				EmailMetadata.class,
-				MimeMessage.class))
-		.prefabValue(IMimePart.class,
-				MimePart.builder().contentType("text/plain").encoding("7BIT").build(),
-				MimePart.builder().contentType("text/html").encoding("8BIT").build())
-		.verify();
 	}
 	
 }

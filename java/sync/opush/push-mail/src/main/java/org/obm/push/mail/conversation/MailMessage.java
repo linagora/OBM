@@ -43,7 +43,7 @@ import java.util.Set;
 
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.message.MailMessageAttachment;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 
 public class MailMessage implements Serializable, Comparable<MailMessage> {
 
@@ -57,7 +57,7 @@ public class MailMessage implements Serializable, Comparable<MailMessage> {
 	private Map<String, String> headers;
 	private Set<MailMessage> forwardMessage;
 	private long uid;
-	private IMimePart invitation;
+	private MimePart invitation;
 
 	private List<Address> to;
 	private List<Address> cc;
@@ -219,11 +219,11 @@ public class MailMessage implements Serializable, Comparable<MailMessage> {
 		}
 	}
 
-	public IMimePart getInvitation() {
+	public MimePart getInvitation() {
 		return invitation;
 	}
 
-	public void setInvitation(IMimePart invitation) {
+	public void setInvitation(MimePart invitation) {
 		this.invitation = invitation;
 	}
 

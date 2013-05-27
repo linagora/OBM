@@ -38,6 +38,7 @@ import java.util.List;
 
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
@@ -95,7 +96,7 @@ public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage
 		
 		try {
 			//remove closing brace
-			MimeMessage.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bodyStructure);
+			MimeMessageImpl.Builder messageBuilder = bodyStructureParser.parseBodyStructure(bodyStructure);
 			messageBuilder.uid(uid).size(size);
 			mts.add(messageBuilder.build());
 			

@@ -38,10 +38,10 @@ import java.io.OutputStreamWriter;
 
 import org.obm.push.mail.mime.BodyParam;
 import org.obm.push.mail.mime.BodyParams;
-import org.obm.push.mail.mime.IMimePart;
-import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
-import org.obm.push.mail.mime.MimePart.Builder;
+import org.obm.push.mail.mime.MimePartImpl;
+import org.obm.push.mail.mime.MimePartImpl.Builder;
 import org.obm.push.minig.imap.mime.impl.BodyParamParser;
 import org.parboiled.Parboiled;
 import org.parboiled.Rule;
@@ -187,12 +187,12 @@ public class BodyStructureParser {
 		}
 
 		Rule bodyTypeBasic() {
-			return Sequence(push(MimePart.builder()), mediaBasic(), whitespaces(), bodyFields());
+			return Sequence(push(MimePartImpl.builder()), mediaBasic(), whitespaces(), bodyFields());
 		}
 
 		Rule bodyTypeMPart() {
 			return Sequence(
-						push(MimePart.builder().primaryMimeType("multipart")), 
+						push(MimePartImpl.builder().primaryMimeType("multipart")), 
 						OneOrMore(body()), 
 						whitespaces(), mediaSubType(), recordMimeSubtype(), 
 						Optional(whitespaces(), bodyExtMPart()),
@@ -200,12 +200,12 @@ public class BodyStructureParser {
 		}
 
 		Rule bodyTypeMsg() {
-			return Sequence(push(MimePart.embeddedMessageBuilder()), mediaMessage(), whitespaces(), bodyFields(), whitespaces(), envelope(), 
+			return Sequence(push(MimePartImpl.embeddedMessageBuilder()), mediaMessage(), whitespaces(), bodyFields(), whitespaces(), envelope(), 
 					whitespaces(), body(), whitespaces(), bodyFldLines());
 		}
 		
 		Rule bodyTypeText() {
-			return Sequence(push(MimePart.builder()), mediaText(), whitespaces(), bodyFields(), whitespaces(), bodyFldLines());
+			return Sequence(push(MimePartImpl.builder()), mediaText(), whitespaces(), bodyFields(), whitespaces(), bodyFldLines());
 		}
 
 		Rule envBcc() {
@@ -290,7 +290,7 @@ public class BodyStructureParser {
 		}
 
 		public Rule rule() {
-			return Sequence(push(MimeMessage.builder()), body(), EOI);
+			return Sequence(push(MimeMessageImpl.builder()), body(), EOI);
 		}
 		
 		boolean addBodyParam() {
@@ -302,22 +302,22 @@ public class BodyStructureParser {
 		}
 		
 		boolean addMimePart() {
-			MimePart.Builder obj = (MimePart.Builder) pop();
-			IMimePart.Builder<?> mimeParent = (IMimePart.Builder<?>) peek();
+			MimePartImpl.Builder obj = (MimePartImpl.Builder) pop();
+			MimePart.Builder<?> mimeParent = (MimePart.Builder<?>) peek();
 			mimeParent.addChild(obj.build());
 			return true;
 		}
 				
 		boolean recordContentDisposition() {
 			String contentDisposition = (String)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.contentDisposition(contentDisposition);
 			return true;
 		}
 		
 		boolean recordEncoding() {
 			String encoding = (String)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.encoding(encoding);
 			return true;
 		}
@@ -325,21 +325,21 @@ public class BodyStructureParser {
 		
 		boolean recordId() {
 			String contentId = (String)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.contentId(contentId);
 			return true;
 		}
 
 		boolean recordBodyParams() {
 			BodyParams.Builder bodyParamsBuilder = (BodyParams.Builder)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.bodyParams(bodyParamsBuilder.build());
 			return true;
 		}
 
 		boolean recordMimeType() {
 			String primaryMimeType = (String)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.primaryMimeType(primaryMimeType);
 			return true;
 		}
@@ -347,27 +347,27 @@ public class BodyStructureParser {
 		
 		boolean recordMimeSubtype() {
 			String mimeType = (String)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.subMimeType(mimeType);
 			return true;
 		}
 
 		boolean recordTextMimeType() {
 			String subMimeType = (String) pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.primaryMimeType("TEXT").subMimeType(subMimeType);
 			return true;
 		}
 		
 		boolean recordMessageRfc822() {
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.primaryMimeType("MESSAGE").subMimeType("RFC822");
 			return true;
 		}
 		
 		boolean recordSize() {
 			Integer size = (Integer)pop();
-			MimePart.Builder mimePartBuilder = (Builder) peek();
+			MimePartImpl.Builder mimePartBuilder = (Builder) peek();
 			mimePartBuilder.size(size);
 			return true;
 		}
@@ -375,11 +375,11 @@ public class BodyStructureParser {
 	
 	private static final Rules parser = Parboiled.createParser(BodyStructureParser.Rules.class);
 	
-	public org.obm.push.mail.mime.MimeMessage.Builder parseBodyStructureDebug(String payload) {
+	public org.obm.push.mail.mime.MimeMessageImpl.Builder parseBodyStructureDebug(String payload) {
 		Rules parserInstance = parser.newInstance();
-		TracingParseRunner<MimeMessage.Builder> runner = new TracingParseRunner<MimeMessage.Builder>(parserInstance.rule());
+		TracingParseRunner<MimeMessageImpl.Builder> runner = new TracingParseRunner<MimeMessageImpl.Builder>(parserInstance.rule());
 		try {
-			ParsingResult<MimeMessage.Builder> result = runner.run(payload);
+			ParsingResult<MimeMessageImpl.Builder> result = runner.run(payload);
 			return result.resultValue;
 		} finally {
 			logToFile(runner);
@@ -387,7 +387,7 @@ public class BodyStructureParser {
 	}
 
 
-	private static void logToFile(TracingParseRunner<MimeMessage.Builder> runner) {
+	private static void logToFile(TracingParseRunner<MimeMessageImpl.Builder> runner) {
 		FileOutputStream fileOutputStream = null;
 		try {
 			fileOutputStream = new FileOutputStream("/tmp/log");
@@ -410,13 +410,13 @@ public class BodyStructureParser {
 	}
 
 	
-	public MimeMessage.Builder parseBodyStructure(String payload) {
+	public MimeMessageImpl.Builder parseBodyStructure(String payload) {
 		Rules parserInstance = parser.newInstance();
-		RecoveringParseRunner<MimeMessage.Builder> runner = 
+		RecoveringParseRunner<MimeMessageImpl.Builder> runner = 
 			//new RecoveringParseRunner<MimeTree>(parserInstance.rule(), new DebugValueStack());
-			new RecoveringParseRunner<MimeMessage.Builder>(parserInstance.rule());
+			new RecoveringParseRunner<MimeMessageImpl.Builder>(parserInstance.rule());
 
-		ParsingResult<MimeMessage.Builder> result = runner.run(payload);
+		ParsingResult<MimeMessageImpl.Builder> result = runner.run(payload);
 		return result.resultValue;
 
 		//logger.info(ParseTreeUtils.printNodeTree(result));

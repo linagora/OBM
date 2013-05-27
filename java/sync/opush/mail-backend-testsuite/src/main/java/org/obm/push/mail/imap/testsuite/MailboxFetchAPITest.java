@@ -69,7 +69,7 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -251,11 +251,11 @@ public abstract class MailboxFetchAPITest {
 		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
-		IMimePart multiPartMixed = onlyElement.getMimePart();
-		IMimePart multiPartAlternative = multiPartMixed.getChildren().get(0);
-		IMimePart attachment = multiPartMixed.getChildren().get(1);
-		IMimePart textPlain = multiPartAlternative.getChildren().get(0);
-		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
+		MimePart multiPartMixed = onlyElement.getMimePart();
+		MimePart multiPartAlternative = multiPartMixed.getChildren().get(0);
+		MimePart attachment = multiPartMixed.getChildren().get(1);
+		MimePart textPlain = multiPartAlternative.getChildren().get(0);
+		MimePart textHtml = multiPartAlternative.getChildren().get(1);
 		
 		assertThat(collections).hasSize(1);
 		assertThat(onlyElement.getUid()).isEqualTo(1L);
@@ -291,10 +291,10 @@ public abstract class MailboxFetchAPITest {
 		Collection<org.obm.push.mail.mime.MimeMessage> collections = mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(1l));
 		org.obm.push.mail.mime.MimeMessage onlyElement = Iterables.getOnlyElement(collections);
 		
-		IMimePart multiPartAlternative = onlyElement.getMimePart();
-		IMimePart textPlain = multiPartAlternative.getChildren().get(0);
-		IMimePart textHtml = multiPartAlternative.getChildren().get(1);
-		IMimePart textCalendar = multiPartAlternative.getChildren().get(2);
+		MimePart multiPartAlternative = onlyElement.getMimePart();
+		MimePart textPlain = multiPartAlternative.getChildren().get(0);
+		MimePart textHtml = multiPartAlternative.getChildren().get(1);
+		MimePart textCalendar = multiPartAlternative.getChildren().get(2);
 		
 		assertThat(collections.size()).isEqualTo(1);
 		assertThat(onlyElement.getUid()).isEqualTo(1L);

@@ -48,7 +48,7 @@ import org.obm.push.mail.conversation.MailBody;
 import org.obm.push.mail.conversation.MailMessage;
 import org.obm.push.mail.imap.StoreException;
 import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 import org.obm.push.mail.mime.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +103,7 @@ public class MessageLoader {
 		return rootMailMessage;
 	}
 
-	private MailMessage fetchOneMessage(IMimePart mimePart)
+	private MailMessage fetchOneMessage(MimePart mimePart)
 			throws IOException {
 		
 		MailMessage mm = extractMailMessage(mimePart);
@@ -126,9 +126,9 @@ public class MessageLoader {
 		mm.setSmtpId(h.getRawHeader("Message-ID"));
 	}
 
-	private MailMessage extractMailMessage(IMimePart mimePart) throws IOException {
+	private MailMessage extractMailMessage(MimePart mimePart) throws IOException {
 		MailMessage mailMessage = new MailMessage();
-		IMimePart chosenPart = new BodySelector(mimePart,
+		MimePart chosenPart = new BodySelector(mimePart,
 				mimeSubtypeInPriorityOrder).findBodyTextPart();
 		MailBody mailBody = null;
 		if (chosenPart == null) {
@@ -145,10 +145,10 @@ public class MessageLoader {
 		return mailMessage;
 	}
 
-	private List<MailMessageAttachment> extractAttachments(IMimePart mimePart) {
+	private List<MailMessageAttachment> extractAttachments(MimePart mimePart) {
 		List<MailMessageAttachment> attachments = new ArrayList<MailMessageAttachment>();
-		IMimePart parentMessage = mimePart.findRootMimePartInTree();
-		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
+		MimePart parentMessage = mimePart.findRootMimePartInTree();
+		for (MimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isAttachment()) {
 				MailMessageAttachment mailMessageAttachment = extractMailMessageAttachment(mp);
 				if (mailMessageAttachment != null) {
@@ -164,14 +164,14 @@ public class MessageLoader {
 		return attachments;
 	}
 	
-	private void fetchQuotedText(IMimePart message, MailMessage mailMessage) 
+	private void fetchQuotedText(MimePart message, MailMessage mailMessage) 
 		throws IOException {
-		for (IMimePart part: message.getChildren()) {
+		for (MimePart part: message.getChildren()) {
 			fetchFlowed(mailMessage, part);
 		}
 	}
 
-	private void fetchFlowed(MailMessage mailMessage, IMimePart part)
+	private void fetchFlowed(MailMessage mailMessage, MimePart part)
 			throws IOException {
 		if (formatFlowed.equals(part.getBodyParam("format"))) {
 			MailMessage mm = fetchOneMessage(part);
@@ -186,26 +186,26 @@ public class MessageLoader {
 		}
 	}
 
-	private void fetchForwardMessages(IMimePart t, MailMessage mailMessage) 
+	private void fetchForwardMessages(MimePart t, MailMessage mailMessage) 
 		throws IOException,	StoreException {
 
-		for (IMimePart part: t.getChildren()) {
+		for (MimePart part: t.getChildren()) {
 			fetchNested(mailMessage, part);
 			fetchMultipart(mailMessage, part);
 		}
 	}
 
-	private void fetchMultipart(MailMessage mailMessage, IMimePart part)
+	private void fetchMultipart(MailMessage mailMessage, MimePart part)
 			throws IOException, StoreException {
 
 		if (part.isMultipart()) {
-			for (IMimePart mp: part.getChildren()) {
+			for (MimePart mp: part.getChildren()) {
 				fetchNested(mailMessage, mp);
 			}
 		}
 	}
 
-	private void fetchNested(MailMessage mailMessage, IMimePart m)
+	private void fetchNested(MailMessage mailMessage, MimePart m)
 			throws IOException, StoreException {
 		
 		if (m.isNested()) {
@@ -217,7 +217,7 @@ public class MessageLoader {
 		}
 	}
 	
-	private MailBody getMailBody(IMimePart chosenPart) throws IOException {
+	private MailBody getMailBody(MimePart chosenPart) throws IOException {
 		MailBody mb = new MailBody();
 		InputStream bodyText = 
 				chosenPart.decodeMimeStream(
@@ -229,7 +229,7 @@ public class MessageLoader {
 		return mb;
 	}
 
-	private void logFullTextBody(IMimePart chosenPart, String partText) {
+	private void logFullTextBody(MimePart chosenPart, String partText) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Added part " + chosenPart.getFullMimeType() + "\n" + partText + "\n------");
 		}
@@ -249,7 +249,7 @@ public class MessageLoader {
 		return Charsets.UTF_8;
 	}
 	
-	private MailMessageAttachment extractMailMessageAttachment(IMimePart mp) {
+	private MailMessageAttachment extractMailMessageAttachment(MimePart mp) {
 		String id = "at_" + message.getUid() + "_" + (nbAttachments++);
 		String partName = mp.getName();
 		if (partName != null) {

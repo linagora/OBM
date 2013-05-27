@@ -31,19 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.message;
 
-import org.obm.push.mail.mime.IMimePart;
+import org.obm.push.mail.mime.MimePart;
 
 public class MailMessageAttachment {
 
 	private String atMgrId;
 	private String displayName;
-	private transient IMimePart part;
+	private transient MimePart part;
 	
 	public MailMessageAttachment(String atMgrId, String displayName) {
 		this(atMgrId, displayName, null);
 	}
 	
-	public MailMessageAttachment(String atMgrId, String displayName, IMimePart part) {
+	public MailMessageAttachment(String atMgrId, String displayName, MimePart part) {
 		super();
 		this.atMgrId = atMgrId;
 		this.displayName = displayName;
@@ -58,7 +58,7 @@ public class MailMessageAttachment {
 		return displayName;
 	}
 
-	public IMimePart getPart() {
+	public MimePart getPart() {
 		return part;
 	}
 	

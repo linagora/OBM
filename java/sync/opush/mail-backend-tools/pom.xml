@@ -41,5 +41,10 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>mail-backend-interfaces</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 </project>

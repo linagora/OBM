@@ -40,19 +40,19 @@ import java.util.TreeSet;
 
 public class LeafPartsFinder {
 
-	private Collection<IMimePart> leaves;
+	private Collection<MimePart> leaves;
 	private final boolean filterNested;
-	private final IMimePart root;
+	private final MimePart root;
 	
-	public LeafPartsFinder(IMimePart root, boolean depthFirst, boolean filterNested) {
+	public LeafPartsFinder(MimePart root, boolean depthFirst, boolean filterNested) {
 		this.root = root;
 		this.filterNested = filterNested;
 		if (depthFirst) {
-			leaves = new ArrayList<IMimePart>();
+			leaves = new ArrayList<MimePart>();
 		} else {
-			leaves = new TreeSet<IMimePart>(new Comparator<IMimePart>() {
+			leaves = new TreeSet<MimePart>(new Comparator<MimePart>() {
 				@Override
-				public int compare(IMimePart o1, IMimePart o2) {
+				public int compare(MimePart o1, MimePart o2) {
 					MimeAddress firstAddr = o1.getAddress();
 					MimeAddress secondAddr = o2.getAddress();
 					int diffLevel = firstAddr.compareNestLevel(secondAddr);
@@ -67,7 +67,7 @@ public class LeafPartsFinder {
 	}
 
 	
-	private void buildLeafList(IMimePart mp) {
+	private void buildLeafList(MimePart mp) {
 		if (mp.getChildren().isEmpty()) {
 			leaves.add(mp);
 		} else {
@@ -75,13 +75,13 @@ public class LeafPartsFinder {
 				leaves.add(mp);
 				return;
 			}
-			for (IMimePart m : mp.getChildren()) {
+			for (MimePart m : mp.getChildren()) {
 				buildLeafList(m);
 			}
 		}
 	}
 
-	public Collection<IMimePart> getLeaves() {
+	public Collection<MimePart> getLeaves() {
 		return leaves;
 	}
 	

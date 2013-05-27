@@ -79,7 +79,9 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
+import org.obm.push.mail.mime.MimePartImpl;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.EventService;
@@ -329,7 +331,7 @@ public class MailboxBackendTest {
 	}
 	
 	private MimeMessage buildMimeMessage(long uid) {
-		return MimeMessage.builder()
+		return MimeMessageImpl.builder()
 				.uid(uid)
 				.addChild(buildMimePart())
 				.size(1)
@@ -337,7 +339,7 @@ public class MailboxBackendTest {
 	}
 	
 	private MimePart buildMimePart() {
-		return MimePart.builder()
+		return MimePartImpl.builder()
 				.contentType("text/plain; charset= utf-8")
 				.size(1)
 				.build();

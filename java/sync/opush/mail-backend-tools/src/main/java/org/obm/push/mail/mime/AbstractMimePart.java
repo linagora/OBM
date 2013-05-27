@@ -44,37 +44,38 @@ import java.util.Map;
 
 import org.minig.imap.command.parser.HeadersParser;
 import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.IMAPHeadersImpl;
 
 
-public abstract class AbstractMimePart implements IMimePart {
+public abstract class AbstractMimePart implements MimePart {
 
-	private List<IMimePart> children;
+	private List<MimePart> children;
 	private BodyParams bodyParams;
 
-	protected AbstractMimePart(List<IMimePart> children, BodyParams bodyParams) {
+	protected AbstractMimePart(List<MimePart> children, BodyParams bodyParams) {
 		setChildren(children);
 		this.bodyParams = bodyParams;
 	}
 	
 	protected AbstractMimePart() {
-		this(new LinkedList<IMimePart>(), BodyParams.builder().build());
+		this(new LinkedList<MimePart>(), BodyParams.builder().build());
 	}
 
 	@Override
-	public List<IMimePart> getChildren() {
+	public List<MimePart> getChildren() {
 		return Collections.unmodifiableList(children);
 	}
 	
-	private void setChildren(List<IMimePart> children) {
+	private void setChildren(List<MimePart> children) {
 		int i = 1;
-		for (IMimePart child: children) {
+		for (MimePart child: children) {
 			child.defineParent(this, i++);
 		}
 		this.children = children;
 	}
 	
 	@Override
-	public Collection<IMimePart> listLeaves(boolean depthFirst, boolean filterNested) {
+	public Collection<MimePart> listLeaves(boolean depthFirst, boolean filterNested) {
 		return new LeafPartsFinder(this, depthFirst, filterNested).getLeaves();
 	}
 	
@@ -89,9 +90,9 @@ public abstract class AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public IMimePart getInvitation() {
-		Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
-		for (IMimePart mimePart: mimeParts) {
+	public MimePart getInvitation() {
+		Collection<MimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
+		for (MimePart mimePart: mimeParts) {
 			if (mimePart.isInvitation() || mimePart.isCancelInvitation()) {
 				return mimePart;
 			} 	
@@ -100,7 +101,7 @@ public abstract class AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public IMimePart findRootMimePartInTree() {
+	public MimePart findRootMimePartInTree() {
 		if (this.getParent() != null) {
 			return this.getParent().findRootMimePartInTree();
 		} else {
@@ -109,10 +110,10 @@ public abstract class AbstractMimePart implements IMimePart {
 	}
 	
 	@Override
-	public IMimePart findMainMessage(ContentType contentType) {
+	public MimePart findMainMessage(ContentType contentType) {
 		if (contentType != null) {
-			Collection<IMimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
-			for (IMimePart mimePart: mimeParts) {
+			Collection<MimePart> mimeParts = findRootMimePartInTree().listLeaves(true, true);
+			for (MimePart mimePart: mimeParts) {
 				if (isMatching(contentType, mimePart)) {
 					return mimePart;
 				}
@@ -121,7 +122,7 @@ public abstract class AbstractMimePart implements IMimePart {
 		return null;
 	}
 
-	private boolean isMatching(ContentType contentType, IMimePart mimePart) {
+	private boolean isMatching(ContentType contentType, MimePart mimePart) {
 		if (mimePart.hasMimePart(contentType)) {
 			if (mimePart.hasMultiPartMixedParent()) {
 				return mimePart.isFirstElementInParent();
@@ -137,7 +138,7 @@ public abstract class AbstractMimePart implements IMimePart {
 	public IMAPHeaders decodeHeaders(InputStream is) throws IOException {
 		InputStreamReader reader = new InputStreamReader(is, getHeaderCharsetDecoder());
 		Map<String, String> rawHeaders = new HeadersParser().parseRawHeaders(reader);
-		IMAPHeaders h = new IMAPHeaders();
+		IMAPHeadersImpl h = new IMAPHeadersImpl();
 		h.setRawHeaders(rawHeaders);
 		return h;
 	}

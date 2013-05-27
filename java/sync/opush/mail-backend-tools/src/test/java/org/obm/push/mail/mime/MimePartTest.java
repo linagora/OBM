@@ -48,7 +48,7 @@ public class MimePartTest {
 	@Test
 	public void testContentTransfertEncodingBase64() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding("BASE64").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding("BASE64").build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isInstanceOf(Base64InputStream.class);
 	}
@@ -56,7 +56,7 @@ public class MimePartTest {
 	@Test
 	public void testContentTransfertEncodingBaSe64IgnoreCase() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding("BaSe64").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding("BaSe64").build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isInstanceOf(Base64InputStream.class);
 	}
@@ -64,7 +64,7 @@ public class MimePartTest {
 	@Test
 	public void testContentTransfertEncodingQuotedPrintable() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding("QUOTED-PRINTABLE").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding("QUOTED-PRINTABLE").build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isInstanceOf(QuotedPrintableInputStream.class);
 	}
@@ -72,7 +72,7 @@ public class MimePartTest {
 	@Test
 	public void testContentTransfertEncodingQuotedPrinTableIgnoreCase() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding("Quoted-PrinTable").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding("Quoted-PrinTable").build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isInstanceOf(QuotedPrintableInputStream.class);
 	}
@@ -80,7 +80,7 @@ public class MimePartTest {
 	@Test
 	public void testBadContentTransfert() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding("Toto").build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding("Toto").build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}
@@ -88,7 +88,7 @@ public class MimePartTest {
 	@Test
 	public void testDefaultContentTransfert() {
 		InputStream inputStream = createMock(InputStream.class);
-		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding(null).build();
+		MimePart mimePart = MimePartImpl.builder().contentType("text/plain").encoding(null).build();
 		Object actual = mimePart.decodeMimeStream(inputStream);
 		assertThat(actual).isSameAs(inputStream);
 	}

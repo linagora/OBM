@@ -47,17 +47,17 @@ import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.Email;
-import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.IMAPHeaders;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 
 public interface MailboxService {
 	
@@ -119,7 +119,7 @@ public interface MailboxService {
 	
 	Collection<UIDEnvelope> fetchEnvelope(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException;
 
-	Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet uid, IMimePart mimePart) throws IOException;
+	Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet uid, MimePart mimePart) throws IOException;
 
 	void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException;
 

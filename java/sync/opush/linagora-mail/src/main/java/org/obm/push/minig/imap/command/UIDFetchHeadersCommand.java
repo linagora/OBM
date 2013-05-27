@@ -42,6 +42,7 @@ import java.util.Map;
 
 import org.minig.imap.command.parser.HeadersParser;
 import org.obm.push.mail.bean.IMAPHeaders;
+import org.obm.push.mail.bean.IMAPHeadersImpl;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
@@ -132,7 +133,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 			logger.warn("cyrus did not return any header for uid {}", uid);
 		}
 
-		IMAPHeaders imapHeaders = new IMAPHeaders();
+		IMAPHeadersImpl imapHeaders = new IMAPHeadersImpl();
 		imapHeaders.setRawHeaders(rawHeaders);
 		
 		if (data == null || data.isEmpty()) {

@@ -38,28 +38,24 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.mime.IMimePart;
-import org.obm.push.mail.mime.LeafPartsFinder;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimePart;
 
 @RunWith(SlowFilterRunner.class)
 public class LeafPartsFinderTest {
 
 	@Test
 	public void testEmlAttachmentIsALeaf() {
-		MimePart textPlain = MimePart.builder().contentType("text/plain").build();
-		MimePart rfc822EmbeddedAttachment = MimePart.builder()
+		MimePart textPlain = MimePartImpl.builder().contentType("text/plain").build();
+		MimePart rfc822EmbeddedAttachment = MimePartImpl.builder()
 				.contentType("message/rfc822")
 				.contentDisposition("attachment")
-				.addChild(MimePart.builder()
+				.addChild(MimePartImpl.builder()
 						.contentType("multipart/alternative")
-						.addChild(MimePart.builder().contentType("text/plain").build())
-						.addChild(MimePart.builder().contentType("text/html").build())
+						.addChild(MimePartImpl.builder().contentType("text/plain").build())
+						.addChild(MimePartImpl.builder().contentType("text/html").build())
 						.build())
 				.build();
-		MimeMessage message = MimeMessage.builder().addChild(
-				MimePart.builder()
+		MimeMessage message = MimeMessageImpl.builder().addChild(
+				MimePartImpl.builder()
 					.contentType("multipart/mixed")
 					.addChild(textPlain)
 					.addChild(rfc822EmbeddedAttachment)
@@ -68,7 +64,7 @@ public class LeafPartsFinderTest {
 
 		boolean filterNested = true;
 		boolean depthFirst = true;
-		Collection<IMimePart> leaves = new LeafPartsFinder(message, depthFirst, filterNested).getLeaves();
+		Collection<MimePart> leaves = new LeafPartsFinder(message, depthFirst, filterNested).getLeaves();
 		
 		assertThat(leaves).hasSize(2);
 		assertThat(leaves).containsOnly(textPlain, rfc822EmbeddedAttachment);
@@ -76,25 +72,25 @@ public class LeafPartsFinderTest {
 
 	@Test
 	public void testEmlAttachmentIsALeafWhenFirstIsAlternative() {
-		MimePart textPlain = MimePart.builder().contentType("text/plain").build();
-		MimePart textHtml = MimePart.builder().contentType("text/html").build();
-		MimePart alternative = MimePart.builder()
+		MimePart textPlain = MimePartImpl.builder().contentType("text/plain").build();
+		MimePart textHtml = MimePartImpl.builder().contentType("text/html").build();
+		MimePart alternative = MimePartImpl.builder()
 				.contentType("multipart/alternative")
 				.addChildren(textPlain, textHtml)
 				.build();
 		
-		MimePart rfc822EmbeddedAttachment = MimePart.builder()
+		MimePart rfc822EmbeddedAttachment = MimePartImpl.builder()
 				.contentType("message/rfc822")
 				.contentDisposition("attachment")
-				.addChild(MimePart.builder()
+				.addChild(MimePartImpl.builder()
 						.contentType("multipart/alternative")
-						.addChild(MimePart.builder().contentType("text/plain").build())
-						.addChild(MimePart.builder().contentType("text/html").build())
+						.addChild(MimePartImpl.builder().contentType("text/plain").build())
+						.addChild(MimePartImpl.builder().contentType("text/html").build())
 						.build())
 				.build();
 		
-		MimeMessage message = MimeMessage.builder().addChild(
-				MimePart.builder()
+		MimeMessage message = MimeMessageImpl.builder().addChild(
+				MimePartImpl.builder()
 					.contentType("multipart/mixed")
 					.addChild(alternative)
 					.addChild(rfc822EmbeddedAttachment)
@@ -103,7 +99,7 @@ public class LeafPartsFinderTest {
 
 		boolean filterNested = true;
 		boolean depthFirst = true;
-		Collection<IMimePart> leaves = new LeafPartsFinder(message, depthFirst, filterNested).getLeaves();
+		Collection<MimePart> leaves = new LeafPartsFinder(message, depthFirst, filterNested).getLeaves();
 		
 		assertThat(leaves).hasSize(3);
 		assertThat(leaves).containsOnly(textPlain, textHtml, rfc822EmbeddedAttachment);

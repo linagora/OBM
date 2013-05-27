@@ -38,8 +38,8 @@ import java.util.List;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.IMimePart;
 import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimePart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +145,7 @@ public class MimePartSelector {
 	private List<FetchInstruction> findMatchingInstruction(MimeMessage mimeMessage, BodyPreference bodyPreference) {
 		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
 		for (FetchHints hints: listContentTypes(bodyPreference.getType())) {
-			IMimePart mimePart =  mimeMessage.findMainMessage(hints.getContentType());
+			MimePart mimePart =  mimeMessage.findMainMessage(hints.getContentType());
 			if (isOptionsMatching(mimePart, bodyPreference)) {
 				fetchInstructions.add(buildFetchInstruction(hints.getInstruction(), mimePart, bodyPreference));
 			}
@@ -153,7 +153,7 @@ public class MimePartSelector {
 		return fetchInstructions;
 	}
 
-	private boolean isOptionsMatching(IMimePart mimePart, BodyPreference bodyPreference) {
+	private boolean isOptionsMatching(MimePart mimePart, BodyPreference bodyPreference) {
 		if (mimePart != null) {
 			if (bodyPreference.isAllOrNone() && bodyPreference.getTruncationSize() != null) {
 				return mimePart.getSize() < bodyPreference.getTruncationSize();
@@ -165,7 +165,7 @@ public class MimePartSelector {
 		}
 	}
 	
-	private FetchInstruction buildFetchInstruction(FetchInstruction.Builder instruction, IMimePart mimePart, BodyPreference bodyPreference) {
+	private FetchInstruction buildFetchInstruction(FetchInstruction.Builder instruction, MimePart mimePart, BodyPreference bodyPreference) {
 		return instruction
 			.mimePart(mimePart)
 			.truncation(bodyPreference.getTruncationSize())

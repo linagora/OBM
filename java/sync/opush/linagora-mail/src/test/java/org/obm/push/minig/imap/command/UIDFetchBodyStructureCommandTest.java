@@ -51,7 +51,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.mime.MimeMessage;
+import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
@@ -76,7 +76,7 @@ public class UIDFetchBodyStructureCommandTest {
 	public void testHandleResponses() {
 		BodyStructureParser resultCallback = createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
-		MimeMessage.Builder mimeMessageBuilder = createNiceMock(MimeMessage.Builder.class);
+		MimeMessageImpl.Builder mimeMessageBuilder = createNiceMock(MimeMessageImpl.Builder.class);
 		expect(mimeMessageBuilder.uid(anyLong())).andReturn(mimeMessageBuilder);
 		expect(mimeMessageBuilder.size(anyInt())).andReturn(mimeMessageBuilder);
 		expect(resultCallback.parseBodyStructure(capture(result))).andReturn(mimeMessageBuilder);
@@ -95,7 +95,7 @@ public class UIDFetchBodyStructureCommandTest {
 	public void testHandleMultipleResponsesWithOnlyOneCorresponding() {
 		BodyStructureParser resultCallback = createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);
-		MimeMessage.Builder mimeMessageBuilder = createNiceMock(MimeMessage.Builder.class);
+		MimeMessageImpl.Builder mimeMessageBuilder = createNiceMock(MimeMessageImpl.Builder.class);
 		expect(mimeMessageBuilder.uid(anyLong())).andReturn(mimeMessageBuilder);
 		expect(mimeMessageBuilder.size(anyInt())).andReturn(mimeMessageBuilder);
 		expect(resultCallback.parseBodyStructure(capture(result))).andReturn(mimeMessageBuilder);
