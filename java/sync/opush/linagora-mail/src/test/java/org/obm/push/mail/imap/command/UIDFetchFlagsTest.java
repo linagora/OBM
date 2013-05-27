@@ -47,13 +47,13 @@ import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Flag;
@@ -183,7 +183,7 @@ public class UIDFetchFlagsTest {
 		return StreamMailTestsUtils.newInputStreamFromString("data");
 	}
 
-	private long messageWithFlagsToInbox(Flag... flags) throws LocatorClientException, IMAPException {
+	private long messageWithFlagsToInbox(Flag... flags) throws OpushLocatorException, IMAPException {
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream(), list(flags));
@@ -197,7 +197,7 @@ public class UIDFetchFlagsTest {
 		return mailboxService.fetchFlags(udr, inbox, MessageSet.singleton(uid)).get(uid);
 	}
 	
-	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {
+	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
 		return clientProvider.getImapClient(udr);
 	}
 }

@@ -47,12 +47,12 @@ import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.LocatorClientException;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.IMAPException;
@@ -165,14 +165,14 @@ public class UIDFetchMessageTest {
 		assertThat(IOUtils.toByteArray(uidFetchMessage)).isEmpty();
 	}
 
-	private InputStream uidFetchMessage(long uid) throws LocatorClientException, IMAPException {
+	private InputStream uidFetchMessage(long uid) throws OpushLocatorException, IMAPException {
 		
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		return client.uidFetchMessage(uid);
 	}
 	
-	private StoreClient loggedClient() throws LocatorClientException, IMAPException  {
+	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
 		return clientProvider.getImapClient(udr);
 	}
 }

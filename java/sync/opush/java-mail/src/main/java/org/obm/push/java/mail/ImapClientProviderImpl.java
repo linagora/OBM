@@ -39,10 +39,9 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.exception.NoImapClientAvailableException;
 import org.obm.push.mail.imap.IMAPException;
@@ -50,6 +49,7 @@ import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.ImapStore.Factory;
 import org.obm.push.mail.imap.MessageInputStreamProvider;
 import org.obm.push.mail.imap.OpushImapFolder;
+import org.obm.push.service.OpushLocatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,14 +67,14 @@ public class ImapClientProviderImpl {
 
 	
 	private final Factory imapStoreFactory;
-	private final LocatorService locatorService;
+	private final OpushLocatorService locatorService;
 	private final MessageInputStreamProvider messageInputStreamProvider;
 	private final boolean loginWithDomain;
 	@VisibleForTesting final Session defaultSession;
 
 	@Inject
 	@VisibleForTesting ImapClientProviderImpl(ImapStore.Factory imapStoreFactory,
-			EmailConfiguration emailConfiguration, LocatorService locatorService, 
+			EmailConfiguration emailConfiguration, OpushLocatorService locatorService, 
 			MessageInputStreamProvider messageInputStreamProvider) {
 		
 		this.imapStoreFactory = imapStoreFactory;
@@ -107,14 +107,14 @@ public class ImapClientProviderImpl {
 	}
 
 	
-	private String locateImap(UserDataRequest udr) throws LocatorClientException {
+	private String locateImap(UserDataRequest udr) throws OpushLocatorException {
 		String imapLocation = locatorService.
 				getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		logger.info("Using {} as imap host.", imapLocation);
 		return imapLocation;
 	}
 
-	public ImapStore getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws LocatorClientException, IMAPException {
+	public ImapStore getImapClient(UserDataRequest udr, OpushImapFolder opushImapFolder) throws OpushLocatorException, IMAPException {
 		try {
 			ImapStore imapStore = retrieveWorkingImapStore(udr, opushImapFolder);
 			if (imapStore != null) {

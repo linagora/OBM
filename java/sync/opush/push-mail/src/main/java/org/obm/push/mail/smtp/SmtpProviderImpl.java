@@ -32,10 +32,10 @@
 package org.obm.push.mail.smtp;
 
 import org.columba.ristretto.smtp.SMTPProtocol;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.exception.SmtpLocatorException;
+import org.obm.push.service.OpushLocatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +46,10 @@ import com.google.inject.Singleton;
 public class SmtpProviderImpl implements SmtpProvider {
 
 	private static final Logger logger = LoggerFactory.getLogger(SmtpProviderImpl.class);
-	private final LocatorService locatorService;
+	private final OpushLocatorService locatorService;
 
 	@Inject
-	private SmtpProviderImpl(LocatorService locatorService) {
+	private SmtpProviderImpl(OpushLocatorService locatorService) {
 		this.locatorService = locatorService;
 	}
 	
@@ -60,7 +60,7 @@ public class SmtpProviderImpl implements SmtpProvider {
 			logger.info("Using " + smtpHost + " as smtp host.");
 			SMTPProtocol proto = new SMTPProtocol(smtpHost);
 			return proto;
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new SmtpLocatorException("Smtp server cannot be discovered", e);
 		}
 	}

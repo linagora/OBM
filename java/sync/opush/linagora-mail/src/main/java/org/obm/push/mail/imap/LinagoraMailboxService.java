@@ -43,13 +43,13 @@ import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -128,7 +128,7 @@ public class LinagoraMailboxService implements MailboxService {
 				return response;
 			}
 			throw new ItemNotFoundException("Cannot find expected response:{" + uid + "} in imap results");
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -142,7 +142,7 @@ public class LinagoraMailboxService implements MailboxService {
 			store.select(extractMailboxNameFromCollectionPath(udr, collectionPath));
 			Map<Long, FlagsList> fetchFlags = store.uidFetchFlags(messages);
 			return fetchFlags;
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -154,7 +154,7 @@ public class LinagoraMailboxService implements MailboxService {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			return mailboxFolders(store.listAll());
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -166,7 +166,7 @@ public class LinagoraMailboxService implements MailboxService {
 		try {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			return mailboxFolders(store.listSubscribed());
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -189,7 +189,7 @@ public class LinagoraMailboxService implements MailboxService {
 			if (!store.create(folder.getName())) {
 				throw new MailException("Folder creation failed for : " + folder.getName());
 			}
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -225,7 +225,7 @@ public class LinagoraMailboxService implements MailboxService {
 		try {
 			String mailboxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			return imapClientProvider.getImapClient(udr).findMailboxNameWithServerCase(mailboxName);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -250,7 +250,7 @@ public class LinagoraMailboxService implements MailboxService {
 			logger.info("delete conv id = {}", messages);
 			store.uidStore(messages, fl, true);
 			store.expunge();
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -311,7 +311,7 @@ public class LinagoraMailboxService implements MailboxService {
 			String mailboxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			store.select(mailboxName);
 			return store.uidFetchMessage(messageUID);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -345,7 +345,7 @@ public class LinagoraMailboxService implements MailboxService {
 			}
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (SMTPException e) {
 			throw new ProcessingEmailException(e);
@@ -396,7 +396,7 @@ public class LinagoraMailboxService implements MailboxService {
 			String mailboxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			store.select(mailboxName);
 			return store.uidFetchPart(mailUid, Objects.firstNonNull(mimePartAddress.getAddress(), ""));
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -516,7 +516,7 @@ public class LinagoraMailboxService implements MailboxService {
 							return !input.isDeleted();
 						}
 					}).toList();
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -529,7 +529,7 @@ public class LinagoraMailboxService implements MailboxService {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			store.select(extractMailboxNameFromCollectionPath(udr, collectionPath));
 			return store.uidFetchBodyStructure(messages);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -546,7 +546,7 @@ public class LinagoraMailboxService implements MailboxService {
 			
 			String addressAsString = Objects.firstNonNull(partAddress.getAddress(), "");
 			return store.uidFetchPart(uid, addressAsString);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -564,7 +564,7 @@ public class LinagoraMailboxService implements MailboxService {
 			
 			String addressAsString = Objects.firstNonNull(partAddress.getAddress(), "");
 			return store.uidFetchPart(uid, addressAsString, limit);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -598,7 +598,7 @@ public class LinagoraMailboxService implements MailboxService {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			String mailBoxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			return store.uidNext(mailBoxName);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);
@@ -611,7 +611,7 @@ public class LinagoraMailboxService implements MailboxService {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			String mailBoxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			return store.uidValidity(mailBoxName);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
 			throw new MailException(e);

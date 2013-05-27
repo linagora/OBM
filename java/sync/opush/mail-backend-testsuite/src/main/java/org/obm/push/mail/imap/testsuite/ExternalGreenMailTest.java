@@ -45,7 +45,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
@@ -58,6 +57,7 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
+import org.obm.push.service.OpushLocatorService;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -70,7 +70,7 @@ public abstract class ExternalGreenMailTest {
 
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
-	@Inject LocatorService locatorService;
+	@Inject OpushLocatorService locatorService;
 	@Inject CollectionPathHelper collectionPathHelper;
 
 	private String mailbox;

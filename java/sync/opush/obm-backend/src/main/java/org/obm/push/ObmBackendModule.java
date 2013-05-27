@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import org.obm.locator.store.LocatorCache;
+import org.obm.locator.store.LocatorService;
 import org.obm.push.auth.AuthenticationServiceImpl;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.OBMBackend;
@@ -40,10 +42,12 @@ import org.obm.push.calendar.EventConverter;
 import org.obm.push.calendar.EventConverterImpl;
 import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.impl.OpushLocatorServiceImpl;
 import org.obm.push.search.ISearchSource;
 import org.obm.push.search.ObmSearchContact;
 import org.obm.push.service.AuthenticationService;
 import org.obm.push.service.EventService;
+import org.obm.push.service.OpushLocatorService;
 import org.obm.push.task.TaskBackend;
 import org.obm.sync.ObmSyncHttpClientModule;
 
@@ -60,6 +64,8 @@ public class ObmBackendModule extends AbstractModule {
     	bind(ICalendarBackend.class).to(CalendarBackend.class);
     	bind(EventService.class).to(EventServiceImpl.class);
     	bind(EventConverter.class).to(EventConverterImpl.class);
+    	bind(LocatorService.class).to(LocatorCache.class);
+    	bind(OpushLocatorService.class).to(OpushLocatorServiceImpl.class);
 
     	Multibinder<PIMBackend> pimBackends = Multibinder.newSetBinder(binder(), PIMBackend.class);
     	pimBackends.addBinding().to(CalendarBackend.class);

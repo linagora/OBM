@@ -47,12 +47,12 @@ import javax.mail.MessagingException;
 
 import org.columba.ristretto.smtp.SMTPException;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.LocatorClientException;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -155,7 +155,7 @@ public class ImapMailboxService implements MailboxService {
 			throw new ItemNotFoundException(e);
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -170,7 +170,7 @@ public class ImapMailboxService implements MailboxService {
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -183,7 +183,7 @@ public class ImapMailboxService implements MailboxService {
 			return mailboxFolders(folders);
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -196,7 +196,7 @@ public class ImapMailboxService implements MailboxService {
 			return mailboxFolders(folders);
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -215,7 +215,7 @@ public class ImapMailboxService implements MailboxService {
 		try {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, null);
 			store.create(folder, Folder.HOLDS_MESSAGES|Folder.HOLDS_FOLDERS);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
@@ -243,7 +243,7 @@ public class ImapMailboxService implements MailboxService {
 			}
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -264,7 +264,7 @@ public class ImapMailboxService implements MailboxService {
 		try {
 			openImapFolderAndGetCorrespondingImapStore(udr, collectionPath);
 			return getMessage(uid);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -276,7 +276,7 @@ public class ImapMailboxService implements MailboxService {
 			currentOpushImapFolder().expunge();
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -314,7 +314,7 @@ public class ImapMailboxService implements MailboxService {
 			store.deleteMessage(currentOpushImapFolder(), messages);
 		} catch (MessagingException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		}
 	}
@@ -363,7 +363,7 @@ public class ImapMailboxService implements MailboxService {
 			return imapInputStream;
 		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} 
 	}
@@ -395,7 +395,7 @@ public class ImapMailboxService implements MailboxService {
 			}
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (SMTPException e) {
 			throw new ProcessingEmailException(e);
@@ -481,7 +481,7 @@ public class ImapMailboxService implements MailboxService {
 			store.appendMessage(currentOpushImapFolder(), message);
 		} catch (ImapCommandException e) {
 			throw new MailException(e.getMessage(), e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e.getMessage(), e);
 		} catch (MessagingException e) {
 			throw new MailException(e.getMessage(), e);
@@ -528,7 +528,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
 			imapMessages = store.fetchEnvelope(currentOpushImapFolder(), messages);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapCommandException e) {
 			throw new MailException(e);
@@ -552,7 +552,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			
 			imapMessages = store.fetchFast(currentOpushImapFolder(), messages);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapLoginException e) {
 			throw new MailException(e);
@@ -572,7 +572,7 @@ public class ImapMailboxService implements MailboxService {
 			
 			imapMessages = store.fetchBodyStructure(currentOpushImapFolder(), messages);
 			return imapMailBoxUtils.buildMimeMessageCollectionFromIMAPMessage(imapMessages);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapLoginException e) {
 			throw new MailException(e);
@@ -592,7 +592,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			OpushImapFolder imapFolder = store.select(mailboxName);
 			return imapFolder.uidFetchPart(uid, partAddress, limit);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapLoginException e) {
 			throw new MailException(e);
@@ -614,7 +614,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			OpushImapFolder imapFolder = store.select(mailboxName);
 			return imapFolder.uidFetchPart(uid, partAddress);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapLoginException e) {
 			throw new MailException(e);
@@ -637,7 +637,7 @@ public class ImapMailboxService implements MailboxService {
 			
 			OpushImapFolder imapFolder = store.select(mailboxName);
 			return imapFolder.uidFetchPart(mailUid, mimePartAddress);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (MessagingException e) {
 			throw new MailException(e);
@@ -695,7 +695,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
 			OpushImapFolder imapFolder = store.select(mailBoxName);
 			return imapFolder.uidNext(mailBoxName);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);
@@ -714,7 +714,7 @@ public class ImapMailboxService implements MailboxService {
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailBoxName);
 			OpushImapFolder imapFolder = store.select(mailBoxName);
 			return imapFolder.uidValidity(mailBoxName);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new MailException(e);

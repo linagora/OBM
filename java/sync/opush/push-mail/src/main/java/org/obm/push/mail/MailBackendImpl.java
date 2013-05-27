@@ -50,7 +50,6 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.OpushBackend;
@@ -81,6 +80,7 @@ import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
@@ -406,7 +406,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			return ret.build();	
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
@@ -439,7 +439,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new ItemNotFoundException(e);
@@ -467,7 +467,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			return serverId;
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new ItemNotFoundException(e);
@@ -491,7 +491,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new ProcessingEmailException(e);
@@ -551,7 +551,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
 			throw new ProcessingEmailException(e);
@@ -604,7 +604,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (MimeException e) {
 			throw new ProcessingEmailException(e);
@@ -713,7 +713,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}
@@ -729,7 +729,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
@@ -794,7 +794,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				throw new ProcessingEmailException(e);
 			} catch (DaoException e) {
 				throw new ProcessingEmailException(e);
-			} catch (LocatorClientException e) {
+			} catch (OpushLocatorException e) {
 				throw new ProcessingEmailException(e);
 			}
 		}
@@ -822,7 +822,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
-		} catch (LocatorClientException e) {
+		} catch (OpushLocatorException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}

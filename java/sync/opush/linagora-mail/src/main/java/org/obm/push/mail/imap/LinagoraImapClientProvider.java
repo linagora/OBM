@@ -32,12 +32,12 @@
 package org.obm.push.mail.imap;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.push.service.OpushLocatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,14 +52,14 @@ public class LinagoraImapClientProvider {
 
 	
 	private final MinigStoreClient.Factory minigStoreClientFactory;
-	private final LocatorService locatorService;
+	private final OpushLocatorService locatorService;
 	private final boolean loginWithDomain;
 	private final boolean activateTLS;
 	private final IdleClient.Factory idleClientFactory;
 
 	@Inject
 	@VisibleForTesting LinagoraImapClientProvider(MinigStoreClient.Factory minigStoreClientFactory,
-			EmailConfiguration emailConfiguration, LocatorService locatorService,
+			EmailConfiguration emailConfiguration, OpushLocatorService locatorService,
 			IdleClient.Factory idleClientFactory) {
 		
 		this.minigStoreClientFactory = minigStoreClientFactory;
@@ -69,14 +69,14 @@ public class LinagoraImapClientProvider {
 		this.idleClientFactory = idleClientFactory;
 	}
 	
-	private String locateImap(UserDataRequest udr) throws LocatorClientException {
+	private String locateImap(UserDataRequest udr) throws OpushLocatorException {
 		String imapLocation = locatorService.
 				getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		logger.info("Using {} as imap host.", imapLocation);
 		return imapLocation;
 	}
 
-	public StoreClient getImapClient(UserDataRequest udr) throws LocatorClientException, IMAPException {
+	public StoreClient getImapClient(UserDataRequest udr) throws OpushLocatorException, IMAPException {
 		StoreClient storeClient = retrieveWorkingStoreClient(udr);
 		if (storeClient != null) {
 			return storeClient;
@@ -121,8 +121,7 @@ public class LinagoraImapClientProvider {
 	}
 
 
-	public IdleClient getImapIdleClient(UserDataRequest udr)
-			throws LocatorClientException {
+	public IdleClient getImapIdleClient(UserDataRequest udr) throws OpushLocatorException {
 		String login = getLogin(udr);
 		logger.debug("Creating idleClient with login: {}, (useDomain {})", login, loginWithDomain);
 		return idleClientFactory.create(locateImap(udr), 143, login, udr.getPassword());

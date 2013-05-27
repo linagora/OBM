@@ -33,8 +33,6 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
-import org.obm.locator.store.LocatorCache;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -112,7 +110,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(IContentsImporter.class).to(ContentsImporter.class);
 		bind(IErrorsManager.class).to(ErrorsManager.class);
 		bind(DeviceService.class).to(DeviceServiceImpl.class);
-		bind(LocatorService.class).to(LocatorCache.class);
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);

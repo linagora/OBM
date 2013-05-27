@@ -52,9 +52,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
+import org.obm.push.service.OpushLocatorService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -77,7 +77,7 @@ public class JavaxMailTest {
 	@Rule
 	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(EnvModule.class);
 
-	@Inject LocatorService locatorService;
+	@Inject OpushLocatorService locatorService;
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
 

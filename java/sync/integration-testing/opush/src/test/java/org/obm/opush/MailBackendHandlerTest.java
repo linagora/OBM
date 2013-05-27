@@ -58,7 +58,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
@@ -110,7 +109,6 @@ public class MailBackendHandlerTest {
 	@Inject	SingleUserFixture singleUserFixture;
 	@Inject	OpushServer opushServer;
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
-	@Inject LocatorService locatorService;
 	@Inject GreenMail greenMail;
 	@Inject CollectionPathHelper collectionPathHelper;
 	@Inject ImapConnectionCounter imapConnectionCounter;

@@ -34,13 +34,12 @@ package org.obm.opush.env;
 import org.easymock.IMocksControl;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.AbstractOverrideModule;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.CountingStoreClient;
 import org.obm.opush.TrackableUserDataRequest;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
@@ -49,6 +48,7 @@ import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.service.EventService;
+import org.obm.push.service.OpushLocatorService;
 
 import com.google.inject.name.Names;
 
@@ -62,11 +62,11 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		install(new GreenMailProviderModule());
 		bindWithMock(EventService.class);
-		bind(LocatorService.class).toInstance(new LocatorService() {
+		bind(OpushLocatorService.class).toInstance(new OpushLocatorService() {
 			
 			@Override
 			public String getServiceLocation(String serviceSlashProperty,
-					String loginAtDomain) throws LocatorClientException {
+					String loginAtDomain) throws OpushLocatorException {
 				return "127.0.0.1";
 			}
 		});
