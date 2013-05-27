@@ -778,12 +778,20 @@ not header :contains "X-Spam-Flag" "YES"
         $vacationMsg .= '"'.$boxEmailsAlias->[$i].'"';
     }
 
-    $vacationMsg .= ' ] "'.$self->{'entityDesc'}->{'userobm_vacation_message'}.'";
+    $vacationMsg .= ' ] "' . $self->_escapeSieveVacationMessage($self->{'entityDesc'}->{'userobm_vacation_message'}) . '";
 }';
 
     return $vacationMsg;
 }
 
+sub _escapeSieveVacationMessage() {
+    my ($self, $message) = @_;
+
+    $message =~ s/([^\\])\"/$1\\"/g;
+    $message =~ s/([^\\])\\([^\\\"])/$1\\\\$2/g;
+
+    return $message;
+}
 
 sub getSieveNomade {
     my $self = shift;
