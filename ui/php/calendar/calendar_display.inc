@@ -4664,6 +4664,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $properties = $event_q->f('event_properties');
     $desc = $event_q->f('event_description');
     $force_insertion = $event_q->f('event_force_insertion');
+    $is_quick_create_with_template = isset($calendar['template_id']) && $action == 'new' && isset($calendar['date_begin']);
     if($force_insertion){
       $calendar['force'] = $force_insertion;
     }
@@ -4685,16 +4686,36 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if ($action == 'conflict_manager') {
       $begin = $calendar['date_begin'];
     } else {
-      $begin = $date_edit_occurrence == null ? new Of_Date($event_q->f('event_date'), 'GMT') : new Of_Date($date_edit_occurrence);
-      if (isset($calendar['template_id']) && $action == 'new') {
-        $today = isset($calendar['date_begin']) ? $calendar['date_begin'] : new Of_Date(date("Y-m-d"), 'GMT');
-        $begin->setDay($today->getDay());
-        $begin->setMonth($today->getMonth());
-        $begin->setYear($today->getYear());
+      if ($date_edit_occurrence != null) {
+        $begin = new Of_Date($date_edit_occurrence);
+      } else {
+        // OBMFULL-3386
+        // If we're using a template to create a new event using the quick form on
+        // a calendar view that allows us to specify the event time, use that time instead of the template one
+        if ($is_quick_create_with_template && $current_view->useCalendarTimeForCreationWithTemplate()) {
+          $begin = clone $calendar['date_begin'];
+        } else {
+          $begin = new Of_Date($event_q->f('event_date'), 'GMT');
+
+          if (isset($calendar['template_id']) && $action == 'new') {
+            $today = isset($calendar['date_begin']) ? $calendar['date_begin'] : new Of_Date(date("Y-m-d"), 'GMT');
+
+            $begin->setDay($today->getDay());
+            $begin->setMonth($today->getMonth());
+            $begin->setYear($today->getYear());
+          }
+        }
       }
     }
     $all_day = $event_q->f('event_allday');
-    $end = event_end_date($begin, $event_q->f('event_duration'), $all_day == 1);
+    // OBMFULL-3386
+    // Same as above, for duration
+    if ($is_quick_create_with_template && $current_view->useCalendarTimeForCreationWithTemplate()) {
+      $duration = $calendar['duration'];
+    } else {
+      $duration = $event_q->f('event_duration');
+    }
+    $end = event_end_date($begin, $duration, $all_day == 1);
     $privacy = $event_q->f('event_privacy');
     $allow_documents = $event_q->f('event_allow_documents');
     if ($date_edit_occurrence == null) {
