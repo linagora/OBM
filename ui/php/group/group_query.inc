@@ -1051,7 +1051,7 @@ function get_group_name_exists($name, $id='') {
 //   - $name : group name
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_check($id, $name, $desc) {
+function run_query_group_check($id, $name, $desc, $domain_id=null) {
   global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
@@ -1062,6 +1062,11 @@ function run_query_group_check($id, $name, $desc) {
   if ($id != '') {
     $id = sql_parse_id($id, true, true);
     $where_id = "AND group_id $id ";
+  }
+
+  if (isset($domain_id)) {
+    $domain_id = sql_parse_id($domain_id);
+    $where_id = "and group_domain_id=$domain_id ";
   }
 
   // If name is short, we test equality, else similarity
