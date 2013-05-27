@@ -840,6 +840,10 @@ function run_query_user_insert($user) {
   // Subscribe the user to his default group
   run_query_user_init_group($domain_id, $id, $gid);
 
+  if (function_exists('hook_post_run_query_user_insert')) {
+    hook_post_run_query_user_insert($id);
+  }
+
   return $id;
 }
 /**

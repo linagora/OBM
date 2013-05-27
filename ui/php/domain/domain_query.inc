@@ -259,6 +259,11 @@ function run_query_domain_insert($domain) {
   } else {
     $domain_id = false;
   }
+
+  if (function_exists('hook_post_run_query_domain_insert')) {
+    hook_post_run_query_domain_insert($domain_id);
+  }
+
   return $domain_id;
 }
 
