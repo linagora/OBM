@@ -29,34 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.service;
 
+import java.io.InputStream;
+import java.util.Set;
 
+import org.obm.push.bean.Address;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.SendEmailException;
 
-public class SendEmailException extends Exception {
+public interface SmtpSender {
 
-	int smtpErrorCode = -1;
-
-	protected SendEmailException(String message, int smtpErrorCode, Throwable cause) {
-		super(message, cause);
-		this.smtpErrorCode = smtpErrorCode;
-	}
-	
-	public SendEmailException(int smtpErrorCode, Throwable cause) {
-		super(cause);
-		this.smtpErrorCode = smtpErrorCode;
-	}
-
-	public SendEmailException(String message, Throwable e) {
-		super(message, e);
-	}
-	
-	public SendEmailException(Throwable e) {
-		super(e);
-	}
-	
-	public int getSmtpErrorCode() {
-		return smtpErrorCode;
-	}
-	
+	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, 
+			InputStream mimeMail) throws SendEmailException;
 }

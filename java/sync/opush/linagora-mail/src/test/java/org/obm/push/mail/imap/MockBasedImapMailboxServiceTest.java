@@ -31,40 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 
-import java.io.InputStream;
-import java.util.Set;
-
-import org.columba.ristretto.smtp.SMTPException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.Address;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.StoreEmailException;
-import org.obm.push.mail.smtp.SmtpSender;
 import org.obm.push.minig.imap.StoreClient;
-
-import com.google.common.collect.Sets;
 
 @RunWith(SlowFilterRunner.class)
 public class MockBasedImapMailboxServiceTest {
@@ -80,34 +65,6 @@ public class MockBasedImapMailboxServiceTest {
 						.createUser(mailbox, mailbox, null), password), null, null);
 	}
 	
-	@Test
-	public void testSendEmailWithBigInputStream() throws ProcessingEmailException, StoreEmailException, SendEmailException, SmtpInvalidRcptException, SMTPException {
-		
-		SmtpSender smtpSender = createMock(SmtpSender.class);
-		
-		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
-		Set<Address> addrs = Sets.newHashSet();
-		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class),
-				anyObject(addrs.getClass()),
-				anyObject(addrs.getClass()),
-				anyObject(addrs.getClass()), anyObject(InputStream.class));
-		expectLastCall().once();
-		
-		replay(emailConfiguration, smtpSender);
-		
-		LinagoraMailboxService emailManager = 
-				new LinagoraMailboxService(emailConfiguration, smtpSender, null, null);
-
-		emailManager.sendEmail(udr,
-				new Address("test@test.fr"),
-				addrs,
-				addrs,
-				addrs,
-				loadEmail("bigEml.eml"), false);
-		
-		verify(emailConfiguration, smtpSender);
-	}
-
  	@Test
 	public void testParseSpecificINBOXCase() throws Exception {
 		String userINBOXFolder = "INBOX";
@@ -121,7 +78,7 @@ public class MockBasedImapMailboxServiceTest {
 		
 		replay(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, imapClientProvider, collectionPathHelper);
+				emailConfiguration, imapClientProvider, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		verify(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);
@@ -143,7 +100,7 @@ public class MockBasedImapMailboxServiceTest {
 
 		replay(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, imapClientProvider, collectionPathHelper);
+				emailConfiguration, imapClientProvider, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(userINBOXFolder));
 		verify(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);
@@ -165,7 +122,7 @@ public class MockBasedImapMailboxServiceTest {
 
 		replay(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);
 		LinagoraMailboxService emailManager = new LinagoraMailboxService(
-				emailConfiguration, null, imapClientProvider, collectionPathHelper);
+				emailConfiguration, imapClientProvider, collectionPathHelper);
 
 		String parsedMailbox = emailManager.parseMailBoxName(udr, collectionPath(folderEndingByINBOX));
 		verify(emailConfiguration, collectionPathHelper, imapClientProvider, storeClient);

@@ -31,12 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
+import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +52,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.bean.Address;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
@@ -75,11 +79,13 @@ import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.WindowingIndexKey;
+import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 @RunWith(SlowFilterRunner.class)
 public class MailBackendImplTest {
@@ -100,6 +106,7 @@ public class MailBackendImplTest {
 	private MSEmailFetcher msEmailFetcher;
 	private MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private WindowingService windowingService;
+	private SmtpSender smtpSender;
 
 	private MailBackendImpl testee;
 
@@ -121,11 +128,13 @@ public class MailBackendImplTest {
 		msEmailFetcher = control.createMock(MSEmailFetcher.class);
 		mailBackendSyncDataFactory = control.createMock(MailBackendSyncDataFactory.class);
 		windowingService = control.createMock(WindowingService.class);
+		smtpSender = control.createMock(SmtpSender.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
+		
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, snapshotService,
 				serverEmailChangesBuilder, mappingService, null, msEmailFetcher, null, mailBackendSyncDataFactory,
-				windowingService);
+				windowingService, smtpSender);
 	}
 	
 	@Test
@@ -827,5 +836,24 @@ public class MailBackendImplTest {
 		
 		control.verify();
 		assertThat(ics).isEqualTo(expectedCalendar);
+	}
+	
+	@Test
+	public void testSendEmailWithBigInputStream() throws Exception {
+		Set<Address> addrs = Sets.newHashSet();
+		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()), anyObject(InputStream.class));
+		expectLastCall().once();
+		
+		control.replay();
+		testee.sendEmail(udr,
+				new Address("test@test.fr"),
+				addrs,
+				addrs,
+				addrs,
+				loadEmail("bigEml.eml"), false);
+		control.verify();
 	}
 }

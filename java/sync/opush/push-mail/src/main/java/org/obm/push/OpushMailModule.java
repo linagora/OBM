@@ -50,9 +50,11 @@ import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
+import org.obm.push.mail.smtp.SmtpSenderImpl;
 import org.obm.push.mail.transformer.HtmlToText;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
+import org.obm.push.service.SmtpSender;
 import org.obm.push.store.SnapshotDao;
 import org.obm.push.store.SyncKeysDao;
 import org.obm.push.store.WindowingDao;
@@ -73,6 +75,7 @@ public class OpushMailModule extends AbstractModule {
 		bind(MailBackend.class).to(MailBackendImpl.class);
 		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
 		bind(SmtpProvider.class).to(SmtpProviderImpl.class);
+		bind(SmtpSender.class).to(SmtpSenderImpl.class);
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(MailBackend.class);

@@ -42,31 +42,36 @@ import org.obm.push.bean.Address;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.mail.exception.SmtpLocatorException;
+import org.obm.push.service.SmtpSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
-public class SmtpSender {
+public class SmtpSenderImpl implements SmtpSender {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(SmtpSender.class);
+	private static final Logger logger = LoggerFactory.getLogger(SmtpSenderImpl.class);
 
-	private SmtpProvider locator;
+	private final SmtpProvider locator;
 
 	@Inject
-	private SmtpSender(SmtpProvider locator) {
+	private SmtpSenderImpl(SmtpProvider locator) {
 		this.locator = locator;
 	}
 
+	@Override
 	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, 
-			InputStream mimeMail) throws SendEmailException, SMTPException {
+			InputStream mimeMail) throws SendEmailException {
 		
-		smtpSendMail(udr, 
-				getCleanedAddress(from), 
-				getAllRistrettoRecipients(setTo, setCc, setCci), 
-				mimeMail);
+		try {
+			smtpSendMail(udr, 
+					getCleanedAddress(from), 
+					getAllRistrettoRecipients(setTo, setCc, setCci), 
+					mimeMail);
+		} catch (SMTPException e) {
+			throw new SendEmailException(e);
+		}
 	}
 	
 	private void smtpSendMail(UserDataRequest udr, org.columba.ristretto.message.Address from, 

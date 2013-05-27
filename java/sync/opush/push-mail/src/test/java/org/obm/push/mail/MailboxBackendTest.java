@@ -85,6 +85,7 @@ import org.obm.push.mail.mime.MimePartImpl;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.EventService;
+import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.UserEmailParserUtils;
 
@@ -114,6 +115,7 @@ public class MailboxBackendTest {
 	private EventService eventService;
 	private SnapshotService snapshotService;
 	private WindowingService windowingService;
+	private SmtpSender smtpSender;
 
 	@Before
 	public void setUp() {
@@ -136,9 +138,10 @@ public class MailboxBackendTest {
 		msEmailFetcher = new MSEmailFetcher(mailboxService, transformersFactory, msEmailConverter);
 		snapshotService = mocks.createMock(SnapshotService.class);
 		windowingService = mocks.createMock(WindowingService.class);
+		smtpSender = mocks.createMock(SmtpSender.class);
 		
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
-				snapshotService, null, mappingService, null, msEmailFetcher, null, null, windowingService);
+				snapshotService, null, mappingService, null, msEmailFetcher, null, null, windowingService, smtpSender);
 	}
 	
 	@Test(expected=ItemNotFoundException.class)

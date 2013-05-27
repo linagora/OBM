@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.java.mail;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -45,21 +44,15 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.columba.ristretto.smtp.SMTPException;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.Address;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
-import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.EmailFactory;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
@@ -84,8 +77,6 @@ import org.obm.push.mail.imap.OpushImapFolder;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.mime.MimePart;
-import org.obm.push.mail.smtp.SmtpSender;
-import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +97,6 @@ public class ImapMailboxService implements MailboxService {
 
 	private static final String WHOLE_HIERARCHY_PATTERN = "*";
 	
-	private final SmtpSender smtpProvider;
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final ImapClientProviderImpl imapClientProvider;
@@ -117,12 +107,10 @@ public class ImapMailboxService implements MailboxService {
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
-			SmtpSender smtpSender, 
 			ImapClientProviderImpl imapClientProvider, 
 			ImapMailBoxUtils imapMailBoxUtils, 
 			CollectionPathHelper collectionPathHelper) {
 		
-		this.smtpProvider = smtpSender;
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;
 		this.collectionPathHelper = collectionPathHelper;
@@ -377,34 +365,6 @@ public class ImapMailboxService implements MailboxService {
 	public void setDeletedFlag(UserDataRequest udr, String collectionPath, MessageSet messages) throws MailException, ImapMessageNotFoundException {
 		updateMailFlag(udr, collectionPath, messages, Flags.Flag.DELETED, true);
 	}
-
-	@Override
-	public void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
-			boolean saveInSent) throws ProcessingEmailException, SendEmailException, SmtpInvalidRcptException, StoreEmailException {
-		
-		InputStream streamMail = null;
-		try {
-			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
-			streamMail.mark(streamMail.available());
-			
-			smtpProvider.sendEmail(udr, from, setTo, setCc, setCci, streamMail);
-			if (saveInSent) {	
-				storeInSent(udr, streamMail);
-			} else {
-				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
-			}
-		} catch (IOException e) {
-			throw new ProcessingEmailException(e);
-		} catch (OpushLocatorException e) {
-			throw new ProcessingEmailException(e);
-		} catch (SMTPException e) {
-			throw new ProcessingEmailException(e);
-		} catch (MailException e) {
-			throw new ProcessingEmailException(e);
-		} finally {
-			closeStream(streamMail);
-		}
-	}	
 	
 	@Override
 	public void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException {
@@ -424,16 +384,6 @@ public class ImapMailboxService implements MailboxService {
 		} catch (IOException e) {
 			mailContent.mark(0);
 			mailContent.reset();
-		}
-	}
-	
-	private void closeStream(InputStream mimeMail) {
-		if (mimeMail != null) {
-			try {
-				mimeMail.close();
-			} catch (IOException t) {
-				logger.error(t.getMessage(), t);
-			}
 		}
 	}
 	

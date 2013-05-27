@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -74,13 +73,13 @@ import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
+import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
@@ -111,8 +110,9 @@ public class MailBackendTest {
 	private WindowingService windowingService;
 	private Provider<Builder> collectionPathBuilderProvider;
 	private CollectionPath.Builder collectionPathBuilder;
-	private MailBackend testee;
+	private SmtpSender smtpSender;
 
+	private MailBackend testee;
 
 	@Before
 	public void setUp() {
@@ -127,26 +127,26 @@ public class MailBackendTest {
 		mailboxService = createMock(MailboxService.class);
 		mappingService = createMock(MappingService.class);
 		windowingService = createMock(WindowingService.class);
+		smtpSender = createMock(SmtpSender.class);
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService, smtpSender);
 	}
 	
 	private void replayCommonMocks() {
-		replay(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder);
+		replay(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder, smtpSender);
 	}
 	
 	private void verifyCommonMocks() {
-		verify(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder);
+		verify(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder, smtpSender);
 	}
 	
 	@Test
 	public void testSendEmailWithBigMail()
-			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException, AuthFault {
+			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, IOException, AuthFault {
 		final String password = "pass";
 		final AccessToken at = new AccessToken(1, "o-push");
 		
-		MailboxService mailboxService = createMock(MailboxService.class);
 		ICalendar calendarClient = createMock(ICalendar.class);
 		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
 		LoginService login = createMock(LoginService.class);
@@ -158,24 +158,27 @@ public class MailBackendTest {
 		expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
 		login.logout(at);
 		expectLastCall().once();
-		Set<Address> addrs = Sets.newHashSet();
-		mailboxService.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class), 
-				anyObject(addrs.getClass()), anyObject(addrs.getClass()), anyObject(addrs.getClass()), 
-				anyObject(InputStream.class), anyBoolean());
 		
+		Set<Address> addrs = Sets.newHashSet();
+		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class), 
+				anyObject(addrs.getClass()), anyObject(addrs.getClass()), anyObject(addrs.getClass()), 
+				anyObject(InputStream.class));
+		expectLastCall().once();
+		
+		mailboxService.storeInSent(anyObject(UserDataRequest.class), anyObject(InputStream.class));
 		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, calendarClient, login, new Mime4jUtils(),
 				mockOpushConfigurationService(), null, null, mappingService, null, null,
-				collectionPathBuilderProvider, null, windowingService);
+				collectionPathBuilderProvider, null, windowingService, smtpSender);
 
-		replay(mailboxService, calendarClient, userDataRequest, login);
+		replay(calendarClient, userDataRequest, login);
 		replayCommonMocks();
 		
 		InputStream emailStream = loadEmail("bigEml.eml");
 		mailBackend.sendEmail(userDataRequest, ByteStreams.toByteArray(emailStream), true);
 		
-		verify(mailboxService, calendarClient, userDataRequest, login);
+		verify(calendarClient, userDataRequest, login);
 		verifyCommonMocks();
 	}
 	
@@ -391,7 +394,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService, smtpSender);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -415,7 +418,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService, smtpSender);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
 		verifyCommonMocks();
 
@@ -441,7 +444,7 @@ public class MailBackendTest {
 		
 		replayCommonMocks(); replay(collectionPath);
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				mappingService, null, null, collectionPathBuilderProvider, null, windowingService, smtpSender);
 		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
 		verifyCommonMocks(); verify(collectionPath);
 		

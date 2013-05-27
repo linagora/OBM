@@ -46,6 +46,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
@@ -82,7 +83,6 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.exception.SendEmailException;
-import org.obm.push.exception.SmtpInvalidRcptException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
@@ -100,6 +100,7 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.service.EventService;
+import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
@@ -158,6 +159,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final EmailChangesFetcher emailChangesFetcher;
 	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private final WindowingService windowingService;
+	private final SmtpSender smtpSender;
 
 
 	@Inject
@@ -171,7 +173,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			MSEmailFetcher msEmailFetcher,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
 			MailBackendSyncDataFactory mailBackendSyncDataFactory,
-			WindowingService windowingService)  {
+			WindowingService windowingService,
+			SmtpSender smtpSender)  {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
@@ -185,6 +188,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.msEmailFetcher = msEmailFetcher;
 		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
 		this.windowingService = windowingService;
+		this.smtpSender = smtpSender;
 	}
 
 	@Override
@@ -674,7 +678,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 			Address from = getAddress(sendEmail.getFrom());
 			if (!sendEmail.isInvitation() && isScheduleMeeting) {
-				mailboxService.sendEmail(udr, from, sendEmail.getTo(),
+				sendEmail(udr, from, sendEmail.getTo(),
 						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
@@ -683,10 +687,33 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (StoreEmailException e) {
 			throw new ProcessingEmailException(e);
+		}
+	}
+
+	@VisibleForTesting void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
+			boolean saveInSent) throws ProcessingEmailException, StoreEmailException {
+		
+		InputStream streamMail = null;
+		try {
+			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
+			streamMail.mark(streamMail.available());
+			
+			smtpSender.sendEmail(udr, from, setTo, setCc, setCci, streamMail);
+			if (saveInSent) {
+				mailboxService.storeInSent(udr, streamMail);
+			} else {
+				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
+			}
+		} catch (IOException e) {
+			throw new ProcessingEmailException(e);
+		} catch (OpushLocatorException e) {
+			throw new ProcessingEmailException(e);
 		} catch (SendEmailException e) {
 			throw new ProcessingEmailException(e);
-		} catch (SmtpInvalidRcptException e) {
+		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
+		} finally {
+			IOUtils.closeQuietly(streamMail);
 		}
 	}
 

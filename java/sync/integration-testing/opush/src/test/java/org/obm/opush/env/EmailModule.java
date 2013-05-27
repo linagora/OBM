@@ -39,7 +39,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.LinagoraMailboxService;
-import org.obm.push.mail.smtp.SmtpSender;
+import org.obm.push.mail.smtp.SmtpSenderImpl;
 
 public final class EmailModule extends AbstractOverrideModule {
 
@@ -51,7 +51,7 @@ public final class EmailModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		bindWithMock(LinagoraImapClientProvider.class);
 		bindWithMock(LinagoraMailboxService.class);
-		bindWithMock(SmtpSender.class);
+		bindWithMock(SmtpSenderImpl.class);
 		bindWithMock(MailBackend.class);
 		MailBackend mailBackend = getMock(MailBackend.class);
 		expect(mailBackend.getPIMDataType()).andReturn(PIMDataType.EMAIL);
