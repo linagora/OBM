@@ -166,6 +166,21 @@ public class SmartReplyHandlerTest {
 		assertThat(success).isTrue();
 		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
 	}
+	
+	@Test
+	public void testQuotaExceededErrorMail() throws Exception {
+		appendToINBOX(greenMailUser, "eml/quotaExceeded.eml");
+		MailFolder inboxFolder = greenMail.getManagers().getImapHostManager().getFolder(greenMailUser, EmailConfiguration.IMAP_INBOX_NAME);
+		assertThat(inboxFolder.getMessageCount()).isEqualTo(1);
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailReply(loadEmail("eml/quotaExceeded.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(inboxFolder.getMessageCount()).isEqualTo(2);
+	}
 
 	private OPClient opClient() {
 		return buildWBXMLOpushClient(user, opushServer.getPort());
