@@ -126,7 +126,7 @@ sub _doWork {
     }
 
     my @oldSieveScript;
-    my $currentScriptString;
+    my $currentScriptString = "";
     if ($sieveScriptExists) {
         $self->_log("Sieve script $sieveScriptName retrieved", 3);
         # Get server sieveScriptName sieve script content if exists
