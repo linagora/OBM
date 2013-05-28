@@ -48,7 +48,6 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
-import org.obm.push.impl.PushNotificationImpl;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.service.PushNotification;
 import org.obm.push.service.PushPublishAndSubscribe;

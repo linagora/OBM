@@ -34,8 +34,8 @@ package org.obm.push.handler;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.MSAttachementData;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;

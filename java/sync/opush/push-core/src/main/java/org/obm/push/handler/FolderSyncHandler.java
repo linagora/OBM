@@ -47,7 +47,7 @@ import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
-import org.obm.push.mail.ImapTimeoutException;
+import org.obm.push.mail.exception.ImapTimeoutException;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.protocol.bean.FolderSyncRequest;
 import org.obm.push.protocol.bean.FolderSyncResponse;

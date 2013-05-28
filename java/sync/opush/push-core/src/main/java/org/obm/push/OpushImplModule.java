@@ -36,7 +36,6 @@ import org.obm.configuration.ConfigurationModule;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
-import org.obm.push.backend.IErrorsManager;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PolicyConfigurationService;
 import org.obm.push.backend.PolicyConfigurationServiceFileImpl;
@@ -108,7 +107,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(IContentsExporter.class).to(ContentsExporter.class);
 		bind(IStateMachine.class).to(StateMachine.class);
 		bind(IContentsImporter.class).to(ContentsImporter.class);
-		bind(IErrorsManager.class).to(ErrorsManager.class);
 		bind(DeviceService.class).to(DeviceServiceImpl.class);
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);

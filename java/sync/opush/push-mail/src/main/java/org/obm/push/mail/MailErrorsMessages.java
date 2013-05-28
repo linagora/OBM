@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.mail;
 
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -44,12 +44,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class Messages {
+public class MailErrorsMessages {
 
 	private ResourceBundle bundle;
 	
 	@Inject
-	private Messages(ConfigurationService configurationService) {
+	private MailErrorsMessages(ConfigurationService configurationService) {
 		bundle = configurationService.getResourceBundle(Locale.getDefault());
 	}
 	

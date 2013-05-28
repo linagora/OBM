@@ -35,7 +35,7 @@ import java.io.IOException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.IErrorsManager;
+import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -54,7 +54,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 	
 	protected final MailBackend mailBackend;
-	private final IErrorsManager errorManager;
+	private final ErrorsManager errorManager;
 	protected final MailProtocol mailProtocol;
 
 	private final Logger mailDataLogger;
@@ -62,7 +62,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	protected abstract void doTheJob(MailRequest mailRequest, UserDataRequest udr) 
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 	
-	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol, Logger mailDataLogger) {
+	protected MailRequestHandler(MailBackend mailBackend, ErrorsManager errorManager, MailProtocol mailProtocol, Logger mailDataLogger) {
 		this.mailBackend = mailBackend;
 		this.errorManager = errorManager;
 		this.mailProtocol = mailProtocol;

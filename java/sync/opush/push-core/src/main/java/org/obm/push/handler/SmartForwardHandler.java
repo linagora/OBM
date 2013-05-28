@@ -32,7 +32,7 @@
 package org.obm.push.handler;
 
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.backend.IErrorsManager;
+import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
@@ -49,7 +49,7 @@ import com.google.inject.name.Named;
 public class SmartForwardHandler extends MailRequestHandler {
 
 	@Inject
-	protected SmartForwardHandler(MailBackend mailBackend, IErrorsManager errorManager, 
+	protected SmartForwardHandler(MailBackend mailBackend, ErrorsManager errorManager, 
 			MailProtocol mailProtocol, @Named(LoggerModule.MAIL_DATA)Logger mailDataLogger) {
 		
 		super(mailBackend, errorManager, mailProtocol, mailDataLogger);

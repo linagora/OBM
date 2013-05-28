@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.mail;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -53,10 +53,9 @@ import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.util.MimeUtil;
-import org.obm.push.backend.IErrorsManager;
+import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
-import org.obm.push.mail.MailboxService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.push.utils.MimeContentType;
 import org.slf4j.Logger;
@@ -67,18 +66,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ErrorsManager implements IErrorsManager {
+public class MailErrorsManager implements ErrorsManager {
 	
 	private final static String errorNameSender = "X-OBM-OPUSH";
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final MailboxService manager;
-	private final Messages messages;
+	private final MailErrorsMessages messages;
 
 	private final Mime4jUtils mime4jUtils;
 	
 	@Inject
-	/* package */ ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils) {
+	MailErrorsManager(MailboxService manager, MailErrorsMessages messages, Mime4jUtils mime4jUtils) {
 		this.manager = manager;
 		this.mime4jUtils = mime4jUtils;
 		this.messages = messages;

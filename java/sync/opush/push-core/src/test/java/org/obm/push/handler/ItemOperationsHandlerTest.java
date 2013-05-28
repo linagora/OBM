@@ -31,8 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,14 +47,11 @@ import org.obm.push.impl.Responder;
 import org.obm.push.protocol.bean.ItemOperationsResponse;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult;
 import org.obm.push.protocol.bean.ItemOperationsResponse.MailboxFetchResult.FetchAttachmentResult;
+import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
 import com.google.common.collect.Lists;
-import static org.fest.assertions.api.Assertions.assertThat;
-
-import org.eclipse.jetty.http.HttpHeaders;
-import org.obm.push.protocol.request.ActiveSyncRequest;
 
 @RunWith(SlowFilterRunner.class)
 public class ItemOperationsHandlerTest {

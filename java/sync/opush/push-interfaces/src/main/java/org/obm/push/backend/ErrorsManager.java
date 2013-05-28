@@ -35,7 +35,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
 
 
-public interface IErrorsManager {
+public interface ErrorsManager {
 	
 	void sendMailHandlerError(UserDataRequest udr, byte[] errorMail, Throwable error);
 

@@ -34,6 +34,7 @@ package org.obm.push;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.mail.imap.NoopImapMonitoringImpl;
+import org.obm.push.backend.ErrorsManager;
 import org.obm.push.backend.MailMonitoringBackend;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.mail.EmailChangesComputer;
@@ -42,6 +43,7 @@ import org.obm.push.mail.EmailChangesFetcher;
 import org.obm.push.mail.EmailChangesFetcherImpl;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.mail.MailBackendImpl;
+import org.obm.push.mail.MailErrorsManager;
 import org.obm.push.mail.MailViewToMSEmailConverter;
 import org.obm.push.mail.MailViewToMSEmailConverterImpl;
 import org.obm.push.mail.SnapshotService;
@@ -90,6 +92,7 @@ public class OpushMailModule extends AbstractModule {
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
+		bind(ErrorsManager.class).to(MailErrorsManager.class);
 	}
 
 }

@@ -32,7 +32,7 @@
 package org.obm.push.handler;
 
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.backend.IErrorsManager;
+import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackend;
@@ -48,7 +48,7 @@ import com.google.inject.name.Named;
 public class SendMailHandler extends MailRequestHandler {
 
 	@Inject
-	protected SendMailHandler(MailBackend mailBackend, IErrorsManager errorManager, 
+	protected SendMailHandler(MailBackend mailBackend, ErrorsManager errorManager, 
 			MailProtocol mailProtocol, @Named(LoggerModule.MAIL_DATA)Logger mailDataLogger) {
 		
 		super(mailBackend, errorManager, mailProtocol, mailDataLogger);

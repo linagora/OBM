@@ -52,7 +52,6 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.exception.DaoException;
-import org.obm.push.impl.MappingServiceImpl;
 import org.obm.push.store.CollectionDao;
 
 import com.google.common.collect.Lists;

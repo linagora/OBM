@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.mail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,20 +41,19 @@ import org.apache.james.mime4j.field.address.ParseException;
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.MailErrorsManager;
 import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
-import org.obm.filter.SlowFilterRunner;
-
 @RunWith(SlowFilterRunner.class)
-public class ErrorsManagerTest {
+public class MailErrorsManagerTest {
 
 	@Test
 	public void testPrepareMessage() throws ParseException, FileNotFoundException, IOException {
@@ -63,7 +62,7 @@ public class ErrorsManagerTest {
 		
 		Mime4jUtils mime4jUtils = new Mime4jUtils();
 		
-		ErrorsManager errorsManager = new ErrorsManager(null, null, mime4jUtils);
+		MailErrorsManager errorsManager = new MailErrorsManager(null, null, mime4jUtils);
 		Message message = errorsManager.prepareMessage(userDataRequest, "Subject", "Body", 
 				StreamMailTestsUtils.newInputStreamFromString("It's mail content !"));
 		
