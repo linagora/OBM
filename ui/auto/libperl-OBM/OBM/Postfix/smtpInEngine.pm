@@ -48,6 +48,10 @@ sub new {
 
     my $self = bless { }, $class;
 
+    # Whether the automaton should query the DB using P_ tables
+    # This is usefull for already deleted entities, such as domains
+    $self->{'usePTables'} = 0;
+
     # Count entities for which correct update need postfix maps regeneration
     $self->{'entitiesUpdate'} = 0;
 
