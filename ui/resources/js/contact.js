@@ -114,7 +114,7 @@ Obm.Contact.AddressBook = new Class ({
       }
       this.contactRequest.removeEvents('success');
     }.bind(this));
-    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')}); 
+    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : document.getElement('input[id=contactfilter]').get('value')}); 
   },
 
   refreshAddressBooks: function() {
@@ -194,7 +194,7 @@ Obm.Contact.AddressBook = new Class ({
       this.dataRequest.addEvent('complete', function() {
         window.location.href =  obm.vars.consts.obmUrl + '/contact/contact_index.php';
       });
-      this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
+      this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : document.getElement('input[id=contactfilter]').get('value')});
     }
   },
 
@@ -271,12 +271,12 @@ Obm.Contact.AddressBook = new Class ({
 
   filterContact: function(form) {
     this.hideContact();
-    this.contactRequest.get({ajax:1, action:'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value')});
+    this.contactRequest.get({ajax:1, action:'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : document.getElement('input[id=contactfilter]').get('value')});
   },
 
   moreContact: function(offset) {
     this.hideContact();
-    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : $('contactfilter').get('value'), offset: offset});
+    this.contactRequest.get({ajax : 1, action : 'search', searchpattern : this.addressbook.retrieve('search'), contactfilter : document.getElement('input[id=contactfilter]').get('value'), offset: offset});
   },
 
   selectAddressBook: function(elem, updateCount) {
