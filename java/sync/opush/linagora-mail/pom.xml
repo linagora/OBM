@@ -83,11 +83,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail-backend-testsuite</artifactId>
 			<version>${obm.version}</version>
 			<scope>test</scope>
@@ -101,13 +96,6 @@
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail-backend-tools</artifactId>
 			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
-			<version>${obm.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

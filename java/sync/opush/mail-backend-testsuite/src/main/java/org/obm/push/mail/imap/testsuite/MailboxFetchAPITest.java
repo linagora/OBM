@@ -33,15 +33,17 @@ package org.obm.push.mail.imap.testsuite;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
+import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.After;
 import org.junit.Before;
@@ -51,15 +53,20 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
@@ -69,10 +76,12 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.UIDEnvelope;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.BodyParam;
+import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.user.UserException;
@@ -176,7 +185,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
@@ -190,7 +199,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = new Date(1234);
 		Date truncatedInternalDate = new Date(1000);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setAnsweredFlag(udr, inbox, MessageSet.singleton(1l));
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
@@ -203,7 +212,7 @@ public abstract class MailboxFetchAPITest {
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		Date internalDate = new Date(1234);
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		mailboxService.setDeletedFlag(udr, inbox, MessageSet.singleton(1l));
 		Collection<FastFetch> result = mailboxService.fetchFast(udr, inbox, MessageSet.singleton(1L));
@@ -226,7 +235,7 @@ public abstract class MailboxFetchAPITest {
 	@Test
 	public void testFetchBodyStructureOneSimpleTextPlainMessage() throws MailException, AddressException, MessagingException, UserException {
 		String messageContent = "message content";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(mailbox, "subject", messageContent, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, new Date());
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
@@ -379,7 +388,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = date("2004-12-14T22:00:00");
 		String content = "content";
 		String from = "user@thilaire.lng.org";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
@@ -391,7 +400,7 @@ public abstract class MailboxFetchAPITest {
 		Date internalDate = date("2004-12-14T22:00:00");
 		String content = "content";
 		String from = "user@thilaire.lng.org";
-		MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
+		javax.mail.internet.MimeMessage message = GreenMailUtil.buildSimpleMessage(from, "subject", content, smtpServerSetup);
 		testUtils.deliverToUserInbox(greenMailUser, message, internalDate);
 		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		
@@ -416,5 +425,70 @@ public abstract class MailboxFetchAPITest {
 		assertThat(mimeMessage.getMimePart().isMultipart()).isFalse();
 		assertThat(mimeMessage.getMimePart().getChildren()).isEmpty();
 		assertThat(mimeMessage.getMimePart().getFullMimeType()).isEqualTo("text/plain");
+	}
+
+	@Test
+	public void testFetchMimePartData() throws MailException, IOException {
+		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<MimeMessage> mimeMessages = 
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
+		
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).build();
+		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
+		
+		MimePartSelector mimeMessageSelector = new MimePartSelector();
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		
+		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
+		String data = CharStreams.toString(new InputStreamReader(mimePartData));
+		
+		assertThat(data).hasSize(fetchInstruction.getMimePart().getSize());
+		assertThat(data).isEqualTo("<b>bodydata</b>");
+	}
+	
+	@Test
+	public void testFetchMimePartTruncationData() throws MailException, IOException {
+		final int truncationSize = 5;
+		
+		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<MimeMessage> mimeMessages = 
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
+		
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.HTML).truncationSize(truncationSize).build();
+		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
+		
+		MimePartSelector mimeMessageSelector = new MimePartSelector();
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		
+		InputStream mimePartData = mailboxService.fetchPartialMimePartStream(udr, inbox, sentEmail.getUid(), 
+				fetchInstruction.getMimePart().getAddress(), fetchInstruction.getTruncation());
+		String data = CharStreams.toString(new InputStreamReader(mimePartData));
+		
+		assertThat(data).hasSize(truncationSize);
+		assertThat(data).isEqualTo("<b>bo");
+	}
+	
+	@Test
+	public void testFetchMimePartDataWithNullMimePart() throws MailException, IOException {
+		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Collection<MimeMessage> mimeMessages = 
+				mailboxService.fetchBodyStructure(udr, inbox, MessageSet.singleton(sentEmail.getUid()));
+		
+		BodyPreference bodyPreference = BodyPreference.builder().bodyType(MSEmailBodyType.RTF).build();
+		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
+		
+		MimePartSelector mimeMessageSelector = new MimePartSelector();
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		
+		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
+		String data = CharStreams.toString(new InputStreamReader(mimePartData));
+		
+		assertThat(data).isEqualTo("bodydata");
 	}
 }
