@@ -383,6 +383,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 install -p -m 755 %{SOURCE11} $RPM_BUILD_ROOT%{_bindir}/%{name}-ui
 install -p -m 644 doc/conf/apache-virtualhost_obm.conf.sample $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
 install -p -m 644 utils/timezone-generator.php $RPM_BUILD_ROOT%{_datadir}/%{name}-ui
+install -p -m 755 utils/purge_contacts.py $RPM_BUILD_ROOT%{_datadir}/%{name}-ui
 
 # obm-services
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
