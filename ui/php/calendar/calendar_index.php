@@ -2292,9 +2292,15 @@ function update_calendar_action($writable_calendars) {
   $id = $params['calendar_id'];
   if($id) {
     $event_info = get_calendar_event_info($id);
-    $owner = $event_info['owner'];
-    $organizerUserObmId = get_event_organizer_userObm_id($id);
-    if ( !$organizerUserObmId || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
+
+    // OBMFULL-4953
+    // $event_info will be false if the event doesn't exist,
+    // which is the case for events in shared, external calendars
+    if ($event_info) {
+      $owner = $event_info['owner'];
+      $organizerUserObmId = get_event_organizer_userObm_id($id);
+    }
+    if (!$event_info || !$organizerUserObmId || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);
 
