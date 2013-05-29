@@ -98,7 +98,7 @@ documentDefaultPath="/"
 ;  - %d will be replace with user OBM domain name
 ; ie: toto@domain.foo : %u=toto, %d=domain.foo
 ; auth-ldap-filter = "(&(uid=%u)(obmDomain=%d))"
-;auth-ldap-binddn = uid=uid=ldapadmin,ou=sysusers,dc=local
+;auth-ldap-binddn = uid=ldapadmin,ou=sysusers,dc=local
 ;auth-ldap-bindpw = "mdp3PaAL"
 
 
