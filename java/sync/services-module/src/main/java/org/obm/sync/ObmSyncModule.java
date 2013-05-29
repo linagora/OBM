@@ -32,6 +32,7 @@
 package org.obm.sync;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 
@@ -41,6 +42,7 @@ public class ObmSyncModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		install(new ConfigurationModule());
 		install(new ObmSyncServicesModule());
 		install(new MessageQueueModule());
 		install(new TransactionalModule());
@@ -48,6 +50,6 @@ public class ObmSyncModule extends AbstractModule {
 		install(new SolrJmsModule());
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
-    install(new DatabaseMetadataModule());
+		install(new DatabaseMetadataModule());
 	}
 }
