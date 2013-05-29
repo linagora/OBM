@@ -40,6 +40,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Login;
+import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.base.EmailLogin;
@@ -103,7 +104,8 @@ public class BeansTest {
 				Address.class,
 				Phone.class,
 				ParticipationChanges.class,
-				InstantMessagingId.class);
+				InstantMessagingId.class,
+				MavenVersion.class);
 	}
 	
 	@Test

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.auth;
 
+import com.google.common.base.Objects;
+
 public class MavenVersion {
 	
 	private String major;
@@ -70,6 +72,23 @@ public class MavenVersion {
 		this.release = release;
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(major, minor, release);
+		
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof MavenVersion) {
+			MavenVersion that = (MavenVersion) object;
+			return Objects.equal(this.major, that.major)
+				&& Objects.equal(this.minor, that.minor)
+				&& Objects.equal(this.release, that.release);
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString() {
 		return getMajor() + "." + getMinor() + "." + getRelease();
