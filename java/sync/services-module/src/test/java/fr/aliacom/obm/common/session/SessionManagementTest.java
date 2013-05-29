@@ -73,6 +73,12 @@ public class SessionManagementTest {
 	private IAuthentificationService authenticationService;
 	private ObmDomain obmDomain;
 	private ObmUser obmUser;
+	
+	private final static String DOMAIN = "test.tlse.lng";
+	private final static String LOGIN = "user";
+	private final static String EMAIL = "user@test";
+	private final static String LOGINATDOMAIN = "user@test.tlse.lng";
+	private final static String TRUSTEDIP = "1.2.3.4";
 
 	@Before
 	public void setup() {
@@ -175,20 +181,39 @@ public class SessionManagementTest {
 
 	@Test
 	public void testLoginWithoutPasswordFromTrustedLemonIP() {
-		String domain = "test.tlse.lng", trustedIp = "1.2.3.4", login = "user", email = "user@test";
-
 		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
 		expect(authenticationService.getType()).andReturn("TestAuthService");
-		expect(domainService.findDomainByName(domain)).andReturn(obmDomain);
-		expect(configurationService.getLemonLdapIps()).andReturn(ImmutableSet.of(trustedIp));
-		expect(userDao.findUserByLogin(login, obmDomain)).andReturn(obmUser);
-		expect(helperService.constructEmailFromList(email, domain)).andReturn(email);
+		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
+		expect(configurationService.getLemonLdapIps()).andReturn(ImmutableSet.of(TRUSTEDIP));
+		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
+		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
 		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
 		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
 		control.replay();
 
-		AccessToken token = sessionManagement.login(login, null, "test", trustedIp, trustedIp, login, domain, false);
+		AccessToken token = sessionManagement.login(LOGIN, null, "test", TRUSTEDIP, TRUSTEDIP, LOGIN, DOMAIN, false);
 
+		assertThat(token).isNotNull();
+
+		control.verify();
+	}
+	
+	@Test
+	public void testLoginIsLoweredBeforeAuthServiceUsage() {
+		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
+		expect(authenticationService.getType()).andReturn("TestAuthService");
+		expect(authenticationService.getObmDomain(LOGIN)).andReturn(DOMAIN);
+		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
+		expect(specialAccounts.isRootAccount(LOGINATDOMAIN, null)).andReturn(false);
+		expect(specialAccounts.isAnyUserAccount(null)).andReturn(true);
+		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
+		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
+		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
+		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
+		
+		control.replay();
+
+		AccessToken token = sessionManagement.login("UseR", null, "test", null, null, null, DOMAIN, false);
 		assertThat(token).isNotNull();
 
 		control.verify();

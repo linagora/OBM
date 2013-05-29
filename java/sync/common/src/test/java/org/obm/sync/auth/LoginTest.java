@@ -9,6 +9,8 @@ public class LoginTest {
 	private static final String DOMAIN = "exemple.com";
 	private static final String LOGIN = "test";
 	private static final String FULL_LOGIN = LOGIN + Login.FULL_LOGIN_SEPARATOR + DOMAIN;
+	private static final String UPPER_LOGIN = "TeSt";
+	private static final String UPPER_FULL_LOGIN = UPPER_LOGIN + Login.FULL_LOGIN_SEPARATOR + DOMAIN;
 	private Login login;
 
 	@Test
@@ -68,6 +70,18 @@ public class LoginTest {
 		login = login.withDomain(ALTERNATIVE_DOMAIN);
 		Login alternative = new Login(LOGIN, ALTERNATIVE_DOMAIN);
 		assertLogin(LOGIN, ALTERNATIVE_DOMAIN, alternative.getFullLogin());
+	}
+	
+	@Test
+	public void loginByLoginPartsIsLowered() {
+		login = Login.builder().login(UPPER_LOGIN).domain(DOMAIN).build();
+		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
+	}
+	
+	@Test
+	public void loginByFullLoginIsLowered() {
+		login = Login.builder().login(UPPER_FULL_LOGIN).build();
+		assertLogin(LOGIN, DOMAIN, FULL_LOGIN);
 	}
 
 	private void assertLogin(String shortLogin, String domain, String fullLogin) {

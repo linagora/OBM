@@ -40,7 +40,7 @@ public class Login {
 			Preconditions.checkState(login != null);
 			
 			String[] parts = login.split(FULL_LOGIN_SEPARATOR, 2);
-			String loginPart = parts[0];
+			String loginPart = parts[0].toLowerCase();
 			String domainPart = parts.length < 2 ? null : parts[1];
 			if (domainPart != null && this.domain != null && !domainPart.equals(domain)) {
 					throw new IllegalStateException(
