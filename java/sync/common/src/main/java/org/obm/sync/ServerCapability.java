@@ -40,5 +40,9 @@ public enum ServerCapability {
 	 * Used to indicate if the calendar API supports {@link EventPrivacy}
 	 * new CONFIDENTIAL value.
 	 */
-	CONFIDENTIAL_EVENTS
+	CONFIDENTIAL_EVENTS,
+	/**
+	 * Used to advertise support for the storeEvent endpoint.
+	 */
+	CALENDAR_HANDLER_SUPPORTS_STOREEVENT
 }
