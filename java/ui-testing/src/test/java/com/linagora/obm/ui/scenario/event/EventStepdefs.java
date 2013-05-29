@@ -74,6 +74,7 @@ public class EventStepdefs {
 	private CalendarPage processedCalendarPage;
 	private CreateCalendarPage createCalendarPage;
 	
+	private CalendarPage calendarPage;
 	@Before
 	public void setUp() {
 		uiUser = UIUser.user();
@@ -91,7 +92,7 @@ public class EventStepdefs {
 
 	@Given("on calendar page")
 	public void openCalendarPage() {
-		CalendarPage calendarPage = pageFactory.create(driver, CalendarPage.class);
+		calendarPage = pageFactory.create(driver, CalendarPage.class);
 		calendarPage.open();
 		
 		createCalendarPage = calendarPage.createCalendarPage();
@@ -308,7 +309,7 @@ public class EventStepdefs {
 			assertThat(hrefElement.getText()).isEqualTo(expectedEventDatesTitle);
 			
 			dateTime = dateTime.plusWeeks(1);
-			processedCalendarPage.navigateToNextPage();
+			processedCalendarPage.calendarNavBarWidget().nextPage();
 		}
 	}
 
@@ -331,7 +332,7 @@ public class EventStepdefs {
 			dateTimeDayOfMonth = dateTimeDayOfMonth.plusMonths(1);
 			timelessDayOfMonth = timelessDayOfMonth.plusMonths(1);
 			for (int weekIterator = 0; weekIterator < 5; weekIterator++) {
-				processedCalendarPage.navigateToNextPage();
+				processedCalendarPage.calendarNavBarWidget().nextPage();
 				found = isDayOfMonthInPrintedWeek(timelessDayOfMonth);
 				if (found) {
 					break;
@@ -370,8 +371,8 @@ public class EventStepdefs {
 	public void eventAppearsEveryYear(String title, int day, int month, int year, int beginHour, int beginMin,
 			int endHour, int endMin) {
 		
-		processedCalendarPage.listView();
-		processedCalendarPage.monthlyEvents();
+		processedCalendarPage.calendarViewWidget().listView();
+		processedCalendarPage.calendarCalRangeWidget().monthlyEvents();
 		
 		DateTime dateTime = new DateTime().withDate(year, month, day);
 		DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -382,7 +383,7 @@ public class EventStepdefs {
 			
 			dateTime = dateTime.plusYears(1);
 			for (int monthIterator = 0; monthIterator < 12; monthIterator++) {
-				processedCalendarPage.navigateToNextPage();
+				processedCalendarPage.calendarNavBarWidget().nextPage();
 				found = isYearlyEventInPrintedMonth(title, dateTimeFormatter.print(dateTime), expectedEventDatesTitle);
 				if (found) {
 					break;

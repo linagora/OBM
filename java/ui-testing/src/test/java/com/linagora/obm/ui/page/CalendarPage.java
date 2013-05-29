@@ -43,6 +43,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.linagora.obm.ui.page.widget.CalendarCalRangeWidget;
+import com.linagora.obm.ui.page.widget.CalendarNavBarWidget;
+import com.linagora.obm.ui.page.widget.CalendarViewWidget;
 
 public class CalendarPage extends RootPage {
 	
@@ -52,6 +55,9 @@ public class CalendarPage extends RootPage {
 	private WebElement newEventCalendar;
 	protected WebElement calendarTitle;
 	protected WebElement calendarHeader;
+	private CalendarNavBarWidget calendarNavBarWidget;
+	private CalendarViewWidget calendarViewWidget;
+	private CalendarCalRangeWidget calendarCalRangeWidget;
 	
 	public CalendarPage(WebDriver driver) {
 		super(driver);
@@ -60,6 +66,18 @@ public class CalendarPage extends RootPage {
 	@Override
 	public void open() {
 		driver.get(mapping.lookup(CalendarPage.class).toExternalForm());
+	}
+	
+	@Override
+	public void waitForPageToLoad() {
+		resetCalendarPageWidgets();
+		super.waitForPageToLoad();
+	}
+
+	private void resetCalendarPageWidgets() {
+		calendarNavBarWidget = null;
+		calendarViewWidget = null;
+		calendarCalRangeWidget = null;
 	}
 
 	public CreateCalendarPage createCalendarPage() {
@@ -91,69 +109,30 @@ public class CalendarPage extends RootPage {
 		return builder.build();
 	}
 	
-	public void navigateToNextPage() {
-		if (isInAgendaView()) {
-			navigateToNextPageOnCalendarView();
-		} else {
-			navigateToNextPageOnOtherViews();
-		}
+	public CalendarNavBarWidget calendarNavBarWidget() {
+		retrieveCalendarPageWidgets();
+		return calendarNavBarWidget;
+	}
+	
+	public CalendarViewWidget calendarViewWidget() {
+		retrieveCalendarPageWidgets();
+		return calendarViewWidget;
+	}
+	
+	public CalendarCalRangeWidget calendarCalRangeWidget() {
+		retrieveCalendarPageWidgets();
+		return calendarCalRangeWidget;
 	}
 
-	private void navigateToNextPageOnCalendarView() {
-		WebElement navigatorElement = getNavigatorElement();
-		List<WebElement> buttonElements = navigatorElement.findElements(new ByCssSelector("a"));
-		for (WebElement webElement : buttonElements) {
-			if (webElement.getAttribute("onclick").contains("showNext")) {
-				webElement.click();
-				waitForPageToLoad();
-				return;
-			}
+	private void retrieveCalendarPageWidgets() {
+		if (calendarNavBarWidget == null) {
+			calendarNavBarWidget = new CalendarNavBarWidget(this, driver.findElement(By.id("calendarNavBar")));
 		}
-	}
-	
-	private void navigateToNextPageOnOtherViews() {
-		WebElement navigatorElement = getNavigatorElement();
-		List<WebElement> buttonElements = navigatorElement.findElements(new ByCssSelector("img"));
-		for (WebElement webElement : buttonElements) {
-			if (webElement.getAttribute("src").contains("next.png")) {
-				webElement.click();
-				waitForPageToLoad();
-				return;
-			}
+		if (calendarViewWidget == null) {
+			calendarViewWidget = new CalendarViewWidget(this, driver.findElement(new ByCssSelector(".LF.NM")));
 		}
-	}
-	
-	private WebElement getNavigatorElement() {
-		WebElement navigatorElement = driver.findElement(By.id("calendarNavBar"));
-		return navigatorElement;
-	}
-	
-	private boolean isInAgendaView() {
-		WebElement currentViewElement = driver.findElement(new ByCssSelector("img[title='Vue calendrier, cette vue est éditable']"));
-		return currentViewElement.getAttribute("src").contains("current.gif");
-	}
-	
-	public void listView() {
-		WebElement calendarViewElement = driver.findElement(new ByCssSelector(".LF.NM"));
-		List<WebElement> buttonElements = calendarViewElement.findElements(new ByCssSelector("a"));
-		for (WebElement webElement : buttonElements) {
-			if (webElement.getAttribute("href").contains("list")) {
-				webElement.click();
-				waitForPageToLoad();
-				return;
-			}
-		}
-	}
-	
-	public void monthlyEvents() {
-		WebElement calendarViewElement = driver.findElement(By.id("calendarCalRange"));
-		List<WebElement> buttonElements = calendarViewElement.findElements(new ByCssSelector("a"));
-		for (WebElement webElement : buttonElements) {
-			if (webElement.getAttribute("href").contains("month")) {
-				webElement.click();
-				waitForPageToLoad();
-				return;
-			}
+		if (calendarCalRangeWidget == null) {
+			calendarCalRangeWidget = new CalendarCalRangeWidget(this, driver.findElement(By.id("calendarCalRange")));
 		}
 	}
 }
