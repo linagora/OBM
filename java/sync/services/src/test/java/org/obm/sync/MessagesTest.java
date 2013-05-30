@@ -31,18 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.util.Locale;
 
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.ConfigurationServiceImpl;
-
-
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.IniFile.Factory;
@@ -69,22 +69,32 @@ public class MessagesTest {
 	@Test
 	public void testResourceBundleFr() {
 		Messages messages = new Messages(configurationService, Locale.FRENCH);
+		String expectedMessage = "Nouvel événement de owner : title";
 		String message = messages.newEventTitle("owner", "title");
-		Assert.assertEquals("Nouvel événement de owner : title", message);
+		assertThat(message).isEqualTo(expectedMessage);
 	}
 	
 	@Test
 	public void testResourceBundleEn() {
 		Messages messages = new Messages(configurationService, Locale.ENGLISH);
+		String expectedMessage = "New event from owner: title";
 		String message = messages.newEventTitle("owner", "title");
-		Assert.assertEquals("New event from owner: title", message);
+		assertThat(message).isEqualTo(expectedMessage);
 	}
 	
 	@Test
-	public void testResourceBundleZhNotExist() {
+	public void testResourceBundleZh() {
 		Messages messages = new Messages(configurationService, Locale.CHINESE);
+		String expectedMessage = "新的事件从 owner: title";
+		String message = messages.newEventTitle("owner", "title");
+		assertThat(message).isEqualTo(expectedMessage);
+	}
+	
+	@Test
+	public void testResourceBundleItNotExist() {
+		Messages messages = new Messages(configurationService, Locale.ITALIAN);
 		String expectedMessage = "New event from owner: title";
 		String message = messages.newEventTitle("owner", "title");
-		Assert.assertEquals(expectedMessage, message);
+		assertThat(message).isEqualTo(expectedMessage);
 	}
 }
