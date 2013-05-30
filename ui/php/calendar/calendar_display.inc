@@ -4694,7 +4694,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         }
       }
     }
-    $all_day = $event_q->f('event_allday');
+    $all_day = ( isset($calendar['all_day']) ) ? $calendar['all_day'] : $event_q->f('event_allday');
     // OBMFULL-3386
     // Same as above, for duration
     if ($is_quick_create_with_template && $current_view->useCalendarTimeForCreationWithTemplate()) {
