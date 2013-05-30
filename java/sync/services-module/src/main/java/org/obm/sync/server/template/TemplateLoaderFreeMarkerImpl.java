@@ -60,11 +60,15 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 		this.constantService = constantService;
 	}
 
-	private Configuration getDefaultCfg() {
+	private Configuration getDefaultCfg(Locale locale) {
 		Configuration externalCfg = new Configuration();
-		externalCfg
-				.setClassForTemplateLoading(AbstractMailer.class, "template");
+		externalCfg.setClassForTemplateLoading(
+				AbstractMailer.class, getTemplatePathPrefix(locale));
 		return externalCfg;
+	}
+
+	public static String getTemplatePathPrefix(Locale locale) {
+		return "template/" + locale.getLanguage();
 	}
 
 	private Configuration getOverrideCfg() throws IOException {
@@ -89,7 +93,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 			}
 		}
 		if (ret == null) {
-			ret = getDefaultCfg().getTemplate(templateName, locale);
+			ret = getDefaultCfg(locale).getTemplate(templateName, locale);
 		}
 		if (ret == null) {
 			throw new FileNotFoundException("Error while loading Template[ "
