@@ -117,10 +117,6 @@
 			<version>1.3</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>columba</groupId>
 			<artifactId>ristretto-core</artifactId>
 			<version>1.1.2-LINAGORA</version>
