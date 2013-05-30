@@ -720,7 +720,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(creatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(creatingMSEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(calendarClient.getEventFromExtId(token, "test@test", eventExtId))
 			.andReturn(oldEvent).once();
 		
@@ -745,10 +745,11 @@ public class CalendarBackendTest {
 		String clientIdHash = "135660464";
 		String serverId = null;
 
-		EventExtId eventExtId = null;
+		EventExtId eventExtId = new EventExtId(null);
 		Event oldEvent = null;
 		Event creatingEvent = new Event();
-		EventExtId generatedEventExtID = new EventExtId("00000123-0456-0789-0012-000000000345");
+		String generatedEventExtIdString = "00000123-0456-0789-0012-000000000345";
+		EventExtId generatedEventExtID = new EventExtId(generatedEventExtIdString);
 		boolean eventIsResolvedAsInternal = true;
 		
 		MSEvent creatingMSEvent = new MSEvent();
@@ -764,13 +765,13 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(creatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(creatingMSEvent.getUid(), device)).andReturn(null);
 		expect(eventConverter.isInternalEvent(oldEvent, eventExtId)).andReturn(eventIsResolvedAsInternal);
 		expect(eventConverter.convert(user, oldEvent, creatingMSEvent, eventIsResolvedAsInternal))
 			.andReturn(creatingEvent).once();
 
 		expect(eventExtIdFactory.generate()).andReturn(generatedEventExtID);
-		eventService.trackEventExtIdMSEventUidTranslation(generatedEventExtID, creatingMSEvent.getUid(), device);
+		eventService.trackEventExtIdMSEventUidTranslation(generatedEventExtIdString, creatingMSEvent.getUid(), device);
 		expectLastCall();
 		
 		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(creatingEvent), eq(true), anyObject(String.class)))
@@ -813,7 +814,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
 		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
@@ -858,7 +859,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
 		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
@@ -899,7 +900,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(calendarClient.getEventFromExtId(token, "test@test", eventExtId))
 			.andReturn(oldEvent).once();
 		
@@ -943,7 +944,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
 		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
@@ -1267,7 +1268,6 @@ public class CalendarBackendTest {
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(new MSEventUid("abc0123"));
 		String eventExtIdString = "00000123-0456-0789-0012-000000000345";
-		EventExtId eventExtId = new EventExtId(eventExtIdString);
 
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(userCalendarCollectionPath.collectionPath());
 		expect(collectionPathBuilder.userDataRequest(userDataRequest)).andReturn(collectionPathBuilder);
@@ -1276,7 +1276,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtIdString);
 		
 		expect(mappingService.getServerIdFor(collectionId, itemId)).andReturn(serverId).once();
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Integer.valueOf(itemId)).once();
@@ -1307,7 +1307,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId);
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtIdString);
 		expect(mappingService.getServerIdFor(collectionId, itemId)).andReturn(serverId).once();
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Integer.valueOf(itemId)).once();
 		
@@ -1348,7 +1348,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId).once();
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtIdString).once();
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(null).once();
 	
@@ -1360,7 +1360,7 @@ public class CalendarBackendTest {
 		expect(eventConverter.convert(user, null, msEvent, false))
 			.andReturn(event).once();
 		
-		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEvent.getUid(), device);
+		eventService.trackEventExtIdMSEventUidTranslation(eventExtIdString, msEvent.getUid(), device);
 		expectLastCall().once();
 		
 		mockControl.replay();
@@ -1381,7 +1381,7 @@ public class CalendarBackendTest {
 		
 		expectLoginBehavior();
 		
-		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId).once();
+		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtIdString).once();
 		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(userCalendarCollectionPath.collectionPath());
@@ -1390,7 +1390,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
 		
 		expect(eventService.getEventExtIdFor(msEvent.getUid(), device))
-			.andReturn(eventExtId).once();
+			.andReturn(eventExtIdString).once();
 
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(null).once();
@@ -1407,7 +1407,7 @@ public class CalendarBackendTest {
 		expect(eventConverter.convert(user, null, msEvent, false))
 			.andReturn(event).once();
 		
-		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEvent.getUid(), device);
+		eventService.trackEventExtIdMSEventUidTranslation(eventExtIdString, msEvent.getUid(), device);
 		expectLastCall().once();
 		
 		mockControl.replay();
@@ -1420,7 +1420,8 @@ public class CalendarBackendTest {
 		String calendarDisplayName = user.getLoginAtDomain();
 		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
 		
-		MSEventUid msEventUid = new MSEventUid("1");
+		String eventExtIdString = "1";
+		MSEventUid msEventUid = new MSEventUid(eventExtIdString);
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(msEventUid);
 		MSEmail invitation  = new MSEmail();
@@ -1428,9 +1429,9 @@ public class CalendarBackendTest {
 
 		expectLoginBehavior();
 		
-		EventExtId eventExtId = new EventExtId("1");
+		EventExtId eventExtId = new EventExtId(eventExtIdString);
 		expect(eventService.getEventExtIdFor(msEventUid, device))
-			.andReturn(eventExtId).once();
+			.andReturn(eventExtIdString).once();
 
 		Event event = new Event();
 		event.setUid(new EventObmId(1));
@@ -1459,7 +1460,7 @@ public class CalendarBackendTest {
 		String serverId = "123";
 		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
 			.andReturn(1).once();
-		expect(mappingService.getServerIdFor(1, "1"))
+		expect(mappingService.getServerIdFor(1, eventExtIdString))
 			.andReturn(serverId);
 		
 		expectBuildCollectionPath(calendarDisplayName);

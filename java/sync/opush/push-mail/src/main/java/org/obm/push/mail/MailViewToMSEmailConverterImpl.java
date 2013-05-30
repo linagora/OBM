@@ -108,7 +108,7 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 	private MSMeetingRequest fillMSEventUid(MSMeetingRequest msMeetingRequest, UserDataRequest userDataRequest) throws DaoException {
 		if (msMeetingRequest != null) {
 			EventExtId eventExtId = new EventExtId(msMeetingRequest.getMSEventExtId().serializeToString());
-			MSEventUid msEventUid = eventService.getMSEventUidFor(eventExtId, userDataRequest.getDevice());
+			MSEventUid msEventUid = eventService.getMSEventUidFor(eventExtId.getExtId(), userDataRequest.getDevice());
 			return MSMeetingRequest.builder()
 				.copy(msMeetingRequest)
 				.msEventUid(msEventUid).build();

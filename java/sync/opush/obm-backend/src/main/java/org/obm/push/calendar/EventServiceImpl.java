@@ -46,12 +46,12 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EventNotFoundException;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.client.login.LoginService;
@@ -85,14 +85,15 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public MSEvent convertEventToMSEvent(UserDataRequest udr, Event event) throws DaoException, ConversionException {
-		MSEventUid msEventUid = getMSEventUidFor(event.getExtId(), udr.getDevice());
-		MSEvent msEvent = eventConverter.convert(event, msEventUid, udr.getCredentials().getUser());
+	public MSEvent convertEventToMSEvent(UserDataRequest udr, Object event) throws DaoException, ConversionException {
+		Event obmEvent = (Event) event;
+		MSEventUid msEventUid = getMSEventUidFor(obmEvent.getExtId().getExtId(), udr.getDevice());
+		MSEvent msEvent = eventConverter.convert(obmEvent, msEventUid, udr.getCredentials().getUser());
 		return msEvent;
 	}
 	
 	@Override
-	public MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException {
+	public MSEventUid getMSEventUidFor(String eventExtId, Device device) throws DaoException {
 		Preconditions.checkNotNull(eventExtId, "Event must contain an extId");
 		MSEventUid msEventUidFromDatabase = retrieveMSEventUidFromDatabase(eventExtId, device);
 		if (msEventUidFromDatabase != null) {
@@ -101,42 +102,46 @@ public class EventServiceImpl implements EventService {
 		return createMSEventUidInDatabase(eventExtId, device);
 	}
 
-	private MSEventUid createMSEventUidInDatabase(EventExtId eventExtId, Device device) throws DaoException {
+	private MSEventUid createMSEventUidInDatabase(String eventExtId, Device device) throws DaoException {
 		MSEventUid convertedFromExtId = createMSEventUidFromEventExtId(eventExtId);
-		byte[] hashedExtId = hashExtId(eventExtId);
-		calendarDao.insertExtIdMSEventUidMapping(eventExtId, convertedFromExtId, device, hashedExtId);
+		byte[] hashedExtId = hashEventExtId(eventExtId);
+		calendarDao.insertExtIdMSEventUidMapping(new EventExtId(eventExtId), convertedFromExtId, device, hashedExtId);
 		return convertedFromExtId;
 	}
 
-	private byte[] hashExtId(EventExtId extId) {
-		HashCode hashCode = Hashing.sha1().hashString(extId.getExtId(), Charsets.US_ASCII);
+	private byte[] hashEventExtId(String eventExtId) {
+		HashCode hashCode = Hashing.sha1().hashString(eventExtId, Charsets.US_ASCII);
 		return hashCode.asBytes();
 	}
 
-	private MSEventUid retrieveMSEventUidFromDatabase(EventExtId eventExtId, Device device)
+	private MSEventUid retrieveMSEventUidFromDatabase(String eventExtId, Device device)
 			throws DaoException {
-		MSEventUid msEventUidFromDatabase = calendarDao.getMSEventUidFor(eventExtId, device);
+		MSEventUid msEventUidFromDatabase = calendarDao.getMSEventUidFor(new EventExtId(eventExtId), device);
 		return msEventUidFromDatabase;
 	}
 
-	private MSEventUid createMSEventUidFromEventExtId(EventExtId eventExtId) {
+	private MSEventUid createMSEventUidFromEventExtId(String eventExtId) {
 		return new MSEventUid(convertExtIdAsHex(eventExtId));
 	}
 	
-	private String convertExtIdAsHex(EventExtId extId) {
-		return Hex.encodeHexString(extId.getExtId().getBytes(Charsets.US_ASCII));
+	private String convertExtIdAsHex(String extId) {
+		return Hex.encodeHexString(extId.getBytes(Charsets.US_ASCII));
 	}
 
 	@Override
-	public EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException {
-		return calendarDao.getEventExtIdFor(msEventUid, device);
+	public String getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException {
+		try {
+			return calendarDao.getEventExtIdFor(msEventUid, device).getExtId();
+		} catch (org.obm.sync.auth.EventNotFoundException e) {
+			throw new EventNotFoundException(e);
+		}
 	}
 	
 	@Override
-	public void trackEventExtIdMSEventUidTranslation(EventExtId eventExtId,
+	public void trackEventExtIdMSEventUidTranslation(String eventExtId,
 			MSEventUid msEventUid, Device device) throws DaoException {
-		byte[] hashedExtId = hashExtId(eventExtId);
-		calendarDao.insertExtIdMSEventUidMapping(eventExtId, msEventUid, device, hashedExtId);
+		byte[] hashedExtId = hashEventExtId(eventExtId);
+		calendarDao.insertExtIdMSEventUidMapping(new EventExtId(eventExtId), msEventUid, device, hashedExtId);
 	}
 	
 	@Override

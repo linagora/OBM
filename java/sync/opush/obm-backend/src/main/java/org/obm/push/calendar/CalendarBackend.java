@@ -460,8 +460,8 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 
 	private EventExtId getEventExtId(UserDataRequest udr, MSEvent msEvent) {
 		try {
-			return eventService.getEventExtIdFor(msEvent.getUid(), udr.getDevice());
-		} catch (EventNotFoundException e) {
+			return new EventExtId(eventService.getEventExtIdFor(msEvent.getUid(), udr.getDevice()));
+		} catch (org.obm.push.exception.EventNotFoundException e) {
 			return null;
 		}
 	}
@@ -499,7 +499,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		if (serverId != null) {
 			EventObmId id = convertServerIdToEventObmId(serverId);
 			return calendarClient.getEventFromId(token, collectionPath.backendName(), id);	
-		} else if (eventExtId != null) {
+		} else if (eventExtId != null && !Strings.isNullOrEmpty(eventExtId.getExtId())) {
 			return getEventFromExtId(token, eventExtId, collectionPath);
 		}
 		return null;
@@ -546,9 +546,9 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 
 	private void assignExtId(UserDataRequest udr, MSEvent msEvent, EventExtId eventExtId, Event event) {
-		if (eventExtId == null) {
+		if (eventExtId == null || Strings.isNullOrEmpty(eventExtId.getExtId())) {
 			EventExtId newEventExtId = eventExtIdFactory.generate();
-			eventService.trackEventExtIdMSEventUidTranslation(newEventExtId, msEvent.getUid(), udr.getDevice());
+			eventService.trackEventExtIdMSEventUidTranslation(newEventExtId.getExtId(), msEvent.getUid(), udr.getDevice());
 			event.setExtId(newEventExtId);
 		} else {
 			event.setExtId(eventExtId);

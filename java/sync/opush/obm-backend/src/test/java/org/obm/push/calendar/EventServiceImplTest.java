@@ -226,7 +226,7 @@ public class EventServiceImplTest {
 		mocksControl.replay();
 
 		EventService eventService = new EventServiceImpl(calendarDao, null, null, null, null);
-		eventService.trackEventExtIdMSEventUidTranslation(eventExtId, msEventUid, device);
+		eventService.trackEventExtIdMSEventUidTranslation(eventExtId.getExtId(), msEventUid, device);
 		mocksControl.verify();
 	}
 

@@ -31,26 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EventNotFoundException;
 import org.obm.push.service.impl.EventParsingException;
-import org.obm.sync.auth.EventNotFoundException;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventExtId;
 
 public interface EventService {
 
-	void trackEventExtIdMSEventUidTranslation(EventExtId eventExtId, MSEventUid msEventUid, Device device) throws DaoException;
+	void trackEventExtIdMSEventUidTranslation(String eventExtId, MSEventUid msEventUid, Device device) throws DaoException;
 	
-	EventExtId getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException;
+	String getEventExtIdFor(MSEventUid msEventUid, Device device) throws DaoException, EventNotFoundException;
 	
-	MSEvent convertEventToMSEvent(UserDataRequest udr, Event event)  throws DaoException, ConversionException;
+	MSEvent convertEventToMSEvent(UserDataRequest udr, Object event)  throws DaoException, ConversionException;
 
 	MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException;
 
-	MSEventUid getMSEventUidFor(EventExtId eventExtId, Device device) throws DaoException;
+	MSEventUid getMSEventUidFor(String eventExtId, Device device) throws DaoException;
 }
