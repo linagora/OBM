@@ -50,6 +50,8 @@ import org.obm.push.service.EventService;
 import org.obm.push.service.OpushLocatorService;
 import org.obm.push.task.TaskBackend;
 import org.obm.sync.ObmSyncHttpClientModule;
+import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.services.AttendeeService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -58,20 +60,21 @@ public class ObmBackendModule extends AbstractModule {
 
     @Override
     protected void configure() {
-    	install(new ObmSyncHttpClientModule());
-    	bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-    	bind(IBackend.class).to(OBMBackend.class);
-    	bind(ICalendarBackend.class).to(CalendarBackend.class);
-    	bind(EventService.class).to(EventServiceImpl.class);
-    	bind(EventConverter.class).to(EventConverterImpl.class);
-    	bind(LocatorService.class).to(LocatorCache.class);
-    	bind(OpushLocatorService.class).to(OpushLocatorServiceImpl.class);
-
-    	Multibinder<PIMBackend> pimBackends = Multibinder.newSetBinder(binder(), PIMBackend.class);
-    	pimBackends.addBinding().to(CalendarBackend.class);
-    	pimBackends.addBinding().to(ContactsBackend.class);
-    	pimBackends.addBinding().to(TaskBackend.class);
-    	Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
-    	searchSources.addBinding().to(ObmSearchContact.class);
+		install(new ObmSyncHttpClientModule());
+		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
+		bind(IBackend.class).to(OBMBackend.class);
+		bind(ICalendarBackend.class).to(CalendarBackend.class);
+		bind(EventService.class).to(EventServiceImpl.class);
+		bind(EventConverter.class).to(EventConverterImpl.class);
+		bind(LocatorService.class).to(LocatorCache.class);
+		bind(OpushLocatorService.class).to(OpushLocatorServiceImpl.class);
+		bind(AttendeeService.class).to(SimpleAttendeeService.class);
+		
+		Multibinder<PIMBackend> pimBackends = Multibinder.newSetBinder(binder(), PIMBackend.class);
+		pimBackends.addBinding().to(CalendarBackend.class);
+		pimBackends.addBinding().to(ContactsBackend.class);
+		pimBackends.addBinding().to(TaskBackend.class);
+		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
+		searchSources.addBinding().to(ObmSearchContact.class);
     }
 }

@@ -72,8 +72,6 @@ import org.obm.servlet.filter.qos.QoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
-import org.obm.sync.calendar.SimpleAttendeeService;
-import org.obm.sync.services.AttendeeService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -121,7 +119,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(DateService.class).to(DateServiceImpl.class);
 		bind(ClientIdService.class).to(ClientIdServiceImpl.class);
 		bind(QoSContinuationSupport.class).to(OpushContinuationSupport.class);
-		bind(AttendeeService.class).to(SimpleAttendeeService.class);
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toInstance("/etc/opush/policy.ini");
 		bind(PolicyConfigurationService.class).to(PolicyConfigurationServiceFileImpl.class);
 		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
