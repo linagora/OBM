@@ -46,9 +46,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.exception.AuthenticationException;
 import org.obm.push.service.AuthenticationService;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,14 +90,14 @@ public class AuthenticationFilter implements Filter {
 				httpRequest.setAttribute(RequestProperties.CREDENTIALS, credentials);
 			}
 			chain.doFilter(request, response);
-		} catch (AuthFault e) {
+		} catch (AuthenticationException e) {
 			logger.info(e.getMessage());
 			httpErrorResponder.returnHttpUnauthorized(httpRequest, httpResponse);
 		}
 
 	}
 
-	private Credentials authentication(HttpServletRequest request) throws AuthFault {
+	private Credentials authentication(HttpServletRequest request) throws AuthenticationException {
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null) {
 			StringTokenizer st = new StringTokenizer(authHeader);
@@ -116,30 +115,25 @@ public class AuthenticationFilter implements Filter {
 				}
 			}
 		}
-		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
+		throw new AuthenticationException("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(String userId, String password) throws AuthFault {
-		AccessToken accessToken = login(getLoginAtDomain(userId), password);
-		User user = createUser(userId, accessToken);
+	private Credentials getCredentials(String userId, String password) throws AuthenticationException {
+		User user = login(getLoginAtDomain(userId), password);
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
 			return new Credentials(user, password);
 		} else {
-			throw new AuthFault("Login {"+ userId + "} failed, bad login or/and password.");
+			throw new AuthenticationException("Login {"+ userId + "} failed, bad login or/and password.");
 		}
 	}
 	
-	private AccessToken login(String userId, String password) throws AuthFault {
+	private User login(String userId, String password) throws AuthenticationException {
 		try {
-			return (AccessToken) authenticationService.authenticate(userFactory.getLoginAtDomain(userId), password);
+			return authenticationService.authenticate(userId, password);
 		} catch (Exception e) {
-			throw new AuthFault(e);
+			throw new AuthenticationException(e);
 		}
-	}
-	
-	private User createUser(String userId, AccessToken accessToken) {
-		return userFactory.createUser(userId, accessToken.getUserEmail(), accessToken.getUserDisplayName());
 	}
 
 	protected String getLoginAtDomain(String userId) {

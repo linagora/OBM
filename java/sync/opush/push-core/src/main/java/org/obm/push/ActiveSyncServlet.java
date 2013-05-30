@@ -50,6 +50,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.AuthenticationException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;
 import org.obm.push.handler.IRequestHandler;
@@ -57,7 +58,6 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
-import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
-		} catch (AuthFault e) {
+		} catch (AuthenticationException e) {
 			logger.info(e.getMessage());
 			httpErrorResponder.returnHttpUnauthorized(request, response);
 		} finally {
@@ -206,7 +206,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		}
 	}
 	
-	private void checkAuthorizedDevice(ActiveSyncRequest request, Credentials credentials) throws AuthFault, DaoException {
+	private void checkAuthorizedDevice(ActiveSyncRequest request, Credentials credentials) throws AuthenticationException, DaoException {
 		DeviceId deviceId = request.getDeviceId();
 		String deviceType = request.getDeviceType();
 		String userAgent = request.getUserAgent();
@@ -218,7 +218,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			authLogger.info("Authentication success [login:{}], the device [type:{}] has been authorized.", 
 					credentials.getUser().getEmail(), deviceType);
 		} else {
-			throw new AuthFault("The device has not been authorized");
+			throw new AuthenticationException("The device has not been authorized");
 		}
 	}
 

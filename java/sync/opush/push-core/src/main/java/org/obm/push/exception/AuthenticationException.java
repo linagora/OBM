@@ -29,12 +29,24 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service;
+package org.obm.push.exception;
 
-import org.obm.push.bean.User;
+public class AuthenticationException extends Exception {
 
-public interface AuthenticationService {
-
-	User authenticate(String userId, String password) throws Exception;
+	public AuthenticationException(String s) {
+		super(s);
+	}
 	
+	public AuthenticationException(Throwable throwable) {
+		super(throwable);
+	}
+
+	public AuthenticationException() {
+		super();
+	}
+
+	public AuthenticationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

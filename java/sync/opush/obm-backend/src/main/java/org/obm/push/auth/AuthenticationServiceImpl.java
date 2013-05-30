@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.auth;
 
+import org.obm.push.bean.User;
 import org.obm.push.service.AuthenticationService;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
@@ -41,15 +43,22 @@ import com.google.inject.Singleton;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private final LoginService loginService;
+	private final User.Factory userFactory;
 
 	@Inject
-	private AuthenticationServiceImpl(LoginService loginService) {
+	private AuthenticationServiceImpl(LoginService loginService, User.Factory userFactory) {
 		this.loginService = loginService;
+		this.userFactory = userFactory;
 	}
 	
 	@Override
-	public Object authenticate(String loginAtDomain, String password) throws Exception {
-		return loginService.authenticate(loginAtDomain, password);
+	public User authenticate(String userId, String password) throws Exception {
+		AccessToken token = loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
+		return createUser(userId, token);
 	}
 
+	
+	private User createUser(String userId, AccessToken token) {
+		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
+	}
 }
