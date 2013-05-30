@@ -43,6 +43,7 @@ import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -80,7 +81,7 @@ public class TemplateTest {
 
 	private Template retrieveEventInvitationTemplate(Locale locale) throws IOException {
 		Configuration cfg = new Configuration();
-		cfg.setClassForTemplateLoading(getClass(), "template");
+		cfg.setClassForTemplateLoading(getClass(), TemplateLoaderFreeMarkerImpl.getTemplatePathPrefix(locale));
 		cfg.setCustomAttribute("datetime_format", "string.medium_short");
 		Template template = cfg.getTemplate("EventInvitationPlain.tpl", locale);
 		return template;

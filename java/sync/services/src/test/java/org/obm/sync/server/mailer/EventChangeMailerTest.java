@@ -83,6 +83,7 @@ import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.server.template.ITemplateLoader;
+import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.sync.services.AttendeeService;
 import org.slf4j.Logger;
 
@@ -159,7 +160,7 @@ public abstract class EventChangeMailerTest {
 			public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
 					throws IOException {
 				Configuration cfg = new Configuration();
-				cfg.setClassForTemplateLoading(getClass(), "template");
+				cfg.setClassForTemplateLoading(getClass(), TemplateLoaderFreeMarkerImpl.getTemplatePathPrefix(locale));
 				Template template = cfg.getTemplate(templateName, locale);
 				template.setTimeZone(TIMEZONE);
 				return cfg.getTemplate(templateName, locale);

@@ -57,6 +57,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.obm.filter.SlowFilterRule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.template.ITemplateLoader;
+import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -97,7 +98,7 @@ public class ErrorMailerTest {
 				public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
 						throws IOException {
 					Configuration cfg = new Configuration();
-					cfg.setClassForTemplateLoading(getClass(), "template");
+					cfg.setClassForTemplateLoading(getClass(), TemplateLoaderFreeMarkerImpl.getTemplatePathPrefix(locale));
 					return cfg.getTemplate(templateName, locale);
 				}
 			};
@@ -250,7 +251,7 @@ public class ErrorMailerTest {
 				public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
 						throws IOException {
 					Configuration cfg = new Configuration();
-					cfg.setClassForTemplateLoading(getClass(), "template");
+					cfg.setClassForTemplateLoading(getClass(), TemplateLoaderFreeMarkerImpl.getTemplatePathPrefix(locale));
 					return cfg.getTemplate(templateName, locale);
 				}
 			};
