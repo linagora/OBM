@@ -32,8 +32,6 @@
 package org.obm.push.auth;
 
 import org.obm.push.service.AuthenticationService;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginService;
 
 import com.google.inject.Inject;
@@ -50,7 +48,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 	
 	@Override
-	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
+	public Object authenticate(String loginAtDomain, String password) throws Exception {
 		return loginService.authenticate(loginAtDomain, password);
 	}
 

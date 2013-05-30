@@ -42,8 +42,6 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 
 public interface IBackend {
 
@@ -64,7 +62,7 @@ public interface IBackend {
 
 	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
 
-	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+	Object authenticate(String loginAtDomain, String password) throws Exception;
 
 	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,

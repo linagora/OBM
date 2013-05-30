@@ -131,7 +131,11 @@ public class AuthenticationFilter implements Filter {
 	}
 	
 	private AccessToken login(String userId, String password) throws AuthFault {
-		return authenticationService.authenticate(userFactory.getLoginAtDomain(userId), password);
+		try {
+			return (AccessToken) authenticationService.authenticate(userFactory.getLoginAtDomain(userId), password);
+		} catch (Exception e) {
+			throw new AuthFault(e);
+		}
 	}
 	
 	private User createUser(String userId, AccessToken accessToken) {

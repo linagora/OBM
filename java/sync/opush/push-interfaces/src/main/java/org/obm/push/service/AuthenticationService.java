@@ -31,11 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-
 public interface AuthenticationService {
 
-	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
+	Object authenticate(String loginAtDomain, String password) throws Exception;
 	
 }
