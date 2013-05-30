@@ -1553,8 +1553,7 @@ function get_calendar_params() {
     $params['event_duration'] = 0;
   }
   if (!is_null($params['date_begin']) && is_null($params['date_end']) && isset($params['duration'])) {
-    $clone = clone $params['date_begin'];
-    $params['date_end'] = $clone->addSecond($params['duration']);
+    $params['date_end'] = event_end_date($params['date_begin'], $params['duration'], $params['all_day'] == 1);
   } 
   if (is_array($params['date_exception'])) {
     $exceptions = array_unique($params['date_exception']);
@@ -2455,6 +2454,19 @@ function create_new_exception($params, $user_id) {
     throw new DBUpdateException();
   }
   return $exception_insert;
+}
+
+function event_end_date($begin, $duration, $allDay) {
+  $end = clone $begin;
+
+  if ($allDay) {
+    $end->addDay(Of_Date::allDayDurationInDays($duration));
+    $end->subSecond(1);
+  } else {
+    $end->addSecondsInUTC($duration);
+  }
+
+  return $end;
 }
 
 class DBUpdateException extends Exception {}

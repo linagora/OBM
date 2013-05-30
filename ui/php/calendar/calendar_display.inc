@@ -3026,19 +3026,6 @@ function event_details_access_rights() {
   return $access_type;
 }
 
-function event_end_date($begin, $duration, $allDay) {
-  $end = clone $begin;
-  
-  if ($allDay) {
-    $end->addDay(Of_Date::allDayDurationInDays($duration));
-    $end->subSecond(1);
-  } else {
-    $end->addSecondsInUTC($duration);
-  }
-  
-  return $end;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
