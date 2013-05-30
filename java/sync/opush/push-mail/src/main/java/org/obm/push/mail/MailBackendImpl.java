@@ -105,7 +105,6 @@ import org.obm.push.service.impl.MappingService;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
-import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;

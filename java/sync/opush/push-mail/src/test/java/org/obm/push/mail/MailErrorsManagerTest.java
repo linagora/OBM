@@ -47,7 +47,6 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailErrorsManager;
-import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;

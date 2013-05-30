@@ -58,7 +58,6 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MethodAttachment;
-import org.obm.push.utils.Mime4jUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;

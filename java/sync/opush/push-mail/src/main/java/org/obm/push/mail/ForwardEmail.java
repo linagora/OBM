@@ -39,7 +39,6 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmail;
 import org.obm.push.mail.exception.NotQuotableEmailException;
-import org.obm.push.utils.Mime4jUtils;
 
 public class ForwardEmail extends ReplyEmail {
 

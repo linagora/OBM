@@ -56,7 +56,6 @@ import org.apache.james.mime4j.util.MimeUtil;
 import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
-import org.obm.push.utils.Mime4jUtils;
 import org.obm.push.utils.MimeContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

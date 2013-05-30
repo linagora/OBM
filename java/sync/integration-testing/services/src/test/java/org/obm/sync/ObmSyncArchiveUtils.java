@@ -112,7 +112,6 @@ import org.obm.push.utils.IniFile;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.LdapUtils;
-import org.obm.push.utils.Mime4jUtils;
 import org.obm.push.utils.MimeContentType;
 import org.obm.push.utils.NoArgFilterInputStream;
 import org.obm.push.utils.SerializableInputStream;
@@ -631,7 +630,6 @@ public class ObmSyncArchiveUtils {
 				WildcardStringSQLCollectionHelper.class,
 				JDBCUtils.class,
 				LdapUtils.class,
-				Mime4jUtils.class,
 				MimeContentType.class,
 				NoArgFilterInputStream.class,
 				SerializableInputStream.class,

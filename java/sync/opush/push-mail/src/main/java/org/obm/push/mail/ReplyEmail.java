@@ -58,7 +58,6 @@ import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 import org.obm.push.utils.DOMUtils;
-import org.obm.push.utils.Mime4jUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

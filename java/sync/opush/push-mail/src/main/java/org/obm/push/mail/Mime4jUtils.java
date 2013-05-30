@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.utils;
+package org.obm.push.mail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,6 +61,8 @@ import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.obm.push.utils.FileUtils;
+import org.obm.push.utils.MimeContentType;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;

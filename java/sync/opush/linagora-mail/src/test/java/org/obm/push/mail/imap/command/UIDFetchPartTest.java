@@ -53,12 +53,12 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.Mime4jUtils;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.minig.imap.StoreClient;
-import org.obm.push.utils.Mime4jUtils;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;

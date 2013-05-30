@@ -81,7 +81,6 @@ import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
-import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;

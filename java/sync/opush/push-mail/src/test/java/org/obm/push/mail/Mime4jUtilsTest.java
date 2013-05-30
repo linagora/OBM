@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.utils;
+package org.obm.push.mail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,11 +46,10 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.utils.MimeContentType;
 
 import com.google.common.base.Charsets;
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class Mime4jUtilsTest {
