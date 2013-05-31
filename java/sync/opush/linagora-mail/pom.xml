@@ -82,6 +82,12 @@
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail-backend-testsuite</artifactId>
 			<version>${obm.version}</version>

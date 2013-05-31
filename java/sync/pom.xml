@@ -707,6 +707,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<artifactId>cucumber-guice</artifactId>
 				<version>${cucumber.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>common-test</artifactId>
+				<version>${obm.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<profiles>
