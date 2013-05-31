@@ -33,7 +33,6 @@ package org.obm.push.bean.ms;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.utils.index.Indexed;
 
@@ -107,9 +106,8 @@ public class UidMSEmail extends MSEmail implements Serializable, Indexed<Long> {
 		if (obj instanceof UidMSEmail) {
 			UidMSEmail other = (UidMSEmail) obj;
 			if (other.canEquals(this)) {
-				return new EqualsBuilder()
-					.append(uid, other.uid)
-					.isEquals() && super.equals(obj);
+				return Objects.equal(uid, other.uid)
+					&& super.equals(obj);
 			}
 		}
 		return false;

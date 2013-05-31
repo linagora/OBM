@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Objects;
@@ -277,26 +276,24 @@ public class MSEmail implements Serializable {
 	public final boolean equals(Object obj) {
 		if (obj instanceof MSEmail) {
 			MSEmail other = (MSEmail) obj;
-			return new EqualsBuilder()
-				.append(answered, other.answered)
-				.append(attachements, other.attachements)
-				.append(bcc, other.bcc)
-				.append(body, other.body)
-				.append(cc, other.cc)
-				.append(date, other.date)
-				.append(from, other.from)
-				.append(headers, other.headers)
-				.append(importance, other.importance)
-				.append(invitation, other.invitation)
-				.append(messageClass, other.messageClass)
-				.append(mimeData, other.mimeData)
-				.append(read, other.read)
-				.append(smtpId, other.smtpId)
-				.append(starred, other.starred)
-				.append(subject, other.subject)
-				.append(to, other.to)
-				.append(uid, other.uid)
-				.isEquals();
+			return Objects.equal(answered, other.answered)
+				&& Objects.equal(attachements, other.attachements)
+				&& Objects.equal(bcc, other.bcc)
+				&& Objects.equal(body, other.body)
+				&& Objects.equal(cc, other.cc)
+				&& Objects.equal(date, other.date)
+				&& Objects.equal(from, other.from)
+				&& Objects.equal(headers, other.headers)
+				&& Objects.equal(importance, other.importance)
+				&& Objects.equal(invitation, other.invitation)
+				&& Objects.equal(messageClass, other.messageClass)
+				&& Objects.equal(mimeData, other.mimeData)
+				&& Objects.equal(read, other.read)
+				&& Objects.equal(smtpId, other.smtpId)
+				&& Objects.equal(starred, other.starred)
+				&& Objects.equal(subject, other.subject)
+				&& Objects.equal(to, other.to)
+				&& Objects.equal(uid, other.uid);
 		}
 		return false;
 	}
