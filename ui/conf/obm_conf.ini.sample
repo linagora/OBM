@@ -171,8 +171,13 @@ shareMailboxDefaultFolders = ''
 ; For new one, leave this to 'false'
 oldSidMapping = false
 ;
+; Do not verify host name on HTTPS connections to obm-satellite
+; Set to 1 to change this behavior
+; 0 is the default prior to libwww-perl 5.840
+satelliteHTTPSVerifyHostName = 0
 ;
 ; Settings use by OBM Thunderbird autoconf
+
 [autoconf]
 ;
 ldapHost = 127.0.0.1
