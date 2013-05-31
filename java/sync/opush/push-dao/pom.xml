@@ -110,13 +110,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-bean</artifactId>
-			<version>${obm.version}</version>
-			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
