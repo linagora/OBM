@@ -48,13 +48,6 @@ import org.obm.StaticConfigurationService;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
-import org.obm.annotations.technicallogging.DefaultTechnicalLoggingBinder;
-import org.obm.annotations.technicallogging.ITechnicalLoggingBinder;
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.ResourceType;
-import org.obm.annotations.technicallogging.TechnicalLogging;
-import org.obm.annotations.technicallogging.TechnicalLoggingInterceptor;
-import org.obm.annotations.technicallogging.TechnicalLoggingModule;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.TransactionException;
@@ -514,13 +507,6 @@ public class ObmSyncArchiveUtils {
 
 	public static Class<?>[] projectAnnotationsClasses() {
 		return new Class<?>[] {
-				DefaultTechnicalLoggingBinder.class,
-				ITechnicalLoggingBinder.class,
-				KindToBeLogged.class,
-				ResourceType.class,
-				TechnicalLoggingInterceptor.class,
-				TechnicalLogging.class,
-				TechnicalLoggingModule.class,
 				ITransactionAttributeBinder.class,
 				Propagation.class,
 				TransactionalBinder.class,

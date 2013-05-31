@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IBackend;
@@ -58,6 +56,8 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

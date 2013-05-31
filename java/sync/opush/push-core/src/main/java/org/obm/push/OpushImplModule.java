@@ -66,6 +66,7 @@ import org.obm.push.service.impl.MappingService;
 import org.obm.push.state.IStateMachine;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.DaoModule;
+import org.obm.push.technicallog.TechnicalLoggingModule;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilterModule;
 import org.obm.servlet.filter.qos.QoSRequestHandler;

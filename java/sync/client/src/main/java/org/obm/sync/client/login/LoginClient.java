@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.login;
 
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.ResourceType;
-import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;

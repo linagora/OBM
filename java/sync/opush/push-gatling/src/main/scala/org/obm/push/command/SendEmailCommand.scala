@@ -32,10 +32,9 @@
 package org.obm.push.command
 
 import org.apache.james.mime4j.dom.Message
-import org.obm.push.utils.Mime4jUtils
-
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.google.common.io.ByteStreams
+import org.obm.push.mail.Mime4jUtils
 
 class SendEmailCommand(sendContext: SendEmailContext)
 		extends AbstractActiveSyncCommand(sendContext.userKey) {

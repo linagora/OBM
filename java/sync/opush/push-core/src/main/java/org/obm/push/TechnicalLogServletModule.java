@@ -32,10 +32,10 @@
 package org.obm.push;
 
 import org.obm.configuration.LogConfiguration;
-import org.obm.push.jaxrs.ListTechnicalLogFileResource;
-import org.obm.push.jaxrs.TechnicalLogFileResource;
-import org.obm.push.jaxrs.TechnicalLogPageResource;
-import org.obm.push.jaxrs.TechnicalLogStatusResource;
+import org.obm.push.technicallog.jaxrs.ListTechnicalLogFileResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogFileResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogPageResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogStatusResource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;

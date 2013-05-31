@@ -16,6 +16,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>technical-log-bean</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
 			<version>${obm.version}</version>
@@ -23,11 +28,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>

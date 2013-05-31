@@ -34,8 +34,6 @@ package org.obm.push.handler;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -47,6 +45,8 @@ import org.obm.push.protocol.data.EncoderFactory;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.wbxml.WBXMLTools;
 import org.slf4j.Logger;

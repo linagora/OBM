@@ -41,9 +41,9 @@ import java.util.Date;
 
 import javax.transaction.UserTransaction;
 
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.ResourceType;
-import org.obm.annotations.technicallogging.TechnicalLogging;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.utils.Mime4jUtils
 import org.apache.james.mime4j.dom.address.Mailbox
 import org.obm.push.context.UserKey
 

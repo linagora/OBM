@@ -40,9 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.annotations.technicallogging.KindToBeLogged;
-import org.obm.annotations.technicallogging.ResourceType;
-import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.IMAPException;
@@ -64,6 +61,9 @@ import org.obm.push.minig.imap.impl.ClientSupport;
 import org.obm.push.minig.imap.impl.IResponseCallback;
 import org.obm.push.minig.imap.impl.MailThread;
 import org.obm.push.minig.imap.impl.StoreClientCallback;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
