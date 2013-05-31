@@ -120,6 +120,7 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
