@@ -69,18 +69,78 @@ public class LoginIntegrationTest extends CalendarIntegrationTest {
 		assertThatTokenIsWellFormed(token);
 	}
 	
+	@Test
+	@RunAsClient
+	public void testDoLoginWithoutDomainSuccess() throws AuthFault {
+		String calendar = "user1";
+		AccessToken token = loginClient.login(calendar, "user1");
+		
+		assertThat(token).isNotNull();
+		assertThatTokenIsWellFormed(token);
+	}
+	
+	@Test
+	@RunAsClient
+	public void testDoLoginWithoutDomainIsCaseInsensitiveWithDBAuth() throws AuthFault {
+		String calendar = "UseR1";
+		AccessToken token = loginClient.login(calendar, "user1");
+		
+		assertThat(token).isNotNull();
+		assertThatTokenIsWellFormed(token);
+	}
+	
 	@Test(expected=AuthFault.class)
 	@RunAsClient
 	public void testDoLoginFailsWithWrongLogin() throws AuthFault {
 		String calendar = "user@domain.org";
-		loginClient.login(calendar, "user1");
+		try {
+			loginClient.login(calendar, "user1");
+		} catch(AuthFault e) {
+			assertThat(e.getMessage()).contains("Login failed for user 'user@domain.org'");
+			throw e;
+		}
 	}
 	
 	@Test(expected=AuthFault.class)
 	@RunAsClient
 	public void testDoLoginFailsWithWrongPassword() throws AuthFault {
-		String calendar = "user1@domain.org";
-		loginClient.login(calendar, "user");
+		String calendar = "user1";
+		try {
+			loginClient.login(calendar, "user");
+		} catch(AuthFault e) {
+			assertThat(e.getMessage()).contains("Login failed for user 'user1'");
+			throw e;
+		}
+	}
+	
+	@Test
+	@RunAsClient
+	public void testDoLoginSuccessForUser2onDomain1() throws AuthFault {
+		String calendar = "user2@domain.org";
+		AccessToken token = loginClient.login(calendar, "user2");
+		
+		assertThat(token).isNotNull();
+	}
+	
+	@Test(expected=AuthFault.class)
+	@RunAsClient
+	public void testDoLoginFailsForUser2WithoutDomain() throws AuthFault {
+		String calendar = "user2";
+		try {
+			loginClient.login(calendar, "user2");
+		} catch(AuthFault e) {
+			assertThat(e.getMessage()).contains("Login failed for user 'user2'");
+			throw e;
+		}
+	}
+	
+	@Test
+	@RunAsClient
+	public void testDoLoginSuccessForUser2onDomain2() throws AuthFault {
+		String calendar = "user2@domain2.org";
+		AccessToken token = loginClient.login(calendar, "user2");
+		
+		assertThat(token).isNotNull();
 	}
 	
 	private void assertThatTokenIsWellFormed(AccessToken token) {

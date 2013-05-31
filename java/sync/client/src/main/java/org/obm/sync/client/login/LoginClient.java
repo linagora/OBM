@@ -159,7 +159,12 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	private AccessToken newAccessToken(String loginAtDomain, String origin) {
-		return newAccessToken(loginAtDomain.split("@", 2)[0], loginAtDomain.split("@", 2)[1], origin);
+		String[] splitLoginAtDomain = loginAtDomain.split("@", 2);
+		if (splitLoginAtDomain.length > 1) {
+			return newAccessToken(splitLoginAtDomain[0], splitLoginAtDomain[1], origin);
+		} else {
+			return newAccessToken(splitLoginAtDomain[0], null, origin); 
+		}
 	}
 
 	private AccessToken newAccessToken(String login, String domain, String origin) {
