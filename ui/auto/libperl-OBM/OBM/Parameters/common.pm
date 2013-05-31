@@ -209,6 +209,7 @@ $cyrusKeyAndCert = $cfgFile->val('automate', 'cyrusKeyAndCert');
 $cyrusCa = $cfgFile->val('automate', 'cyrusCa');
 $cyrusCaPath = $cfgFile->val('automate', 'cyrusCaPath');
 
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = $cfgFile->val('automate', 'satelliteHTTPSVerifyHostName');
 # Publication des adresses principales des utilisateurs n'ayant pas le droit
 # mail activé
 $ldapAllMainMailAddress = $cfgFile->val( 'automate', 'ldapAllMainMailAddress' );
