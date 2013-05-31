@@ -49,6 +49,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -92,7 +93,6 @@ import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
 
-import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.StringContains;
@@ -140,6 +140,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -260,9 +261,7 @@ public class Ical4jHelperTest {
 		l.add(event1);
 		l.add(event2);
 
-		InputStream stream = getStreamICS("serializedOBMEvent.ics");
-		String expectedICS = IOUtils.toString(stream);
-		stream.close();
+		String expectedICS = getICSAsString("serializedOBMEvent.ics");
 
 		AccessToken token = new AccessToken(0, "OBM");
 		String ics = ical4jHelper.parseEvents(getDefaultObmUser(), l, token);
@@ -1051,7 +1050,7 @@ public class Ical4jHelperTest {
 
 	@Test @Slow
 	public void testParserAttendee() throws IOException, ParserException {
-		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
+		String ics = getICSAsString("bugGn.ics");
 		List<Event> event = ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
 		assertEquals(event.size(), 1);
 	}
@@ -1064,10 +1063,14 @@ public class Ical4jHelperTest {
 		}
 		return in;
 	}
+
+	private String getICSAsString(String filename) throws IOException {
+		return CharStreams.toString(new InputStreamReader(getStreamICS(filename)));
+	}
 	
 	@Test @Slow
 	public void testParsingICSFileOf200kio() throws IOException, ParserException {
-		final String ics = IOUtils.toString(getStreamICS("bellemin-calendrierobm.ics"));
+		final String ics = getICSAsString("bellemin-calendrierobm.ics");
 		
 		final List<Event> events = ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
 		for (final Event event: events) {
@@ -1081,7 +1084,7 @@ public class Ical4jHelperTest {
 		final String[] icsFiles = {"cdespino.ics", "dkaplan.ics"};
 		
 		for (String icsFile: icsFiles) {
-			final String ics = IOUtils.toString(getStreamICS(icsFile));
+			final String ics = getICSAsString(icsFile);
 			ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);	
 		}
 		assertTrue(true);
@@ -1089,7 +1092,7 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testParsingICSFilesWhichDontProvideUid() throws IOException, ParserException {
-		final String ics = IOUtils.toString(getStreamICS("calendar_pst.ics"));
+		final String ics = getICSAsString("calendar_pst.ics");
 
 		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab0")).once();
 		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("ab1")).once();
@@ -1469,11 +1472,8 @@ public class Ical4jHelperTest {
 		assertThat(events).isNotNull().isNotEmpty();
 	}
 
-	private List<Event> testIcsParsing(String icsFilename) throws IOException,
-			ParserException {
-		InputStream stream = getStreamICS(icsFilename);
-		String ics = IOUtils.toString(stream);
-		return ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
+	private List<Event> testIcsParsing(String icsFilename) throws IOException, ParserException {
+		return ical4jHelper.parseICS(getICSAsString(icsFilename), getDefaultObmUser(), 0);
 	}
 	
 	@Test @Slow
@@ -1606,9 +1606,7 @@ public class Ical4jHelperTest {
 		Ical4jUser obmUser = buildObmUser(normalEvent.findOrganizer());
 		AccessToken token = new AccessToken(0, "OBM");
 
-		InputStream stream = getStreamICS("eventsWithExceptions.ics");
-		String expectedICSWithoutTimestamp = stripTimestamps(IOUtils.toString(stream));
-		stream.close();
+		String expectedICSWithoutTimestamp = stripTimestamps(getICSAsString("eventsWithExceptions.ics"));
 
 		String ics = ical4jHelper.buildIcs(obmUser, events, token);
 		assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
@@ -1616,7 +1614,7 @@ public class Ical4jHelperTest {
 	
 	@Test
 	public void testParseIcsWithEmptyUid() throws Exception {
-		String ics = IOUtils.toString(getStreamICS("meetingWithEmptyUid.ics"));
+		String ics = getICSAsString("meetingWithEmptyUid.ics");
 		
 		expect(eventExtIdFactory.generate()).andReturn(new EventExtId("abc"));
 		replay(eventExtIdFactory);
@@ -1766,7 +1764,7 @@ public class Ical4jHelperTest {
 	}
 	
 	private void assertIcsEquals(String compareFile, String actual) throws Exception {
-		String expected = IOUtils.toString(getStreamICS(compareFile));
+		String expected = getICSAsString(compareFile);
 		
 		assertThat(stripTimestamps(actual)).isEqualTo(stripTimestamps(expected));
 	}
@@ -1830,7 +1828,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDateRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDate.ics"));
+		String ics = getICSAsString("monthlyByDate.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybydate, 1);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1839,7 +1837,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDateFreq3RecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDateFreq3.ics"));
+		String ics = getICSAsString("monthlyByDateFreq3.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybydate, 3);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1848,7 +1846,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithDailyRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("daily.ics"));
+		String ics = getICSAsString("daily.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.daily, 1);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1857,7 +1855,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithDailyFreq4RecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("dailyFreq4.ics"));
+		String ics = getICSAsString("dailyFreq4.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.daily, 4);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1866,7 +1864,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithWeeklyRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("weekly.ics"));
+		String ics = getICSAsString("weekly.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 1, new RecurrenceDays(RecurrenceDay.Wednesday)); // 2013-04-17 is wedsneday
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1875,7 +1873,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithWeeklyAllDaysRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("weeklyAllDays.ics"));
+		String ics = getICSAsString("weeklyAllDays.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 1, RecurrenceDays.ALL_DAYS);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1884,7 +1882,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithWeeklyAllDaysFreq3RecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("weeklyAllDaysFreq3.ics"));
+		String ics = getICSAsString("weeklyAllDaysFreq3.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.weekly, 3, RecurrenceDays.ALL_DAYS);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1893,7 +1891,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithYearlyRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("yearly.ics"));
+		String ics = getICSAsString("yearly.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.yearly, 1);
 
 		assertRecurrenceEquals(ical4jHelper.parseICS(ics, ical4jUser, 1).get(0), recurrence);
@@ -1902,7 +1900,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDay3WRRecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDay3WE.ics"));
+		String ics = getICSAsString("monthlyByDay3WE.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 1);
 		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
 
@@ -1913,7 +1911,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDayMinus1SURecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDay-1SU.ics"));
+		String ics = getICSAsString("monthlyByDay-1SU.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 1);
 		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
 
@@ -1924,7 +1922,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDayMinus2TURecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDay-2TU.ics"));
+		String ics = getICSAsString("monthlyByDay-2TU.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 3);
 		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
 
@@ -1935,7 +1933,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsWithMonthlyByDay2MORecurrentEvent() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("monthlyByDay2MO.ics"));
+		String ics = getICSAsString("monthlyByDay2MO.ics");
 		EventRecurrence recurrence = getRecurrence(RecurrenceKind.monthlybyday, 2);
 		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
 
@@ -1946,7 +1944,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParceIcsHandlesEXDATEs() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("eventWithEXDATEs.ics"));
+		String ics = getICSAsString("eventWithEXDATEs.ics");
 		Event event = ical4jHelper.parseICS(ics, ical4jUser, 1).get(0);
 		Set<Date> expectedExceptions = ImmutableSet.of(
 				DateUtils.date("2005-01-13T21:00:00Z"),
@@ -1959,7 +1957,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsUsesAttendeeCache() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("4Events.ics"));
+		String ics = getICSAsString("4Events.ics");
 		AttendeeService attendeeService = createMock(AttendeeService.class);
 		Ical4jHelper ical4jHelper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		UserAttendee userAttendee = UserAttendee.builder().email("user@test.tlse.lng").build();
@@ -1979,7 +1977,7 @@ public class Ical4jHelperTest {
 	@Test
 	public void testParseIcsSetsCorrectPropertiesOnAttendees() throws Exception {
 		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = IOUtils.toString(getStreamICS("4Events.ics"));
+		String ics = getICSAsString("4Events.ics");
 		List<Event> events = ical4jHelper.parseICS(ics, ical4jUser, 1);
 		String organizerEmail = "organizer@test.tlse.lng", userEmail = "user@test.tlse.lng";
 
