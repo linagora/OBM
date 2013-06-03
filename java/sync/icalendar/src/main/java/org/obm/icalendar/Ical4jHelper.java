@@ -170,8 +170,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class Ical4jHelper {
 	
 	private static final String MAILTO = "mailto:";
-	private static final int MAX_FOLD_LENGTH = 74; 
-	private static final int SECONDS_IN_DAY = 43200000;
+	private static final int MAX_FOLD_LENGTH = 74;
 	private static final String X_OBM_DOMAIN = "X-OBM-DOMAIN";
 	private static final String X_OBM_DOMAIN_UUID = "X-OBM-DOMAIN-UUID";
 	private static final String XOBMORIGIN = "X-OBM-ORIGIN";
@@ -1475,15 +1474,10 @@ public class Ical4jHelper {
 		return null;
 	}
 
-	/* package */ DtEnd getDtEnd(Date start, int duration, boolean isAllDays) {
+	/* package */ DtEnd getDtEnd(Date start, int duration) {
 		if (start != null && duration >= 0) {
-			net.fortuna.ical4j.model.Date dateTimeEnd = null;
-			if (isAllDays) {
-				dateTimeEnd = new net.fortuna.ical4j.model.Date(start.getTime()
-						+ (duration * 1000) + SECONDS_IN_DAY);
-			} else {
-				dateTimeEnd = new DateTime(start.getTime() + duration * 1000);
-			}
+			net.fortuna.ical4j.model.Date dateTimeEnd =
+					new DateTime(start.getTime() + duration * 1000);
 			return new DtEnd(dateTimeEnd, true);
 		}
 		return null;
@@ -1723,8 +1717,7 @@ public class Ical4jHelper {
 		return calendar.toString();
 	}
 
-	private VFreeBusy getVFreeBusy(FreeBusy fb, Attendee att,
-			Set<FreeBusyInterval> fbls) {
+	private VFreeBusy getVFreeBusy(FreeBusy fb, Attendee att, Set<FreeBusyInterval> fbls) {
 		VFreeBusy vfb = new VFreeBusy();
 		Organizer orga = getOrganizer("", fb.getOwner());
 		vfb.getProperties().add(orga);
@@ -1744,15 +1737,12 @@ public class Ical4jHelper {
 
 		for (FreeBusyInterval line : fbls) {
 			DtStart start = getDtStart(line.getStart());
-			DtEnd end = getDtEnd(line.getStart(), line.getDuration(),
-					line.isAllDay());
+			DtEnd end = getDtEnd(line.getStart(), line.getDuration());
 			if (start != null && end != null) {
 				net.fortuna.ical4j.model.property.FreeBusy fbics = new net.fortuna.ical4j.model.property.FreeBusy();
-				Period p = new Period(new DateTime(start.getDate()),
-						new DateTime(end.getDate()));
+				Period p = new Period(new DateTime(start.getDate()), new DateTime(end.getDate()));
 				fbics.getPeriods().add(p);
-				FbType type = FbType.BUSY;
-				fbics.getParameters().add(type);
+				fbics.getParameters().add(FbType.BUSY);
 				vfb.getProperties().add(fbics);
 			}
 		}

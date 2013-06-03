@@ -116,6 +116,8 @@ import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.FreeBusy;
+import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
@@ -943,8 +945,7 @@ public class Ical4jHelperTest {
 		Calendar cal = getCalendarPrecisionOfSecond();
 		event.setStartDate(cal.getTime());
 		event.setDuration(3600);
-		DtEnd dtend = ical4jHelper.getDtEnd(event.getStartDate(),
-				event.getDuration(), false);
+		DtEnd dtend = ical4jHelper.getDtEnd(event.getStartDate(), event.getDuration());
 		assertEquals(cal.getTime().getTime() + 3600000, dtend.getDate()
 				.getTime());
 	}
@@ -2025,5 +2026,49 @@ public class Ical4jHelperTest {
 		event4.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.declined()).build());
 
 		assertThat(events).containsOnly(event1, event2, event3, event4);
+  }
+	
+	@Test
+	public void testParseFreeBusy() {
+		String expectedFreebusy = 
+				"BEGIN:VCALENDAR\r\n" +
+				"PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar //FR\r\n" +
+				"VERSION:2.0\r\n" +
+				"CALSCALE:GREGORIAN\r\n" +
+				"METHOD:REPLY\r\n" +
+				"BEGIN:VFREEBUSY\r\n" +
+				"DTSTAMP:20130604T075838Z\r\n" +
+				"ORGANIZER:mailto:userb@ext.org\r\n" +
+				"DTSTART:20130328T170000Z\r\n" +
+				"DTEND:20130529T040000Z\r\n" +
+				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=usera@ext.org;ROLE=OPT-PARTICIPANT:mailto:usera@ext.org\r\n" +
+				"UID:uid\r\n" +
+				"FREEBUSY;FBTYPE=BUSY:20130428T170000Z/20130428T180000Z\r\n" +
+				"FREEBUSY;FBTYPE=BUSY:20130502T220000Z/20130503T220000Z\r\n" +
+				"END:VFREEBUSY\r\n" +
+				"END:VCALENDAR\r\n";
+	
+		FreeBusyInterval freeBusyIntervalOfSingleEvent = new FreeBusyInterval();
+		freeBusyIntervalOfSingleEvent.setAllDay(false);
+		freeBusyIntervalOfSingleEvent.setStart(DateUtils.date("2013-04-28T17:00:00Z"));
+		freeBusyIntervalOfSingleEvent.setDuration(3600);
+		
+		FreeBusyInterval freeBusyIntervalOfAllDayEvent = new FreeBusyInterval();
+		freeBusyIntervalOfAllDayEvent.setAllDay(true);
+		freeBusyIntervalOfAllDayEvent.setStart(DateUtils.date("2013-05-02T22:00:00Z"));
+		freeBusyIntervalOfAllDayEvent.setDuration(86400);
+		
+		FreeBusy freebusy = new FreeBusy();
+		freebusy.setAtt(UserAttendee.builder().email("usera@ext.org").build());
+		freebusy.setStart(DateUtils.date("2013-03-28T17:00:00Z"));
+		freebusy.setEnd(DateUtils.date("2013-05-29T04:00:00Z"));
+		freebusy.setOwner("userb@ext.org");
+		freebusy.setUid("uid");
+		freebusy.addFreeBusyInterval(freeBusyIntervalOfSingleEvent);
+		freebusy.addFreeBusyInterval(freeBusyIntervalOfAllDayEvent);
+		
+		String resultFreebusy = ical4jHelper.parseFreeBusy(freebusy);
+		
+		assertThat(stripTimestamps(resultFreebusy)).isEqualTo(stripTimestamps(expectedFreebusy));
 	}
 }
