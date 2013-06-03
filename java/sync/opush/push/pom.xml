@@ -31,10 +31,6 @@
 			<artifactId>jsp-2.1-jetty</artifactId>
 			<version>6.1.26</version>
 		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
