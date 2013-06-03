@@ -98,7 +98,6 @@ public class OpushImplModule extends AbstractModule {
 		install(new DaoModule());
 		install(qosModule());
 		install(new OpushServletModule());
-		install(new TechnicalLogServletModule());
 		install(new ConfigurationModule());
 		install(new org.obm.push.configuration.ConfigurationModule());
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);

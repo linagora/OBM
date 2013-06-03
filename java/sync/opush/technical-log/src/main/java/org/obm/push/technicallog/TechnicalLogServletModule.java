@@ -29,43 +29,44 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.technicallog;
 
-import org.obm.push.technicallog.LogConfiguration;
+import org.obm.push.technicallog.jaxrs.ListTechnicalLogFileResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogFileResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogPageResource;
+import org.obm.push.technicallog.jaxrs.TechnicalLogStatusResource;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-@Singleton
-public class LogConfigurationImpl implements LogConfiguration {
-	
-	private final String LOGS_DIRECTORY = "/var/log/opush/";
-	private final String TECHNICAL_LOG_PREFIX = "technical";
-	private final String LOG_FILE_EXTENSION = "log";
-	private final String DOT = ".";
-	private final String MAIN_LOG_FILE_NAME = LOGS_DIRECTORY + TECHNICAL_LOG_PREFIX + DOT + LOG_FILE_EXTENSION;
-	
+public class TechnicalLogServletModule extends ServletModule{
+
 	@Override
-	public String getLogDirectory() {
-		return LOGS_DIRECTORY;
+	protected void configureServlets() {
+		super.configureServlets();
+
+		bind(LogConfiguration.class).to(LogConfigurationImpl.class);
+		bind(TechnicalLogPageResource.class);
+		bind(TechnicalLogStatusResource.class);
+		bind(TechnicalLogFileResource.class);
+		bind(ListTechnicalLogFileResource.class);
+		serve("/TechnicalLog/*").with(GuiceTechnicalLogJerseyServlet.class, 
+				ImmutableMap.of("com.sun.jersey.config.feature.Trace", "true",
+						ResourceConfig.FEATURE_DISABLE_WADL, "true"));
 	}
 
-	@Override
-	public String getTechnicalLogPrefix() {
-		return TECHNICAL_LOG_PREFIX;
-	}
+	@Singleton
+	private static class GuiceTechnicalLogJerseyServlet extends GuiceContainer {
 
-	@Override
-	public String getLogFileExtension() {
-		return LOG_FILE_EXTENSION;
-	}
-
-	@Override
-	public String getMainLogFileName() {
-		return MAIN_LOG_FILE_NAME;
-	}
-
-	@Override
-	public String fileExtensionSeparator() {
-		return DOT;
+		@Inject
+		private GuiceTechnicalLogJerseyServlet(Injector injector) {
+			super(injector);
+		}
+		
 	}
 }

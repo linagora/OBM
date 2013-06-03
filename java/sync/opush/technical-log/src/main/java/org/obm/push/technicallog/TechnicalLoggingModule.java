@@ -47,6 +47,7 @@ public class TechnicalLoggingModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
+		install(new TechnicalLogServletModule());
 		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
 		bind(ITechnicalLoggingBinder.class).to(TechnicalLoggingBinder.class);
 		
