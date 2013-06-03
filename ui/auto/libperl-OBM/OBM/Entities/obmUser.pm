@@ -787,8 +787,8 @@ not header :contains "X-Spam-Flag" "YES"
 sub _escapeSieveVacationMessage() {
     my ($self, $message) = @_;
 
-    $message =~ s/([^\\])\"/$1\\"/g;
-    $message =~ s/([^\\])\\([^\\\"])/$1\\\\$2/g;
+    $message =~ s/(?<!\\)\"/\\"/g;
+    $message =~ s/(?<!\\)\\(?![\\\"])/\\\\/g;
 
     return $message;
 }
