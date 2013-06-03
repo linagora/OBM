@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.configuration.LogConfiguration;
+import org.obm.push.technicallog.LogConfiguration;
 
 import com.google.inject.Singleton;
 

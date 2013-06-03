@@ -45,7 +45,6 @@ public class LoggerModule extends AbstractModule {
 	public static final String MAIL_DATA = "MAIL.DATA";
 	public static final String OBM_SYNC = "OBM-SYNC";
 	public static final String CONFIGURATION = "CONFIGURATION";
-	public static final String TECHNICAL_LOG = "technical_log";
 	
 	@Override
 	protected void configure() {
@@ -56,7 +55,6 @@ public class LoggerModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(MAIL_DATA)).toInstance(LoggerFactory.getLogger(MAIL_DATA));
 		bind(Logger.class).annotatedWith(Names.named(OBM_SYNC)).toInstance(LoggerFactory.getLogger(OBM_SYNC));
 		bind(Logger.class).annotatedWith(Names.named(CONFIGURATION)).toInstance(LoggerFactory.getLogger(CONFIGURATION));
-		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
 	}
 	
 }

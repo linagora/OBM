@@ -34,7 +34,7 @@ package org.obm.push.technicallog.jaxrs;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import org.obm.configuration.LogConfiguration;
+import org.obm.push.technicallog.LogConfiguration;
 
 public class TechnicalLogFilenameFilter implements FilenameFilter {
 	

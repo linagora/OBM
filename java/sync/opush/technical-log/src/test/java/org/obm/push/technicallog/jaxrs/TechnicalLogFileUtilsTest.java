@@ -51,7 +51,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.LogConfiguration;
+import org.obm.push.technicallog.LogConfiguration;
 import org.obm.push.technicallog.bean.jaxb.LogFile;
 import org.obm.push.technicallog.jaxrs.DateFormatException;
 import org.obm.push.technicallog.jaxrs.TechnicalLogFileUtils;

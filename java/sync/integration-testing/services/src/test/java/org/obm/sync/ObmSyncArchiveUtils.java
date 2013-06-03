@@ -65,7 +65,6 @@ import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.configuration.LogConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
@@ -532,7 +531,6 @@ public class ObmSyncArchiveUtils {
 				DefaultTransactionConfiguration.class,
 				EmailConfigurationImpl.class,
 				EmailConfiguration.class,
-				LogConfiguration.class,
 				LoggerModule.class,
 				Control.class,
 				StoreNotFoundException.class,

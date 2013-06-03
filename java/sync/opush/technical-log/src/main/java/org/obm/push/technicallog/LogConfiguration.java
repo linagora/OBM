@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.push.technicallog;
 
 public interface LogConfiguration {
 

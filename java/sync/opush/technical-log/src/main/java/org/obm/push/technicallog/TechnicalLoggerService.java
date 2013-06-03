@@ -37,7 +37,6 @@ import javax.xml.bind.JAXBException;
 
 import net.sf.ehcache.Element;
 
-import org.obm.configuration.module.LoggerModule;
 import org.obm.push.technicallog.bean.jaxb.JAXBBean;
 import org.obm.push.technicallog.bean.jaxb.Request;
 import org.obm.push.technicallog.bean.jaxb.Resource;
@@ -59,7 +58,7 @@ public class TechnicalLoggerService {
 	private RequestStore requestStore;
 	
 	@Inject
-	@VisibleForTesting TechnicalLoggerService(@Named(LoggerModule.TECHNICAL_LOG)Logger technicalLogger, RequestStore requestStore) {
+	@VisibleForTesting TechnicalLoggerService(@Named(TechnicalLoggingModule.TECHNICAL_LOG)Logger technicalLogger, RequestStore requestStore) {
 		this.technicalLogger = technicalLogger;
 		this.requestStore = requestStore;
 	}

@@ -34,14 +34,20 @@ package org.obm.push.technicallog;
 import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.technicallog.logger.ITechnicalLoggingBinder;
 import org.obm.push.technicallog.logger.TechnicalLoggingBinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 
 public class TechnicalLoggingModule extends AbstractModule {
 
+	public static final String TECHNICAL_LOG = "technical_log";
+	
 	@Override
 	protected void configure() {
+		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
 		bind(ITechnicalLoggingBinder.class).to(TechnicalLoggingBinder.class);
 		
 		TechnicalLoggingInterceptor technicalLoggingInterceptor = new TechnicalLoggingInterceptor();

@@ -45,7 +45,7 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.obm.configuration.LogConfiguration;
+import org.obm.push.technicallog.LogConfiguration;
 import org.obm.push.technicallog.bean.jaxb.LogFile;
 import org.obm.push.utils.DateUtils;
 import org.slf4j.LoggerFactory;

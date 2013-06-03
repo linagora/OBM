@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.configuration.LogConfiguration;
+import org.obm.push.technicallog.LogConfiguration;
 import org.obm.push.technicallog.jaxrs.ListTechnicalLogFileResource;
 import org.obm.push.technicallog.jaxrs.TechnicalLogFileResource;
 import org.obm.push.technicallog.jaxrs.TechnicalLogPageResource;
