@@ -31,10 +31,6 @@
 			<artifactId>guice</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
 		    <groupId>com.google.guiceberry</groupId>
 		    <artifactId>guiceberry</artifactId>
 		    <version>3.1.0</version>
