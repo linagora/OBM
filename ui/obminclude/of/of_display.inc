@@ -1447,7 +1447,7 @@ function display_actions($section, $module) {
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value['Name']."</a> &nbsp;";
 	  } else {
-            $id = isset($value['Id']) ? 'id="$value['Id']"' : '';
+            $id = isset($value['Id']) ? 'id="' . $value['Id'] . '"' : '';
             $content = "
               <a $id href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
           }
