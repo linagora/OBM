@@ -31,12 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -110,7 +111,7 @@ public class HornetQTransactionalModeTest {
 		String testText = "test text";
 		xaMessageQueueInstance.put(testText);
 		TextMessage messageReceived = (TextMessage)consumer.receive(TIMEOUT);
-		Assert.assertEquals(testText, messageReceived.getText());
+		assertThat(messageReceived.getText()).isEqualTo(testText);
 	}
 	
 	@Ignore("OBMFULL-2887 : hornetq is not registered in our transaction manager")
@@ -121,7 +122,7 @@ public class HornetQTransactionalModeTest {
 			xaMessageQueueInstance.putAndthrowException(testText);
 		} catch (TestRollbackException e) {
 			TextMessage messageReceived = (TextMessage)consumer.receive(TIMEOUT);
-			Assert.assertNull(messageReceived.getText());
+			assertThat(messageReceived.getText()).isNotNull();
 			throw e;
 		}
 	}
