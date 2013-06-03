@@ -94,11 +94,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>annotations</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 			<version>${obm.version}</version>
 			<scope>compile</scope>
