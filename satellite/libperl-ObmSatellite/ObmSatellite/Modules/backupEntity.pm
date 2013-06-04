@@ -37,6 +37,7 @@ use constant QUOTA_PATH => '/usr/lib/cyrus-imapd:/usr/lib/cyrus/bin';
 use constant QUOTA_CMD => 'quota';
 use constant MAIL_REPORT_RECIPIENT => 'x-obm-backup';
 use constant BACKUP_FTP_TIMEOUT => 10;
+use constant BACKUP_ROOT => '/var/lib/obm/backup';
 
 use constant SOME_FILE_DIFFER_CODE => 1;
 
@@ -57,7 +58,7 @@ sub _initHook {
     }
 
     if( my $cfgFile = Config::IniFiles->new( -file => OBM_CONF_INI_FILE ) ) {
-      $self->{'backupRoot'} = $cfgFile->val( 'global', 'backupRoot' );
+      $self->{'backupRoot'} = $cfgFile->val( 'global', 'backupRoot', BACKUP_ROOT);
     	# In case the ini file contains quotes around the directory name
     	$self->{'backupRoot'} =~ s/"//g;
     	$self->_log('Backup root: ' . $self->{'backupRoot'}, 4);
