@@ -57,11 +57,13 @@ sub _initHook {
     }
 
     if( my $cfgFile = Config::IniFiles->new( -file => OBM_CONF_INI_FILE ) ) {
-    	$self->{'backupRoot'} = $cfgFile->val( 'global', 'backupRoot' );
+      $self->{'backupRoot'} = $cfgFile->val( 'global', 'backupRoot' );
     	# In case the ini file contains quotes around the directory name
     	$self->{'backupRoot'} =~ s/"//g;
-    	
     	$self->_log('Backup root: ' . $self->{'backupRoot'}, 4);
+
+      $self->{'backupFtpTimeout'} = $cfgFile->val( 'global', 'backupFtpTimeout', BACKUP_FTP_TIMEOUT);
+      $self->_log('Backup ftp timeout: ' . $self->{'backupFtpTimeout'}, 4);
     }
 
     $self->{'neededServices'} = [ 'LDAP', 'CYRUS' ];
@@ -1819,7 +1821,7 @@ sub _getFtpConn {
     my $self = shift;
     my($response, $obmBackupFtpHostname, $ftpHostIp, $ftpHostLogin, $ftpHostPassword, $ftpHostRoot) = @_;
 
-    my $ftpConn = Net::FTP->new( $ftpHostIp, Timeout => BACKUP_FTP_TIMEOUT );
+    my $ftpConn = Net::FTP->new( $ftpHostIp, Timeout => $self->{'backupFtpTimeout'} );
     if( !defined($ftpConn) ) {
         $self->_log('Fail to contact backup FTP server \''.$ftpHostIp.'\'', 1);
         $response->setExtraContent({
