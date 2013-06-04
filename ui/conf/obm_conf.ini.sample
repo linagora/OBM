@@ -80,6 +80,9 @@ obm-contact = false
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
 
+; backupFtpTimeout sets the ftp timeout connection.
+backupFtpTimeout = 10
+
 ; documentRoot is root of document repository
 documentRoot="/var/lib/obm/documents"
 documentDefaultPath="/"
