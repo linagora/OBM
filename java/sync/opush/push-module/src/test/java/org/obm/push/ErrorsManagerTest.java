@@ -31,30 +31,48 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.field.address.ParseException;
-import org.fest.assertions.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.Mime4jUtils;
+import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
-import org.obm.filter.SlowFilterRunner;
-
 @RunWith(SlowFilterRunner.class)
 public class ErrorsManagerTest {
+
+	private DateProvider dateProvider;
+	private Date messageHeaderDate;
+	
+	@Before
+	public void setUp() {
+		messageHeaderDate = date("2012-05-04T11:30:12");
+		dateProvider = new DateProvider() {
+			
+			@Override
+			public Date getDate() {
+				return messageHeaderDate;
+			}
+		}; 
+	}
 
 	@Test
 	public void testPrepareMessage() throws ParseException, FileNotFoundException, IOException {
@@ -63,16 +81,17 @@ public class ErrorsManagerTest {
 		
 		Mime4jUtils mime4jUtils = new Mime4jUtils();
 		
-		ErrorsManager errorsManager = new ErrorsManager(null, null, mime4jUtils);
+		ErrorsManager errorsManager = new ErrorsManager(null, null, mime4jUtils, dateProvider);
 		Message message = errorsManager.prepareMessage(userDataRequest, "Subject", "Body", 
 				StreamMailTestsUtils.newInputStreamFromString("It's mail content !"));
 		
 		InputStream stream = mime4jUtils.toInputStream(message);
 		String messageAsString = CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
 		
-		Assertions.assertThat(message).isNotNull();
-		Assertions.assertThat(message.isMultipart()).isTrue();
-		Assertions.assertThat(messageAsString).contains("test@domain")
+		assertThat(message).isNotNull();
+		assertThat(message.getDate()).isEqualTo(messageHeaderDate);
+		assertThat(message.isMultipart()).isTrue();
+		assertThat(messageAsString).contains("test@domain")
 					.contains("Subject: Subject")
 					.contains("Body")
 					.contains("Content-Disposition: attachment; filename=error_message.eml")

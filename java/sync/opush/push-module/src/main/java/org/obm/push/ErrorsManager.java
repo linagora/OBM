@@ -59,6 +59,7 @@ import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.push.utils.MimeContentType;
+import org.obm.sync.date.DateProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +75,16 @@ public class ErrorsManager implements IErrorsManager {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final MailboxService manager;
 	private final Messages messages;
-
 	private final Mime4jUtils mime4jUtils;
+	private final DateProvider dateProvider;
 	
 	@Inject
-	/* package */ ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils) {
+	/* package */ ErrorsManager(MailboxService manager, Messages messages, Mime4jUtils mime4jUtils,
+			DateProvider dateProvider) {
 		this.manager = manager;
 		this.mime4jUtils = mime4jUtils;
 		this.messages = messages;
+		this.dateProvider = dateProvider;
 	}
 
 	/**
@@ -138,6 +141,7 @@ public class ErrorsManager implements IErrorsManager {
 		mm.setSubject(subject);
 		mm.setFrom(new Mailbox(errorNameSender, "postmaster", ""));
 		mm.setTo(AddressBuilder.DEFAULT.parseMailbox(udr.getCredentials().getUser().getEmail()));
+		mm.setDate(dateProvider.getDate());
 		return mm;
 	}
 

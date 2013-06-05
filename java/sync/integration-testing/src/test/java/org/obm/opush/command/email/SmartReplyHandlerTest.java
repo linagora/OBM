@@ -33,10 +33,13 @@ package org.obm.opush.command.email;
 
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
+import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationTestUtils.appendToINBOX;
+import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.loadEmail;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
+
+import java.util.Date;
 
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
@@ -56,6 +59,7 @@ import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.ServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.services.ICalendar;
 import org.obm.test.GuiceModule;
@@ -64,6 +68,7 @@ import org.obm.test.SlowGuiceRunner;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.store.SimpleStoredMessage;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 
@@ -78,11 +83,13 @@ public class SmartReplyHandlerTest {
 	@Inject Configuration configuration;
 	@Inject GreenMail greenMail;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	@Inject DateProvider dateProvider;
 	
 	private OpushUser user;
 	private GreenMailUser greenMailUser;
 	private String inboxCollectionPath;
 	private int inboxCollectionId;
+	private MailFolder inboxFolder;
 	private MailFolder sentFolder;
 	private ServerId serverId;
 
@@ -92,6 +99,7 @@ public class SmartReplyHandlerTest {
 		greenMail.start();
 		greenMailUser = greenMail.setUser(user.user.getLoginAtDomain(), user.password);
 		sentFolder = greenMail.getManagers().getImapHostManager().createMailbox(greenMailUser, EmailConfiguration.IMAP_SENT_NAME);
+		inboxFolder = greenMail.getManagers().getImapHostManager().getInbox(greenMailUser);
 		
 		inboxCollectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
 		inboxCollectionId = 1;
@@ -165,6 +173,25 @@ public class SmartReplyHandlerTest {
 		
 		assertThat(success).isTrue();
 		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+	}
+
+	@Test
+	public void testReplySendsReportEmailWhenError() throws Exception {
+		appendToINBOX(greenMailUser, "eml/multipartAlternative.eml");
+		
+		Date expectedDate = date("2012-05-04T11:30:12");
+		expect(dateProvider.getDate()).andReturn(expectedDate);
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailReply(loadEmail("eml/badToSyntax.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(2);
+		SimpleStoredMessage inboxMessage = inboxFolder.getMessages().get(1);
+		assertThat(inboxMessage.getMimeMessage().getSentDate()).isEqualTo(expectedDate);
 	}
 
 	private OPClient opClient() {
