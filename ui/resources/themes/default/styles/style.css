@@ -2048,9 +2048,6 @@ form.button-to input {
 
 #advancedSearch input, select {
   border-radius: 5px;
-  padding: 2px 3px;
-  margin-bottom: 2px;
-  margin-left: 5px;
   background-color: #FAFAFA;
   border: 1px solid #DDD;
   background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
