@@ -583,6 +583,6 @@ public class SyncHandlerWithBackendTest {
 						.serverId(serverId)
 						.withNewFlag(true)
 						.build()));
-		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.NEED_RETRY);
+		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
 	}
 }
