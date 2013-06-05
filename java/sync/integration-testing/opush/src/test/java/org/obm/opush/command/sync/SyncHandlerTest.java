@@ -289,7 +289,7 @@ public class SyncHandlerTest {
 		SyncResponse syncEmailResponse = opClient.syncEmail(decoder, syncEmailSyncKey, inbox.getCollectionId(), FilterType.THREE_DAYS_BACK, 100);
 		
 		assertThat(syncEmailResponse).isNotNull();
-		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.NEED_RETRY);
+		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
 	}
 	
 	@Test
