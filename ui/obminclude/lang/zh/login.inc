@@ -28,6 +28,7 @@
 // Modified on 2009-09-10T18:08:12+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-10T18:11:21+02:00 using OBMtranslation (0.4.1)
 
+$l_validate = "验证"; //Validate
 $l_login = "用户名";  //Login
 $l_password = "密码";  //"Password"
 $l_error = "用户名或密码无效，或者会话已过期。请重新登录";  //"Either your login or your password is invalid or your session may have expired. Please try again"
