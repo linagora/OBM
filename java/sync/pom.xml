@@ -50,7 +50,7 @@
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
 		<apache-commons-compress.version>1.5</apache-commons-compress.version>
 		<btm.version>2.2.0-SNAPSHOT</btm.version>
-		<parboiled.version>1.1.4</parboiled.version>
+		<parboiled.version>1.1.5</parboiled.version>
 		<jersey.version>1.17.1</jersey.version>
 		<resteasy.version>2.3.5.Final</resteasy.version>
 		<scala.version>2.9.2</scala.version>
