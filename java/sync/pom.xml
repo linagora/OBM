@@ -381,19 +381,19 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-core</artifactId>
-				<version>1.0.11</version>
+				<version>1.0.13</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>1.0.11</version>
+				<version>1.0.13</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-access</artifactId>
-				<version>1.0.11</version>
+				<version>1.0.13</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
