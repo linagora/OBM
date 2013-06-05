@@ -23,7 +23,7 @@
 		<obm.version>2.6.0-SNAPSHOT</obm.version>
 
 		<postgresql.version>9.2-1002.jdbc4</postgresql.version>
-		<mysql-connector-java.version>5.1.24</mysql-connector-java.version>
+		<mysql-connector-java.version>5.1.25</mysql-connector-java.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hornetq.version>2.2.21.Final</hornetq.version>
