@@ -76,7 +76,9 @@ import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
+import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailboxService;
@@ -323,7 +325,7 @@ public class SyncHandlerWithBackendTest {
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(4);
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
-
+	
 	@Test
 	public void testInitialSyncThenRecreatesAccountOnCalendars() throws Exception {
 		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
@@ -521,5 +523,66 @@ public class SyncHandlerWithBackendTest {
 	private void assertEmailCountInMailbox(String mailbox, Integer expectedNumberOfEmails) {
 		MailFolder inboxFolder = imapHostManager.getFolder(greenMailUser, mailbox);
 		assertThat(inboxFolder.getMessageCount()).isEqualTo(expectedNumberOfEmails);
+	}
+
+	@Test
+	public void testFecthDeletedMail() throws Exception {
+		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", greenMail.getSmtp().getServerSetup());
+		greenMail.waitForIncomingEmail(1);
+		
+		SyncKey firstAllocatedSyncKey = new SyncKey("132");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		SyncKey thirdAllocatedSyncKey = new SyncKey("789");
+		int firstAllocatedStateId = 3;
+		int secondAllocatedStateId = 4;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey, thirdAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(firstAllocatedStateId)
+				.build();
+		Date secondDate = date("2012-10-10T16:22:53");
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(secondDate)
+				.syncKey(secondAllocatedSyncKey)
+				.id(secondAllocatedStateId)
+				.build();
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
+		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKey)).andReturn(secondAllocatedState).times(2);
+
+		String serverId = inboxCollectionIdAsString + ":" + 1;
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, 
+				new ServerId(serverId)))
+			.andReturn(false);
+		
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		
+		SyncResponse firstSyncResponse = opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, ONE_WINDOWS_SIZE);
+		greenMail.deleteEmailFromInbox(greenMailUser, 1);
+		greenMail.expungeInbox(greenMailUser);
+		SyncResponse secondSyncResponse = opClient.syncWithCommand(decoder, secondAllocatedSyncKey, inboxCollectionIdAsString, SyncCommand.FETCH, serverId);
+		
+		mocksControl.verify();
+
+		SyncCollectionResponse firstCollectionResponse = getCollectionWithId(firstSyncResponse, inboxCollectionIdAsString);
+
+		assertEqualsWithoutApplicationData(firstCollectionResponse.getItemChanges(), 
+				ImmutableList.of(
+					new ItemChangeBuilder()
+						.serverId(serverId)
+						.withNewFlag(true)
+						.build()));
+		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.NEED_RETRY);
 	}
 }
