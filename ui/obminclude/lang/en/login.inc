@@ -28,6 +28,7 @@
 // Modified on 2009-09-10T18:08:12+02:00 using OBMtranslation (0.4.1)
 // Modified on 2009-09-10T18:11:21+02:00 using OBMtranslation (0.4.1)
 
+$l_validate = "Validate";
 $l_login = "Login";
 $l_password = "Password";
 $l_error = "Either your login or your password is invalid or your session may have expired. Please try again";
