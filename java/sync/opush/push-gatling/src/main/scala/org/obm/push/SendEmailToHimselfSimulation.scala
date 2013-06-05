@@ -42,10 +42,8 @@ import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
 import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
-import com.excilys.ebi.gatling.http.Predef.httpConfig
-import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import org.obm.push.context.feeder.UserFeeder
+import com.excilys.ebi.gatling.http.Predef._
 
 class SendEmailToHimselfSimulation extends Simulation {
 
@@ -69,7 +67,7 @@ class SendEmailToHimselfSimulation extends Simulation {
 			.baseURL(configuration.targetServerUrl)
 			.disableFollowRedirect
 			.disableCaching
-		List(folderSyncScenario.configure.users(1).ramp(10).protocolConfig(httpConf))
+		List(folderSyncScenario.users(1).ramp(10).protocolConfig(httpConf))
 		
 	}
 	

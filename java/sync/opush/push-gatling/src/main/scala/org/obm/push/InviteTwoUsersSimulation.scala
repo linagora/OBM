@@ -50,10 +50,8 @@ import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
 import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
 import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
-import com.excilys.ebi.gatling.http.Predef.httpConfig
-import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import org.obm.push.context.feeder.UserFeeder
+import com.excilys.ebi.gatling.http.Predef._
 
 class InviteTwoUsersSimulation extends Simulation {
 
@@ -73,7 +71,7 @@ class InviteTwoUsersSimulation extends Simulation {
 		val userNumber = 1
 		for (userNumber <- Iterator.range(1, 100)) {
 			val organizerScenario = buildScenarioForOrganizer(userNumber)
-			scenarios += organizerScenario.configure.users(1).protocolConfig(httpConf)
+			scenarios += organizerScenario.users(1).protocolConfig(httpConf)
 		}
 		
 		scenarios

@@ -54,16 +54,15 @@ import org.obm.push.context.UserKey
 import org.obm.push.context.feeder.UserFeeder
 import org.obm.push.protocol.bean.SyncResponse
 import org.obm.push.wbxml.WBXMLTools
-
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
 import com.excilys.ebi.gatling.core.Predef.scenario
 import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.core.check.MatchStrategy
-import com.excilys.ebi.gatling.http.Predef.httpConfig
-import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
+import com.excilys.ebi.gatling.http.Predef._
 import com.excilys.ebi.gatling.http.request.builder.PostHttpRequestBuilder
+import com.excilys.ebi.gatling.core.action.builder.ActionBuilder
+import com.excilys.ebi.gatling.core.config.HttpConfiguration
 
 class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 
@@ -83,20 +82,17 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 		endTime = date("2014-01-12T10:00:00"),
 		folderType = usedCalendarCollection)
 	
-	def apply = {
 		
-		val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
-		
-		val httpConf = httpConfig
-				.baseURL(configuration.targetServerUrl)
-				.disableFollowRedirect
-				.disableCaching
-				
-		List(buildScenario(users)
-				.configure
-				.users(configuration.parallelsScenariosCount)
-				.protocolConfig(httpConf))
-	}
+	val users = for (userNumber <- Iterator.range(1, 100)) yield new User(userNumber, configuration)
+	
+	val httpConf = httpConfig
+		.baseURL(configuration.targetServerUrl)
+		.disableFollowRedirect
+		.disableCaching
+	
+	setUp(buildScenario(users)
+			.users(configuration.parallelsScenariosCount)
+			.protocolConfig(httpConf))
 
 	def buildScenario(users: Iterator[User]) = {
 
@@ -125,7 +121,7 @@ class InviteTwoUsersOneAcceptOneDeclineSimulation extends Simulation {
 			)
 	}
 	
-	def buildInitialFolderSyncCommand(userKey: UserKey) = {
+	def buildInitialFolderSyncCommand(userKey: UserKey): PostHttpRequestBuilder = {
 		val context = new InitialFolderSyncContext(userKey, FolderSyncCommand.validInitialFolderSync)
 		new FolderSyncCommand(context, wbTools).buildCommand
 	}

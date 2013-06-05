@@ -31,14 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.command
 
-import org.obm.push.bean.FolderSyncStatus
-import org.obm.push.checks.Check
 import org.obm.push.checks.{WholeBodyExtractorCheckBuilder => bodyExtractor}
 import org.obm.push.encoder.GatlingEncoders.folderSyncProtocol
+import org.obm.push.wbxml.WBXMLTools
+import org.obm.push.checks.Check
 import org.obm.push.protocol.bean.FolderSyncRequest
 import org.obm.push.protocol.bean.FolderSyncResponse
-import org.obm.push.wbxml.WBXMLTools
-
+import org.obm.push.bean.FolderSyncStatus
 import com.excilys.ebi.gatling.core.Predef.Session
 import com.excilys.ebi.gatling.core.Predef.checkBuilderToCheck
 import com.excilys.ebi.gatling.core.check._

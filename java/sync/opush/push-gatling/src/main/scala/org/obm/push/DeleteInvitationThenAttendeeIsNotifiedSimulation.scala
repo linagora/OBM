@@ -36,9 +36,9 @@ import org.obm.push.command.InvitationCommand
 import org.obm.push.command.InvitationContext
 import org.obm.push.command.SyncCollectionCommand.{atLeastOneAddResponse, noChange}
 import org.obm.push.context.User
+import com.excilys.ebi.gatling.http.Predef._
 
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 
 class DeleteInvitationThenAtendeeIsNotifiedSimulation extends ModifyInvitationOneAttendeeAcceptOneDeclineSimulation {
 

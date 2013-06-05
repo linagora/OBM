@@ -32,7 +32,6 @@
 package org.obm.push
 
 import scala.collection.mutable.MutableList
-import org.obm.push.bean.FolderType
 import org.obm.push.command.FolderSyncCommand
 import org.obm.push.command.InitialFolderSyncContext
 import org.obm.push.command.InitialSyncContext
@@ -44,12 +43,12 @@ import org.obm.push.context.UserKey
 import org.obm.push.wbxml.WBXMLTools
 import com.excilys.ebi.gatling.core.Predef.Simulation
 import com.excilys.ebi.gatling.core.Predef.scenario
+import com.excilys.ebi.gatling.http.Predef._
 import com.excilys.ebi.gatling.core.feeder.FeederBuiltIns
 import com.excilys.ebi.gatling.core.scenario.configuration.ConfiguredScenarioBuilder
 import com.excilys.ebi.gatling.http.Predef.httpConfig
-import com.excilys.ebi.gatling.http.Predef.toHttpProtocolConfiguration
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 import org.obm.push.context.feeder.UserFeeder
+import org.obm.push.bean.FolderType
 
 class InitialSyncOnCalendarSimulation extends Simulation {
 
@@ -57,20 +56,18 @@ class InitialSyncOnCalendarSimulation extends Simulation {
   
 	val configuration: Configuration = GatlingConfiguration.build
 
-	def apply = {
-		
-		val httpConf = httpConfig
-			.baseURL(configuration.targetServerUrl)
-			.disableFollowRedirect
-			.disableCaching
-		
-		var scenarios = MutableList[ConfiguredScenarioBuilder]()
+	val httpConf = httpConfig
+		.baseURL(configuration.targetServerUrl)
+		.disableFollowRedirect
+		.disableCaching
+
+	override def scenarios = {
+		val list = new MutableList[ConfiguredScenarioBuilder]
 		for (userNumber <- Iterator.range(1, 100)) {
 			val userSendEmailScenario = buildScenarioForUser(1)
-			scenarios += userSendEmailScenario.configure.users(1).protocolConfig(httpConf)
+			list += userSendEmailScenario.users(1).protocolConfig(httpConf)
 		}
-		
-		scenarios
+		list.map(_.build)
 	}
 
 	def buildScenarioForUser(userNumber: Int) = {

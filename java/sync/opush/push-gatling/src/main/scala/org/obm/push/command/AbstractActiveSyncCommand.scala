@@ -45,7 +45,7 @@ abstract class AbstractActiveSyncCommand(userKey: UserKey)
 		extends ActiveSyncCommand {
 
 	override def buildCommand(): PostHttpRequestBuilder = {
-		http(commandTitle)
+		http(s => commandTitle)
 			.post(ActiveSyncConfiguration.postUrl)
 			.header(HttpHeaders.CONTENT_TYPE.toString, ActiveSyncConfiguration.wbXmlContentType)
 			.header(HttpHeaders.AS_VERSION.toString, ActiveSyncConfiguration.activeSyncVersion.asSpecificationValue())

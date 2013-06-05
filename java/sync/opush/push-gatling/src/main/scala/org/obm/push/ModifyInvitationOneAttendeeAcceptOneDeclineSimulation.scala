@@ -40,9 +40,9 @@ import org.obm.push.command.ModifyInvitationCommand
 import org.obm.push.command.SyncCollectionCommand.atLeastOneMeetingRequest
 import org.obm.push.command.SyncCollectionCommand.atLeastOneDeleteResponse
 import org.obm.push.context.User
+import com.excilys.ebi.gatling.http.Predef._
 
 import com.excilys.ebi.gatling.core.Predef.bootstrap.exec
-import com.excilys.ebi.gatling.http.request.builder.AbstractHttpRequestBuilder.toActionBuilder
 
 class ModifyInvitationOneAttendeeAcceptOneDeclineSimulation extends InviteTwoUsersOneAcceptOneDeclineSimulation {
 

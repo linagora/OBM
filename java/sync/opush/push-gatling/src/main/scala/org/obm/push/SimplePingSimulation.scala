@@ -65,10 +65,10 @@ class SimplePingSimulation extends Simulation {
 					.byteArrayBody(byteArray)
 			)
 
-		List(scn.configure.users(1).ramp(10).protocolConfig(httpConf))
+		List(scn.users(1).ramp(10).protocolConfig(httpConf))
 	}
 
-	val byteArray = () => {
+	val byteArray = (s: Session) => {
 		Array[Byte](3, 1, 106, 0, 0, 13, 5)
 //		Array[Byte](3, 1, 106, 0, 0, 13, 69, 72, 3, 52, 55, 48, 0, 1, 73, 74, 75, 3, 49, 0, 1, 76, 3, 67, 97, 108, 101, 110, 100, 97, 114, 0, 1, 1, 74, 75, 3, 50, 0, 1, 76, 3, 69, 109, 97, 105, 108, 0, 1, 1, 74, 75, 3, 54, 0, 1, 76, 3, 67, 111, 110, 116, 97, 99, 116, 115, 0, 1, 1, 1, 1)
 	}
