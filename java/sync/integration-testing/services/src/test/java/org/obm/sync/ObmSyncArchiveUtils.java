@@ -433,6 +433,8 @@ public class ObmSyncArchiveUtils {
 			.offline()
 			.loadPomFromFile("pom.xml")
 			.importRuntimeDependencies()
+			.resolve()
+			.withTransitivity()
 			.asResolvedArtifact();
 	}
 
