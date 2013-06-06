@@ -35,7 +35,7 @@
             <?php if($_metadata['status'] == 2) { ?>
             <th><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></th>
             <?php } else { ?>
-            <td style='width:<?php echo $_size; ?>'><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></td>
+            <td style='width:<?php echo $_size; ?>; vertical-align:middle;padding-left:15px;' ><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></td>
             <?php }?>
             <?php } ?>
             <td class='filler'> </td>

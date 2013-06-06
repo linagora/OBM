@@ -60,7 +60,7 @@ $rcmail_config['session_name'] = 'roundcube_obm_sessid';
 
 // setup required OBM modules
 $rcmail_config["plugins"][] = "multiple_smtp_server";
-//$rcmail_config["plugins"][] = "obm_addressbook";
+$rcmail_config["plugins"][] = "obm_addressbook";
 
 
 if ( $auth_kind && $auth_kind == "CAS" ) {

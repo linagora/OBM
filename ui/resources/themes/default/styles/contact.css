@@ -20,7 +20,7 @@
 }
 
 #contactPanel td {
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 .contactPanelHeader thead td, .contactPanelHeader thead tr {
@@ -270,7 +270,9 @@
 
 #informationGrid .details dd {
   margin-bottom: 0.5em;
-  margin-left: 1em;
+  padding-left: 2em;
+  font-weight:normal;
+  text-align: left;
 }
 
 #informationGrid dl.details {

@@ -76,7 +76,7 @@
   <table id="contact-card-<?php echo $contact->id ?>">
     <tbody>
       <tr>
-        <td>
+        <th>
           <img alt="<?php echo __('Contact photo') ?>" class="photo" src="<?php echo self::__getphoto($contact->photo) ?>" />
           <div class="head">
             <h1><?php echo $contact->header.' '.$contact->firstname.' '.$contact->mname.' '.$contact->lastname.' '.$contact->suffix ?></h1>
@@ -207,7 +207,7 @@
               </dd>
             </dl>
           <?php } ?>
-        </td>
+        </th>
       </tr>
     </tbody>
   </table>

@@ -81,7 +81,7 @@ $display['header'] = display_menu($module).$spreadlove;
 
 $get_params = params_for_iframe($token);
 
-$display['detail'] = '<iframe src="index.php'.$get_params.'" style="border:none;width:100%;height:94%;padding-top:40px;" id="webmail_iframe"></iframe>';
+$display['detail'] = '<iframe src="index.php'.$get_params.'" id="webmail_iframe" frameBorder="0"></iframe>';
 display_outframe($display);
 
 

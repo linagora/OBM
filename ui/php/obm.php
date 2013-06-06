@@ -630,7 +630,7 @@ function dis_portlets_menu() {
 
   foreach($cgp_show['section'] as $section => $value){
     //var_dump($value['url']);
-    $portlet_need = array('gw', 'admin', 'user', 'dic', 'my');
+    $portlet_need = array('gw', 'admin', 'user', 'dic');
     if( in_array($section, $portlet_need) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
       $portlet_title = "l_section_".$section;
       $block .= "

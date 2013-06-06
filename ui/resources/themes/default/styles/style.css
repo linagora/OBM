@@ -272,11 +272,10 @@ form {
 }
 
 #mainPanel {
-  z-index:100;
+  z-index:9;
   min-width: 800px;
-  margin-top:40px;
   margin-left: 17.5em;
-  padding: 2.8em 1em 0em;
+  padding: 80px 1em 0em ;
 /*IE workaround*/
   height: auto!important;
   height: 1px;
@@ -286,6 +285,15 @@ form {
   z-index:0;
   background-color: #F4F4F4;
   padding: 5px 0 5px;
+}
+
+#webmail_iframe {
+  position:absolute;
+  top: 50px;
+  left: 0;
+  border:none;
+  width:100%;
+  height:94%;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -315,7 +323,7 @@ form {
   left: 0;
   padding-left: 105px;
   font-size: 0.9em;
-  z-index: 0;
+  z-index: 9;
 }
 
 .spreadLove a {  color: #368397; font-weight: bolder; }
@@ -329,6 +337,7 @@ form {
 #banner {
   position: fixed;
   top:0;
+  left: 0;
   width: 100%;
   margin-bottom: 1em;
   min-width: 1002px;
@@ -337,6 +346,7 @@ form {
   background: #FAFAFA;
   box-shadow: 0px -1px 5px #BBB inset;
   border-bottom: 1px solid #EEE;
+  z-index: 999;
 }
 
 #banner div+div li{
@@ -345,9 +355,9 @@ form {
 
 #obmLogo {
   position: absolute;
-  z-index: 999;
   top:0;
   left:0;
+  z-index: 99;
 }
 
 #allinonemenu{
@@ -360,10 +370,18 @@ form {
   line-height: 18px;
   padding-left: 5px;
   padding-bottom:10px;
-  border: 1px solid #CCC;
+  border: 1px solid #DDD;
+  border-top: none;
   z-index: 999999;
   display: none;
   box-shadow: 0px 0px 5px #999;
+  border-radius: 0 0 8px 8px;
+}
+
+#allinonemenu h3 {
+  margin:0;
+  padding-top: 5px;
+  font-size: 14px;
 }
 
 #allinonemenu ul {
@@ -375,7 +393,7 @@ form {
 #profileMenu{
   position: absolute;
   width:350px;
-  right:10px;
+  right:8px;
   top:50px;
   background-color: #FAFAFA;
   border: 1px solid #CCC;
@@ -383,6 +401,11 @@ form {
   line-height: 11px;
   display: none;
   box-shadow: 0px 0px 5px #999;
+  border-radius: 8px;
+}
+
+#profileMenu .button{
+  background-color: #368397;
 }
 
 .arrow_box { 
@@ -453,8 +476,8 @@ form {
 
 #shinnyUserInfos #infos p+p{
   font-weight: normal;
-  font-size:15px;
-  color: #999;
+  font-size:14px;
+  color: #777;
 }
 
 #shinnyUserInfos #infos .buttons{
@@ -536,9 +559,6 @@ form {
   padding: 0 0.4em 0 0.4em;
   margin: 0 0.4em 0 -0.4em;
 }
-#banner li{
-  margin-left:15px;
-}
 
 .notification_popup{
   display: none;
@@ -577,6 +597,7 @@ form {
 #section li {
   display: inline;
   margin-right: 1px;
+  margin-left: 10px;
   padding-left: 10px;
   padding-right: 10px;
   padding-bottom: 5px;
