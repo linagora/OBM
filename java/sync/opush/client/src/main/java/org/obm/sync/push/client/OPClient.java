@@ -131,6 +131,10 @@ public abstract class OPClient {
 		return run(new PartialSyncCommand(decoder));
 	}
 
+	public SyncResponse sync(SyncDecoder decoder, SyncKey syncKey, Folder... folders) throws Exception {
+		return run(new Sync(decoder, syncKey, folders));
+	}
+	
 	public SyncResponse syncEmail(SyncDecoder decoder, SyncKey key, String collectionId, FilterType filterType, int windowSize) throws Exception {
 		return run(new EmailSyncCommand(decoder, key, collectionId, filterType, windowSize));
 	}
