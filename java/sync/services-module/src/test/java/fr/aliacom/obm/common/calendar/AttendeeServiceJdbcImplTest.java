@@ -40,13 +40,14 @@ import java.sql.SQLException;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
@@ -74,10 +75,11 @@ import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.ObmHelper;
 
-
+@GuiceModule(AttendeeServiceJdbcImplTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class AttendeeServiceJdbcImplTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl = createControl();
 		
 		@Override
@@ -99,9 +101,6 @@ public class AttendeeServiceJdbcImplTest {
 		}
 	}
 	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
-
 	@Inject
 	private IMocksControl mocksControl;
 	@Inject

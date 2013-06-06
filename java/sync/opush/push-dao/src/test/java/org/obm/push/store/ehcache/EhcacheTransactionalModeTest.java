@@ -48,37 +48,34 @@ import net.sf.ehcache.transaction.TransactionTimeoutException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.exception.EhcacheRollbackException;
 
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
-import com.google.guiceberry.GuiceBerryModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@Slow
+@GuiceModule(EhcacheTransactionalModeTest.Module.class)
+@RunWith(SlowGuiceRunner.class) 
 public class EhcacheTransactionalModeTest {
 
 	public static class Module extends AbstractModule {
 		@Override
 		protected void configure() {
 			install(new TransactionalModule());
-			install(new GuiceBerryModule());
 			install(new TestConfigurationModule());
 		}
 	}
-	
-	@Rule public final JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Module.class);
 
 	@Inject private TestClass xaCacheInstance;
 	

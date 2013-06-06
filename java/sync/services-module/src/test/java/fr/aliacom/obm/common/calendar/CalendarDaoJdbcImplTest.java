@@ -55,13 +55,14 @@ import java.util.TimeZone;
 
 import org.easymock.IMocksControl;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.locator.store.LocatorService;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -92,10 +93,11 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 
-
+@GuiceModule(CalendarDaoJdbcImplTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class CalendarDaoJdbcImplTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl = createControl();
 		
 		@Override
@@ -116,9 +118,6 @@ public class CalendarDaoJdbcImplTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
 	
 	@Inject
 	private IMocksControl mocksControl;

@@ -37,22 +37,22 @@ import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.dao.TableDescription;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(DatabaseMetadataServiceImplTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class DatabaseMetadataServiceImplTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 
 		private IMocksControl mocksControl = createControl();
 		
@@ -71,9 +71,6 @@ public class DatabaseMetadataServiceImplTest {
 		
 	}
  	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
-	
 	@Inject
 	private IMocksControl mocksControl;
 	

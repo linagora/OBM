@@ -39,22 +39,22 @@ import javax.jms.TextMessage;
 
 import org.junit.After;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.TestConfigurationModule;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
-import com.google.guiceberry.GuiceBerryModule;
-import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@Slow
+@GuiceModule(HornetQTransactionalModeTest.Module.class)
+@RunWith(SlowGuiceRunner.class)
 public class HornetQTransactionalModeTest {
 
 	public static class Module extends AbstractModule {
@@ -69,16 +69,11 @@ public class HornetQTransactionalModeTest {
 		protected void configure() {
 			install(new TransactionalModule());
 			install(messageQueueModule);
-			install(new GuiceBerryModule());
 			install(new TestConfigurationModule());
 		}
 	}
 	
 	private final static long TIMEOUT = 1000;
-	
-	@Rule public final GuiceBerryRule guiceBerry =
-			new GuiceBerryRule(Module.class);
-
 	
 	@Inject private TestClass xaMessageQueueInstance;
 	@Inject private MessageConsumer consumer;	

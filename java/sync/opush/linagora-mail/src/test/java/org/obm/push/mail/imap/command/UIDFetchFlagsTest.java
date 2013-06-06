@@ -40,14 +40,13 @@ import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -69,11 +68,10 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@Slow
+@GuiceModule(org.obm.push.minig.imap.MailEnvModule.class)
+@RunWith(SlowGuiceRunner.class)
 public class UIDFetchFlagsTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(org.obm.push.minig.imap.MailEnvModule.class);
 
 	@Inject LinagoraImapClientProvider clientProvider;
 	@Inject MailboxService mailboxService;

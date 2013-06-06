@@ -47,11 +47,10 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -78,11 +77,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(ConversionModule.class)
+@RunWith(SlowGuiceRunner.class)
 public class EventConverterTest {
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ConversionModule.class);
 
 	@Inject EventConverterImpl eventConverter;
 	private CalendarDecoder decoder;

@@ -47,12 +47,11 @@ import org.apache.http.StatusLine;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
 import org.obm.servlet.filter.qos.util.SuspendingServletUtils;
@@ -63,18 +62,17 @@ import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@Slow
+@GuiceModule(OnePerClientQoSSuspendRequestAndContinuationHandlerTest.Configuration.class)
+@RunWith(SlowGuiceRunner.class)
 public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	
-	private static class Configuration extends NPerClientQosSuspendConfiguration {
+	public static class Configuration extends NPerClientQosSuspendConfiguration {
 		@Override
 		protected int getN() {
 			return 1;
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceModule = new JUnitGuiceRule(Configuration.class);
 	
 	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
 	@Inject IMocksControl control;

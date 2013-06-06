@@ -45,11 +45,10 @@ import javax.xml.transform.TransformerException;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
@@ -94,12 +93,10 @@ import org.w3c.dom.Document;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(ProtocolModuleTest.class)
+@RunWith(SlowGuiceRunner.class)
 public class SyncProtocolTest {
 
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(ProtocolModuleTest.class);
-	
 	@Inject EncoderFactory encoderFactory;
 
 	private final int DEFAULT_WINDOW_SIZE = 100;

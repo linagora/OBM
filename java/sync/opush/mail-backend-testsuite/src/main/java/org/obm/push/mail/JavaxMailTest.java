@@ -47,12 +47,11 @@ import javax.mail.Store;
 import org.fest.assertions.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.service.OpushLocatorService;
 
@@ -62,7 +61,8 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(JavaxMailTest.EnvModule.class)
+@RunWith(SlowGuiceRunner.class)
 public class JavaxMailTest {
 
 	public static class EnvModule extends AbstractModule {
@@ -73,9 +73,6 @@ public class JavaxMailTest {
 			install(new MailEnvModule(3600000));
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(EnvModule.class);
 
 	@Inject OpushLocatorService locatorService;
 	@Inject EmailConfiguration emailConfig;

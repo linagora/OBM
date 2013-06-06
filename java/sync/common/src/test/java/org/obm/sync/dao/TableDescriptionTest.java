@@ -30,44 +30,41 @@
 package org.obm.sync.dao;
 
 import static org.easymock.EasyMock.createControl;
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(TableDescriptionTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class TableDescriptionTest {
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 
-		private IMocksControl mocksControl = createControl();
+		private IMocksControl control = createControl();
 		
 		@Override
 		protected void configure() {
-			bind(IMocksControl.class).toInstance(mocksControl);
+			bind(IMocksControl.class).toInstance(control);
 			
 			bindWithMock(ResultSetMetaData.class);
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {
-			bind(cls).toInstance(mocksControl.createMock(cls));
+			bind(cls).toInstance(control.createMock(cls));
 		}
 		
 	}
  	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
-	
 	@Inject
 	private IMocksControl mocksControl;
 	

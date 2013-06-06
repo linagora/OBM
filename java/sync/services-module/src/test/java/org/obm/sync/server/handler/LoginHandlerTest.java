@@ -58,15 +58,14 @@ import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
@@ -86,7 +85,8 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 import fr.aliacom.obm.utils.HelperService;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(LoginHandlerTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class LoginHandlerTest {
 
 	private ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
@@ -96,9 +96,6 @@ public class LoginHandlerTest {
 			resultStream.write(b);
 		}
 	};
-
-	@Rule
-	public JUnitGuiceRule rule = new JUnitGuiceRule(Env.class);
 
 	@Inject
 	private LoginHandler handler;
@@ -281,7 +278,7 @@ public class LoginHandlerTest {
 		return request;
 	}
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl control = createControl();
 		
 		private <T> T bindMock(Class<T> cls) {

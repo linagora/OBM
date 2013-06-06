@@ -69,18 +69,17 @@ import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -128,10 +127,11 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(CalendarBindingImplTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class CalendarBindingImplTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl = createControl();
 		
 		@Override
@@ -155,9 +155,6 @@ public class CalendarBindingImplTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
 
 	@Inject
 	private IMocksControl mocksControl;

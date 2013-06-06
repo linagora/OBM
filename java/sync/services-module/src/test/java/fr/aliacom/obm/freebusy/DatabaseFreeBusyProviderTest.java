@@ -8,13 +8,12 @@ import java.util.List;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
-import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -30,10 +29,11 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(DatabaseFreeBusyProviderTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class DatabaseFreeBusyProviderTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl = createControl();
 		
 		@Override
@@ -49,9 +49,6 @@ public class DatabaseFreeBusyProviderTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
 	
 	@Inject
 	private IMocksControl mocksControl;

@@ -41,15 +41,14 @@ import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
@@ -65,10 +64,11 @@ import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.utils.ObmHelper;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(UserDaoTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class UserDaoTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl = createControl();
 
 		@Override
@@ -84,9 +84,6 @@ public class UserDaoTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
 
 	@Inject IMocksControl mocksControl;
 	@Inject ObmHelper obmHelper;

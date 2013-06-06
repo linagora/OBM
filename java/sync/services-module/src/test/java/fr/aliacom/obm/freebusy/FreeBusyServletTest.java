@@ -22,11 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.opush.env.JUnitGuiceRule;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.exception.ObmUserNotFoundException;
 
@@ -36,10 +35,11 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(FreeBusyServletTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class FreeBusyServletTest {
 
-	private static class Env extends AbstractModule {
+	public static class Env extends AbstractModule {
 		private IMocksControl mocksControl;
 
 		@Override
@@ -63,9 +63,6 @@ public class FreeBusyServletTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-	
-	@Rule
-	public JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Env.class);
 	
 	@Inject
 	private IMocksControl mocksControl;
