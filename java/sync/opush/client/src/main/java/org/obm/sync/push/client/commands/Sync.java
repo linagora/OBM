@@ -33,6 +33,7 @@ package org.obm.sync.push.client.commands;
 
 import java.io.IOException;
 
+import org.obm.push.bean.SyncKey;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
@@ -59,6 +60,21 @@ public class Sync extends AbstractCommand<SyncResponse> {
 				for (Folder folder : folders) {
 					Element col = DOMUtils.createElement(cols, "Collection");
 					DOMUtils.createElementAndText(col, "SyncKey", "0");
+					DOMUtils.createElementAndText(col, "CollectionId", folder.getServerId());
+				}				
+			}
+		});
+	}
+
+	public Sync(final SyncDecoder decoder, final SyncKey syncKey, final Folder... folders) throws SAXException, IOException {
+		this(decoder, new TemplateDocument("SyncRequest.xml") {
+			
+			@Override
+			protected void customize(Document document, AccountInfos accountInfos) {
+				Element cols = DOMUtils.getUniqueElement(document.getDocumentElement(), "Collections");
+				for (Folder folder : folders) {
+					Element col = DOMUtils.createElement(cols, "Collection");
+					DOMUtils.createElementAndText(col, "SyncKey", syncKey.getSyncKey());
 					DOMUtils.createElementAndText(col, "CollectionId", folder.getServerId());
 				}				
 			}
