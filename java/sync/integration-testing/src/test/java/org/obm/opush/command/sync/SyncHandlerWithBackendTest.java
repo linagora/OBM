@@ -47,6 +47,7 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +77,7 @@ import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSAttachement;
@@ -101,14 +103,22 @@ import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.service.EventService;
 import org.obm.push.store.CollectionDao;
+import org.obm.push.store.DeviceDao;
+import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.client.login.LoginService;
+import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
+import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.services.IAddressBook;
 import org.obm.sync.services.ICalendar;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
@@ -150,6 +160,7 @@ public class SyncHandlerWithBackendTest {
 	private CollectionDao collectionDao;
 	private DateService dateService;
 	private ICalendar calendarClient;
+	private IAddressBook addressBook;
 
 	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
@@ -157,10 +168,13 @@ public class SyncHandlerWithBackendTest {
 	private String mailbox;
 	private String inboxCollectionPath;
 	private String calendarCollectionPath;
+	private String contactCollectionPath;
 	private int inboxCollectionId;
 	private int calendarCollectionId;
+	private int contactCollectionId;
 	private String inboxCollectionIdAsString;
 	private String calendarCollectionIdAsString;
+	private String contactCollectionIdAsString;
 
 	@Before
 	public void init() throws Exception {
@@ -177,11 +191,15 @@ public class SyncHandlerWithBackendTest {
 		calendarCollectionPath = IntegrationTestUtils.buildCalendarCollectionPath(user);
 		calendarCollectionId = 5678;
 		calendarCollectionIdAsString = String.valueOf(calendarCollectionId);
+		contactCollectionId = 7891;
+		contactCollectionIdAsString = String.valueOf(contactCollectionId);
+		contactCollectionPath = IntegrationTestUtils.buildContactCollectionPath(user, contactCollectionIdAsString);
 		
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 		calendarClient = classToInstanceMap.get(ICalendar.class);
+		addressBook = classToInstanceMap.get(IAddressBook.class);
 		eventService = classToInstanceMap.get(EventService.class);
 
 		bindCollectionIdToPath();
@@ -192,6 +210,7 @@ public class SyncHandlerWithBackendTest {
 	private void bindCollectionIdToPath() throws Exception {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(calendarCollectionId)).andReturn(calendarCollectionPath).anyTimes();
+		expect(collectionDao.getCollectionPath(contactCollectionId)).andReturn(contactCollectionPath).anyTimes();
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
@@ -202,8 +221,14 @@ public class SyncHandlerWithBackendTest {
 					.build()).anyTimes();
 		expect(syncedCollectionDao.get(user.credentials, user.device, calendarCollectionId))
 			.andReturn(AnalysedSyncCollection.builder()
-					.collectionId(inboxCollectionId)
-					.collectionPath(inboxCollectionPath)
+					.collectionId(calendarCollectionId)
+					.collectionPath(calendarCollectionPath)
+					.syncKey(new SyncKey("123"))
+					.build()).anyTimes();
+		expect(syncedCollectionDao.get(user.credentials, user.device, contactCollectionId))
+			.andReturn(AnalysedSyncCollection.builder()
+					.collectionId(contactCollectionId)
+					.collectionPath(contactCollectionPath)
 					.syncKey(new SyncKey("123"))
 					.build()).anyTimes();
 		
@@ -674,5 +699,81 @@ public class SyncHandlerWithBackendTest {
 		assertThat(attachment.getContentId()).isEqualTo("555343607@11062013-0EC1");
 		assertThat(attachment.getContentLocation()).isEqualTo("location");
 		assertThat(attachment.isInline()).isTrue();
+	}
+
+	@Test
+	public void testOnlyOneOpushObmSyncConnectionUsed() throws Exception {
+		SyncKey firstAllocatedSyncKey = new SyncKey("123");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		int firstAllocatedStateId = 3;
+		int secondAllocatedStateId = 4;
+		
+		Date firstDate = date("2012-10-09T16:22:53");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(firstDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(firstAllocatedStateId)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(firstDate)
+				.syncKey(secondAllocatedSyncKey)
+				.id(secondAllocatedStateId)
+				.build();
+		
+		LoginService loginService = classToInstanceMap.get(LoginService.class);
+		// This should be 1
+		expect(loginService.login(user.user.getLoginAtDomain(), user.password))
+			.andReturn(user.accessToken).times(3);
+		loginService.logout(user.accessToken);
+		expectLastCall().anyTimes();
+		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password))
+			.andReturn(user.accessToken).anyTimes();
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getDevice(user.user, 
+				user.deviceId, 
+				user.userAgent,
+				user.deviceProtocolVersion))
+				.andReturn(
+						new Device(user.device.getDatabaseId(), user.deviceType, user.deviceId, new Properties(), user.deviceProtocolVersion))
+						.anyTimes();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED))
+			.andReturn(0l).anyTimes();
+		
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(firstDate)
+			.anyTimes();
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey, secondAllocatedSyncKey);
+		
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, calendarCollectionId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, contactCollectionId);
+		
+		expect(calendarClient.getSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+			.andReturn(EventChanges.builder()
+					.lastSync(firstDate)
+					.build());
+		expect(calendarClient.getUserEmail(user.accessToken))
+			.andReturn(user.user.getLoginAtDomain());
+		
+		expect(addressBook.listAllBooks(user.accessToken))
+			.andReturn(ImmutableList.<AddressBook> of(new AddressBook(contactCollectionIdAsString, contactCollectionId, false)));
+		expect(collectionDao.getCollectionMapping(user.device, contactCollectionPath + ":" + contactCollectionId))
+			.andReturn(contactCollectionId);
+		expect(addressBook.listContactsChanged(user.accessToken, firstDate, contactCollectionId))
+			.andReturn(new ContactChanges(ImmutableList.<Contact> of(),
+					ImmutableSet.<Integer> of(),
+					firstDate));
+		
+		mocksControl.replay();
+		opushServer.start();
+
+		Folder calendarFolder = new Folder();
+		calendarFolder.setServerId(calendarCollectionIdAsString);
+		Folder contactFolder = new Folder();
+		contactFolder.setServerId(contactCollectionIdAsString);
+		
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		SyncResponse syncResponse = opClient.sync(decoder, firstAllocatedSyncKey, calendarFolder, contactFolder);
+		mocksControl.verify();
+		
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
 	}
 }

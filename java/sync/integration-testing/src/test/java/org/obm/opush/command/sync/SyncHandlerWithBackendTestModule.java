@@ -73,17 +73,21 @@ public class SyncHandlerWithBackendTestModule extends AbstractOpushGreenMailEnv 
 	
 	@Override
 	protected BackendsModule backendsModule() {
-		return new ContactBackendModule(getMocksControl());
+		return new UnmockedBackendsModule(getMocksControl());
 	}
 	
-	private class ContactBackendModule extends BackendsModule {
+	private class UnmockedBackendsModule extends BackendsModule {
 
-		public ContactBackendModule(IMocksControl mocksControl) {
+		public UnmockedBackendsModule(IMocksControl mocksControl) {
 			super(mocksControl);
 		}
 
 		@Override
 		protected void bindCalendarBackend() {
+		}
+
+		@Override
+		protected void bindContactsBackend() {
 		}
 	}
 
