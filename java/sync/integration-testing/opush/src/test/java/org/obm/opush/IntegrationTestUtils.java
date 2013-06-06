@@ -184,6 +184,10 @@ public class IntegrationTestUtils {
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {
 		return buildCollectionPath(opushUser, "calendar", opushUser.user.getLoginAtDomain());
 	}
+
+	public static String buildContactCollectionPath(OpushUser opushUser, String contactCollectionId) {
+		return buildCollectionPath(opushUser, "contacts", contactCollectionId);
+	}
 	
 	public static String buildEmailInboxCollectionPath(OpushUser opushUser) {
 		return buildCollectionPath(opushUser, "email", "INBOX");
