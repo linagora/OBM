@@ -34,6 +34,7 @@ package org.obm.push.bean;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.obm.push.backend.IAccessTokenResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,9 +131,13 @@ public class UserDataRequest {
 		}
 	}
 	
+	public IAccessTokenResource getAccessTokenResource() {
+		return (IAccessTokenResource) getResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE);
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(credentials, device, command, resources);
+		return Objects.hashCode(credentials, device, command);
 	}
 	
 	@Override
@@ -141,8 +146,7 @@ public class UserDataRequest {
 			UserDataRequest that = (UserDataRequest) object;
 			return Objects.equal(this.credentials, that.credentials)
 				&& Objects.equal(this.device, that.device)
-				&& Objects.equal(this.command, that.command)
-				&& Objects.equal(this.resources, that.resources);
+				&& Objects.equal(this.command, that.command);
 		}
 		return false;
 	}

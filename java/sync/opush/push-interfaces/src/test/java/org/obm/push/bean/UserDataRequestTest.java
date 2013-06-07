@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.User.Factory;
 
 import com.google.common.collect.Maps;
@@ -255,6 +256,15 @@ public class UserDataRequestTest {
 		userDataRequest.closeResources();
 		
 		verify(resource1, resource2, resource3);
+	}
+	
+	@Test
+	public void testAccessTokenResource() {
+		UserDataRequest userDataRequest = createUserDataRequest();
+		IAccessTokenResource accessTokenResource = createMock(IAccessTokenResource.class);
+		userDataRequest.putResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE, accessTokenResource);
+		
+		assertThat(userDataRequest.getAccessTokenResource()).isEqualTo(accessTokenResource);
 	}
 	
 	private UserDataRequest createUserDataRequest() {
