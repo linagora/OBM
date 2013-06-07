@@ -2686,7 +2686,7 @@ Obm.CalendarQuickForm = new Class({
     if(!this.eventData.private) {
     	this.gotoURI += '&title='+encodeURIComponent(this.form.tf_title.value);
     }
-    if(this.eventData.all_day == '1'  && obm.vars.consts.calendarRange != 'month'){
+    if(this.eventData.all_day == '1'){
       this.gotoURI += '&all_day=1';
     } 
     gotoUriContainsActionNew = new RegExp("action=new");
