@@ -36,8 +36,8 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-	    	<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>

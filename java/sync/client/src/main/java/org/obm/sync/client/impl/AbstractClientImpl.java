@@ -33,7 +33,6 @@ package org.obm.sync.client.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -41,16 +40,10 @@ import java.util.Map.Entry;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.message.BasicHeader;
+import org.apache.http.client.fluent.Request;
 import org.apache.http.message.BasicNameValuePair;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.DOMUtils;
@@ -73,32 +66,22 @@ public abstract class AbstractClientImpl {
 		XTrustProvider.install();
 	}
 	
-	private static final int MAX_CONNECTIONS = 8;
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Logger obmSyncLogger;
 	protected final SyncClientException exceptionFactory;
-	protected HttpClient hc;
 	
 	protected abstract Locator getLocator();
-
-	protected static HttpClient createHttpClient() {
-		PoolingClientConnectionManager mtManager = new PoolingClientConnectionManager();
-		mtManager.setMaxTotal(MAX_CONNECTIONS);
-		mtManager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
-		return new DefaultHttpClient(mtManager);
-	}
 
 	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger) {
 		super();
 		this.exceptionFactory = exceptionFactory;
 		this.obmSyncLogger = obmSyncLogger;
-		this.hc = createHttpClient();
 	}
 
 	protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
-		HttpPost request = null;
+		Request request = null;
 		try {
-			request = getPostMethod(token, action);
+			request = getPostRequest(token, action);
 			logRequest(action, parameters);
 			InputStream is = executePostAndGetResultStream(request, parameters);
 			if (is != null) {
@@ -120,8 +103,6 @@ public abstract class AbstractClientImpl {
 		} catch (FactoryConfigurationError e) {
 			logger.error(e.getMessage(), e);
 			throw new ObmSyncClientException(e.getMessage(), e);
-		} finally {
-			releaseConnection(request);
 		}
 	}
 
@@ -159,10 +140,10 @@ public abstract class AbstractClientImpl {
 		return m;
 	}
 
-	private InputStream executePostAndGetResultStream(HttpPost request, Multimap<String, String> parameters) throws IOException {
+	private InputStream executePostAndGetResultStream(Request request, Multimap<String, String> parameters) throws IOException {
 		InputStream is = null;
-		setPostMethodParameters(request, parameters);
-		HttpResponse response = hc.execute(request);
+		setPostRequestParameters(request, parameters);
+		HttpResponse response = request.execute().returnResponse();
 		int httpResultStatus = response.getStatusLine().getStatusCode();
 		if (isHttpStatusOK(httpResultStatus)) {
 			is = response.getEntity().getContent();
@@ -177,20 +158,20 @@ public abstract class AbstractClientImpl {
 		return httpResultStatus == HttpStatus.SC_OK;
 	}
 
-	private void setPostMethodParameters(HttpPost request, Multimap<String, String> parameters) throws UnsupportedEncodingException {
+	private void setPostRequestParameters(Request request, Multimap<String, String> parameters) {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		for (Entry<String, String> entry: parameters.entries()) {
 			if (entry.getKey() != null && entry.getValue() != null) {
 				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 		}
-		request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		request.bodyForm(nameValuePairs);
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
-		HttpPost request = null; 
+		Request request = null; 
 		try {
-			request = getPostMethod(at, action);
+			request = getPostRequest(at, action);
 			executePostAndGetResultStream(request, parameters);
 		} catch (LocatorClientException e) {
 			logger.error(e.getMessage(), e);
@@ -198,8 +179,6 @@ public abstract class AbstractClientImpl {
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			throw new ObmSyncClientException(e.getMessage(), e);
-		} finally {
-			releaseConnection(request);
 		}
 	}
 
@@ -208,17 +187,9 @@ public abstract class AbstractClientImpl {
 		return locator.backendUrl(loginAtDomain);
 	}
 
-	private HttpPost getPostMethod(AccessToken at, String action) throws LocatorClientException {
+	private Request getPostRequest(AccessToken at, String action) throws LocatorClientException {
 		String backendUrl = getBackendUrl(at.getUserWithDomain());
-		HttpPost request = new HttpPost(backendUrl + action);
-		request.setHeaders(new Header[] { new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8") });
-		return request;
+		return Request.Post(backendUrl + action)
+			.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
 	}
-
-	private void releaseConnection(HttpPost request) {
-		if (request != null) {
-			request.releaseConnection();
-		}
-	}
-
 }
