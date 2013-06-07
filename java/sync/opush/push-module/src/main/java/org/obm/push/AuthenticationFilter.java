@@ -111,7 +111,9 @@ public class AuthenticationFilter implements Filter {
 					if (p != -1) {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
-						return getCredentials(userId, password);
+						
+						AccessToken token = setAccessTokenRequestAttribute(request, userId, password);
+						return getCredentials(token, userId, password);
 					}
 				}
 			}
@@ -119,9 +121,8 @@ public class AuthenticationFilter implements Filter {
 		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(String userId, String password) throws AuthFault {
-		AccessToken accessToken = login(getLoginAtDomain(userId), password);
-		User user = createUser(userId, accessToken);
+	private Credentials getCredentials(AccessToken token, String userId, String password) throws AuthFault {
+		User user = createUser(userId, token);
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
 			return new Credentials(user, password);
@@ -129,13 +130,23 @@ public class AuthenticationFilter implements Filter {
 			throw new AuthFault("Login {"+ userId + "} failed, bad login or/and password.");
 		}
 	}
-	
-	private AccessToken login(String userId, String password) throws AuthFault {
-		return loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
+
+	private AccessToken setAccessTokenRequestAttribute(HttpServletRequest request, String userId, String password) throws AuthFault {
+		AccessToken token = login(getLoginAtDomain(userId), password);
+		request.setAttribute(RequestProperties.ACCESS_TOKEN, token);
+		return token;
 	}
 	
-	private User createUser(String userId, AccessToken accessToken) {
-		return userFactory.createUser(userId, accessToken.getUserEmail(), accessToken.getUserDisplayName());
+	private AccessToken login(String userId, String password) throws AuthFault {
+		try {
+			return loginService.authenticate(userId, password);
+		} catch (Exception e) {
+			throw new AuthFault(e);
+		}
+	}
+	
+	private User createUser(String userId, AccessToken token) {
+		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
 	}
 
 	protected String getLoginAtDomain(String userId) {
