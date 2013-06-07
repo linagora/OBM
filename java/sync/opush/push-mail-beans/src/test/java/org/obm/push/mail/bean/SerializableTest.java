@@ -1,3 +1,4 @@
+package org.obm.push.mail.bean;
 /* ***** BEGIN LICENSE BLOCK *****
  * 
  * Copyright (C) 2011-2012  Linagora
@@ -29,63 +30,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.bean;
+
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.BodyParams;
-import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.MimeAddress;
-import org.obm.sync.bean.EqualsVerifierUtils;
-import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.FilterType;
+import org.obm.push.bean.SyncKey;
+import org.obm.push.utils.DateUtils;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public class SerializableTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
+	private ObjectOutputStream objectOutputStream;
+
+
 	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	public void buildOutputStream() throws IOException {
+		objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());	
+	}
+
+	@Test
+	public void testEmail() throws IOException {
+		Email email = Email.builder()
+				.uid(1)
+				.read(true)
+				.date(DateUtils.getCurrentDate())
+				.answered(true)
+				.build();
+		objectOutputStream.writeObject(email);
 	}
 	
 	@Test
-	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(Address.class)
-					.add(BodyParam.class)
-					.add(Envelope.class)
-					.add(FastFetch.class)
-					.add(ListInfo.class)
-					.add(MailboxFolder.class)
-					.add(MailboxFolders.class)
-					.add(MimeAddress.class)
-					.add(SnapshotKey.class)
-					.add(WindowingIndexKey.class)
-					.add(EmailMetadata.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
-		
-		EqualsVerifierBuilder.builder()
-			.equalsVerifiers(ImmutableList.<Class<?>>of(ContentType.class))
-			.prefabValue(BodyParams.class, 
-					BodyParams.builder().add(new BodyParam("white", "wine")).build(),
-					BodyParams.builder().add(new BodyParam("blond", "beer")).build())
-			.verify();
-
-		EqualsVerifierBuilder.builder()
-			.equalsVerifiers(ImmutableList.<Class<?>>of(BodyParams.class))
-			.prefabValue(ImmutableMap.class, 
-					ImmutableMap.of("key", "value"),
-					ImmutableMap.of("first", "second"))
-			.verify();
+	public void testSnapshot() throws IOException {
+		Snapshot snapshot = Snapshot.builder()
+				.collectionId(1)
+				.deviceId(new DeviceId("deviceId"))
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.syncKey(new SyncKey("syncKey"))
+				.uidNext(2)
+				.addEmail(Email.builder()
+						.uid(1)
+						.read(true)
+						.date(DateUtils.getCurrentDate())
+						.answered(true)
+						.build())
+				.build();
+		objectOutputStream.writeObject(snapshot);
 	}
 	
+	@Test
+	public void testDeviceId() throws IOException {
+		DeviceId deviceId = new DeviceId("deviceId");
+		objectOutputStream.writeObject(deviceId);
+	}
+
+	@Test
+	public void testSyncKey() throws IOException {
+		SyncKey syncKey = new SyncKey("syncKey");
+		objectOutputStream.writeObject(syncKey);
+	}
+
 }

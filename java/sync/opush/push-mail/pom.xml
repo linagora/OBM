@@ -31,6 +31,16 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-mail-beans</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-mail</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>mail-backend-interfaces</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
