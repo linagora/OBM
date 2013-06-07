@@ -292,6 +292,18 @@ CREATE TABLE DeletedEvent (
 create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
 create INDEX idx_dce_user_id ON DeletedEvent (deletedevent_user_id);
 
+CREATE SEQUENCE deletedevent_deletedevent_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE deletedevent_deletedevent_id_seq OWNED BY deletedevent.deletedevent_id;
+
+ALTER TABLE DeletedEvent ALTER COLUMN deletedevent_id SET DEFAULT nextval('deletedevent_deletedevent_id_seq'::regclass);
+
 --
 -- Table structure for table TaskEvent
 --
