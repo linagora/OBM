@@ -8,9 +8,9 @@
 		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>push-dao</artifactId>
+	<artifactId>push-dao-jdbc</artifactId>
 	<packaging>jar</packaging>
-	<name>OPush DAO</name>
+	<name>OPush DAO JDBC implementation</name>
 	<url>http://www.obm.org/</url>
 
 	<licenses>
@@ -46,6 +46,21 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>utils</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>dbcp</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
@@ -60,21 +75,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>guice-webapp-extensions</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.guiceberry</groupId>
+		    <artifactId>guiceberry</artifactId>
+		    <version>3.1.0</version>
+		    <scope>test</scope>
 		</dependency>
 		<dependency>
                        <groupId>org.codehaus.btm</groupId>
@@ -91,10 +103,6 @@
                        	<artifactId>jta</artifactId>
                        	<scope>test</scope>
                </dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava-testlib</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>

@@ -29,19 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.store.jdbc;
 
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.push.store.CalendarDao;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.DeviceDao;
+import org.obm.push.store.FolderSnapshotDao;
+import org.obm.push.store.FolderSyncStateBackendMappingDao;
+import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.ItemTrackingDao;
+import org.obm.push.store.MonitoredCollectionDao;
+import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
 
-public class DaoModule extends AbstractModule{
+public class JdbcDaoModule extends AbstractModule{
 
 	@Override
 	protected void configure() {
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
+		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
+		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
+		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
+		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
+		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
+		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
+		bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
+		bind(DateProvider.class).to(TransactionDateProvider.class);
 	}
 
 }
