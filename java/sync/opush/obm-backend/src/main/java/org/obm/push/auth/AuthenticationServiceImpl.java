@@ -52,13 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 	
 	@Override
-	public User authenticate(String userId, String password) throws Exception {
-		AccessToken token = loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
-		return createUser(userId, token);
-	}
-
-	
-	private User createUser(String userId, AccessToken token) {
-		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
+	public AccessToken authenticate(String userId, String password) throws Exception {
+		return loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
 	}
 }

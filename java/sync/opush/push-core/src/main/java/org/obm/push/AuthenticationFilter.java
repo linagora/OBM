@@ -48,6 +48,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.service.AuthenticationService;
+import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,9 @@ public class AuthenticationFilter implements Filter {
 					if (p != -1) {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
-						return getCredentials(userId, password);
+						
+						AccessToken token = setAccessTokenRequestAttribute(request, userId, password);
+						return getCredentials(token, userId, password);
 					}
 				}
 			}
@@ -118,8 +121,8 @@ public class AuthenticationFilter implements Filter {
 		throw new AuthenticationException("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(String userId, String password) throws AuthenticationException {
-		User user = login(getLoginAtDomain(userId), password);
+	private Credentials getCredentials(AccessToken token, String userId, String password) throws AuthenticationException {
+		User user = createUser(userId, token);
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
 			return new Credentials(user, password);
@@ -127,13 +130,23 @@ public class AuthenticationFilter implements Filter {
 			throw new AuthenticationException("Login {"+ userId + "} failed, bad login or/and password.");
 		}
 	}
+
+	private AccessToken setAccessTokenRequestAttribute(HttpServletRequest request, String userId, String password) throws AuthenticationException {
+		AccessToken token = login(getLoginAtDomain(userId), password);
+		request.setAttribute(RequestProperties.ACCESS_TOKEN, token);
+		return token;
+	}
 	
-	private User login(String userId, String password) throws AuthenticationException {
+	private AccessToken login(String userId, String password) throws AuthenticationException {
 		try {
 			return authenticationService.authenticate(userId, password);
 		} catch (Exception e) {
 			throw new AuthenticationException(e);
 		}
+	}
+	
+	private User createUser(String userId, AccessToken token) {
+		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
 	}
 
 	protected String getLoginAtDomain(String userId) {
