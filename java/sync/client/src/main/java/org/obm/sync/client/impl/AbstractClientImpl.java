@@ -33,27 +33,32 @@ package org.obm.sync.client.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 import org.obm.locator.LocatorClientException;
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.exception.ObmSyncClientException;
 import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.locators.Locator;
-import org.obm.push.utils.DOMUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -74,24 +79,13 @@ public abstract class AbstractClientImpl {
 	protected final SyncClientException exceptionFactory;
 	protected HttpClient hc;
 	
-	private static final HttpMethodRetryHandler retryH = new HttpMethodRetryHandler() {
-			public boolean retryMethod(HttpMethod arg0, IOException arg1, int arg2) {
-				return false;
-			}
-		};
-
 	protected abstract Locator getLocator();
 
 	protected static HttpClient createHttpClient() {
-		MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = 
-				new MultiThreadedHttpConnectionManager();
-		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-		params.setMaxTotalConnections(MAX_CONNECTIONS);
-		params.setDefaultMaxConnectionsPerHost(MAX_CONNECTIONS);
-		multiThreadedHttpConnectionManager.setParams(params);
-		HttpClient ret = new HttpClient(multiThreadedHttpConnectionManager);
-		ret.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, retryH);
-		return ret;
+		PoolingClientConnectionManager mtManager = new PoolingClientConnectionManager();
+		mtManager.setMaxTotal(MAX_CONNECTIONS);
+		mtManager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
+		return new DefaultHttpClient(mtManager);
 	}
 
 	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger) {
@@ -102,11 +96,11 @@ public abstract class AbstractClientImpl {
 	}
 
 	protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
-		PostMethod pm = null;
+		HttpPost request = null;
 		try {
-			pm = getPostMethod(token, action);
+			request = getPostMethod(token, action);
 			logRequest(action, parameters);
-			InputStream is = executePostAndGetResultStream(pm, parameters);
+			InputStream is = executePostAndGetResultStream(request, parameters);
 			if (is != null) {
 				Document document = DOMUtils.parse(is);
 				logResponse(document);
@@ -127,7 +121,7 @@ public abstract class AbstractClientImpl {
 			logger.error(e.getMessage(), e);
 			throw new ObmSyncClientException(e.getMessage(), e);
 		} finally {
-			releaseConnection(pm);
+			releaseConnection(request);
 		}
 	}
 
@@ -165,15 +159,16 @@ public abstract class AbstractClientImpl {
 		return m;
 	}
 
-	private InputStream executePostAndGetResultStream(PostMethod pm, Multimap<String, String> parameters) throws HttpException, IOException {
+	private InputStream executePostAndGetResultStream(HttpPost request, Multimap<String, String> parameters) throws IOException {
 		InputStream is = null;
-		setPostMethodParameters(pm, parameters);
-		int httpResultStatus = hc.executeMethod(pm);
+		setPostMethodParameters(request, parameters);
+		HttpResponse response = hc.execute(request);
+		int httpResultStatus = response.getStatusLine().getStatusCode();
 		if (isHttpStatusOK(httpResultStatus)) {
-			is = pm.getResponseBodyAsStream();
+			is = response.getEntity().getContent();
 		} else {
-			logger.error("method failed:\n" + pm.getStatusLine() + "\n"
-					+ pm.getResponseBodyAsString());
+			logger.error("method failed:\n" + response.getStatusLine() + "\n"
+					+ response.getEntity().getContent());
 		}
 		return is;
 	}
@@ -182,30 +177,29 @@ public abstract class AbstractClientImpl {
 		return httpResultStatus == HttpStatus.SC_OK;
 	}
 
-	private void setPostMethodParameters(PostMethod pm, Multimap<String, String> parameters) {
+	private void setPostMethodParameters(HttpPost request, Multimap<String, String> parameters) throws UnsupportedEncodingException {
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		for (Entry<String, String> entry: parameters.entries()) {
 			if (entry.getKey() != null && entry.getValue() != null) {
-				pm.setParameter(entry.getKey(), entry.getValue());
+				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 		}
+		request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
-		PostMethod pm = null; 
+		HttpPost request = null; 
 		try {
-			pm = getPostMethod(at, action);
-			executePostAndGetResultStream(pm, parameters);
+			request = getPostMethod(at, action);
+			executePostAndGetResultStream(request, parameters);
 		} catch (LocatorClientException e) {
-			logger.error(e.getMessage(), e);
-			throw new ObmSyncClientException(e.getMessage(), e);
-		} catch (HttpException e) {
 			logger.error(e.getMessage(), e);
 			throw new ObmSyncClientException(e.getMessage(), e);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			throw new ObmSyncClientException(e.getMessage(), e);
 		} finally {
-			releaseConnection(pm);
+			releaseConnection(request);
 		}
 	}
 
@@ -214,16 +208,16 @@ public abstract class AbstractClientImpl {
 		return locator.backendUrl(loginAtDomain);
 	}
 
-	private PostMethod getPostMethod(AccessToken at, String action) throws LocatorClientException {
+	private HttpPost getPostMethod(AccessToken at, String action) throws LocatorClientException {
 		String backendUrl = getBackendUrl(at.getUserWithDomain());
-		PostMethod pm = new PostMethod(backendUrl + action);
-		pm.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
-		return pm;
+		HttpPost request = new HttpPost(backendUrl + action);
+		request.setHeaders(new Header[] { new BasicHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8") });
+		return request;
 	}
 
-	private void releaseConnection(PostMethod pm) {
-		if (pm != null) {
-			pm.releaseConnection();
+	private void releaseConnection(HttpPost request) {
+		if (request != null) {
+			request.releaseConnection();
 		}
 	}
 
