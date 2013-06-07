@@ -43,6 +43,7 @@ import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
@@ -57,6 +58,7 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +89,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final LoggerService loggerService;
 	private final Logger authLogger;
 	private final HttpErrorResponder httpErrorResponder;
+	private final IAccessTokenResource.Factory accessTokenResourceFactory;
 
 	private final PolicyService policyService;
 
@@ -96,7 +99,8 @@ public class ActiveSyncServlet extends HttpServlet {
 			PolicyService policyService,
 			ResponderImpl.Factory responderFactory, Handlers handlers,
 			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
-			HttpErrorResponder httpErrorResponder) {
+			HttpErrorResponder httpErrorResponder,
+			IAccessTokenResource.Factory accessTokenResourceFactory) {
 	
 		super();
 		
@@ -109,6 +113,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.loggerService = loggerService;
 		this.authLogger = authLogger;
 		this.httpErrorResponder = httpErrorResponder;
+		this.accessTokenResourceFactory = accessTokenResourceFactory;
 	}
 
 	@Override
@@ -158,6 +163,8 @@ public class ActiveSyncServlet extends HttpServlet {
 				throw new IllegalStateException("Credentials must be handled by " + AuthenticationFilter.class.getSimpleName());
 			}
 			
+			IAccessTokenResource accessTokenResource = getAccessTokenResource(request);
+			
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 
 			checkAuthorizedDevice(asrequest, credentials);
@@ -170,7 +177,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				logger.debug("policy used = {}", asrequest.getMsPolicyKey());
 			}
 
-			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response);
+			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, accessTokenResource);
 		
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -181,6 +188,10 @@ public class ActiveSyncServlet extends HttpServlet {
 		} finally {
 			loggerService.closeSession();
 		}
+	}
+
+	private IAccessTokenResource getAccessTokenResource(HttpServletRequest request) {
+		return accessTokenResourceFactory.create((AccessToken) request.getAttribute(RequestProperties.ACCESS_TOKEN));
 	}
 
 	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {
@@ -224,13 +235,14 @@ public class ActiveSyncServlet extends HttpServlet {
 
 	private void processActiveSyncMethod(IContinuation continuation,
 			Credentials credentials, DeviceId devId,
-			ActiveSyncRequest request, HttpServletResponse response)
+			ActiveSyncRequest request, HttpServletResponse response, IAccessTokenResource accessTokenResource)
 			throws IOException, DaoException {
 
 		UserDataRequest userDataRequest = null;
 		Responder responder = null;
 		try {
 			userDataRequest = sessionService.getSession(credentials, devId, request);
+			userDataRequest.putResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE, accessTokenResource);
 			logger.debug("incoming query");
 			
 			if (userDataRequest.getCommand() == null) {

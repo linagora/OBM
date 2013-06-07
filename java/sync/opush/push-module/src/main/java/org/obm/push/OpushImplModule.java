@@ -36,6 +36,7 @@ import org.obm.configuration.ConfigurationModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.backend.BackendWindowingService;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -62,6 +63,7 @@ import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 import org.obm.push.qos.OpushQoSKeyProvider;
+import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.DateService;
 import org.obm.push.service.DeviceService;
@@ -154,6 +156,7 @@ public class OpushImplModule extends AbstractModule {
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toInstance("/etc/opush/policy.ini");
 		bind(PolicyConfigurationService.class).to(PolicyConfigurationServiceFileImpl.class);
+		bind(IAccessTokenResource.Factory.class).to(AccessTokenResource.Factory.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
