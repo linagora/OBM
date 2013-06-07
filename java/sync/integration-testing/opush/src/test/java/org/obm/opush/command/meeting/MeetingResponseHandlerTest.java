@@ -44,7 +44,7 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
