@@ -41,7 +41,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
@@ -94,12 +94,12 @@ public class LinagoraMailboxService implements MailboxService {
 	private final boolean activateTLS;
 	private final boolean loginWithDomain;
 	private final LinagoraImapClientProvider imapClientProvider;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 
 	@Inject
 	LinagoraMailboxService(EmailConfiguration emailConfiguration, 
 			LinagoraImapClientProvider imapClientProvider, 
-			CollectionPathHelper collectionPathHelper) {
+			ICollectionPathHelper collectionPathHelper) {
 		
 		this.imapClientProvider = imapClientProvider;
 		this.collectionPathHelper = collectionPathHelper;

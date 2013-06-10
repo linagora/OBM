@@ -63,7 +63,7 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
@@ -110,7 +110,7 @@ public class MailBackendHandlerTest {
 	@Inject	OpushServer opushServer;
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject PendingQueriesLock pendingQueries;
 	@Inject IMocksControl mocksControl;

@@ -29,19 +29,22 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.impl;
 
 import org.easymock.EasyMock;
 import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.User.Factory;
-import org.obm.push.exception.CollectionPathException;
-
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.User;
+import org.obm.push.bean.User.Factory;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.CollectionPathException;
 
 @RunWith(SlowFilterRunner.class)
 public class SpecificCollectionPathHelperTest {
@@ -50,7 +53,7 @@ public class SpecificCollectionPathHelperTest {
 	private static final String SPECIFIC_MAILBOX_SENT = "specific\\mysent";
 	private static final String SPECIFIC_MAILBOX_TRASH = "specific\\bin";
 	private UserDataRequest udr;
-	private CollectionPathHelper collectionPathHelper;
+	private ICollectionPathHelper collectionPathHelper;
 	
 	@Before
 	public void setUp() {

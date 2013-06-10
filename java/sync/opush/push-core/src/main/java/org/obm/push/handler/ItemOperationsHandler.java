@@ -41,7 +41,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;
@@ -96,7 +96,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 	private static final String NAMESPACE = "ItemOperations";
 	private final ItemOperationsProtocol.Factory protocolFactory;
 	private final MailBackend mailBackend;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected ItemOperationsHandler(IBackend backend,
@@ -104,7 +104,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter,
 			StateMachine stMachine, ItemOperationsProtocol.Factory protocolFactory,
 			CollectionDao collectionDao, WBXMLTools wbxmlTools,
-			MailBackend mailBackend, DOMDumper domDumper, CollectionPathHelper collectionPathHelper) {
+			MailBackend mailBackend, DOMDumper domDumper, ICollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);

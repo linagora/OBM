@@ -43,7 +43,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -69,7 +69,7 @@ public class MockBasedImapMailboxServiceTest {
 	public void testParseSpecificINBOXCase() throws Exception {
 		String userINBOXFolder = "INBOX";
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 		
 		LinagoraImapClientProvider imapClientProvider = createMock(LinagoraImapClientProvider.class);
 		StoreClient storeClient = createMock(StoreClient.class);
@@ -91,7 +91,7 @@ public class MockBasedImapMailboxServiceTest {
 		String userINBOXFolder = "InBoX";
 		String serverINBOXFolder = "INBOX";
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(userINBOXFolder);
 		
 		LinagoraImapClientProvider imapClientProvider = createMock(LinagoraImapClientProvider.class);
 		StoreClient storeClient = createMock(StoreClient.class);
@@ -112,7 +112,7 @@ public class MockBasedImapMailboxServiceTest {
 	public void testParseINBOXWithOtherFolderEndingByINBOX() throws Exception {
 		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
 
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(folderEndingByINBOX);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperExtractFolder(folderEndingByINBOX);
 		EmailConfiguration emailConfiguration = newEmailConfigurationMock();
 
 		LinagoraImapClientProvider imapClientProvider = createMock(LinagoraImapClientProvider.class);
@@ -137,8 +137,8 @@ public class MockBasedImapMailboxServiceTest {
 		return emailConfiguration;
 	}
 	
-	private CollectionPathHelper mockCollectionPathHelperExtractFolder(String expectedFolder) throws CollectionPathException {
-		CollectionPathHelper helper = createMock(CollectionPathHelper.class);
+	private ICollectionPathHelper mockCollectionPathHelperExtractFolder(String expectedFolder) throws CollectionPathException {
+		ICollectionPathHelper helper = createMock(ICollectionPathHelper.class);
 		expect(helper.extractFolder(udr, collectionPath(expectedFolder), PIMDataType.EMAIL))
 			.andReturn(expectedFolder).anyTimes();
 		return helper;

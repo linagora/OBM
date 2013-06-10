@@ -92,5 +92,17 @@
 			<version>${obm.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>obm-backend</artifactId>
+			<version>${obm.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-core</artifactId>
+			<version>${obm.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>

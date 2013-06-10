@@ -35,7 +35,7 @@ import javax.naming.NoPermissionException;
 
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.PIMBackend;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
@@ -57,10 +57,10 @@ import com.google.inject.Singleton;
 public class ContentsImporter implements IContentsImporter {
 
 	private final Backends backends;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 
 	@Inject
-	private ContentsImporter(Backends backends, CollectionPathHelper collectionPathHelper) {
+	private ContentsImporter(Backends backends, ICollectionPathHelper collectionPathHelper) {
 		this.backends = backends;
 		this.collectionPathHelper = collectionPathHelper;
 	}

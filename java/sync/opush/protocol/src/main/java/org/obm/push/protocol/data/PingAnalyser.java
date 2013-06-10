@@ -34,7 +34,7 @@ package org.obm.push.protocol.data;
 import java.util.Set;
 
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncCollectionRequest;
 import org.obm.push.bean.SyncKey;
@@ -61,12 +61,12 @@ public class PingAnalyser {
 	private final CollectionDao collectionDao;
 	private final HearbeatDao hearbeatDao;
 	private final MonitoredCollectionDao monitoredCollectionDao;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 	private final StateMachine stateMachine;
 
 	@Inject
 	protected PingAnalyser(CollectionDao collectionDao, HearbeatDao hearbeatDao, MonitoredCollectionDao monitoredCollectionDao,
-			CollectionPathHelper collectionPathHelper, StateMachine stateMachine) {
+			ICollectionPathHelper collectionPathHelper, StateMachine stateMachine) {
 		
 		this.collectionDao = collectionDao;
 		this.hearbeatDao = hearbeatDao;

@@ -44,7 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -77,7 +77,7 @@ public class PingAnalyserTest {
 	private CollectionDao collectionDao;
 	private HearbeatDao heartbeatDao;
 	private MonitoredCollectionDao monitoredCollectionDao;
-	private CollectionPathHelper collectionPathHelper;
+	private ICollectionPathHelper collectionPathHelper;
 	private StateMachine stateMachine;
 	
 	private PingAnalyser pingAnalyser;
@@ -96,7 +96,7 @@ public class PingAnalyserTest {
 		collectionDao = mocks.createMock(CollectionDao.class);
 		heartbeatDao = mocks.createMock(HearbeatDao.class);
 		monitoredCollectionDao = mocks.createMock(MonitoredCollectionDao.class);
-		collectionPathHelper = mocks.createMock(CollectionPathHelper.class);
+		collectionPathHelper = mocks.createMock(ICollectionPathHelper.class);
 		stateMachine = mocks.createMock(StateMachine.class);
 		
 		pingAnalyser = new PingAnalyser(collectionDao, heartbeatDao, monitoredCollectionDao, collectionPathHelper, stateMachine);

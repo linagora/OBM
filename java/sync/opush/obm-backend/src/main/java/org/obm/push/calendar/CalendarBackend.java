@@ -604,7 +604,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 
 	@Override
-	public String handleMeetingResponse(UserDataRequest udr, org.obm.icalendar.ICalendar iCalendar, AttendeeStatus status) 
+	public String handleMeetingResponse(UserDataRequest udr, Object iCalendar, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
 			ItemNotFoundException, ConversionException, HierarchyChangedException, ICalendarConverterException {
 		
@@ -612,7 +612,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		
 		AccessToken at = login(udr);
 		try {
-			Event event = convertICalendarToEvent(udr, at, iCalendar);
+			Event event = convertICalendarToEvent(udr, at, (org.obm.icalendar.ICalendar) iCalendar);
 			logger.info("handleMeetingResponse = {}", event.getExtId());
 			Event obmEvent = createOrModifyInvitationEvent(at, event, collectionPath);
 			updateUserStatus(obmEvent, status, at, collectionPath);

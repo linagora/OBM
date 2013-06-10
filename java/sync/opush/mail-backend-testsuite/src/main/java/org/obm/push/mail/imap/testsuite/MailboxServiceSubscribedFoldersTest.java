@@ -42,7 +42,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -59,7 +59,7 @@ import com.icegreen.greenmail.util.GreenMail;
 public abstract class MailboxServiceSubscribedFoldersTest {
 
 	@Inject MailboxService mailboxService;
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 
 	@Inject GreenMail greenMail;
 	private String mailbox;

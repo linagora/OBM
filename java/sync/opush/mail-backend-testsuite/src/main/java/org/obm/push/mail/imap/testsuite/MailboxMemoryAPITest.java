@@ -56,7 +56,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -80,7 +80,7 @@ public abstract class MailboxMemoryAPITest {
 	@Inject MailboxService mailboxService;
 	@Inject EmailConfiguration emailConfiguration;
 	@Inject OpushLocatorService locatorService;
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 	
 	private String mailbox;
 	private String password;

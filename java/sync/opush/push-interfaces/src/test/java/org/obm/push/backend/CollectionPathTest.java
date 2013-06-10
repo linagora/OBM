@@ -39,7 +39,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
@@ -56,21 +56,21 @@ public class CollectionPathTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void nullUserDataRequest() throws CollectionPathException {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		replay(collectionPathHelper);
 		new CollectionPath.Builder(collectionPathHelper).backendName("backendName").pimType(PIMDataType.CALENDAR).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void nullPimType() throws CollectionPathException {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		replay(collectionPathHelper, udr);
 		new CollectionPath.Builder(collectionPathHelper).backendName("backendName").userDataRequest(udr).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void nullbackendName() throws CollectionPathException {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		replay(collectionPathHelper, udr);
 		new CollectionPath.Builder(collectionPathHelper).pimType(PIMDataType.CALENDAR).userDataRequest(udr).build();
 	}
@@ -79,7 +79,7 @@ public class CollectionPathTest {
 	public void validCollectionPath() {
 		PIMDataType collectionType = PIMDataType.CALENDAR;
 		String backendName = "backendName";
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		expect(collectionPathHelper.buildCollectionPath(udr, collectionType, backendName)).andReturn("collectionPath");
 		replay(collectionPathHelper, udr);
 		
@@ -97,7 +97,7 @@ public class CollectionPathTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuildByQualifiedCollectionPathDenybackendName() throws CollectionPathException {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		replay(collectionPathHelper, udr);
 		
 		new CollectionPath.Builder(collectionPathHelper)
@@ -109,7 +109,7 @@ public class CollectionPathTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testBuildByQualifiedCollectionPathDenyPIMDataType() throws CollectionPathException {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		replay(collectionPathHelper, udr);
 		
 		new CollectionPath.Builder(collectionPathHelper)
@@ -123,7 +123,7 @@ public class CollectionPathTest {
 	public void testValidBuildByQualifiedCollectionPath() throws CollectionPathException {
 		String qualifiedCollectionPath = "obm:\\\\login@domain\\email\\INBOX";
 
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.EMAIL);
 		expect(collectionPathHelper.extractFolder(udr, qualifiedCollectionPath, PIMDataType.EMAIL)).andReturn("INBOX");
 		replay(collectionPathHelper, udr); 
@@ -143,7 +143,7 @@ public class CollectionPathTest {
 	public void testRootUserCollectionPathIsUnknownDataType() throws CollectionPathException {
 		String qualifiedCollectionPath = "obm:\\\\login@domain.org";
 
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.UNKNOWN);
 		replay(collectionPathHelper, udr); 
 		
@@ -162,7 +162,7 @@ public class CollectionPathTest {
 	public void testUnexpectedCollectionPathIsUnknownDataType() throws CollectionPathException {
 		String qualifiedCollectionPath = "obm:\\\\login@domain.org\\unexpected\\contacts";
 
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		expect(collectionPathHelper.recognizePIMDataType(qualifiedCollectionPath)).andReturn(PIMDataType.UNKNOWN);
 		replay(collectionPathHelper, udr); 
 		

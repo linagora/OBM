@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 
@@ -45,14 +45,14 @@ public class CollectionPath {
 
 	public static class Builder {
 
-		private final CollectionPathHelper collectionPathHelper;
+		private final ICollectionPathHelper collectionPathHelper;
 		private UserDataRequest userDataRequest;
 		private PIMDataType pimType;
 		private String backendName;
 		private String fullyQualifiedCollectionPath;
 
 		@Inject
-		@VisibleForTesting Builder(CollectionPathHelper collectionPathHelper) {
+		@VisibleForTesting Builder(ICollectionPathHelper collectionPathHelper) {
 			this.collectionPathHelper = collectionPathHelper;
 		}
 		

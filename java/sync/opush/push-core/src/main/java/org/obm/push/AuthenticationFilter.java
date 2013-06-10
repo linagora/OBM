@@ -44,11 +44,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.service.AuthenticationService;
-import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +112,7 @@ public class AuthenticationFilter implements Filter {
 						String userId = userPass.substring(0, p);
 						String password = userPass.substring(p + 1);
 						
-						AccessToken token = setAccessTokenRequestAttribute(request, userId, password);
+						IAccessTokenResource token = setAccessTokenRequestAttribute(request, userId, password);
 						return getCredentials(token, userId, password);
 					}
 				}
@@ -121,7 +121,7 @@ public class AuthenticationFilter implements Filter {
 		throw new AuthenticationException("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(AccessToken token, String userId, String password) throws AuthenticationException {
+	private Credentials getCredentials(IAccessTokenResource token, String userId, String password) throws AuthenticationException {
 		User user = createUser(userId, token);
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
@@ -131,13 +131,13 @@ public class AuthenticationFilter implements Filter {
 		}
 	}
 
-	private AccessToken setAccessTokenRequestAttribute(HttpServletRequest request, String userId, String password) throws AuthenticationException {
-		AccessToken token = login(getLoginAtDomain(userId), password);
-		request.setAttribute(RequestProperties.ACCESS_TOKEN, token);
+	private IAccessTokenResource setAccessTokenRequestAttribute(HttpServletRequest request, String userId, String password) throws AuthenticationException {
+		IAccessTokenResource token = login(getLoginAtDomain(userId), password);
+		request.setAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE, token);
 		return token;
 	}
 	
-	private AccessToken login(String userId, String password) throws AuthenticationException {
+	private IAccessTokenResource login(String userId, String password) throws AuthenticationException {
 		try {
 			return authenticationService.authenticate(userId, password);
 		} catch (Exception e) {
@@ -145,7 +145,7 @@ public class AuthenticationFilter implements Filter {
 		}
 	}
 	
-	private User createUser(String userId, AccessToken token) {
+	private User createUser(String userId, IAccessTokenResource token) {
 		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
 	}
 

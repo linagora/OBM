@@ -52,7 +52,7 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -111,7 +111,7 @@ public class SyncProtocolTest {
 	private IMocksControl mocks;
 	private SyncedCollectionDao syncedCollectionDao;
 	private CollectionDao collectionDao;
-	private CollectionPathHelper collectionPathHelper;
+	private ICollectionPathHelper collectionPathHelper;
 	
 	@Before
 	public void setUp() {
@@ -125,7 +125,7 @@ public class SyncProtocolTest {
 		mocks = createControl();
 		syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
 		collectionDao = mocks.createMock(CollectionDao.class);
-		collectionPathHelper = mocks.createMock(CollectionPathHelper.class);
+		collectionPathHelper = mocks.createMock(ICollectionPathHelper.class);
 	}
 
 	@Test
@@ -293,7 +293,7 @@ public class SyncProtocolTest {
 
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -313,7 +313,7 @@ public class SyncProtocolTest {
 
 		SyncedCollectionDao syncedCollectionDao = mockReadThenWriteSyncedCollectionCache(syncingCollectionId, syncingCollectionSyncKey);
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -592,7 +592,7 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -624,7 +624,7 @@ public class SyncProtocolTest {
 				"</Sync>");
 
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -681,7 +681,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -762,7 +762,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange2)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -823,7 +823,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -904,7 +904,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange2)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -954,7 +954,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1015,7 +1015,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange2)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1066,7 +1066,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1126,7 +1126,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionChange2)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType();
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 		
 
@@ -1275,7 +1275,7 @@ public class SyncProtocolTest {
 					.addCommand(expectedSyncCollectionDelete2)
 					.build());
 		CollectionDao collectionDao = mockFindCollectionPathForId(PIMDataType.CONTACTS, syncingCollectionId);
-		CollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
+		ICollectionPathHelper collectionPathHelper = mockCollectionPathHelperRecognizeDataType(PIMDataType.CONTACTS);
 		replay(syncedCollectionDao, collectionDao, collectionPathHelper);
 		
 		SyncProtocol syncProtocol = newSyncProtocol(syncedCollectionDao, collectionDao, collectionPathHelper);
@@ -1381,7 +1381,7 @@ public class SyncProtocolTest {
 	}
 	
 	private SyncProtocol newSyncProtocol(SyncedCollectionDao syncedCollectionDao, CollectionDao collectionDao,
-			CollectionPathHelper collectionPathHelper) {
+			ICollectionPathHelper collectionPathHelper) {
 		SyncDecoder syncDecoder = new SyncDecoderTest();
 		SyncEncoder syncEncoder = new SyncEncoderTest();
 		EncoderFactory encoderFactory = new EncoderFactoryTest();
@@ -1427,12 +1427,12 @@ public class SyncProtocolTest {
 		return syncedCollectionDao;
 	}
 	
-	private CollectionPathHelper mockCollectionPathHelperRecognizeDataType() {
+	private ICollectionPathHelper mockCollectionPathHelperRecognizeDataType() {
 		return mockCollectionPathHelperRecognizeDataType(PIMDataType.EMAIL);
 	}
 
-	private CollectionPathHelper mockCollectionPathHelperRecognizeDataType(PIMDataType pimDataType) {
-		CollectionPathHelper collectionPathHelper = createMock(CollectionPathHelper.class);
+	private ICollectionPathHelper mockCollectionPathHelperRecognizeDataType(PIMDataType pimDataType) {
+		ICollectionPathHelper collectionPathHelper = createMock(ICollectionPathHelper.class);
 		expect(collectionPathHelper.recognizePIMDataType(anyObject(String.class))).andReturn(pimDataType);
 		return collectionPathHelper;
 	}
@@ -1455,7 +1455,7 @@ public class SyncProtocolTest {
 		protected SyncAnalyserTest(
 				SyncedCollectionDao syncedCollectionStoreService,
 				CollectionDao collectionDao,
-				CollectionPathHelper collectionPathHelper) {
+				ICollectionPathHelper collectionPathHelper) {
 			super(syncedCollectionStoreService, collectionDao, collectionPathHelper, new DecoderFactoryTest());
 		}
 

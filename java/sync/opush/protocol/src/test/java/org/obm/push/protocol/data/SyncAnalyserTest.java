@@ -45,7 +45,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -82,7 +82,7 @@ public class SyncAnalyserTest {
 	private IMocksControl mocks;
 	private SyncedCollectionDao syncedCollectionDao;
 	private CollectionDao collectionDao;
-	private CollectionPathHelper collectionPathHelper;
+	private ICollectionPathHelper collectionPathHelper;
 
 	private SyncDecoder syncDecoder;
 	private SyncAnalyser syncAnalyser;
@@ -99,7 +99,7 @@ public class SyncAnalyserTest {
 		mocks = createControl();
 		syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);
 		collectionDao = mocks.createMock(CollectionDao.class);
-		collectionPathHelper = mocks.createMock(CollectionPathHelper.class);
+		collectionPathHelper = mocks.createMock(ICollectionPathHelper.class);
 
 		syncDecoder = new SyncDecoder(null);
 		syncAnalyser = new SyncAnalyser(syncedCollectionDao, collectionDao, collectionPathHelper, null);

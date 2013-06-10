@@ -34,7 +34,7 @@ package org.obm.push.protocol.data;
 import java.util.List;
 
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.Sync;
@@ -65,12 +65,12 @@ public class SyncAnalyser {
 
 	private final CollectionDao collectionDao;
 	private final SyncedCollectionDao syncedCollectionStoreService;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 	private final DecoderFactory decoderFactory;
 
 	@Inject
 	protected SyncAnalyser(SyncedCollectionDao syncedCollectionStoreService,
-			CollectionDao collectionDao, CollectionPathHelper collectionPathHelper,
+			CollectionDao collectionDao, ICollectionPathHelper collectionPathHelper,
 			DecoderFactory decoderFactory) {
 		this.collectionDao = collectionDao;
 		this.syncedCollectionStoreService = syncedCollectionStoreService;

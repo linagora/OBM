@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.impl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -39,6 +39,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 
 @RunWith(SlowFilterRunner.class)
@@ -48,7 +53,7 @@ public class CollectionPathHelperTest {
 	private static final String PROTOCOL = "obm:" + BACKSLASH + BACKSLASH;
 
 	private UserDataRequest udr;
-	private CollectionPathHelper collectionPathHelper;
+	private ICollectionPathHelper collectionPathHelper;
 	
 	@Before
 	public void setUp() {

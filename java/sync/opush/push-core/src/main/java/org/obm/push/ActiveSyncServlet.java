@@ -59,7 +59,6 @@ import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
 import org.obm.push.technicallog.bean.KindToBeLogged;
 import org.obm.push.technicallog.bean.TechnicalLogging;
-import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,7 +190,8 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private IAccessTokenResource getAccessTokenResource(HttpServletRequest request) {
-		return accessTokenResourceFactory.create((AccessToken) request.getAttribute(RequestProperties.ACCESS_TOKEN));
+		Object accessTokenResource = request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE);
+		return accessTokenResourceFactory.create(accessTokenResource);
 	}
 
 	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {

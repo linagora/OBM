@@ -128,7 +128,7 @@ public class ActiveSyncServletTest {
 		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
 		expect(request.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST)).andReturn(activeSyncRequest);
-		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN)).andReturn(accessToken);
+		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE)).andReturn(accessToken);
 		
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));

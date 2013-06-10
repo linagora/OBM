@@ -29,9 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.impl;
 
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -53,7 +56,7 @@ import com.google.inject.Singleton;
  * 
  */
 @Singleton
-public class CollectionPathHelper {
+public class CollectionPathHelper implements ICollectionPathHelper {
 
 	private static final char BACKSLASH = '\\';
 	private static final String PROTOCOL = "obm:" + BACKSLASH + BACKSLASH;
@@ -65,6 +68,7 @@ public class CollectionPathHelper {
 		this.emailConfiguration = emailConfiguration;
 	}
 	
+	@Override
 	public PIMDataType recognizePIMDataType(String collectionPath) 
 			throws CollectionPathException {
 		
@@ -91,6 +95,7 @@ public class CollectionPathHelper {
 		return userPath.concat(pimDataType.asCollectionPathValue());
 	}
 	
+	@Override
 	public String buildCollectionPath(UserDataRequest udr, PIMDataType collectionType, String...imapFolders) {
 		Preconditions.checkNotNull(udr);
 		Preconditions.checkNotNull(collectionType);
@@ -105,6 +110,7 @@ public class CollectionPathHelper {
 		return userPath.toString();
 	}
 
+	@Override
 	public String extractFolder(UserDataRequest udr, String collectionPath, PIMDataType collectionType)
 			throws CollectionPathException {
 		

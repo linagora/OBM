@@ -38,7 +38,7 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
@@ -80,7 +80,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 
 	private final UnsynchronizedItemDao unSynchronizedItemCache;
 	private final GetItemEstimateProtocol protocol;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected GetItemEstimateHandler(IBackend backend,
@@ -88,7 +88,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			IContentsExporter contentsExporter, StateMachine stMachine,
 			UnsynchronizedItemDao unSynchronizedItemCache, CollectionDao collectionDao,
 			GetItemEstimateProtocol protocol, WBXMLTools wbxmlTools, DOMDumper domDumper,
-			CollectionPathHelper collectionPathHelper) {
+			ICollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter,
 				contentsExporter, stMachine, collectionDao, wbxmlTools, domDumper);

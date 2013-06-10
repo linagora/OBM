@@ -48,7 +48,7 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
@@ -116,7 +116,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private final SyncProtocol.Factory syncProtocolFactory;
 	private final MonitoredCollectionDao monitoredCollectionService;
 	private final ItemTrackingDao itemTrackingDao;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 	private final ContinuationService continuationService;
 	private final boolean enablePush;
 	private final SyncKeyFactory syncKeyFactory;
@@ -127,7 +127,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			StateMachine stMachine,
 			MonitoredCollectionDao monitoredCollectionService, SyncProtocol.Factory syncProtocolFactory,
 			CollectionDao collectionDao, ItemTrackingDao itemTrackingDao,
-			WBXMLTools wbxmlTools, DOMDumper domDumper, CollectionPathHelper collectionPathHelper,
+			WBXMLTools wbxmlTools, DOMDumper domDumper, ICollectionPathHelper collectionPathHelper,
 			ContinuationService continuationService,
 			@Named("enable-push") boolean enablePush,
 			SyncKeyFactory syncKeyFactory,

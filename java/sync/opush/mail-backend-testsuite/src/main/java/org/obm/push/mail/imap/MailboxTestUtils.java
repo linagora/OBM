@@ -39,7 +39,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
@@ -62,12 +62,12 @@ public class MailboxTestUtils {
 	private final UserDataRequest udr;
 	private final String mailbox;
 	private final Date beforeTest;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 	private final ServerSetup smtpServerSetup;
 
 	public MailboxTestUtils(MailboxService mailboxService,
 			UserDataRequest udr, String mailbox, Date beforeTest,
-			CollectionPathHelper collectionPathHelper, ServerSetup smtpServerSetup) {
+			ICollectionPathHelper collectionPathHelper, ServerSetup smtpServerSetup) {
 		
 		this.mailboxService = mailboxService;
 		this.udr = udr;

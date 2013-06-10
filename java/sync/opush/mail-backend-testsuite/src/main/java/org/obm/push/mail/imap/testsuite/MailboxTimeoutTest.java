@@ -42,7 +42,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
@@ -59,7 +59,7 @@ public abstract class MailboxTimeoutTest {
 
 	@Inject MailboxService mailboxService;
 	@Inject GreenMail greenMail;
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 	
 	private UserDataRequest udr;
 	private String mailbox;

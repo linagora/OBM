@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import org.obm.icalendar.ICalendar;
 import org.obm.push.ICalendarBackend;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
@@ -208,7 +207,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 	private String handle(UserDataRequest udr, MeetingResponse item) 
 			throws ConversionException, CollectionNotFoundException, ItemNotFoundException, UnexpectedObmSyncServerException, DaoException, HierarchyChangedException, ICalendarConverterException {
 		
-		ICalendar invitation = mailBackend.getInvitation(udr, item.getCollectionId(), item.getReqId());
+		Object invitation = mailBackend.getInvitation(udr, item.getCollectionId(), item.getReqId());
 		return calendarBackend.handleMeetingResponse(udr, invitation, item.getUserResponse());
 	}
 

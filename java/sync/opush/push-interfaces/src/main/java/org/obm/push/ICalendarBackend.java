@@ -44,7 +44,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 
 public interface ICalendarBackend extends PIMBackend {
 
-	String handleMeetingResponse(UserDataRequest udr, org.obm.icalendar.ICalendar iCalendar, AttendeeStatus status) 
+	String handleMeetingResponse(UserDataRequest udr, Object iCalendar, AttendeeStatus status) 
 			throws UnexpectedObmSyncServerException, CollectionNotFoundException, DaoException,
 			ItemNotFoundException, ConversionException, HierarchyChangedException, ICalendarConverterException;
 }

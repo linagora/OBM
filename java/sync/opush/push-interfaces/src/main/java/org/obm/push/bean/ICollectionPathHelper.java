@@ -29,59 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resource;
+package org.obm.push.bean;
 
-import org.obm.push.backend.IAccessTokenResource;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginService;
+import org.obm.push.exception.CollectionPathException;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+/**
+ *
+ * 	Pattern :
+ * 
+ *  obm:\\login@domain\email\Sent
+ *  obm:\\login@domain\calendar\login@domain
+ *  obm:\\login@domain\contacts
+ *  obm:\\login@domain\contacts\collected_contacts
+ * 
+ */
+public interface ICollectionPathHelper {
 
-public class AccessTokenResource implements IAccessTokenResource {
+	PIMDataType recognizePIMDataType(String collectionPath) throws CollectionPathException;
 
-	@Singleton
-	public static class Factory implements IAccessTokenResource.Factory {
+	String buildCollectionPath(UserDataRequest udr, PIMDataType collectionType, String...imapFolders);
 
-		private final LoginService loginService;
-
-		@Inject 
-		@VisibleForTesting Factory(LoginService loginService) {
-			this.loginService = loginService;
-		}
-
-		@Override
-		public AccessTokenResource create(Object accessToken) {
-			return new AccessTokenResource(loginService, accessToken);
-		}
-	}
-	
-	private final LoginService loginService;
-	private final Object accessToken;
-	
-	private AccessTokenResource(LoginService loginService, Object accessToken) {
-		this.loginService = loginService;
-		this.accessToken = accessToken;
-	}
-	
-	@Override
-	public void close() {
-		loginService.logout(getAccessToken());
-	}
-
-	@Override
-	public AccessToken getAccessToken() {
-		return (AccessToken) accessToken;
-	}
-
-	@Override
-	public String getUserEmail() {
-		return getAccessToken().getUserEmail();
-	}
-
-	@Override
-	public String getUserDisplayName() {
-		return getAccessToken().getUserDisplayName();
-	}
+	String extractFolder(UserDataRequest udr, String collectionPath, PIMDataType collectionType) throws CollectionPathException;
 }

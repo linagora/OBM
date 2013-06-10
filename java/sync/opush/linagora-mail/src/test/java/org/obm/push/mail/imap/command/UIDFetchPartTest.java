@@ -46,8 +46,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -69,7 +69,7 @@ public class UIDFetchPartTest {
 
 	@Inject LinagoraImapClientProvider clientProvider;
 
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 	@Inject MailboxService mailboxService;
 	@Inject GreenMail greenMail;
 	@Inject Mime4jUtils mime4jUtils;

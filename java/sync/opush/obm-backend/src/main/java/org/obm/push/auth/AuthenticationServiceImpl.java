@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.auth;
 
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.User;
 import org.obm.push.service.AuthenticationService;
 import org.obm.sync.auth.AccessToken;
@@ -44,15 +45,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private final LoginService loginService;
 	private final User.Factory userFactory;
+	private final IAccessTokenResource.Factory accessTokenResourceFactory;
 
 	@Inject
-	private AuthenticationServiceImpl(LoginService loginService, User.Factory userFactory) {
+	private AuthenticationServiceImpl(LoginService loginService, User.Factory userFactory,
+			IAccessTokenResource.Factory accessTokenResourceFactory) {
 		this.loginService = loginService;
 		this.userFactory = userFactory;
+		this.accessTokenResourceFactory = accessTokenResourceFactory;
 	}
 	
 	@Override
-	public AccessToken authenticate(String userId, String password) throws Exception {
-		return loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
+	public IAccessTokenResource authenticate(String userId, String password) throws Exception {
+		AccessToken accessToken = loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
+		return accessTokenResourceFactory.create(accessToken);
 	}
 }

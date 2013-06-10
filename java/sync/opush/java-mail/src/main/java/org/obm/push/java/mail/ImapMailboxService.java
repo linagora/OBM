@@ -45,7 +45,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
@@ -99,7 +99,7 @@ public class ImapMailboxService implements MailboxService {
 	private final boolean loginWithDomain;
 	private final ImapClientProviderImpl imapClientProvider;
 	private final ImapMailBoxUtils imapMailBoxUtils;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 	
 	private OpushImapFolderConnection opushImapFolderConnection;
 	
@@ -107,7 +107,7 @@ public class ImapMailboxService implements MailboxService {
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 
 			ImapClientProviderImpl imapClientProvider, 
 			ImapMailBoxUtils imapMailBoxUtils, 
-			CollectionPathHelper collectionPathHelper) {
+			ICollectionPathHelper collectionPathHelper) {
 		
 		this.imapClientProvider = imapClientProvider;
 		this.imapMailBoxUtils = imapMailBoxUtils;

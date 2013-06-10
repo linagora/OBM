@@ -54,7 +54,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
@@ -96,7 +96,7 @@ public abstract class MailboxFetchAPITest {
 	
 	@Inject EmailConfiguration emailConfig;
 	@Inject GreenMail greenMail;
-	@Inject CollectionPathHelper collectionPathHelper;
+	@Inject ICollectionPathHelper collectionPathHelper;
 	
 	private ServerSetup smtpServerSetup;
 	private String mailbox;

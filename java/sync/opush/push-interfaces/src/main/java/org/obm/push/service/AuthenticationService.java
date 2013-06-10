@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import org.obm.sync.auth.AccessToken;
+import org.obm.push.backend.IAccessTokenResource;
 
 public interface AuthenticationService {
 
-	AccessToken authenticate(String userId, String password) throws Exception;
+	IAccessTokenResource authenticate(String userId, String password) throws Exception;
 	
 }

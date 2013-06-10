@@ -35,7 +35,7 @@ import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.bean.CollectionPathHelper;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.MoveItem;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
@@ -73,14 +73,14 @@ import com.google.inject.Singleton;
 public class MoveItemsHandler extends WbxmlRequestHandler {
 
 	private final MoveItemsProtocol moveItemsProtocol;
-	private final CollectionPathHelper collectionPathHelper;
+	private final ICollectionPathHelper collectionPathHelper;
 
 	@Inject
 	protected MoveItemsHandler(IBackend backend, EncoderFactory encoderFactory,
 			IContentsImporter contentsImporter, IContentsExporter contentsExporter, 
 			StateMachine stMachine, MoveItemsProtocol moveItemsProtocol,
 			CollectionDao collectionDao, WBXMLTools wbxmlTools, DOMDumper domDumper,
-			CollectionPathHelper collectionPathHelper) {
+			ICollectionPathHelper collectionPathHelper) {
 		
 		super(backend, encoderFactory, contentsImporter, contentsExporter, 
 				stMachine, collectionDao, wbxmlTools, domDumper);
