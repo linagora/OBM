@@ -13,6 +13,13 @@
             "description": "Checks that at least one user domain is created in OBM.",
             "url": "http://obm.org/wiki/getting-started",
             "parentId": null
+        },
+        {
+            "id": "DatabaseIntegrityStatus",
+            "name": "Database Integrity Check",
+            "description": "Checks the integrity of the OBM database.",
+            "url": null,
+            "parentId": null
         }
     ]
 }
