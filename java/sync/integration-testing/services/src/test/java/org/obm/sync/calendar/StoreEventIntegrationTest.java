@@ -36,13 +36,14 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-public class StoreEventIntegrationTest extends CalendarIntegrationTest {
+public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient

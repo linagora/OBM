@@ -31,128 +31,83 @@ package org.obm.sync.client;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.apache.http.client.CookieStore;
+import java.util.List;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.Configuration;
-import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
-import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
+import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.calendar.CalendarIntegrationTest;
+import org.obm.sync.client.impl.AbstractClientImpl;
 import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
-import com.google.common.collect.Multimap;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-public class ClientIntegrationTest extends CalendarIntegrationTest {
+public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 
-	private LoginClient loginClientWithCookie;
-	public DefaultHttpClient httpClient;
+	private CookiesFromClient cookiesFromClient;
 
 	@Before
 	@Override
 	public void setUp() {
-		Logger logger = LoggerFactory.getLogger(CalendarIntegrationTest.class);
-		ObmSyncConfiguration configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
-		SyncClientException exceptionFactory = new SyncClientException();
-		LocatorService locatorService = arquillianLocatorService();
-		Locator locator = new Locator(configuration, locatorService) {};
-		httpClient = new DefaultHttpClient();
-		
-		LoginClient.Factory loginClientFactory = new LoginClientFactory("integration-testing", configuration, exceptionFactory, locator, logger);
-		loginClientWithCookie = loginClientFactory.create(httpClient);
-	}
-
-	protected LocatorService arquillianLocatorService() {
-		return new LocatorService() {
-			
-			@Override
-			public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
-				return baseURL.toExternalForm();
-			}
-		};
+		super.setUp();
+		cookiesFromClient = new CookiesFromClient(exceptionFactory, logger, httpClient);
 	}
 	
 	@Test
 	@RunAsClient
-	public void testConnectionKeepsCookie() throws Exception {
-		AccessToken login = loginClientWithCookie.login("user1@domain.org", "user1");
+	public void testClientKeepsCookie() throws Exception {
+		AccessToken token = loginClient.login("user1@domain.org", "user1");
+		String sid = cookiesFromClient.getSid();
 		
-		loginClientWithCookie.logout(login);
-	}
+		calendarClient.listCalendars(token);
+		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
-	private class LoginClientFactory extends LoginClient.Factory {
+		bookClient.listAllBooks(token);
+		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
-		@Override
-		public LoginClient create(HttpClient httpClient) {
-			return new LoginClientWithCookie(origin, configurationService, syncClientException, locator, obmSyncLogger, httpClient);
-		}
-
-		protected LoginClientFactory(String origin,
-				ConfigurationService configurationService,
-				SyncClientException syncClientException, Locator locator,
-				Logger obmSyncLogger) {
-			super(origin, configurationService, syncClientException, locator, obmSyncLogger);
-		}
+		loginClient.logout(token);
+		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 	}
 	
-	private class LoginClientWithCookie extends LoginClient {
+	protected class CookiesFromClient extends AbstractClientImpl {
 
-		private LoginClientWithCookie(String origin,
-				ConfigurationService configurationService,
-				SyncClientException syncClientException, Locator locator,
+		public CookiesFromClient(SyncClientException exceptionFactory,
 				Logger obmSyncLogger, HttpClient httpClient) {
-
-			super(origin, configurationService, syncClientException, locator, obmSyncLogger, httpClient);
+			super(exceptionFactory, obmSyncLogger, httpClient);
 		}
 
 		@Override
-		protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
-			setCookie(action);
-			return super.execute(token, action, parameters);
-		}
-
-		@Override
-		protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
-			assertCookie(action);
-			super.executeVoid(at, action, parameters);
+		protected Locator getLocator() {
+			return locator;
 		}
 		
-		private void setCookie(String action) {
-			if ("/login/doLogin".equals(action)) {
-				CookieStore cookieStore = ((DefaultHttpClient) httpClient).getCookieStore();
-				cookieStore.addCookie(new BasicClientCookie("abc", "123"));
-				((DefaultHttpClient) httpClient).setCookieStore(cookieStore);
-			}
+		public String getSid() {
+			return FluentIterable.from(getCookies())
+				.firstMatch(new Predicate<Cookie>() {
+
+					@Override
+					public boolean apply(Cookie input) {
+						return input.getName().equals("JSESSIONID");
+					}
+				})
+				.get()
+				.getValue();
 		}
 
-		private void assertCookie(String action) {
-			if ("/login/doLogout".equals(action)) {
-				boolean foundMine = false;
-				for (Cookie cookie : ((DefaultHttpClient) httpClient).getCookieStore().getCookies()) {
-					if (cookie.getName().equals("abc") && cookie.getValue().equals("123")) {
-						foundMine = true;
-						break;
-					}
-				}
-				assertThat(foundMine).isTrue();
-			}
+		private List<Cookie> getCookies() {
+			return ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
 		}
 	}
 }

@@ -43,12 +43,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.push.utils.DateUtils;
+import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.items.EventChanges;
 
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
-public class ImportICalendarIntegrationTest extends CalendarIntegrationTest {
+public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test @RunAsClient
 	public void testImportICS() throws Exception {

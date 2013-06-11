@@ -27,11 +27,12 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.calendar;
+package org.obm.sync;
 
 import java.net.URL;
 import java.util.Comparator;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -41,9 +42,9 @@ import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.sync.H2GuiceServletContextListener;
-import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
+import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
+import org.obm.sync.calendar.Event;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.impl.SyncClientException;
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 
-public abstract class CalendarIntegrationTest {
+public abstract class ObmSyncIntegrationTest {
 
 	@ArquillianResource
 	protected URL baseURL;
@@ -62,25 +63,38 @@ public abstract class CalendarIntegrationTest {
 	protected LoginClient loginClient;
 	protected CalendarClient calendarClient;
 	protected BookClient bookClient;
+	protected HttpClient httpClient;
+	protected Locator locator;
+	protected SyncClientException exceptionFactory;
+	protected Logger logger;
 
 	@Before
 	public void setUp() {
-		Logger logger = LoggerFactory.getLogger(CalendarIntegrationTest.class);
+		logger = LoggerFactory.getLogger(ObmSyncIntegrationTest.class);
 		ObmSyncConfiguration configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
-		SyncClientException exceptionFactory = new SyncClientException();
+		exceptionFactory = new SyncClientException();
 		LocatorService locatorService = arquillianLocatorService();
-		Locator locator = new Locator(configuration, locatorService) {};
+		locator = new Locator(configuration, locatorService) {};
 		
-		LoginClient.Factory loginClientFactory = new LoginClientFactory("integration-testing", configuration, exceptionFactory, locator, logger);
 		CalendarClient.Factory calendarClientFactory = new CalendarClientFactory(exceptionFactory, locator, logger);
 		BookClient.Factory bookClientFactory = new BookClientFactory(exceptionFactory, locator, logger);
 		
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		loginClient = loginClientFactory.create(httpClient);
+		httpClient = new DefaultHttpClient();
+		loginClient = createLoginClient(configuration, exceptionFactory, locator, logger, httpClient);
 		calendarClient = calendarClientFactory.create(httpClient);
 		bookClient = bookClientFactory.create(httpClient);
 	}
 
+	protected LoginClient createLoginClient(ConfigurationService configuration, 
+			SyncClientException exceptionFactory, 
+			Locator locator, 
+			Logger logger, 
+			HttpClient httpClient) {
+		
+		LoginClient.Factory loginClientFactory = new LoginClientFactory("integration-testing", configuration, exceptionFactory, locator, logger);
+		return loginClientFactory.create(httpClient);
+	}
+	
 	private class LoginClientFactory extends LoginClient.Factory {
 
 		protected LoginClientFactory(String origin,

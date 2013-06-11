@@ -37,17 +37,17 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
-import org.obm.sync.calendar.CalendarIntegrationTest;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-public class LoginIntegrationTest extends CalendarIntegrationTest {
+public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient

@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -50,7 +51,6 @@ import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
-import org.obm.sync.calendar.CalendarIntegrationTest;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -59,7 +59,7 @@ import org.obm.sync.exception.ContactNotFoundException;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-public class AutoTruncateIntegrationTest extends CalendarIntegrationTest {
+public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	
 	private static final int ADDRESSBOOK_ID = 1;
 	
