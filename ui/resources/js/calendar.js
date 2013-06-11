@@ -2573,18 +2573,31 @@ Obm.CalendarQuickForm = new Class({
     }
   },
 
+  addDaysToTimestamp: function(timestamp, days){
+    var date = new Date(timestamp * 1000);
+    return this.addDaysToDate(date, days).getTime() / 1000;
+  },
+
+  addDaysToDate: function(date, days){
+    date.setDate(date.getDate() + days);
+    return date;
+  },
+
   setDefaultFormValues: function(time, allDay, duration) {
     var date_begin = new Obm.DateTime(time * 1000);
-    var date_end = new Obm.DateTime((time + duration) * 1000);  
     this.form.tf_title.value = '';
     this.eventData.calendar_id = '';
     this.eventData.entity_id = '';
     this.eventData.entity = '';
     this.eventData.all_day = allDay;
+    var date_end = null;
     if (allDay) {
       this.eventData.opacity = 'TRANSPARENT';
+      var nbdays = Math.round(duration / 86400);
+      date_end = new Obm.DateTime(this.addDaysToTimestamp(time, nbdays) * 1000);
     } else {
       this.eventData.opacity = 'OPAQUE';
+      date_end = new Obm.DateTime((time + duration) * 1000);
     }
     this.eventData.date_begin = date_begin.format('c');
     this.eventData.old_date_begin = this.eventData.date_begin;
