@@ -6492,10 +6492,9 @@ Class Occurrence {
   function Occurrence($event, $date, $entity, $id, $state) {
     $this->event = $event;
     if($event->all_day == 1) {
+      $this->date = $date;
       $this->end = clone $date;
-      $this->date = $date->setHour(0)->setMinute(0)->setSecond(0);
-      $this->end->addSecond($event->duration - 1);
-      $this->end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+      $this->end->addSecondsInUTC($event->duration);
     } else {
       $this->date = $date;
       $this->end = clone $this->date;
