@@ -62,8 +62,6 @@ public interface IBackend {
 
 	void resetCollection(UserDataRequest udr, Integer collectionId) throws DaoException;
 
-	Object authenticate(String loginAtDomain, String password) throws Exception;
-
 	Set<SyncCollectionResponse> getChangesSyncCollections(ICollectionChangeListener collectionChangeListener) 
 			throws DaoException, CollectionNotFoundException, UnexpectedObmSyncServerException, ProcessingEmailException,
 			ConversionException, FilterTypeChangedException, HierarchyChangedException;

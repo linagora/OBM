@@ -139,8 +139,8 @@ public class MailboxBackendTest {
 		windowingService = mocks.createMock(WindowingService.class);
 		smtpSender = mocks.createMock(SmtpSender.class);
 		
-		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
-				snapshotService, null, mappingService, null, msEmailFetcher, null, null, windowingService, smtpSender);
+		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, snapshotService,
+				null, mappingService, null, msEmailFetcher, null, null, windowingService, smtpSender);
 	}
 	
 	@Test(expected=ItemNotFoundException.class)

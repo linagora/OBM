@@ -49,6 +49,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;
@@ -88,7 +89,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final LoggerService loggerService;
 	private final Logger authLogger;
 	private final HttpErrorResponder httpErrorResponder;
-	private final IAccessTokenResource.Factory accessTokenResourceFactory;
 
 	private final PolicyService policyService;
 
@@ -98,8 +98,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			PolicyService policyService,
 			ResponderImpl.Factory responderFactory, Handlers handlers,
 			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
-			HttpErrorResponder httpErrorResponder,
-			IAccessTokenResource.Factory accessTokenResourceFactory) {
+			HttpErrorResponder httpErrorResponder) {
 	
 		super();
 		
@@ -112,7 +111,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.loggerService = loggerService;
 		this.authLogger = authLogger;
 		this.httpErrorResponder = httpErrorResponder;
-		this.accessTokenResourceFactory = accessTokenResourceFactory;
 	}
 
 	@Override
@@ -190,8 +188,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private IAccessTokenResource getAccessTokenResource(HttpServletRequest request) {
-		Object accessTokenResource = request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE);
-		return accessTokenResourceFactory.create(accessTokenResource);
+		return (IAccessTokenResource) request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE);
 	}
 
 	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {
@@ -242,7 +239,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		Responder responder = null;
 		try {
 			userDataRequest = sessionService.getSession(credentials, devId, request);
-			userDataRequest.putResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE, accessTokenResource);
+			userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 			logger.debug("incoming query");
 			
 			if (userDataRequest.getCommand() == null) {

@@ -106,10 +106,8 @@ import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.CalendarType;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +149,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final Mime4jUtils mime4jUtils;
 	private final ConfigurationService configurationService;
 	private final ICalendar calendarClient;
-	private final LoginService login;
 	private final EventService eventService;
 	private final MSEmailFetcher msEmailFetcher;
 	private final SnapshotService snapshotService;
@@ -164,7 +161,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
-			LoginService login, Mime4jUtils mime4jUtils, ConfigurationService configurationService,
+			Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotService snapshotService,
 			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
@@ -180,7 +177,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.mime4jUtils = mime4jUtils;
 		this.configurationService = configurationService;
 		this.calendarClient = calendarClient;
-		this.login = login;
 		this.snapshotService = snapshotService;
 		this.emailChangesFetcher = emailChangesFetcher;
 		this.eventService = eventService;
@@ -514,8 +510,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
-		} catch (AuthFault e) {
-			throw new ProcessingEmailException(e);
 		} 
 	}
 
@@ -559,8 +553,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		} catch (MimeException e) {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
-			throw new ProcessingEmailException(e);
-		} catch (AuthFault e) {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new ItemNotFoundException(e);
@@ -613,8 +605,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
-		} catch (AuthFault e) {
-			throw new ProcessingEmailException(e);
 		} 
 	}
 	
@@ -655,19 +645,17 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		}
 	}
 
-	private AccessToken login(UserDataRequest session) throws AuthFault {
-		return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
+	private AccessToken getAccessToken(UserDataRequest udr) {
+		return (AccessToken) udr.getAccessTokenResource().getAccessToken();
 	}
 	
-	private String getUserEmail(UserDataRequest udr) throws UnexpectedObmSyncServerException, AuthFault {
+	private String getUserEmail(UserDataRequest udr) throws UnexpectedObmSyncServerException {
 		ICalendar cal = calendarClient;
-		AccessToken at = login(udr);
+		AccessToken at = getAccessToken(udr);
 		try {
 			return cal.getUserEmail(at);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
-		} finally {
-			login.logout(at);
 		}
 	}
 

@@ -34,11 +34,8 @@ package org.obm.push.impl;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.OpushBackend;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,22 +47,11 @@ public abstract class ObmSyncBackend extends OpushBackend {
 	
 	protected String obmSyncHost;
 
-	private final LoginService login;
-
-	protected ObmSyncBackend(MappingService mappingService, LoginService login, Provider<Builder> collectionPathBuilderProvider) {
+	protected ObmSyncBackend(MappingService mappingService, Provider<Builder> collectionPathBuilderProvider) {
 		super(mappingService, collectionPathBuilderProvider);
-		this.login = login;
 	}
-
-	protected AccessToken login(UserDataRequest session) throws UnexpectedObmSyncServerException {
-		try {
-			return login.login(session.getUser().getLoginAtDomain(), session.getPassword());
-		} catch (AuthFault e) {
-			throw new UnexpectedObmSyncServerException(e);
-		}
-	}
-
-	protected void logout(AccessToken at) {
-		login.logout(at);
+	
+	protected AccessToken getAccessToken(UserDataRequest udr) {
+		return (AccessToken) udr.getAccessTokenResource().getAccessToken();
 	}
 }

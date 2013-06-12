@@ -56,17 +56,17 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
+import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.SimpleAttendeeService;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 
@@ -97,16 +97,16 @@ public class EventServiceImplTest {
 	}
 	
 	@Test
-	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, AuthFault, DaoException {
+	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, DaoException {
 		
 		UserDataRequest udr = new UserDataRequest(
 				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null);
-		
-		LoginService loginService = mocksControl.createMock(LoginService.class);
 		AccessToken accessToken = new AccessToken(1, "origin");
-		expect(loginService.authenticate("user@domain", "password")).andReturn(accessToken);
-		loginService.logout(accessToken);
-		expectLastCall();
+		AccessTokenResource accessTokenResource = mocksControl.createMock(AccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(accessToken).anyTimes();
+		udr.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		
 		CalendarDao calendarDao = mocksControl.createMock(CalendarDao.class);
 		expect(calendarDao.getMSEventUidFor(anyObject(EventExtId.class), anyObject(Device.class))).andReturn(new MSEventUid("uid"));
 		Factory factory = mocksControl.createMock(Ical4jUser.Factory.class);
@@ -118,7 +118,7 @@ public class EventServiceImplTest {
 		EventConverterImpl eventConverter = new EventConverterImpl(new MSEventToObmEventConverterImpl(), new ObmEventToMSEventConverterImpl());
 		
 		InputStream icsStream = ClassLoader.getSystemResourceAsStream("icalendar/OBMFULL-3526.ics");
-		EventService eventService = new EventServiceImpl(calendarDao, eventConverter, ical4jHelper, factory, loginService);
+		EventService eventService = new EventServiceImpl(calendarDao, eventConverter, ical4jHelper, factory);
 		eventService.parseEventFromICalendar(udr, new String(ByteStreams.toByteArray(icsStream)));
 		
 		mocksControl.verify();
@@ -157,7 +157,7 @@ public class EventServiceImplTest {
 
 		mocksControl.replay();
 
-		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
+		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null);
 
 		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
 		Assertions.assertThat(msEvent).isEqualTo(expectedMsEvent);
@@ -202,7 +202,7 @@ public class EventServiceImplTest {
 
 		mocksControl.replay();
 
-		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null, null);
+		EventService eventService = new EventServiceImpl(calendarDao, converter, null, null);
 
 		MSEvent msEvent = eventService.convertEventToMSEvent(udr, event);
 		Assertions.assertThat(msEvent).isEqualTo(expectedMsEvent);
@@ -225,7 +225,7 @@ public class EventServiceImplTest {
 
 		mocksControl.replay();
 
-		EventService eventService = new EventServiceImpl(calendarDao, null, null, null, null);
+		EventService eventService = new EventServiceImpl(calendarDao, null, null, null);
 		eventService.trackEventExtIdMSEventUidTranslation(eventExtId.getExtId(), msEventUid, device);
 		mocksControl.verify();
 	}

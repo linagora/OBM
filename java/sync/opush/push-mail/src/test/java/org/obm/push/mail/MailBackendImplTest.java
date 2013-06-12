@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
@@ -66,6 +67,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -83,6 +85,7 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
+import org.obm.sync.auth.AccessToken;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -119,9 +122,15 @@ public class MailBackendImplTest {
 		devId = new DeviceId("my phone");
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", devId, null);
 		udr = new UserDataRequest(new Credentials(user, "password"),  null, device);
-		windowingKey = new WindowingIndexKey(udr.getUser(), udr.getDevId(), collectionId);
 		
 		control = createControl();
+		IAccessTokenResource accessTokenResource = control.createMock(IAccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(new AccessToken(0, "OBM")).anyTimes();
+		udr.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		
+		windowingKey = new WindowingIndexKey(udr.getUser(), udr.getDevId(), collectionId);
+		
 		mailboxService = control.createMock(MailboxService.class);
 		snapshotService = control.createMock(SnapshotService.class);
 		mappingService = control.createMock(MappingService.class);
@@ -133,8 +142,7 @@ public class MailBackendImplTest {
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, snapshotService,
-				serverEmailChangesBuilder, mappingService, null, msEmailFetcher, null, mailBackendSyncDataFactory,
+		testee = new MailBackendImpl(mailboxService, null, null, null, snapshotService, serverEmailChangesBuilder, mappingService, null, msEmailFetcher, null, mailBackendSyncDataFactory,
 				windowingService, smtpSender);
 	}
 	

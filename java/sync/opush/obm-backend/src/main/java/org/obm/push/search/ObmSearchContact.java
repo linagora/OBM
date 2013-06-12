@@ -34,15 +34,13 @@ package org.obm.push.search;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.contacts.ContactConverter;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.IAddressBook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +53,11 @@ public class ObmSearchContact implements ISearchSource {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObmSearchContact.class);
 	private final IAddressBook bookClient;
-	private final LoginService login;
 	
 	@Inject
-	private ObmSearchContact(IAddressBook bookClient, LoginService login) {
+	private ObmSearchContact(IAddressBook bookClient) {
 		super();
 		this.bookClient = bookClient;
-		this.login = login;
 	}
 	
 	@Override
@@ -73,21 +69,15 @@ public class ObmSearchContact implements ISearchSource {
 	public List<SearchResult> search(UserDataRequest udr, String query, Integer limit) {
 		IAddressBook bc = getBookClient();
 		List<SearchResult> ret = new LinkedList<SearchResult>();
+		AccessToken token = (AccessToken) udr.getAccessTokenResource().getAccessToken();
+		ContactConverter cc = new ContactConverter();
 		try {
-			AccessToken token = login.login(udr.getUser().getLoginAtDomain(), udr.getPassword());
-			ContactConverter cc = new ContactConverter();
-			try {
-				Integer offset = null;
-				List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
-				for (Contact contact: contacts) {
-					ret.add(cc.convertToSearchResult(contact));
-				}
-			} catch (ServerFault e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				login.logout(token);
+			Integer offset = null;
+			List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
+			for (Contact contact: contacts) {
+				ret.add(cc.convertToSearchResult(contact));
 			}
-		} catch (AuthFault e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(), e);
 		}
 		return ret;

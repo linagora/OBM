@@ -48,11 +48,10 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 
 @RunWith(SlowFilterRunner.class)
 public class ImapClientProviderImplTest {
-	
-	private static final String IMAP_STORE_RESOURCE = "imap-store";
 	
 	private User user;
 	private Device device;
@@ -94,7 +93,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(IMAP_STORE_RESOURCE, imapStore);
+		udr.putResource(UserDataRequestResource.IMAP_STORE, imapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore nullImapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, null);
@@ -115,7 +114,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(IMAP_STORE_RESOURCE, expectedImapStore);
+		udr.putResource(UserDataRequestResource.IMAP_STORE, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
@@ -140,7 +139,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(IMAP_STORE_RESOURCE, expectedImapStore);
+		udr.putResource(UserDataRequestResource.IMAP_STORE, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);

@@ -52,9 +52,6 @@ import org.obm.push.monitor.ContactsMonitoringThread;
 import org.obm.push.service.DateService;
 import org.obm.push.state.IStateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +68,6 @@ public class OBMBackend implements IBackend {
 	private final IContentsExporter contentsExporter;
 	private final CalendarMonitoringThread calendarPushMonitor;
 	private final ContactsMonitoringThread contactsPushMonitor;
-	private final LoginService loginService;
 	private final Set<ICollectionChangeListener> registeredListeners;
 	private final MailMonitoringBackend emailBackend;
 	private final DateService dateService;
@@ -83,7 +79,6 @@ public class OBMBackend implements IBackend {
 			IContentsExporter contentsExporter,
 			CalendarMonitoringThread.Factory calendarMonitoringThreadFactory,
 			ContactsMonitoringThread.Factory contactsMonitoringThreadFactory, 
-			LoginService loginService,
 			MailMonitoringBackend emailBackend,
 			DateService dateService,
 			IStateMachine stateMachine,
@@ -91,7 +86,6 @@ public class OBMBackend implements IBackend {
 		
 		this.collectionDao = collectionDao;
 		this.contentsExporter = contentsExporter;
-		this.loginService = loginService;
 		this.emailBackend = emailBackend;
 		this.dateService = dateService;
 		this.stateMachine = stateMachine;
@@ -161,11 +155,6 @@ public class OBMBackend implements IBackend {
 			logger.error(re.getMessage(), re);
 			throw re;
 		}
-	}
-
-	@Override
-	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
-		return loginService.authenticate(loginAtDomain, password);
 	}
 
 	@Override

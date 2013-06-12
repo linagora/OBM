@@ -721,11 +721,9 @@ public class SyncHandlerWithBackendTest {
 				.build();
 		
 		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		// This should be 1
-		expect(loginService.login(user.user.getLoginAtDomain(), user.password))
-			.andReturn(user.accessToken).times(3);
 		loginService.logout(user.accessToken);
 		expectLastCall().anyTimes();
+		// Login is done in authentication
 		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password))
 			.andReturn(user.accessToken).anyTimes();
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);

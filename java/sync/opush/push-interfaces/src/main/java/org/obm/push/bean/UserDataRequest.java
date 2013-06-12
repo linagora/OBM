@@ -55,14 +55,14 @@ public class UserDataRequest {
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
-	private final Map<String, Resource> resources;
+	private final Map<UserDataRequestResource, Resource> resources;
 
 	public UserDataRequest(Credentials credentials, String command, Device device) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
 		this.device = device;
-		this.resources = new HashMap<String, Resource>();
+		this.resources = new HashMap<UserDataRequestResource, Resource>();
 	}
 
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -97,26 +97,26 @@ public class UserDataRequest {
 		return device;
 	}
 
-	public void putResource(String key, Resource resource) {
+	public void putResource(UserDataRequestResource key, Resource resource) {
 		if (key != null && resource != null) {
 			this.resources.put(key, resource);
 		}
 	}
 	
-	public void putAllResources(Map<String, Resource> resources) {
+	public void putAllResources(Map<UserDataRequestResource, Resource> resources) {
 		if (resources != null) {
 			this.resources.putAll(resources);
 		}
 	}
 	
-	public Resource getResource(String key) {
+	public Resource getResource(UserDataRequestResource key) {
 		if (null != key) {
 			return resources.get(key);
 		}
 		return null;
 	}
 	
-	public Map<String, Resource> getResources() {
+	public Map<UserDataRequestResource, Resource> getResources() {
 		return resources;
 	}
 
@@ -132,9 +132,9 @@ public class UserDataRequest {
 	}
 	
 	public IAccessTokenResource getAccessTokenResource() {
-		return (IAccessTokenResource) getResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE);
+		return (IAccessTokenResource) getResource(UserDataRequestResource.ACCESS_TOKEN);
 	}
-	
+
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(credentials, device, command);
