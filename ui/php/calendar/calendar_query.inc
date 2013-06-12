@@ -7282,8 +7282,12 @@ Class CalendarView {
       $end->addDay(7);
     } else if ($this->cal_range == "month") {
       $begin->setDay(1)->addDay(1)->subWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
-      $end = clone $begin;
-      $end->addMonth(1)->subDay(1)->addWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $this->get_date();
+      $end->setHour(0)->setMinute(0)->setSecond(0)->setDay(1);// the first day of the displayed month at midnight
+      $end->addMonth(1); // the first day of the next month
+      $end->subDay(1); // the last day of the displayed month
+      $end->addWeekday($GLOBALS['ccalendar_weekstart']);//find the next "first day of week" (eg monday)
+      $end->setHour(0)->setMinute(0)->setSecond(0);
     } else if ($this->cal_range == "custom") {
       $end = clone $this->get_date();
       $end->addDay($this->ndays);
