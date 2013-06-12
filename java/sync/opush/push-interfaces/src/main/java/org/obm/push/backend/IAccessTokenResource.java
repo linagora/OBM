@@ -41,7 +41,9 @@ public interface IAccessTokenResource extends Resource {
 		abstract IAccessTokenResource create(AccessToken accessToken);
 	}
 
-	String ACCESS_TOKEN_RESOURCE = "AccessTokenResource";
-	
-	AccessToken getAccessToken();
+	Object getAccessToken();
+
+	String getUserEmail();
+
+	String getUserDisplayName();
 }

@@ -47,6 +47,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.User.Factory;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @RunWith(SlowFilterRunner.class)
@@ -120,7 +121,7 @@ public class UserDataRequestTest {
 	@Test
 	public void testPutNullResourceToResources() {
 		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource("key", null);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, null);
 		assertThat(userDataRequest.getResources()).isEmpty();
 	}
 
@@ -129,7 +130,7 @@ public class UserDataRequestTest {
 		Resource resource = createMock(Resource.class);
 		
 		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource("key", resource);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, resource);
 		assertThat(userDataRequest.getResources()).hasSize(1);
 	}
 
@@ -140,7 +141,7 @@ public class UserDataRequestTest {
 		assertThat(userDataRequest.getResources()).isEmpty();
 	}
 
-	private Map<String, Resource> createResourcesMap() {
+	private Map<UserDataRequestResource, Resource> createResourcesMap() {
 		resource1 = createMock(Resource.class);
 		resource1.close();
 		expectLastCall().once();
@@ -149,9 +150,9 @@ public class UserDataRequestTest {
 		expectLastCall().once();
 		replay(resource1, resource2);
 		
-		Map<String, Resource> resources = Maps.newHashMap();
-		resources.put("key1", resource1);
-		resources.put("key2", resource2);
+		Map<UserDataRequestResource, Resource> resources = Maps.newHashMap();
+		resources.put(UserDataRequestResource.ACCESS_TOKEN, resource1);
+		resources.put(UserDataRequestResource.IMAP_STORE, resource2);
 		return resources;
 	}
 	
@@ -163,29 +164,15 @@ public class UserDataRequestTest {
 	}
 
 	@Test
-	public void testGetResourceWithNullKey() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		Resource resource = createMock(Resource.class);
-		Map<String, Resource> resources = Maps.newHashMap();
-		String key = "key";
-		resources.put(key, resource);
-		
-		userDataRequest.putAllResources(resources);
-		
-		userDataRequest.getResource(null);
-	}
-
-	@Test
 	public void testGetResource() {
 		UserDataRequest userDataRequest = createUserDataRequest();
 		Resource resource = createMock(Resource.class);
-		Map<String, Resource> resources = Maps.newHashMap();
-		String key = "key";
-		resources.put(key, resource);
+		Map<UserDataRequestResource, Resource> resources = 
+				ImmutableMap.of(UserDataRequestResource.ACCESS_TOKEN, resource);
 		
 		userDataRequest.putAllResources(resources);
 		
-		assertThat(userDataRequest.getResource(key)).isEqualTo(resource);
+		assertThat(userDataRequest.getResource(UserDataRequestResource.ACCESS_TOKEN)).isEqualTo(resource);
 	}
 	
 	@Test
@@ -215,7 +202,7 @@ public class UserDataRequestTest {
 		replay(resource);
 		
 		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource("key", resource);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, resource);
 		userDataRequest.closeResources();
 	}
 
@@ -241,28 +228,23 @@ public class UserDataRequestTest {
 		resource2.close();
 		expectLastCall().andThrow(new RuntimeException("runtime")).once();
 		
-		Resource resource3 = createMock(Resource.class);
-		resource3.close();
-		expectLastCall().once();
+		replay(resource1, resource2);
 		
-		replay(resource1, resource2, resource3);
-		
-		Map<String, Resource> resources = Maps.newHashMap();
-		resources.put("key1", resource1);
-		resources.put("key2", resource2);
-		resources.put("key3", resource3);
+		Map<UserDataRequestResource, Resource> resources = Maps.newHashMap();
+		resources.put(UserDataRequestResource.ACCESS_TOKEN, resource1);
+		resources.put(UserDataRequestResource.IMAP_STORE, resource2);
 		userDataRequest.putAllResources(resources);
 		
 		userDataRequest.closeResources();
 		
-		verify(resource1, resource2, resource3);
+		verify(resource1, resource2);
 	}
 	
 	@Test
 	public void testAccessTokenResource() {
 		UserDataRequest userDataRequest = createUserDataRequest();
 		IAccessTokenResource accessTokenResource = createMock(IAccessTokenResource.class);
-		userDataRequest.putResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE, accessTokenResource);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 		
 		assertThat(userDataRequest.getAccessTokenResource()).isEqualTo(accessTokenResource);
 	}

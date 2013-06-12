@@ -134,7 +134,7 @@ public class MailboxBackendTest {
 		snapshotService = mocks.createMock(SnapshotService.class);
 		windowingService = mocks.createMock(WindowingService.class);
 		
-		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, null,
+		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null,
 				snapshotService, null, mappingService, null, msEmailFetcher, null, null, windowingService);
 	}
 	

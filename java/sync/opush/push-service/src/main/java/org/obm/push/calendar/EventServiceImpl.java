@@ -39,7 +39,6 @@ import net.fortuna.ical4j.data.ParserException;
 import org.apache.commons.codec.binary.Hex;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -50,11 +49,9 @@ import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.client.login.LoginService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
@@ -71,17 +68,15 @@ public class EventServiceImpl implements EventService {
 	private final EventConverter eventConverter;
 	private final Ical4jHelper ical4jHelper;
 	private final Ical4jUser.Factory ical4jUserFactory;
-	private final LoginService loginService;
 
 	@Inject
 	@VisibleForTesting EventServiceImpl(CalendarDao calendarDao, EventConverter eventConverter, 
-			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory, LoginService loginService) {
+			Ical4jHelper ical4jHelper, Ical4jUser.Factory ical4jUserFactory) {
 		super();
 		this.calendarDao = calendarDao;
 		this.eventConverter = eventConverter;
 		this.ical4jHelper = ical4jHelper;
 		this.ical4jUserFactory = ical4jUserFactory;
-		this.loginService = loginService;
 	}
 
 	@Override
@@ -141,11 +136,8 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	public MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException {
-		
-		Credentials credentials = udr.getCredentials();
-		AccessToken accessToken = null;
 		try {
-			accessToken = loginService.authenticate(credentials.getUser().getLoginAtDomain(), credentials.getPassword());
+			AccessToken accessToken = (AccessToken) udr.getAccessTokenResource().getAccessToken();
 			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
 			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser, accessToken.getObmId());
 			
@@ -156,16 +148,10 @@ public class EventServiceImpl implements EventService {
 			return null;
 		} catch (DaoException e) {
 			throw new EventParsingException(e);
-		} catch (AuthFault e) {
-			throw new EventParsingException(e);
 		} catch (IOException e) {
 			throw new EventParsingException(e);
 		} catch (ParserException e) {
 			throw new EventParsingException(e);
-		} finally {
-			if (accessToken != null) {
-				loginService.logout(accessToken);
-			}
 		}
 	}
 }

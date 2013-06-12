@@ -43,6 +43,7 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.mail.exception.ImapLoginException;
 import org.obm.push.mail.exception.NoImapClientAvailableException;
 import org.obm.push.mail.imap.IMAPException;
@@ -61,7 +62,6 @@ import com.sun.mail.imap.IMAPStore;
 public class ImapClientProviderImpl {
 
 	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
-	private static final String IMAP_STORE_RESOURCE = "imap-store";
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
 
@@ -122,7 +122,7 @@ public class ImapClientProviderImpl {
 			} else {
 				ImapStore newStore = buildImapStore(udr);
 				newStore.login();
-				udr.putResource(IMAP_STORE_RESOURCE, newStore);
+				udr.putResource(UserDataRequestResource.IMAP_STORE, newStore);
 				return newStore;
 			}
 		} catch (NoImapClientAvailableException e) {
@@ -137,7 +137,7 @@ public class ImapClientProviderImpl {
 	}
 
 	@VisibleForTesting ImapStore retrieveWorkingImapStore(UserDataRequest udr, OpushImapFolder opushImapFolder) throws MessagingException {
-		ImapStore imapStore = (ImapStore) udr.getResource(IMAP_STORE_RESOURCE);
+		ImapStore imapStore = (ImapStore) udr.getResource(UserDataRequestResource.IMAP_STORE);
 		if (imapStore != null && opushImapFolder != null) {
 			try {
 				if (imapStore.isConnected(opushImapFolder)) {

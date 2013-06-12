@@ -31,47 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.resource;
 
-import org.obm.push.backend.IAccessTokenResource;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expectLastCall;
+
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.login.LoginService;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+@RunWith(SlowFilterRunner.class)
+public class AccessTokenResourceTest {
 
-public class AccessTokenResource implements IAccessTokenResource {
+	private IMocksControl mocksControl;
+	private LoginService loginService;
 
-	@Singleton
-	public static class Factory implements IAccessTokenResource.Factory {
-
-		private final LoginService loginService;
-
-		@Inject 
-		@VisibleForTesting Factory(LoginService loginService) {
-			this.loginService = loginService;
-		}
-
-		@Override
-		public AccessTokenResource create(AccessToken accessToken) {
-			return new AccessTokenResource(loginService, accessToken);
-		}
+	@Before 
+	public void setup() {
+		mocksControl = createControl();
+		loginService = mocksControl.createMock(LoginService.class);
 	}
 	
-	private final LoginService loginService;
-	private final AccessToken accessToken;
-	
-	private AccessTokenResource(LoginService loginService, AccessToken accessToken) {
-		this.loginService = loginService;
-		this.accessToken = accessToken;
-	}
-	
-	@Override
-	public void close() {
+	@Test
+	public void testCloseAccessTokenResource() {
+		AccessToken accessToken = new AccessToken(1, "origin");
+		AccessTokenResource accessTokenResource = new AccessTokenResource.Factory(loginService)
+			.create(accessToken);
+		
+		UserDataRequest userDataRequest = new UserDataRequest(null, null, null);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		
 		loginService.logout(accessToken);
-	}
-
-	@Override
-	public AccessToken getAccessToken() {
-		return accessToken;
+		expectLastCall().once();
+		
+		mocksControl.replay();
+		
+		userDataRequest.closeResources();
+		mocksControl.verify();
 	}
 }

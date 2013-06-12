@@ -33,11 +33,9 @@ package org.obm.push.mail;
 
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
@@ -50,6 +48,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +56,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
@@ -69,6 +69,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -84,9 +85,7 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.services.ICalendar;
 
 import com.google.common.base.Function;
@@ -111,6 +110,8 @@ public class MailBackendTest {
 	private WindowingService windowingService;
 	private Provider<Builder> collectionPathBuilderProvider;
 	private CollectionPath.Builder collectionPathBuilder;
+
+	private IMocksControl mocksControl;
 	private MailBackend testee;
 
 
@@ -119,45 +120,41 @@ public class MailBackendTest {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
-		collectionPathBuilder = createMock(Builder.class);
+		
+		mocksControl = createControl();
+		IAccessTokenResource accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(mocksControl).anyTimes();
+		udr.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		
+		collectionPathBuilder = mocksControl.createMock(Builder.class);
 		expect(collectionPathBuilder.userDataRequest(udr)).andReturn(collectionPathBuilder).anyTimes();
 		expect(collectionPathBuilder.pimType(PIMDataType.EMAIL)).andReturn(collectionPathBuilder).anyTimes();
-		collectionPathBuilderProvider = createMock(Provider.class);
+		collectionPathBuilderProvider = mocksControl.createMock(Provider.class);
 		expect(collectionPathBuilderProvider.get()).andReturn(collectionPathBuilder).anyTimes();
-		mailboxService = createMock(MailboxService.class);
-		mappingService = createMock(MappingService.class);
-		windowingService = createMock(WindowingService.class);
+		mailboxService = mocksControl.createMock(MailboxService.class);
+		mappingService = mocksControl.createMock(MappingService.class);
+		windowingService = mocksControl.createMock(WindowingService.class);
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
-	}
-	
-	private void replayCommonMocks() {
-		replay(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder);
-	}
-	
-	private void verifyCommonMocks() {
-		verify(mailboxService, mappingService, collectionPathBuilderProvider, collectionPathBuilder);
+		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, mappingService,
+				null, null, collectionPathBuilderProvider, null, windowingService);
 	}
 	
 	@Test
 	public void testSendEmailWithBigMail()
-			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, SmtpInvalidRcptException, IOException, AuthFault {
-		final String password = "pass";
+			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, IOException, SmtpInvalidRcptException {
 		final AccessToken at = new AccessToken(1, "o-push");
 		
-		MailboxService mailboxService = createMock(MailboxService.class);
-		ICalendar calendarClient = createMock(ICalendar.class);
-		UserDataRequest userDataRequest = createMock(UserDataRequest.class);
-		LoginService login = createMock(LoginService.class);
+		ICalendar calendarClient = mocksControl.createMock(ICalendar.class);
+		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		
-		expect(userDataRequest.getUser()).andReturn(user).once();
-		expect(userDataRequest.getPassword()).andReturn(password).once();
+		IAccessTokenResource accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(at).anyTimes();
+		expect(userDataRequest.getAccessTokenResource())
+			.andReturn(accessTokenResource).anyTimes();
 
-		expect(login.login(user.getLoginAtDomain(), password)).andReturn(at).once();
 		expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
-		login.logout(at);
-		expectLastCall().once();
 		Set<Address> addrs = Sets.newHashSet();
 		mailboxService.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class), 
 				anyObject(addrs.getClass()), anyObject(addrs.getClass()), anyObject(addrs.getClass()), 
@@ -165,18 +162,16 @@ public class MailBackendTest {
 		
 		expectLastCall().once();
 				
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, calendarClient, login, new Mime4jUtils(),
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, calendarClient, new Mime4jUtils(),
 				mockOpushConfigurationService(), null, null, mappingService, null, null,
 				collectionPathBuilderProvider, null, windowingService);
 
-		replay(mailboxService, calendarClient, userDataRequest, login);
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		InputStream emailStream = loadEmail("bigEml.eml");
 		mailBackend.sendEmail(userDataRequest, ByteStreams.toByteArray(emailStream), true);
 		
-		verify(mailboxService, calendarClient, userDataRequest, login);
-		verifyCommonMocks();
+		mocksControl.verify();
 	}
 	
 	private void expectBuildMailboxesCollectionPaths(Map<String, Integer> mailboxesIds) {
@@ -206,11 +201,11 @@ public class MailBackendTest {
 		expectMappingServiceListLastKnowCollection(incomingSyncState, ImmutableList.<CollectionPath>of());
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
-		verifyCommonMocks();
+		mocksControl.verify();
 		
 		CollectionChange inboxItemChange = CollectionChange.builder().collectionId("1")
 			.parentCollectionId("0").folderType(FolderType.DEFAULT_INBOX_FOLDER)
@@ -253,11 +248,11 @@ public class MailBackendTest {
 				new MailCollectionPath("Sent"), new MailCollectionPath("Trash")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
-		
-		verifyCommonMocks();
+
+		mocksControl.verify();
 		
 		assertThat(hierarchyItemsChanges.getCollectionChanges()).isEmpty();
 		assertThat(hierarchyItemsChanges.getCollectionDeletions()).isEmpty();
@@ -287,11 +282,11 @@ public class MailBackendTest {
 				new MailCollectionPath("Sent"), new MailCollectionPath("Trash")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("NewFolder"));
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 		
-		verifyCommonMocks();
+		mocksControl.verify();
 
 		CollectionChange newFolderItemChange = CollectionChange.builder().collectionId("5")
 				.parentCollectionId("0").folderType(FolderType.USER_CREATED_EMAIL_FOLDER)
@@ -323,11 +318,11 @@ public class MailBackendTest {
 				new MailCollectionPath("Sent"), new MailCollectionPath("Trash"), new MailCollectionPath("deletedFolder")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders());
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
-		verifyCommonMocks();
+		mocksControl.verify();
 		
 		assertThat(hierarchyItemsChanges.getCollectionDeletions()).containsOnly(
 				CollectionDeletion.builder().collectionId("5").build());
@@ -359,11 +354,11 @@ public class MailBackendTest {
 				new MailCollectionPath("Sent"), new MailCollectionPath("Trash"), new MailCollectionPath("deletedFolder")));
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("changedFolder"));
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		
 		HierarchyCollectionChanges hierarchyItemsChanges = testee.getHierarchyChanges(udr, incomingSyncState, outgoingSyncState);
 
-		verifyCommonMocks();
+		mocksControl.verify();
 		
 		CollectionChange newFolderItemChange = CollectionChange.builder()
 				.collectionId("5")
@@ -389,11 +384,11 @@ public class MailBackendTest {
 		
 		expectBuildMailboxesCollectionPaths(changedMailboxes);
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
-		verifyCommonMocks();
+		mocksControl.verify();
 
 		assertThat(specialFolders).hasSize(4);
 		assertThat(Iterables.transform(specialFolders, toDisplayNameFunction()))
@@ -413,11 +408,11 @@ public class MailBackendTest {
 		expectBuildMailboxesCollectionPaths(changedMailboxes);
 		expect(mailboxService.listSubscribedFolders(udr)).andReturn(mailboxFolders("display name", "another display name"));
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
-		verifyCommonMocks();
+		mocksControl.verify();
 
 		
 		assertThat(subscribedFolders).hasSize(2);
@@ -427,7 +422,7 @@ public class MailBackendTest {
 	
 	@Test
 	public void createItemChangeGetsDisplayNameFromOpushCollection() throws Exception {
-		CollectionPath collectionPath = createMock(CollectionPath.class);
+		CollectionPath collectionPath = mocksControl.createMock(CollectionPath.class);
 		expect(collectionPath.collectionPath()).andReturn(COLLECTION_MAIL_PREFIX + "technicalName");
 		
 		expect(mappingService.collectionIdToString(3)).andReturn("3").anyTimes();
@@ -439,11 +434,11 @@ public class MailBackendTest {
 				.displayName("great display name!")
 				.build();
 		
-		replayCommonMocks(); replay(collectionPath);
-		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				mappingService, null, null, collectionPathBuilderProvider, null, windowingService);
+		mocksControl.replay();
+		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, mappingService,
+				null, null, collectionPathBuilderProvider, null, windowingService);
 		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
-		verifyCommonMocks(); verify(collectionPath);
+		mocksControl.verify();
 		
 		assertThat(itemChange).isEqualTo(CollectionChange.builder()
 				.displayName("great display name!")
@@ -474,10 +469,10 @@ public class MailBackendTest {
 		mailboxService.delete(udr, trashCollectionPath.collectionPath(), MessageSet.singleton(itemId));
 		expectLastCall();
 		
-		replayCommonMocks();
+		mocksControl.replay();
 		 
 		testee.delete(udr, collectionId, serverId, true);
-		verifyCommonMocks();
+		mocksControl.verify();
 	}
 
 	private void expectMappingServiceSearchThenCreateCollection(Map<String, Integer> mailboxesIds)

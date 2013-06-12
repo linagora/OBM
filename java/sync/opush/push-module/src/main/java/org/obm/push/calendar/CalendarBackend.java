@@ -90,7 +90,6 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.calendar.ConsistencyEventChangesLogger;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
@@ -122,13 +121,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
 			EventConverter eventConverter, 
 			EventService eventService,
-			LoginService login,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger,
 			EventExtId.Factory eventExtIdFactory,
 			BackendWindowingService backendWindowingService,
 			ClientIdService clientIdService) {
 		
-		super(mappingService, login, collectionPathBuilderProvider);
+		super(mappingService, collectionPathBuilderProvider);
 		this.calendarClient = calendarClient;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
@@ -176,7 +174,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private PathsToCollections getCalendarCollectionPaths(UserDataRequest udr) {
 		
 		Builder builder = PathsToCollections.builder();
-		AccessToken token = login(udr);
+		AccessToken token = getAccessToken(udr);
 		try {
 			CalendarInfo[] cals = calendarClient.listCalendars(token);
 			for (CalendarInfo ci : cals) {
@@ -188,8 +186,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			}
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
-		} finally {
-			logout(token);
 		}
 		return builder.build();
 	}
@@ -284,7 +280,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			Integer collectionId, SyncCollectionOptions collectionOptions, SyncKey newSyncKey) {
 		
 		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
-		AccessToken token = login(udr);
+		AccessToken token = getAccessToken(udr);
 		
 		DataDelta delta = null;
 
@@ -314,8 +310,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			return delta;
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
-		} finally {
-			logout(token);
 		}
 	}
 
@@ -418,7 +412,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		MSEvent msEvent = (MSEvent) data;
 
 		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
-		AccessToken token = login(udr);
+		AccessToken token = getAccessToken(udr);
 		
 		logger.info("createOrUpdate( calendar = {}, serverId = {} )", collectionPath.backendName(), serverId);
 		
@@ -437,8 +431,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			throw new UnexpectedObmSyncServerException(e);
 		} catch (EventNotFoundException e) {
 			throw new ItemNotFoundException(e);
-		} finally {
-			logout(token);
 		}
 	}
 
@@ -568,7 +560,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		if (serverId != null) {
 
-			AccessToken token = login(udr);
+			AccessToken token = getAccessToken(udr);
 			try {
 				logger.info("Delete event serverId {} in calendar {}", serverId, collectionPath.backendName());
 				//FIXME: not transactional
@@ -581,8 +573,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			} catch (org.obm.sync.NotAllowedException e) {
 				logger.warn(e.getMessage(), e);
 				throw new ItemNotFoundException(e);
-			} finally {
-				logout(token);
 			}
 		}
 	}
@@ -594,7 +584,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		MSEvent event = invitation.getInvitation();
 		CollectionPath collectionPath = defaultCalendar(udr);
 		
-		AccessToken at = login(udr);
+		AccessToken at = getAccessToken(udr);
 		try {
 			logger.info("handleMeetingResponse = {}", event.getUid());
 			Event obmEvent = createOrModifyInvitationEvent(udr, at, event, collectionPath);
@@ -608,8 +598,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 			throw e;
 		} catch (EventNotFoundException e) {
 			throw new ItemNotFoundException(e);
-		} finally {
-			logout(at);
 		}
 	}
 
@@ -692,7 +680,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		CollectionPath collectionPath = buildCollectionPath(udr, collectionId);
 		
 		List<ItemChange> ret = new LinkedList<ItemChange>();
-		AccessToken token = login(udr);
+		AccessToken token = getAccessToken(udr);
 		for (String serverId : fetchServerIds) {
 			try {
 				Event event = getEventFromServerId(token, collectionPath, serverId);
@@ -708,7 +696,6 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 				logger.error(e1.getMessage(), e1);
 			}
 		}
-		logout(token);	
 		return ret;
 	}
 	

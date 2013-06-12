@@ -60,19 +60,19 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Folder;
 import org.obm.sync.client.book.BookClient;
-import org.obm.sync.client.login.LoginService;
 import org.obm.sync.items.FolderChanges;
 
 import com.google.common.collect.ImmutableList;
@@ -95,7 +95,6 @@ public class ContactsBackendHierarchyChangesTest {
 	private IMocksControl mocks;
 	private MappingService mappingService;
 	private BookClient bookClient;
-	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
 	private BackendWindowingService backendWindowingService;
@@ -103,19 +102,23 @@ public class ContactsBackendHierarchyChangesTest {
 	private ContactsBackend contactsBackend;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		accessToken = new AccessToken(0, "OBM");
+		
+		mocks = createControl();
+		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(accessToken).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);
 		contactParentName = "contacts";
 
-		mocks = createControl();
 		mappingService = mocks.createMock(MappingService.class);
 		bookClient = mocks.createMock(BookClient.class);
-		loginService = mocks.createMock(LoginService.class);
 		contactConfiguration = publicContactConfiguration();
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
 		backendWindowingService = mocks.createMock(BackendWindowingService.class);
@@ -123,13 +126,10 @@ public class ContactsBackendHierarchyChangesTest {
 		
 		contactsBackend = new ContactsBackend(mappingService, 
 				bookClient, 
-				loginService, 
 				contactConfiguration, 
 				collectionPathBuilderProvider,
 				backendWindowingService,
 				clientIdService);
-		
-		expectLoginBehavior();
 	}
 
 	private ContactConfiguration publicContactConfiguration() {
@@ -768,14 +768,6 @@ public class ContactsBackendHierarchyChangesTest {
 		expectMappingServiceFindCollection(collectionName, collectionId);
 		expect(mappingService.collectionIdToString(collectionId))
 			.andReturn(String.valueOf(collectionId)).once();
-	}
-
-	private void expectLoginBehavior() throws AuthFault {
-		expect(loginService.login(userDataRequest.getUser().getLoginAtDomain(), userDataRequest.getPassword()))
-			.andReturn(accessToken).once();
-		
-		loginService.logout(accessToken);
-		expectLastCall().once();
 	}
 	
 	private static class ContactCollectionPath extends CollectionPath {

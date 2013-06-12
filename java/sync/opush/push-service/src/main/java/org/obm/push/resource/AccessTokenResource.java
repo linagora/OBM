@@ -29,62 +29,59 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.search;
+package org.obm.push.resource;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.obm.push.bean.SearchResult;
-import org.obm.push.bean.StoreName;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.contacts.ContactConverter;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.book.Contact;
-import org.obm.sync.services.IAddressBook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obm.sync.client.login.LoginService;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-@Singleton
-public class ObmSearchContact implements ISearchSource {
+public class AccessTokenResource implements IAccessTokenResource {
 
-	private final static Logger logger = LoggerFactory.getLogger(ObmSearchContact.class);
-	private final IAddressBook bookClient;
-	
-	@Inject
-	private ObmSearchContact(IAddressBook bookClient) {
-		super();
-		this.bookClient = bookClient;
-	}
-	
-	@Override
-	public StoreName getStoreName() {
-		return StoreName.GAL;
-	}
+	@Singleton
+	public static class Factory implements IAccessTokenResource.Factory {
 
-	@Override
-	public List<SearchResult> search(UserDataRequest udr, String query, Integer limit) {
-		IAddressBook bc = getBookClient();
-		List<SearchResult> ret = new LinkedList<SearchResult>();
-		AccessToken token = (AccessToken) udr.getAccessTokenResource().getAccessToken();
-		ContactConverter cc = new ContactConverter();
-		try {
-			Integer offset = null;
-			List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
-			for (Contact contact: contacts) {
-				ret.add(cc.convertToSearchResult(contact));
-			}
-		} catch (ServerFault e) {
-			logger.error(e.getMessage(), e);
+		private final LoginService loginService;
+
+		@Inject 
+		@VisibleForTesting Factory(LoginService loginService) {
+			this.loginService = loginService;
 		}
-		return ret;
+
+		@Override
+		public AccessTokenResource create(AccessToken accessToken) {
+			return new AccessTokenResource(loginService, accessToken);
+		}
 	}
 	
-	private IAddressBook getBookClient() {
-		return bookClient;
+	private final LoginService loginService;
+	private final AccessToken accessToken;
+	
+	private AccessTokenResource(LoginService loginService, AccessToken accessToken) {
+		this.loginService = loginService;
+		this.accessToken = accessToken;
 	}
 	
+	@Override
+	public void close() {
+		loginService.logout(accessToken);
+	}
+
+	@Override
+	public AccessToken getAccessToken() {
+		return accessToken;
+	}
+
+	@Override
+	public String getUserEmail() {
+		return getAccessToken().getUserEmail();
+	}
+
+	@Override
+	public String getUserDisplayName() {
+		return getAccessToken().getUserDisplayName();
+	}
 }

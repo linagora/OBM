@@ -57,6 +57,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IRequestHandler;
 import org.obm.push.impl.PushContinuation;
@@ -64,7 +65,6 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.service.DeviceService;
-import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 
 @RunWith(SlowFilterRunner.class)
@@ -83,7 +83,6 @@ public class ActiveSyncServletTest {
 	private Credentials credentials;
 	private ActiveSyncRequest activeSyncRequest;
 	private PolicyService policyService;
-	private AccessToken accessToken;
 	private IAccessTokenResource accessTokenResource;
 	
 	@Before
@@ -103,7 +102,6 @@ public class ActiveSyncServletTest {
 		credentials = mocksControl.createMock(Credentials.class);
 		expect(credentials.getUser()).andReturn(user).atLeastOnce();
 		
-		accessToken = mocksControl.createMock(AccessToken.class);
 		accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
 		
 		PushContinuation pushContinuation = mocksControl.createMock(PushContinuation.class);
@@ -128,7 +126,7 @@ public class ActiveSyncServletTest {
 		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
 		expect(request.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST)).andReturn(activeSyncRequest);
-		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN)).andReturn(accessToken);
+		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN)).andReturn(accessTokenResource);
 		
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));
@@ -138,7 +136,7 @@ public class ActiveSyncServletTest {
 	@Test
 	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, DaoException {
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
-		userDataRequest.putResource(IAccessTokenResource.ACCESS_TOKEN_RESOURCE, accessTokenResource);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 		expectLastCall().once();
 		userDataRequest.closeResources();
 		expectLastCall();
@@ -213,17 +211,9 @@ public class ActiveSyncServletTest {
 		ResponderImpl.Factory responderFactory = createResponderFactory();
 		Handlers handlers = createHandlers(userDataRequest);
 		HttpErrorResponder httpErrorResponder = mocksControl.createMock(HttpErrorResponder.class);
-		IAccessTokenResource.Factory accessTokenResourceFactory = createAccessTokenResourceFactory();
 		
 		Logger logger = createLogger();
 		
-		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder, accessTokenResourceFactory);
-	}
-
-	private IAccessTokenResource.Factory createAccessTokenResourceFactory() {
-		IAccessTokenResource.Factory accessTokenResourceFactory = mocksControl.createMock(IAccessTokenResource.Factory.class);
-		expect(accessTokenResourceFactory.create(accessToken))
-			.andReturn(accessTokenResource).anyTimes();
-		return accessTokenResourceFactory;
+		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
 	}
 }

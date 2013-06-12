@@ -66,12 +66,14 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -116,10 +118,15 @@ public class ContactsBackendTest {
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		token = new AccessToken(0, "OBM");
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		
 		mocks = createControl();
+		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
+		expect(accessTokenResource.getAccessToken())
+			.andReturn(token).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		
 		mappingService = mocks.createMock(MappingService.class);
 		bookClient = mocks.createMock(BookClient.class);
 		loginService = mocks.createMock(LoginService.class);
@@ -128,7 +135,7 @@ public class ContactsBackendTest {
 		backendWindowingService = mocks.createMock(BackendWindowingService.class);
 		clientIdService = mocks.createMock(ClientIdService.class);
 		
-		contactsBackend = new ContactsBackend(mappingService, bookClient, loginService, contactConfiguration,
+		contactsBackend = new ContactsBackend(mappingService, bookClient, contactConfiguration,
 				collectionPathBuilderProvider, backendWindowingService, clientIdService);
 		
 		expectDefaultAddressAndParentForContactConfiguration();
@@ -154,7 +161,7 @@ public class ContactsBackendTest {
 	
 	@Test
 	public void testGetPIMDataType() {
-		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null, null);
+		ContactsBackend contactsBackend = new ContactsBackend(null, null, null, null, null, null);
 		assertThat(contactsBackend.getPIMDataType()).isEqualTo(PIMDataType.CONTACTS);
 	}
 
