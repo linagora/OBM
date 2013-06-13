@@ -35,16 +35,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.MSEmailBody.Builder;
@@ -58,11 +61,13 @@ import org.obm.push.protocol.data.MSEmailEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
@@ -93,6 +98,7 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 				.messageClass(MSMessageClass.fromSpecificationValue(uniqueStringFieldValue(data, ASEmail.MESSAGE_CLASS)))
 				.read(uniqueBooleanFieldValue(data, ASEmail.READ, false))
 				.meetingRequest(meetingRequest(DOMUtils.getUniqueElement(data, ASEmail.MEETING_REQUEST.getName())))
+				.attachements(attachements(DOMUtils.getUniqueElement(data, ASAirs.ATTACHMENTS.getName())))
 				.build();
 		} catch (AddressException e) {
 			throw new ConversionException("An address field is not valid", e);
@@ -101,6 +107,29 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 		}
 	}
 
+	private Set<MSAttachement> attachements(Element attachmentsElement) {
+		Set<MSAttachement> attachments = Sets.newHashSet();
+		if (attachmentsElement != null) {
+			for (Node attachmentNode : DOMUtils.getElementsByName(attachmentsElement, ASAirs.ATTACHMENT.getName())) {
+				Element attachmentEl = (Element) attachmentNode;
+				MSAttachement parsedAttachment = new MSAttachement();
+				parsedAttachment.setDisplayName(uniqueStringFieldValue(attachmentEl, ASAirs.DISPLAY_NAME));
+				parsedAttachment.setEstimatedDataSize(uniqueIntegerFieldValue(attachmentEl, ASAirs.ESTIMATED_DATA_SIZE));
+				parsedAttachment.setFileReference(uniqueStringFieldValue(attachmentEl, ASAirs.FILE_REFERENCE));
+				parsedAttachment.setMethod(attachmentMethod(uniqueIntegerFieldValue(attachmentEl, ASAirs.METHOD)));
+				attachments.add(parsedAttachment);
+			}
+		}
+		return attachments;
+	}
+
+	private MethodAttachment attachmentMethod(Integer attachmentMethodValue) {
+		if (attachmentMethodValue == null) {
+			return null;
+		}
+		return MethodAttachment.fromSpecificationValue(String.valueOf(attachmentMethodValue));
+	}
+	
 	private MSMeetingRequest meetingRequest(Element meetingRequest) throws ConversionException {
 		if (meetingRequest != null) {
 			return meetingRequestDecoder.decode(meetingRequest);

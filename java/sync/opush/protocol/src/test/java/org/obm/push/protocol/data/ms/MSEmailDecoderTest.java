@@ -48,9 +48,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSImportance;
 import org.obm.push.bean.MSMessageClass;
+import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
@@ -422,5 +424,100 @@ public class MSEmailDecoderTest {
 		MSEmail email= decoder.decode(doc.getDocumentElement());
 		
 		assertThat(email.getMeetingRequest()).isNull();
+	}
+
+	@Test
+	public void parseAttachments() throws Exception {
+		Document doc = DOMUtils.parse(
+				"<ApplicationData>" +
+					"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+					"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+					"<Subject>email subject</Subject>" +
+					"<Attachments>" +
+						"<Attachment>" +
+							"<DisplayName>name.JPG</DisplayName>" +
+							"<FileReference>57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0</FileReference>" +
+							"<Method>1</Method>" +
+							"<EstimatedDataSize>38260</EstimatedDataSize>" +
+						"</Attachment>" +
+					"</Attachments>" +
+				"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		MSAttachement expectedAttachment = new MSAttachement();
+		expectedAttachment.setDisplayName("name.JPG");
+		expectedAttachment.setMethod(MethodAttachment.NormalAttachment);
+		expectedAttachment.setFileReference("57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0");
+		expectedAttachment.setEstimatedDataSize(38260);
+		
+		assertThat(email.getAttachments()).containsOnly(expectedAttachment);
+	}
+
+	@Test
+	public void parseAttachmentsWithoutOptionalFields() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Attachments>" +
+					"<Attachment>" +
+						"<FileReference>57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0</FileReference>" +
+						"<Method>5</Method>" +
+						"<EstimatedDataSize>0</EstimatedDataSize>" +
+					"</Attachment>" +
+				"</Attachments>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+		MSAttachement expectedAttachment = new MSAttachement();
+		expectedAttachment.setDisplayName(null);
+		expectedAttachment.setMethod(MethodAttachment.EmbeddedMessage);
+		expectedAttachment.setFileReference("57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0");
+		expectedAttachment.setEstimatedDataSize(0);
+		
+		assertThat(email.getAttachments()).containsOnly(expectedAttachment);
+	}
+
+	@Test
+	public void parseAttachmentsWhenTwoItems() throws Exception {
+		Document doc = DOMUtils.parse(
+			"<ApplicationData>" +
+				"<From> &lt;from@thilaire.lng.org&gt;, &lt;from2@thilaire.lng.org&gt; </From>" +
+				"<To> &lt;to@thilaire.lng.org&gt;, &lt;to2@thilaire.lng.org&gt; </To>" +
+				"<Subject>email subject</Subject>" +
+				"<Attachments>" +
+					"<Attachment>" +
+						"<DisplayName>name.JPG</DisplayName>" +
+						"<FileReference>aaa</FileReference>" +
+						"<Method>1</Method>" +
+						"<EstimatedDataSize>38260</EstimatedDataSize>" +
+					"</Attachment>" +
+					"<Attachment>" +
+						"<FileReference>bbb</FileReference>" +
+						"<Method>5</Method>" +
+						"<EstimatedDataSize>0</EstimatedDataSize>" +
+					"</Attachment>" +
+				"</Attachments>" +
+			"</ApplicationData>");
+
+		MSEmail email= decoder.decode(doc.getDocumentElement());
+		
+
+		MSAttachement expectedAttachmentOne = new MSAttachement();
+		expectedAttachmentOne.setDisplayName("name.JPG");
+		expectedAttachmentOne.setMethod(MethodAttachment.NormalAttachment);
+		expectedAttachmentOne.setFileReference("aaa");
+		expectedAttachmentOne.setEstimatedDataSize(38260);
+		
+		MSAttachement expectedAttachmentTwo = new MSAttachement();
+		expectedAttachmentTwo.setDisplayName(null);
+		expectedAttachmentTwo.setMethod(MethodAttachment.EmbeddedMessage);
+		expectedAttachmentTwo.setFileReference("bbb");
+		expectedAttachmentTwo.setEstimatedDataSize(0);
+		
+		assertThat(email.getAttachments()).containsOnly(expectedAttachmentOne, expectedAttachmentTwo);
 	}
 }
