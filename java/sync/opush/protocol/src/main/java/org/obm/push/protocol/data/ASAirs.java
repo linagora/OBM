@@ -34,17 +34,17 @@ package org.obm.push.protocol.data;
 
 public enum ASAirs implements ActiveSyncFields {
 
-	BODY("Body"),
-	TYPE("Type"),
-	ESTIMATED_DATA_SIZE("EstimatedDataSize"),
-	TRUNCATED("Truncated"),
-	DATA("Data"),
-	ATTACHMENTS("Attachments"),
 	ATTACHMENT("Attachment"),
+	ATTACHMENTS("Attachments"),
+	BODY("Body"),
+	DATA("Data"),
 	DISPLAY_NAME("DisplayName"),
+	ESTIMATED_DATA_SIZE("EstimatedDataSize"),
 	FILE_REFERENCE("FileReference"),
-	METHOD("Method"), 
-	NATIVE_TYPE("NativeBodyType");
+	METHOD("Method"),
+	NATIVE_TYPE("NativeBodyType"),
+	TRUNCATED("Truncated"),
+	TYPE("Type");
 	
 	private final String name;
 
