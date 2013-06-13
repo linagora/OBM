@@ -195,7 +195,7 @@ public class MimeMessageTest {
 		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
-		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class MimeMessageTest {
 		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
-		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
 	}
 
 	@Test
@@ -217,7 +217,7 @@ public class MimeMessageTest {
 		MimePart parentMimePart = buildMimePart("multipart/mixed");
 		mimePart.defineParent(parentMimePart, mimePartIndex);
 
-		Assertions.assertThat(mimePart.isAttachment()).isFalse();
+		Assertions.assertThat(mimePart.isAttachment()).isTrue();
 	}
 
 	@Test
@@ -233,6 +233,18 @@ public class MimeMessageTest {
 		Assertions.assertThat(secondPart.isAttachment()).isTrue();
 	}
 
+	@Test
+	public void testIsAttachmentWhenTwoMixedTextPartsAndInlineDisposition() {
+		MimePart firstPart = buildMimePart("text/plain");
+		MimePart secondPart = buildMimePart("text/plain;Content-Disposition=inline");
+
+		MimePart parentMimePart = buildMimePart("multipart/mixed");
+		firstPart.defineParent(parentMimePart, 1);
+		secondPart.defineParent(parentMimePart, 2);
+
+		Assertions.assertThat(firstPart.isAttachment()).isFalse();
+		Assertions.assertThat(secondPart.isAttachment()).isTrue();
+	}
 
 	@Test
 	public void testIsAttachmentIsFalseWhenMultipartAlternative() {
