@@ -29,48 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.server;
+package org.obm.sync.client.user;
 
-import java.util.Map;
+import org.obm.configuration.module.LoggerModule;
+import org.obm.push.utils.DOMUtils;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
+import org.obm.sync.client.impl.AbstractClientImpl;
+import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.locators.Locator;
+import org.obm.sync.services.IUser;
+import org.slf4j.Logger;
+import org.w3c.dom.Document;
 
-import org.obm.sync.server.handler.AddressBookHandler;
-import org.obm.sync.server.handler.CalendarHandler;
-import org.obm.sync.server.handler.ISyncHandler;
-import org.obm.sync.server.handler.LoginHandler;
-import org.obm.sync.server.handler.SettingHandler;
-import org.obm.sync.server.handler.TodoHandler;
-import org.obm.sync.server.handler.UserHandler;
-
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
-public class SyncHandlers {
-
-	private Map<String, ISyncHandler> handlers;
+public class UserClient extends AbstractClientImpl implements IUser {
+	
+	private final Locator locator;
 
 	@Inject
-	private SyncHandlers(CalendarHandler calendarHandler, 
-			TodoHandler todoHandler, 
-			AddressBookHandler addressBookHandler,
-			SettingHandler settingHandler,
-			LoginHandler loginHandler,
-			MailingListHandler mailingListHandler, 
-			UserHandler userHandler) {
+	protected UserClient(SyncClientException syncClientException, 
+			Locator locator, 
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 		
-		handlers = new ImmutableMap.Builder<String, ISyncHandler>()
-			.put("login", loginHandler)
-			.put("calendar", calendarHandler)
-			.put("todo", todoHandler)
-			.put("book", addressBookHandler)
-			.put("setting", settingHandler)
-			.put("mailingList", mailingListHandler)
-			.put("user", userHandler)
-			.build();
+		super(syncClientException, obmSyncLogger);
+		this.locator = locator;
 	}
 
-	public Map<String, ISyncHandler> getHandlers() {
-		return handlers;
+	@Override
+	public String getUserEmail(AccessToken token) throws ServerFault {
+		Multimap<String, String> params = initParams(token);
+		Document doc = execute(token, "/user/getUserEmail", params);
+		exceptionFactory.checkServerFaultException(doc);
+		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
+	}
+
+	@Override
+	protected Locator getLocator() {
+		return locator;
 	}
 }
