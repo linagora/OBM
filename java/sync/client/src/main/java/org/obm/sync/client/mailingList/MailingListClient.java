@@ -33,6 +33,7 @@ package org.obm.sync.client.mailingList;
 
 import java.util.List;
 
+import org.apache.http.client.HttpClient;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -52,16 +53,37 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-@Singleton
 public class MailingListClient extends AbstractClientImpl implements IMailingList {
 
+	@Singleton
+	public static class Factory {
+
+		private final SyncClientException syncClientException;
+		private final Locator locator;
+		private final Logger obmSyncLogger;
+
+		@Inject
+		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientException = syncClientException;
+			this.locator = locator;
+			this.obmSyncLogger = obmSyncLogger;
+		}
+
+		public MailingListClient create(HttpClient httpClient) {
+			return new MailingListClient(syncClientException, locator, obmSyncLogger, httpClient);
+		}
+	}
+	
 	private final MailingListItemsParser mlParser;
 	private final MailingListItemsWriter mlWriter;
 	private final Locator locator;
 
-	@Inject
-	private MailingListClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-		super(syncClientException, obmSyncLogger);
+	private MailingListClient(SyncClientException syncClientException, 
+			Locator locator, 
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
+			HttpClient httpClient) {
+		
+		super(syncClientException, obmSyncLogger, httpClient);
 		this.locator = locator;
 		this.mlParser = new MailingListItemsParser();
 		this.mlWriter = new MailingListItemsWriter();

@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.IAccessTokenResource;
+import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
@@ -82,11 +84,10 @@ import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
+import org.obm.push.service.AuthenticationService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.services.ICalendar;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -142,10 +143,10 @@ public class MailBackendTest {
 	
 	@Test
 	public void testSendEmailWithBigMail()
-			throws ProcessingEmailException, ServerFault, StoreEmailException, SendEmailException, IOException, SmtpInvalidRcptException {
+			throws ProcessingEmailException, StoreEmailException, SendEmailException, IOException, SmtpInvalidRcptException {
 		final AccessToken at = new AccessToken(1, "o-push");
 		
-		ICalendar calendarClient = mocksControl.createMock(ICalendar.class);
+		AuthenticationService authenticationService = mocksControl.createMock(AuthenticationService.class);
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		
 		IAccessTokenResource accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
@@ -153,8 +154,15 @@ public class MailBackendTest {
 			.andReturn(at).anyTimes();
 		expect(userDataRequest.getAccessTokenResource())
 			.andReturn(accessTokenResource).anyTimes();
+		IHttpClientResource httpClientResource = mocksControl.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		expect(userDataRequest.getHttpClientResource())
+			.andReturn(httpClientResource).anyTimes();
 
-		expect(calendarClient.getUserEmail(at)).andReturn(user.getLoginAtDomain()).once();
+		expect(authenticationService.getUserEmail(userDataRequest))
+			.andReturn(user.getLoginAtDomain()).once();
+		
 		Set<Address> addrs = Sets.newHashSet();
 		mailboxService.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class), 
 				anyObject(addrs.getClass()), anyObject(addrs.getClass()), anyObject(addrs.getClass()), 
@@ -162,7 +170,7 @@ public class MailBackendTest {
 		
 		expectLastCall().once();
 				
-		MailBackend mailBackend = new MailBackendImpl(mailboxService, calendarClient, new Mime4jUtils(),
+		MailBackend mailBackend = new MailBackendImpl(mailboxService, authenticationService, new Mime4jUtils(),
 				mockOpushConfigurationService(), null, null, mappingService, null, null,
 				collectionPathBuilderProvider, null, windowingService);
 

@@ -32,5 +32,19 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-assert-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

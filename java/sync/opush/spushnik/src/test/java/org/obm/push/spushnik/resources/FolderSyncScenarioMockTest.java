@@ -64,7 +64,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
@@ -112,7 +112,7 @@ public class FolderSyncScenarioMockTest {
 
 	@Test
 	public void testErrorInBackend() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
+		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginClient.class), 
 				singleUserFixture.jaures);
 		User user = singleUserFixture.jaures.user;
 		DeviceId deviceId = new DeviceId("spushnik");
@@ -170,7 +170,7 @@ public class FolderSyncScenarioMockTest {
 
 	@Test
 	public void testBadOpushPort() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
+		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginClient.class), 
 				singleUserFixture.jaures);
 		
 		mocksControl.replay();
@@ -188,7 +188,7 @@ public class FolderSyncScenarioMockTest {
 
 	@Test
 	public void testBadOpushAddress() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
+		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginClient.class), 
 				singleUserFixture.jaures);
 		
 		mocksControl.replay();
@@ -206,7 +206,7 @@ public class FolderSyncScenarioMockTest {
 
 	@Test
 	public void testBadWebApp() throws Exception {
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), 
+		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginClient.class), 
 				singleUserFixture.jaures);
 		
 		mocksControl.replay();

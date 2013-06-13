@@ -31,14 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.backend;
 
+import org.apache.http.client.HttpClient;
 import org.obm.push.bean.Resource;
-import org.obm.sync.auth.AccessToken;
 
 public interface IAccessTokenResource extends Resource {
 
 	interface Factory {
 
-		abstract IAccessTokenResource create(AccessToken accessToken);
+		abstract IAccessTokenResource create(HttpClient httpClient, Object accessToken);
 	}
 
 	Object getAccessToken();

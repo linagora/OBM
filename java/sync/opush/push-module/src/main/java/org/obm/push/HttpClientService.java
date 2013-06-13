@@ -29,45 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.calendar;
+package org.obm.push;
 
-import org.apache.http.client.HttpClient;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
+import javax.servlet.http.HttpServletRequest;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.obm.push.resource.HttpClientResource;
 
-public class CalendarClient extends AbstractEventSyncClient {
+public class HttpClientService {
 
-	@Singleton
-	public static class Factory {
-
-		private final SyncClientException syncClientException;
-		private final Locator locator;
-		private final Logger obmSyncLogger;
-
-		@Inject
-		protected Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
-			this.locator = locator;
-			this.obmSyncLogger = obmSyncLogger;
-		}
-		
-		public CalendarClient create(HttpClient httpClient) {
-			return new CalendarClient(syncClientException, locator, obmSyncLogger, httpClient);
-		}
+	public HttpClientResource setHttpClientRequestAttribute(HttpServletRequest request) {
+		HttpClientResource httpClientResource = new HttpClientResource(new DefaultHttpClient());
+		request.setAttribute(RequestProperties.HTTP_CLIENT_RESOURCE, httpClientResource);
+		return httpClientResource;
 	}
-	
-	private CalendarClient(SyncClientException syncClientException, 
-			Locator locator, 
-			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
-			HttpClient httpClient) {
-		
-		super("/calendar", syncClientException, locator, obmSyncLogger, httpClient);
-	}
-
 }

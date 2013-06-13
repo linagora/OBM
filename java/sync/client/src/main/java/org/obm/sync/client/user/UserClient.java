@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.user;
 
+import org.apache.http.client.HttpClient;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -47,17 +49,44 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-@Singleton
 public class UserClient extends AbstractClientImpl implements IUser {
+	
+	@Singleton
+	public static class Factory {
+
+		protected final String origin;
+		protected final ConfigurationService configurationService;
+		protected final SyncClientException syncClientException;
+		protected final Locator locator;
+		protected final Logger obmSyncLogger;
+
+		@Inject
+		protected Factory(@Named("origin")String origin,
+				ConfigurationService configurationService,
+				SyncClientException syncClientException, 
+				Locator locator, 
+				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			
+			this.origin = origin;
+			this.configurationService = configurationService;
+			this.syncClientException = syncClientException;
+			this.locator = locator;
+			this.obmSyncLogger = obmSyncLogger;
+		}
+		
+		public UserClient create(HttpClient httpClient) {
+			return new UserClient(syncClientException, locator, obmSyncLogger, httpClient);
+		}
+	}
 	
 	private final Locator locator;
 
-	@Inject
-	protected UserClient(SyncClientException syncClientException, 
+	private UserClient(SyncClientException syncClientException, 
 			Locator locator, 
-			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
+			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger);
+		super(syncClientException, obmSyncLogger, httpClient);
 		this.locator = locator;
 	}
 

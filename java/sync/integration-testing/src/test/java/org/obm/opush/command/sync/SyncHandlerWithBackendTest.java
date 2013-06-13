@@ -113,13 +113,13 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.book.BookClient;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.Folder;
-import org.obm.sync.services.IAddressBook;
-import org.obm.sync.services.ICalendar;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
@@ -159,8 +159,8 @@ public class SyncHandlerWithBackendTest {
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
 	private DateService dateService;
-	private ICalendar calendarClient;
-	private IAddressBook addressBook;
+	private CalendarClient calendarClient;
+	private BookClient bookClient;
 
 	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
@@ -198,8 +198,8 @@ public class SyncHandlerWithBackendTest {
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
-		calendarClient = classToInstanceMap.get(ICalendar.class);
-		addressBook = classToInstanceMap.get(IAddressBook.class);
+		calendarClient = classToInstanceMap.get(CalendarClient.class);
+		bookClient = classToInstanceMap.get(BookClient.class);
 		eventService = classToInstanceMap.get(EventService.class);
 
 		bindCollectionIdToPath();
@@ -720,11 +720,11 @@ public class SyncHandlerWithBackendTest {
 				.id(secondAllocatedStateId)
 				.build();
 		
-		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		loginService.logout(user.accessToken);
+		LoginClient loginClient = classToInstanceMap.get(LoginClient.class);
+		loginClient.logout(user.accessToken);
 		expectLastCall().anyTimes();
 		// Login is done in authentication
-		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password))
+		expect(loginClient.authenticate(user.user.getLoginAtDomain(), user.password))
 			.andReturn(user.accessToken).anyTimes();
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expect(deviceDao.getDevice(user.user, 
@@ -751,11 +751,11 @@ public class SyncHandlerWithBackendTest {
 		expect(calendarClient.getUserEmail(user.accessToken))
 			.andReturn(user.user.getLoginAtDomain());
 		
-		expect(addressBook.listAllBooks(user.accessToken))
+		expect(bookClient.listAllBooks(user.accessToken))
 			.andReturn(ImmutableList.<AddressBook> of(new AddressBook(contactCollectionIdAsString, contactCollectionId, false)));
 		expect(collectionDao.getCollectionMapping(user.device, contactCollectionPath + ":" + contactCollectionId))
 			.andReturn(contactCollectionId);
-		expect(addressBook.listContactsChanged(user.accessToken, firstDate, contactCollectionId))
+		expect(bookClient.listContactsChanged(user.accessToken, firstDate, contactCollectionId))
 			.andReturn(new ContactChanges(ImmutableList.<Contact> of(),
 					ImmutableSet.<Integer> of(),
 					firstDate));

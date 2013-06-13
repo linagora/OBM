@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.contacts;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -43,6 +44,8 @@ import java.util.TreeSet;
 
 import javax.naming.NoPermissionException;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +56,7 @@ import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Credentials;
@@ -106,6 +110,7 @@ public class ContactsBackendTest {
 	private IMocksControl mocks;
 	private MappingService mappingService;
 	private BookClient bookClient;
+	private BookClient.Factory bookClientFactory;
 	private LoginService loginService;
 	private ContactConfiguration contactConfiguration;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
@@ -126,16 +131,23 @@ public class ContactsBackendTest {
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IHttpClientResource httpClientResource = mocks.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		
 		mappingService = mocks.createMock(MappingService.class);
 		bookClient = mocks.createMock(BookClient.class);
+		bookClientFactory = mocks.createMock(BookClient.Factory.class);
+		expect(bookClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(bookClient).anyTimes();
 		loginService = mocks.createMock(LoginService.class);
 		contactConfiguration = mocks.createMock(ContactConfiguration.class);
 		collectionPathBuilderProvider = mocks.createMock(Provider.class);
 		backendWindowingService = mocks.createMock(BackendWindowingService.class);
 		clientIdService = mocks.createMock(ClientIdService.class);
 		
-		contactsBackend = new ContactsBackend(mappingService, bookClient, contactConfiguration,
+		contactsBackend = new ContactsBackend(mappingService, bookClientFactory, contactConfiguration,
 				collectionPathBuilderProvider, backendWindowingService, clientIdService);
 		
 		expectDefaultAddressAndParentForContactConfiguration();

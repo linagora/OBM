@@ -44,30 +44,30 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 
 public class IntegrationUserAccessUtils {
 
 	public static void mockUsersAccess(ClassToInstanceAgregateView<Object> classToInstanceMap,
 			Collection<OpushUser> users) throws DaoException, AuthFault {
-		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		expectUserLoginFromOpush(loginService, users);
+		LoginClient loginClient = classToInstanceMap.get(LoginClient.class);
+		expectUserLoginFromOpush(loginClient, users);
 		
 		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
 		expectUserDeviceAccess(deviceDao, users);
 	}
 	
-	public static void expectUserLoginFromOpush(LoginService loginService, Collection<OpushUser> users) throws AuthFault {
+	public static void expectUserLoginFromOpush(LoginClient loginClient, Collection<OpushUser> users) throws AuthFault {
 		for (OpushUser user : users) {
-			expectUserLoginFromOpush(loginService, user);
+			expectUserLoginFromOpush(loginClient, user);
 		}
 	}
 
-	public static void expectUserLoginFromOpush(LoginService loginService, OpushUser user) throws AuthFault {
-		expect(loginService.login(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
-		loginService.logout(user.accessToken);
+	public static void expectUserLoginFromOpush(LoginClient loginClient, OpushUser user) throws AuthFault {
+		expect(loginClient.login(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
+		loginClient.logout(user.accessToken);
 		expectLastCall().anyTimes();
-		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
+		expect(loginClient.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
 	}
 
 
@@ -87,6 +87,4 @@ public class IntegrationUserAccessUtils {
 						.anyTimes();
 		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED)).andReturn(0l).anyTimes();
 	}
-	
-	
 }

@@ -44,11 +44,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.HttpClient;
+import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
+import org.obm.push.resource.HttpClientResource;
+import org.obm.push.service.AuthenticationService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,18 +63,25 @@ public class AuthenticationFilter implements Filter {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
+	private final AuthenticationService authenticationService;
 	private final LoggerService loggerService;
 	private final User.Factory userFactory;
-	private final LoginService loginService;
 	private final HttpErrorResponder httpErrorResponder;
-	
+	private final HttpClientService httpClientService;
+
+
 	@Inject
-	private AuthenticationFilter(LoginService loginService, 
-			LoggerService loggerService, User.Factory userFactory, HttpErrorResponder httpErrorResponder) {
-		this.loginService = loginService;
+	private AuthenticationFilter(AuthenticationService authenticationService, 
+			LoggerService loggerService, 
+			User.Factory userFactory, 
+			HttpErrorResponder httpErrorResponder,
+			HttpClientService httpClientService) {
+		
+		this.authenticationService = authenticationService;
 		this.loggerService = loggerService;
 		this.userFactory = userFactory;
 		this.httpErrorResponder = httpErrorResponder;
+		this.httpClientService = httpClientService;
 	}
 	
 	@Override
@@ -109,11 +119,9 @@ public class AuthenticationFilter implements Filter {
 					String userPass = new String( Base64.decodeBase64(credentials) );
 					int p = userPass.indexOf(":");
 					if (p != -1) {
-						String userId = userPass.substring(0, p);
-						String password = userPass.substring(p + 1);
-						
-						AccessToken token = setAccessTokenRequestAttribute(request, userId, password);
-						return getCredentials(token, userId, password);
+						return authenticateValidRequest(request, 
+								userPass.substring(0, p), 
+								userPass.substring(p + 1));
 					}
 				}
 			}
@@ -121,8 +129,16 @@ public class AuthenticationFilter implements Filter {
 		throw new AuthFault("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials getCredentials(AccessToken token, String userId, String password) throws AuthFault {
-		User user = createUser(userId, token);
+	private Credentials authenticateValidRequest(HttpServletRequest request, String userId, String password) throws AuthFault {
+		HttpClientResource httpClientResource = httpClientService.setHttpClientRequestAttribute(request);
+		
+		IAccessTokenResource token = setAccessTokenRequestAttribute(request, 
+				httpClientResource.getHttpClient(), userId, password);
+		return getCredentials(token, userId, password);
+	}
+
+	private Credentials getCredentials(IAccessTokenResource token, String userId, String password) throws AuthFault {
+		User user = createUser(userId, (AccessToken) token.getAccessToken());
 		if (user != null) {
 			logger.debug("Login success {} ! ", user.getLoginAtDomain());
 			return new Credentials(user, password);
@@ -131,15 +147,15 @@ public class AuthenticationFilter implements Filter {
 		}
 	}
 
-	private AccessToken setAccessTokenRequestAttribute(HttpServletRequest request, String userId, String password) throws AuthFault {
-		AccessToken token = login(getLoginAtDomain(userId), password);
-		request.setAttribute(RequestProperties.ACCESS_TOKEN, token);
+	private IAccessTokenResource setAccessTokenRequestAttribute(HttpServletRequest request, HttpClient httpClient, String userId, String password) throws AuthFault {
+		IAccessTokenResource token = login(httpClient, getLoginAtDomain(userId), password);
+		request.setAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE, token);
 		return token;
 	}
 	
-	private AccessToken login(String userId, String password) throws AuthFault {
+	private IAccessTokenResource login(HttpClient httpClient, String userId, String password) throws AuthFault {
 		try {
-			return loginService.authenticate(userId, password);
+			return authenticationService.authenticate(httpClient, userId, password);
 		} catch (Exception e) {
 			throw new AuthFault(e);
 		}

@@ -33,6 +33,17 @@ package org.obm.push.bean;
 
 public enum UserDataRequestResource {
 
-	ACCESS_TOKEN,
-	IMAP_STORE;
+	HTTP_CLIENT(2),
+	ACCESS_TOKEN(1),
+	IMAP_STORE(0);
+	
+	private final int closeOrder;
+
+	private UserDataRequestResource(int closeOrder) {
+		this.closeOrder = closeOrder;
+	}
+	
+	public int closeOrder() {
+		return closeOrder;
+	}
 }

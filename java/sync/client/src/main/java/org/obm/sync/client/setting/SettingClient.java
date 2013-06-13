@@ -33,6 +33,7 @@ package org.obm.sync.client.setting;
 
 import java.util.Map;
 
+import org.apache.http.client.HttpClient;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -51,15 +52,36 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-@Singleton
 public class SettingClient extends AbstractClientImpl implements ISetting {
 
+	@Singleton
+	public static class Factory {
+
+		private final SyncClientException syncClientException;
+		private final Locator locator;
+		private final Logger obmSyncLogger;
+
+		@Inject
+		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientException = syncClientException;
+			this.locator = locator;
+			this.obmSyncLogger = obmSyncLogger;
+		}
+		
+		public SettingClient create(HttpClient httpClient) {
+			return new SettingClient(syncClientException, locator, obmSyncLogger, httpClient);
+		}
+	}
+	
 	private final SettingItemsParser respParser;
 	private final Locator locator;
 
-	@Inject
-	private SettingClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-		super(syncClientException, obmSyncLogger);
+	private SettingClient(SyncClientException syncClientException, 
+			Locator locator, 
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
+			HttpClient httpClient) {
+		
+		super(syncClientException, obmSyncLogger, httpClient);
 		this.locator = locator;
 		this.respParser = new SettingItemsParser();
 	}

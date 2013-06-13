@@ -47,6 +47,7 @@ import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
@@ -161,6 +162,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			}
 			
 			IAccessTokenResource accessTokenResource = getAccessTokenResource(request);
+			IHttpClientResource httpClientResource = getHttpClientResource(request);
 			
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 
@@ -174,7 +176,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				logger.debug("policy used = {}", asrequest.getMsPolicyKey());
 			}
 
-			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, accessTokenResource);
+			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, accessTokenResource, httpClientResource);
 		
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -188,7 +190,11 @@ public class ActiveSyncServlet extends HttpServlet {
 	}
 
 	private IAccessTokenResource getAccessTokenResource(HttpServletRequest request) {
-		return (IAccessTokenResource) request.getAttribute(RequestProperties.ACCESS_TOKEN);
+		return (IAccessTokenResource) request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE);
+	}
+
+	private IHttpClientResource getHttpClientResource(HttpServletRequest request) {
+		return (IHttpClientResource) request.getAttribute(RequestProperties.HTTP_CLIENT_RESOURCE);
 	}
 
 	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {
@@ -232,14 +238,18 @@ public class ActiveSyncServlet extends HttpServlet {
 
 	private void processActiveSyncMethod(IContinuation continuation,
 			Credentials credentials, DeviceId devId,
-			ActiveSyncRequest request, HttpServletResponse response, IAccessTokenResource accessTokenResource)
-			throws IOException, DaoException {
+			ActiveSyncRequest request, 
+			HttpServletResponse response, 
+			IAccessTokenResource accessTokenResource, 
+			IHttpClientResource httpClientResource)
+					throws IOException, DaoException {
 
 		UserDataRequest userDataRequest = null;
 		Responder responder = null;
 		try {
 			userDataRequest = sessionService.getSession(credentials, devId, request);
 			userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+			userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 			logger.debug("incoming query");
 			
 			if (userDataRequest.getCommand() == null) {

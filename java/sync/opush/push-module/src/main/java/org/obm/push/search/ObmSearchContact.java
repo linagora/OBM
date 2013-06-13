@@ -41,6 +41,7 @@ import org.obm.push.contacts.ContactConverter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
+import org.obm.sync.client.book.BookClient;
 import org.obm.sync.services.IAddressBook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,12 +53,12 @@ import com.google.inject.Singleton;
 public class ObmSearchContact implements ISearchSource {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObmSearchContact.class);
-	private final IAddressBook bookClient;
+	private final BookClient.Factory bookClientFactory;
 	
 	@Inject
-	private ObmSearchContact(IAddressBook bookClient) {
+	private ObmSearchContact(BookClient.Factory bookClientFactory) {
 		super();
-		this.bookClient = bookClient;
+		this.bookClientFactory = bookClientFactory;
 	}
 	
 	@Override
@@ -67,13 +68,13 @@ public class ObmSearchContact implements ISearchSource {
 
 	@Override
 	public List<SearchResult> search(UserDataRequest udr, String query, Integer limit) {
-		IAddressBook bc = getBookClient();
 		List<SearchResult> ret = new LinkedList<SearchResult>();
 		AccessToken token = (AccessToken) udr.getAccessTokenResource().getAccessToken();
 		ContactConverter cc = new ContactConverter();
 		try {
 			Integer offset = null;
-			List<Contact> contacts = bc.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
+			List<Contact> contacts = getBookClient(udr)
+					.searchContactsInSynchronizedAddressBooks(token, query, limit, offset);
 			for (Contact contact: contacts) {
 				ret.add(cc.convertToSearchResult(contact));
 			}
@@ -83,8 +84,8 @@ public class ObmSearchContact implements ISearchSource {
 		return ret;
 	}
 	
-	private IAddressBook getBookClient() {
-		return bookClient;
+	private IAddressBook getBookClient(UserDataRequest udr) {
+		return bookClientFactory.create(udr.getHttpClientResource().getHttpClient());
 	}
 	
 }

@@ -78,7 +78,7 @@ public class SingleUserFixture {
 		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId, jaures.deviceProtocolVersion);
 		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device);
 		jaures.userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, 
-				accessTokenResourceFactory.create(jaures.accessToken));
+				accessTokenResourceFactory.create(null, jaures.accessToken));
 		jaures.rootCollectionPath = "obm:\\\\" + jaures.user.getLoginAtDomain();
 	}
 	

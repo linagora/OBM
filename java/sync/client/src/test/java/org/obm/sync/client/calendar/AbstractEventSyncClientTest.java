@@ -81,7 +81,7 @@ public class AbstractEventSyncClientTest {
 		responder = control.createMock(Responder.class);
 		token = ToolBox.mockAccessToken(control);
 		logger = control.createMock(Logger.class);
-		client = new AbstractEventSyncClient("/calendar", new SyncClientException(), null, logger) {
+		client = new AbstractEventSyncClient("/calendar", new SyncClientException(), null, logger, null) {
 			@Override
 			protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
 				return responder.execute(token, action, parameters);

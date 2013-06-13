@@ -99,16 +99,13 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.service.AuthenticationService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.tnefconverter.TNEFConverterException;
 import org.obm.push.tnefconverter.TNEFUtils;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.Mime4jUtils;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.client.CalendarType;
-import org.obm.sync.services.ICalendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +122,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
@@ -148,7 +144,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final MailboxService mailboxService;
 	private final Mime4jUtils mime4jUtils;
 	private final ConfigurationService configurationService;
-	private final ICalendar calendarClient;
+	private final AuthenticationService authenticationService;
 	private final EventService eventService;
 	private final MSEmailFetcher msEmailFetcher;
 	private final SnapshotService snapshotService;
@@ -159,7 +155,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
-			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
+			AuthenticationService authenticationService, 
 			Mime4jUtils mime4jUtils, ConfigurationService configurationService,
 			SnapshotService snapshotService,
 			EmailChangesFetcher emailChangesFetcher,
@@ -174,7 +170,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.mailboxService = mailboxService;
 		this.mime4jUtils = mime4jUtils;
 		this.configurationService = configurationService;
-		this.calendarClient = calendarClient;
+		this.authenticationService = authenticationService;
 		this.snapshotService = snapshotService;
 		this.emailChangesFetcher = emailChangesFetcher;
 		this.eventService = eventService;
@@ -641,19 +637,9 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			} 
 		}
 	}
-
-	private AccessToken getAccessToken(UserDataRequest udr) {
-		return (AccessToken) udr.getAccessTokenResource().getAccessToken();
-	}
 	
 	private String getUserEmail(UserDataRequest udr) throws UnexpectedObmSyncServerException {
-		ICalendar cal = calendarClient;
-		AccessToken at = getAccessToken(udr);
-		try {
-			return cal.getUserEmail(at);
-		} catch (ServerFault e) {
-			throw new UnexpectedObmSyncServerException(e);
-		}
+		return authenticationService.getUserEmail(udr);
 	}
 
 	private void send(UserDataRequest udr, SendEmail sendEmail, boolean saveInSent) throws ProcessingEmailException {

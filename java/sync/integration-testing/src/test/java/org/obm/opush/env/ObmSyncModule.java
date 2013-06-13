@@ -31,13 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+
+import org.apache.http.client.HttpClient;
 import org.easymock.IMocksControl;
-import org.obm.sync.client.CalendarType;
-import org.obm.sync.client.login.LoginService;
-import org.obm.sync.services.IAddressBook;
-import org.obm.sync.services.ICalendar;
-import org.obm.sync.services.IMailingList;
-import org.obm.sync.services.ISetting;
+import org.obm.sync.client.book.BookClient;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.login.LoginClient;
+import org.obm.sync.client.mailingList.MailingListClient;
+import org.obm.sync.client.setting.SettingClient;
+import org.obm.sync.client.user.UserClient;
 
 import com.google.inject.name.Names;
 
@@ -52,16 +56,35 @@ public final class ObmSyncModule extends AbstractOverrideModule {
 	@Override
 	protected void configureImpl() {
 		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(PUSH_ENABLED);
-		bindWithMock(IAddressBook.class);
-		ICalendar calendar = createAndRegisterMock(ICalendar.class);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.CALENDAR))
-			.toInstance(calendar);
-		bind(ICalendar.class)
-			.annotatedWith(Names.named(CalendarType.TODO))
-			.toInstance(calendar);
-		bindWithMock(LoginService.class);
-		bindWithMock(IMailingList.class);
-		bindWithMock(ISetting.class);
+		UserClient.Factory userClientFactory = bindWithMock(UserClient.Factory.class);
+		UserClient user = bindWithMock(UserClient.class);
+		expect(userClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(user).anyTimes();
+		
+		BookClient.Factory bookClientFactory = bindWithMock(BookClient.Factory.class);
+		BookClient bookClient = bindWithMock(BookClient.class);
+		expect(bookClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(bookClient).anyTimes();
+		
+		CalendarClient.Factory calendarClientFactory = bindWithMock(CalendarClient.Factory.class);
+		CalendarClient calendar = bindWithMock(CalendarClient.class);
+		expect(calendarClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(calendar).anyTimes();
+		
+		LoginClient.Factory loginClientFactory = bindWithMock(LoginClient.Factory.class);
+		LoginClient loginClient = bindWithMock(LoginClient.class);
+		expect(loginClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(loginClient).anyTimes();
+		
+		MailingListClient.Factory mailingListClientFactory = bindWithMock(MailingListClient.Factory.class);
+		MailingListClient mailingListClient = bindWithMock(MailingListClient.class);
+		expect(mailingListClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(mailingListClient).anyTimes();
+		
+		SettingClient.Factory settingClientFactory = bindWithMock(SettingClient.Factory.class);
+		SettingClient settingClient = bindWithMock(SettingClient.class);
+		expect(settingClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(settingClient).anyTimes();
+		
 	}
 }
