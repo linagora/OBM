@@ -50,7 +50,7 @@ public interface MimePart {
 	ContentType getContentType();
 	
 	String getPrimaryType();
-
+	
 	String getSubtype();
 
 	List<MimePart> getChildren();
@@ -96,7 +96,7 @@ public interface MimePart {
 	MimePart getInvitation();
 
 	MimePart findRootMimePartInTree();
-
+	
 	MimePart findMainMessage(ContentType contentType);
 
 	Integer getSize();

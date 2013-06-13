@@ -157,7 +157,7 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	}
 	
 	private MimePart parent;
-	private int idx;
+	private Integer idx;
 	private final ContentType contentType;
 	private final String contentTransfertEncoding;
 	private final String contentId;
@@ -171,6 +171,9 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 		this.contentTransfertEncoding = encoding;
 		this.size = size;
 		this.multipartSubType = multipartSubType;
+		if (!isMultipart()) {
+			this.idx = 1;
+		}
 	}
 
 	@Override
@@ -220,12 +223,6 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	}
 	
 	private Integer selfAddress() {
-		if (parent == null) {
-			if (isMultipart()) {
-				return null;
-			}
-			return 1;
-		}
 		return idx;
 	}
 
@@ -250,7 +247,7 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	
 	@Override
 	public boolean isAttachment() {
-		return (idx > 1	
+		return (!isFirstElementInParent()	
 				&& !isMultipart()
 				&& contentTypeIsAttachment());
 	}
@@ -357,10 +354,9 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 
 	@Override
 	public boolean isFirstElementInParent() {
-		MimeAddress mimeAddress = getAddressInternal();
-		return mimeAddress != null && mimeAddress.getLastIndex() == 1;
+		return idx != null && idx == 1;
 	}
-
+	
 	@Override
 	public boolean hasMimePart(ContentType contentType) {
 		return this.getFullMimeType().
