@@ -253,12 +253,10 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 	}
 
 	private boolean contentTypeIsAttachment() {
-		if (contentType.getContentDisposition() == ContentDisposition.ATTACHMENT) {
-			return true;
-		}
-		if (contentType.getPrimaryType().equalsIgnoreCase("message")
-			|| contentType.getPrimaryType().equalsIgnoreCase("application")) {
-			return true;
+		if (parent != null) {
+			if (!parent.getFullMimeType().equalsIgnoreCase("multipart/alternative")) {
+				return true;
+			}
 		}
 		return false;
 	}
