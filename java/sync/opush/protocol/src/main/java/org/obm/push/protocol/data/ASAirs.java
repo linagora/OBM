@@ -34,16 +34,22 @@ package org.obm.push.protocol.data;
 
 public enum ASAirs implements ActiveSyncFields {
 
+	ALL_OR_NONE("AllOrNone"),
 	ATTACHMENT("Attachment"),
 	ATTACHMENTS("Attachments"),
 	BODY("Body"),
+	CONTENT_ID("ContentId"), 
+	CONTENT_LOCATION("ContentLocation"),
+	CONTENT_TYPE("ContentType"),
 	DATA("Data"),
 	DISPLAY_NAME("DisplayName"),
 	ESTIMATED_DATA_SIZE("EstimatedDataSize"),
 	FILE_REFERENCE("FileReference"),
+	IS_INLINE("IsInline"),
 	METHOD("Method"),
 	NATIVE_TYPE("NativeBodyType"),
 	TRUNCATED("Truncated"),
+	TRUNCATION_SIZE("TruncationSize"),
 	TYPE("Type");
 	
 	private final String name;
