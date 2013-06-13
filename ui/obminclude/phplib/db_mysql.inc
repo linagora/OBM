@@ -159,6 +159,17 @@ class DB_Sql {
     return $this->Query_ID;
   }
 
+  function query_fmt(/* $fmt, ... */) {
+    $args = func_get_args();
+    if (count($args) < 2) {
+      return false;
+    }
+    for ($i=1; $i<count($args); $i++) {
+      $args[$i] = $this->escape($args[$i]);
+    }
+    return call_user_func_array('sprintf', $args);
+  }
+
   /* public: walk result set */
   function next_record($type=MYSQL_BOTH) {
     if (!$this->Query_ID) {
@@ -583,6 +594,17 @@ class DB_Sql {
   static function INT($args) {
     $int = current($args);
     return (is_numeric($int))?(int)$int:'NULL';
+  }
+
+  /**
+   * NOW
+   *
+   * @static
+   * @access public
+   * @return string
+   */
+  static function NOW() {
+    return "NOW()";
   }
 }
 ?>
