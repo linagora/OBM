@@ -29,45 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.calendar;
+package org.obm.push.resource;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
+import org.obm.push.backend.IHttpClientResource;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+public class HttpClientResource implements IHttpClientResource {
 
-public class CalendarClient extends AbstractEventSyncClient {
+	private final HttpClient httpClient;
 
-	@Singleton
-	public static class Factory {
-
-		private final SyncClientException syncClientException;
-		private final Locator locator;
-		private final Logger obmSyncLogger;
-
-		@Inject
-		protected Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
-			this.locator = locator;
-			this.obmSyncLogger = obmSyncLogger;
-		}
-		
-		public CalendarClient create(HttpClient httpClient) {
-			return new CalendarClient(syncClientException, locator, obmSyncLogger, httpClient);
-		}
+	public HttpClientResource(HttpClient httpClient) {
+		this.httpClient = httpClient;
 	}
 	
-	private CalendarClient(SyncClientException syncClientException, 
-			Locator locator, 
-			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
-			HttpClient httpClient) {
-		
-		super("/calendar", syncClientException, locator, obmSyncLogger, httpClient);
+	@Override
+	public void close() {
+		httpClient.getConnectionManager().shutdown();
 	}
 
+	@Override
+	public HttpClient getHttpClient() {
+		return httpClient;
+	}
 }

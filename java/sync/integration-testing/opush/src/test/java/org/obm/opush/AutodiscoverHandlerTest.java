@@ -60,7 +60,7 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -144,8 +144,8 @@ public class AutodiscoverHandlerTest {
 	}
 	
 	private void mockLoginService() throws AuthFault {
-		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		IntegrationTestUtils.expectUserLoginFromOpush(loginService, singleUserFixture.jaures);
+		LoginClient loginClient = classToInstanceMap.get(LoginClient.class);
+		IntegrationTestUtils.expectUserLoginFromOpush(loginClient, singleUserFixture.jaures);
 	}
 	
 	private Document buildAutodiscoverCommand(String emailAddress)

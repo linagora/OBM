@@ -31,14 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.obm.push.backend.IAccessTokenResource;
+import org.obm.push.backend.IHttpClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 
 public class UserDataRequest {
@@ -55,16 +59,30 @@ public class UserDataRequest {
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
-	private final Map<UserDataRequestResource, Resource> resources;
+	private final TreeMap<UserDataRequestResource, Resource> resources;
 
 	public UserDataRequest(Credentials credentials, String command, Device device) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
 		this.device = device;
-		this.resources = new HashMap<UserDataRequestResource, Resource>();
+		this.resources = Maps.<UserDataRequestResource, UserDataRequestResource, Resource>
+							newTreeMap(new CloseOrderComparator());
 	}
 
+	private class CloseOrderComparator implements Comparator<UserDataRequestResource> {
+
+		@Override
+		public int compare(UserDataRequestResource udrr1, UserDataRequestResource udrr2) {
+			if (udrr1.closeOrder() < udrr2.closeOrder()) {
+				return -1;
+			} else if (udrr1.closeOrder() == udrr2.closeOrder()) {
+				return 0;
+			}
+			return 1;	
+		}
+	}
+	
 	public boolean checkHint(String key, boolean defaultValue) {
 		return device.checkHint(key, defaultValue);
 	}
@@ -105,7 +123,9 @@ public class UserDataRequest {
 	
 	public void putAllResources(Map<UserDataRequestResource, Resource> resources) {
 		if (resources != null) {
-			this.resources.putAll(resources);
+			for (Entry<UserDataRequestResource, Resource> entry : resources.entrySet()) {
+				putResource(entry.getKey(), entry.getValue());
+			}
 		}
 	}
 	
@@ -116,7 +136,7 @@ public class UserDataRequest {
 		return null;
 	}
 	
-	public Map<UserDataRequestResource, Resource> getResources() {
+	public TreeMap<UserDataRequestResource, Resource> getResources() {
 		return resources;
 	}
 
@@ -133,6 +153,10 @@ public class UserDataRequest {
 	
 	public IAccessTokenResource getAccessTokenResource() {
 		return (IAccessTokenResource) getResource(UserDataRequestResource.ACCESS_TOKEN);
+	}
+
+	public IHttpClientResource getHttpClientResource() {
+		return (IHttpClientResource) getResource(UserDataRequestResource.HTTP_CLIENT);
 	}
 
 	@Override

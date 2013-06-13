@@ -32,11 +32,13 @@ package org.obm.sync.calendar;
 import java.net.URL;
 import java.util.Comparator;
 
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.obm.Configuration;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.H2GuiceServletContextListener;
@@ -69,11 +71,43 @@ public abstract class CalendarIntegrationTest {
 		LocatorService locatorService = arquillianLocatorService();
 		Locator locator = new Locator(configuration, locatorService) {};
 		
-		loginClient = new LoginClient("integration-testing", configuration, exceptionFactory, locator, logger) {};
-		calendarClient = new CalendarClient(exceptionFactory, locator, logger) {};
-		bookClient = new BookClient(exceptionFactory, locator, logger) {};
+		LoginClient.Factory loginClientFactory = new LoginClientFactory("integration-testing", configuration, exceptionFactory, locator, logger);
+		CalendarClient.Factory calendarClientFactory = new CalendarClientFactory(exceptionFactory, locator, logger);
+		BookClient.Factory bookClientFactory = new BookClientFactory(exceptionFactory, locator, logger);
+		
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		loginClient = loginClientFactory.create(httpClient);
+		calendarClient = calendarClientFactory.create(httpClient);
+		bookClient = bookClientFactory.create(httpClient);
 	}
 
+	private class LoginClientFactory extends LoginClient.Factory {
+
+		protected LoginClientFactory(String origin,
+				ConfigurationService configurationService,
+				SyncClientException syncClientException, Locator locator,
+				Logger obmSyncLogger) {
+			super(origin, configurationService, syncClientException, locator, obmSyncLogger);
+		}
+	}
+	
+	private class CalendarClientFactory extends CalendarClient.Factory {
+
+		protected CalendarClientFactory(
+				SyncClientException syncClientException, Locator locator,
+				Logger obmSyncLogger) {
+			super(syncClientException, locator, obmSyncLogger);
+		}
+	}
+	
+	private class BookClientFactory extends BookClient.Factory {
+
+		protected BookClientFactory(SyncClientException syncClientException,
+				Locator locator, Logger obmSyncLogger) {
+			super(syncClientException, locator, obmSyncLogger);
+		}
+	}
+	
 	private LocatorService arquillianLocatorService() {
 		return new LocatorService() {
 			

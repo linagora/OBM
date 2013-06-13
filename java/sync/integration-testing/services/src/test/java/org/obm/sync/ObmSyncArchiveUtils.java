@@ -244,6 +244,7 @@ import org.obm.sync.server.handler.LoginHandler;
 import org.obm.sync.server.handler.SecureSyncHandler;
 import org.obm.sync.server.handler.SettingHandler;
 import org.obm.sync.server.handler.TodoHandler;
+import org.obm.sync.server.handler.UserHandler;
 import org.obm.sync.server.handler.VersionValidator;
 import org.obm.sync.server.mailer.AbstractMailer;
 import org.obm.sync.server.mailer.ErrorMailer;
@@ -743,6 +744,7 @@ public class ObmSyncArchiveUtils {
 				SecureSyncHandler.class,
 				SettingHandler.class,
 				TodoHandler.class,
+				UserHandler.class,
 				VersionValidator.class,
 				AbstractMailer.class,
 				ErrorMailer.class,

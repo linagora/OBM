@@ -38,6 +38,7 @@ import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.http.client.HttpClient;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
@@ -80,8 +81,11 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	private final Locator locator;
 
 	public AbstractEventSyncClient(String type, SyncClientException syncClientException, 
-			Locator locator, Logger obmSyncLogger) {
-		super(syncClientException, obmSyncLogger);
+			Locator locator, 
+			Logger obmSyncLogger, 
+			HttpClient httpClient) {
+		
+		super(syncClientException, obmSyncLogger, httpClient);
 		this.locator = locator;
 		respParser = new CalendarItemsParser();
 		this.type = type;

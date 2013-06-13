@@ -52,6 +52,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContinuation;
+import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
@@ -84,6 +85,7 @@ public class ActiveSyncServletTest {
 	private ActiveSyncRequest activeSyncRequest;
 	private PolicyService policyService;
 	private IAccessTokenResource accessTokenResource;
+	private IHttpClientResource httpClientResource;
 	
 	@Before
 	public void setUp() throws DaoException {
@@ -103,6 +105,7 @@ public class ActiveSyncServletTest {
 		expect(credentials.getUser()).andReturn(user).atLeastOnce();
 		
 		accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
+		httpClientResource = mocksControl.createMock(IHttpClientResource.class);
 		
 		PushContinuation pushContinuation = mocksControl.createMock(PushContinuation.class);
 		expect(pushContinuation.isResumed()).andReturn(false).anyTimes();
@@ -127,6 +130,7 @@ public class ActiveSyncServletTest {
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
 		expect(request.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST)).andReturn(activeSyncRequest);
 		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE)).andReturn(accessTokenResource);
+		expect(request.getAttribute(RequestProperties.HTTP_CLIENT_RESOURCE)).andReturn(httpClientResource);
 		
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));
@@ -137,6 +141,8 @@ public class ActiveSyncServletTest {
 	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, DaoException {
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		expectLastCall().once();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		expectLastCall().once();
 		userDataRequest.closeResources();
 		expectLastCall();

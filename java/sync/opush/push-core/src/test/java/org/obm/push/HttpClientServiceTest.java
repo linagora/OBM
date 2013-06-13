@@ -29,45 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.calendar;
+package org.obm.push;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.push.resource.HttpClientResource;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+@RunWith(SlowFilterRunner.class)
+public class HttpClientServiceTest {
 
-public class CalendarClient extends AbstractEventSyncClient {
+	@Test
+	public void testSetHttpClientRequestAttribute() {
+		HttpServletRequest request = createMock(HttpServletRequest.class);
+		request.setAttribute(eq(RequestProperties.HTTP_CLIENT_RESOURCE), anyObject(HttpClient.class));
+		expectLastCall();
 
-	@Singleton
-	public static class Factory {
+		replay(request);
 
-		private final SyncClientException syncClientException;
-		private final Locator locator;
-		private final Logger obmSyncLogger;
-
-		@Inject
-		protected Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
-			this.locator = locator;
-			this.obmSyncLogger = obmSyncLogger;
-		}
+		HttpClientService httpClientService = new HttpClientService();
+		HttpClientResource httpClientResource = httpClientService.setHttpClientRequestAttribute(request);
 		
-		public CalendarClient create(HttpClient httpClient) {
-			return new CalendarClient(syncClientException, locator, obmSyncLogger, httpClient);
-		}
+		verify(request);
+		assertThat(httpClientResource).isNotNull();
 	}
-	
-	private CalendarClient(SyncClientException syncClientException, 
-			Locator locator, 
-			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
-			HttpClient httpClient) {
-		
-		super("/calendar", syncClientException, locator, obmSyncLogger, httpClient);
-	}
-
 }

@@ -43,6 +43,8 @@ import javax.xml.transform.TransformerException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.message.BasicNameValuePair;
 import org.obm.locator.LocatorClientException;
@@ -69,13 +71,15 @@ public abstract class AbstractClientImpl {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Logger obmSyncLogger;
 	protected final SyncClientException exceptionFactory;
+	protected final HttpClient httpClient;
 	
 	protected abstract Locator getLocator();
 
-	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger) {
+	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger, HttpClient httpClient) {
 		super();
 		this.exceptionFactory = exceptionFactory;
 		this.obmSyncLogger = obmSyncLogger;
+		this.httpClient = httpClient;
 	}
 
 	protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
@@ -143,7 +147,7 @@ public abstract class AbstractClientImpl {
 	private InputStream executePostAndGetResultStream(Request request, Multimap<String, String> parameters) throws IOException {
 		InputStream is = null;
 		setPostRequestParameters(request, parameters);
-		HttpResponse response = request.execute().returnResponse();
+		HttpResponse response = Executor.newInstance(httpClient).execute(request).returnResponse();
 		int httpResultStatus = response.getStatusLine().getStatusCode();
 		if (isHttpStatusOK(httpResultStatus)) {
 			is = response.getEntity().getContent();

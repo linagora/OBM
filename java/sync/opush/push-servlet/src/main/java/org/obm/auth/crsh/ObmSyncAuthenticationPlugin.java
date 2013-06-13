@@ -31,27 +31,29 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.auth.crsh;
 
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
 public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> implements
 		AuthenticationPlugin {
 
-	private final LoginService loginService;
+	private final LoginClient.Factory loginClientFactory;
 
 	@Inject
-	private ObmSyncAuthenticationPlugin(LoginService loginService) {
-		this.loginService = loginService;
+	private ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory) {
+		this.loginClientFactory = loginClientFactory;
 	}
 	
 	@Override
 	public boolean authenticate(String username, String password) throws Exception {
 		try {
-			return loginService.authenticateGlobalAdmin(username, password);
+			return loginClientFactory.create(new DefaultHttpClient())
+					.authenticateGlobalAdmin(username, password);
 		} catch (AuthFault e) {
 			return false;
 		}

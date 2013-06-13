@@ -54,19 +54,19 @@ import org.obm.push.mail.MailBackend;
 import org.obm.push.state.SyncKeyFactory;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
+import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 
 public class SpushnikScenarioTestUtils {
 
 	public static void mockWorkingFolderSync(
 			ClassToInstanceAgregateView<Object> classToInstanceMap, OpushUser userFixture) throws AuthFault {
 		
-		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginService.class), userFixture);
+		IntegrationTestUtils.expectUserLoginFromOpush(classToInstanceMap.get(LoginClient.class), userFixture);
 		User user = userFixture.user;
 		DeviceId deviceId = new DeviceId("spushnik");
 		Device device = new Device(user.hashCode(), 

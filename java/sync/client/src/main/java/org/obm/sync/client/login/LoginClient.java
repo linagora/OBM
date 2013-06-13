@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.login;
 
+import javax.inject.Singleton;
+
+import org.apache.http.client.HttpClient;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.technicallog.bean.KindToBeLogged;
@@ -58,15 +61,46 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class LoginClient extends AbstractClientImpl implements LoginService {
 
+	@Singleton
+	public static class Factory {
+
+		protected final String origin;
+		protected final ConfigurationService configurationService;
+		protected final SyncClientException syncClientException;
+		protected final Locator locator;
+		protected final Logger obmSyncLogger;
+
+		@Inject
+		protected Factory(@Named("origin")String origin,
+				ConfigurationService configurationService,
+				SyncClientException syncClientException, 
+				Locator locator, 
+				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			
+			this.origin = origin;
+			this.configurationService = configurationService;
+			this.syncClientException = syncClientException;
+			this.locator = locator;
+			this.obmSyncLogger = obmSyncLogger;
+		}
+		
+		public LoginClient create(HttpClient httpClient) {
+			return new LoginClient(origin, configurationService, syncClientException, locator, obmSyncLogger, httpClient);
+		}
+	}
+	
 	private final Locator locator;
 	private final String origin;
 	private final ConfigurationService configurationService;
 
-	@Inject
 	protected LoginClient(@Named("origin")String origin,
 			ConfigurationService configurationService,
-			SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-		super(syncClientException, obmSyncLogger);
+			SyncClientException syncClientException, 
+			Locator locator, 
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
+			HttpClient httpClient) {
+		
+		super(syncClientException, obmSyncLogger, httpClient);
 		this.origin = origin;
 		this.configurationService = configurationService;
 		this.locator = locator;
@@ -116,12 +150,8 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	@Override
 	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
 		AccessToken token = login(loginAtDomain, password);
-		try {
-			if (token == null || token.getSessionId() == null) {
-				throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
-			}
-		} finally {
-			logout(token);
+		if (token == null || token.getSessionId() == null) {
+			throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
 		}
 		return token;
 	}

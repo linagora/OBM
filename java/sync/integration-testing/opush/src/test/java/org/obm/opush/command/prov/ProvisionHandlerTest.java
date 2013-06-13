@@ -70,7 +70,7 @@ import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.ProvisionResponse;
 
@@ -452,8 +452,8 @@ public class ProvisionHandlerTest {
 	private void mockProvisionNeeds(OpushUser user)
 			throws DaoException, AuthFault, CollectionNotFoundException {
 		
-		LoginService loginService = classToInstanceMap.get(LoginService.class);
-		expectUserLoginFromOpush(loginService, user);
+		LoginClient loginClient = classToInstanceMap.get(LoginClient.class);
+		expectUserLoginFromOpush(loginClient, user);
 		
 		expectUserCollectionsNeverChange(classToInstanceMap.get(CollectionDao.class), fakeTestUsers, Sets.<Integer>newHashSet());
 		

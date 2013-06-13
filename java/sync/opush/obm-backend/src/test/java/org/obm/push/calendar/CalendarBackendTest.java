@@ -49,6 +49,8 @@ import java.util.Set;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.util.Strings;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,6 +65,7 @@ import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.DataDelta;
+import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
@@ -137,6 +140,7 @@ public class CalendarBackendTest {
 	
 	private MappingService mappingService;
 	private CalendarClient calendarClient;
+	private CalendarClient.Factory calendarClientFactory;
 	private EventConverter eventConverter;
 	private EventService eventService;
 	private Provider<CollectionPath.Builder> collectionPathBuilderProvider;
@@ -175,9 +179,14 @@ public class CalendarBackendTest {
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IHttpClientResource httpClientResource = mockControl.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		
 		this.mappingService = mockControl.createMock(MappingService.class);
 		this.calendarClient = mockControl.createMock(CalendarClient.class);
+		this.calendarClientFactory = mockControl.createMock(CalendarClient.Factory.class);
 		this.eventConverter = mockControl.createMock(EventConverter.class);
 		this.eventService = mockControl.createMock(EventService.class);
 		this.collectionPathBuilderProvider = mockControl.createMock(Provider.class);
@@ -193,8 +202,11 @@ public class CalendarBackendTest {
 		consistencyLogger.log(anyObject(Logger.class), anyObject(EventChanges.class));
 		expectLastCall().anyTimes();
 		
+		expect(calendarClientFactory.create(anyObject(HttpClient.class)))
+			.andReturn(calendarClient).anyTimes();
+		
 		this.calendarBackend = new CalendarBackend(mappingService, 
-				calendarClient, 
+				calendarClientFactory, 
 				eventConverter, 
 				eventService, 
 				collectionPathBuilderProvider, consistencyLogger, eventExtIdFactory, 
@@ -276,6 +288,10 @@ public class CalendarBackendTest {
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IHttpClientResource httpClientResource = mockControl.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "test@test";
@@ -336,6 +352,10 @@ public class CalendarBackendTest {
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IHttpClientResource httpClientResource = mockControl.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "added@test";
@@ -424,6 +444,10 @@ public class CalendarBackendTest {
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IHttpClientResource httpClientResource = mockControl.createMock(IHttpClientResource.class);
+		expect(httpClientResource.getHttpClient())
+			.andReturn(new DefaultHttpClient()).anyTimes();
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
 		
 		expectObmSyncCalendarChanges(
 				newCalendarInfo("1", calendarBackendName),

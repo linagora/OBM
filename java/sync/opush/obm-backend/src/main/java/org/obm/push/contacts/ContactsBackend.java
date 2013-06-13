@@ -82,6 +82,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
+import org.obm.sync.client.book.BookClient;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
@@ -100,18 +101,19 @@ import com.google.inject.Singleton;
 public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	private final ContactConfiguration contactConfiguration;
-	private final IAddressBook bookClient;
+	private final BookClient.Factory bookClientFactory;
 	private final BackendWindowingService backendWindowingService;
 	private final ClientIdService clientIdService;
 	@Inject
-	@VisibleForTesting ContactsBackend(MappingService mappingService, IAddressBook bookClient, 
+	@VisibleForTesting ContactsBackend(MappingService mappingService, 
+			BookClient.Factory bookClientFactory, 
 			ContactConfiguration contactConfiguration,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
 			BackendWindowingService backendWindowingService,
 			ClientIdService clientIdService) {
 		
 		super(mappingService, collectionPathBuilderProvider);
-		this.bookClient = bookClient;
+		this.bookClientFactory = bookClientFactory;
 		this.contactConfiguration = contactConfiguration;
 		this.backendWindowingService = backendWindowingService;
 		this.clientIdService = clientIdService;
@@ -245,7 +247,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		AccessToken token = getAccessToken(udr);
 		Date lastSyncDate = backendLastSyncDate(lastKnownState);
 		try {
-			return bookClient.listAddressBooksChanged(token, lastSyncDate);
+			return getBookClient(udr).listAddressBooksChanged(token, lastSyncDate);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -349,7 +351,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	private List<AddressBook> listAddressBooks(UserDataRequest udr) throws UnexpectedObmSyncServerException {
 		AccessToken token = getAccessToken(udr);
 		try {
-			return bookClient.listAllBooks(token);
+			return getBookClient(udr).listAllBooks(token);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -359,9 +361,9 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		AccessToken token = getAccessToken(udr);
 		try {
 			if (state.isInitial()) {
-				return bookClient.firstListContactsChanged(token, state.getSyncDate(), addressBookId);
+				return getBookClient(udr).firstListContactsChanged(token, state.getSyncDate(), addressBookId);
 			}
-			return bookClient.listContactsChanged(token, state.getSyncDate(), addressBookId);
+			return getBookClient(udr).listContactsChanged(token, state.getSyncDate(), addressBookId);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -407,7 +409,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = getAccessToken(udr);
 		try {
-			return bookClient.modifyContact(token, addressBookId, contact);
+			return getBookClient(udr).modifyContact(token, addressBookId, contact);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -418,7 +420,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = getAccessToken(udr);
 		try {
-			return bookClient.createContact(token, addressBookId, contact, clientIdService.hash(udr, clientId));
+			return getBookClient(udr).createContact(token, addressBookId, contact, clientIdService.hash(udr, clientId));
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -445,7 +447,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = getAccessToken(udr);
 		try {
-			return bookClient.removeContact(token, addressBookId, contactId);
+			return getBookClient(udr).removeContact(token, addressBookId, contactId);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
@@ -485,12 +487,16 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 		
 		AccessToken token = getAccessToken(udr);
 		try {
-			return bookClient.getContactFromId(token, addressBookId, contactId);
+			return getBookClient(udr).getContactFromId(token, addressBookId, contactId);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
 	}
 
+	private IAddressBook getBookClient(UserDataRequest udr) {
+		return bookClientFactory.create(udr.getHttpClientResource().getHttpClient());
+	}
+	
 	@Override
 	public String move(UserDataRequest udr, String srcFolder, String dstFolder,
 			String messageId) throws CollectionNotFoundException,

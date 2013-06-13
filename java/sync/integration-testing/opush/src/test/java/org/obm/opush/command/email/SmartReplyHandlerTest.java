@@ -61,9 +61,9 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.ServerId;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
+import org.obm.sync.client.user.UserClient;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.services.ICalendar;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -106,10 +106,10 @@ public class SmartReplyHandlerTest {
 		serverId = new ServerId(ServerId.buildServerIdString(inboxCollectionId, 1l));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
-		ICalendar iCalendar = classToInstanceMap.get(ICalendar.class);
+		UserClient userClient = classToInstanceMap.get(UserClient.class);
 		mockUsersAccess(classToInstanceMap, Lists.newArrayList(user));
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
-		expect(iCalendar.getUserEmail(user.accessToken)).andReturn(user.user.getLoginAtDomain()).anyTimes();
+		expect(userClient.getUserEmail(user.accessToken)).andReturn(user.user.getLoginAtDomain()).anyTimes();
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration").anyTimes();
 	}
 	

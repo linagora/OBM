@@ -72,7 +72,7 @@ import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.wbxml.WBXMLTools;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.WBXMLOPClient;
 import org.obm.sync.push.client.XMLOPClient;
@@ -89,15 +89,15 @@ public class IntegrationTestUtils {
 		expect(stateMachine.getItemSyncState(syncKey)).andReturn(syncState).anyTimes();
 	}
 	
-	public static void expectUserLoginFromOpush(LoginService loginService, Collection<OpushUser> users) throws AuthFault {
+	public static void expectUserLoginFromOpush(LoginClient loginClient, Collection<OpushUser> users) throws AuthFault {
 		for (OpushUser user : users) {
-			expectUserLoginFromOpush(loginService, user);
+			expectUserLoginFromOpush(loginClient, user);
 		}
 	}
 	
-	public static void expectUserLoginFromOpush(LoginService loginService, OpushUser user) throws AuthFault {
-		expect(loginService.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
-		loginService.logout(user.accessToken);
+	public static void expectUserLoginFromOpush(LoginClient loginClient, OpushUser user) throws AuthFault {
+		expect(loginClient.authenticate(user.user.getLoginAtDomain(), user.password)).andReturn(user.accessToken).anyTimes();
+		loginClient.logout(user.accessToken);
 		expectLastCall().anyTimes();
 	}
 

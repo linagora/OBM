@@ -38,7 +38,9 @@ import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +49,6 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.User.Factory;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @RunWith(SlowFilterRunner.class)
@@ -141,7 +142,7 @@ public class UserDataRequestTest {
 		assertThat(userDataRequest.getResources()).isEmpty();
 	}
 
-	private Map<UserDataRequestResource, Resource> createResourcesMap() {
+	private TreeMap<UserDataRequestResource, Resource> createResourcesMap() {
 		resource1 = createMock(Resource.class);
 		resource1.close();
 		expectLastCall().once();
@@ -150,7 +151,7 @@ public class UserDataRequestTest {
 		expectLastCall().once();
 		replay(resource1, resource2);
 		
-		Map<UserDataRequestResource, Resource> resources = Maps.newHashMap();
+		TreeMap<UserDataRequestResource, Resource> resources = Maps.newTreeMap();
 		resources.put(UserDataRequestResource.ACCESS_TOKEN, resource1);
 		resources.put(UserDataRequestResource.IMAP_STORE, resource2);
 		return resources;
@@ -167,8 +168,8 @@ public class UserDataRequestTest {
 	public void testGetResource() {
 		UserDataRequest userDataRequest = createUserDataRequest();
 		Resource resource = createMock(Resource.class);
-		Map<UserDataRequestResource, Resource> resources = 
-				ImmutableMap.of(UserDataRequestResource.ACCESS_TOKEN, resource);
+		Map<UserDataRequestResource, Resource> resources = Maps.newHashMap();
+		resources.put(UserDataRequestResource.ACCESS_TOKEN, resource);
 		
 		userDataRequest.putAllResources(resources);
 		
@@ -230,7 +231,7 @@ public class UserDataRequestTest {
 		
 		replay(resource1, resource2);
 		
-		Map<UserDataRequestResource, Resource> resources = Maps.newHashMap();
+		TreeMap<UserDataRequestResource, Resource> resources = Maps.newTreeMap();
 		resources.put(UserDataRequestResource.ACCESS_TOKEN, resource1);
 		resources.put(UserDataRequestResource.IMAP_STORE, resource2);
 		userDataRequest.putAllResources(resources);
@@ -247,6 +248,24 @@ public class UserDataRequestTest {
 		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 		
 		assertThat(userDataRequest.getAccessTokenResource()).isEqualTo(accessTokenResource);
+	}
+	
+	@Test 
+	public void testCloseOrder() {
+		UserDataRequest userDataRequest = createUserDataRequest();
+		IAccessTokenResource accessTokenResource = createMock(IAccessTokenResource.class);
+		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		IAccessTokenResource accessTokenResource2 = createMock(IAccessTokenResource.class);
+		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, accessTokenResource2);
+		IAccessTokenResource accessTokenResource3 = createMock(IAccessTokenResource.class);
+		userDataRequest.putResource(UserDataRequestResource.IMAP_STORE, accessTokenResource3);
+
+		int previousOrder = -1;
+		for (Entry<UserDataRequestResource, Resource> udrr : userDataRequest.getResources().entrySet()) {
+			assertThat(udrr.getKey().closeOrder()).isGreaterThan(previousOrder);
+			previousOrder = udrr.getKey().closeOrder();
+		}
+			
 	}
 	
 	private UserDataRequest createUserDataRequest() {

@@ -95,7 +95,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
-import org.obm.sync.client.CalendarType;
+import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.services.ICalendar;
 
@@ -110,7 +110,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
 public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICalendarBackend {
@@ -121,7 +120,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	
 	private final EventConverter eventConverter;
 	private final EventService eventService;
-	private final ICalendar calendarClient;
+	private final CalendarClient.Factory calendarClientFactory;
 	private final ConsistencyEventChangesLogger consistencyLogger;
 	private final EventExtId.Factory eventExtIdFactory;
 	private final BackendWindowingService backendWindowingService;
@@ -130,7 +129,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	private final Factory ical4jUserFactory;
 	@Inject
 	@VisibleForTesting CalendarBackend(MappingService mappingService, 
-			@Named(CalendarType.CALENDAR) ICalendar calendarClient, 
+			CalendarClient.Factory calendarClientFactory, 
 			EventConverter eventConverter, 
 			EventService eventService,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider, ConsistencyEventChangesLogger consistencyLogger,
@@ -141,7 +140,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			Ical4jUser.Factory ical4jUserFactory) {
 		
 		super(mappingService, collectionPathBuilderProvider);
-		this.calendarClient = calendarClient;
+		this.calendarClientFactory = calendarClientFactory;
 		this.eventConverter = eventConverter;
 		this.eventService = eventService;
 		this.consistencyLogger = consistencyLogger;
@@ -192,7 +191,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		Builder builder = PathsToCollections.builder();
 		AccessToken token = getAccessToken(udr);
 		try {
-			CalendarInfo[] cals = calendarClient.listCalendars(token);
+			CalendarInfo[] cals = getCalendarClient(udr).listCalendars(token);
 			for (CalendarInfo ci : cals) {
 				CollectionPath collectionPath = collectionPathOfCalendar(udr, ci.getMail());
 				builder.put(collectionPath, OpushCollection.builder()
@@ -306,9 +305,9 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			Date filteredSyncDate = state.getFilteredSyncDate(collectionOptions.getFilterType());
 			boolean syncFiltered = filteredSyncDate != state.getSyncDate();
 			if (state.isInitial()) {
-				changes = initialSync(collectionPath, token, filteredSyncDate, syncFiltered);
+				changes = initialSync(collectionPath, token, filteredSyncDate, syncFiltered, udr);
 			} else {
-				changes = sync(collectionPath, token, filteredSyncDate, syncFiltered);
+				changes = sync(collectionPath, token, filteredSyncDate, syncFiltered, udr);
 			}
 			
 			consistencyLogger.log(logger, changes);
@@ -329,28 +328,28 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		}
 	}
 
-	private EventChanges initialSync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered)
+	private EventChanges initialSync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered, UserDataRequest udr)
 			throws ServerFault, org.obm.sync.NotAllowedException {
 		
 		if (syncFiltered) {
-			return calendarClient.getFirstSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
+			return getCalendarClient(udr).getFirstSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
 		} 
-		return calendarClient.getFirstSync(token, collectionPath.backendName(), filteredSyncDate);
+		return getCalendarClient(udr).getFirstSync(token, collectionPath.backendName(), filteredSyncDate);
 	}
 
-	private EventChanges sync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered) 
+	private EventChanges sync(CollectionPath collectionPath, AccessToken token, Date filteredSyncDate, boolean syncFiltered, UserDataRequest udr) 
 			throws ServerFault, org.obm.sync.NotAllowedException {
 		
 		if (syncFiltered) {
-			return calendarClient.getSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
+			return getCalendarClient(udr).getSyncEventDate(token, collectionPath.backendName(), filteredSyncDate);
 		} 
-		return calendarClient.getSync(token, collectionPath.backendName(), filteredSyncDate);
+		return getCalendarClient(udr).getSync(token, collectionPath.backendName(), filteredSyncDate);
 	}
 	
 	@VisibleForTesting DataDelta buildDataDelta(UserDataRequest udr, Integer collectionId,
 			AccessToken token, EventChanges changes, SyncKey newSyncKey) throws ServerFault,
 			DaoException, ConversionException {
-		final String userEmail = calendarClient.getUserEmail(token);
+		final String userEmail = getCalendarClient(udr).getUserEmail(token);
 		Preconditions.checkNotNull(userEmail, "User has no email address");
 
 		return DataDelta.builder()
@@ -434,7 +433,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		
 		try {
 			EventExtId eventExtId = getEventExtId(udr, msEvent);
-			Event oldEvent = fetchReferenceEvent(token, serverId, eventExtId, collectionPath);
+			Event oldEvent = fetchReferenceEvent(token, serverId, eventExtId, collectionPath, udr);
 			EventObmId eventId = getEventId(oldEvent);
 			
 			EventObmId newEventId = chooseBackendChange(udr, msEvent, collectionPath, token, eventExtId, oldEvent, eventId, clientId);
@@ -464,7 +463,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			throws org.obm.sync.NotAllowedException, ServerFault {
 		
 		if (isParticipationChangeUpdate(collectionPath, oldEvent)) {
-			updateUserStatus(oldEvent, AttendeeStatus.ACCEPT, token, collectionPath);
+			updateUserStatus(oldEvent, AttendeeStatus.ACCEPT, token, collectionPath, udr);
 			return eventId;
 		} else if (isEventModification(eventId)){
 			updateEvent(token, udr, collectionPath, oldEvent, eventExtId, msEvent);
@@ -486,13 +485,13 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 
 	private Event fetchReferenceEvent(AccessToken token,
-			String serverId, EventExtId eventExtId, CollectionPath collectionPath)
+			String serverId, EventExtId eventExtId, CollectionPath collectionPath, UserDataRequest udr)
 					throws ServerFault, EventNotFoundException, org.obm.sync.NotAllowedException {
 		if (serverId != null) {
 			EventObmId id = convertServerIdToEventObmId(serverId);
-			return calendarClient.getEventFromId(token, collectionPath.backendName(), id);	
+			return getCalendarClient(udr).getEventFromId(token, collectionPath.backendName(), id);	
 		} else if (eventExtId != null && !Strings.isNullOrEmpty(eventExtId.getExtId())) {
-			return getEventFromExtId(token, eventExtId, collectionPath);
+			return getEventFromExtId(token, eventExtId, collectionPath, udr);
 		}
 		return null;
 	}
@@ -512,7 +511,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		if (event.getExtId() == null || event.getExtId().getExtId() == null) {
 			event.setExtId(oldEvent.getExtId());
 		}
-		calendarClient.modifyEvent(token, collectionPath.backendName(), event, true, true);
+		getCalendarClient(udr).modifyEvent(token, collectionPath.backendName(), event, true, true);
 	}
 
 	private void setSequence(Event oldEvent, Event event) {
@@ -531,9 +530,9 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
 		assignExtId(udr, msEvent, eventExtId, event);
 		try { 
-			return calendarClient.createEvent(token, collectionPath.backendName(), event, true, clientIdService.hash(udr, clientId));
+			return getCalendarClient(udr).createEvent(token, collectionPath.backendName(), event, true, clientIdService.hash(udr, clientId));
 		} catch (EventAlreadyExistException e) {
-			return getEventIdFromExtId(token, collectionPath, event);
+			return getEventIdFromExtId(token, collectionPath, event, udr);
 		}
 	}
 
@@ -556,11 +555,11 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		return eventConverter.convert(udr.getUser(), oldEvent, data, isInternal);
 	}
 	
-	private EventObmId getEventIdFromExtId(AccessToken token, CollectionPath collectionPath, Event event)
+	private EventObmId getEventIdFromExtId(AccessToken token, CollectionPath collectionPath, Event event, UserDataRequest udr)
 			throws UnexpectedObmSyncServerException, org.obm.sync.NotAllowedException {
 		
 		try {
-			return calendarClient.getEventObmIdFromExtId(token, collectionPath.backendName(), event.getExtId());
+			return getCalendarClient(udr).getEventObmIdFromExtId(token, collectionPath.backendName(), event.getExtId());
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} catch (EventNotFoundException e) {
@@ -580,8 +579,8 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 			try {
 				logger.info("Delete event serverId {} in calendar {}", serverId, collectionPath.backendName());
 				//FIXME: not transactional
-				Event evr = getEventFromServerId(token, collectionPath, serverId);
-				calendarClient.removeEventById(token, collectionPath.backendName(), evr.getObmId(), evr.getSequence(), true);
+				Event evr = getEventFromServerId(token, collectionPath, serverId, udr);
+				getCalendarClient(udr).removeEventById(token, collectionPath.backendName(), evr.getObmId(), evr.getSequence(), true);
 			} catch (ServerFault e) {
 				throw new UnexpectedObmSyncServerException(e);
 			} catch (EventNotFoundException e) {
@@ -604,8 +603,8 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		try {
 			Event event = convertICalendarToEvent(udr, at, (org.obm.icalendar.ICalendar) iCalendar);
 			logger.info("handleMeetingResponse = {}", event.getExtId());
-			Event obmEvent = createOrModifyInvitationEvent(at, event, collectionPath);
-			updateUserStatus(obmEvent, status, at, collectionPath);
+			Event obmEvent = createOrModifyInvitationEvent(at, event, collectionPath, udr);
+			updateUserStatus(obmEvent, status, at, collectionPath, udr);
 			Integer collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath.collectionPath());
 			return getServerIdFor(collectionId, obmEvent.getObmId());
 		} catch (org.obm.sync.NotAllowedException e) {
@@ -618,22 +617,22 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		}
 	}
 
-	private Event createOrModifyInvitationEvent(AccessToken at, Event event, CollectionPath collectionPath) 
+	private Event createOrModifyInvitationEvent(AccessToken at, Event event, CollectionPath collectionPath, UserDataRequest udr) 
 		throws UnexpectedObmSyncServerException, EventNotFoundException, 
 			ConversionException, DaoException, org.obm.sync.NotAllowedException {
 		
 		try {
 			boolean internalEvent = event.isInternalEvent();
 			if (internalEvent) {
-				return calendarClient.getEventFromExtId(at, collectionPath.backendName(), event.getExtId());
+				return getCalendarClient(udr).getEventFromExtId(at, collectionPath.backendName(), event.getExtId());
 			}
 			
-			Event previousEvent = getEventFromExtId(at, event.getExtId(), collectionPath);
+			Event previousEvent = getEventFromExtId(at, event.getExtId(), collectionPath, udr);
 			if (previousEvent == null) {
 				try {
 					logger.info("createOrModifyInvitationEvent : create new event {}", event.getObmId());
-					EventObmId id = calendarClient.createEvent(at, collectionPath.backendName(), event, internalEvent, null);
-					return calendarClient.getEventFromId(at, collectionPath.backendName(), id);
+					EventObmId id = getCalendarClient(udr).createEvent(at, collectionPath.backendName(), event, internalEvent, null);
+					return getCalendarClient(udr).getEventFromId(at, collectionPath.backendName(), id);
 				} catch (EventAlreadyExistException e) {
 					throw new UnexpectedObmSyncServerException("it's not possible because getEventFromExtId == null");
 				}
@@ -643,7 +642,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 				event.setSequence(previousEvent.getSequence());
 				if (!previousEvent.isInternalEvent()) {
 					logger.info("createOrModifyInvitationEvent : update event {}", event.getObmId());
-					previousEvent = calendarClient.modifyEvent(at, collectionPath.backendName(), event, true, false);
+					previousEvent = getCalendarClient(udr).modifyEvent(at, collectionPath.backendName(), event, true, false);
 				}
 				return previousEvent;
 			}	
@@ -697,24 +696,24 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 
 	private Event getEventFromExtId(AccessToken at, EventExtId eventExtId, 
-			CollectionPath collectionPath) 
+			CollectionPath collectionPath, UserDataRequest udr) 
 		throws ServerFault, org.obm.sync.NotAllowedException {
 		
 		try {
-			return calendarClient.getEventFromExtId(at, collectionPath.backendName(), eventExtId);
+			return getCalendarClient(udr).getEventFromExtId(at, collectionPath.backendName(), eventExtId);
 		} catch (EventNotFoundException e) {
 			logger.info(e.getMessage());
 		}
 		return null;
 	}
 	
-	private void updateUserStatus(Event event, AttendeeStatus status, AccessToken at, CollectionPath collectionPath)
+	private void updateUserStatus(Event event, AttendeeStatus status, AccessToken at, CollectionPath collectionPath, UserDataRequest udr)
 			throws CollectionNotFoundException, DaoException, UnexpectedObmSyncServerException, org.obm.sync.NotAllowedException {
 		
 		logger.info("update user status {} in calendar {}", status, collectionPath.backendName());
 		Participation participationStatus = eventConverter.getParticipation(status);
 		try {
-			calendarClient.changeParticipationState(at, collectionPath.backendName(), event.getExtId(), 
+			getCalendarClient(udr).changeParticipationState(at, collectionPath.backendName(), event.getExtId(), 
 					participationStatus, event.getSequence(), true);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
@@ -739,7 +738,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		AccessToken token = getAccessToken(udr);
 		for (String serverId : fetchServerIds) {
 			try {
-				Event event = getEventFromServerId(token, collectionPath, serverId);
+				Event event = getEventFromServerId(token, collectionPath, serverId, udr);
 				if (event != null) {
 					ItemChange ic = createItemChangeToAddFromEvent(udr, event, serverId);
 					ret.add(ic);
@@ -755,12 +754,12 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		return ret;
 	}
 	
-	private Event getEventFromServerId(AccessToken token, CollectionPath collectionPath, String serverId) throws ServerFault, EventNotFoundException, org.obm.sync.NotAllowedException {
+	private Event getEventFromServerId(AccessToken token, CollectionPath collectionPath, String serverId, UserDataRequest udr) throws ServerFault, EventNotFoundException, org.obm.sync.NotAllowedException {
 		Integer itemId = mappingService.getItemIdFromServerId(serverId);
 		if (itemId == null) {
 			return null;
 		}
-		return calendarClient.getEventFromId(token, collectionPath.backendName(), new EventObmId(itemId));
+		return getCalendarClient(udr).getEventFromId(token, collectionPath.backendName(), new EventObmId(itemId));
 	}
 
 	@Override
@@ -778,4 +777,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 						+ collectionPath);
 	}
 
+	private ICalendar getCalendarClient(UserDataRequest udr) {
+		return calendarClientFactory.create(udr.getHttpClientResource().getHttpClient());
+	}
 }

@@ -31,9 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.resource;
 
+import org.apache.http.client.HttpClient;
 import org.obm.push.backend.IAccessTokenResource;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.client.login.LoginClient;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -44,30 +45,33 @@ public class AccessTokenResource implements IAccessTokenResource {
 	@Singleton
 	public static class Factory implements IAccessTokenResource.Factory {
 
-		private final LoginService loginService;
+		private final LoginClient.Factory loginClientFactory;
 
 		@Inject 
-		@VisibleForTesting Factory(LoginService loginService) {
-			this.loginService = loginService;
+		@VisibleForTesting Factory(LoginClient.Factory loginClientFactory) {
+			this.loginClientFactory = loginClientFactory;
 		}
 
 		@Override
-		public AccessTokenResource create(Object accessToken) {
-			return new AccessTokenResource(loginService, accessToken);
+		public AccessTokenResource create(HttpClient httpClient, Object accessToken) {
+			return new AccessTokenResource(loginClientFactory, httpClient, accessToken);
 		}
 	}
 	
-	private final LoginService loginService;
+	private final LoginClient.Factory loginClientFactory;
 	private final Object accessToken;
+	private final HttpClient httpClient;
 	
-	private AccessTokenResource(LoginService loginService, Object accessToken) {
-		this.loginService = loginService;
+	private AccessTokenResource(LoginClient.Factory loginClientFactory, HttpClient httpClient, Object accessToken) {
+		this.loginClientFactory = loginClientFactory;
+		this.httpClient = httpClient;
 		this.accessToken = accessToken;
 	}
 	
 	@Override
 	public void close() {
-		loginService.logout(getAccessToken());
+		loginClientFactory.create(httpClient)
+			.logout(getAccessToken());
 	}
 
 	@Override

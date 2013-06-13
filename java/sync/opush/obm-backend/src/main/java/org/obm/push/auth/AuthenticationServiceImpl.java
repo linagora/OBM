@@ -31,11 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.auth;
 
+import org.apache.http.client.HttpClient;
 import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.User;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.service.AuthenticationService;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginService;
+import org.obm.sync.auth.ServerFault;
+import org.obm.sync.client.login.LoginClient;
+import org.obm.sync.client.user.UserClient;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -43,21 +48,41 @@ import com.google.inject.Singleton;
 @Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-	private final LoginService loginService;
+	private final LoginClient.Factory loginClientFactory;
 	private final User.Factory userFactory;
+	private final UserClient.Factory userClientFactory;
 	private final IAccessTokenResource.Factory accessTokenResourceFactory;
 
 	@Inject
-	private AuthenticationServiceImpl(LoginService loginService, User.Factory userFactory,
+	private AuthenticationServiceImpl(LoginClient.Factory loginClientFactory, 
+			User.Factory userFactory,
+			UserClient.Factory userClientFactory,
 			IAccessTokenResource.Factory accessTokenResourceFactory) {
-		this.loginService = loginService;
+		
+		this.loginClientFactory = loginClientFactory;
 		this.userFactory = userFactory;
+		this.userClientFactory = userClientFactory;
 		this.accessTokenResourceFactory = accessTokenResourceFactory;
 	}
 	
 	@Override
-	public IAccessTokenResource authenticate(String userId, String password) throws Exception {
-		AccessToken accessToken = loginService.authenticate(userFactory.getLoginAtDomain(userId), password);
-		return accessTokenResourceFactory.create(accessToken);
+	public IAccessTokenResource authenticate(HttpClient httpClient, String userId, String password) throws Exception {
+		AccessToken accessToken = loginClientFactory.create(httpClient)
+				.authenticate(userFactory.getLoginAtDomain(userId), password);
+		return accessTokenResourceFactory.create(httpClient, accessToken);
+	}
+	
+	@Override
+	public String getUserEmail(UserDataRequest udr) {
+		try {
+			return userClientFactory.create(udr.getHttpClientResource().getHttpClient())
+					.getUserEmail(getAccessToken(udr));
+		} catch (ServerFault e) {
+			throw new UnexpectedObmSyncServerException(e);
+		}
+	}
+
+	private AccessToken getAccessToken(UserDataRequest udr) {
+		return (AccessToken) udr.getAccessTokenResource().getAccessToken();
 	}
 }

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.calendar;
 
+import org.apache.http.client.HttpClient;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
@@ -40,12 +41,33 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-@Singleton
 public class TodoClient extends AbstractEventSyncClient {
+
+	@Singleton
+	public static class Factory {
+
+		private final SyncClientException syncClientException;
+		private final Locator locator;
+		private final Logger obmSyncLogger;
+
+		@Inject
+		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientException = syncClientException;
+			this.locator = locator;
+			this.obmSyncLogger = obmSyncLogger;
+		}
+		
+		public TodoClient create(HttpClient httpClient) {
+			return new TodoClient(syncClientException, locator, obmSyncLogger, httpClient);
+		}
+	}
 	
-	@Inject
-	private TodoClient(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-		super("/todo", syncClientException, locator, obmSyncLogger);
+	private TodoClient(SyncClientException syncClientException, 
+			Locator locator, 
+			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
+			HttpClient httpClient) {
+		
+		super("/todo", syncClientException, locator, obmSyncLogger, httpClient);
 	}
 	
 }
