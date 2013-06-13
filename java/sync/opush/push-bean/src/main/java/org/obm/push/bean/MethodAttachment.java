@@ -31,23 +31,44 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 /**
  * This enum is serialized, take care of changes done there for older version compatibility
  */
 public enum MethodAttachment {
-	NormalAttachment, // 1
-	EmbeddedMessage, // 5
-	AttachOLE;// 6
+	
+	NormalAttachment("1"),
+	EmbeddedMessage("5"),
+	AttachOLE("6");
 
-	public String asIntString() {
-		switch (this) {
-		case AttachOLE:
-			return "6";
-		case EmbeddedMessage:
-			return "5";
-		case NormalAttachment:
-		default:
-			return "1";
+	private final String specificationValue;
+	
+	private MethodAttachment(String specificationValue) {
+		this.specificationValue = specificationValue;
+	}
+
+	public String asSpecificationValue() {
+		return specificationValue;
+	}
+
+	public static MethodAttachment fromSpecificationValue(String specificationValue){
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
 		}
+		return null;
+	}
+	
+	private static Map<String, MethodAttachment> specValueToEnum;
+	
+	static {
+		Builder<String, MethodAttachment> builder = ImmutableMap.builder();
+		for (MethodAttachment method : values()) {
+			builder.put(method.specificationValue, method);
+		}
+		specValueToEnum = builder.build();
 	}
 }
