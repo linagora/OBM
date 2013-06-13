@@ -100,6 +100,7 @@ public class MailViewToMSEmailConverterImplTest {
 				.displayName(subject)
 				.fileReference("file")
 				.size(20)
+				.inline(true)
 				.build());
 		InputStream attachmentInputStream = resourceAsStream("ics/attendee.ics");
 		ICalendar iCalendar = null;

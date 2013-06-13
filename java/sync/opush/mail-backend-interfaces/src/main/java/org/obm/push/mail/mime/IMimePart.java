@@ -120,4 +120,8 @@ public interface IMimePart {
 
 	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
 
+	String getContentLocation();
+
+	boolean isInline();
+
 }

@@ -147,7 +147,7 @@ public class BodyStructureParser {
 		}
 
 		Rule bodyFldLoc() {
-			return nstringNoStack();
+			return Sequence(nstring(), recordLocation());
 		}
 
 		Rule bodyFldMd5() {
@@ -336,6 +336,13 @@ public class BodyStructureParser {
 			} else {
 				return payload;
 			}
+		}
+
+		boolean recordLocation() {
+			String contentLocation = (String)pop();
+			MimePart.Builder mimePartBuilder = (Builder) peek();
+			mimePartBuilder.contentLocation(contentLocation);
+			return true;
 		}
 		
 		boolean recordBodyParams() {

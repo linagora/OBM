@@ -342,6 +342,7 @@ public class EmailViewTest {
 				.displayName("Name")
 				.fileReference("/file")
 				.size(20)
+				.inline(true)
 				.build();
 	}
 	

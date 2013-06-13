@@ -195,6 +195,16 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
+	public String getContentLocation() {
+		return from.getContentLocation();
+	}
+	
+	@Override
+	public boolean isInline() {
+		return false;
+	}
+	
+	@Override
 	public boolean isCancelInvitation() {
 		return from.isCancelInvitation();
 	}

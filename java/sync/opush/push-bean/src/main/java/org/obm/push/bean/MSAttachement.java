@@ -43,11 +43,39 @@ public class MSAttachement implements Serializable {
 	private String fileReference;
 	private MethodAttachment method;
 	private Integer estimatedDataSize;
+	private boolean inline;
+	private String contentId;
+	private String contentLocation;
 	
 	public MSAttachement(){
 		method = MethodAttachment.NormalAttachment;
+		inline = false;
 	}
 
+	public String getContentId() {
+		return contentId;
+	}
+
+	public void setContentId(String contentId) {
+		this.contentId = contentId;
+	}
+	
+	public String getContentLocation() {
+		return contentLocation;
+	}
+
+	public void setContentLocation(String contentLocation) {
+		this.contentLocation = contentLocation;
+	}
+	
+	public boolean isInline() {
+		return inline;
+	}
+
+	public void setInline(boolean inline) {
+		this.inline = inline;
+	}
+	
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -81,18 +109,22 @@ public class MSAttachement implements Serializable {
 	}
 
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(displayName, fileReference, method, estimatedDataSize);
+	public int hashCode(){
+		return Objects.hashCode(displayName, fileReference, method, 
+				estimatedDataSize, inline, contentId, contentLocation);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	public boolean equals(Object object){
 		if (object instanceof MSAttachement) {
 			MSAttachement that = (MSAttachement) object;
 			return Objects.equal(this.displayName, that.displayName)
 				&& Objects.equal(this.fileReference, that.fileReference)
 				&& Objects.equal(this.method, that.method)
-				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize);
+				&& Objects.equal(this.estimatedDataSize, that.estimatedDataSize)
+				&& Objects.equal(this.inline, that.inline)
+				&& Objects.equal(this.contentId, that.contentId)
+				&& Objects.equal(this.contentLocation, that.contentLocation);
 		}
 		return false;
 	}
@@ -100,11 +132,15 @@ public class MSAttachement implements Serializable {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
+			.add("serialVersionUID", serialVersionUID)
 			.add("displayName", displayName)
 			.add("fileReference", fileReference)
 			.add("method", method)
 			.add("estimatedDataSize", estimatedDataSize)
+			.add("inline", inline)
+			.add("contentId", contentId)
+			.add("contentLocation", contentLocation)
 			.toString();
 	}
-	
+
 }
