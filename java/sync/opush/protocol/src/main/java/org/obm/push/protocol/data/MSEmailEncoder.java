@@ -141,6 +141,9 @@ public class MSEmailEncoder {
 				DOMUtils.createElementAndText(att, ASAirs.METHOD.asASValue(), msAtt.getMethod().asSpecificationValue());
 				DOMUtils.createElementAndText(att, ASAirs.ESTIMATED_DATA_SIZE.asASValue(), 
 						msAtt.getEstimatedDataSize().toString());
+				DOMUtils.createElementAndTextIfNotNull(att, ASAirs.CONTENT_ID.asASValue(), msAtt.getContentId());
+				DOMUtils.createElementAndTextIfNotNull(att, ASAirs.CONTENT_LOCATION.asASValue(), msAtt.getContentLocation());
+				DOMUtils.createElementAndText(att, ASAirs.IS_INLINE.asASValue(), msAtt.isInline());
 			}
 		}
 	}

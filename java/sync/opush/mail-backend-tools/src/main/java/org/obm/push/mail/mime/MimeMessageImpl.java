@@ -198,6 +198,16 @@ public class MimeMessageImpl implements MimeMessage {
 	}
 
 	@Override
+	public String getContentLocation() {
+		return from.getContentLocation();
+	}
+
+	@Override
+	public boolean isInline() {
+		return false;
+	}
+	
+	@Override
 	public boolean isCancelInvitation() {
 		return from.isCancelInvitation();
 	}

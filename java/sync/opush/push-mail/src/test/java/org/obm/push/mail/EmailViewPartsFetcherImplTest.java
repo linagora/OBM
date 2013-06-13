@@ -97,6 +97,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+
 @RunWith(SlowFilterRunner.class)
 public class EmailViewPartsFetcherImplTest {
 
@@ -597,6 +598,7 @@ public class EmailViewPartsFetcherImplTest {
 						.contentType("message/rfc822")
 						.add(BodyParams.builder().add(new BodyParam("name", attachmentName)).build())
 						.build())
+				.inline(false)
 				.build();
 		
 		EmailView.Builder emailViewBuilder = createStrictMock(EmailView.Builder.class);
@@ -824,7 +826,9 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.isReplyInvitation()).andReturn(false);
-		expect(mimePart.getContentId()).andReturn(messageFixture.contentId);
+		expect(mimePart.getContentId()).andReturn(messageFixture.contentId).anyTimes();
+		expect(mimePart.getContentLocation()).andReturn(null).anyTimes();
+		expect(mimePart.isInline()).andReturn(false).anyTimes();
 		expect(mimePart.isICSAttachment()).andReturn(messageFixture.isICSAttachment);
 		expect(mimePart.decodeMimeStream(anyObject(InputStream.class)))
 			.andReturn(messageFixture.bodyDataDecoded);

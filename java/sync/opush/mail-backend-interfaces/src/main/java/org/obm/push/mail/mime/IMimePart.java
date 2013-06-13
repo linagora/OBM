@@ -29,41 +29,99 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.imap;
+package org.obm.push.mail.mime;
 
-import java.util.Map;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
 
-import org.obm.push.mail.mime.BodyParams;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimeMessageImpl;
-import org.obm.push.mail.mime.MimePart;
-import org.obm.push.mail.mime.MimePartImpl;
+import org.obm.push.mail.bean.IMAPHeaders;
 
-public class MimeMessageFactory {
 
-	public static MimePart createSimpleMimePart(String mimeType, String mimeSubtype, String contentId, 
-			String contentLocation, String encoding, Integer size, Map<String, String> bodyParams, MimePart... parts) {
-		return MimePartImpl.builder()
-			.primaryMimeType(mimeType)
-			.subMimeType(mimeSubtype)
-			.contentId(contentId)
-			.contentLocation(contentLocation)
-			.encoding(encoding)
-			.size(size)
-			.bodyParams(BodyParams.builder().bodyParams(bodyParams).build())
-			.addChildren(parts)
-			.build();
+public interface IMimePart {
+
+	interface Builder<T extends IMimePart> {
+		
+		Builder<T> addChild(IMimePart mimePart);
+		
 	}
 
-	public static MimeMessage createSimpleMimeMessage(String mimeType, String mimeSubtype, String contentId, String encoding, int size, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = MimeMessageImpl.builder().from(createSimpleMimePart(mimeType, mimeSubtype, contentId, null, encoding, size, bodyParams, parts)).build();
-		return tree;
-	}
+	ContentType getContentType();
 	
-	public static MimeMessage createSimpleMimeTree(String mimeType, String mimeSubtype, String contentId, String encoding, Map<String, String> bodyParams, MimePart... parts) {
-		MimeMessage tree = MimeMessageImpl.builder().from((createSimpleMimePart(mimeType, mimeSubtype, contentId, null, encoding, null, bodyParams, parts))).build();
-		return tree;
-	}
+	String getPrimaryType();
 
+	String getSubtype();
+
+	List<IMimePart> getChildren();
+
+	List<IMimePart> getSibling();
 	
+	MimeAddress getAddress();
+	
+	MimeAddress getAddressInternal();
+
+	BodyParams getBodyParams();
+
+	BodyParam getBodyParam(final String param);
+
+	IMimePart getParent();
+
+	Collection<IMimePart> listLeaves(boolean depthFirst, boolean filterNested);
+
+	void defineParent(IMimePart parent, int index);
+
+	String getFullMimeType();
+
+	boolean isInvitation();
+
+	String getContentTransfertEncoding();
+	
+	String getCharset();
+
+	String getContentId();
+
+	boolean isCancelInvitation();
+
+	String getName();
+
+	boolean isMultipart();
+
+	String getMultipartSubtype();
+
+	boolean isAttachment();
+
+	boolean isNested();
+	
+	IMimePart getInvitation();
+
+	IMimePart findRootMimePartInTree();
+
+	IMimePart findMainMessage(ContentType contentType);
+
+	Integer getSize();
+
+	boolean hasMultiPartMixedParent();
+
+	boolean isMultiPartMixed();
+
+	boolean isFirstElementInParent();
+
+	boolean hasMimePart(ContentType contentType);
+	
+	boolean isICSAttachment();
+	
+	
+	/**
+	 * This method decodes an InputStream representing itself
+	 * by using Content-Transfer-Encoding header
+	 */
+	InputStream decodeMimeStream(InputStream rawStream);
+
+	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
+
+	String getContentLocation();
+
+	boolean isInline();
+
 }

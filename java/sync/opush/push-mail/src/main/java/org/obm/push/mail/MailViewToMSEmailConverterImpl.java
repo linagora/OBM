@@ -176,6 +176,9 @@ public class MailViewToMSEmailConverterImpl implements MailViewToMSEmailConverte
 				msAttachment.setEstimatedDataSize(attachment.getSize());
 				msAttachment.setFileReference(attachment.getFileReference());
 				msAttachment.setMethod(method(attachment.getContentType()));
+				msAttachment.setContentId(attachment.getContentId());
+				msAttachment.setContentLocation(attachment.getContentLocation());
+				msAttachment.setInline(attachment.isInline());
 				msAttachments.add(msAttachment);
 			}
 		}

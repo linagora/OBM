@@ -121,5 +121,9 @@ public interface MimePart {
 	IMAPHeaders decodeHeaders(InputStream is) throws IOException;
 
 	boolean isReplyInvitation();
+	
+	String getContentLocation();
+
+	boolean isInline();
 
 }

@@ -66,6 +66,7 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 		protected Integer size;
 		protected List<MimePart> children;
 		protected org.obm.push.mail.mime.ContentType.Builder contentTypeBuilder;
+		protected String contentLocation;
 
 		private Builder() {
 			children = Lists.newArrayList();
@@ -107,8 +108,13 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 			return this;
 		}
 
-		public Builder contentType(	String contentType) {
+		public Builder contentType(String contentType) {
 			this.contentTypeBuilder.contentType(contentType);
+			return this;
+		}
+		
+		public Builder contentLocation(String contentLocation) {
+			this.contentLocation = contentLocation;
 			return this;
 		}
 		
@@ -130,7 +136,8 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 		}
 		
 		public MimePart build() {
-			return new MimePartImpl(contentTypeBuilder.build(), children, contentId, encoding, size, multipartSubType);
+			return new MimePartImpl(contentTypeBuilder.build(), children, contentId, contentLocation, 
+					encoding, size, multipartSubType);
 		}
 
 	}
@@ -163,11 +170,14 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	private final String contentId;
 	private final Integer size;
 	private final String multipartSubType;
+	private final String contentLocation;
 	
-	private MimePartImpl(ContentType contentType, List<MimePart> children, String contentId, String encoding, Integer size, String multipartSubType) {
+	private MimePartImpl(ContentType contentType, List<MimePart> children, String contentId, 
+			String contentLocation, String encoding, Integer size, String multipartSubType) {
 		super(children, contentType.getBodyParams());
 		this.contentType = contentType;
 		this.contentId = contentId;
+		this.contentLocation = contentLocation;
 		this.contentTransfertEncoding = encoding;
 		this.size = size;
 		this.multipartSubType = multipartSubType;
@@ -197,6 +207,16 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 		return contentType.getSubType();
 	}
 
+	@Override
+	public boolean isInline() {
+		return contentType.getContentDisposition() == ContentDisposition.INLINE;
+	}
+
+	@Override
+	public String getContentLocation() {
+		return contentLocation;
+	}
+	
 	@Override
 	public MimeAddress getAddressInternal() {
 		return MimeAddress.concat(getParentAddressInternal(), selfAddress());
@@ -369,7 +389,8 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(
-				parent, idx, contentType, contentTransfertEncoding, contentId, size, multipartSubType);
+				parent, idx, contentType, contentTransfertEncoding, contentId, 
+				contentLocation, size, multipartSubType);
 	}
 	
 	@Override
@@ -381,6 +402,7 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 					&& Objects.equal(this.contentType, that.contentType)
 					&& Objects.equal(this.contentTransfertEncoding, that.contentTransfertEncoding)
 					&& Objects.equal(this.contentId, that.contentId)
+					&& Objects.equal(this.contentLocation, that.contentLocation)
 					&& Objects.equal(this.size, that.size)
 					&& Objects.equal(this.multipartSubType, that.multipartSubType);
 		}

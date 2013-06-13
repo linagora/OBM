@@ -34,6 +34,7 @@ package org.obm.push.mail.conversation;
 import org.obm.push.mail.mime.ContentType;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 
 public class EmailViewAttachment {
@@ -49,6 +50,9 @@ public class EmailViewAttachment {
 		private String fileReference;
 		private Integer size;
 		private ContentType contentType;
+		private Boolean inline;
+		private String contentId;
+		private String contentLocation;
 		
 		private Builder() {
 			super();
@@ -82,8 +86,25 @@ public class EmailViewAttachment {
 			return this;
 		}
 
+		public Builder contentId(String contentId) {
+			this.contentId = contentId;
+			return this;
+		}
+		
+		public Builder contentLocation(String contentLocation) {
+			this.contentLocation = contentLocation;
+			return this;
+		}
+		
+		public Builder inline(boolean inline) {
+			this.inline = inline;
+			return this;
+		}
+		
 		public EmailViewAttachment build() {
-			return new EmailViewAttachment(id, displayName, fileReference, size, contentType);
+			Preconditions.checkState(inline != null);
+			return new EmailViewAttachment(id, displayName, fileReference, size, contentType, 
+					contentId, contentLocation, inline);
 		}
 	}
 	
@@ -92,13 +113,20 @@ public class EmailViewAttachment {
 	private final String fileReference;
 	private final Integer size;
 	private final ContentType contentType;
+	private final String contentId;
+	private final String contentLocation;
+	private final boolean inline;
 	
-	private EmailViewAttachment(String id, String displayName, String fileReference, Integer size, ContentType contentType) {
+	private EmailViewAttachment(String id, String displayName, String fileReference, 
+			Integer size, ContentType contentType, String contentId, String contentLocation, boolean inline) {
 		this.id = id;
 		this.displayName = displayName;
 		this.fileReference = fileReference;
 		this.size = size;
 		this.contentType = contentType;
+		this.contentId = contentId;
+		this.contentLocation = contentLocation;
+		this.inline = inline;
 	}
 
 	public String getId() {
@@ -121,6 +149,18 @@ public class EmailViewAttachment {
 		return contentType;
 	}
 
+	public String getContentId() {
+		return contentId;
+	}
+	
+	public String getContentLocation() {
+		return contentLocation;
+	}
+	
+	public boolean isInline() {
+		return inline;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(id, displayName, fileReference, size, contentType);

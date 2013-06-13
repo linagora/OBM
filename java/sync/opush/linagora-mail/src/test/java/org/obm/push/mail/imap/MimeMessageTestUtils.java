@@ -51,6 +51,7 @@ public class MimeMessageTestUtils {
 		assertThat(actual.getSubtype()).isEqualTo(expected.getSubtype()).describedAs(prefixMessage(expected));
 		assertThat(actual.getContentTransfertEncoding()).isEqualTo(expected.getContentTransfertEncoding()).describedAs(prefixMessage(expected));
 		assertThat(actual.getContentId()).isEqualTo(expected.getContentId()).describedAs(prefixMessage(expected));
+		assertThat(actual.getContentLocation()).isEqualTo(expected.getContentLocation()).describedAs(prefixMessage(expected));
 		assertThat(actual.getBodyParams()).isEqualTo(expected.getBodyParams()).as(prefixMessage(expected));
 		assertThat(actual.getSize()).isEqualTo(expected.getSize()).describedAs(prefixMessage(expected));
 		Iterator<MimePart> expectedParts = expected.getChildren().iterator();
