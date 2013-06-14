@@ -25,7 +25,7 @@ Obm.CalendarManager = new Class({
     var d  = new Obm.DateTime(obm.vars.consts.startTime);
     this.write = write;
     this.popupManager = new Obm.CalendarPopupManager(); 
-
+    this.sessionUniqueId = 1;
     // Reset minical
     if(obm.miniCalendar) {
       if (obm.miniCalendar.currentMonth == d.getMonth()) {
@@ -1931,7 +1931,7 @@ Obm.CalendarAllDayEvent = new Class({
     var serieClass= 'evt_'+this.event.id;
     if ($(id)) { 
       extClass = id;
-      id += '_'+$(id).uid; // multi-weeks event
+      id += '_'+obm.calendarManager.sessionUniqueId++; // multi-weeks event
     }
 
     this.element = new Element('div').addClass('event '+extClass+' '+serieClass)
