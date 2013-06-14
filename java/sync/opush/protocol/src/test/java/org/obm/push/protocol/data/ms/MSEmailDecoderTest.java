@@ -439,6 +439,9 @@ public class MSEmailDecoderTest {
 							"<FileReference>57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0</FileReference>" +
 							"<Method>1</Method>" +
 							"<EstimatedDataSize>38260</EstimatedDataSize>" +
+							"<ContentId>555343607@11062013-0EC1</ContentId>" +
+							"<ContentLocation>TB_import.JPG</ContentLocation>" +
+							"<IsInline>1</IsInline>" +
 						"</Attachment>" +
 					"</Attachments>" +
 				"</ApplicationData>");
@@ -450,7 +453,9 @@ public class MSEmailDecoderTest {
 		expectedAttachment.setMethod(MethodAttachment.NormalAttachment);
 		expectedAttachment.setFileReference("57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0");
 		expectedAttachment.setEstimatedDataSize(38260);
-		
+		expectedAttachment.setContentId("555343607@11062013-0EC1");
+		expectedAttachment.setContentLocation("TB_import.JPG");
+		expectedAttachment.setInline(true);
 		assertThat(email.getAttachments()).containsOnly(expectedAttachment);
 	}
 
@@ -477,6 +482,7 @@ public class MSEmailDecoderTest {
 		expectedAttachment.setMethod(MethodAttachment.EmbeddedMessage);
 		expectedAttachment.setFileReference("57_44_2_aW1hZ2UvanBlZw==_QkFTRTY0");
 		expectedAttachment.setEstimatedDataSize(0);
+		expectedAttachment.setInline(false);
 		
 		assertThat(email.getAttachments()).containsOnly(expectedAttachment);
 	}
