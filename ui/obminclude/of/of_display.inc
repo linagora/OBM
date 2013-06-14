@@ -1970,11 +1970,12 @@ function get_sections_data() {
   global $cgp_show;
 
   $sections_data = array();
+  $exclusions = array("com", "prod", "compta");
 
   foreach($cgp_show['section'] as $section => $value){
     $exceptions = array('my', 'webmail');
     if( !in_array($section, $exceptions) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
-      if (display_modules($section, null, true) !=''){
+      if (display_modules($section, null, true) !='' && !in_array($section, $exclusions)){
         $sections_data[] = get_module_data($section, null);
       }
     }
@@ -2011,7 +2012,7 @@ function get_module_data($section, $module) {
   else $ftext = false;
 
   $section_link = array_keys($cgp_show['module'],$section);
-  if (is_array($section_link)) {
+  if (is_array($section_link) ) {
     $id = $section.'Items';
 
     $module_data = array();
@@ -2021,36 +2022,37 @@ function get_module_data($section, $module) {
 
     $module_data["links"] = array();
 
-
     foreach ($section_link as $mod) {
-      $link_name = $modules[$mod]['Name'];
-      $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
-      $link_url = $modules[$mod]['Url'];
+      $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning']);
+      if (!in_array($modules[$mod]['Name'], $exclusions)) {
+        $link_name = $modules[$mod]['Name'];
+        $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
+        $link_url = $modules[$mod]['Url'];
 
-      $link_right = $perm->get_module_rights($mod); 
-      if (($link_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
+        $link_right = $perm->get_module_rights($mod);
+        if (($link_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
 
-        $link_target = $modules[$mod]['Target'];
-        if (!isset($link_target)) {
-          $link_target = "_self";
+          $link_target = $modules[$mod]['Target'];
+          if (!isset($link_target)) {
+            $link_target = "_self";
+          }
+
+          if ($fico) {
+            $link_ico = $modules[$mod]['Ico'];
+          }
+
+          $module_data["links"][] = array(
+            "url"     => $link_url,
+            "target"  => $link_target,
+            "ico"     => $link_ico,
+            "title"   => $link_name,
+            "tooltip" => $link_tooltip
+          );
         }
-
-        if ($fico) {
-          $link_ico = $modules[$mod]['Ico'];
-        }
-
-        $module_data["links"][] = array(
-          "url"     => $link_url, 
-          "target"  => $link_target, 
-          "ico"     => $link_ico, 
-          "title"   => $link_name, 
-          "tooltip" => $link_tooltip
-        );
       }
     }
+    return $module_data;
   }
-
-  return $module_data;
 }
 
 ?>
