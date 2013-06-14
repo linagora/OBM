@@ -73,7 +73,7 @@ public class BodyStructureParserTest {
 		checkMimeTree(
 				createSimpleMimeTree("multipart", "MIXED", null, null, new HashMap<String, String>(), 
 						createSimpleMimePart("TEXT", "PLAIN", null, "7BIT", 1152, ImmutableMap.of("CHARSET", "US-ASCII")),
-						createSimpleMimePart("TEXT", "PLAIN", "<960723163407.20117h@cac.washington.edu>", "BASE64", 4554, ImmutableMap.of("CHARSET", "US-ASCII", "NAME", "cc.diff"))),
+						createSimpleMimePart("TEXT", "PLAIN", "960723163407.20117h@cac.washington.edu", "BASE64", 4554, ImmutableMap.of("CHARSET", "US-ASCII", "NAME", "cc.diff"))),
 				result);
 	}
 	
@@ -310,8 +310,8 @@ public class BodyStructureParserTest {
 			       createSimpleMimePart("multipart", "RELATED", null, null, null,
 						    		 ImmutableMap.of("BOUNDARY", "Boundary_(ID_j1VqHCLvxMbObr0Y49iZgQ)"),
 			        createSimpleMimePart("TEXT", "HTML", null, "7BIT", 1840, ImmutableMap.of("CHARSET", "utf-8")),
-			        createSimpleMimePart("IMAGE", "JPEG", "<part1.05060905.06000802@cpam-auch.cnamts.fr>", "BASE64", 3544, new HashMap<String, String>()),
-			        createSimpleMimePart("IMAGE", "JPEG", "<part2.06080502.08080709@cpam-auch.cnamts.fr>", "BASE64", 9638, new HashMap<String, String>()))),
+			        createSimpleMimePart("IMAGE", "JPEG", "part1.05060905.06000802@cpam-auch.cnamts.fr", "BASE64", 3544, new HashMap<String, String>()),
+			        createSimpleMimePart("IMAGE", "JPEG", "part2.06080502.08080709@cpam-auch.cnamts.fr", "BASE64", 9638, new HashMap<String, String>()))),
 			      createSimpleMimePart("DOCUMENT", "PDF", null, "BASE64", 2513828,
 			    		  ImmutableMap.of("NAME", "Infos erronées du 010910_1.pdf",
 			    				  "FILENAME", "Infos erronées du 010910_1.pdf"))  

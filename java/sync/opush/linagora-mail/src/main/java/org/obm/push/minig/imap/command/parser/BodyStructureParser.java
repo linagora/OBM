@@ -326,10 +326,18 @@ public class BodyStructureParser {
 		boolean recordId() {
 			String contentId = (String)pop();
 			MimePart.Builder mimePartBuilder = (Builder) peek();
-			mimePartBuilder.contentId(contentId);
+			mimePartBuilder.contentId(stripSurroundingStripes(contentId));
 			return true;
 		}
 
+		String stripSurroundingStripes(String payload) {
+			if (payload != null && payload.startsWith("<") && payload.endsWith(">")) {
+				return payload.substring(1, payload.length() - 1);
+			} else {
+				return payload;
+			}
+		}
+		
 		boolean recordBodyParams() {
 			BodyParams.Builder bodyParamsBuilder = (BodyParams.Builder)pop();
 			MimePart.Builder mimePartBuilder = (Builder) peek();
