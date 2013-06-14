@@ -843,7 +843,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ItemNotFoundException();
 		}
 		List<ItemChange> fetchs = fetch(udr, collectionId, itemIds, collectionOptions);
-		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(snapshot, newSyncKey));
 		return fetchs;
 	}
 }
