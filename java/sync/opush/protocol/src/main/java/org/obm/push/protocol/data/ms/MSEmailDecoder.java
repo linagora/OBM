@@ -117,6 +117,9 @@ public class MSEmailDecoder extends ActiveSyncDecoder implements IDataDecoder {
 				parsedAttachment.setEstimatedDataSize(uniqueIntegerFieldValue(attachmentEl, ASAirs.ESTIMATED_DATA_SIZE));
 				parsedAttachment.setFileReference(uniqueStringFieldValue(attachmentEl, ASAirs.FILE_REFERENCE));
 				parsedAttachment.setMethod(attachmentMethod(uniqueIntegerFieldValue(attachmentEl, ASAirs.METHOD)));
+				parsedAttachment.setContentId(uniqueStringFieldValue(attachmentEl, ASAirs.CONTENT_ID));
+				parsedAttachment.setContentLocation(uniqueStringFieldValue(attachmentEl, ASAirs.CONTENT_LOCATION));
+				parsedAttachment.setInline(uniqueBooleanFieldValue(attachmentEl, ASAirs.IS_INLINE, false));
 				attachments.add(parsedAttachment);
 			}
 		}

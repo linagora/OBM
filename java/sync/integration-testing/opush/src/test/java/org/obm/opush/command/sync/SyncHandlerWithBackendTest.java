@@ -634,5 +634,8 @@ public class SyncHandlerWithBackendTest {
 		assertThat(attachment.getDisplayName()).isEqualTo("TB_import.JPG");
 		assertThat(attachment.getFileReference()).isNotEmpty();
 		assertThat(attachment.getEstimatedDataSize()).isPositive();
+		assertThat(attachment.getContentId()).isEqualTo("555343607@11062013-0EC1");
+		assertThat(attachment.getContentLocation()).isEqualTo("location");
+		assertThat(attachment.isInline()).isTrue();
 	}
 }
