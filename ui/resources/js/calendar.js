@@ -190,6 +190,16 @@ Obm.CalendarManager = new Class({
     return eventData;
   },
   
+  addDaysToTimestamp: function(timestamp, days){
+    var date = new Date(timestamp * 1000);
+    return this.addDaysToDate(date, days).getTime() / 1000;
+  },
+
+  addDaysToDate: function(date, days){
+    date.setDate(date.getDate() + days);
+    return date;
+  },
+  
   /**
    * Register an event
    */
@@ -2592,16 +2602,6 @@ Obm.CalendarQuickForm = new Class({
     } else {
       this.attendees.set('html',evt.event.attendees);
     }
-  },
-
-  addDaysToTimestamp: function(timestamp, days){
-    var date = new Date(timestamp * 1000);
-    return this.addDaysToDate(date, days).getTime() / 1000;
-  },
-
-  addDaysToDate: function(date, days){
-    date.setDate(date.getDate() + days);
-    return date;
   },
 
   setDefaultFormValues: function(time, allDay, duration) {
