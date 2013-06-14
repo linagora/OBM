@@ -29,21 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.resource;
 
-public enum UserDataRequestResource {
+import org.apache.http.client.HttpClient;
 
-	HTTP_CLIENT(2),
-	ACCESS_TOKEN(1),
-	IMAP_STORE(0);
-	
-	private final int closeOrder;
+public class HttpClientResource extends ObmBackendResource {
 
-	private UserDataRequestResource(int closeOrder) {
-		this.closeOrder = closeOrder;
+	private final HttpClient httpClient;
+
+	public HttpClientResource(HttpClient httpClient) {
+		this.httpClient = httpClient;
 	}
 	
-	public int closeOrder() {
-		return closeOrder;
+	@Override
+	public void close() {
+		httpClient.getConnectionManager().shutdown();
 	}
+
+	public HttpClient getHttpClient() {
+		return httpClient;
+	}
+	
+	@Override
+	protected ResourceCloseOrder getCloseOrder() {
+		return ResourceCloseOrder.HTTP_CLIENT;
+	}
+	
 }

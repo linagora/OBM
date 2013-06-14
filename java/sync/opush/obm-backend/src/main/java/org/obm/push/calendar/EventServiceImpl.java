@@ -46,6 +46,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EventNotFoundException;
+import org.obm.push.resource.ResourcesUtils;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
@@ -142,7 +143,7 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public MSEvent parseEventFromICalendar(UserDataRequest udr, String ics) throws EventParsingException, ConversionException {
 		try {
-			AccessToken accessToken = (AccessToken) udr.getAccessTokenResource().getAccessToken();
+			AccessToken accessToken = ResourcesUtils.getAccessToken(udr);
 			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
 			List<Event> obmEvents = ical4jHelper.parseICSEvent(ics, ical4jUser, accessToken.getObmId());
 			

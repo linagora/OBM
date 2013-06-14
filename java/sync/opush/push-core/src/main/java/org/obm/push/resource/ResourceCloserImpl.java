@@ -29,39 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.resource;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.util.SortedSet;
 
-import javax.servlet.http.HttpServletRequest;
+import org.obm.push.bean.Resource;
+import org.obm.push.bean.UserDataRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.http.client.HttpClient;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.resource.HttpClientResource;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
+import com.google.inject.Singleton;
 
-@RunWith(SlowFilterRunner.class)
-public class HttpClientServiceTest {
+@Singleton
+public class ResourceCloserImpl implements ResourceCloser {
 
-	@Test
-	public void testSetHttpClientRequestAttribute() {
-		HttpServletRequest request = createMock(HttpServletRequest.class);
-		request.setAttribute(eq(RequestProperties.HTTP_CLIENT_RESOURCE), anyObject(HttpClient.class));
-		expectLastCall();
-
-		replay(request);
-
-		HttpClientService httpClientService = new HttpClientService();
-		HttpClientResource httpClientResource = httpClientService.setHttpClientRequestAttribute(request);
+	private final Logger logger = LoggerFactory.getLogger(ResourceCloserImpl.class);
+	
+	@Override
+	public void closeResources(UserDataRequest userDataRequest, Class<? extends Resource> type) {
+		SortedSet<Resource> sortedResources =
+			FluentIterable.from(userDataRequest.getResources().values())
+			.filter(Predicates.instanceOf(type))
+			.toSortedSet(Ordering.natural());
 		
-		verify(request);
-		assertThat(httpClientResource).isNotNull();
+		for (Resource resource: sortedResources) {
+			try {
+				resource.close();
+			} catch (RuntimeException exception) {
+				logger.error("fail to close resource {}, exception occured {}", resource, exception);
+			}
+		}
 	}
+	
 }

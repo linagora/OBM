@@ -31,62 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.resource;
 
-import org.apache.http.client.HttpClient;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginClient;
+import org.obm.push.bean.Resource;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.base.Preconditions;
 
-public class AccessTokenResource extends ObmBackendResource {
+public abstract class ObmBackendResource implements Resource {
 
-	@Singleton
-	public static class Factory {
-
-		private final LoginClient.Factory loginClientFactory;
-
-		@Inject 
-		@VisibleForTesting Factory(LoginClient.Factory loginClientFactory) {
-			this.loginClientFactory = loginClientFactory;
-		}
-
-		public AccessTokenResource create(HttpClient httpClient, Object accessToken) {
-			return new AccessTokenResource(loginClientFactory, httpClient, accessToken);
-		}
-	}
+	protected abstract ResourceCloseOrder getCloseOrder();
 	
-	private final LoginClient.Factory loginClientFactory;
-	private final Object accessToken;
-	private final HttpClient httpClient;
-	
-	private AccessTokenResource(LoginClient.Factory loginClientFactory, HttpClient httpClient, Object accessToken) {
-		this.loginClientFactory = loginClientFactory;
-		this.httpClient = httpClient;
-		this.accessToken = accessToken;
-	}
-	
-	@Override
-	public void close() {
-		loginClientFactory.create(httpClient)
-			.logout(getAccessToken());
-	}
-
-	public AccessToken getAccessToken() {
-		return (AccessToken) accessToken;
-	}
-
-	public String getUserEmail() {
-		return getAccessToken().getUserEmail();
-	}
-
-	public String getUserDisplayName() {
-		return getAccessToken().getUserDisplayName();
-	}
-
-	@Override
-	protected ResourceCloseOrder getCloseOrder() {
-		return ResourceCloseOrder.ACCESS_TOKEN;
+	public int compareTo(Resource o) {
+		Preconditions.checkArgument(o instanceof ObmBackendResource);
+		ObmBackendResource otherResource = (ObmBackendResource) o;
+		return getCloseOrder().compareTo(otherResource.getCloseOrder());
 	}
 	
 }

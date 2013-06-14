@@ -56,10 +56,10 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.resource.AccessTokenResource;
+import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
@@ -105,7 +105,7 @@ public class EventServiceImplTest {
 		AccessTokenResource accessTokenResource = mocksControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(accessToken).anyTimes();
-		udr.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
+		udr.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		
 		CalendarDao calendarDao = mocksControl.createMock(CalendarDao.class);
 		expect(calendarDao.getMSEventUidFor(anyObject(EventExtId.class), anyObject(Device.class))).andReturn(new MSEventUid("uid"));

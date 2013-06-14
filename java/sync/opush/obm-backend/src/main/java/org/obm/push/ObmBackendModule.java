@@ -34,7 +34,6 @@ package org.obm.push;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.auth.AuthenticationServiceImpl;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.OBMBackend;
 import org.obm.push.backend.PIMBackend;
@@ -45,6 +44,8 @@ import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.impl.OpushLocatorServiceImpl;
 import org.obm.push.resource.AccessTokenResource;
+import org.obm.push.resource.ResourcesService;
+import org.obm.push.resource.ObmBackendResourcesService;
 import org.obm.push.search.ISearchSource;
 import org.obm.push.search.ObmSearchContact;
 import org.obm.push.service.AuthenticationService;
@@ -71,7 +72,7 @@ public class ObmBackendModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(OpushLocatorService.class).to(OpushLocatorServiceImpl.class);
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
-		bind(IAccessTokenResource.Factory.class).to(AccessTokenResource.Factory.class);
+		bind(AccessTokenResource.Factory.class);
 		
 		Multibinder<PIMBackend> pimBackends = Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(CalendarBackend.class);
@@ -79,5 +80,8 @@ public class ObmBackendModule extends AbstractModule {
 		pimBackends.addBinding().to(TaskBackend.class);
 		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
 		searchSources.addBinding().to(ObmSearchContact.class);
+		
+		Multibinder<ResourcesService> resources = Multibinder.newSetBinder(binder(), ResourcesService.class);
+		resources.addBinding().to(ObmBackendResourcesService.class);
     }
 }

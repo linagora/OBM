@@ -29,64 +29,47 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resource;
+package org.obm.opush;
 
-import org.apache.http.client.HttpClient;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginClient;
+import org.obm.push.bean.Resource;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.resource.ResourceCloser;
+import org.obm.push.resource.ResourceCloserImpl;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class AccessTokenResource extends ObmBackendResource {
-
+public class TrackableResourceCloser extends ResourceCloserImpl {
+	
 	@Singleton
-	public static class Factory {
+	public static class Provider implements com.google.inject.Provider<ResourceCloser> {
+		
+		private final PendingQueriesLock queriesLock;
 
-		private final LoginClient.Factory loginClientFactory;
-
-		@Inject 
-		@VisibleForTesting Factory(LoginClient.Factory loginClientFactory) {
-			this.loginClientFactory = loginClientFactory;
+		@Inject
+		private Provider(PendingQueriesLock queriesLock) {
+			this.queriesLock = queriesLock;
 		}
-
-		public AccessTokenResource create(HttpClient httpClient, Object accessToken) {
-			return new AccessTokenResource(loginClientFactory, httpClient, accessToken);
+		
+		@Override
+		public ResourceCloser get() {
+			queriesLock.incrementLockCount();
+			return new TrackableResourceCloser(queriesLock);
 		}
+		
 	}
 	
-	private final LoginClient.Factory loginClientFactory;
-	private final Object accessToken;
-	private final HttpClient httpClient;
-	
-	private AccessTokenResource(LoginClient.Factory loginClientFactory, HttpClient httpClient, Object accessToken) {
-		this.loginClientFactory = loginClientFactory;
-		this.httpClient = httpClient;
-		this.accessToken = accessToken;
+	private final PendingQueriesLock queriesLock;
+
+	protected TrackableResourceCloser(PendingQueriesLock queriesLock) {
+		this.queriesLock = queriesLock;
 	}
 	
 	@Override
-	public void close() {
-		loginClientFactory.create(httpClient)
-			.logout(getAccessToken());
+	public void closeResources(UserDataRequest userDataRequest, Class<? extends Resource> type) {
+		super.closeResources(userDataRequest, type);
+		this.queriesLock.countDown();
 	}
 
-	public AccessToken getAccessToken() {
-		return (AccessToken) accessToken;
-	}
-
-	public String getUserEmail() {
-		return getAccessToken().getUserEmail();
-	}
-
-	public String getUserDisplayName() {
-		return getAccessToken().getUserDisplayName();
-	}
-
-	@Override
-	protected ResourceCloseOrder getCloseOrder() {
-		return ResourceCloseOrder.ACCESS_TOKEN;
-	}
 	
 }

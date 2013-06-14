@@ -37,8 +37,6 @@ import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.CountingStoreClient;
-import org.obm.opush.TrackableUserDataRequest;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.java.mail.ImapStore;
 import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
@@ -78,7 +76,6 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
 		bind(StoreClient.Factory.class).to(CountingStoreClient.Factory.class);
-		bind(UserDataRequest.Factory.class).to(TrackableUserDataRequest.Factory.class);
 	}
 	
 	protected void bindImapTimeout() {

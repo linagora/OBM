@@ -34,6 +34,7 @@ package org.obm.push.impl;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.OpushBackend;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.resource.ResourcesUtils;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
@@ -52,6 +53,6 @@ public abstract class ObmSyncBackend extends OpushBackend {
 	}
 	
 	protected AccessToken getAccessToken(UserDataRequest udr) {
-		return (AccessToken) udr.getAccessTokenResource().getAccessToken();
+		return ResourcesUtils.getAccessToken(udr);
 	}
 }

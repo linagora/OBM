@@ -33,6 +33,7 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,16 +42,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;
@@ -58,6 +56,7 @@ import org.obm.push.handler.IRequestHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.resource.ResourcesService;
 import org.obm.push.service.DeviceService;
 import org.obm.push.technicallog.bean.KindToBeLogged;
 import org.obm.push.technicallog.bean.TechnicalLogging;
@@ -92,6 +91,7 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final HttpErrorResponder httpErrorResponder;
 
 	private final PolicyService policyService;
+	private final Set<ResourcesService> resourcesServices;
 
 	@Inject
 	@VisibleForTesting ActiveSyncServlet(SessionService sessionService, 
@@ -99,7 +99,8 @@ public class ActiveSyncServlet extends HttpServlet {
 			PolicyService policyService,
 			ResponderImpl.Factory responderFactory, Handlers handlers,
 			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
-			HttpErrorResponder httpErrorResponder) {
+			HttpErrorResponder httpErrorResponder,
+			Set<ResourcesService> resourcesServices) {
 	
 		super();
 		
@@ -112,6 +113,7 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.loggerService = loggerService;
 		this.authLogger = authLogger;
 		this.httpErrorResponder = httpErrorResponder;
+		this.resourcesServices = resourcesServices;
 	}
 
 	@Override
@@ -161,9 +163,6 @@ public class ActiveSyncServlet extends HttpServlet {
 				throw new IllegalStateException("Credentials must be handled by " + AuthenticationFilter.class.getSimpleName());
 			}
 			
-			IAccessTokenResource accessTokenResource = getAccessTokenResource(request);
-			IHttpClientResource httpClientResource = getHttpClientResource(request);
-			
 			final ActiveSyncRequest asrequest = getActiveSyncRequest(request);
 
 			checkAuthorizedDevice(asrequest, credentials);
@@ -176,7 +175,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				logger.debug("policy used = {}", asrequest.getMsPolicyKey());
 			}
 
-			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, accessTokenResource, httpClientResource);
+			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, request);
 		
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -187,14 +186,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		} finally {
 			loggerService.closeSession();
 		}
-	}
-
-	private IAccessTokenResource getAccessTokenResource(HttpServletRequest request) {
-		return (IAccessTokenResource) request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE);
-	}
-
-	private IHttpClientResource getHttpClientResource(HttpServletRequest request) {
-		return (IHttpClientResource) request.getAttribute(RequestProperties.HTTP_CLIENT_RESOURCE);
 	}
 
 	private void handleContinuation(HttpServletRequest request, HttpServletResponse response, IContinuation c) {
@@ -240,16 +231,16 @@ public class ActiveSyncServlet extends HttpServlet {
 			Credentials credentials, DeviceId devId,
 			ActiveSyncRequest request, 
 			HttpServletResponse response, 
-			IAccessTokenResource accessTokenResource, 
-			IHttpClientResource httpClientResource)
+			HttpServletRequest servletRequest)
 					throws IOException, DaoException {
 
 		UserDataRequest userDataRequest = null;
 		Responder responder = null;
 		try {
 			userDataRequest = sessionService.getSession(credentials, devId, request);
-			userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
-			userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
+			for (ResourcesService resourcesService: resourcesServices) {
+				resourcesService.initRequest(userDataRequest, servletRequest);
+			}
 			logger.debug("incoming query");
 			
 			if (userDataRequest.getCommand() == null) {
@@ -268,7 +259,9 @@ public class ActiveSyncServlet extends HttpServlet {
 			rh.process(continuation, userDataRequest, request, responder);
 		} finally {
 			if (userDataRequest != null) {
-				userDataRequest.closeResources();
+				for (ResourcesService resourcesService: resourcesServices) {
+					resourcesService.closeResources(userDataRequest);
+				}
 			}
 		}
 	}

@@ -29,21 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.backend;
+package org.obm.push.resource;
 
-import org.apache.http.client.HttpClient;
-import org.obm.push.bean.Resource;
+import javax.servlet.http.HttpServletRequest;
 
-public interface IAccessTokenResource extends Resource {
+import org.obm.push.bean.UserDataRequest;
 
-	interface Factory {
+public interface ResourcesService {
 
-		abstract IAccessTokenResource create(HttpClient httpClient, Object accessToken);
-	}
+	void initRequest(UserDataRequest userDataRequest, HttpServletRequest request);
 
-	Object getAccessToken();
-
-	String getUserEmail();
-
-	String getUserDisplayName();
+	void closeResources(UserDataRequest userDataRequest);
 }

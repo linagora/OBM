@@ -58,7 +58,6 @@ import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.DataDelta;
-import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Credentials;
@@ -72,7 +71,6 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
@@ -80,6 +78,8 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.resource.AccessTokenResource;
+import org.obm.push.resource.HttpClientResource;
+import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -132,11 +132,11 @@ public class ContactsBackendTest {
 		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
-		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
-		IHttpClientResource httpClientResource = mocks.createMock(IHttpClientResource.class);
+		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		HttpClientResource httpClientResource = mocks.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
+		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		mappingService = mocks.createMock(MappingService.class);
 		bookClient = mocks.createMock(BookClient.class);

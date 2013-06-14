@@ -31,15 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import org.obm.push.backend.IAccessTokenResource;
-import org.obm.push.backend.IHttpClientResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -54,33 +46,17 @@ public class UserDataRequest {
 		}
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(UserDataRequest.class);
-	
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
-	private final TreeMap<UserDataRequestResource, Resource> resources;
+	private final Map<String, Resource> resources;
 
 	public UserDataRequest(Credentials credentials, String command, Device device) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
 		this.device = device;
-		this.resources = Maps.<UserDataRequestResource, UserDataRequestResource, Resource>
-							newTreeMap(new CloseOrderComparator());
-	}
-
-	private class CloseOrderComparator implements Comparator<UserDataRequestResource> {
-
-		@Override
-		public int compare(UserDataRequestResource udrr1, UserDataRequestResource udrr2) {
-			if (udrr1.closeOrder() < udrr2.closeOrder()) {
-				return -1;
-			} else if (udrr1.closeOrder() == udrr2.closeOrder()) {
-				return 0;
-			}
-			return 1;	
-		}
+		this.resources = Maps.newHashMap();
 	}
 	
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -115,48 +91,27 @@ public class UserDataRequest {
 		return device;
 	}
 
-	public void putResource(UserDataRequestResource key, Resource resource) {
+	public void putResource(String key, Resource resource) {
 		if (key != null && resource != null) {
 			this.resources.put(key, resource);
 		}
 	}
 	
-	public void putAllResources(Map<UserDataRequestResource, Resource> resources) {
+	public void putAllResources(Map<String, Resource> resources) {
 		if (resources != null) {
-			for (Entry<UserDataRequestResource, Resource> entry : resources.entrySet()) {
-				putResource(entry.getKey(), entry.getValue());
-			}
+			this.resources.putAll(resources);
 		}
 	}
 	
-	public Resource getResource(UserDataRequestResource key) {
+	public Resource getResource(String key) {
 		if (null != key) {
 			return resources.get(key);
 		}
 		return null;
 	}
 	
-	public TreeMap<UserDataRequestResource, Resource> getResources() {
+	public Map<String, Resource> getResources() {
 		return resources;
-	}
-
-	public void closeResources() {
-		for (Resource resource : resources.values()) {
-			try {
-				resource.close();
-			}
-			catch (RuntimeException exception) {
-				logger.error("fail to close resource {}, exception occured {}", resource, exception);
-			}
-		}
-	}
-	
-	public IAccessTokenResource getAccessTokenResource() {
-		return (IAccessTokenResource) getResource(UserDataRequestResource.ACCESS_TOKEN);
-	}
-
-	public IHttpClientResource getHttpClientResource() {
-		return (IHttpClientResource) getResource(UserDataRequestResource.HTTP_CLIENT);
 	}
 
 	@Override

@@ -80,6 +80,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ObmSyncBackend;
+import org.obm.push.resource.ResourcesUtils;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
@@ -778,6 +779,6 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 
 	private ICalendar getCalendarClient(UserDataRequest udr) {
-		return calendarClientFactory.create(udr.getHttpClientResource().getHttpClient());
+		return calendarClientFactory.create(ResourcesUtils.getHttpClient(udr));
 	}
 }

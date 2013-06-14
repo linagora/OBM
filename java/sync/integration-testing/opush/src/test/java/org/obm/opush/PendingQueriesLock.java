@@ -31,29 +31,38 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
 
 @Singleton
 public class PendingQueriesLock {
 
-	private final Semaphore lock;
+	private CountDownLatch countDownLatch;
+	private final AtomicBoolean started;
+	private final AtomicInteger nbLock;
 	
 	public PendingQueriesLock() {
-		lock = new Semaphore(1);
+		nbLock = new AtomicInteger(0);
+		started = new AtomicBoolean();
+		countDownLatch = new CountDownLatch(nbLock.get());
 	}
-
-	public void acquire() throws InterruptedException {
-		lock.acquire();
+	
+	public void countDown() {
+		started.set(true);
+		countDownLatch.countDown();
 	}
-
+	
 	public boolean waitingClose(long timeout, TimeUnit unit) throws InterruptedException {
-		return lock.tryAcquire(timeout, unit);
+		return countDownLatch.await(timeout, unit);
 	}
 
-	public void release() {
-		lock.release();
+	public void incrementLockCount() {
+		Preconditions.checkState(started.get() == false);
+		countDownLatch = new CountDownLatch(nbLock.incrementAndGet());
 	}
 }

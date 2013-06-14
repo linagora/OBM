@@ -39,6 +39,8 @@ import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
+import org.obm.push.resource.ResourceCloser;
+import org.obm.push.resource.ResourceCloserImpl;
 import org.obm.push.service.EventService;
 import org.obm.push.service.OpushLocatorService;
 import org.obm.sync.client.login.LoginService;
@@ -76,5 +78,7 @@ public class MailEnvModule extends AbstractModule {
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
+		
+		bind(ResourceCloser.class).to(ResourceCloserImpl.class);
 	}
 }

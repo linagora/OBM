@@ -32,61 +32,18 @@
 package org.obm.push.resource;
 
 import org.apache.http.client.HttpClient;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginClient;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+public class ResourcesUtils {
 
-public class AccessTokenResource extends ObmBackendResource {
-
-	@Singleton
-	public static class Factory {
-
-		private final LoginClient.Factory loginClientFactory;
-
-		@Inject 
-		@VisibleForTesting Factory(LoginClient.Factory loginClientFactory) {
-			this.loginClientFactory = loginClientFactory;
-		}
-
-		public AccessTokenResource create(HttpClient httpClient, Object accessToken) {
-			return new AccessTokenResource(loginClientFactory, httpClient, accessToken);
-		}
-	}
-	
-	private final LoginClient.Factory loginClientFactory;
-	private final Object accessToken;
-	private final HttpClient httpClient;
-	
-	private AccessTokenResource(LoginClient.Factory loginClientFactory, HttpClient httpClient, Object accessToken) {
-		this.loginClientFactory = loginClientFactory;
-		this.httpClient = httpClient;
-		this.accessToken = accessToken;
-	}
-	
-	@Override
-	public void close() {
-		loginClientFactory.create(httpClient)
-			.logout(getAccessToken());
+	public static HttpClient getHttpClient(UserDataRequest udr) {
+		return ((HttpClientResource) udr.getResource(ResourceCloseOrder.HTTP_CLIENT.name()))
+				.getHttpClient();
 	}
 
-	public AccessToken getAccessToken() {
-		return (AccessToken) accessToken;
+	public static AccessToken getAccessToken(UserDataRequest udr) {
+		return ((AccessTokenResource) udr.getResource(ResourceCloseOrder.ACCESS_TOKEN.name()))
+				.getAccessToken();
 	}
-
-	public String getUserEmail() {
-		return getAccessToken().getUserEmail();
-	}
-
-	public String getUserDisplayName() {
-		return getAccessToken().getUserDisplayName();
-	}
-
-	@Override
-	protected ResourceCloseOrder getCloseOrder() {
-		return ResourceCloseOrder.ACCESS_TOKEN;
-	}
-	
 }

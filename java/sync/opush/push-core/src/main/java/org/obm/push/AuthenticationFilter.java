@@ -44,12 +44,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.client.HttpClient;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.bean.Credentials;
-import org.obm.push.bean.User;
 import org.obm.push.exception.AuthenticationException;
-import org.obm.push.resource.HttpClientResource;
 import org.obm.push.service.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,23 +59,17 @@ public class AuthenticationFilter implements Filter {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final LoggerService loggerService;
-	private final User.Factory userFactory;
 	private final AuthenticationService authenticationService;
 	private final HttpErrorResponder httpErrorResponder;
-	private final HttpClientService httpClientService;
 	
 	@Inject
 	private AuthenticationFilter(AuthenticationService authenticationService, 
 			LoggerService loggerService, 
-			User.Factory userFactory, 
-			HttpErrorResponder httpErrorResponder,
-			HttpClientService httpClientService) {
+			HttpErrorResponder httpErrorResponder) {
 		
 		this.authenticationService = authenticationService;
 		this.loggerService = loggerService;
-		this.userFactory = userFactory;
 		this.httpErrorResponder = httpErrorResponder;
-		this.httpClientService = httpClientService;
 	}
 	
 	@Override
@@ -128,43 +118,11 @@ public class AuthenticationFilter implements Filter {
 	}
 
 	private Credentials authenticateValidRequest(HttpServletRequest request, String userId, String password) throws AuthenticationException {
-		HttpClientResource httpClientResource = httpClientService.setHttpClientRequestAttribute(request);
-		
-		IAccessTokenResource token = setAccessTokenRequestAttribute(request, 
-				httpClientResource.getHttpClient(), userId, password);
-		return getCredentials(token, userId, password);
-	}
-
-	private Credentials getCredentials(IAccessTokenResource token, String userId, String password) throws AuthenticationException {
-		User user = createUser(userId, token);
-		if (user != null) {
-			logger.debug("Login success {} ! ", user.getLoginAtDomain());
-			return new Credentials(user, password);
-		} else {
-			throw new AuthenticationException("Login {"+ userId + "} failed, bad login or/and password.");
-		}
-	}
-
-	private IAccessTokenResource setAccessTokenRequestAttribute(HttpServletRequest request, HttpClient httpClient, String userId, String password) throws AuthenticationException {
-		IAccessTokenResource token = login(httpClient, getLoginAtDomain(userId), password);
-		request.setAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE, token);
-		return token;
-	}
-	
-	private IAccessTokenResource login(HttpClient httpClient, String userId, String password) throws AuthenticationException {
 		try {
-			return authenticationService.authenticate(httpClient, userId, password);
+			return authenticationService.authenticateValidRequest(request, userId, password);
 		} catch (Exception e) {
 			throw new AuthenticationException(e);
 		}
-	}
-	
-	private User createUser(String userId, IAccessTokenResource token) {
-		return userFactory.createUser(userId, token.getUserEmail(), token.getUserDisplayName());
-	}
-
-	protected String getLoginAtDomain(String userId) {
-		return userFactory.getLoginAtDomain(userId);
 	}
 	
 	@Override

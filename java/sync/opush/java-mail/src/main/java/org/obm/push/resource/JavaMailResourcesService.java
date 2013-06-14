@@ -29,51 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm.push.resource;
 
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
+import javax.servlet.http.HttpServletRequest;
+
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.java.mail.ImapStore;
 
-import com.google.common.base.Throwables;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class TrackableUserDataRequest extends UserDataRequest {
+@Singleton
+public class JavaMailResourcesService implements ResourcesService {
 	
-	private PendingQueriesLock pendingQueries;
+	private final ResourceCloser resourceCloser;
 
-	@Singleton
-	public static class Factory extends UserDataRequest.Factory {
-
-		private PendingQueriesLock pendingQueries;
-
-		@Inject
-		private Factory(PendingQueriesLock pendingQueries) {
-			this.pendingQueries = pendingQueries;
-		}
-		
-		@Override
-		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device) {
-			return new TrackableUserDataRequest(credentials, command, device, pendingQueries);
-		}
-	}
-	
-	
-	public TrackableUserDataRequest(Credentials credentials, String command, Device device, PendingQueriesLock pendingQueries) {
-		super(credentials, command, device);
-		this.pendingQueries = pendingQueries;
-		
-		try {
-			pendingQueries.acquire();
-		} catch (InterruptedException e) {
-			Throwables.propagate(e);
-		}
+	@Inject
+	@VisibleForTesting JavaMailResourcesService(ResourceCloser resourceCloser) {
+		this.resourceCloser = resourceCloser;
 	}
 	
 	@Override
-	public void closeResources() {
-		super.closeResources();
-		pendingQueries.release();
+	public void initRequest(UserDataRequest userDataRequest, HttpServletRequest request) {
 	}
+		
+	@Override
+	public void closeResources(UserDataRequest userDataRequest) {
+		resourceCloser.closeResources(userDataRequest, ImapStore.class);
+	}
+	
 }

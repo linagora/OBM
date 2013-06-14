@@ -182,7 +182,6 @@ public class MailBackendGetItemEstimateTest {
 		mocksControl.verify();
 		
 		assertThat(itemEstimateResponse.getStatus()).isEqualTo(GetItemEstimateStatus.INVALID_SYNC_KEY);
-		assertThat(pendingQueries.waitingClose(10, TimeUnit.SECONDS)).isTrue();
 	}
 
 	@Test

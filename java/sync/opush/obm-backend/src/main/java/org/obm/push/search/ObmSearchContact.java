@@ -38,6 +38,7 @@ import org.obm.push.bean.SearchResult;
 import org.obm.push.bean.StoreName;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.contacts.ContactConverter;
+import org.obm.push.resource.ResourcesUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.Contact;
@@ -69,7 +70,7 @@ public class ObmSearchContact implements ISearchSource {
 	@Override
 	public List<SearchResult> search(UserDataRequest udr, String query, Integer limit) {
 		List<SearchResult> ret = new LinkedList<SearchResult>();
-		AccessToken token = (AccessToken) udr.getAccessTokenResource().getAccessToken();
+		AccessToken token = ResourcesUtils.getAccessToken(udr);
 		ContactConverter cc = new ContactConverter();
 		try {
 			Integer offset = null;
@@ -85,7 +86,7 @@ public class ObmSearchContact implements ISearchSource {
 	}
 	
 	private IAddressBook getBookClient(UserDataRequest udr) {
-		return bookClientFactory.create(udr.getHttpClientResource().getHttpClient());
+		return bookClientFactory.create(ResourcesUtils.getHttpClient(udr));
 	}
 	
 }

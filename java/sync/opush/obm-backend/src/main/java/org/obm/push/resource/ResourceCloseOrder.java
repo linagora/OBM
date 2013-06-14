@@ -29,18 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.resource;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.obm.push.resource.HttpClientResource;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
-public class HttpClientService {
+public enum ResourceCloseOrder {
 
-	public HttpClientResource setHttpClientRequestAttribute(HttpServletRequest request) {
-		HttpClientResource httpClientResource = new HttpClientResource(new DefaultHttpClient());
-		request.setAttribute(RequestProperties.HTTP_CLIENT_RESOURCE, httpClientResource);
-		return httpClientResource;
+	// Enum order is meaningful
+	ACCESS_TOKEN,
+	HTTP_CLIENT;
+	
+	public static ResourceCloseOrder fromValue(String value){
+		if (valueToEnum.containsKey(value)) {
+			return valueToEnum.get(value);
+		}
+		throw new IllegalArgumentException(value);
+	}
+	
+	private static Map<String, ResourceCloseOrder> valueToEnum;
+	
+	static {
+		Builder<String, ResourceCloseOrder> builder = ImmutableMap.builder();
+		for (ResourceCloseOrder resourceType : values()) {
+			builder.put(resourceType.name(), resourceType);
+		}
+		valueToEnum = builder.build();
 	}
 }

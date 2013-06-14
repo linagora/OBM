@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -49,24 +50,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContinuation;
-import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IRequestHandler;
 import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
+import org.obm.push.resource.ResourcesService;
 import org.obm.push.service.DeviceService;
 import org.slf4j.Logger;
+
+import com.google.common.collect.Sets;
 
 @RunWith(SlowFilterRunner.class)
 public class ActiveSyncServletTest {
@@ -84,8 +85,8 @@ public class ActiveSyncServletTest {
 	private Credentials credentials;
 	private ActiveSyncRequest activeSyncRequest;
 	private PolicyService policyService;
-	private IAccessTokenResource accessTokenResource;
-	private IHttpClientResource httpClientResource;
+	private ResourcesService resourcesService;
+	private Set<ResourcesService> resourcesServices;
 	
 	@Before
 	public void setUp() throws DaoException {
@@ -103,9 +104,6 @@ public class ActiveSyncServletTest {
 		
 		credentials = mocksControl.createMock(Credentials.class);
 		expect(credentials.getUser()).andReturn(user).atLeastOnce();
-		
-		accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
-		httpClientResource = mocksControl.createMock(IHttpClientResource.class);
 		
 		PushContinuation pushContinuation = mocksControl.createMock(PushContinuation.class);
 		expect(pushContinuation.isResumed()).andReturn(false).anyTimes();
@@ -129,24 +127,24 @@ public class ActiveSyncServletTest {
 		expect(request.getAttribute(RequestProperties.CREDENTIALS)).andReturn(credentials);
 		expect(request.getAttribute(RequestProperties.CONTINUATION)).andReturn(pushContinuation);
 		expect(request.getAttribute(RequestProperties.ACTIVE_SYNC_REQUEST)).andReturn(activeSyncRequest);
-		expect(request.getAttribute(RequestProperties.ACCESS_TOKEN_RESOURCE)).andReturn(accessTokenResource);
-		expect(request.getAttribute(RequestProperties.HTTP_CLIENT_RESOURCE)).andReturn(httpClientResource);
 		
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));
 		expectLastCall().anyTimes();
+		
+		resourcesService = mocksControl.createMock(ResourcesService.class);
+		resourcesServices = Sets.newHashSet(resourcesService);
 	}
 	
 	@Test
 	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, DaoException {
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
-		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
-		expectLastCall().once();
-		userDataRequest.putResource(UserDataRequestResource.HTTP_CLIENT, httpClientResource);
-		expectLastCall().once();
-		userDataRequest.closeResources();
-		expectLastCall();
 		expect(userDataRequest.getCommand()).andReturn(command).atLeastOnce();
+		
+		resourcesService.initRequest(userDataRequest, request);
+		expectLastCall().once();
+		resourcesService.closeResources(userDataRequest);
+		expectLastCall().once();
 		
 		ActiveSyncServlet activeSyncServlet = createActiveSyncServlet(userDataRequest);
 		mocksControl.replay();
@@ -220,6 +218,6 @@ public class ActiveSyncServletTest {
 		
 		Logger logger = createLogger();
 		
-		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
+		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder, resourcesServices);
 	}
 }

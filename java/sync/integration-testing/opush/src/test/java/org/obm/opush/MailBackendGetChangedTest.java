@@ -61,7 +61,6 @@ import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -100,7 +99,7 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) 
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetChangedTest {
 
@@ -167,7 +166,7 @@ public class MailBackendGetChangedTest {
 				.dataType(PIMDataType.EMAIL)
 				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
 				.build()).anyTimes();
-	expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
+		expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
 		.andReturn(AnalysedSyncCollection.builder()
 				.collectionId(trashCollectionId)
 				.dataType(PIMDataType.EMAIL)
