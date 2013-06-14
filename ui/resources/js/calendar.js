@@ -740,8 +740,9 @@ Obm.CalendarManager = new Class({
                 evt.size = Math.ceil((end.getTime() - begin)/86400000);
                 evt.leftExtension.setStyle('display', '');
               }
-              if ((evt.event.date+evt.event.duration*1000) > obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays)) {
-                evt.size = Math.ceil((obm.calendarManager.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
+              var endOfGridTimestamp = this.addDaysToTimestamp(this.startTime, obm.vars.consts.nbDisplayedDays);
+              if ((evt.event.date+evt.event.duration*1000) > (endOfGridTimestamp*1000) ) {
+                evt.size = Math.ceil((this.startTime*1000 + (86400000 * obm.vars.consts.nbDisplayedDays) - begin)/86400000);
                 evt.rightExtension.setStyle('display', '');
               }
 
@@ -778,7 +779,7 @@ Obm.CalendarManager = new Class({
             passed.set(passedId, true);
           }
 
-        });
+        }.bind(this));
       }
     }.bind(this));
 
