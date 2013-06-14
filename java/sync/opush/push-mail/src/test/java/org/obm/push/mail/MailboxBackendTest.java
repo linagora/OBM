@@ -202,8 +202,6 @@ public class MailboxBackendTest {
 			.filterType(FilterType.ALL_ITEMS).build();
 		expect(snapshotService.getSnapshot(device.getDevId(), previousSyncKey, collectionId))
 			.andReturn(existingSnapshot);
-		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(existingSnapshot, newSyncKey));
-		expectLastCall();
 		
 		mocks.replay();		
 		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
@@ -314,8 +312,6 @@ public class MailboxBackendTest {
 				.filterType(FilterType.ALL_ITEMS).build();
 		expect(snapshotService.getSnapshot(device.getDevId(), previousSyncKey, collectionId))
 				.andReturn(existingSnapshot);
-		snapshotService.storeSnapshot(Snapshot.builder().actualizeSnapshot(existingSnapshot, newSyncKey));
-		expectLastCall();
 		
 		mocks.replay();
 		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
