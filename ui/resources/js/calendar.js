@@ -511,10 +511,10 @@ Obm.CalendarManager = new Class({
     var div = this.dummyPrepare(evt);
     if (evt.type == 'mousedown' && (div[0] == 'dayContainer' || div[0] == 'dayMonthLabel' ||  div[0] == 'more' ) && obm.calendarManager.write == 1) {
       this.dummy = new Object();
-      this.dummy.down = obm.calendarManager.startTime + div[1].toInt()*86400;
+      this.dummy.down = this.addDaysToTimestamp(obm.calendarManager.startTime, div[1].toInt());
       this.dummy.downCell = div;
     } else if (evt.type == 'mouseup' && (div[0] == 'dayContainer' || div[0] == 'dayMonthLabel' ||  div[0] == 'more' ) && obm.calendarManager.write == 1 && this.dummy) {
-      this.dummy.up = obm.calendarManager.startTime + div[1].toInt()*86400;
+      this.dummy.up = this.addDaysToTimestamp(obm.calendarManager.startTime, div[1].toInt());
       var begin = Math.min(this.dummy.down, this.dummy.up);
       var end = Math.max(this.dummy.down, this.dummy.up);
       this.dummy = null;
