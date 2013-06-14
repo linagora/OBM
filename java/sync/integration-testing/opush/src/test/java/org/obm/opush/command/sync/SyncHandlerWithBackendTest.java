@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
+import static org.obm.opush.IntegrationTestUtils.appendToINBOX;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.assertEqualsWithoutApplicationData;
@@ -73,8 +74,11 @@ import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.MethodAttachment;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
@@ -82,6 +86,7 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
+import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.protocol.bean.SyncResponse;
@@ -100,6 +105,8 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.services.ICalendar;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
@@ -584,5 +591,48 @@ public class SyncHandlerWithBackendTest {
 						.withNewFlag(true)
 						.build()));
 		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
+	}
+	
+	@Test
+	public void testNoContentDispositionPartIsSentAsAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/attachmentWithoutContentDisposition.eml");
+
+		SyncKey firstAllocatedSyncKey = new SyncKey("132");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(firstAllocatedSyncKey)
+				.id(3)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(4)
+				.build();
+		
+		ServerId emailServerId = new ServerId(inboxCollectionIdAsString + ":" + 1);
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, emailServerId)).andReturn(false);
+		itemTrackingDao.markAsSynced(secondAllocatedState, ImmutableSet.of(emailServerId));
+		expectLastCall().once();
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		SyncResponse response = opClient.sync(decoder, firstAllocatedSyncKey, inboxCollectionId, PIMDataType.EMAIL);
+		mocksControl.verify();
+
+		SyncCollectionResponse collectionResponse = getCollectionWithId(response, inboxCollectionIdAsString);
+		MSEmail mail = (MSEmail) Iterables.getOnlyElement(collectionResponse.getItemChanges()).getData();
+		MSAttachement attachment = Iterables.getOnlyElement(mail.getAttachments());
+		
+		assertThat(attachment.getMethod()).isEqualTo(MethodAttachment.NormalAttachment);
+		assertThat(attachment.getDisplayName()).isEqualTo("TB_import.JPG");
+		assertThat(attachment.getFileReference()).isNotEmpty();
+		assertThat(attachment.getEstimatedDataSize()).isPositive();
 	}
 }
