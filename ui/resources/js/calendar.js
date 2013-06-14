@@ -7,6 +7,10 @@ Obm.CalendarManager = new Class({
    * Constructor
    */
   initialize: function(time, write) {
+    this.DAY_IN_SECONDS = 24 * 60 * 60;
+    this.HOUR_IN_SECONDS = 60 * 60;
+    this.ALLDAY = 1;
+    this.NOT_ALLDAY = 0;
     this.redraw = new Hash();
     this.redrawAllDay = new Hash();
     this.events = new Hash();
@@ -2408,10 +2412,6 @@ Obm.calendarOccurenceEditPopup = new Class({
 Obm.CalendarQuickForm = new Class({
 
   initialize: function() {
-    this.DAY_IN_SECONDS = 24 * 60 * 60;
-    this.HOUR_IN_SECONDS = 60 * 60;
-    this.ALLDAY = 1;
-    this.NOT_ALLDAY = 0;
     this.form = $('calendarQuickFormStore');
     this.date = $('calendarQuickFormDate');
     this.title = $('calendarQuickFormTitle');
@@ -2436,7 +2436,6 @@ Obm.CalendarQuickForm = new Class({
   },
   
   compute: function(ivent) {
-    var _this = this;
     var ivent = new Event(ivent);
     var target = ivent.target;
     target = $(target);
@@ -2455,7 +2454,7 @@ Obm.CalendarQuickForm = new Class({
     * daylight savings diff between the startdate of the grid and the date of the selected row
     */
     var getMonthlyGridDate = function(containerIdSplit) {
-      var d = obm.calendarManager.startTime + containerIdSplit[1].toInt() * _this.DAY_IN_SECONDS;
+      var d = obm.calendarManager.startTime + containerIdSplit[1].toInt() * obm.calendarManager.DAY_IN_SECONDS;
       d = d + ( obm.timeZoneParser.getTimeZoneOffset(obm.calendarManager.startTime*1000) - obm.timeZoneParser.getTimeZoneOffset(d*1000) ) / 1000 ;
       return d;
     };
@@ -2473,21 +2472,21 @@ Obm.CalendarQuickForm = new Class({
       if (!x) x =ivent.event.offsetX;
       /* End of crappy ie fix*/
 
-      var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt())) * _this.DAY_IN_SECONDS;
-      this.setDefaultFormValues(d, _this.NOT_ALLDAY, _this.HOUR_IN_SECONDS);
+      var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(x/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth.toInt())) * obm.calendarManager.DAY_IN_SECONDS;
+      this.setDefaultFormValues(d, obm.calendarManager.NOT_ALLDAY, obm.calendarManager.HOUR_IN_SECONDS);
     } else if (type == 'allday') {
       if(!obm.calendarManager.write) return false;
-      var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt()) * _this.DAY_IN_SECONDS;
-      this.setDefaultFormValues(d, _this.ALLDAY, _this.HOUR_IN_SECONDS);
+      var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt()) * obm.calendarManager.DAY_IN_SECONDS;
+      this.setDefaultFormValues(d, obm.calendarManager.ALLDAY, obm.calendarManager.HOUR_IN_SECONDS);
     } else if (type == 'dayContainer' || type == 'more') { // Month view
       if(!obm.calendarManager.write) return false;
       var d = getMonthlyGridDate(str);
-      this.setDefaultFormValues(d, _this.ALLDAY, _this.HOUR_IN_SECONDS);
+      this.setDefaultFormValues(d, obm.calendarManager.ALLDAY, obm.calendarManager.HOUR_IN_SECONDS);
     } else if (type == 'dayMonthLabel') {
       var dayContainer = target.parentNode.id.split('_');
 			if(!obm.calendarManager.write) return false;
 			var d = getMonthlyGridDate(dayContainer);
-			this.setDefaultFormValues(d, _this.ALLDAY, _this.HOUR_IN_SECONDS);
+			this.setDefaultFormValues(d, obm.calendarManager.ALLDAY, obm.calendarManager.HOUR_IN_SECONDS);
     } else {
       $('sel_template').style.display ='none';
       var evt = obm.calendarManager.events.get(target.id);
@@ -2555,7 +2554,7 @@ Obm.CalendarQuickForm = new Class({
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat));
       }
     } else {
-      if (evt.event.duration <= this.DAY_IN_SECONDS) {
+      if (evt.event.duration <= obm.calendarManager.DAY_IN_SECONDS) {
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));
       } else {
         var date_end = new Obm.DateTime((evt.event.time + evt.event.duration-1) * 1000);    
@@ -2598,7 +2597,7 @@ Obm.CalendarQuickForm = new Class({
     var date_end = null;
     if (allDay) {
       this.eventData.opacity = 'TRANSPARENT';
-      var nbdays = Math.round(duration / this.DAY_IN_SECONDS);
+      var nbdays = Math.round(duration / obm.calendarManager.DAY_IN_SECONDS);
       date_end = new Obm.DateTime(this.addDaysToTimestamp(time, nbdays) * 1000);
     } else {
       this.eventData.opacity = 'OPAQUE';
@@ -2607,8 +2606,8 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.date_begin = date_begin.format('c');
     this.eventData.old_date_begin = this.eventData.date_begin;
     this.eventData.duration = duration;
-    if (allDay && duration != this.HOUR_IN_SECONDS) {
-      this.eventData.duration += this.DAY_IN_SECONDS;
+    if (allDay && duration != obm.calendarManager.HOUR_IN_SECONDS) {
+      this.eventData.duration += obm.calendarManager.DAY_IN_SECONDS;
     }
     this.eventData.element_id = '';
     this.eventData.formAction = 'quick_insert';
@@ -2634,7 +2633,7 @@ Obm.CalendarQuickForm = new Class({
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat+' '+obm.vars.regexp.dispTimeFormat));
       }
     } else {
-      if (this.eventData.duration <= this.DAY_IN_SECONDS) {
+      if (this.eventData.duration <= obm.calendarManager.DAY_IN_SECONDS) {
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat));
       } else {
         this.date.set('html',date_begin.format(obm.vars.regexp.dispDateFormat) + ' - ' + date_end.format(obm.vars.regexp.dispDateFormat));
