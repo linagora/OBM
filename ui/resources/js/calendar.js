@@ -175,6 +175,21 @@ Obm.CalendarManager = new Class({
     return begin;
   },
   
+  _getAllDayDaysCount: function(duration) {
+    return Math.round(duration / this.DAY_IN_SECONDS);
+  },
+  
+  _fixAllDayDurationForServer: function(eventData) {
+    if ( eventData.all_day ) {
+      var dayCount = this._getAllDayDaysCount(eventData.duration);
+      if ( !dayCount ) {
+        dayCount = 1;
+      }
+      eventData.duration = dayCount * this.DAY_IN_SECONDS;
+    }
+    return eventData;
+  },
+  
   /**
    * Register an event
    */
@@ -1077,6 +1092,7 @@ Obm.CalendarManager = new Class({
     eventData.all_day = evt.event.all_day;
     eventData.periodic = evt.event.periodic;
     eventData.opacity = evt.event.opacity;
+    obm.calendarManager._fixAllDayDurationForServer(eventData);
     return eventData;
   },
 
@@ -1093,6 +1109,7 @@ Obm.CalendarManager = new Class({
    * Create the event on OBM server 
    */
   sendCreateEvent: function(eventData) {
+    obm.calendarManager._fixAllDayDurationForServer(eventData);
     new Request.JSON({
       url: obm.vars.consts.calendarUrl,
       secure : false,
@@ -2597,8 +2614,8 @@ Obm.CalendarQuickForm = new Class({
     var date_end = null;
     if (allDay) {
       this.eventData.opacity = 'TRANSPARENT';
-      var nbdays = Math.round(duration / obm.calendarManager.DAY_IN_SECONDS);
-      date_end = new Obm.DateTime(this.addDaysToTimestamp(time, nbdays) * 1000);
+      var nbdays = obm.calendarManager._getAllDayDaysCount(duration);
+      date_end = new Obm.DateTime(obm.calendarManager.addDaysToTimestamp(time, nbdays) * 1000);
     } else {
       this.eventData.opacity = 'OPAQUE';
       date_end = new Obm.DateTime((time + duration) * 1000);
@@ -2689,14 +2706,18 @@ Obm.CalendarQuickForm = new Class({
     }
     this.eventData.entity_id = this.entityView.get('inputValue');
     this.gotoURI += '&utf8=1&date_begin='
-      +encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration
+      +encodeURIComponent(this.eventData.date_begin)
       +'&new_user_id[]='+this.eventData.entity_id;
     if(!this.eventData.private) {
     	this.gotoURI += '&title='+encodeURIComponent(this.form.tf_title.value);
     }
     if(this.eventData.all_day == '1'){
       this.gotoURI += '&all_day=1';
-    } 
+      var nbDays = obm.calendarManager._getAllDayDaysCount(this.eventData.duration);
+      this.gotoURI += '&duration='+ (nbDays*obm.calendarManager.DAY_IN_SECONDS);
+    } else {
+      this.gotoURI += '&duration='+this.eventData.duration;
+    }
     gotoUriContainsActionNew = new RegExp("action=new");
     if(action == "new" || gotoUriContainsActionNew.test(this.gotoURI))
       this.gotoURI +='&organizer='+this.eventData.entity_id;
