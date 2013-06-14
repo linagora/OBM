@@ -34,9 +34,11 @@ package org.obm.opush.env;
 import static org.easymock.EasyMock.expect;
 
 import org.easymock.IMocksControl;
+import org.obm.opush.TrackableResourceCloser;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
+import org.obm.push.resource.ResourceCloser;
 import org.obm.push.task.TaskBackend;
 
 public class BackendsModule extends AbstractOverrideModule {
@@ -50,6 +52,7 @@ public class BackendsModule extends AbstractOverrideModule {
 		bindCalendarBackend();
 		bindContactsBackend();
 		bindTaskBackend();
+		bind(ResourceCloser.class).toProvider(TrackableResourceCloser.Provider.class);
 	}
 	
 	protected void bindCalendarBackend() {

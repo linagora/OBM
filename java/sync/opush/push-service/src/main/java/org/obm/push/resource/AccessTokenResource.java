@@ -32,7 +32,6 @@
 package org.obm.push.resource;
 
 import org.apache.http.client.HttpClient;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.login.LoginClient;
 
@@ -40,10 +39,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-public class AccessTokenResource implements IAccessTokenResource {
+public class AccessTokenResource extends ObmBackendResource {
 
 	@Singleton
-	public static class Factory implements IAccessTokenResource.Factory {
+	public static class Factory {
 
 		private final LoginClient.Factory loginClientFactory;
 
@@ -52,7 +51,6 @@ public class AccessTokenResource implements IAccessTokenResource {
 			this.loginClientFactory = loginClientFactory;
 		}
 
-		@Override
 		public AccessTokenResource create(HttpClient httpClient, Object accessToken) {
 			return new AccessTokenResource(loginClientFactory, httpClient, accessToken);
 		}
@@ -74,18 +72,21 @@ public class AccessTokenResource implements IAccessTokenResource {
 			.logout(getAccessToken());
 	}
 
-	@Override
 	public AccessToken getAccessToken() {
 		return (AccessToken) accessToken;
 	}
 
-	@Override
 	public String getUserEmail() {
 		return getAccessToken().getUserEmail();
 	}
 
-	@Override
 	public String getUserDisplayName() {
 		return getAccessToken().getUserDisplayName();
 	}
+
+	@Override
+	protected ResourceCloseOrder getCloseOrder() {
+		return ResourceCloseOrder.ACCESS_TOKEN;
+	}
+	
 }

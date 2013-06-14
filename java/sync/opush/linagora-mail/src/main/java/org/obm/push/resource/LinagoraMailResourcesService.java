@@ -29,21 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.bean;
+package org.obm.push.resource;
 
-public enum UserDataRequestResource {
+import javax.servlet.http.HttpServletRequest;
 
-	HTTP_CLIENT(2),
-	ACCESS_TOKEN(1),
-	IMAP_STORE(0);
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.mail.imap.MinigStoreClient;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class LinagoraMailResourcesService implements ResourcesService {
 	
-	private final int closeOrder;
+	private final ResourceCloser resourceCloser;
 
-	private UserDataRequestResource(int closeOrder) {
-		this.closeOrder = closeOrder;
+	@Inject
+	@VisibleForTesting LinagoraMailResourcesService(ResourceCloser resourceCloser) {
+		this.resourceCloser = resourceCloser;
 	}
 	
-	public int closeOrder() {
-		return closeOrder;
+	@Override
+	public void initRequest(UserDataRequest userDataRequest, HttpServletRequest request) {
 	}
+		
+	@Override
+	public void closeResources(UserDataRequest userDataRequest) {
+		resourceCloser.closeResources(userDataRequest, MinigStoreClient.class);
+	}
+	
 }

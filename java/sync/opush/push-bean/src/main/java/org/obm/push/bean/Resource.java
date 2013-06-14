@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-public interface Resource {
+public interface Resource extends Comparable<Resource> {
 
 	void close();
 }

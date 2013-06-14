@@ -35,8 +35,8 @@ import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.auth.AuthenticationServiceImpl;
 import org.obm.push.backend.BackendWindowingService;
-import org.obm.push.backend.IAccessTokenResource;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -63,7 +63,13 @@ import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.protocol.data.TimeZoneEncoderImpl;
 import org.obm.push.qos.OpushQoSKeyProvider;
-import org.obm.push.resource.AccessTokenResource;
+import org.obm.push.resource.ObmBackendResourcesService;
+import org.obm.push.resource.ResourceCloser;
+import org.obm.push.resource.ResourceCloserImpl;
+import org.obm.push.resource.ResourcesService;
+import org.obm.push.search.ISearchSource;
+import org.obm.push.search.ldap.BookSource;
+import org.obm.push.service.AuthenticationService;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.DateService;
 import org.obm.push.service.DeviceService;
@@ -156,13 +162,21 @@ public class OpushImplModule extends AbstractModule {
 		bind(AttendeeService.class).to(SimpleAttendeeService.class);
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toInstance("/etc/opush/policy.ini");
 		bind(PolicyConfigurationService.class).to(PolicyConfigurationServiceFileImpl.class);
-		bind(IAccessTokenResource.Factory.class).to(AccessTokenResource.Factory.class);
+		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
 		
 		Multibinder<PIMBackend> pimBackends = 
 				Multibinder.newSetBinder(binder(), PIMBackend.class);
 		pimBackends.addBinding().to(TaskBackend.class);
 		pimBackends.addBinding().to(CalendarBackend.class);
 		pimBackends.addBinding().to(ContactsBackend.class);
+		
+		Multibinder<ISearchSource> searchSources = Multibinder.newSetBinder(binder(), ISearchSource.class);
+		searchSources.addBinding().to(BookSource.class);
+		
+		bind(ResourceCloser.class).to(ResourceCloserImpl.class);
+		
+		Multibinder<ResourcesService> resources = Multibinder.newSetBinder(binder(), ResourcesService.class);
+		resources.addBinding().to(ObmBackendResourcesService.class);
 	}
 	
 	private Module qosModule() {

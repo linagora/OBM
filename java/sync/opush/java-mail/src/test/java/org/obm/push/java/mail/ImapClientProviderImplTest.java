@@ -48,7 +48,6 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.mail.imap.ImapStore;
 import org.obm.push.mail.imap.OpushImapFolder;
 
@@ -95,7 +94,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(UserDataRequestResource.IMAP_STORE, imapStore);
+		udr.putResource(ImapClientProviderImpl.IMAP_STORE, imapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore nullImapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, null);
@@ -116,7 +115,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(UserDataRequestResource.IMAP_STORE, expectedImapStore);
+		udr.putResource(ImapClientProviderImpl.IMAP_STORE, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
@@ -141,7 +140,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(UserDataRequestResource.IMAP_STORE, expectedImapStore);
+		udr.putResource(ImapClientProviderImpl.IMAP_STORE, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);

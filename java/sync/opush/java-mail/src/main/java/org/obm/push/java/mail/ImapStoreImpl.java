@@ -43,6 +43,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.bean.Resource;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MailboxFolder;
@@ -61,6 +62,7 @@ import org.obm.push.mail.imap.StreamedLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPFolder;
@@ -203,6 +205,7 @@ public class ImapStoreImpl implements ImapStore {
 		}
 	}
 
+
 	@Override
 	public OpushImapFolder getDefaultFolder() throws MessagingException {
 		IMAPFolder defaultFolder = (IMAPFolder) store.getDefaultFolder();
@@ -254,7 +257,7 @@ public class ImapStoreImpl implements ImapStore {
 		opushImapFolder.open(mode);
 		return opushImapFolder;
 	}
-	
+
 	private OpushImapFolder getFolder(String folderName) throws MessagingException {
 		IMAPFolder folder = (IMAPFolder) store.getDefaultFolder().getFolder(folderName);
 		return newOpushImapFolder(folder);
@@ -330,5 +333,11 @@ public class ImapStoreImpl implements ImapStore {
 	public void expunge() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public int compareTo(Resource o) {
+		Preconditions.checkArgument(o instanceof ImapStore);
+		return 0;
 	}
 }

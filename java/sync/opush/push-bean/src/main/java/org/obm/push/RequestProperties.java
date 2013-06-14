@@ -29,54 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resource;
+package org.obm.push;
 
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+public class RequestProperties {
 
-import org.apache.http.client.HttpClient;
-import org.easymock.IMocksControl;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.login.LoginClient;
-
-@RunWith(SlowFilterRunner.class)
-public class AccessTokenResourceTest {
-
-	private IMocksControl mocksControl;
-	private LoginClient.Factory loginClientFactory;
-
-	@Before 
-	public void setup() {
-		mocksControl = createControl();
-		loginClientFactory = mocksControl.createMock(LoginClient.Factory.class);
-	}
+	public static final String CREDENTIALS = "crendentials";
+	public static final String CONTINUATION = "requestId";
+	public static final String ACTIVE_SYNC_REQUEST = "activeSyncRequest";
 	
-	@Test
-	public void testCloseAccessTokenResource() {
-		HttpClient httpClient = mocksControl.createMock(HttpClient.class);
-		AccessToken accessToken = new AccessToken(1, "origin");
-		AccessTokenResource accessTokenResource = new AccessTokenResource.Factory(loginClientFactory)
-			.create(httpClient, accessToken);
-		
-		UserDataRequest userDataRequest = new UserDataRequest(null, null, null);
-		userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
-		
-		LoginClient loginClient = mocksControl.createMock(LoginClient.class);
-		expect(loginClientFactory.create(httpClient))
-			.andReturn(loginClient).once();
-		loginClient.logout(accessToken);
-		expectLastCall().once();
-		
-		mocksControl.replay();
-		
-		userDataRequest.closeResources();
-		mocksControl.verify();
-	}
 }

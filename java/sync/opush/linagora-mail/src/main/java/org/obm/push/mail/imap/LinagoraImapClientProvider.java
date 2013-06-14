@@ -36,7 +36,6 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.Logger;
@@ -47,6 +46,8 @@ import com.google.inject.Inject;
 
 public class LinagoraImapClientProvider {
 
+	public static final String IMAP_STORE = "IMAP_STORE";
+	
 	private static final Logger logger = LoggerFactory.getLogger(LinagoraImapClientProvider.class);
 
 	
@@ -86,7 +87,7 @@ public class LinagoraImapClientProvider {
 
 		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(imapHost, login, udr.getPassword());
 		newMinigStoreClient.login(activateTLS);
-		udr.putResource(UserDataRequestResource.IMAP_STORE, newMinigStoreClient);
+		udr.putResource(IMAP_STORE, newMinigStoreClient);
 		
 		logger.debug("Creating storeClient with login {} : loginWithDomain = {}", login, loginWithDomain);
 		
@@ -94,7 +95,7 @@ public class LinagoraImapClientProvider {
 	}
 
 	private StoreClient retrieveWorkingStoreClient(UserDataRequest udr) {
-		MinigStoreClient minigStoreClient = (MinigStoreClient) udr.getResource(UserDataRequestResource.IMAP_STORE);
+		MinigStoreClient minigStoreClient = (MinigStoreClient) udr.getResource(IMAP_STORE);
 		if (minigStoreClient != null) {
 			try {
 				StoreClient storeClient = minigStoreClient.getStoreClient();

@@ -84,10 +84,10 @@ public class ItemOperationHandlerTest {
 	@Inject	ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject GreenMail greenMail;
 	@Inject IMocksControl mocksControl;
-	@Inject PendingQueriesLock pendingQueries;
 	@Inject ImapConnectionCounter imapConnectionCounter;
 	@Inject Configuration configuration;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	@Inject PendingQueriesLock pendingQueries;
 	
 	private CollectionDao collectionDao;
 

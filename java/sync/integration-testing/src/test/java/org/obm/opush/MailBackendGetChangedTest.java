@@ -59,12 +59,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.opush.env.Configuration;
-import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.opush.env.ConfigurationModule.PolicyConfigurationProvider;
+import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
@@ -100,7 +99,7 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(SlowGuiceRunner.class) 
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetChangedTest {
 
@@ -250,7 +249,7 @@ public class MailBackendGetChangedTest {
 		assertThat(imapConnectionCounter.selectCounter.get()).isEqualTo(1);
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(0);
 	}
-
+	
 	@Test
 	public void testInitialGetChangedWithSnapshotNoChanges() throws Exception {
 		String emailId1 = ":1";

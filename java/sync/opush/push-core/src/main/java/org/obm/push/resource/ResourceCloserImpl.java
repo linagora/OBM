@@ -29,51 +29,39 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm.push.resource;
 
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
+import java.util.SortedSet;
+
+import org.obm.push.bean.Resource;
 import org.obm.push.bean.UserDataRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Throwables;
-import com.google.inject.Inject;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 import com.google.inject.Singleton;
 
-public class TrackableUserDataRequest extends UserDataRequest {
-	
-	private PendingQueriesLock pendingQueries;
+@Singleton
+public class ResourceCloserImpl implements ResourceCloser {
 
-	@Singleton
-	public static class Factory extends UserDataRequest.Factory {
-
-		private PendingQueriesLock pendingQueries;
-
-		@Inject
-		private Factory(PendingQueriesLock pendingQueries) {
-			this.pendingQueries = pendingQueries;
-		}
-		
-		@Override
-		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device) {
-			return new TrackableUserDataRequest(credentials, command, device, pendingQueries);
-		}
-	}
-	
-	
-	public TrackableUserDataRequest(Credentials credentials, String command, Device device, PendingQueriesLock pendingQueries) {
-		super(credentials, command, device);
-		this.pendingQueries = pendingQueries;
-		
-		try {
-			pendingQueries.acquire();
-		} catch (InterruptedException e) {
-			Throwables.propagate(e);
-		}
-	}
+	private final Logger logger = LoggerFactory.getLogger(ResourceCloserImpl.class);
 	
 	@Override
-	public void closeResources() {
-		super.closeResources();
-		pendingQueries.release();
+	public void closeResources(UserDataRequest userDataRequest, Class<? extends Resource> type) {
+		SortedSet<Resource> sortedResources =
+			FluentIterable.from(userDataRequest.getResources().values())
+			.filter(Predicates.instanceOf(type))
+			.toSortedSet(Ordering.natural());
+		
+		for (Resource resource: sortedResources) {
+			try {
+				resource.close();
+			} catch (RuntimeException exception) {
+				logger.error("fail to close resource {}, exception occured {}", resource, exception);
+			}
+		}
 	}
+	
 }

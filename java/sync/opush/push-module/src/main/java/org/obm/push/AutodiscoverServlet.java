@@ -32,6 +32,7 @@
 package org.obm.push;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,6 +46,7 @@ import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.impl.ResponderImpl.Factory;
 import org.obm.push.protocol.request.SimpleQueryString;
+import org.obm.push.resource.ResourcesService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -57,18 +59,21 @@ public class AutodiscoverServlet extends HttpServlet {
 	private final Factory responderFactory;
 	private final UserDataRequest.Factory userDataRequestFactory;
 	private final LoggerService loggerService;
+	private final Set<ResourcesService> resourcesServices;
 	
 	@Inject
 	@VisibleForTesting AutodiscoverServlet(AutodiscoverHandler autodiscoverHandler, 
 			ResponderImpl.Factory responderFactory, 
 			UserDataRequest.Factory userDataRequestFactory,
-			LoggerService loggerService) {
+			LoggerService loggerService,
+			Set<ResourcesService> resourcesServices) {
 		
 		super();
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
 		this.userDataRequestFactory = userDataRequestFactory;
 		this.loggerService = loggerService;
+		this.resourcesServices = resourcesServices;
 	}
 
 	@Override
@@ -87,7 +92,9 @@ public class AutodiscoverServlet extends HttpServlet {
 			autodiscoverHandler.process(null, userDataRequest, queryString, responder);
 		} finally {
 			if (userDataRequest != null) {
-				userDataRequest.closeResources();
+				for (ResourcesService resourcesService: resourcesServices) {
+					resourcesService.closeResources(userDataRequest);
+				}
 			}
 		}
 

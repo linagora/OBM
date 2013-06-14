@@ -48,7 +48,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,8 +56,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
-import org.obm.push.backend.IAccessTokenResource;
-import org.obm.push.backend.IHttpClientResource;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.Credentials;
@@ -71,7 +68,6 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.bean.change.hierarchy.CollectionChange;
 import org.obm.push.bean.change.hierarchy.CollectionDeletion;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -87,7 +83,6 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.service.AuthenticationService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.Mime4jUtils;
-import org.obm.sync.auth.AccessToken;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -123,10 +118,6 @@ public class MailBackendTest {
 		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		
 		mocksControl = createControl();
-		IAccessTokenResource accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
-		expect(accessTokenResource.getAccessToken())
-			.andReturn(mocksControl).anyTimes();
-		udr.putResource(UserDataRequestResource.ACCESS_TOKEN, accessTokenResource);
 		
 		collectionPathBuilder = mocksControl.createMock(Builder.class);
 		expect(collectionPathBuilder.userDataRequest(udr)).andReturn(collectionPathBuilder).anyTimes();
@@ -144,22 +135,10 @@ public class MailBackendTest {
 	@Test
 	public void testSendEmailWithBigMail()
 			throws ProcessingEmailException, StoreEmailException, SendEmailException, IOException, SmtpInvalidRcptException {
-		final AccessToken at = new AccessToken(1, "o-push");
 		
 		AuthenticationService authenticationService = mocksControl.createMock(AuthenticationService.class);
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		
-		IAccessTokenResource accessTokenResource = mocksControl.createMock(IAccessTokenResource.class);
-		expect(accessTokenResource.getAccessToken())
-			.andReturn(at).anyTimes();
-		expect(userDataRequest.getAccessTokenResource())
-			.andReturn(accessTokenResource).anyTimes();
-		IHttpClientResource httpClientResource = mocksControl.createMock(IHttpClientResource.class);
-		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
-		expect(userDataRequest.getHttpClientResource())
-			.andReturn(httpClientResource).anyTimes();
-
 		expect(authenticationService.getUserEmail(userDataRequest))
 			.andReturn(user.getLoginAtDomain()).once();
 		

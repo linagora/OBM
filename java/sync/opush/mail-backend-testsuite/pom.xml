@@ -105,5 +105,11 @@
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-module</artifactId>
+			<version>${obm.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 </project>

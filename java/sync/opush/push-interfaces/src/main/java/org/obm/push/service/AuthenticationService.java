@@ -31,13 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import org.apache.http.client.HttpClient;
-import org.obm.push.backend.IAccessTokenResource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.obm.push.bean.Credentials;
 import org.obm.push.bean.UserDataRequest;
 
 public interface AuthenticationService {
 
-	IAccessTokenResource authenticate(HttpClient httpClient, String userId, String password) throws Exception;
+	Credentials authenticateValidRequest(HttpServletRequest request, String userId, String password) throws Exception;
 	
 	String getUserEmail(UserDataRequest udr);
 }

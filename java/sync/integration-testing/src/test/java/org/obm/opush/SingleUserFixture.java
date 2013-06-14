@@ -37,8 +37,8 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.UserDataRequestResource;
 import org.obm.push.resource.AccessTokenResource;
+import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
@@ -77,7 +77,7 @@ public class SingleUserFixture {
 		jaures.credentials = new Credentials(jaures.user, jaures.password);
 		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId, jaures.deviceProtocolVersion);
 		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device);
-		jaures.userDataRequest.putResource(UserDataRequestResource.ACCESS_TOKEN, 
+		jaures.userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), 
 				accessTokenResourceFactory.create(null, jaures.accessToken));
 		jaures.rootCollectionPath = "obm:\\\\" + jaures.user.getLoginAtDomain();
 	}
