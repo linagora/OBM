@@ -832,7 +832,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> itemIds, SyncCollectionOptions collectionOptions, 
-				ItemSyncState previousItemSyncState, SyncKey newSyncKey) 
+				ItemSyncState previousItemSyncState) 
 			throws ProcessingEmailException {
 
 		Snapshot snapshot = snapshotService.getSnapshot(udr.getDevId(), previousItemSyncState.getSyncKey(), collectionId);

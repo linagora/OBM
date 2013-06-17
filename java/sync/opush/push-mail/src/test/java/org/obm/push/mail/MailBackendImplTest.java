@@ -777,7 +777,6 @@ public class MailBackendImplTest {
 	@Test(expected=InvalidSyncKeyException.class)
 	public void testFetchWhenNoSnapshotLinkedToSyncKey() {
 		SyncCollectionOptions collectionOptions = new SyncCollectionOptions();
-		SyncKey newSyncKey = new SyncKey("456");
 		List<String> itemIds = ImmutableList.of("1:1");
 
 		ItemSyncState previousItemSyncState = ItemSyncState.builder()
@@ -789,7 +788,7 @@ public class MailBackendImplTest {
 		control.replay();
 		
 		try {
-			testee.fetch(udr, collectionId, itemIds, collectionOptions, previousItemSyncState, newSyncKey);
+			testee.fetch(udr, collectionId, itemIds, collectionOptions, previousItemSyncState);
 		} catch (InvalidSyncKeyException e) {
 			control.verify();
 			throw e;

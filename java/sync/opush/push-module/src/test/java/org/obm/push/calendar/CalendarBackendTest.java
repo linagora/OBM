@@ -1068,7 +1068,7 @@ public class CalendarBackendTest {
 		
 		List<String> itemIds = ImmutableList.of(serverId1, serverId2);
 
-		List<ItemChange> itemChanges = calendarBackend.fetch(userDataRequest, collectionId, itemIds, null, null, null);
+		List<ItemChange> itemChanges = calendarBackend.fetch(userDataRequest, collectionId, itemIds, null, null);
 		
 		mockControl.verify();
 		
@@ -1413,7 +1413,7 @@ public class CalendarBackendTest {
 		
 		List<String> itemIds = ImmutableList.of(serverId);
 
-		calendarBackend.fetch(userDataRequest, collectionId, itemIds, null, null, null);
+		calendarBackend.fetch(userDataRequest, collectionId, itemIds, null, null);
 	}
 	
 	@Test

@@ -475,7 +475,7 @@ public class ContactsBackendTest {
 		expect(mappingService.getServerIdFor(targetcontactCollectionUid, String.valueOf(itemId))).andReturn(serverId);
 	
 		mocks.replay();
-		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, targetcontactCollectionUid, ImmutableList.of(serverId), null, null, null);
+		List<ItemChange> itemChanges = contactsBackend.fetch(userDataRequest, targetcontactCollectionUid, ImmutableList.of(serverId), null, null);
 		mocks.verify();
 		
 		ItemChange itemChange = new ItemChange(serverId, false);
