@@ -361,32 +361,47 @@ form {
 }
 
 #allinonemenu{
-  overflow-y: auto;
-  position: relative;
-  width: 200px;
-  right:55px;
-  top:34px;
-  background-color: #FAFAFA;
-  line-height: 18px;
-  padding-left: 5px;
-  padding-bottom:10px;
-  border: 1px solid #DDD;
-  border-top: none;
-  z-index: 999999;
   display: none;
-  box-shadow: 0px 0px 5px #999;
+  position: absolute;
+  top:33px;
+  left: 385px;
+  max-width: 260px;
+  width: auto;
+  background-color: #FAFAFA;
+  line-height: 16px;
+  border-left: 2px solid #CCC;
+  border-right: 2px solid #CCC;
+  border-bottom: 2px solid #CCC;
+  z-index: 999;
+  box-shadow: 0px 0px 5px #CCC;
   border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 0px;
+  padding-right: 20px;
+  padding-bottom: 15px;
+  padding-left: 5px;
+}
+
+@media screen and (max-height: 600px) {
+  #allinonemenu{
+    height: auto;
+    max-height: 400px;
+    max-width: auto;
+  }
 }
 
 #allinonemenu h3 {
   margin:0;
+  padding-bottom: 0;
   padding-top: 5px;
   font-size: 14px;
+  color: #333;
 }
 
 #allinonemenu ul {
   margin:0;
-  padding:0;
+  padding-left: 5px;
   font-size:13px;
 }
 

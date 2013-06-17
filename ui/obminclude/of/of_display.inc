@@ -1968,16 +1968,18 @@ function display_document_form($params, $label='') {
 }
 
 function get_sections_data() {
-  global $cgp_show;
+  global $cgp_show, $perm;
 
   $sections_data = array();
-  $exclusions = array("com", "prod", "compta");
+  $exclusions = array("my", "webmail");
 
   foreach($cgp_show['section'] as $section => $value){
-    $exceptions = array('my', 'webmail');
-    if( !in_array($section, $exceptions) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
-      if (display_modules($section, null, true) !='' && !in_array($section, $exclusions)){
-        $sections_data[] = get_module_data($section, null);
+    $section_right = $perm->get_section_rights($section);
+    if ($section_right) {
+      if( !in_array($section, $exclusions) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
+        if (display_modules($section, null, true) !=''){
+          $sections_data[] = get_module_data($section, null);
+        }
       }
     }
   }
