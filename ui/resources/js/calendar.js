@@ -1413,17 +1413,20 @@ Obm.CalendarManager = new Class({
                $$('div.evt_'+response.deleted_ids[i] ).each(deleteRoutine);
             }
         }
-      } else {      
+      } else {
         for(var i=0;i< events.length;i++) {
           var ivent = events[i].event;
-          var element_id = 'event_'+str[1]+'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-          var evt = obm.calendarManager.events.get(element_id);
-          if (evt) {
+          var eventsToRemove = obm.calendarManager.events.filter(function(evt) {
+            return evt.event.entity_id == ivent.entity_id && 
+                    evt.event.entity == ivent.entity &&
+                    evt.event.id == str[1];
+          });
+          eventsToRemove.each(function(evt) {
             obm.calendarManager.unregister(evt);
-            obm.calendarManager.events.erase(element_id);
+            obm.calendarManager.events.erase(evt.element.id);
             evt.element.destroy();
             delete evt;
-          }
+          });
         }
       }
       obm.calendarManager.eventIndexing(str[1], 1);
