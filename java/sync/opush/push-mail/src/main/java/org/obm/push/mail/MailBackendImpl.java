@@ -892,7 +892,6 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		if (!snapshot.containsAllIds(itemIds)) {
 			throw new ItemNotFoundException();
 		}
-		List<ItemChange> fetchs = fetch(udr, collectionId, itemIds, collectionOptions);
-		return fetchs;
+		return fetch(udr, collectionId, itemIds, collectionOptions);
 	}
 }

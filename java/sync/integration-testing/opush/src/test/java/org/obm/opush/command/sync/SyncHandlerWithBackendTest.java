@@ -51,6 +51,12 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -86,9 +92,12 @@ import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
+import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.SnapshotService;
+import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
@@ -103,6 +112,8 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.services.ICalendar;
+
+import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -133,6 +144,7 @@ public class SyncHandlerWithBackendTest {
 	@Inject EventService eventService;
 	@Inject SyncDecoder decoder;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	@Inject SnapshotService snapshotService;
 
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
@@ -542,34 +554,40 @@ public class SyncHandlerWithBackendTest {
 		SyncKey thirdAllocatedSyncKey = new SyncKey("789");
 		int firstAllocatedStateId = 3;
 		int secondAllocatedStateId = 4;
+		int thirdAllocatedStateId = 5;
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey, thirdAllocatedSyncKey);
+		initializeEmptySnapshotForSyncKey(firstAllocatedSyncKey);
 		
-		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
 		ItemSyncState firstAllocatedState = ItemSyncState.builder()
-				.syncDate(initialDate)
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
 				.syncKey(firstAllocatedSyncKey)
 				.id(firstAllocatedStateId)
 				.build();
-		Date secondDate = date("2012-10-10T16:22:53");
 		ItemSyncState secondAllocatedState = ItemSyncState.builder()
-				.syncDate(secondDate)
+				.syncDate(date("2012-10-10T16:22:53"))
 				.syncKey(secondAllocatedSyncKey)
 				.id(secondAllocatedStateId)
 				.build();
-		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		ItemSyncState thirdAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T17:00:00"))
+				.syncKey(thirdAllocatedSyncKey)
+				.id(thirdAllocatedStateId)
+				.build();
 		
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
 		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
-		expect(collectionDao.findItemStateForKey(secondAllocatedSyncKey)).andReturn(secondAllocatedState).times(2);
+
+		expect(dateService.getCurrentDate()).andReturn(thirdAllocatedState.getSyncDate()).once();
+		expectCollectionDaoPerformSync(secondAllocatedSyncKey, secondAllocatedState, thirdAllocatedState, inboxCollectionId);
 
 		String serverId = inboxCollectionIdAsString + ":" + 1;
-		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, 
-				new ServerId(serverId)))
-			.andReturn(false);
-		
-		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
-		expectLastCall().anyTimes();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(serverId))).andReturn(false);
+		itemTrackingDao.markAsSynced(secondAllocatedState, ImmutableSet.of(new ServerId(serverId)));
+		expectLastCall().once();
+		itemTrackingDao.markAsDeleted(thirdAllocatedState, ImmutableSet.of(new ServerId(serverId)));
+		expectLastCall().once();
 		
 		mocksControl.replay();
 		opushServer.start();
@@ -590,7 +608,26 @@ public class SyncHandlerWithBackendTest {
 						.serverId(serverId)
 						.withNewFlag(true)
 						.build()));
-		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM);
+		
+		SyncCollectionResponse secondCollectionResponse = getCollectionWithId(secondSyncResponse, inboxCollectionIdAsString);
+		assertThat(secondSyncResponse.getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(secondCollectionResponse.getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(secondCollectionResponse.getItemFetchs()).isEmpty();
+		assertThat(secondCollectionResponse.getItemChanges()).isEmpty();
+		assertThat(secondCollectionResponse.getItemChangesDeletion())
+			.containsOnly(ItemDeletion.builder().serverId(serverId).build());
+	}
+
+	private void initializeEmptySnapshotForSyncKey(SyncKey firstAllocatedSyncKey) throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+		TransactionManagerServices.getTransactionManager().begin();
+		snapshotService.storeSnapshot(Snapshot.builder()
+				.syncKey(firstAllocatedSyncKey)
+				.collectionId(inboxCollectionId)
+				.deviceId(user.deviceId)
+				.uidNext(1l)
+				.filterType(FilterType.THREE_DAYS_BACK)
+				.build());
+		TransactionManagerServices.getTransactionManager().commit();
 	}
 	
 	@Test

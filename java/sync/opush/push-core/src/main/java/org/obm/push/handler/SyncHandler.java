@@ -239,23 +239,32 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuationService.suspend(udr, continuation, syncRequest.getWaitInSecond());
 	}
 
-	private ItemSyncState doUpdates(UserDataRequest udr, AnalysedSyncCollection request, SyncClientCommands clientCommands, 
+	private Date doUpdates(UserDataRequest udr, AnalysedSyncCollection request, SyncClientCommands clientCommands, 
 			SyncCollectionResponse.Builder responseBuilder, ItemSyncState syncState, SyncKey newSyncKey) throws DaoException, CollectionNotFoundException, 
 			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, FilterTypeChangedException, HierarchyChangedException, InvalidServerId {
 
 		DataDelta delta = contentsExporter.getChanged(udr, syncState, request, clientCommands, newSyncKey);
-
+		
 		responseBuilder
 			.responses(SyncCollectionCommands.Response.builder()
+					.fetchs(fetchItems(udr, request, syncState, newSyncKey))
 					.changes(identifyNewItems(delta.getChanges(), syncState), clientCommands)
 					.deletions(delta.getDeletions())
 					.build())
 			.moreAvailable(delta.hasMoreAvailable());
 		
-		return ItemSyncState.builder()
-				.syncKey(delta.getSyncKey())
-				.syncDate(delta.getSyncDate())
-				.build();
+		return delta.getSyncDate();
+	}
+
+	private List<ItemChange> fetchItems(UserDataRequest udr, AnalysedSyncCollection request, ItemSyncState syncState, SyncKey newSyncKey) {
+		if (!request.getFetchIds().isEmpty()) {
+			try {
+				return identifyNewItems(contentsExporter.fetch(udr, syncState, request, newSyncKey), syncState);
+			} catch (ItemNotFoundException e) {
+				logger.warn("At least one item to fetch can not be found", e);
+			}
+		}
+		return ImmutableList.of();
 	}
 
 	private SyncClientCommands processClientCommands(UserDataRequest udr, Sync syncRequest) throws CollectionNotFoundException, DaoException, 
@@ -439,24 +448,12 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			builder.status(SyncStatus.INVALID_SYNC_KEY);
 			return null;
 		} else {
-			Date syncDate = null;
 			SyncKey newSyncKey = syncKeyFactory.randomSyncKey();
-			if (request.getFetchIds().isEmpty()) {
-				ItemSyncState itemSyncState = doUpdates(udr, request, clientCommands, builder, st, newSyncKey);
-				syncDate = itemSyncState.getSyncDate();
-			} else {
-				syncDate = st.getSyncDate();
-				builder.responses(
-						SyncCollectionCommands.Response.builder()
-							.fetchs(identifyNewItems(contentsExporter.fetch(udr, st, request, newSyncKey), st))
-							.build());
-			}
-			
-			builder.syncKey(newSyncKey)
-				.status(SyncStatus.OK);
+			Date newSyncDate = doUpdates(udr, request, clientCommands, builder, st, newSyncKey);
+			builder.syncKey(newSyncKey).status(SyncStatus.OK);
 			
 			return ItemSyncState.builder()
-					.syncDate(syncDate)
+					.syncDate(newSyncDate)
 					.syncKey(newSyncKey)
 					.build();
 		}
