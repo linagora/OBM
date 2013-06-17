@@ -10,5 +10,4 @@ DEB_ANT_INSTALL_TARGET := dist
 
 DEB_UPDATE_RCD_PARAMS_obm-tomcat := "start 22 2 3 4 5 . stop 18 0 1 6 ."
 
-DEB_DH_SHLIBDEPS_ARGS_obm-jdk := "-Xlib"
 DEB_DH_SHLIBDEPS_ARGS_obm-tomcat := "-Xlib"

@@ -2,7 +2,7 @@ Source: obm-java
 Section: net
 Priority: optional
 Maintainer: Thomas Sarboni <tsarboni@linagora.com>
-Build-Depends: cdbs, maven2, debhelper (>= 5.0), sun-java6-jdk
+Build-Depends: cdbs, maven2, debhelper (>= 5.0), java-sdk, java-compiler
 Standards-Version: 3.8.3
 Homepage: http://www.obm.org
 
@@ -22,7 +22,7 @@ Description: synchronization application for Open Business Management
 
 Package: opush
 Architecture: all
-Depends: obm-conf, sun-java6-jdk, obm-jetty, obm-jetty-common-libs
+Depends: obm-conf, obm-jetty-common-libs
 Provides: obm-opush
 Replaces: obm-opush ( << 2.3.3-1 )
 Conflicts: obm-opush ( << 2.3.3-1 )
@@ -49,7 +49,7 @@ Description: Transitional package for opush
 
 Package: obm-locator
 Architecture: all
-Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty, obm-jetty-common-libs
+Depends: obm-conf, openssl, obm-jetty-common-libs
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
@@ -96,7 +96,7 @@ Description: Jetty common libs for Open Business Management
 
 Package: spushnik
 Architecture: all
-Depends: sun-java6-jdk, obm-jetty, obm-jetty-common-libs
+Depends: obm-jetty-common-libs
 Description: Opush probe
  This package contains a Java webapp probe able to check the status of an Opush server instance.
  .

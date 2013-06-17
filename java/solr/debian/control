@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Thomas Sarboni <tsarboni@linagora.com>
 Build-Depends-Indep: ant
-Build-Depends: cdbs, debhelper (>> 5), sun-java6-jdk
+Build-Depends: cdbs, debhelper (>> 5), java-sdk, java-compiler
 Standards-Version: 3.7.8
 
 Package: obm-solr

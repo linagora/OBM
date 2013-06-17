@@ -2,27 +2,15 @@ Source: obm-tomcat
 Section: net
 Priority: optional
 Maintainer: Thomas Sarboni <tsarboni@linagora.com>
-Build-Depends-Indep: ant, ant-optional, sun-java6-jdk
+Build-Depends-Indep: ant, ant-optional, java-sdk, java-compiler
 Build-Depends: cdbs, debhelper (>= 5.0)
 Standards-Version: 3.8.4
 Homepage: http://www.obm.org
 
 
-Package: obm-jdk
-Architecture: all
-Depends: sun-java6-jdk, ${misc:Depends}
-Description: Java configuration for Open Business Management
- This package ensures that sun-java6-jdk is the Java version used on the
- system.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
 Package: obm-tomcat
 Architecture: all
-Depends: obm-jdk, libapr1, obm-munin-node, ${misc:Depends}
+Depends: java-sdk, java-compiler, libapr1, obm-munin-node, ${misc:Depends}
 Description: the Tomcat web application server for Open Business Management
  This package contains the 6.0.20 version of the Apache Tomcat application
  server for OBM.
