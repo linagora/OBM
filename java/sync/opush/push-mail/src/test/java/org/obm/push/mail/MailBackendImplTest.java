@@ -69,6 +69,7 @@ import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
 import org.obm.push.mail.bean.Email;
@@ -768,6 +769,28 @@ public class MailBackendImplTest {
 		try {
 			testee.getChanged(udr, syncState, syncCollectionRequest, SyncClientCommands.empty(), newSyncKey);
 		} catch (ProcessingEmailException e) {
+			control.verify();
+			throw e;
+		}
+	}
+	
+	@Test(expected=InvalidSyncKeyException.class)
+	public void testFetchWhenNoSnapshotLinkedToSyncKey() {
+		SyncCollectionOptions collectionOptions = new SyncCollectionOptions();
+		SyncKey newSyncKey = new SyncKey("456");
+		List<String> itemIds = ImmutableList.of("1:1");
+
+		ItemSyncState previousItemSyncState = ItemSyncState.builder()
+				.syncKey(new SyncKey("123"))
+				.syncDate(date("2004-12-14T22:00:00"))
+				.build();
+		
+		expect(snapshotService.getSnapshot(devId, previousItemSyncState.getSyncKey(), collectionId)).andReturn(null);
+		control.replay();
+		
+		try {
+			testee.fetch(udr, collectionId, itemIds, collectionOptions, previousItemSyncState, newSyncKey);
+		} catch (InvalidSyncKeyException e) {
 			control.verify();
 			throw e;
 		}
