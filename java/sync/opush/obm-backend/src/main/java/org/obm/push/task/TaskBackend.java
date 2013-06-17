@@ -69,8 +69,7 @@ public class TaskBackend implements PIMBackend {
 				int collectionId, 
 				List<String> fetchServerIds, 
 				SyncCollectionOptions syncCollectionOptions,
-				ItemSyncState previousItemSyncState, 
-				SyncKey newSyncKey)
+				ItemSyncState previousItemSyncState)
 			throws ProcessingEmailException, CollectionNotFoundException,
 			DaoException, UnexpectedObmSyncServerException {
 		throw new CollectionNotFoundException();

@@ -247,7 +247,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		
 		responseBuilder
 			.responses(SyncCollectionCommands.Response.builder()
-					.fetchs(fetchItems(udr, request, syncState, newSyncKey))
+					.fetchs(fetchItems(udr, request, syncState))
 					.changes(identifyNewItems(delta.getChanges(), syncState), clientCommands)
 					.deletions(delta.getDeletions())
 					.build())
@@ -256,10 +256,10 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		return delta.getSyncDate();
 	}
 
-	private List<ItemChange> fetchItems(UserDataRequest udr, AnalysedSyncCollection request, ItemSyncState syncState, SyncKey newSyncKey) {
+	private List<ItemChange> fetchItems(UserDataRequest udr, AnalysedSyncCollection request, ItemSyncState syncState) {
 		if (!request.getFetchIds().isEmpty()) {
 			try {
-				return identifyNewItems(contentsExporter.fetch(udr, syncState, request, newSyncKey), syncState);
+				return identifyNewItems(contentsExporter.fetch(udr, syncState, request), syncState);
 			} catch (ItemNotFoundException e) {
 				logger.warn("At least one item to fetch can not be found", e);
 			}

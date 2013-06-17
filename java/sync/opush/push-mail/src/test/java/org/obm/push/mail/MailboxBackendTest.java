@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
@@ -193,7 +192,6 @@ public class MailboxBackendTest {
 				.syncDate(date("2012-01-01T11:22:33"))
 				.build();
 
-		SyncKey newSyncKey = new SyncKey("456");
 		Snapshot existingSnapshot = Snapshot.builder()
 			.addEmail(Email.builder().uid(itemId).build())
 			.collectionId(collectionId)
@@ -204,7 +202,7 @@ public class MailboxBackendTest {
 			.andReturn(existingSnapshot);
 		
 		mocks.replay();		
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
@@ -239,12 +237,8 @@ public class MailboxBackendTest {
 				.syncDate(date("2012-01-01T11:22:33"))
 				.build();
 
-		SyncKey newSyncKey = new SyncKey("456");
-		snapshotService.actualizeSnapshot(device.getDevId(), previousSyncKey, collectionId, newSyncKey);
-		expectLastCall();
-		
 		mocks.replay();
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();
@@ -303,7 +297,6 @@ public class MailboxBackendTest {
 				.syncDate(date("2012-01-01T11:22:33"))
 				.build();
 
-		SyncKey newSyncKey = new SyncKey("456");
 		Snapshot existingSnapshot = Snapshot.builder()
 				.addEmail(Email.builder().uid(itemId).build())
 				.collectionId(collectionId)
@@ -314,7 +307,7 @@ public class MailboxBackendTest {
 				.andReturn(existingSnapshot);
 		
 		mocks.replay();
-		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState, newSyncKey);
+		List<ItemChange> emails = mailBackendImpl.fetch(udr, collectionId, ImmutableList.of(serverId), syncCollectionOptions, previousItemSyncState);
 		mocks.verify();
 		
 		MSEmail actual = (MSEmail) Iterables.getOnlyElement(emails).getData();

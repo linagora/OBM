@@ -87,11 +87,11 @@ public class ContentsExporter implements IContentsExporter {
 	}
 
 	@Override
-	public List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, DaoException, 
+	public List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection) throws CollectionNotFoundException, DaoException, 
 			ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException {
 		
 		PIMBackend backend = backends.getBackend(syncCollection.getDataType());
-		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollection.getOptions(), itemSyncState, newSyncKey);
+		return backend.fetch(udr, syncCollection.getCollectionId(), syncCollection.getFetchIds(), syncCollection.getOptions(), itemSyncState);
 	}
 
 	@Override

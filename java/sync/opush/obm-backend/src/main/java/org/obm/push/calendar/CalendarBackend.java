@@ -735,7 +735,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 
 	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions,
-				ItemSyncState previousItemSyncState, SyncKey newSyncKey)
+				ItemSyncState previousItemSyncState)
 			throws DaoException, UnexpectedObmSyncServerException, ConversionException, HierarchyChangedException {
 	
 		return fetch(udr, collectionId, fetchServerIds, syncCollectionOptions);

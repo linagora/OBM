@@ -60,7 +60,7 @@ public interface IContentsExporter {
 	List<ItemChange> fetch(UserDataRequest udr, SyncCollectionResponse syncCollection, SyncCollectionOptions syncCollectionOptions) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 	
-	List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection, SyncKey newSyncKey) throws CollectionNotFoundException, 
+	List<ItemChange> fetch(UserDataRequest udr, ItemSyncState itemSyncState, AnalysedSyncCollection syncCollection) throws CollectionNotFoundException, 
 		DaoException, ProcessingEmailException, UnexpectedObmSyncServerException, ConversionException;
 
 	int getItemEstimateSize(UserDataRequest udr, AnalysedSyncCollection syncCollection, ItemSyncState itemSyncState)

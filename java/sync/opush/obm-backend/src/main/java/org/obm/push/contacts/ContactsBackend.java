@@ -466,7 +466,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 
 	@Override
 	public List<ItemChange> fetch(UserDataRequest udr, int collectionId, List<String> fetchServerIds, SyncCollectionOptions syncCollectionOptions,
-				ItemSyncState previousItemSyncState, SyncKey newSyncKey)
+				ItemSyncState previousItemSyncState)
 			throws DaoException, UnexpectedObmSyncServerException, ConversionException {
 	
 		return fetch(udr, collectionId, fetchServerIds, syncCollectionOptions);

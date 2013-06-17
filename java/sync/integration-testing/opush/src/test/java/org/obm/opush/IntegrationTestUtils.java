@@ -241,7 +241,7 @@ public class IntegrationTestUtils {
 	}
 	
 	public static void expectContentExporterFetching(IContentsExporter iContentsExporter, UserDataRequest userDataRequest, List<ItemChange> itemChanges) throws Exception {
-		expect(iContentsExporter.fetch(eq(userDataRequest), anyObject(ItemSyncState.class), anyObject(AnalysedSyncCollection.class), anyObject(SyncKey.class)))
+		expect(iContentsExporter.fetch(eq(userDataRequest), anyObject(ItemSyncState.class), anyObject(AnalysedSyncCollection.class)))
 			.andReturn(itemChanges);
 	}
 }
