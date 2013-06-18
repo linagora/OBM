@@ -2021,9 +2021,9 @@ function get_module_data($section, $module) {
     $module_data["section_name"] = $section;
 
     $module_data["links"] = array();
+    $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning']);
 
     foreach ($section_link as $mod) {
-      $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning']);
       if (!in_array($modules[$mod]['Name'], $exclusions)) {
         $link_name = $modules[$mod]['Name'];
         $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
