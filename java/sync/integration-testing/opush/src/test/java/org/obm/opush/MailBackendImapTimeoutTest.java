@@ -106,6 +106,7 @@ import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 
+@Ignore("OBMFULL-5114")
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendImapTimeoutTestModule.class)
 public class MailBackendImapTimeoutTest {
