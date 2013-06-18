@@ -109,6 +109,7 @@
 
 	<build>
 		<pluginManagement>
+			
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -315,6 +316,13 @@ org.eclipse.jdt.core.compiler.source=1.6
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<extensions>
+			<extension>
+				<groupId>com.github.lkoskela</groupId>
+				<artifactId>maven-build-utils</artifactId>
+				<version>1.5-LINAGORA-1</version>
+			</extension>	
+		</extensions>	
 	</build>
 
 	<dependencyManagement>
@@ -704,6 +712,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
 	<profiles>
 		<profile>
 <!-- Usage
@@ -727,5 +736,12 @@ dot reactor-graph.png.dot -Tpng -oobm.png -Gsplines=ortho -Glandscape=true
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>timeline</id>
+			<properties>
+				<maven-build-utils.activate-timeline>true</maven-build-utils.activate-timeline>
+			</properties>
+		</profile>
 	</profiles>
+
 </project>
