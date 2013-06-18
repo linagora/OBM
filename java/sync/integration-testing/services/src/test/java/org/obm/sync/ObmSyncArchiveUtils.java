@@ -291,6 +291,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
+import com.linagora.obm.sync.HornetQConfigurationBuilder;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -392,7 +393,6 @@ public class ObmSyncArchiveUtils {
 				.addAsManifestResource("MANIFEST.MF")
 				.addAsResource("bitronix-default-config.properties")
 				.addAsResource("hornetq-configuration.xml")
-				.addAsResource("hornetq-jms.xml")
 				.addAsResource("ical4j.properties")
 				.addAsResource("logback.xml")
 				.addAsResource("Messages_en.properties")
@@ -583,6 +583,7 @@ public class ObmSyncArchiveUtils {
 		return new Class<?>[] {
 				Producer.class,
 				QueueManager.class,
+				HornetQConfigurationBuilder.class
 		};
 	}
 	

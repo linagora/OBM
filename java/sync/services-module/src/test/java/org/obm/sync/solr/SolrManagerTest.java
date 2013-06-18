@@ -48,6 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.fest.assertions.api.Assertions;
+import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +72,7 @@ import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
+import com.linagora.obm.sync.HornetQConfigurationBuilder;
 import com.linagora.obm.sync.QueueManager;
 
 
@@ -91,9 +93,24 @@ public class SolrManagerTest {
 		}
 	};
 	
+	private static JMSConfiguration jmsConfiguration() {
+		return 
+			HornetQConfigurationBuilder.jmsConfiguration()
+			.connectionFactory(
+					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					.name("ConnectionFactory")
+					.connector("netty")
+					.binding("ConnectionFactory")
+					.build())
+			.topic("eventChanges", "/topic/eventChanges")
+			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic("contactChanges", SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.build();
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		queueManager = new QueueManager();
+		queueManager = new QueueManager(jmsConfiguration());
 		queueManager.start();
 		
 		configurationService = createMock(ConfigurationService.class);

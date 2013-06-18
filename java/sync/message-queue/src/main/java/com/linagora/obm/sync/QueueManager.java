@@ -39,6 +39,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
 
+import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
 import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
@@ -51,12 +52,13 @@ public class QueueManager implements LifecycleListener {
 	private boolean started;
 	private ConnectionFactory cf;
 
-	public QueueManager() {
+	public QueueManager(JMSConfiguration jmsConfiguration) {
 		super();
 		jmsServer = new EmbeddedJMS();
+		jmsServer.setJmsConfiguration(jmsConfiguration);
 		started = false;
 	}
-		
+	
 	public synchronized void start() throws Exception {
 		if (started) {
 			throw new IllegalStateException(this.getClass().getName() + " can't be started twice");

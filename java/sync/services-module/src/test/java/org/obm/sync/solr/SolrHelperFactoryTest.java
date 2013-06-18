@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +48,9 @@ import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.solr.jms.DefaultCommandConverter;
+import org.obm.sync.solr.jms.SolrJmsQueue;
 
+import com.linagora.obm.sync.HornetQConfigurationBuilder;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
@@ -65,9 +68,23 @@ public class SolrHelperFactoryTest {
 	private QueueManager queueManager;
 	private ConfigurationService configurationService;
 
+	private static JMSConfiguration jmsConfiguration() {
+		return 
+			HornetQConfigurationBuilder.jmsConfiguration()
+			.connectionFactory(
+					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					.name("ConnectionFactory")
+					.connector("netty")
+					.binding("ConnectionFactory")
+					.build())
+			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic("contactChanges", SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.build();
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		queueManager = new QueueManager();
+		queueManager = new QueueManager(jmsConfiguration());
 		queueManager.start();
 
 		contact = new Contact();

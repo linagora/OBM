@@ -42,6 +42,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.commons.io.FileUtils;
+import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,6 +56,8 @@ import org.slf4j.LoggerFactory;
 @RunWith(SlowFilterRunner.class) @Slow
 public class TestQueueManager {
 
+	private static final String TOPIC = "/topic/eventChanges";
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private QueueManager queueManager;
@@ -67,10 +70,23 @@ public class TestQueueManager {
 		startQueueManager();
 	}
 
+	private static JMSConfiguration configuration() {
+		return 
+			HornetQConfigurationBuilder.jmsConfiguration()
+			.connectionFactory(
+					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					.name("ConnectionFactory")
+					.connector("in-vm")
+					.binding("ConnectionFactory")
+					.build())
+			.topic("eventChanges", TOPIC)
+			.build();
+	}
+	
 	private void startQueueManager() throws Exception {
 		connections = new ArrayList<Connection>();
 		sessions = new ArrayList<Session>();
-		queueManager = new QueueManager();
+		queueManager = new QueueManager(configuration());
 		queueManager.start();
 	}
 
@@ -123,14 +139,13 @@ public class TestQueueManager {
 	@Test
 	public void testSimple() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
+		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
 		
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		
 	
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
@@ -140,21 +155,20 @@ public class TestQueueManager {
 	@Test
 	public void testClosedSession() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession = queueManager.createSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
+		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
 		
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		
 		TextMessage messageReceived1 = (TextMessage) consumer.receive(TIMEOUT);
 		consumerSession.close();
 
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		consumerSession = createManagedSession(connection);
-		consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
+		consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
 		
 		TextMessage messageReceived2 = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived1.getText());
@@ -164,25 +178,24 @@ public class TestQueueManager {
 	@Test
 	public void testDurableSubscription() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 		String clientId = "c1";
 
 		Connection connection = queueManager.createConnection();
 		connection.setClientID(clientId);
 		connection.start();
 		Session consumerSession = queueManager.createSession(connection);
-		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
+		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
 		consumerSession.close();
 		connection.close();
 		
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		
 		Connection connection2 = createManagedConnection();
 		connection2.setClientID(clientId);
 		connection2.start();
 
 		consumerSession = queueManager.createSession(connection2);
-		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
+		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
 		
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
@@ -191,16 +204,15 @@ public class TestQueueManager {
 	@Test
 	public void testDurableSubscription2() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 		String clientId = "c1";
 
 		Connection connection = createManagedConnection();
 		connection.setClientID(clientId);
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
+		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
 		
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		shutdownQueueManager();
 		startQueueManager();
 		
@@ -209,7 +221,7 @@ public class TestQueueManager {
 		connection2.start();
 
 		consumerSession = createManagedSession(connection2);
-		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, topicName, clientId);
+		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
 		
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
@@ -218,14 +230,13 @@ public class TestQueueManager {
 	@Test
 	public void testConsumeLater() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, topicName);
+		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertNull(messageReceived);
 	}
@@ -233,17 +244,16 @@ public class TestQueueManager {
 	@Test
 	public void testTwoConsumers() throws Exception {
 		String testText = "test text";
-		String topicName = "/topic/eventChanges";
 
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession1 = createManagedSession(connection);
-		MessageConsumer consumer1 = queueManager.createConsumerOnTopic(consumerSession1, topicName);
+		MessageConsumer consumer1 = queueManager.createConsumerOnTopic(consumerSession1, TOPIC);
 		
 		Session consumerSession2 = createManagedSession(connection);
-		MessageConsumer consumer2 = queueManager.createConsumerOnTopic(consumerSession2, topicName);
+		MessageConsumer consumer2 = queueManager.createConsumerOnTopic(consumerSession2, TOPIC);
 		
-		writeMessageOnTopic(testText, topicName, queueManager);
+		writeMessageOnTopic(testText, TOPIC, queueManager);
 		
 		TextMessage messageReceived1 = (TextMessage) consumer1.receive(TIMEOUT);
 		TextMessage messageReceived2 = (TextMessage) consumer2.receive(TIMEOUT);

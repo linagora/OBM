@@ -1,0 +1,163 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * 
+ * Copyright (C) 2011-2012  Linagora
+ *
+ * This program is free software: you can redistribute it and/or 
+ * modify it under the terms of the GNU Affero General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version, provided you comply 
+ * with the Additional Terms applicable for OBM connector by Linagora 
+ * pursuant to Section 7 of the GNU Affero General Public License, 
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
+ * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * signature notice appended to any and all outbound messages 
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
+ * from infringing Linagora intellectual property rights over its trademarks 
+ * and commercial brands. Other Additional Terms apply, 
+ * see <http://www.linagora.com/licenses/> for more details. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
+ * for more details. 
+ *
+ * You should have received a copy of the GNU Affero General Public License 
+ * and its applicable Additional Terms for OBM along with this program. If not, 
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
+ * OBM connectors. 
+ * 
+ * ***** END LICENSE BLOCK ***** */
+package com.linagora.obm.sync;
+
+import java.util.List;
+
+import org.hornetq.api.jms.JMSFactoryType;
+import org.hornetq.jms.server.config.ConnectionFactoryConfiguration;
+import org.hornetq.jms.server.config.JMSConfiguration;
+import org.hornetq.jms.server.config.JMSQueueConfiguration;
+import org.hornetq.jms.server.config.TopicConfiguration;
+import org.hornetq.jms.server.config.impl.ConnectionFactoryConfigurationImpl;
+import org.hornetq.jms.server.config.impl.JMSConfigurationImpl;
+import org.hornetq.jms.server.config.impl.TopicConfigurationImpl;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+public class HornetQConfigurationBuilder {
+
+	public static JMSConfigurationBuilder jmsConfiguration() {
+		return new JMSConfigurationBuilder();
+	}
+	
+	public static class JMSConfigurationBuilder {
+		
+		private final List<ConnectionFactoryConfiguration> connectionFactoryConfigurations;
+        private final List<JMSQueueConfiguration> queueConfigurations;
+        private final List<TopicConfiguration> topicConfigurations;
+        private String domain;
+
+		private JMSConfigurationBuilder() {
+			connectionFactoryConfigurations = Lists.newArrayList();
+			queueConfigurations = Lists.newArrayList();
+			topicConfigurations = Lists.newArrayList();
+		}
+
+		public JMSConfigurationBuilder connectionFactory(ConnectionFactoryConfiguration factory) {
+			connectionFactoryConfigurations.add(factory);
+			return this;
+		}
+		
+		public JMSConfigurationBuilder connectionFactory(String name, String connector, String... bindings) {
+			return connectionFactory(
+					new ConnectionFactoryConfigurationImpl(name, false, ImmutableList.of(connector), bindings));
+		}
+		
+		public JMSConfigurationBuilder queue(JMSQueueConfiguration queueConfiguration) {
+			queueConfigurations.add(queueConfiguration);
+			return this;
+		}
+		
+		public JMSConfigurationBuilder topic(TopicConfiguration topic) {
+			topicConfigurations.add(topic);
+			return this;
+		}
+		
+		public JMSConfigurationBuilder topic(String name, String... bindings) {
+			return topic(new TopicConfigurationImpl(name, bindings));
+		}
+		
+		public JMSConfigurationBuilder domain(String domain) {
+			this.domain = domain;
+			return this;
+		}
+		
+		public JMSConfiguration build() {
+			return new JMSConfigurationImpl(
+					connectionFactoryConfigurations, 
+					queueConfigurations, 
+					topicConfigurations, 
+					domain);
+		}
+		
+	}
+	
+	public static ConnectionFactoryConfigurationBuilder connectionFactoryConfigurationBuilder() {
+		return new ConnectionFactoryConfigurationBuilder();
+	}
+	
+	public static class ConnectionFactoryConfigurationBuilder {
+		
+		private final List<String> bindings;
+        private final List<String> connectors;
+        private String name;
+        private Boolean ha;
+		private JMSFactoryType factoryType;
+		
+		private ConnectionFactoryConfigurationBuilder() {
+			bindings = Lists.newArrayList();
+			connectors = Lists.newArrayList();
+		}
+		
+		public ConnectionFactoryConfigurationBuilder ha(boolean ha) {
+			this.ha = ha;
+			return this;
+		}
+		
+		public ConnectionFactoryConfigurationBuilder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public ConnectionFactoryConfigurationBuilder binding(String binding) {
+			bindings.add(binding);
+			return this;
+		}
+		
+		public ConnectionFactoryConfigurationBuilder connector(String connector) {
+			connectors.add(connector);
+			return this;
+		}
+
+		public ConnectionFactoryConfigurationBuilder factoryType(JMSFactoryType factoryType) {
+			this.factoryType = factoryType;
+			return this;
+		}
+		
+		public ConnectionFactoryConfiguration build() {
+			ConnectionFactoryConfigurationImpl configuration 
+				= new ConnectionFactoryConfigurationImpl(name, 
+						Objects.firstNonNull(ha, false), 
+						connectors, 
+						bindings.toArray(new String[0]));
+			if (factoryType != null) {
+				configuration.setFactoryType(factoryType);
+			}
+			return configuration;
+		}
+
+	}
+	
+}

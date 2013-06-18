@@ -35,16 +35,21 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.hornetq.jms.server.config.JMSConfiguration;
+import org.obm.sync.solr.jms.SolrJmsQueue;
+
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
+import com.linagora.obm.sync.HornetQConfigurationBuilder;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
 public class MessageQueueModule extends AbstractModule {
 
+	private static final String EVENT_CHANGES_TOPIC = "/topic/eventChanges";
 	private final QueueManager queueManager;
 	
 	public MessageQueueModule() {
@@ -58,10 +63,25 @@ public class MessageQueueModule extends AbstractModule {
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().toInstance(queueManager);
 	}
+
+	private static JMSConfiguration configuration() {
+		return 
+			HornetQConfigurationBuilder.jmsConfiguration()
+			.connectionFactory(
+					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					.name("ConnectionFactory")
+					.connector("netty")
+					.binding("ConnectionFactory")
+					.build())
+			.topic("eventChanges", EVENT_CHANGES_TOPIC)
+			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic("contactChanges", SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.build();
+	}
 	
 	private QueueManager constructQueueManager() {
 		try {
-			QueueManager queueManager = new QueueManager();
+			QueueManager queueManager = new QueueManager(configuration());
 			queueManager.start();
 			return queueManager;
 		} catch (Exception e) {
@@ -74,7 +94,7 @@ public class MessageQueueModule extends AbstractModule {
 	Producer provideMessageProducer(QueueManager queueManager) throws JMSException {
 		Connection connection = queueManager.createConnection();
 		Session session = queueManager.createSession(connection);
-		return queueManager.createProducerOnTopic(session, "/topic/eventChanges");
+		return queueManager.createProducerOnTopic(session, EVENT_CHANGES_TOPIC);
 	}
 	
 }

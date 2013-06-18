@@ -36,9 +36,13 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import org.hornetq.api.jms.JMSFactoryType;
+import org.hornetq.jms.server.config.JMSConfiguration;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.linagora.obm.sync.HornetQConfigurationBuilder;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -57,8 +61,23 @@ public class MessageQueueModule extends AbstractModule {
 		bind(QueueManager.class).toInstance(queueManager);
 	}
 	
+	private JMSConfiguration jmsConfiguration() {
+		return 
+				HornetQConfigurationBuilder.jmsConfiguration()
+				.connectionFactory(
+						HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+						.name("ConnectionFactory")
+						.connector("in-vm")
+						.binding("ConnectionFactory")
+						.binding("XAConnectionFactory")
+						.factoryType(JMSFactoryType.XA_CF)
+						.build())
+				.topic("test", "/topic/test")
+				.build();
+	}
+	
 	private QueueManager constructQueueManager() throws Exception {
-		QueueManager queueManager = new QueueManager();
+		QueueManager queueManager = new QueueManager(jmsConfiguration());
 		queueManager.start();
 		return queueManager;
 	}
