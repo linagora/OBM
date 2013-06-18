@@ -1131,6 +1131,7 @@ function display_head($p_module, $standard=true) {
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js?version=$obm_version\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/css3-mediaqueries.js\" ></script>
   <script type=\"text/javascript\">
   //<![CDATA[
   var obm = Obm = {};
