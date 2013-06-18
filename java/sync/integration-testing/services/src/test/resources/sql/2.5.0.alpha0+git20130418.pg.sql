@@ -17531,14 +17531,6 @@ ALTER TABLE ONLY opush_sync_state
 
 
 --
--- Name: opush_synced_item_sync_state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
---
-
-ALTER TABLE ONLY opush_synced_item
-    ADD CONSTRAINT opush_synced_item_sync_state_id_fkey FOREIGN KEY (sync_state_id) REFERENCES opush_sync_state(id) ON DELETE CASCADE;
-
-
---
 -- Name: organizationalchart_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
 --
 
