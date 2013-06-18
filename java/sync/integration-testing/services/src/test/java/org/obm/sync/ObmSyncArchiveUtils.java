@@ -392,7 +392,6 @@ public class ObmSyncArchiveUtils {
 				.create(JavaArchive.class, "services-integration-testing-classes.jar")
 				.addAsManifestResource("MANIFEST.MF")
 				.addAsResource("bitronix-default-config.properties")
-				.addAsResource("hornetq-configuration.xml")
 				.addAsResource("ical4j.properties")
 				.addAsResource("logback.xml")
 				.addAsResource("Messages_en.properties")

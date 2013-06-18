@@ -48,6 +48,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.fest.assertions.api.Assertions;
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
@@ -93,6 +98,39 @@ public class SolrManagerTest {
 		}
 	};
 	
+	public static Configuration hornetQConfiguration() {
+		return HornetQConfigurationBuilder.configuration()
+				.enablePersistence(false)
+				.enableSecurity(false)
+				.journalDirectory("target/jms-journal")
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(InVMConnectorFactory.class)
+						.name("in-vm")
+						.build())
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(NettyConnectorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(InVMAcceptorFactory.class)
+						.name("in-vm")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("stomp-acceptor")
+						.param("protocol", "stomp")
+						.param("port", 61613)
+						.build()
+						)
+				.build();
+	}
+	
 	private static JMSConfiguration jmsConfiguration() {
 		return 
 			HornetQConfigurationBuilder.jmsConfiguration()
@@ -110,7 +148,7 @@ public class SolrManagerTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		queueManager = new QueueManager(jmsConfiguration());
+		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 		
 		configurationService = createMock(ConfigurationService.class);

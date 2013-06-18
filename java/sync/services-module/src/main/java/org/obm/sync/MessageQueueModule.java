@@ -35,7 +35,13 @@ import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
 
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
+import org.obm.configuration.ConfigurationService;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.google.common.base.Throwables;
@@ -50,20 +56,52 @@ import com.linagora.obm.sync.QueueManager;
 public class MessageQueueModule extends AbstractModule {
 
 	private static final String EVENT_CHANGES_TOPIC = "/topic/eventChanges";
-	private final QueueManager queueManager;
 	
 	public MessageQueueModule() {
 		super();
-		this.queueManager = constructQueueManager();
 	}
 
 	@Override
 	protected void configure() {
-		bind(QueueManager.class).toInstance(queueManager);
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().toInstance(queueManager);
+		lifecycleListeners.addBinding().to(QueueManager.class);
 	}
-
+	
+	public static Configuration hornetQConfiguration(String dataDirectory) {
+		return HornetQConfigurationBuilder.configuration()
+				.enablePersistence(true)
+				.enableSecurity(false)
+				.largeMessagesDirectory(dataDirectory + "/large-messages")
+				.bindingsDirectory(dataDirectory + "/bindings")
+				.journalDirectory(dataDirectory + "/journal")
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(InVMConnectorFactory.class)
+						.name("in-vm")
+						.build())
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(NettyConnectorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(InVMAcceptorFactory.class)
+						.name("in-vm")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("stomp-acceptor")
+						.param("protocol", "stomp")
+						.param("port", 61613)
+						.build()
+						)
+				.build();
+	}
+	
 	private static JMSConfiguration configuration() {
 		return 
 			HornetQConfigurationBuilder.jmsConfiguration()
@@ -79,9 +117,11 @@ public class MessageQueueModule extends AbstractModule {
 			.build();
 	}
 	
-	private QueueManager constructQueueManager() {
+	@Provides @Singleton
+	public static QueueManager queueManager(ConfigurationService configurationService) {
+		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
 		try {
-			QueueManager queueManager = new QueueManager(configuration());
+			QueueManager queueManager = new QueueManager(hornetQConfiguration(dataDirectory), configuration());
 			queueManager.start();
 			return queueManager;
 		} catch (Exception e) {

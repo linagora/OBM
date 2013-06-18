@@ -42,6 +42,11 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.commons.io.FileUtils;
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
@@ -70,7 +75,7 @@ public class TestQueueManager {
 		startQueueManager();
 	}
 
-	private static JMSConfiguration configuration() {
+	private static JMSConfiguration jmsConfiguration() {
 		return 
 			HornetQConfigurationBuilder.jmsConfiguration()
 			.connectionFactory(
@@ -83,10 +88,35 @@ public class TestQueueManager {
 			.build();
 	}
 	
+	public static Configuration hornetQConfiguration() {
+		return HornetQConfigurationBuilder.configuration()
+				.enablePersistence(true)
+				.enableSecurity(false)
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(InVMConnectorFactory.class)
+						.name("in-vm")
+						.build())
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(NettyConnectorFactory.class)
+						.name("netty")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(InVMAcceptorFactory.class)
+						.name("in-vm")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("netty")
+						.param("protocol", "stomp")
+						.param("port", 61613)
+						.build())
+				.build();
+	}
+	
 	private void startQueueManager() throws Exception {
 		connections = new ArrayList<Connection>();
 		sessions = new ArrayList<Session>();
-		queueManager = new QueueManager(configuration());
+		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 	}
 

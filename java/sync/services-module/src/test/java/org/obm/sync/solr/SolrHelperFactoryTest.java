@@ -37,6 +37,11 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
@@ -82,9 +87,42 @@ public class SolrHelperFactoryTest {
 			.build();
 	}
 	
+	public static Configuration hornetQConfiguration() {
+		return HornetQConfigurationBuilder.configuration()
+				.enablePersistence(false)
+				.enableSecurity(false)
+				.journalDirectory("target/jms-journal")
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(InVMConnectorFactory.class)
+						.name("in-vm")
+						.build())
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(NettyConnectorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(InVMAcceptorFactory.class)
+						.name("in-vm")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("netty")
+						.build()
+						)
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(NettyAcceptorFactory.class)
+						.name("stomp-acceptor")
+						.param("protocol", "stomp")
+						.param("port", 61613)
+						.build()
+						)
+				.build();
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		queueManager = new QueueManager(jmsConfiguration());
+		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 
 		contact = new Contact();

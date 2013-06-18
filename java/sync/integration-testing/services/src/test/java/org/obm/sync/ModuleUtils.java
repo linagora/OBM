@@ -36,6 +36,7 @@ import java.io.Serializable;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.apache.commons.io.FileUtils;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
@@ -49,8 +50,10 @@ import org.obm.sync.solr.SolrRequest;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 
+import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.multibindings.Multibinder;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -62,9 +65,16 @@ public class ModuleUtils {
 
 			@Override
 			protected void configure() {
-				Configuration configuration = new Configuration();
+				final Configuration configuration = new Configuration();
 				configuration.locatorUrl = "localhost";
-				
+				configuration.dataDir = Files.createTempDir();
+				Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+				lifecycleListeners.addBinding().toInstance(new LifecycleListener() {
+					@Override
+					public void shutdown() throws Exception {
+						FileUtils.deleteDirectory(configuration.dataDir);						
+					}
+				});
 				install(new ConfigurationModule(configuration, TestTransactionConfiguration.class));
 				bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
 				bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);

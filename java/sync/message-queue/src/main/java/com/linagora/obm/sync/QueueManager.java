@@ -39,6 +39,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
 
+import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
 import org.obm.sync.LifecycleListener;
@@ -52,9 +53,10 @@ public class QueueManager implements LifecycleListener {
 	private boolean started;
 	private ConnectionFactory cf;
 
-	public QueueManager(JMSConfiguration jmsConfiguration) {
+	public QueueManager(Configuration configuration, JMSConfiguration jmsConfiguration) {
 		super();
 		jmsServer = new EmbeddedJMS();
+		jmsServer.setConfiguration(configuration);
 		jmsServer.setJmsConfiguration(jmsConfiguration);
 		started = false;
 	}

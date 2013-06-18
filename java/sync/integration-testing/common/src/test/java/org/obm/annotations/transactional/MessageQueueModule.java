@@ -37,6 +37,9 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 import org.hornetq.api.jms.JMSFactoryType;
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
+import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 
 import com.google.inject.AbstractModule;
@@ -61,6 +64,21 @@ public class MessageQueueModule extends AbstractModule {
 		bind(QueueManager.class).toInstance(queueManager);
 	}
 	
+	public static Configuration hornetQConfiguration() {
+		return HornetQConfigurationBuilder.configuration()
+				.enablePersistence(true)
+				.enableSecurity(false)
+				.connector(HornetQConfigurationBuilder.connectorBuilder()
+						.factory(InVMConnectorFactory.class)
+						.name("in-vm")
+						.build())
+				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
+						.factory(InVMAcceptorFactory.class)
+						.name("in-vm")
+						.build())
+				.build();
+	}
+	
 	private JMSConfiguration jmsConfiguration() {
 		return 
 				HornetQConfigurationBuilder.jmsConfiguration()
@@ -77,7 +95,7 @@ public class MessageQueueModule extends AbstractModule {
 	}
 	
 	private QueueManager constructQueueManager() throws Exception {
-		QueueManager queueManager = new QueueManager(jmsConfiguration());
+		QueueManager queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 		return queueManager;
 	}

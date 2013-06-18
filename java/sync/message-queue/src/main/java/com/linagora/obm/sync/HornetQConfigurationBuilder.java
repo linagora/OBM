@@ -32,8 +32,13 @@
 package com.linagora.obm.sync;
 
 import java.util.List;
+import java.util.Map;
 
+import org.hornetq.api.core.TransportConfiguration;
 import org.hornetq.api.jms.JMSFactoryType;
+import org.hornetq.core.config.Configuration;
+import org.hornetq.core.config.impl.ConfigurationImpl;
+import org.hornetq.core.server.JournalType;
 import org.hornetq.jms.server.config.ConnectionFactoryConfiguration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.config.JMSQueueConfiguration;
@@ -41,13 +46,179 @@ import org.hornetq.jms.server.config.TopicConfiguration;
 import org.hornetq.jms.server.config.impl.ConnectionFactoryConfigurationImpl;
 import org.hornetq.jms.server.config.impl.JMSConfigurationImpl;
 import org.hornetq.jms.server.config.impl.TopicConfigurationImpl;
+import org.hornetq.spi.core.remoting.AcceptorFactory;
+import org.hornetq.spi.core.remoting.ConnectorFactory;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class HornetQConfigurationBuilder {
 
+	public static ConfigurationBuilder configuration() {
+		return new ConfigurationBuilder();
+	}
+	
+	public static class ConfigurationBuilder {
+		
+		private Boolean persistenceEnabled;
+		private Boolean securityEnabled;
+		private List<TransportConfiguration> connectors;
+		private List<TransportConfiguration> acceptors;
+		private String largeMessagesDirectory;
+		private String bindingsDirectory;
+		private String journalDirectory;
+		
+		private ConfigurationBuilder() {
+			connectors = Lists.newArrayList();
+			acceptors = Lists.newArrayList(); 
+		}
+		
+		public ConfigurationBuilder enablePersistence(boolean enable) {
+			persistenceEnabled = enable;
+			return this;
+		}
+		
+		public ConfigurationBuilder enableSecurity(boolean enable) {
+			securityEnabled = enable;
+			return this;
+		}
+		
+		public ConfigurationBuilder largeMessagesDirectory(String largeMessagesDirectory) {
+			this.largeMessagesDirectory = largeMessagesDirectory;
+			return this;
+		}
+		
+		public ConfigurationBuilder bindingsDirectory(String bindingsDirectory) {
+			this.bindingsDirectory = bindingsDirectory;
+			return this;
+		}
+		
+		public ConfigurationBuilder journalDirectory(String journalDirectory) {
+			this.journalDirectory = journalDirectory;
+			return this;
+		}
+		
+		public ConfigurationBuilder connector(TransportConfiguration connector) {
+			connectors.add(connector);
+			return this;
+		}
+		
+		public ConfigurationBuilder acceptor(TransportConfiguration acceptor) {
+			acceptors.add(acceptor);
+			return this;
+		}
+		
+		public Configuration build() {
+			ConfigurationImpl configurationImpl = new ConfigurationImpl();
+			if (persistenceEnabled != null) {
+				configurationImpl.setPersistenceEnabled(persistenceEnabled);
+			}
+			if (securityEnabled != null) {
+				configurationImpl.setSecurityEnabled(securityEnabled);
+			}
+			if (largeMessagesDirectory != null) {
+				configurationImpl.setLargeMessagesDirectory(largeMessagesDirectory);
+			}
+			if (bindingsDirectory != null) {
+				configurationImpl.setBindingsDirectory(bindingsDirectory);
+			}
+			if (journalDirectory != null) {
+				configurationImpl.setJournalDirectory(journalDirectory);
+			}
+			configurationImpl.setConnectorConfigurations(listAsMap(connectors));
+			configurationImpl.setAcceptorConfigurations(ImmutableSet.copyOf(acceptors));
+			configurationImpl.setJournalType(JournalType.NIO);
+			return configurationImpl;
+		}
+
+		private ImmutableMap<String, TransportConfiguration> listAsMap(List<TransportConfiguration> entries) {
+			return Maps.uniqueIndex(entries, new Function<TransportConfiguration, String>() {
+
+				@Override
+				public String apply(TransportConfiguration input) {
+					return input.getName();
+				}
+			});
+		}
+		
+	}
+	
+	public static AcceptorConfigurationBuilder acceptorBuilder() {
+		return new AcceptorConfigurationBuilder();
+	}
+
+	public static class AcceptorConfigurationBuilder {
+		
+		private Class<? extends AcceptorFactory> factory;
+		private Map<String, Object> params;
+		private String name;
+		
+		private AcceptorConfigurationBuilder() {
+			params = Maps.newHashMap();
+		}
+		
+		public AcceptorConfigurationBuilder factory(Class<? extends AcceptorFactory> factory) {
+			this.factory = factory;
+			return this;
+		}
+		
+		public AcceptorConfigurationBuilder param(String key, Object value) {
+			params.put(key, value);
+			return this;
+		}
+		
+		public AcceptorConfigurationBuilder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public TransportConfiguration build() {
+			return new TransportConfiguration(factory.getCanonicalName(), params, name);
+		}
+		
+	}
+
+
+	public static ConnectorConfigurationBuilder connectorBuilder() {
+		return new ConnectorConfigurationBuilder();
+	}
+	
+	public static class ConnectorConfigurationBuilder {
+		
+		private Class<? extends ConnectorFactory> factory;
+		private Map<String, Object> params;
+		private String name;
+		
+		private ConnectorConfigurationBuilder() {
+			params = Maps.newHashMap();
+		}
+		
+		public ConnectorConfigurationBuilder factory(Class<? extends ConnectorFactory> factory) {
+			this.factory = factory;
+			return this;
+		}
+		
+		public ConnectorConfigurationBuilder param(String key, Object value) {
+			params.put(key, value);
+			return this;
+		}
+		
+		public ConnectorConfigurationBuilder name(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public TransportConfiguration build() {
+			return new TransportConfiguration(factory.getCanonicalName(), params, name);
+		}
+		
+	}
+	
 	public static JMSConfigurationBuilder jmsConfiguration() {
 		return new JMSConfigurationBuilder();
 	}
