@@ -85,6 +85,13 @@
 		</repository>
 	</repositories>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>plugins</id>
+			<url>http://ci-obm.linagora.com/artifactory/repo</url>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<modules>
 		<module>common</module>
 		<module>client</module>
