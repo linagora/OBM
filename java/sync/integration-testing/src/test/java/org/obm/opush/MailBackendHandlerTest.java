@@ -50,6 +50,7 @@ import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -103,6 +104,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
+@Ignore("OBMFULL-5114")
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendHandlerTestModule.class)
 public class MailBackendHandlerTest {
