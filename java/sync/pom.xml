@@ -26,7 +26,7 @@
 		<mysql-connector-java.version>5.1.25</mysql-connector-java.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<hornetq.version>2.2.21.Final</hornetq.version>
+		<hornetq.version>2.3.1.Final</hornetq.version>
 		<junit.version>4.11</junit.version>
 		<easymock.version>3.1</easymock.version>
 		<fest.version>2.0M10</fest.version>
@@ -567,22 +567,17 @@ org.eclipse.jdt.core.compiler.source=1.6
             		</dependency>
 			<dependency>
 				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-core</artifactId>
+				<artifactId>hornetq-server</artifactId>
 				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-jms</artifactId>
+				<artifactId>hornetq-jms-server</artifactId>
 				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hornetq</groupId>
 				<artifactId>hornetq-jms-client</artifactId>
-				<version>${hornetq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-logging</artifactId>
 				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
