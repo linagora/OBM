@@ -1975,12 +1975,10 @@ function get_sections_data() {
 
   foreach($cgp_show['section'] as $section => $value){
     $section_right = $perm->get_section_rights($section);
-    if ($section_right) {
-      if( !in_array($section, $exclusions) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
-        if (display_modules($section, null, true) !=''){
-          $sections_data[] = get_module_data($section, null);
-        }
-      }
+    $in_more_menu = !in_array($section, $exclusions);
+    $have_content = $value && isset($value['url']);
+    if ( $section_right && $in_more_menu && $have_content ) {
+      $sections_data[] = get_module_data($section, null);
     }
   }
 
