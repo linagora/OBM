@@ -58,6 +58,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
+import com.google.inject.servlet.ServletModule;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
@@ -69,7 +70,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	protected abstract void onModuleInstalled();
 	
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(new OpushModule());
+		OverriddenModuleBuilder override = Modules.override(new OpushModule(), new PendingQueryFilterModule());
 		try {
 			install(override.with(overrideModule()));
 			onModuleInstalled();
@@ -78,6 +79,15 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 		}
 	}
 
+	private static class PendingQueryFilterModule extends ServletModule {
+		
+		@Override
+		protected void configureServlets() {
+			filter("/*").through(PendingQueryFilter.class);
+		}
+		
+	}
+	
 	@Provides @Singleton
 	protected OpushServer buildOpushServer(Injector injector) {
 		return new OpushServer(injector);

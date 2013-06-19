@@ -75,7 +75,6 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@Ignore("OBMFULL-5114")
 @RunWith(SlowGuiceRunner.class) @Slow
 @GuiceModule(MailBackendTestModule.class)
 public class ItemOperationHandlerTest {
