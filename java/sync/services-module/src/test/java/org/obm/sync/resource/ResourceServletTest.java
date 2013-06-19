@@ -30,13 +30,13 @@
 package org.obm.sync.resource;
 
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -49,7 +49,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fest.assertions.api.Assertions;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
@@ -82,24 +82,26 @@ public class ResourceServletTest {
 	private DateProvider dateProvider;
 	private AttendeeService attendeeService;
 	private Date now;
+	private IMocksControl control;
 	
 	@Before
 	public void setUp() {
 		now = new Date();
-		dateProvider = createMock(DateProvider.class);
+		control = createControl();
+		dateProvider = control.createMock(DateProvider.class);
 		attendeeService = new SimpleAttendeeService();
-		Factory eventExtIdFactory = createMock(EventExtId.Factory.class);
+		Factory eventExtIdFactory = control.createMock(EventExtId.Factory.class);
 		helper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
 				ToolBox.getDefaultObmDomain());
 		resourceServlet = new ResourceServlet();
 
-		servletConfig = createMock(ServletConfig.class);
-		servletContext = createMock(ServletContext.class);
-		injector = createMock(Injector.class);
-		calendarBinding = createMock(ICalendar.class);
-		request = createMock(HttpServletRequest.class);
-		response = createMock(HttpServletResponse.class);
+		servletConfig = control.createMock(ServletConfig.class);
+		servletContext = control.createMock(ServletContext.class);
+		injector = control.createMock(Injector.class);
+		calendarBinding = control.createMock(ICalendar.class);
+		request = control.createMock(HttpServletRequest.class);
+		response = control.createMock(HttpServletResponse.class);
 
 		expect(dateProvider.getDate()).andReturn(now).anyTimes();
 		
@@ -109,8 +111,6 @@ public class ResourceServletTest {
 		expect(injector.getInstance(eq(ICalendar.class))).andReturn(
 				calendarBinding);
 		expect(injector.getInstance(Ical4jHelper.class)).andReturn(helper);
-		
-		replay(dateProvider);
 	}
 
 	@Test
@@ -121,13 +121,12 @@ public class ResourceServletTest {
 				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
 				.andReturn(collectionEvents);
 
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding };
-		replay(mocks);
+		control.replay();
 		resourceServlet.init(servletConfig);
 
 		String ics = resourceServlet.getResourceICS("resource@domain");
-		Assertions.assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
-		verify(mocks);
+		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
+		control.verify();
 	}
 
 	@Test
@@ -149,17 +148,14 @@ public class ResourceServletTest {
 		expectLastCall();
 
 		expect(response.getWriter()).andReturn(writer);
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
-				response };
-
-		replay(mocks);
+		control.replay();
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 
-		verify(mocks);
+		control.verify();
 		String ics = stringWriter.toString();
-		Assertions.assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
+		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
 	}
 
 	@Test
@@ -170,13 +166,11 @@ public class ResourceServletTest {
 		response.setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
 		expectLastCall();
 
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
-				response };
-		replay(mocks);
+		control.replay();
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
-		verify(mocks);
+		control.verify();
 	}
 
 	@Test
@@ -192,13 +186,11 @@ public class ResourceServletTest {
 		response.flushBuffer();
 		expectLastCall();
 
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request,
-				response };
-		replay(mocks);
+		control.replay();
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
-		verify(mocks);
+		control.verify();
 	}
 
 	@Test
@@ -214,14 +206,12 @@ public class ResourceServletTest {
 		response.setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
 		expectLastCall();
 
-		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request, response };
-
-		replay(mocks);
+		control.replay();
 
 		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 
-		verify(mocks);
+		control.verify();
 	}
 
 }
