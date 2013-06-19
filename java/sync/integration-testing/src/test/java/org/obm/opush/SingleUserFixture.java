@@ -36,6 +36,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
+import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.resource.ResourceCloseOrder;
@@ -60,26 +61,35 @@ public class SingleUserFixture {
 		public String rootCollectionPath;
 	}
 	
+	private final Factory userFactory;
+	private final AccessTokenResource.Factory accessTokenResourceFactory;
+
 	public final OpushUser jaures;
 	
 	@Inject
 	public SingleUserFixture(User.Factory userFactory, AccessTokenResource.Factory accessTokenResourceFactory) {
-		jaures = new OpushUser();
-		jaures.user = userFactory.createUser("jaures@sfio.fr", "jaures@sfio.fr", "Jean Jaures");
-		jaures.password = "jaures";
-		jaures.deviceType = "BellLabsWiredPhone";
-		jaures.deviceId = new DeviceId("blwp123");
-		jaures.deviceProtocolVersion = ProtocolVersion.V121;
-		jaures.userAgent = "BellLabsWiredPhoneAgent";
-		jaures.accessToken = new AccessToken(1, "o-push");
-		jaures.accessToken.setUserDisplayName(jaures.user.getDisplayName());
-		jaures.accessToken.setUserEmail(jaures.user.getEmail());
-		jaures.credentials = new Credentials(jaures.user, jaures.password);
-		jaures.device = new Device.Factory().create(1, jaures.deviceType, jaures.userAgent, jaures.deviceId, jaures.deviceProtocolVersion);
-		jaures.userDataRequest = new UserDataRequest(jaures.credentials, null, jaures.device);
-		jaures.userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), 
-				accessTokenResourceFactory.create(null, jaures.accessToken));
-		jaures.rootCollectionPath = "obm:\\\\" + jaures.user.getLoginAtDomain();
+		this.userFactory = userFactory;
+		this.accessTokenResourceFactory = accessTokenResourceFactory;
+		jaures = buildUser("jaures");
 	}
-	
+
+	public OpushUser buildUser(String password) {
+		OpushUser user = new OpushUser();
+		user.user = userFactory.createUser("jaures@sfio.fr", "jaures@sfio.fr", "Jean Jaures");
+		user.password = password;
+		user.deviceType = "BellLabsWiredPhone";
+		user.deviceId = new DeviceId("blwp123");
+		user.deviceProtocolVersion = ProtocolVersion.V121;
+		user.userAgent = "BellLabsWiredPhoneAgent";
+		user.accessToken = new AccessToken(1, "o-push");
+		user.accessToken.setUserDisplayName(user.user.getDisplayName());
+		user.accessToken.setUserEmail(user.user.getEmail());
+		user.credentials = new Credentials(user.user, user.password);
+		user.device = new Device.Factory().create(1, user.deviceType, user.userAgent, user.deviceId, user.deviceProtocolVersion);
+		user.userDataRequest = new UserDataRequest(user.credentials, null, user.device);
+		user.userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), 
+				accessTokenResourceFactory.create(null, user.accessToken));
+		user.rootCollectionPath = "obm:\\\\" + user.user.getLoginAtDomain();
+		return user;
+	}
 }

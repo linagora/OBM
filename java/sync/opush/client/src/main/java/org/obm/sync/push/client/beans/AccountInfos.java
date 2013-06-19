@@ -31,10 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.beans;
 
-import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.DeviceId;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
+import com.google.common.io.BaseEncoding;
 
 public final class AccountInfos {
 	private String login;
@@ -90,13 +91,9 @@ public final class AccountInfos {
 	}
 	
 	public String authValue() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Basic ");
-		String unCodedString = userId + ":" + password;
-		String encoded = new String(Base64.encodeBase64(unCodedString.getBytes()));
-		sb.append(encoded);
-		String ret = sb.toString();
-		return ret;
+		String basicCredentials = userId + ":" + password;
+		byte[] basicCredentialsBytes = basicCredentials.getBytes(Charsets.ISO_8859_1);
+		return "Basic " + BaseEncoding.base64().encode(basicCredentialsBytes);
 	}
 
 	@Override

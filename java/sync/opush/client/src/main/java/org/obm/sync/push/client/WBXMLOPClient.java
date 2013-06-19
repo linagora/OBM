@@ -91,7 +91,8 @@ public class WBXMLOPClient extends OPClient {
 		
 		HttpPost request = new HttpPost(buildUrl(ai.getUrl(), ai.getLogin(),
 				ai.getDevId(), ai.getDevType(), cmd));
-		request.setHeaders(new Header[] { new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
+		request.setHeaders(new Header[] { 
+				new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
 				new BasicHeader("Authorization", ai.authValue()),
 				new BasicHeader("User-Agent", ai.getUserAgent()),
 				new BasicHeader("Ms-Asprotocolversion", protocolVersion.asSpecificationValue()),

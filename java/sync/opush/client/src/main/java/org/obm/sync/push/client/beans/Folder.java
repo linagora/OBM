@@ -44,6 +44,14 @@ public final class Folder {
 	private FolderType type;
 	private FolderSyncStatus status;
 	
+	public Folder() {
+		super();
+	}
+	
+	public Folder(String serverId) {
+		this.serverId = serverId;
+	}
+	
 	public String getServerId() {
 		return serverId;
 	}
