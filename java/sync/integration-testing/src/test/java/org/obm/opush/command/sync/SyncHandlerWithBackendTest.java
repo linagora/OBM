@@ -62,7 +62,6 @@ import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
@@ -137,7 +136,6 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@Ignore("OBMFULL-5114")
 @GuiceModule(SyncHandlerWithBackendTestModule.class)
 @RunWith(SlowGuiceRunner.class) @Slow
 public class SyncHandlerWithBackendTest {

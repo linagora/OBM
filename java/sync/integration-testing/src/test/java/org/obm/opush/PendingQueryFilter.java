@@ -31,46 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.io.IOException;
 
-import com.google.common.base.Preconditions;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class PendingQueriesLock {
+public class PendingQueryFilter implements Filter {
 
-	private final AtomicInteger nbClient;
-	private final Semaphore lock;
-	private int nbLock;
-	
-	public PendingQueriesLock() {
-		nbLock = 0;
-		nbClient = new AtomicInteger(0);
-		lock = new Semaphore(1);
-	}
-	
-	public synchronized void countDown() {
-		nbLock -= 1;
-		Preconditions.checkState(nbLock >= 0);
-		if (nbLock == 0) {
-			lock.release();
-		}
-	}
-	
-	public boolean waitingClose(long timeout, TimeUnit unit) throws InterruptedException {
-		return lock.tryAcquire(timeout, unit);
+	private final PendingQueriesLock queriesLock;
+
+	@Inject
+	private PendingQueryFilter(PendingQueriesLock queriesLock) {
+		this.queriesLock = queriesLock;
 	}
 
-	public void incrementLockCount() {
-		nbClient.incrementAndGet();
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
 	}
 
-	public synchronized void start() {
-		nbLock += nbClient.get();
-		if (nbLock > 0) {
-			lock.tryAcquire();
-		}
+	@Override
+	public void destroy() {
 	}
+	
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+		queriesLock.start();
+		chain.doFilter(request, response);
+	}
+	
 }
