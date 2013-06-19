@@ -16,24 +16,25 @@ class Packager(object):
     Builds the Debian package. The constructor accepts the following parameters:
         - *package*: the :class:`Package` to build
         - *package_type*: should be either `deb` or `rpm`
+        - *osversion*: operating system version for various specifics
         - *build_dir*: the path to the work directory where the packages will be
           built
         - *changelog_updater*: an instance of :class:`ChangelogUpdater` (may be
           **None**)
     """
 
-    def __init__(self, package, package_type, build_dir, changelog_updater,
-            version, release, perl_module_compat=None, perl_vendorlib=None, nocompile=False):
+    def __init__(self, package, package_type, osversion, build_dir, changelog_updater,
+            version, release, config, nocompile=False):
         self.package = package
         self.package_type = package_type
+        self.osversion = osversion
         self.changelog_updater = changelog_updater
         self.version = version
         self.release = release
-        self.perl_module_compat = perl_module_compat
-        self.perl_vendorlib = perl_vendorlib
         self.build_dir = build_dir
-        self._target_dir = os.path.join(self.build_dir, package.name)
         self.nocompile = nocompile
+        self._target_dir = os.path.join(self.build_dir, package.name)
+        self._config = config
 
     def prepare_build(self):
         """
@@ -141,6 +142,29 @@ class Packager(object):
         for deb in generated_debs:
             self.logger.info("Created Debian package: %s" % deb)
 
+    def _override_perl(self):
+        if self.osversion == "el5":
+            perl_version = "5.8"
+        elif self.osversion == 'el6':
+            perl_version = "5.10"
+        else:
+             raise PackagingError("Unknown OS version: %s" % \
+                    self.osversion)
+        # Override the Perl module destination directory
+        perl_section_name = "perl_%s" % perl_version
+        perl_module_compat = self._config.get(perl_section_name, 'perl_module_compat')
+        perl_vendorlib = self._config.get(perl_section_name, 'perl_vendorlib')
+        if perl_vendorlib is None or perl_module_compat is None:
+            raise ValueError("Need perl_vendorlib and perl_module_compat!")
+        command = "--define 'perl_module_compat " \
+            "%s' " % perl_module_compat
+        command += "--define 'perl_vendorlib " \
+            "%s' " % perl_vendorlib
+        return command
+
+    def _override_platform(self):
+        return self._override_perl()
+
     def build(self):
         """
         Builds the package itself.
@@ -152,9 +176,6 @@ class Packager(object):
             os.putenv('OBM_NOCOMPILE', "%d" % self.nocompile)
         elif self.package_type == "rpm":
             distname, version, id = platform.linux_distribution()
-            # If we're not building on RedHat/CentOS, we need to make sure we're
-            # not going to take system directories from the current platform
-            redefine_platform_params = distname != 'redhat'
             topdir = os.path.abspath(os.path.join(self._target_dir, 'rpm'))
             target_dir = os.path.abspath(self._target_dir)
             command = "rpmbuild -ba --nodeps --define '_topdir %s' " \
@@ -162,14 +183,11 @@ class Packager(object):
                 "--define 'obm_version %s' --define 'obm_release %s' " % \
                 (topdir, target_dir, target_dir, self.version, self.release)
             command += "--define 'obm_nocompile %d' " % self.nocompile
-            if redefine_platform_params:
-                # Override the Perl module destination directory
-                if self.perl_vendorlib is None or self.perl_module_compat is None:
-                    raise ValueError("Need perl_vendorlib and perl_module_compat!")
-                command += "--define 'perl_module_compat " \
-                    "%s' " % self.perl_module_compat
-                command += "--define 'perl_vendorlib " \
-                    "%s' " % self.perl_vendorlib
+            command += "--define 'obm_osversion %s' " % self.osversion
+            # If we're not building on RedHat/CentOS, we need to make sure we're
+            # not going to take system directories from the current platform
+            if distname != 'redhat':
+                command += self._override_platform()
             command += "rpm/SPECS/*.spec"
         else:
             raise PackagingError("Unknown packaging type: %s" % \

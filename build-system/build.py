@@ -29,6 +29,14 @@ import errno
 
 import obm.build as ob
 
+OS_TO_PKGTYPE = {'el5' : 'rpm',
+                 'el6' : 'rpm',
+                'etch' : 'deb',
+                'lenny': 'deb',
+             'squeeze' : 'deb',
+              'wheezy' : 'deb'}
+
+
 def boolean_value_of(envstr):
     return envstr.lower() in ['true', 't', '1', 'yes']
 
@@ -51,21 +59,15 @@ def build_argument_parser(args):
     parser.add_argument('-r', '--release', help="release of OBM. Defaults to $OBM_RELEASE or 'None'",
             default=os.environ.get('OBM_RELEASE', None), dest='obm_release')
 
-    parser.add_argument('--perl-version', help="perl flavor (only for RPMs). Defaults to $OBM_PERLVERSION or '5.8'",
-            default=os.environ.get('OBM_PERLVERSION', '5.8'), dest='perl_version', choices=['5.8', '5.10'])
-
     parser.add_argument('-n', '--nocompile', help="Do not attempt to compile anything. Defaults to $OBM_NOCOMPILE or 'False'",
             default=boolean_value_of(os.environ.get('OBM_NOCOMPILE', '0')), action='store_true', dest='nocompile')
 
     parser.add_argument('-P', '--processcount', help="set the number of concurrent processes usedused  to build the packages. "
                        "One process by Debian control file or RPM .SPEC file. Defaults to $OBM_PROCESSCOUNT or "
-                       "number of available cores",
+                       "number of available cores", type=int,
                        default=int(os.environ.get('OBM_PROCESSCOUNT', multiprocessing.cpu_count())), dest='processcount')
 
-    package_types = ['deb', 'rpm']
-    parser.add_argument('-p', '--package-type', metavar='PACKAGETYPE',
-            help="package type, may be one of: %s. Defaults to $OBM_PACKAGETYPE or 'deb' " % ", ".join(package_types),
-            choices=package_types, default=os.environ.get('OBM_PACKAGETYPE', 'deb'), dest='package_type')
+    parser.add_argument('-O', '--osversion', metavar='OSVERSION', help="OS version, maybe one of: %s. Defaults to $OBM_OSVERSION or 'squeeze'" % ", ".join(OS_TO_PKGTYPE.keys()), choices = OS_TO_PKGTYPE.keys(), default=os.environ.get('OBM_OSVERSION', 'squeeze'), dest='osversion')
 
     parser.add_argument('work_dir', metavar='WORKDIR', help='directory where '
             'the packages will be built')
@@ -80,11 +82,13 @@ def get_version_release(args, config, date, sha1):
     obm_version = args.obm_version if args.obm_version is not None else config.get('global', 'version')
     obm_release = args.obm_release if args.obm_release is not None else config.get('global', 'release')
 
+    pkgtype = OS_TO_PKGTYPE[args.osversion]
+
     if not obm_version:
         raise ValueError("The obm version should be specified on the "
                 "command line or in the configuration file")
     version = obm_version
-    if args.package_type == 'rpm' and not obm_release:
+    if pkgtype == 'rpm' and not obm_release:
         obm_release = 1
     short_sha1 = sha1[:7]
     if args.oncommit:
@@ -97,22 +101,24 @@ def get_version_release(args, config, date, sha1):
                 minute=date.strftime("%M"),
                 short_sha1=short_sha1)
         release = None
-        if args.package_type == 'deb':
+        if pkgtype == 'deb':
             release = formatter.format("{obm_release}+git{year}{month}{day}-"
                     "{hour}{minute}-{short_sha1}", **params)
-        elif args.package_type == 'rpm':
+        elif pkgtype == 'rpm':
             release = formatter.format("{obm_release}+git{year}{month}{day}_"
                     "{hour}{minute}_{short_sha1}", **params)
         else:
-            raise ValueError("Unknown package type %s" % args.package_type)
+            raise ValueError("Unknown package type %s" % pkgtype)
     else:
         release = obm_release
     return version, release
 
 def make_packagers(config, args, packages_dir, checkout_dir, packages):
     template = None
+    pkgtype = OS_TO_PKGTYPE[args.osversion]
+
     if args.oncommit:
-        template_section = "%s_templates" % args.package_type
+        template_section = "%s_templates" % pkgtype
         template = config.get(template_section,
             'oncommit_changelog')
         mode = ob.ChangelogUpdater.REPLACE
@@ -128,16 +134,11 @@ def make_packagers(config, args, packages_dir, checkout_dir, packages):
     version, release = get_version_release(args, config, date, scm_manager.sha1)
 
     changelog_updater = ob.ChangelogUpdater(changelog_template=template,
-            package_type=args.package_type, date=date, sha1=scm_manager.sha1,
+            package_type=pkgtype, date=date, sha1=scm_manager.sha1,
             mode=mode, version=version, release=release)
 
-    perl_section_name = "perl_%s" % args.perl_version
-    perl_module_compat = config.get(perl_section_name, 'perl_module_compat')
-    perl_vendorlib = config.get(perl_section_name, 'perl_vendorlib')
-
-    packagers = [ob.Packager(p, args.package_type, packages_dir,
-        changelog_updater, version, release, perl_module_compat,
-        perl_vendorlib, args.nocompile) for p in packages]
+    packagers = [ob.Packager(p, pkgtype, args.osversion, packages_dir,
+        changelog_updater, version, release, config, args.nocompile) for p in packages]
     return packagers
 
 def assert_package_option_is_correct(usage, package_names, available_packages):
