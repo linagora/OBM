@@ -31,10 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.java.mail.testsuite;
 
+import org.junit.Ignore;
 import org.obm.guice.GuiceModule;
 import org.obm.push.java.mail.MailEnvModule;
 
 @GuiceModule(MailEnvModule.class)
 public class MailboxServiceTest extends
 		org.obm.push.mail.imap.testsuite.MailboxServiceTest {
+
+	@Ignore("Javamail only use ASCII for the login command")
+	@Override
+	public void testAcceptsNotASCIIUserPassword() throws Exception {
+		/*
+		 * Into com.sun.mail.imap.protocol.IMAPProtocol, the method login
+		 * uses Argument.writeString which writes string as ASCII.
+		 * 
+		 * public void login(String u, String p) throws ProtocolException {
+		 *		Argument args = new Argument();
+		 *		args.writeString(u);
+		 *		args.writeString(p);
+		 */
+	}
 }
