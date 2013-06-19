@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.icalendar.Ical4jHelper;
-import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.services.ICalendar;
@@ -52,23 +51,23 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 
+@Singleton
 public class ResourceServlet extends HttpServlet {
 
 	private Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
 	private ICalendar calendarBinding;
 	private Ical4jHelper ical4jHelper;
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		Injector injector = (Injector) getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
-
-		calendarBinding = injector.getInstance(ICalendar.class);
-		ical4jHelper = injector.getInstance(Ical4jHelper.class);
+	@Inject
+	@VisibleForTesting ResourceServlet(ICalendar calendarBinding, Ical4jHelper ical4jHelper) {
+		this.calendarBinding = calendarBinding;
+		this.ical4jHelper = ical4jHelper;
+		
 	}
 
 	@Override

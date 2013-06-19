@@ -47,7 +47,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.exception.ObmUserNotFoundException;
@@ -57,13 +56,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.ConfigurationException;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
 /*
  * /obm-sync/freebusy/<email_of_attendee>?organizer=<login_of_organizer>
  */
+@Singleton
 public class FreeBusyServlet extends HttpServlet {
 
 	public final static String DATASOURCE_PARAMETER = "datasource";
@@ -76,21 +78,18 @@ public class FreeBusyServlet extends HttpServlet {
 	private Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
 	private LocalFreeBusyProvider localFreeBusyProvider;
 	private Collection<RemoteFreeBusyProvider> remoteFreeBusyProviders;
-	
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		Injector injector = (Injector) getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
-		
-		localFreeBusyProvider = injector.getInstance(LocalFreeBusyProvider.class);
-		
-		TypeLiteral<Set<RemoteFreeBusyProvider>> setOfFreeBusyProviders = new TypeLiteral<Set<RemoteFreeBusyProvider>>() {};
+
+	@Inject
+	private FreeBusyServlet(LocalFreeBusyProvider localProvider, Injector injector) {
+		this.localFreeBusyProvider = localProvider;
+		TypeLiteral<Set<RemoteFreeBusyProvider>> setOfFreeBusyProviders = 
+				new TypeLiteral<Set<RemoteFreeBusyProvider>>() {};
 		try {		
-			remoteFreeBusyProviders = injector.getInstance(Key.get(setOfFreeBusyProviders));
-		}
-		catch (ConfigurationException e) {
+			this.remoteFreeBusyProviders = injector.getInstance(Key.get(setOfFreeBusyProviders));
+		} catch (ConfigurationException e) {
 			logger.info("No remote free busy providers configured");
 		}
+	
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)

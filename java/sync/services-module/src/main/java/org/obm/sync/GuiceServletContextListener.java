@@ -56,83 +56,74 @@ import com.linagora.obm.sync.QueueManager;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
-	public static final String ATTRIBUTE_NAME = "GuiceInjecter";
-	
-    @Override
+	protected Injector injector;
+
+	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-    	XTrustProvider.install();
-    	
-        final ServletContext servletContext = servletContextEvent.getServletContext(); 
-        
-        try {
-        	Injector injector = createInjector(servletContext);
-        	if (injector == null) { 
-        		failStartup("Could not create injector: createInjector() returned null"); 
-        	} 
-        	servletContext.setAttribute(ATTRIBUTE_NAME, injector);
-        	TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-        } catch (Exception e) {
-        	failStartup(e.getMessage());
-        } 
-    } 
-    
-    private Injector createInjector(ServletContext servletContext)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    	
-        return Guice.createInjector(selectGuiceModule(servletContext));
-    }
+		XTrustProvider.install();
+
+		final ServletContext servletContext = servletContextEvent.getServletContext(); 
+
+		try {
+			injector = createInjector(servletContext);
+			if (injector == null) { 
+				failStartup("Could not create injector: createInjector() returned null"); 
+			} 
+			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+		} catch (Exception e) {
+			failStartup(e.getMessage());
+		} 
+	} 
+
+	private Injector createInjector(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+		return Guice.createInjector(selectGuiceModule(servletContext));
+	}
 
     @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		
-		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
-	}
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
+    	return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
+    }
 
     @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
     		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    	
-		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
-		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
-			return null;
-		}
-		return (Module) Class.forName(guiceModuleClassName).newInstance();
-	}
+
+    	String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
+    	if (Strings.isNullOrEmpty(guiceModuleClassName)) {
+    		return null;
+    	}
+    	return (Module) Class.forName(guiceModuleClassName).newInstance();
+    }
     
     private void failStartup(String message) { 
-        throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
+    	throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
     }
     
     @Override
-	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-		Errors errors = new Errors();
-		Injector injector = (Injector) servletContextEvent.getServletContext().getAttribute(ATTRIBUTE_NAME);
+    public void contextDestroyed(ServletContextEvent servletContextEvent) { 
+    	Errors errors = new Errors();
 
-		try {
-			if (injector != null) {
-				injector.getInstance(SolrManager.class).stop();
-			}
-		}
-		catch (Exception e) {
-			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop SolrManager.", e));
-		}
-		
-		try {
-			if (injector != null) {
-				injector.getInstance(QueueManager.class).stop();
-			}
-		}
-		catch (Exception e) {
-			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop QueueManager.", e));
-		}
+    	try {
+    		injector.getInstance(SolrManager.class).stop();
+    	}
+    	catch (Exception e) {
+    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop SolrManager.", e));
+    	}
 
-		try {
-			TransactionManagerServices.getTransactionManager().shutdown();
-		}
-		catch (Exception e) {
-			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop TransactionManager.", e));
-		}
+    	try {
+    		injector.getInstance(QueueManager.class).stop();
+    	} catch (Exception e) {
+    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop QueueManager.", e));
+    	}
 
-		servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null);
-		errors.throwConfigurationExceptionIfErrorsExist();
+    	try {
+    		TransactionManagerServices.getTransactionManager().shutdown();
+    	} catch (Exception e) {
+    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop TransactionManager.", e));
+    	}
+
+    	errors.throwConfigurationExceptionIfErrorsExist();
     }
 }

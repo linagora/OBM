@@ -33,35 +33,35 @@ package org.obm.sync.server;
 
 import java.io.IOException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.server.handler.ISyncHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Injector;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
 
+@Singleton
 public class SyncServlet extends HttpServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final SyncHandlers syncHandlers;
+	private final SyncStatus syncStatus;
 
-	private Injector injector;
-
-	@Override
-	public void init(ServletConfig config) throws ServletException {
+	@Inject
+	private SyncServlet(SyncHandlers syncHandlers, SyncStatus syncStatus) {
+		this.syncHandlers = syncHandlers;
+		this.syncStatus = syncStatus;
 		logger.info("Init obm-sync servlet ...");
-		super.init(config);
-		injector = (Injector)config.getServletContext().getAttribute(GuiceServletContextListener.ATTRIBUTE_NAME);
-		logger.info("Starting obm-sync " + ObmSyncVersion.current());
+		logger.info("Starting obm-sync " + ObmSyncVersion.current());		
 	}
-
+	
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -74,8 +74,7 @@ public class SyncServlet extends HttpServlet {
 				showSyncStatus(resp);
 			} else {
 				String handlerName = request.getHandlerName();
-				ISyncHandler handler = injector.getInstance(SyncHandlers.class).getHandlers().
-						get(handlerName);
+				ISyncHandler handler = syncHandlers.getHandlers().get(handlerName);
 				if (handler == null) {
 					logger.error("no handler for {}", handlerName);
 					responder.sendError(new Exception("no handler for " + handlerName));
@@ -99,8 +98,7 @@ public class SyncServlet extends HttpServlet {
 
 	private void showSyncStatus(HttpServletResponse resp) {
 		logger.info("show obm sync status");
-		SyncStatus ss = injector.getInstance(SyncStatus.class);
-		ss.show(resp);
+		syncStatus.show(resp);
 	}
 	
 }

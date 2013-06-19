@@ -34,8 +34,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
-
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
@@ -44,8 +42,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,8 +58,6 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
 
-import com.google.inject.Injector;
-
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 
@@ -72,9 +66,6 @@ public class ResourceServletTest {
 	private Ical4jHelper helper;
 	private Ical4jUser iCalUser;
 	private ResourceServlet resourceServlet;
-	private Injector injector;
-	private ServletConfig servletConfig;
-	private ServletContext servletContext;
 	private ICalendar calendarBinding;
 	private Collection<Event> collectionEvents;
 	private HttpServletRequest request;
@@ -94,23 +85,13 @@ public class ResourceServletTest {
 		helper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
 				ToolBox.getDefaultObmDomain());
-		resourceServlet = new ResourceServlet();
 
-		servletConfig = control.createMock(ServletConfig.class);
-		servletContext = control.createMock(ServletContext.class);
-		injector = control.createMock(Injector.class);
 		calendarBinding = control.createMock(ICalendar.class);
 		request = control.createMock(HttpServletRequest.class);
 		response = control.createMock(HttpServletResponse.class);
 
 		expect(dateProvider.getDate()).andReturn(now).anyTimes();
-		
-		expect(servletConfig.getServletContext()).andReturn(servletContext);
-		expect(servletContext.getAttribute(isA(String.class)))
-				.andReturn(injector);
-		expect(injector.getInstance(eq(ICalendar.class))).andReturn(
-				calendarBinding);
-		expect(injector.getInstance(Ical4jHelper.class)).andReturn(helper);
+		resourceServlet = new ResourceServlet(calendarBinding, helper);
 	}
 
 	@Test
@@ -122,7 +103,6 @@ public class ResourceServletTest {
 				.andReturn(collectionEvents);
 
 		control.replay();
-		resourceServlet.init(servletConfig);
 
 		String ics = resourceServlet.getResourceICS("resource@domain");
 		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
@@ -150,7 +130,6 @@ public class ResourceServletTest {
 		expect(response.getWriter()).andReturn(writer);
 		control.replay();
 
-		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 
 		control.verify();
@@ -168,7 +147,6 @@ public class ResourceServletTest {
 
 		control.replay();
 
-		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 		control.verify();
 	}
@@ -188,7 +166,6 @@ public class ResourceServletTest {
 
 		control.replay();
 
-		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 		control.verify();
 	}
@@ -208,7 +185,6 @@ public class ResourceServletTest {
 
 		control.replay();
 
-		resourceServlet.init(servletConfig);
 		resourceServlet.doGet(request, response);
 
 		control.verify();

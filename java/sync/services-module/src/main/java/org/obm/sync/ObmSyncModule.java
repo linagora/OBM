@@ -42,6 +42,7 @@ public class ObmSyncModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		install(new ObmSyncServletModule());
 		install(new ConfigurationModule());
 		install(new ObmSyncServicesModule());
 		install(new MessageQueueModule());

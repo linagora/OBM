@@ -37,6 +37,7 @@ import org.obm.sync.DatabaseModule;
 import org.obm.sync.MessageQueueModule;
 import org.obm.sync.ModuleUtils;
 import org.obm.sync.ObmSyncServicesModule;
+import org.obm.sync.ObmSyncServletModule;
 import org.obm.sync.SolrJmsModule;
 
 import com.google.inject.AbstractModule;
@@ -49,6 +50,7 @@ public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		OverriddenModuleBuilder override = Modules.override(
+				new ObmSyncServletModule(),
 				new ObmSyncServicesModule(),
 				new MessageQueueModule(),
 				new TransactionalModule(),

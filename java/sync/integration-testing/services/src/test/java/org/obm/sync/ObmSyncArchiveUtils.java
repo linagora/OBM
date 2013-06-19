@@ -492,17 +492,6 @@ public class ObmSyncArchiveUtils {
 	                "<filter-name>guiceFilter</filter-name>" +
 	                "<url-pattern>/*</url-pattern>" +
                 "</filter-mapping>" +
-	                
-				"<servlet>" +
-					"<servlet-name>sync</servlet-name>" +
-					"<display-name>OBM Sync Servlet</display-name>" +
-					"<servlet-class>org.obm.sync.server.SyncServlet</servlet-class>" +
-				"</servlet>" +
-					
-				"<servlet-mapping>" +
-					"<servlet-name>sync</servlet-name>" +
-					"<url-pattern>/services/*</url-pattern>" +
-				"</servlet-mapping>" +
 					
 			"</web-app>");
 	}
@@ -731,6 +720,7 @@ public class ObmSyncArchiveUtils {
 				ObmSmtpProvider.class,
 				ObmSyncModule.class,
 				ObmSyncServicesModule.class,
+				ObmSyncServletModule.class,
 				ResourceServlet.class,
 				AuthentificationServiceFactory.class,
 				IAuthentificationService.class,

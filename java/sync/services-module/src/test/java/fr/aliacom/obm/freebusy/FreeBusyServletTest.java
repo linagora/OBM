@@ -2,11 +2,8 @@ package fr.aliacom.obm.freebusy;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -14,7 +11,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -94,13 +90,6 @@ public class FreeBusyServletTest {
 	@Before
 	public void setUp() {
 		outputStream = getFakeOutputStream();
-		
-		ServletContext servletContext = createMock(ServletContext.class);
-
-		expect(servletConfig.getServletContext()).andReturn(servletContext);
-		expect(servletContext.getAttribute(isA(String.class))).andReturn(injector);
-
-		replay(servletContext);
 	}
 	
 	@Test
@@ -116,7 +105,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -133,8 +121,7 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
-		freeBusyServlet.init(servletConfig);
+
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -156,7 +143,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -179,7 +165,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -200,7 +185,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -220,7 +204,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -243,7 +226,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -266,7 +248,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -287,7 +268,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -308,7 +288,6 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 		
-		freeBusyServlet.init(servletConfig);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();

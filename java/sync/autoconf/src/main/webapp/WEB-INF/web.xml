@@ -25,16 +25,4 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <resource-env-ref-type>javax.transaction.UserTransaction</resource-env-ref-type>
   </resource-env-ref>
   
-  <servlet>
-    <servlet-name>autoconf</servlet-name>
-    <display-name>Thunderbird Autoconfiguration</display-name>
-    <servlet-class>
-      fr.aliasource.obm.autoconf.AutoconfService
-    </servlet-class>
-  </servlet>
-  
-   <servlet-mapping>
-    <servlet-name>autoconf</servlet-name>
-    <url-pattern>/autoconfiguration/*</url-pattern>
-  </servlet-mapping>
 </web-app>

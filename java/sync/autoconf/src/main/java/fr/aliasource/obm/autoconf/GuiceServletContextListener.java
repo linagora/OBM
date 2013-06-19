@@ -33,7 +33,6 @@ package fr.aliasource.obm.autoconf;
 
 import java.util.Collections;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -58,31 +57,35 @@ import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
+import com.google.inject.servlet.ServletModule;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener{
-	public static final String ATTRIBUTE_NAME = "GuiceInjecter";
+
 	private static final String APPLICATION_NAME = "obm-autoconf";
 
+	@Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-    	
-        final ServletContext servletContext = servletContextEvent.getServletContext();    
-                
                 
         try {   
-            Injector injector = createInjector();
+        	Injector injector = createInjector();
             if (injector == null) { 
                 failStartup("Could not create injector: createInjector() returned null");             
             }               
-            servletContext.setAttribute(ATTRIBUTE_NAME, injector);
         } catch (Exception e) {
             failStartup(e.getMessage());
         }   
     }
+    
 	private Injector createInjector() {
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
+            	install(new ServletModule() {
+            		protected void configureServlets() {
+            			serve("/autoconfiguration/*").with(AutoconfService.class);
+            		}
+            	});
             	install(new ConfigurationModule());
             	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
             	bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
@@ -100,8 +103,8 @@ public class GuiceServletContextListener implements ServletContextListener{
         throw new CreationException(Collections.nCopies(1, new Message(this, message)));
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        servletContextEvent.getServletContext().setAttribute(ATTRIBUTE_NAME, null);
     }
 
 }

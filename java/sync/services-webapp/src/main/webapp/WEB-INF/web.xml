@@ -4,7 +4,7 @@
 Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-	<display-name>OBM Sync 2.2.x</display-name>
+	<display-name>OBM Sync</display-name>
 
 	<listener>
 		<listener-class>org.obm.sync.GuiceServletContextListener</listener-class>
@@ -25,62 +25,9 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<servlet>
-		<servlet-name>sync</servlet-name>
-		<display-name>OBM Sync Servlet</display-name>
-		<servlet-class>org.obm.sync.server.SyncServlet</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>sync</servlet-name>
-		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
-
-	<!-- Resources -->
-	<servlet>
-		<servlet-name>ResourceServlet</servlet-name>
-		<display-name>OBM Resources Servlet</display-name>
-		<servlet-class>
-			org.obm.sync.resource.ResourceServlet
-    </servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>ResourceServlet</servlet-name>
-		<url-pattern>/resources/*</url-pattern>
-	</servlet-mapping>
-
-	<!-- Free Busy -->
-	<servlet>
-		<servlet-name>FreeBusyServlet</servlet-name>
-		<display-name>OBM FreeBusy Servlet</display-name>
-		<servlet-class>
-			fr.aliacom.obm.freebusy.FreeBusyServlet
-    </servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>FreeBusyServlet</servlet-name>
-		<url-pattern>/freebusy/*</url-pattern>
-	</servlet-mapping>
-
-
 	<session-config>
 		<!-- Default to 5 minute session timeouts -->
 		<session-timeout>5</session-timeout>
 	</session-config>
-
-	<resource-env-ref>
-		<description>DB Connection</description>
-		<resource-env-ref-name>jdbc/ObmDS</resource-env-ref-name>
-		<resource-env-ref-type>javax.sql.DataSource</resource-env-ref-type>
-	</resource-env-ref>
-
-	<resource-env-ref>
-		<description>JTA Transaction</description>
-		<resource-env-ref-name>UserTransaction</resource-env-ref-name>
-		<resource-env-ref-type>javax.transaction.UserTransaction</resource-env-ref-type>
-	</resource-env-ref>
-
 
 </web-app>

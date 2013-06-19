@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,40 +45,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.google.inject.Injector;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.novell.ldap.LDAPAttributeSet;
 import com.novell.ldap.LDAPException;
 
 import fr.aliasource.obm.utils.ConstantService;
 import fr.aliasource.obm.utils.DOMUtils;
 
+@Singleton
 public class AutoconfService extends HttpServlet {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3346961272290678959L;
-	private static final Logger logger = LoggerFactory.getLogger(AutoconfService.class);
-	private Injector injector;
+	private final Logger logger = LoggerFactory.getLogger(AutoconfService.class);
+	private final DBQueryTool dbqt;
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
+	@Inject
+	private AutoconfService(DBQueryTool dbqt) {
+		this.dbqt = dbqt;
 		logger.info("Init obm-autoconf servlet ...");
-		super.init(config);
-		injector = (Injector) config.getServletContext().getAttribute(
-				GuiceServletContextListener.ATTRIBUTE_NAME);
 	}
-
-	/**
-	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
-	 */
+	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		String reqString = req.getRequestURI();
 		logger.info("AutoconfService : reqString: '" + reqString);
-		logger.info("Guice injector: " + injector);
 
 		// get user from reqString : format ".../autoconfiguration/login"
 		String login = reqString.substring(reqString.lastIndexOf("/") + 1);
@@ -90,7 +81,6 @@ public class AutoconfService extends HttpServlet {
 			login = splitted[0];
 			domain = splitted[1];
 		}
-		DBQueryTool dbqt = injector.getInstance(DBQueryTool.class);
 
 		HashMap<String, String> servicesHostNames = new HashMap<String, String>();
 		try {
