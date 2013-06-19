@@ -344,7 +344,27 @@ public abstract class MailboxServiceTest {
 		
 		mailboxService.move(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), testUtils.mailboxPath(trash), MessageSet.singleton(1));
 	}
-	
+
+	@Test
+	public void testAcceptsNotASCIIUserPassword() throws Exception {
+		Date fromDate = DateUtils.getMidnightCalendar().getTime();
+		String user = "weird@localhost.com";
+		String weirdPassword = "password°£";
+		greenMail.setUser(user, weirdPassword);
+		UserDataRequest udr = new UserDataRequest(
+				new Credentials(User.Factory.create()
+						.createUser(user, user, null), weirdPassword), null, null);
+		
+		GreenMailUtil.sendTextEmail(user, "from@localhost.com", "subject", "body", smtpServerSetup);
+		greenMail.waitForIncomingEmail(1);
+		String mailBoxPath = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup)
+			.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
+		
+		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, fromDate);
+		
+		assertThat(emails).hasSize(1);
+	}
+
 	private void consumeInputStream(InputStream inputStream) throws IOException {
 		while (inputStream.read() != -1) {
 			// consume Inputstream
