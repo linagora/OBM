@@ -202,37 +202,37 @@ public class SyncHandlerWithBackendTest {
 		bookClient = classToInstanceMap.get(BookClient.class);
 		eventService = classToInstanceMap.get(EventService.class);
 
-		bindCollectionIdToPath();
+		bindCollectionIdToPath(user);
 		
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
-	private void bindCollectionIdToPath() throws Exception {
+	private void bindCollectionIdToPath(OpushUser userToBind) throws Exception {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(calendarCollectionId)).andReturn(calendarCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(contactCollectionId)).andReturn(contactCollectionPath).anyTimes();
 		
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
+		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, inboxCollectionId))
 			.andReturn(AnalysedSyncCollection.builder()
 					.collectionId(inboxCollectionId)
 					.collectionPath(inboxCollectionPath)
 					.syncKey(new SyncKey("123"))
 					.build()).anyTimes();
-		expect(syncedCollectionDao.get(user.credentials, user.device, calendarCollectionId))
+		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, calendarCollectionId))
 			.andReturn(AnalysedSyncCollection.builder()
 					.collectionId(calendarCollectionId)
 					.collectionPath(calendarCollectionPath)
 					.syncKey(new SyncKey("123"))
 					.build()).anyTimes();
-		expect(syncedCollectionDao.get(user.credentials, user.device, contactCollectionId))
+		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, contactCollectionId))
 			.andReturn(AnalysedSyncCollection.builder()
 					.collectionId(contactCollectionId)
 					.collectionPath(contactCollectionPath)
 					.syncKey(new SyncKey("123"))
 					.build()).anyTimes();
 		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
+		syncedCollectionDao.put(eq(userToBind.credentials), eq(userToBind.device), anyObject(AnalysedSyncCollection.class));
 		expectLastCall().anyTimes();
 	}
 
@@ -763,15 +763,75 @@ public class SyncHandlerWithBackendTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		Folder calendarFolder = new Folder();
-		calendarFolder.setServerId(calendarCollectionIdAsString);
-		Folder contactFolder = new Folder();
-		contactFolder.setServerId(contactCollectionIdAsString);
+		SyncResponse syncResponse = buildWBXMLOpushClient(user, opushServer.getPort()).sync(decoder, firstAllocatedSyncKey,
+				new Folder(calendarCollectionIdAsString),
+				new Folder(contactCollectionIdAsString));
 		
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
-		SyncResponse syncResponse = opClient.sync(decoder, firstAllocatedSyncKey, calendarFolder, contactFolder);
 		mocksControl.verify();
-		
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
+	}
+	
+	@Test
+	public void testUserPasswordWithDegreeSentAsISO() throws Exception {
+		String complexPassword = "password°";
+		OpushUser user = singleUserFixture.buildUser(complexPassword);
+		String userEmail = user.user.getLoginAtDomain();
+		greenMail.setUser(userEmail, complexPassword);
+		bindCollectionIdToPath(user);
+
+		SyncKey firstAllocatedSyncKey = new SyncKey("123");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		SyncKey thirdAllocatedSyncKey = new SyncKey("789");
+		
+		Date firstDate = date("2012-10-09T16:22:53");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(firstDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(3)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(firstDate)
+				.syncKey(secondAllocatedSyncKey)
+				.id(4)
+				.build();
+		ItemSyncState thirdAllocatedState = ItemSyncState.builder()
+				.syncDate(firstDate)
+				.syncKey(thirdAllocatedSyncKey)
+				.id(5)
+				.build();
+		
+		LoginClient loginClient = classToInstanceMap.get(LoginClient.class);
+		loginClient.logout(user.accessToken);
+		expectLastCall().anyTimes();
+		// Login is done in authentication
+		expect(loginClient.authenticate(userEmail, complexPassword)).andReturn(user.accessToken).anyTimes();
+		DeviceDao deviceDao = classToInstanceMap.get(DeviceDao.class);
+		expect(deviceDao.getDevice(user.user, user.deviceId, user.userAgent, user.deviceProtocolVersion))
+			.andReturn(user.device).anyTimes();
+		expect(deviceDao.getPolicyKey(user.user, user.deviceId, PolicyStatus.ACCEPTED))
+			.andReturn(5l).anyTimes();
+		
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(firstDate).anyTimes();
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey, thirdAllocatedSyncKey);
+		
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, calendarCollectionId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, thirdAllocatedState, inboxCollectionId);
+
+		expect(dateService.getCurrentDate()).andReturn(thirdAllocatedState.getSyncDate()).once();
+		expect(calendarClient.getUserEmail(user.accessToken)).andReturn(user.user.getLoginAtDomain());
+		expect(calendarClient.getSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+			.andReturn(EventChanges.builder().lastSync(firstDate).build());
+		
+		mocksControl.replay();
+		opushServer.start();
+		
+		SyncResponse syncResponse = buildWBXMLOpushClient(user, opushServer.getPort()).sync(decoder, firstAllocatedSyncKey,
+				new Folder(calendarCollectionIdAsString),
+				new Folder(inboxCollectionIdAsString));
+		
+		mocksControl.verify();
+		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(getCollectionWithId(syncResponse, calendarCollectionIdAsString).getStatus()).isEqualTo(SyncStatus.OK);
+		assertThat(getCollectionWithId(syncResponse, inboxCollectionIdAsString).getStatus()).isEqualTo(SyncStatus.OK);
 	}
 }

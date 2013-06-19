@@ -50,6 +50,7 @@ import org.obm.push.service.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -104,7 +105,7 @@ public class AuthenticationFilter implements Filter {
 				String basic = st.nextToken();
 				if (basic.equalsIgnoreCase("Basic")) {
 					String credentials = st.nextToken();
-					String userPass = new String( Base64.decodeBase64(credentials) );
+					String userPass = new String( Base64.decodeBase64(credentials), Charsets.ISO_8859_1 );
 					int p = userPass.indexOf(":");
 					if (p != -1) {
 						return authenticateValidRequest(request, 
