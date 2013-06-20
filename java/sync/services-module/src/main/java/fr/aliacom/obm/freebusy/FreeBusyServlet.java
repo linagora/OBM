@@ -80,7 +80,7 @@ public class FreeBusyServlet extends HttpServlet {
 	private Collection<RemoteFreeBusyProvider> remoteFreeBusyProviders;
 
 	@Inject
-	private FreeBusyServlet(LocalFreeBusyProvider localProvider, Injector injector) {
+	@VisibleForTesting FreeBusyServlet(LocalFreeBusyProvider localProvider, Injector injector) {
 		this.localFreeBusyProvider = localProvider;
 		TypeLiteral<Set<RemoteFreeBusyProvider>> setOfFreeBusyProviders = 
 				new TypeLiteral<Set<RemoteFreeBusyProvider>>() {};

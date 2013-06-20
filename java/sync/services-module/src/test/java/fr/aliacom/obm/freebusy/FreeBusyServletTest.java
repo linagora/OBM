@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -20,61 +19,24 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.exception.ObmUserNotFoundException;
 
-import com.google.common.collect.Sets;
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
-@GuiceModule(FreeBusyServletTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(SlowFilterRunner.class)
 public class FreeBusyServletTest {
 
-	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl;
-
-		@Override
-		protected void configure() {
-			mocksControl = createControl();
-			RemoteFreeBusyProvider remoteFreeBusyProvider = mocksControl.createMock(RemoteFreeBusyProvider.class);
-			
-			bind(IMocksControl.class).toInstance(mocksControl);
-			bind(LocalFreeBusyProvider.class)
-				.toInstance(mocksControl.createMock((DatabaseFreeBusyProvider.class)));
-			bind(RemoteFreeBusyProvider.class)
-				.toInstance(remoteFreeBusyProvider);
-			bind(new TypeLiteral<Set<RemoteFreeBusyProvider>>() {})
-				.toInstance(Sets.newHashSet(remoteFreeBusyProvider));
-			bindWithMock(HttpServletRequest.class);
-			bindWithMock(HttpServletResponse.class);
-			bindWithMock(ServletConfig.class);
-		}
-		
-		private <T> void bindWithMock(Class<T> cls) {
-			bind(cls).toInstance(mocksControl.createMock(cls));
-		}
-	}
-	
-	@Inject
 	private IMocksControl mocksControl;
-	@Inject
-	private FreeBusyServlet freeBusyServlet;
-	@Inject
 	private LocalFreeBusyProvider localFreeBusyProvider;
-	@Inject
 	private RemoteFreeBusyProvider remoteFreeBusyProvider;
-	@Inject
 	private HttpServletRequest request;
-	@Inject
 	private HttpServletResponse response;
-	@Inject
-	private ServletConfig servletConfig;
-	@Inject
+	private FreeBusyServlet freeBusyServlet;
 	private Injector injector;
 	
 	private ServletOutputStream outputStream;
@@ -89,7 +51,15 @@ public class FreeBusyServletTest {
 	
 	@Before
 	public void setUp() {
+		mocksControl = createControl();
 		outputStream = getFakeOutputStream();
+		remoteFreeBusyProvider = mocksControl.createMock(RemoteFreeBusyProvider.class);
+		localFreeBusyProvider = mocksControl.createMock((DatabaseFreeBusyProvider.class));
+		request = mocksControl.createMock(HttpServletRequest.class);
+		response = mocksControl.createMock(HttpServletResponse.class);
+		injector = mocksControl.createMock(Injector.class);
+		expect(injector.getInstance(Key.get(new TypeLiteral<Set<RemoteFreeBusyProvider>>() {})))
+			.andReturn(ImmutableSet.of(remoteFreeBusyProvider));
 	}
 	
 	@Test
@@ -104,7 +74,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -122,6 +93,7 @@ public class FreeBusyServletTest {
 		
 		mocksControl.replay();
 
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -142,7 +114,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -164,7 +137,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -184,7 +158,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -203,7 +178,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -225,7 +201,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -247,7 +224,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -267,7 +245,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -287,7 +266,8 @@ public class FreeBusyServletTest {
 		expectLastCall().once();
 		
 		mocksControl.replay();
-		
+
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		freeBusyServlet.doGet(request, response);
 		
 		mocksControl.verify();
@@ -297,7 +277,10 @@ public class FreeBusyServletTest {
 	
 	@Test
 	public void testMakeFreeBusyRequestWithNullOrganizer() {
+		mocksControl.replay();
+		freeBusyServlet = new FreeBusyServlet(localFreeBusyProvider, injector);
 		FreeBusyRequest fbr = freeBusyServlet.makeFreeBusyRequest(null, "attendee", new Date(), new Date());
+		mocksControl.verify();
 		assertThat(fbr.getOwner()).isEqualTo("attendee");
 	}
 
