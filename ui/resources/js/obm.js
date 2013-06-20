@@ -696,6 +696,28 @@ function refreshWaitEvent() {
   }).get({ajax : 1,action : 'get_json_waiting_events'});
 }
 
+
+function getWebmailUnreadMail(callback) {
+  var r = new Request({
+    url: obm.vars.consts.obmUrl+'/webmail/',
+    secure: false,
+    method: 'get',
+    data: {_task: "mail", _action: "unread_plugin"},
+    noCache: true,
+    async: true,
+    onSuccess: function(responseText){
+        var count = parseInt(responseText, 10);
+        if( isNaN(count)) {
+            return ;
+        }
+        callback(count);
+    }
+  });
+  r.send();
+}
+
+
+
 //used by calendar to go through webkit's bug #18994 (https://bugs.webkit.org/show_bug.cgi?id=18994)
 String.prototype.toFloat = function(){
   var value = this;
