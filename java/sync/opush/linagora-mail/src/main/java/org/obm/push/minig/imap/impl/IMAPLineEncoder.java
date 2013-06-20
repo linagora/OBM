@@ -41,8 +41,6 @@ import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.apache.mina.filter.codec.textline.LineDelimiter;
 
-import com.google.common.base.Charsets;
-
 public class IMAPLineEncoder extends ProtocolEncoderAdapter {
 	private static final String ENCODER = IMAPLineEncoder.class.getName()
 			+ ".encoder";
@@ -52,7 +50,7 @@ public class IMAPLineEncoder extends ProtocolEncoderAdapter {
 	private final LineDelimiter delimiter;
 
 	public IMAPLineEncoder() {
-		this(Charsets.UTF_8, LineDelimiter.WINDOWS);
+		this(Charset.forName("US-ASCII"), LineDelimiter.WINDOWS);
 	}
 
 	private IMAPLineEncoder(Charset charset, LineDelimiter delimiter) {
@@ -81,7 +79,6 @@ public class IMAPLineEncoder extends ProtocolEncoderAdapter {
 		if (message instanceof String) {
 			String value = message.toString();
 			IoBuffer buf = IoBuffer.allocate(value.length() + 2);
-			buf.setAutoExpand(true);
 			buf.putString(value, encoder);
 			buf.putString(delimiter.getValue(), encoder);
 			buf.flip();
