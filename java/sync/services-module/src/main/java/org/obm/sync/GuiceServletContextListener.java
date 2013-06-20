@@ -32,15 +32,12 @@
 package org.obm.sync;
 
 import java.util.Collections;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.obm.sync.solr.SolrManager;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -49,10 +46,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.internal.Errors;
 import com.google.inject.spi.Message;
-import com.linagora.obm.sync.QueueManager;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -80,50 +78,36 @@ public class GuiceServletContextListener implements ServletContextListener {
 
 		return Guice.createInjector(selectGuiceModule(servletContext));
 	}
+	@VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-    @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
+	}
 
-    	return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
-    }
+	@VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-    @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
+		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
+			return null;
+		}
+		return (Module) Class.forName(guiceModuleClassName).newInstance();
+	}
 
-    	String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
-    	if (Strings.isNullOrEmpty(guiceModuleClassName)) {
-    		return null;
-    	}
-    	return (Module) Class.forName(guiceModuleClassName).newInstance();
-    }
-    
-    private void failStartup(String message) { 
-    	throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
-    }
-    
-    @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-    	Errors errors = new Errors();
+	private void failStartup(String message) { 
+		throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
+	}
 
-    	try {
-    		injector.getInstance(SolrManager.class).stop();
-    	}
-    	catch (Exception e) {
-    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop SolrManager.", e));
-    	}
-
-    	try {
-    		injector.getInstance(QueueManager.class).stop();
-    	} catch (Exception e) {
-    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop QueueManager.", e));
-    	}
-
-    	try {
-    		TransactionManagerServices.getTransactionManager().shutdown();
-    	} catch (Exception e) {
-    		errors.addMessage(new Message(ImmutableList.of(), "Failed to stop TransactionManager.", e));
-    	}
-
-    	errors.throwConfigurationExceptionIfErrorsExist();
-    }
+	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
+		Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+		Errors errors = new Errors();
+		for (LifecycleListener listener: listeners) {
+			try {
+				listener.shutdown();
+			} catch (Throwable t) {
+				errors.addMessage(new Message(ImmutableList.of(), "Error during listener shutdown", t));
+			}
+		}
+		errors.throwConfigurationExceptionIfErrorsExist();
+	}
 }

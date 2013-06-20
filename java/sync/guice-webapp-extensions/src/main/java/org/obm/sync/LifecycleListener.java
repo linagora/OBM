@@ -29,31 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.annotations.transactional;
+package org.obm.sync;
 
-import javax.transaction.TransactionManager;
+public interface LifecycleListener {
 
-import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.sync.LifecycleListener;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.multibindings.Multibinder;
-
-public class TransactionalModule extends AbstractModule{
-
-	@Override
-	protected void configure() {
-
-		bind(TransactionManager.class).toProvider(TransactionProvider.class);
-		bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(TransactionProvider.class);
-		
-		TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
-		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
-				transactionalInterceptor);
-		requestInjection(transactionalInterceptor);
-	}
-
+	void shutdown() throws Exception;
+	
 }

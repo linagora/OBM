@@ -33,6 +33,8 @@ package org.obm.annotations.transactional;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.Set;
+
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
@@ -45,8 +47,7 @@ import org.obm.configuration.TestConfigurationModule;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-
-import bitronix.tm.TransactionManagerServices;
+import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -76,7 +77,8 @@ public class HornetQTransactionalModeTest {
 	private final static long TIMEOUT = 1000;
 	
 	@Inject private TestClass xaMessageQueueInstance;
-	@Inject private MessageConsumer consumer;	
+	@Inject private MessageConsumer consumer;
+	@Inject private Set<LifecycleListener> lifecycleListeners;
 	
 	public static class TestClass {
 
@@ -97,8 +99,10 @@ public class HornetQTransactionalModeTest {
 	}
 	
 	@After
-	public void shutdown() {
-		TransactionManagerServices.getTransactionManager().shutdown();
+	public void shutdown() throws Exception {
+		for (LifecycleListener listener: lifecycleListeners) {
+			listener.shutdown();
+		}
 	}
 	
 	@Test

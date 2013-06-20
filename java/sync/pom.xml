@@ -111,6 +111,7 @@
     		<module>icalendar</module>
     		<module>qos-filter</module>
 	        <module>healthcheck-api</module>
+		<module>guice-webapp-extensions</module>
   </modules>
 
 	<build>

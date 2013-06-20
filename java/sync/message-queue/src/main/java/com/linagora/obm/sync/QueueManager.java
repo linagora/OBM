@@ -40,10 +40,11 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
+import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QueueManager {
+public class QueueManager implements LifecycleListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(QueueManager.class);
 	private final EmbeddedJMS jmsServer;
@@ -102,6 +103,11 @@ public class QueueManager {
 		Topic queue = (Topic)jmsServer.lookup(topicPath);
 		MessageConsumer consumer = session.createDurableSubscriber(queue, clientId);
 		return consumer;
+	}
+
+	@Override
+	public void shutdown() throws Exception {
+		stop();
 	}
 	
 }

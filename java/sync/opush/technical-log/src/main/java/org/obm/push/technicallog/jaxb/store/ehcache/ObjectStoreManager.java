@@ -34,6 +34,8 @@ package org.obm.push.technicallog.jaxb.store.ehcache;
 import java.util.Arrays;
 import java.util.List;
 
+import org.obm.sync.LifecycleListener;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
@@ -46,7 +48,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ObjectStoreManager {
+public class ObjectStoreManager implements LifecycleListener {
 
 	public static final String REQUEST_STORE = "request";
 	
@@ -59,6 +61,7 @@ public class ObjectStoreManager {
 		this.singletonManager = new CacheManager(ehCacheConfiguration());
 	}
 
+	@Override
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}

@@ -397,6 +397,7 @@ public class ObmSyncArchiveUtils {
 				.addAsResource("logback.xml")
 				.addAsResource("Messages_en.properties")
 				.addAsResource("Messages_fr.properties")
+				.addClasses(LifecycleListener.class)
 				.addClasses(ObmSyncArchiveUtils.projectAnnotationsClasses())
 				.addClasses(ObmSyncArchiveUtils.projectConfigurationClasses())
 				.addClasses(ObmSyncArchiveUtils.projectDBCPClasses())

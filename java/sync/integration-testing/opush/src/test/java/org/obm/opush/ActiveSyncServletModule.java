@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -47,16 +48,17 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
-
-import bitronix.tm.TransactionManagerServices;
+import org.obm.sync.LifecycleListener;
 
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.ServletModule;
 import com.google.inject.util.Modules;
@@ -111,10 +113,10 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/");
 			root.addLifeCycleListener(buildServerStartedListener());
-			root.addEventListener(buildTransactionManagerListener(injector));
+			root.addEventListener(buildCleanupListener(injector));
 		}
 
-		private ServletContextListener buildTransactionManagerListener(final Injector injector) {
+		private ServletContextListener buildCleanupListener(final Injector injector) {
 			return new ServletContextListener() {
 
 				@Override
@@ -123,9 +125,14 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 				@Override
 				public void contextDestroyed(ServletContextEvent sce) {
-					injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
-					injector.getInstance(org.obm.push.technicallog.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
-					TransactionManagerServices.getTransactionManager().shutdown();
+				   	Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+			    	for (LifecycleListener listener: listeners) {
+			    		try {
+			    			listener.shutdown();
+			    		} catch (Throwable t) {
+			    			Throwables.propagate(t);
+			    		}
+			    	}
 				}
 			};
 		}

@@ -39,6 +39,7 @@ import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -54,6 +55,8 @@ public class MessageQueueModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(QueueManager.class).toInstance(queueManager);
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().toInstance(queueManager);
 	}
 	
 	private QueueManager constructQueueManager() {

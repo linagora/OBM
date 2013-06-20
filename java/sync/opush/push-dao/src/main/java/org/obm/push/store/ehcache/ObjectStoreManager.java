@@ -44,6 +44,7 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
@@ -51,7 +52,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ObjectStoreManager {
+public class ObjectStoreManager implements LifecycleListener {
 
 	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
@@ -77,6 +78,7 @@ public class ObjectStoreManager {
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 	}
 
+	@Override
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}

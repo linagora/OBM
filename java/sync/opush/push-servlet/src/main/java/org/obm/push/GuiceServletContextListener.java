@@ -32,20 +32,24 @@
 package org.obm.push;
 
 import java.util.Collections;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.obm.sync.LifecycleListener;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.TransactionManagerServices;
-
+import com.google.common.collect.ImmutableList;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.internal.Errors;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -77,9 +81,16 @@ public class GuiceServletContextListener implements ServletContextListener {
     }
     
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
-    	injector.getInstance(org.obm.push.technicallog.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
-    	TransactionManagerServices.getTransactionManager().shutdown();
+    	Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+    	Errors errors = new Errors();
+    	for (LifecycleListener listener: listeners) {
+    		try {
+    			listener.shutdown();
+    		} catch (Throwable t) {
+    			errors.addMessage(new Message(ImmutableList.of(), "Error during listener shutdown", t));
+    		}
+    	}
+		errors.throwConfigurationExceptionIfErrorsExist();
     }
     
 }

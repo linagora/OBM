@@ -36,8 +36,10 @@ import javax.transaction.TransactionManager;
 
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
@@ -47,9 +49,9 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class TransactionProvider implements Provider<TransactionManager> {
+public class TransactionProvider implements Provider<TransactionManager>, LifecycleListener {
 	
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 
 	@Inject
 	public TransactionProvider(TransactionConfiguration configuration,
@@ -75,5 +77,10 @@ public class TransactionProvider implements Provider<TransactionManager> {
 	@Override
 	public TransactionManager get() {
 		return transactionManager;
+	}
+	
+	@Override
+	public void shutdown() throws Exception {
+		transactionManager.shutdown();
 	}
 }
