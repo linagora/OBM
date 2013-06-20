@@ -59,8 +59,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -164,14 +162,14 @@ public abstract class AbstractClientImpl {
 		return httpResultStatus == HttpStatus.SC_OK;
 	}
 
-	@VisibleForTesting void setPostRequestParameters(Request request, Multimap<String, String> parameters) {
+	private void setPostRequestParameters(Request request, Multimap<String, String> parameters) {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		for (Entry<String, String> entry: parameters.entries()) {
 			if (entry.getKey() != null && entry.getValue() != null) {
 				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 		}
-		request.bodyForm(nameValuePairs, Charsets.UTF_8);
+		request.bodyForm(nameValuePairs);
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
@@ -194,6 +192,8 @@ public abstract class AbstractClientImpl {
 	}
 
 	private Request getPostRequest(AccessToken at, String action) throws LocatorClientException {
-		return Request.Post(getBackendUrl(at.getUserWithDomain()) + action);
+		String backendUrl = getBackendUrl(at.getUserWithDomain());
+		return Request.Post(backendUrl + action)
+			.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
 	}
 }
