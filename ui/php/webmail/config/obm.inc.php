@@ -84,6 +84,8 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
     $rcmail_config['cas_validation'] = $cas_validation;
     $rcmail_config['cas_cert'] = $cas_cert;
   }
+} else if ( $auth_kind && $auth_kind == "LemonLDAP") {
+  $rcmail_config["plugins"][] = "http_authentication";
 } else {
   $rcmail_config["plugins"][] = "obm_auth";
 }
