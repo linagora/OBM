@@ -34,7 +34,7 @@
 		<powermock.version>1.5</powermock.version>
 		<httpclient.version>4.2.4</httpclient.version>
 		<commons-io.version>2.4</commons-io.version>
-    <commons-validator.version>1.4.0</commons-validator.version>
+    	<commons-validator.version>1.4.0</commons-validator.version>
 		<jms.version>1.1</jms.version>
 		<netty.version>3.6.6.Final</netty.version>
 		<jta.version>1.1</jta.version>
@@ -108,10 +108,15 @@
 		<module>common-test</module>
 		<module>integration-testing</module>
 		<module>webapp-common-dependencies</module>
-    		<module>icalendar</module>
-    		<module>qos-filter</module>
-	        <module>healthcheck-api</module>
+    	<module>icalendar</module>
+    	<module>qos-filter</module>
+	    <module>healthcheck-api</module>
 		<module>guice-webapp-extensions</module>
+		<module>provisioning-module</module>
+		<module>provisioning-client</module>
+		<module>ldap-client</module>
+		<module>cyrus-client</module>
+		<module>satellite-client</module>
   </modules>
 
 	<build>
