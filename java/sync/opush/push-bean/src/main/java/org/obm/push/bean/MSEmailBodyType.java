@@ -42,10 +42,14 @@ import com.google.common.collect.ImmutableMap.Builder;
  */
 public enum MSEmailBodyType {
 	
-	PlainText(1, "text/plain"), HTML(2, "text/html"), RTF(3, "text/rtf"), MIME(4, "message/rfc822");
+	PlainText(1, "text/plain", true), 
+	HTML(2, "text/html", false), 
+	RTF(3, "text/rtf", true), 
+	MIME(4, "message/rfc822", true);
 
 	private final int xmlValue;
 	private final String mimeType;
+	private final boolean cDataEncoded;
 	
 	private static Map<Integer, MSEmailBodyType> values;
 	static {
@@ -65,9 +69,10 @@ public enum MSEmailBodyType {
 		mimeTypeMap = builder.build();
 	}
 	
-	private MSEmailBodyType(int xmlValue, String mimeType) {
+	private MSEmailBodyType(int xmlValue, String mimeType, boolean cDataEncoded) {
 		this.xmlValue = xmlValue;
 		this.mimeType = mimeType;
+		this.cDataEncoded = cDataEncoded;
 	}
 	
 	public int asXmlValue() {
@@ -76,6 +81,10 @@ public enum MSEmailBodyType {
 	
 	public String getMimeType() {
 		return mimeType;
+	}
+	
+	public boolean isCDataEncoded() {
+		return cDataEncoded;
 	}
 
 	public static final MSEmailBodyType getValueOf(Integer xmlValue) {
