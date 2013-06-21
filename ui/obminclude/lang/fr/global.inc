@@ -360,7 +360,7 @@ $l_section_user   = "Annuaire";
 $l_section_admin  = "Administration";
 $l_section_dic    = "Dictionnaire";
 $l_section_my     = "Mon compte";
-$l_section_webmail= "Webmail";
+$l_section_webmail= "Mail";
 $l_section_more   = "Plus";
 
 $l_module_company = "Sociétés";
