@@ -8,11 +8,11 @@
       {{#buttons}}
 
         {{#notifier}}
-        <li><a href="{{url}}">{{name}}</a> <a href="{{notifier_url}}"> <span id="{{notifier_id}}" class="notification_popup"></span></a></li>
+        <li><a href="{{url}}" class="toplink">{{name}}</a> <a href="{{notifier_url}}"> <span id="{{notifier_id}}" class="notification_popup"></span></a></li>
         {{/notifier}}
 
         {{^notifier}}
-          <li><a href="{{url}}" onclick="{{onclick}}">{{name}}</a>
+          <li><a href="{{url}}" onclick="{{onclick}}" class="toplink" id="{{idmore}}">{{name}}</a></li>
         {{/notifier}}
 
       {{/buttons}}
@@ -51,7 +51,7 @@
 
     </ul>
   </div>
-{{>more_menu}}
 
 {{>profile_menu}}
 </div>
+{{>more_menu}}

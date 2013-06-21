@@ -562,11 +562,14 @@ function popup(url,name,height,width) {
 }
 
 function showAllInOneMenu(){
+  var positionMoreMenuButton = $('moremenu_button').getPosition().x;
   var allinonemenu = $('allinonemenu');
+
   if ( allinonemenu.isVisible() ){
     allinonemenu.setStyle('display', 'none');
   }else{
     allinonemenu.setStyle('display', 'block');
+    allinonemenu.setStyle('left', positionMoreMenuButton);
   }
 }
 
@@ -687,15 +690,32 @@ function refreshWaitEvent() {
         async: true,
         onComplete: function(response) {
             var elem = $('bannerWaitingEvent');
-            if(elem){
-              elem.set('text',response.msg);
+            var count = parseInt(response.msg, 10);
+            if(count > 0){
+              elem.set('text',count);
               elem.setStyle('display', 'inline-block');
-              //setTimeout(refreshWaitEvent,30000);
+              resizeForBadges(elem, count);
+            } else {
+              elem.setStyle('display', 'none');
             }
         }
   }).get({ajax : 1,action : 'get_json_waiting_events'});
 }
 
+function refreshUnreadMail(){
+  getWebmailUnreadMail(displayUnreadMail);
+}
+
+function displayUnreadMail(count) {
+  var elem = $('bannerUnreadMail');
+  if(count > 0){
+    elem.set('text', count);
+    elem.setStyle('display', 'inline-block');
+    resizeForBadges(elem, count);
+  } else {
+    elem.setStyle('display', 'none');
+  }
+}
 
 function getWebmailUnreadMail(callback) {
   var r = new Request({
@@ -716,7 +736,17 @@ function getWebmailUnreadMail(callback) {
   r.send();
 }
 
-
+function resizeForBadges(elem, count){
+  if (count <= 9) {
+    elem.getParent('li').setStyle('margin-right', '10px');
+  } else if (count > 9 && count < 99) {
+    elem.getParent('li').setStyle('margin-right', '15px');
+  } else if (count > 99 && count < 999) {
+    elem.getParent('li').setStyle('margin-right', '22px');
+  } else if (count > 999) {
+    elem.getParent('li').setStyle('margin-right', '28px');
+  }
+}
 
 //used by calendar to go through webkit's bug #18994 (https://bugs.webkit.org/show_bug.cgi?id=18994)
 String.prototype.toFloat = function(){

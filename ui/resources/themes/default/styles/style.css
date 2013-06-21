@@ -364,7 +364,6 @@ form {
   display: none;
   position: absolute;
   top:33px;
-  left: 385px;
   max-width: 260px;
   width: auto;
   background-color: #FAFAFA;
@@ -576,15 +575,15 @@ form {
 }
 
 .notification_popup{
+  font-family: verdana, arial;
   display: none;
   position: absolute;
   z-index: 99;
   color:#FFF;
   font-size: 11px;
-  font-family: serif;
-  margin-left: -2px;
-  margin-top:15px; 
-  padding:2px 5px 4px 5px;
+  margin-top: 22px;
+  margin-left: -10px;
+  padding:3px 6px 3px 6px;
   line-height: 12px;
   border-radius:15px; 
 
@@ -594,7 +593,17 @@ form {
   background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
   background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
   background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
-  text-shadow: 0 -1px 0px #333;
+  text-shadow: 0 -1px 0px #444;
+}
+
+.notification_popup:hover{
+  background: #ff670f;
+  background: -moz-linear-gradient(top, #ff670f 0%, #ff670f 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff670f), color-stop(100%,#ff670f));
+  background: -webkit-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: -o-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: -ms-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: linear-gradient(to bottom, #ff670f 0%,#ff670f 100%);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -606,30 +615,24 @@ form {
   padding: 0;
   font-weight: bold;
   list-style-type: none;
-  margin-left: 105px;
+  margin-left: 110px;
 }
 
 #section li {
   display: inline;
-  margin-right: 1px;
-  margin-left: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 5px;
+  padding: 0;
+  margin: 0;
+  margin-right: 10px;
+}
+
+#section li a.toplink {
   text-align: center;
-  cursor: pointer;
   font-weight: bold;
   font-size: 14px;
   color: #999;
-}
-
-#section li:hover {
-  color: #000;
-  border-bottom: 2px solid #368397;
-}
-
-#section li.hover a {
-  color: #000;
+  padding-right: 5px;
+  padding-left: 5px;
+  padding-bottom: 4px;
 }
 
 #section li.current {
@@ -654,8 +657,9 @@ form {
   color: #999;  
 }
 
-#section a:hover {
+#section a.toplink:hover {
   color: #000;
+  border-bottom: 2px solid #368397;
 }
 /* ------------------------------------------------------------------------- */
 /* Submenu (modules) */

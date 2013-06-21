@@ -1202,6 +1202,9 @@ function display_head($p_module, $standard=true) {
 
   obm.initialize.chain(datePickerGenerator);
   obm.initialize.chain(refreshWaitEvent);
+  obm.initialize.chain(refreshUnreadMail);
+  setInterval(refreshUnreadMail,300000);
+  setInterval(refreshWaitEvent,300000);
   window.addEvent('load', function () {
     while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
@@ -1393,7 +1396,7 @@ function display_unified_menu($module) {
       "name" => $l_section_webmail, 
       "url" => "$path/webmail/webmail_index.php", 
       "notifier" => true, 
-      "notifier_url" => "$path/webmail/webmail_index.php",
+      "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_mbox=INBOX",
       "notifier_id" => "bannerUnreadMail"
     ),
     array(
@@ -1410,6 +1413,7 @@ function display_unified_menu($module) {
     ),
     array(
       "name" => $l_section_more, 
+      "idmore" => "moremenu_button",
       "url" => "#", 
       "notifier" => false, 
       "onclick" => "showAllInOneMenu()"
@@ -2018,7 +2022,9 @@ function get_module_data($section, $module) {
 
     $module_data = array();
 
-    $module_data["name"] = $sections[$section]['Name'];
+    $l_section = 'l_section_'.$section;
+
+    $module_data["name"] = $sections[$section]['Name'] != "" ? $sections[$section]['Name'] : $GLOBALS[$l_section];
     $module_data["section_name"] = $section;
 
     $module_data["links"] = array();
