@@ -4,13 +4,13 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>		
-		<version>2.5.1-SNAPSHOT</version>
+		<version>2.5.1-rc2</version>
 	</parent>
 
 	<artifactId>message-queue</artifactId>
 	<name>obm-sync message-queue</name>
 	<url>http://www.obm.org/</url>
-	<version>2.5.1-SNAPSHOT</version>
+	<version>2.5.1-rc2</version>
 
 	<licenses>
 		<license>
