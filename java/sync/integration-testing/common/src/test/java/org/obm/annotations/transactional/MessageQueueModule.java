@@ -38,14 +38,12 @@ import javax.jms.Session;
 
 import org.hornetq.api.jms.JMSFactoryType;
 import org.hornetq.core.config.Configuration;
-import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
-import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.linagora.obm.sync.HornetQConfigurationBuilder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -65,27 +63,21 @@ public class MessageQueueModule extends AbstractModule {
 	}
 	
 	public static Configuration hornetQConfiguration() {
-		return HornetQConfigurationBuilder.configuration()
+		return HornetQConfiguration.configuration()
 				.enablePersistence(true)
 				.enableSecurity(false)
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(InVMConnectorFactory.class)
-						.name("in-vm")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(InVMAcceptorFactory.class)
-						.name("in-vm")
-						.build())
+				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 				.build();
 	}
 	
 	private JMSConfiguration jmsConfiguration() {
 		return 
-				HornetQConfigurationBuilder.jmsConfiguration()
+				HornetQConfiguration.jmsConfiguration()
 				.connectionFactory(
-						HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+						HornetQConfiguration.connectionFactoryConfigurationBuilder()
 						.name("ConnectionFactory")
-						.connector("in-vm")
+						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 						.binding("ConnectionFactory")
 						.binding("XAConnectionFactory")
 						.factoryType(JMSFactoryType.XA_CF)

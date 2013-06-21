@@ -290,11 +290,11 @@ public class HornetQConfiguration {
 	}
 	
 	public static class JMSConfigurationBuilder {
-
+		
 		private final List<ConnectionFactoryConfiguration> connectionFactoryConfigurations;
-		private final List<JMSQueueConfiguration> queueConfigurations;
-		private final List<TopicConfiguration> topicConfigurations;
-		private String domain;
+        private final List<JMSQueueConfiguration> queueConfigurations;
+        private final List<TopicConfiguration> topicConfigurations;
+        private String domain;
 
 		private JMSConfigurationBuilder() {
 			connectionFactoryConfigurations = Lists.newArrayList();
@@ -346,11 +346,11 @@ public class HornetQConfiguration {
 	}
 	
 	public static class ConnectionFactoryConfigurationBuilder {
-
+		
 		private final List<String> bindings;
-		private final List<String> connectors;
-		private String name;
-		private Boolean ha;
+        private final List<String> connectors;
+        private String name;
+        private Boolean ha;
 		private JMSFactoryType factoryType;
 		
 		private ConnectionFactoryConfigurationBuilder() {

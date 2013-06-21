@@ -38,10 +38,6 @@ import static org.easymock.EasyMock.replay;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.hornetq.core.config.Configuration;
-import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
-import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
@@ -55,7 +51,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.solr.jms.DefaultCommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
-import com.linagora.obm.sync.HornetQConfigurationBuilder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
@@ -75,11 +71,11 @@ public class SolrHelperFactoryTest {
 
 	private static JMSConfiguration jmsConfiguration() {
 		return 
-			HornetQConfigurationBuilder.jmsConfiguration()
+			HornetQConfiguration.jmsConfiguration()
 			.connectionFactory(
-					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					HornetQConfiguration.connectionFactoryConfigurationBuilder()
 					.name("ConnectionFactory")
-					.connector("netty")
+					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
 			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
@@ -88,35 +84,12 @@ public class SolrHelperFactoryTest {
 	}
 	
 	public static Configuration hornetQConfiguration() {
-		return HornetQConfigurationBuilder.configuration()
+		return HornetQConfiguration.configuration()
 				.enablePersistence(false)
 				.enableSecurity(false)
 				.journalDirectory("target/jms-journal")
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(InVMConnectorFactory.class)
-						.name("in-vm")
-						.build())
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(NettyConnectorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(InVMAcceptorFactory.class)
-						.name("in-vm")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("stomp-acceptor")
-						.param("protocol", "stomp")
-						.param("port", 61613)
-						.build()
-						)
+				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 				.build();
 	}
 	

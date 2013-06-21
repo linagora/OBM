@@ -54,6 +54,7 @@ import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -87,6 +88,18 @@ public class ModuleUtils {
 						return "localhost";
 					}
 				});
+				
+				String jmsDataDirectory = configuration.dataDir + "/" + "jms/data";
+				bind(org.hornetq.core.config.Configuration.class).toInstance(
+						HornetQConfiguration.configuration()
+						.enablePersistence(true)
+						.enableSecurity(false)
+						.largeMessagesDirectory(jmsDataDirectory + "/large-messages")
+						.bindingsDirectory(jmsDataDirectory + "/bindings")
+						.journalDirectory(jmsDataDirectory + "/journal")
+						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+						.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
+						.build());
 			}
 		};
 	}

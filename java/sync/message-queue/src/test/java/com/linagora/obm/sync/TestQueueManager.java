@@ -43,10 +43,6 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.io.FileUtils;
 import org.hornetq.core.config.Configuration;
-import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
-import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Assert;
@@ -77,11 +73,11 @@ public class TestQueueManager {
 
 	private static JMSConfiguration jmsConfiguration() {
 		return 
-			HornetQConfigurationBuilder.jmsConfiguration()
+			HornetQConfiguration.jmsConfiguration()
 			.connectionFactory(
-					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					HornetQConfiguration.connectionFactoryConfigurationBuilder()
 					.name("ConnectionFactory")
-					.connector("in-vm")
+					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
 			.topic("eventChanges", TOPIC)
@@ -89,27 +85,11 @@ public class TestQueueManager {
 	}
 	
 	public static Configuration hornetQConfiguration() {
-		return HornetQConfigurationBuilder.configuration()
+		return HornetQConfiguration.configuration()
 				.enablePersistence(true)
 				.enableSecurity(false)
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(InVMConnectorFactory.class)
-						.name("in-vm")
-						.build())
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(NettyConnectorFactory.class)
-						.name("netty")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(InVMAcceptorFactory.class)
-						.name("in-vm")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("netty")
-						.param("protocol", "stomp")
-						.param("port", 61613)
-						.build())
+				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 				.build();
 	}
 	

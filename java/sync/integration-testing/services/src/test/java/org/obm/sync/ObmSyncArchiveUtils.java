@@ -291,7 +291,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
-import com.linagora.obm.sync.HornetQConfigurationBuilder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -582,7 +582,7 @@ public class ObmSyncArchiveUtils {
 		return new Class<?>[] {
 				Producer.class,
 				QueueManager.class,
-				HornetQConfigurationBuilder.class
+				HornetQConfiguration.class
 		};
 	}
 	

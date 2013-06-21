@@ -49,10 +49,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.fest.assertions.api.Assertions;
 import org.hornetq.core.config.Configuration;
-import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
-import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
@@ -77,7 +73,7 @@ import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
-import com.linagora.obm.sync.HornetQConfigurationBuilder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 
@@ -99,45 +95,22 @@ public class SolrManagerTest {
 	};
 	
 	public static Configuration hornetQConfiguration() {
-		return HornetQConfigurationBuilder.configuration()
+		return HornetQConfiguration.configuration()
 				.enablePersistence(false)
 				.enableSecurity(false)
 				.journalDirectory("target/jms-journal")
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(InVMConnectorFactory.class)
-						.name("in-vm")
-						.build())
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(NettyConnectorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(InVMAcceptorFactory.class)
-						.name("in-vm")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("stomp-acceptor")
-						.param("protocol", "stomp")
-						.param("port", 61613)
-						.build()
-						)
+				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 				.build();
 	}
 	
 	private static JMSConfiguration jmsConfiguration() {
 		return 
-			HornetQConfigurationBuilder.jmsConfiguration()
+			HornetQConfiguration.jmsConfiguration()
 			.connectionFactory(
-					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					HornetQConfiguration.connectionFactoryConfigurationBuilder()
 					.name("ConnectionFactory")
-					.connector("netty")
+					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
 			.topic("eventChanges", "/topic/eventChanges")

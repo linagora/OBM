@@ -34,12 +34,9 @@ package org.obm.sync;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
+import javax.ws.rs.Produces;
 
 import org.hornetq.core.config.Configuration;
-import org.hornetq.core.remoting.impl.invm.InVMAcceptorFactory;
-import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
-import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.obm.configuration.ConfigurationService;
 import org.obm.sync.solr.jms.SolrJmsQueue;
@@ -49,7 +46,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.linagora.obm.sync.HornetQConfigurationBuilder;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -63,52 +60,33 @@ public class MessageQueueModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(JMSConfiguration.class).toInstance(jmsConfiguration());
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(QueueManager.class);
 	}
 	
-	public static Configuration hornetQConfiguration(String dataDirectory) {
-		return HornetQConfigurationBuilder.configuration()
+	@Produces @Singleton
+	public static Configuration hornetQConfiguration(ConfigurationService configurationService) {
+		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
+		return HornetQConfiguration.configuration()
 				.enablePersistence(true)
 				.enableSecurity(false)
 				.largeMessagesDirectory(dataDirectory + "/large-messages")
 				.bindingsDirectory(dataDirectory + "/bindings")
 				.journalDirectory(dataDirectory + "/journal")
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(InVMConnectorFactory.class)
-						.name("in-vm")
-						.build())
-				.connector(HornetQConfigurationBuilder.connectorBuilder()
-						.factory(NettyConnectorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(InVMAcceptorFactory.class)
-						.name("in-vm")
-						.build())
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("netty")
-						.build()
-						)
-				.acceptor(HornetQConfigurationBuilder.acceptorBuilder()
-						.factory(NettyAcceptorFactory.class)
-						.name("stomp-acceptor")
-						.param("protocol", "stomp")
-						.param("port", 61613)
-						.build()
-						)
+				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.Stomp)
 				.build();
 	}
 	
-	private static JMSConfiguration configuration() {
+	private JMSConfiguration jmsConfiguration() {
 		return 
-			HornetQConfigurationBuilder.jmsConfiguration()
+			HornetQConfiguration.jmsConfiguration()
 			.connectionFactory(
-					HornetQConfigurationBuilder.connectionFactoryConfigurationBuilder()
+					HornetQConfiguration.connectionFactoryConfigurationBuilder()
 					.name("ConnectionFactory")
-					.connector("netty")
+					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
 			.topic("eventChanges", EVENT_CHANGES_TOPIC)
@@ -118,10 +96,9 @@ public class MessageQueueModule extends AbstractModule {
 	}
 	
 	@Provides @Singleton
-	public static QueueManager queueManager(ConfigurationService configurationService) {
-		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
+	public static QueueManager queueManager(Configuration configuration, JMSConfiguration jms) {
 		try {
-			QueueManager queueManager = new QueueManager(hornetQConfiguration(dataDirectory), configuration());
+			QueueManager queueManager = new QueueManager(configuration, jms);
 			queueManager.start();
 			return queueManager;
 		} catch (Exception e) {
