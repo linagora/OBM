@@ -38,7 +38,6 @@ import java.util.zip.GZIPInputStream;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -79,7 +78,7 @@ public class WBXMLOPClient extends OPClient {
 
 	private ByteArrayEntity getRequestEntity(String namespace, Document doc) throws WBXmlException, IOException {
 		byte[] wbxml = wbxmlTools.toWbxml(namespace, doc);
-		return new ByteArrayEntity(wbxml, ContentType.create("application/vnd.ms-sync.wbxml", Consts.ISO_8859_1));
+		return new ByteArrayEntity(wbxml, ContentType.create("application/vnd.ms-sync.wbxml"));
 	}
 
 	@Override
