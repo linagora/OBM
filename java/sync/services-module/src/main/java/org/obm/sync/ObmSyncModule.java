@@ -39,6 +39,7 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
+import org.obm.provisioning.ProvisioningService;
 
 import com.google.inject.AbstractModule;
 
@@ -64,6 +65,7 @@ public class ObmSyncModule extends AbstractModule {
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
 		install(new DatabaseMetadataModule());
+		install(new ProvisioningService());
 	}
 
 	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {
