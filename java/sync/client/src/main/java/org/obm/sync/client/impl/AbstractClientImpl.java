@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -169,7 +170,7 @@ public abstract class AbstractClientImpl {
 				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 		}
-		request.bodyForm(nameValuePairs);
+		request.bodyForm(nameValuePairs, Charsets.UTF_8);
 	}
 
 	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
