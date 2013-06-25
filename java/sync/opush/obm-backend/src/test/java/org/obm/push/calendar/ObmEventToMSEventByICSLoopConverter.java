@@ -48,6 +48,7 @@ import org.obm.sync.calendar.Event;
 import com.google.common.collect.Iterables;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventConverter {
 
@@ -81,7 +82,7 @@ public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventCon
                 				.builder()
                 				.id(1)
                 				.name(user.getDomain())
-                				.uuid("83bff451-11b7-8f55-d06b-7013cb8a0531")
+                				.uuid(ObmDomainUuid.of("83bff451-11b7-8f55-d06b-7013cb8a0531"))
                 				.build();
 		
 		return Ical4jUser.Factory.create().createIcal4jUser(user.getLoginAtDomain(), obmDomain);

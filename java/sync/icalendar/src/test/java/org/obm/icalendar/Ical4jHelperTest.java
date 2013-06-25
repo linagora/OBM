@@ -143,6 +143,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @RunWith(SlowFilterRunner.class)
 public class Ical4jHelperTest {
@@ -227,7 +228,7 @@ public class Ical4jHelperTest {
 	protected ObmDomain getDefaultObmDomain() {
 		return ObmDomain
 				.builder()
-				.uuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6")
+				.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 				.name("test.tlse.lng")
 				.build();
 	}
@@ -1253,7 +1254,7 @@ public class Ical4jHelperTest {
 	private Ical4jUser buildObmUser(final Attendee attendeeReply) {
 		ObmDomain obmDomain = ObmDomain
                 				.builder()
-                				.uuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6")
+                				.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
                 				.name(new UserEmailParserUtils().getDomain(attendeeReply.getEmail()))
                 				.build();
 		
@@ -1327,9 +1328,9 @@ public class Ical4jHelperTest {
 		String icsCancel = ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, token);
 		String icsReply = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
 		
-		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
-		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
-		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid());
+		checkContainIcsProperty(icsRequest, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid().get());
+		checkContainIcsProperty(icsCancel, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid().get());
+		checkContainIcsProperty(icsReply, "X-OBM-DOMAIN-UUID", ical4jUser.getObmDomain().getUuid().get());
 	}
 	
 	@Test

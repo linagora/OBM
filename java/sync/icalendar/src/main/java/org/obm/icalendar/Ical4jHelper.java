@@ -850,8 +850,7 @@ public class Ical4jHelper {
 	private void appendXObmDomainProperties(Ical4jUser iCal4jUser, PropertyList prop) {
 		ObmDomain obmDomain = iCal4jUser.getObmDomain();
 		XProperty domainProp = new XProperty(X_OBM_DOMAIN, obmDomain.getName());
-		XProperty uuidDomainProp = new XProperty(X_OBM_DOMAIN_UUID, obmDomain.getUuid());
-		
+		XProperty uuidDomainProp = new XProperty(X_OBM_DOMAIN_UUID, obmDomain.getUuid().get());	
 		prop.add(domainProp);
 		prop.add(uuidDomainProp);
 	}

@@ -80,7 +80,7 @@ public class DomainDao {
 				return ObmDomain
 						.builder()
 						.id(rs.getInt("domain_id"))
-						.uuid(rs.getString("domain_uuid"))
+						.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
 						.name(domainName)
 						.aliases(aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").split(aliases))
 						.build();

@@ -149,7 +149,7 @@ public class XmlResponder {
 		}
 
 		Element domain = DOMUtils.createElementAndText(root, "domain", tokenDomain.getName());
-		domain.setAttribute("uuid", tokenDomain.getUuid());
+		domain.setAttribute("uuid", tokenDomain.getUuid().get());
 
 		appendUserSettings(root, userSettings);
 		appendServerCapabilities(root, serverCapabilities);

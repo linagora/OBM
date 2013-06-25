@@ -60,6 +60,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 
@@ -115,7 +116,7 @@ public class ToolBox {
 				.builder()
 				.id(1)
 				.name("test.tlse.lng")
-				.uuid("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6")
+				.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 				.build();
 	}
 

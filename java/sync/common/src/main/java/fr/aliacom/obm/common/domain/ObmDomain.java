@@ -45,7 +45,7 @@ public class ObmDomain implements Serializable {
 		
 		private int id;
 		private String name;
-		private String uuid;
+		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
 		
 		private Builder() {
@@ -62,7 +62,7 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 		
-		public Builder uuid(String uuid) {
+		public Builder uuid(ObmDomainUuid uuid) {
 			this.uuid = uuid;
 			return this;
 		}
@@ -93,10 +93,10 @@ public class ObmDomain implements Serializable {
 	
 	private final int id;
 	private final String name;
-	private final String uuid;
+	private final ObmDomainUuid uuid;
 	private final Set<String> aliases;
 	
-	private ObmDomain(int id, String name, String uuid, Set<String> aliases) {
+	private ObmDomain(int id, String name, ObmDomainUuid uuid, Set<String> aliases) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
@@ -111,7 +111,7 @@ public class ObmDomain implements Serializable {
 		return id;
 	}
 
-	public String getUuid() {
+	public ObmDomainUuid getUuid() {
 		return uuid;
 	}
 

@@ -79,6 +79,7 @@ import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -319,7 +320,7 @@ public class LoginHandlerTest {
             				.builder()
             				.id(1)
             				.name(String.valueOf(getCurrentArguments()[0]))
-        					.uuid("1234567890")
+        					.uuid(ObmDomainUuid.of("1234567890"))
             				.build();
 				}
 			}).anyTimes();

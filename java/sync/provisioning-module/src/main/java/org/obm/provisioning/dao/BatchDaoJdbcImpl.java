@@ -47,6 +47,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class BatchDaoJdbcImpl implements BatchDao {
@@ -162,7 +163,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	private Batch batchFromCursor(ResultSet rs) throws SQLException {
 		ObmDomain domain = ObmDomain.builder()
 				.id(rs.getInt("domain_id"))
-				.uuid(rs.getString("domain_uuid"))
+				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
 				.name(rs.getString("domain_name"))
 				.build();
 

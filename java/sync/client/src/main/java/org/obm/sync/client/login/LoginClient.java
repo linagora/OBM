@@ -58,6 +58,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class LoginClient extends AbstractClientImpl implements LoginService {
 
@@ -183,7 +184,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	private ObmDomain getDomain(Element domain) {
 		return ObmDomain
 				.builder()
-				.uuid(domain.getAttribute("uuid"))
+				.uuid(ObmDomainUuid.of(domain.getAttribute("uuid")))
 				.name(DOMUtils.getElementText(domain))
 				.build();
 	}

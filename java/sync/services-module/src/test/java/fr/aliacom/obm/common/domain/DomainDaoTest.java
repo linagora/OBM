@@ -93,7 +93,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
-		assertThat(d.getUuid()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
 	}
 	
@@ -104,7 +104,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
-		assertThat(d.getUuid()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
 	}
 	
@@ -115,7 +115,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
-		assertThat(d.getUuid()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 	}
 	

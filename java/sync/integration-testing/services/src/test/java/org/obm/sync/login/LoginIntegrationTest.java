@@ -48,6 +48,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -160,7 +161,11 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(token.getCalendarRights()).isNull();
 		assertThat(token.getConversationUid()).isEqualTo(0);
 		assertThat(token.getDomain()).isEqualTo(
-				ObmDomain.builder().id(0).name("domain.org").uuid("b55911e6-6848-4f16-abd4-52d94b6901a6").build());
+				ObmDomain.builder()
+				         .id(0)
+				         .name("domain.org")
+				         .uuid(ObmDomainUuid.of("b55911e6-6848-4f16-abd4-52d94b6901a6"))
+				         .build());
 		assertThat(token.getIsoCodeToNameCache()).isEmpty();
 		assertThat(token.getObmId()).isEqualTo(0);
 		assertThat(token.getOrigin()).isEqualTo("integration-testing");
