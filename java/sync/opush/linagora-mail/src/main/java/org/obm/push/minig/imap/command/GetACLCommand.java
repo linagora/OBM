@@ -1,8 +1,12 @@
 package org.obm.push.minig.imap.command;
 
+import java.util.Map;
+
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
-public class GetACLCommand extends SimpleCommand<Boolean> {
+import com.google.common.collect.Maps;
+
+public class GetACLCommand extends SimpleCommand<Map<String,String>> {
 	
 	private final static String IMAP_COMMAND = "GETACL";
 
@@ -17,7 +21,14 @@ public class GetACLCommand extends SimpleCommand<Boolean> {
 
 	@Override
 	public void handleResponse(IMAPResponse response) {
-		data = response.isOk();
+		String[] responses = response.getPayload().split(" ");
+		for (int i = 3; i < responses.length-1; i += 2) {
+			data.put(responses[i], responses[i+1]);
+		}
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = Maps.newHashMap();
+	}
 }
