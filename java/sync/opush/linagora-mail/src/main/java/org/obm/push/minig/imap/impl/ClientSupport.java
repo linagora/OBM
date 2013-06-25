@@ -283,6 +283,10 @@ public class ClientSupport {
 		return run(new CreateCommand(mailbox));
 	}
 
+	public boolean create(String mailbox, String partition) {
+		return run(new CreateCommand(mailbox, partition));
+	}
+
 	public boolean delete(String mailbox) {
 		return run(new DeleteCommand(mailbox));
 	}

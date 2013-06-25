@@ -86,6 +86,8 @@ public interface StoreClient {
 	boolean select(String mailbox);
 
 	boolean create(String mailbox);
+	
+	boolean create(String mailbox, String partition);
 
 	boolean subscribe(String mailbox);
 

@@ -34,10 +34,23 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
+import com.google.common.base.Strings;
+
 public class CreateCommand extends SimpleCommand<Boolean> {
 
 	public CreateCommand(String mailbox) {
-		super("CREATE "+toUtf7(mailbox));
+		this(mailbox, null);
+	}
+
+	public CreateCommand(String mailbox, String partition) {
+		super("CREATE "+toUtf7(mailbox) + partitionSuffix(partition));
+	}
+
+	private static String partitionSuffix(String partition) {
+		if (Strings.isNullOrEmpty(partition)) {
+			return "";
+		}
+		return " " + toUtf7(partition);
 	}
 
 	@Override

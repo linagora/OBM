@@ -168,6 +168,11 @@ public class StoreClientImpl implements StoreClient {
 	public boolean create(String mailbox) {
 		return clientSupport.create(mailbox);
 	}
+	
+	@Override
+	public boolean create(String mailbox, String partition) {
+		return clientSupport.create(mailbox, partition);
+	}
 
 	@Override
 	public boolean subscribe(String mailbox) {
