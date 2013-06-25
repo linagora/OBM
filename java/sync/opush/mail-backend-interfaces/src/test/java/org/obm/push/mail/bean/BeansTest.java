@@ -70,6 +70,7 @@ public class BeansTest {
 					.add(SnapshotKey.class)
 					.add(WindowingIndexKey.class)
 					.add(EmailMetadata.class)
+					.add(Acl.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 		
