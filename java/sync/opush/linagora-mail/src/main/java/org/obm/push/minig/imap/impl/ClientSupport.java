@@ -71,6 +71,7 @@ import org.obm.push.minig.imap.command.CapabilityCommand;
 import org.obm.push.minig.imap.command.CreateCommand;
 import org.obm.push.minig.imap.command.DeleteCommand;
 import org.obm.push.minig.imap.command.ExpungeCommand;
+import org.obm.push.minig.imap.command.GetACLCommand;
 import org.obm.push.minig.imap.command.ICommand;
 import org.obm.push.minig.imap.command.ListCommand;
 import org.obm.push.minig.imap.command.LoginCommand;
@@ -80,6 +81,7 @@ import org.obm.push.minig.imap.command.NoopCommand;
 import org.obm.push.minig.imap.command.QuotaRootCommand;
 import org.obm.push.minig.imap.command.RenameCommand;
 import org.obm.push.minig.imap.command.SelectCommand;
+import org.obm.push.minig.imap.command.SetACLCommand;
 import org.obm.push.minig.imap.command.StartIdleCommand;
 import org.obm.push.minig.imap.command.StopIdleCommand;
 import org.obm.push.minig.imap.command.SubscribeCommand;
@@ -305,6 +307,14 @@ public class ClientSupport {
 
 	public boolean append(String mailbox, Reader message, FlagsList fl) {
 		return run(new AppendCommand(mailbox, message, fl));
+	}
+	
+	public boolean getAcl(String mailbox) {
+		return run(new GetACLCommand(mailbox));
+	}
+	
+	public boolean setAcl(String mailbox, String identifier, String accessRights) {
+		return run(new SetACLCommand(mailbox, identifier, accessRights));
 	}
 
 	public void expunge() {

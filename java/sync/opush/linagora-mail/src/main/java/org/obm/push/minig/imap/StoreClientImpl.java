@@ -337,4 +337,14 @@ public class StoreClientImpl implements StoreClient {
 	private boolean isINBOXSpecificCase(String boxName) {
 		return boxName.toLowerCase().equals(EmailConfiguration.IMAP_INBOX_NAME.toLowerCase());
 	}
+
+	@Override
+	public boolean setAcl(String mailbox, String identifier, String accessRights) {
+		return clientSupport.setAcl(mailbox, identifier, accessRights);
+	}
+
+	@Override
+	public boolean getAcl(String mailbox) {
+		return clientSupport.getAcl(mailbox);
+	}
 }

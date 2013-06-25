@@ -96,7 +96,11 @@ public interface StoreClient {
 	boolean delete(String mailbox);
 
 	boolean rename(String mailbox, String newMailbox);
+	
+	boolean setAcl(String mailbox, String identifier, String accessRights);
 
+	boolean getAcl(String mailbox);
+	
 	/**
 	 * Issues the CAPABILITY command to the IMAP server
 	 * 
