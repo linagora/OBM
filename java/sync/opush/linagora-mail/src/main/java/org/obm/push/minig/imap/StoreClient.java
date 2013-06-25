@@ -128,6 +128,10 @@ public interface StoreClient {
 	
 	QuotaInfo quota(String mailbox);
 
+	boolean removeQuota(String mailbox);
+	
+	boolean setQuota(String mailbox, long quotaInKo);
+
 	InputStream uidFetchMessage(long uid);
 
 	MessageSet uidSearch(SearchQuery sq);

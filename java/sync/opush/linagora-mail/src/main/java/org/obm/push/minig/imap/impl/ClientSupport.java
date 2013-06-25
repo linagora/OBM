@@ -82,6 +82,7 @@ import org.obm.push.minig.imap.command.QuotaRootCommand;
 import org.obm.push.minig.imap.command.RenameCommand;
 import org.obm.push.minig.imap.command.SelectCommand;
 import org.obm.push.minig.imap.command.SetACLCommand;
+import org.obm.push.minig.imap.command.SetQuotaCommand;
 import org.obm.push.minig.imap.command.StartIdleCommand;
 import org.obm.push.minig.imap.command.StopIdleCommand;
 import org.obm.push.minig.imap.command.SubscribeCommand;
@@ -323,6 +324,14 @@ public class ClientSupport {
 
 	public QuotaInfo quota(String mailbox) {
 		return run(new QuotaRootCommand(mailbox));
+	}
+	
+	public boolean removeQuota(String mailbox) {
+		return run(new SetQuotaCommand(mailbox));
+	}
+
+	public boolean setQuota(String mailbox, long quotaInKb) {
+		return run(new SetQuotaCommand(mailbox, quotaInKb));
 	}
 
 	public InputStream uidFetchMessage(long uid) {

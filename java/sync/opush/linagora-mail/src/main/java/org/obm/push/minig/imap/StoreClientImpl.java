@@ -228,6 +228,16 @@ public class StoreClientImpl implements StoreClient {
 	public QuotaInfo quota(String mailbox) {
 		return clientSupport.quota(findMailboxNameWithServerCase(mailbox));
 	}
+	
+	@Override
+	public boolean removeQuota(String mailbox) {
+		return clientSupport.removeQuota(findMailboxNameWithServerCase(mailbox));
+	}
+
+	@Override
+	public boolean setQuota(String mailbox, long quotaInKb) {
+		return clientSupport.setQuota(findMailboxNameWithServerCase(mailbox), quotaInKb);
+	}
 
 	@Override
 	public InputStream uidFetchMessage(long uid) {
