@@ -1,5 +1,6 @@
 package org.obm.provisioning;
 
-public interface LdapUserMembership {
+
+public interface LdapUserMembership extends LdapGroupMembership {
 
 }

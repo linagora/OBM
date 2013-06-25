@@ -211,4 +211,38 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	public String getGlobalDomain() {
 		return GLOBAL_DOMAIN;
 	}
+
+	@Override
+	public String getLdapServer() {
+		return iniFile.getStringValue("auth-ldap-server");
+	}
+
+	@Override
+	public String getLdapBaseDn() {
+		return iniFile.getStringValue("auth-ldap-basedn").replace("\"", "");
+	}
+
+	@Override
+	public String getLdapFilter() {
+		return iniFile.getStringValue("auth-ldap-filter").replace("\"", "");
+	}
+
+	@Override
+	public String getLdapBindDn() {
+		String bindDn = iniFile.getStringValue("auth-ldap-binddn");
+		if (bindDn != null) {
+			return bindDn.replace("\"", "");
+		}
+		return null;
+	}
+
+	@Override
+	public String getLdapBindPassword() {
+		String bindPassword = iniFile.getStringValue("auth-ldap-bindpw");
+		if (bindPassword != null) {
+			return bindPassword.replace("\"", "");
+		}
+		return null;
+	}
+
 }

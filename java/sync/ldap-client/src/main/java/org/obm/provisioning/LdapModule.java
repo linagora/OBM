@@ -29,56 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-package org.obm.configuration;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+public class LdapModule implements Module {
 
-import javax.naming.ConfigurationException;
-
-public interface ConfigurationService {
-	
-	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
-
-	String getLocatorUrl() throws ConfigurationException;
-
-	String getObmUIBaseUrl();
-
-	String getObmSyncUrl(String obmSyncHost);
-
-	int getLocatorCacheTimeout();
-
-	TimeUnit getLocatorCacheTimeUnit();
-
-	ResourceBundle getResourceBundle(Locale locale);
-	
-	String getActiveSyncServletUrl();
-
-	Charset getDefaultEncoding();
-
-	int transactionTimeoutInSeconds();
-
-	boolean usePersistentCache();
-
-	int trustTokenTimeoutInSeconds();
-	
-	int solrCheckingInterval();
-
-	String getDataDirectory();
-
-	String getGlobalDomain();
-	
-	String getLdapServer();
-
-	String getLdapBaseDn();
-	
-	String getLdapFilter();
-	
-	String getLdapBindDn();
-	
-	String getLdapBindPassword();
-
+	@Override
+	public void configure(Binder binder) {
+		binder.bind(LdapService.class);
+	}
 }

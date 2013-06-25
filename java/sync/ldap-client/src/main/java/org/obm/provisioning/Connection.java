@@ -28,6 +28,6 @@ public interface Connection {
 	
 	void removeGroupsFromGroup(List<LdapGroupMembership> ldapGroupMemberships, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
 	
-	void shutdown();
+	void shutdown() throws ConnectionException;
 	
 }

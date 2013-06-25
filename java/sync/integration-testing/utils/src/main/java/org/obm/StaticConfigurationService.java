@@ -180,4 +180,29 @@ public class StaticConfigurationService implements ConfigurationService {
 		return "global.test";
 	}
 
+	@Override
+	public String getLdapServer() {
+		return null;
+	}
+
+	@Override
+	public String getLdapBaseDn() {
+		return null;
+	}
+
+	@Override
+	public String getLdapFilter() {
+		return null;
+	}
+
+	@Override
+	public String getLdapBindDn() {
+		return null;
+	}
+
+	@Override
+	public String getLdapBindPassword() {
+		return null;
+	}
+
 }

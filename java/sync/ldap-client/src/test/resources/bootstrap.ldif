@@ -1,0 +1,23 @@
+dn: dc=local
+objectClass: dcObject
+objectClass: organization
+dc: local
+o: Global Domain
+description: Virtual domain for managing domains
+
+dn: dc=test.obm.org,dc=local
+objectClass: dcObject
+objectClass: organization
+dc: test.obm.org
+o: Test
+description: Integration testing
+
+dn: ou=users,dc=test.obm.org,dc=local
+objectClass: organizationalUnit
+ou: users
+description: Users account
+
+dn: ou=groups,dc=test.obm.org,dc=local
+objectClass: organizationalUnit
+ou: groups
+description: System Groups

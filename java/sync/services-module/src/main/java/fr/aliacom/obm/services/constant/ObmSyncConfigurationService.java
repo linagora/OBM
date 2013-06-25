@@ -50,11 +50,6 @@ public interface ObmSyncConfigurationService extends ConfigurationService {
 	String getDefaultTemplateFolder();
 	String getOverrideTemplateFolder();
 	String getObmSyncMailer(AccessToken accessToken);
-	String getLdapServer();
-	String getLdapBaseDn();
-	String getLdapFilter();
-	String getLdapBindDn();
-	String getLdapBindPassword();
 	Iterable<String> getLemonLdapIps();
 	String getRootAccounts();
 	String getAppliAccounts();

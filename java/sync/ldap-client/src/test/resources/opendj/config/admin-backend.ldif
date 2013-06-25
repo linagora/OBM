@@ -1,0 +1,41 @@
+dn: cn=admin data
+objectClass: top
+objectClass: ds-cfg-branch
+cn: admin data
+
+dn: cn=instance keys,cn=admin data
+objectClass: top
+objectClass: ds-cfg-branch
+cn: instance keys
+
+dn: cn=secret keys,cn=admin data
+objectClass: top
+objectClass: ds-cfg-branch
+cn: secret keys
+
+dn: cn=Administrators,cn=admin data
+objectClass: top
+objectClass: groupofurls
+description: Group of identities which have full access.
+cn: Administrators
+memberURL: ldap:///cn=Administrators,cn=admin data??one?(objectclass=*)
+
+dn: cn=Server Groups,cn=admin data
+objectClass: top
+objectClass: ds-cfg-branch
+cn: Server Groups
+
+dn: cn=all-servers,cn=Server Groups,cn=admin data
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: all-servers
+
+dn: ds-cfg-key-id=7DBD60E8C0F8A50A16A25996D6AC8680,cn=instance keys,cn=admin data
+objectClass: top
+objectClass: ds-cfg-instance-key
+ds-cfg-public-key-certificate;binary:: MIIB1TCCAT6gAwIBAgIEA1h6CDANBgkqhkiG9w0BAQUFADAvMRswGQYDVQQKExJPcGVuRFMgQ2VydGlmaWNhdGUxEDAOBgNVBAMTB3JhcGhhZWwwHhcNMTMwNjI2MTAwMzA2WhcNMzMwNjIxMTAwMzA2WjAvMRswGQYDVQQKExJPcGVuRFMgQ2VydGlmaWNhdGUxEDAOBgNVBAMTB3JhcGhhZWwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKnhJT995Ly+EkID7N02bJF2yn+r+opgPjkMozcmNEtP+3YrwBWnGCLGEtDz/BSYJ3xbY/X/3PzfEHUVAp0sW+NJNywRvSrIljWjqgiUgUD2IsRYCza6zOOd/ldx3cSOJ1KJXKFoVDdCZb2iD7x3ZaJHDalQSdAcxn43NHUQKrdJAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEALl4w1tnQzVJs+WYxgehjSw65f7mJIrR0SGdqxQSTC5VmntXdZ6/3y8BJYy5SBLlDV5RSpxftPz8iaG7hQUrcmmNiIy1TrQy6p7F2/INXY/8kmjT3cnTE3SXVGT+/T+aINbyadPORJYqNWLCm734c1gkWhuDB/5ndBQ6bCZuQtv8=
+ds-cfg-key-id: 7DBD60E8C0F8A50A16A25996D6AC8680
+creatorsName: cn=Internal Client,cn=Root DNs,cn=config
+createTimestamp: 20130626100947Z
+entryUUID: 863120b8-1ae6-4c22-9efa-9d10ec3d916f
+
