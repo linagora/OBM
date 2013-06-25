@@ -53,6 +53,7 @@ import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -310,7 +311,7 @@ public class ClientSupport {
 		return run(new AppendCommand(mailbox, message, fl));
 	}
 	
-	public boolean getAcl(String mailbox) {
+	public Set<Acl> getAcl(String mailbox) {
 		return run(new GetACLCommand(mailbox));
 	}
 	

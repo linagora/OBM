@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -99,7 +100,7 @@ public interface StoreClient {
 	
 	boolean setAcl(String mailbox, String identifier, String accessRights);
 
-	boolean getAcl(String mailbox);
+	Set<Acl> getAcl(String mailbox);
 	
 	/**
 	 * Issues the CAPABILITY command to the IMAP server

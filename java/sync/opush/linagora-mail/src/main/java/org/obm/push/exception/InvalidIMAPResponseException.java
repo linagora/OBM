@@ -29,20 +29,20 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.mail.exception;
+package org.obm.push.exception;
 
 
-public class ImapRuntimeException extends RuntimeException {
+public class InvalidIMAPResponseException extends RuntimeException {
 	
-	public ImapRuntimeException(Throwable cause) {
+	public InvalidIMAPResponseException(Throwable cause) {
 		super(cause);
 	}
 	
-	public ImapRuntimeException(String message, Throwable cause) {
+	public InvalidIMAPResponseException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
-	public ImapRuntimeException(String message) {
+	public InvalidIMAPResponseException(String message) {
 		super(message);
 	}
 }

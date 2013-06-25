@@ -44,6 +44,7 @@ import java.util.Set;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -354,7 +355,7 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	public boolean getAcl(String mailbox) {
+	public Set<Acl> getAcl(String mailbox) {
 		return clientSupport.getAcl(mailbox);
 	}
 }
