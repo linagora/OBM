@@ -117,6 +117,7 @@
 		<module>ldap-client</module>
 		<module>cyrus-client</module>
 		<module>satellite-client</module>
+		<module>obm-dao</module>
   </modules>
 
 	<build>

@@ -121,27 +121,12 @@
         </dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
-            <artifactId>dbcp</artifactId>
+            <artifactId>utils</artifactId>
             <version>${obm.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.3.172</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.linagora.obm</groupId>
-            <artifactId>utils</artifactId>
+            <artifactId>obm-dao</artifactId>
             <version>${obm.version}</version>
         </dependency>
 	</dependencies>
