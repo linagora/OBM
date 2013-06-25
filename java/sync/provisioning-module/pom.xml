@@ -114,6 +114,13 @@
             <artifactId>fluent-hc</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.linagora.obm</groupId>
+            <artifactId>common</artifactId>
+            <version>${obm.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
 	</dependencies>
 
 </project>
