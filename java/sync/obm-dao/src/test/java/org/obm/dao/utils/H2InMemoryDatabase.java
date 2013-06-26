@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.dao.utils;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

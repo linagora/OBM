@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.dao.utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

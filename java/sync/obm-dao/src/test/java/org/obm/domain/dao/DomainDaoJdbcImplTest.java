@@ -34,11 +34,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.H2ConnectionProvider;
-import org.obm.provisioning.dao.H2InMemoryDatabase;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;

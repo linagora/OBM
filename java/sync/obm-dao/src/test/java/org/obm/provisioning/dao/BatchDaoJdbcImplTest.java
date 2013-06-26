@@ -36,6 +36,8 @@ import java.sql.ResultSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
