@@ -51,7 +51,7 @@ import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.items.EventChanges;
 
-@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
+@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) //@Slow
 public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test @RunAsClient

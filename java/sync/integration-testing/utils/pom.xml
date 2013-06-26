@@ -27,5 +27,10 @@
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>arquillian-bundle</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 </project>

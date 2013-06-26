@@ -39,8 +39,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
+import org.obm.DependencyResolverHelper;
 import org.obm.StaticConfigurationService;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
@@ -54,7 +53,6 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalInterceptor;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.arquillian.ArtifactFilters;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
@@ -79,6 +77,7 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckHandler;
 import org.obm.healthcheck.HealthCheckModule;
@@ -350,7 +349,6 @@ import fr.aliacom.obm.common.setting.SettingsServiceImpl;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.trust.TrustTokenDao;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.common.user.UserSettings;
@@ -409,7 +407,7 @@ public class ObmSyncArchiveUtils {
 		return ShrinkWrap
 				.create(WebArchive.class)
 				.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(guiceModule, H2GuiceServletContextListener.class), "web.xml")
-				.addAsLibraries(projectDependencies())
+				.addAsLibraries(DependencyResolverHelper.projectDependencies(new File("pom.xml")))
 				.addAsLibraries(wholeObmSyncArchive)
 				.addClasses(
 						ModuleUtils.class,
@@ -423,19 +421,6 @@ public class ObmSyncArchiveUtils {
 						H2GuiceServletContextListener.class);
 	}
 
-	private static File[] projectDependencies() {
-		return ArtifactFilters.filterObmDependencies(allObmSyncDependencies());
-	}
-
-	private static MavenResolvedArtifact[] allObmSyncDependencies() {
-		return Maven.resolver()
-			.offline()
-			.loadPomFromFile("pom.xml")
-			.importRuntimeDependencies()
-			.resolve()
-			.withTransitivity()
-			.asResolvedArtifact();
-	}
 
 	public static Class<?>[] projectAnnotationsClasses() {
 		return new Class<?>[] {
@@ -663,7 +648,6 @@ public class ObmSyncArchiveUtils {
 				ObmSmtpProvider.class,
 				ObmSyncModule.class,
 				ObmSyncServicesModule.class,
-				ObmSyncServletModule.class,
 				ResourceServlet.class,
 				AuthentificationServiceFactory.class,
 				IAuthentificationService.class,
