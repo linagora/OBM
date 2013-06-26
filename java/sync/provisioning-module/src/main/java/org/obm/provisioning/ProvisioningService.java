@@ -18,6 +18,7 @@ public class ProvisioningService extends JerseyServletModule {
 		serve(PROVISIONING_URL_PATTERN).with(GuiceProvisioningJerseyServlet.class, 
 				ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 		bind(BatchResource.class);
+		bind(UserResource.class);
 
 		install(new LdapModule());
 	}
