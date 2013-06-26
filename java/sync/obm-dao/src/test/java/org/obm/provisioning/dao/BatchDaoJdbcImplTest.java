@@ -146,7 +146,7 @@ public class BatchDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		dao.update(batch);
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM Batch WHERE id=1 AND status='RUNNING'");
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch WHERE id=1 AND status='RUNNING'");
 
 		rs.next();
 
@@ -166,7 +166,7 @@ public class BatchDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		dao.delete(1);
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM Batch");
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch");
 
 		rs.next();
 
