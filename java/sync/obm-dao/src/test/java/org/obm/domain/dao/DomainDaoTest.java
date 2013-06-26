@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.domain;
+package org.obm.domain.dao;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.isA;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.easymock.IMocksControl;
@@ -51,7 +52,8 @@ import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.mysql.jdbc.PreparedStatement;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @GuiceModule(DomainDaoTest.Env.class)
 @RunWith(SlowGuiceRunner.class)
@@ -93,6 +95,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
+		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
 	}
@@ -104,6 +107,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
+		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
 	}
@@ -115,6 +119,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
+		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 	}
@@ -130,6 +135,7 @@ public class DomainDaoTest {
 		expect(rs.getString("domain_uuid")).andReturn("uuid");
 		expect(rs.getInt("domain_id")).andReturn(1);
 		expect(rs.getString("domain_alias")).andReturn(aliases);
+		expect(rs.getString("domain_label")).andReturn("label");
 		mocksControl.replay();
 		
 		return domainDao.findDomainByName(domainName);

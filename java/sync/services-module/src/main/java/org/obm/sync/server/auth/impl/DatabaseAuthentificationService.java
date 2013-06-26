@@ -38,6 +38,7 @@ import java.sql.SQLException;
 
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,6 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.ldap.UnixCrypt;
 import fr.aliacom.obm.utils.HelperService;
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * Authentification against the OBM database

@@ -34,6 +34,7 @@ package fr.aliacom.obm.common.domain;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.obm.domain.dao.DomainDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

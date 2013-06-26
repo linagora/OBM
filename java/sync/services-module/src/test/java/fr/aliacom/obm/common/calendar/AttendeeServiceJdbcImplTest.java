@@ -59,6 +59,7 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.solr.SolrHelper;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -73,7 +74,6 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
-import fr.aliacom.obm.utils.ObmHelper;
 
 @GuiceModule(AttendeeServiceJdbcImplTest.Env.class)
 @RunWith(SlowGuiceRunner.class)

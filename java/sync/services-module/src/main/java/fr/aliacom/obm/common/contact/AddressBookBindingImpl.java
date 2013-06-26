@@ -62,6 +62,7 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DateHelper;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,6 @@ import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.LogUtils;
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * OBM {@link IAddressBook} web service implementation

@@ -37,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

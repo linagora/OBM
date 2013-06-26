@@ -52,6 +52,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
 import org.obm.sync.book.Phone;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.utils.ObmHelper;
 
 @Singleton
 public class UserDao {

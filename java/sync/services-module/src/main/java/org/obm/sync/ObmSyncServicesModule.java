@@ -44,6 +44,7 @@ import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,6 @@ import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.HelperServiceImpl;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class ObmSyncServicesModule extends AbstractModule {
 

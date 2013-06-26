@@ -48,11 +48,11 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.solr.SolrHelper.Factory;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.utils.ObmHelper;
 
 @RunWith(SlowFilterRunner.class)
 public class ContactDaoTest {

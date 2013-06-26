@@ -49,12 +49,12 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.InstantMessagingId;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class ContactIndexer extends SolrRequest {
 

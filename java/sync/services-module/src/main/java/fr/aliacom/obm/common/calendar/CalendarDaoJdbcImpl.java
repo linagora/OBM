@@ -95,6 +95,8 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.sync.utils.DisplayNameUtils;
+import org.obm.utils.LinkedEntity;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,9 +123,7 @@ import fr.aliacom.obm.common.calendar.loader.ResourceLoader;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.LinkedEntity;
 import fr.aliacom.obm.utils.LogUtils;
-import fr.aliacom.obm.utils.ObmHelper;
 import fr.aliacom.obm.utils.RFC2445;
 
 /**

@@ -57,6 +57,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
+import org.obm.utils.ObmHelper;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 
@@ -69,7 +70,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.utils.ObmHelper;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(AddressBookBindingImplTest.Env.class)

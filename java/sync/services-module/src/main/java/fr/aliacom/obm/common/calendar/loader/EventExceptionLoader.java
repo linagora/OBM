@@ -10,13 +10,13 @@ import java.util.Map;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.utils.DBUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import fr.aliacom.obm.common.calendar.EventUtils;
-import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class EventExceptionLoader {

@@ -17,6 +17,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.utils.DBUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -27,7 +28,6 @@ import com.google.common.collect.Sets;
 import fr.aliacom.obm.common.calendar.EventUtils;
 import fr.aliacom.obm.common.calendar.loader.filter.DeclinedAttendeeFilter;
 import fr.aliacom.obm.common.calendar.loader.filter.EventFilter;
-import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class EventLoader {

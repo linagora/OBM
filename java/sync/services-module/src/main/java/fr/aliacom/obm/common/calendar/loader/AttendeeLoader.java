@@ -17,13 +17,13 @@ import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
+import org.obm.utils.DBUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class AttendeeLoader {

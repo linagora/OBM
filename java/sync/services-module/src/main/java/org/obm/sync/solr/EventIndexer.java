@@ -48,6 +48,7 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventType;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -57,7 +58,6 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
-import fr.aliacom.obm.utils.ObmHelper;
 
 public class EventIndexer extends SolrRequest {
 

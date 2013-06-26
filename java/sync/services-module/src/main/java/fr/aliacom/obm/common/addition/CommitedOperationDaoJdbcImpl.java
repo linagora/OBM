@@ -46,6 +46,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -54,7 +55,6 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.contact.ContactDao;
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * Calendar data access functions

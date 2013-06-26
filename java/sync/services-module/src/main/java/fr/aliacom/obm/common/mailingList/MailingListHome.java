@@ -44,6 +44,7 @@ import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,6 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * SQL queries for contact for sync

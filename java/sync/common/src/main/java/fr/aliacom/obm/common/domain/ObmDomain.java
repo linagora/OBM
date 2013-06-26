@@ -43,14 +43,23 @@ public class ObmDomain implements Serializable {
 
 	public static class Builder {
 		
-		private int id;
+		private Integer id;
 		private String name;
 		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
+		private String label;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();
 		}
+
+		public Builder from(ObmDomain domain) {
+			return name(domain.name)
+				.label(domain.label)
+				.uuid(domain.uuid)
+				.aliases(domain.aliases);
+		}
+
 		
 		public Builder id(int id) {
 			this.id = id;
@@ -82,7 +91,12 @@ public class ObmDomain implements Serializable {
 		}
 		
 		public ObmDomain build() {
-			return new ObmDomain(id, name, uuid, aliases.build());
+			return new ObmDomain(id, name, uuid, label, aliases.build());
+		}
+
+		public Builder label(String label) {
+			this.label = label;
+			return this;
 		}
 		
 	}
@@ -91,15 +105,17 @@ public class ObmDomain implements Serializable {
 		return new Builder();
 	}
 	
-	private final int id;
+	private final Integer id;
 	private final String name;
 	private final ObmDomainUuid uuid;
 	private final Set<String> aliases;
+	private final String label;
 	
-	private ObmDomain(int id, String name, ObmDomainUuid uuid, Set<String> aliases) {
+	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
+		this.label = label;
 		this.aliases = aliases;
 	}
 
@@ -123,9 +139,13 @@ public class ObmDomain implements Serializable {
 		return Sets.union(ImmutableSet.of(name), aliases);
 	}
 	
+	public String getLabel() {
+		return label;
+	}
+	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(id, name, uuid);
+		return Objects.hashCode(id, name, uuid, label, aliases);
 	}
 
 	@Override
@@ -135,7 +155,9 @@ public class ObmDomain implements Serializable {
 			
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.uuid, that.uuid);
+				&& Objects.equal(this.label, that.label)
+				&& Objects.equal(this.uuid, that.uuid)
+				&& Objects.equal(this.aliases, that.aliases);
 		}
 		
 		return false;
@@ -146,6 +168,8 @@ public class ObmDomain implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("id", id)
 			.add("name", name)
+			.add("label", label)
+			.add("aliases", aliases)
 			.add("uuid", uuid)
 			.toString();
 	}

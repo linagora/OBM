@@ -41,11 +41,11 @@ import java.util.Set;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.IMergeable;
 import org.obm.sync.book.Website;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * Merges contact data sent by sync client into the contact data store in the

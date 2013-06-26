@@ -1,4 +1,4 @@
-package fr.aliacom.obm.utils;
+package org.obm.utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

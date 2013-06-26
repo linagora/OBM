@@ -40,13 +40,13 @@ import java.util.List;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.base.Category;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.utils.ObmHelper;
 
 @Singleton
 public class CategoryDao {

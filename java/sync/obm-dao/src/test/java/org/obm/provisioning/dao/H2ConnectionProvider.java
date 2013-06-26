@@ -32,6 +32,7 @@
 package org.obm.provisioning.dao;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -62,7 +63,11 @@ public class H2ConnectionProvider implements DatabaseConnectionProvider {
 
 	@Override
 	public int lastInsertId(Connection con) throws SQLException {
-		throw new UnsupportedOperationException();
+		ResultSet result = con.createStatement().executeQuery("CALL SCOPE_IDENTITY()");
+		if (result.next()) {
+			return result.getInt(1);
+		}
+		throw new IllegalStateException();
 	}
 
 	@Override

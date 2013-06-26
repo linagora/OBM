@@ -56,13 +56,13 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
 import org.obm.sync.book.Phone;
 import org.obm.sync.date.DateProvider;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
-import fr.aliacom.obm.utils.ObmHelper;
 
 @GuiceModule(UserDaoTest.Env.class)
 @RunWith(SlowGuiceRunner.class)

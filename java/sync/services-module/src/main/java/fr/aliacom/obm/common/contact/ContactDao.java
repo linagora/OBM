@@ -94,6 +94,8 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
+import org.obm.utils.LinkedEntity;
+import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,8 +107,6 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.utils.LinkedEntity;
-import fr.aliacom.obm.utils.ObmHelper;
 
 /**
  * SQL queries for contact for sync

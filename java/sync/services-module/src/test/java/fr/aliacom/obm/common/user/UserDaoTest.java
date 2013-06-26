@@ -53,13 +53,13 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.date.DateProvider;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.utils.ObmHelper;
 
 @GuiceModule(UserDaoTest.Env.class)
 @RunWith(SlowGuiceRunner.class)
