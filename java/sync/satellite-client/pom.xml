@@ -53,6 +53,11 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>
