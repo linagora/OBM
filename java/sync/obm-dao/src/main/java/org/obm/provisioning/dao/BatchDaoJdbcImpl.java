@@ -40,6 +40,7 @@ import java.util.Date;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 
@@ -53,10 +54,12 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class BatchDaoJdbcImpl implements BatchDao {
 
 	private DatabaseConnectionProvider dbcp;
+	private OperationDao operationDao;
 
 	@Inject
-	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp, OperationDao operationDao) {
 		this.dbcp = dbcp;
+		this.operationDao = operationDao;
 	}
 
 	@Override
@@ -160,6 +163,19 @@ public class BatchDaoJdbcImpl implements BatchDao {
 		}	
 	}
 
+	@Override
+	public Batch addOperation(Integer batchId, Operation operation) throws SQLException, BatchNotFoundException {
+		Batch batch = get(batchId);
+
+		if (batch == null) {
+			throw new BatchNotFoundException(String.format("Batch %d not found", batchId));
+		}
+
+		operationDao.create(batch, operation);
+
+		return get(batch.getId());
+	}
+
 	private Batch batchFromCursor(ResultSet rs) throws SQLException {
 		ObmDomain domain = ObmDomain.builder()
 				.id(rs.getInt("domain_id"))
@@ -167,12 +183,15 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				.name(rs.getString("domain_name"))
 				.build();
 
+		int batchId = rs.getInt("id");
+
 		return Batch.builder()
-				.id(rs.getInt("id"))
+				.id(batchId)
 				.status(BatchStatus.valueOf(rs.getString("status")))
 				.domain(domain)
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))
 				.timecommit(JDBCUtils.getDate(rs, "timecommit"))
+				.operations(operationDao.getByBatchId(batchId))
 				.build();
 	}
 

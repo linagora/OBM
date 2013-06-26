@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
@@ -50,6 +51,9 @@ import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
+
+import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(OperationDaoJdbcImplTest.Env.class)
@@ -133,6 +137,8 @@ public class OperationDaoJdbcImplTest {
 
 	@Test
 	public void testCreate() throws Exception {
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -147,11 +153,13 @@ public class OperationDaoJdbcImplTest {
 		
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		
-		assertThat(dao.create(1, operation).getId()).isNotNull();
+		assertThat(dao.create(batch, operation).getId()).isNotNull();
 	}
 	
 	@Test
 	public void testCreateActuallyWritesToDB() throws Exception {
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -166,7 +174,7 @@ public class OperationDaoJdbcImplTest {
 		
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		
-		dao.create(1, operation).getId();
+		dao.create(batch, operation).getId();
 		
 		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch_operation");
 		
@@ -177,6 +185,8 @@ public class OperationDaoJdbcImplTest {
 	
 	@Test
 	public void testCreateActuallyWritesParametersToDB() throws Exception {
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -191,7 +201,7 @@ public class OperationDaoJdbcImplTest {
 		
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		
-		dao.create(1, operation).getId();
+		dao.create(batch, operation).getId();
 		
 		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch_operation_param");
 		
@@ -202,6 +212,8 @@ public class OperationDaoJdbcImplTest {
 	
 	@Test(expected = SQLException.class)
 	public void testCreateWhenBatchDoesntExist() throws Exception {
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -214,7 +226,7 @@ public class OperationDaoJdbcImplTest {
 				.entityType(BatchEntityType.USER)
 				.build();
 		
-		dao.create(1, operation).getId();
+		dao.create(batch, operation).getId();
 	}
 	
 	@Test

@@ -32,6 +32,7 @@ package org.obm.provisioning.dao;
 import java.sql.SQLException;
 
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 
 public interface BatchDao {
@@ -43,5 +44,7 @@ public interface BatchDao {
 	Batch update(Batch batch) throws SQLException, BatchNotFoundException;
 
 	void delete(Integer id) throws SQLException, BatchNotFoundException;
+
+	Batch addOperation(Integer batchId, Operation operation) throws SQLException, BatchNotFoundException;
 
 }

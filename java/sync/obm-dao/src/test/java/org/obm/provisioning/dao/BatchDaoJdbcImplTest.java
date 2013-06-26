@@ -41,7 +41,11 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 
 import com.google.inject.AbstractModule;
@@ -63,6 +67,7 @@ public class BatchDaoJdbcImplTest {
 
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
+			bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 		}
 
 	}
@@ -82,10 +87,13 @@ public class BatchDaoJdbcImplTest {
 	@Test
 	public void testGet() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (key, value, operation) VALUES ('p1', 'v1', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
 
 		Batch batch = dao.get(1);
 
-		assertThat(batch.getStatus()).isEqualTo(BatchStatus.IDLE);
+		assertThat(batch.getOperations()).hasSize(2);
 	}
 
 	@Test(expected = SQLException.class)
@@ -168,5 +176,54 @@ public class BatchDaoJdbcImplTest {
 	@Test(expected = BatchNotFoundException.class)
 	public void testDeleteWhenBatchDoesntExist() throws Exception {
 		dao.delete(1);
+	}
+
+	@Test(expected = BatchNotFoundException.class)
+	public void testAddOperationWhenBatchNotFound() throws Exception {
+		dao.addOperation(1, null);
+	}
+
+	@Test
+	public void testAddOperation() throws Exception {
+		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
+
+		Request request = Request.builder()
+				.url("/batches/1/users")
+				.verb(HttpVerb.POST)
+				.param("p1", "v1")
+				.build();
+		Operation operation = Operation.builder()
+				.id(1)
+				.status(BatchStatus.IDLE)
+				.request(request)
+				.entityType(BatchEntityType.USER)
+				.build();
+
+		assertThat(dao.addOperation(1, operation).getOperations()).isNotEmpty();
+	}
+
+	@Test
+	public void testAddOperationActuallyWritesToDB() throws Exception {
+		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
+
+		Request request = Request.builder()
+				.url("/batches/1/users")
+				.verb(HttpVerb.POST)
+				.param("p1", "v1")
+				.build();
+		Operation operation = Operation.builder()
+				.id(1)
+				.status(BatchStatus.IDLE)
+				.request(request)
+				.entityType(BatchEntityType.USER)
+				.build();
+
+		dao.addOperation(1, operation).getOperations();
+
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch_operation");
+
+		rs.next();
+
+		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 }

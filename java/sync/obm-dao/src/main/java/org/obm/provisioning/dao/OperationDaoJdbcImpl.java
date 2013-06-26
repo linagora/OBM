@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
@@ -114,7 +115,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public Operation create(Integer batchId, Operation operation) throws SQLException {
+	public Operation create(Batch batch, Operation operation) throws SQLException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -127,7 +128,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			ps.setString(3, operation.getRequest().getBody());
 			ps.setString(4, operation.getRequest().getVerb().toString());
 			ps.setString(5, operation.getEntityType().toString());
-			ps.setInt(6, batchId);
+			ps.setInt(6, batch.getId());
 
 			ps.executeUpdate();
 

@@ -32,6 +32,7 @@ package org.obm.provisioning.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
@@ -41,7 +42,7 @@ public interface OperationDao {
 
 	List<Operation> getByBatchId(Integer batchId) throws SQLException;
 
-	Operation create(Integer batchId, Operation operation) throws SQLException;
+	Operation create(Batch batch, Operation operation) throws SQLException;
 
 	Operation update(Operation operation) throws SQLException, OperationNotFoundException;
 
