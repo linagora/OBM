@@ -27,23 +27,23 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.provisioning.dao.exceptions;
 
-import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
-import org.obm.provisioning.dao.exceptions.DaoException;
+public class DaoException extends Exception {
 
-public interface BatchDao {
+	public DaoException() {
+	}
 
-	Batch get(Integer id) throws DaoException;
+	public DaoException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	Batch create(Batch batch) throws DaoException;
+	public DaoException(String message) {
+		super(message);
+	}
 
-	Batch update(Batch batch) throws DaoException, BatchNotFoundException;
-
-	void delete(Integer id) throws DaoException, BatchNotFoundException;
-
-	Batch addOperation(Integer batchId, Operation operation) throws DaoException, BatchNotFoundException;
+	public DaoException(Throwable cause) {
+		super(cause);
+	}
 
 }

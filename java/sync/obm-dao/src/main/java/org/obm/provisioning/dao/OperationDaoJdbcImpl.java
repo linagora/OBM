@@ -46,6 +46,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 
@@ -64,7 +65,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public Operation get(Integer operationId) throws SQLException {
+	public Operation get(Integer operationId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -81,6 +82,9 @@ public class OperationDaoJdbcImpl implements OperationDao {
 				return operationFromCursor(rs);
 			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
@@ -89,7 +93,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public List<Operation> getByBatchId(Integer batchId) throws SQLException {
+	public List<Operation> getByBatchId(Integer batchId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -107,6 +111,9 @@ public class OperationDaoJdbcImpl implements OperationDao {
 				operations.add(operationFromCursor(rs));
 			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
@@ -115,7 +122,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public Operation create(Batch batch, Operation operation) throws SQLException {
+	public Operation create(Batch batch, Operation operation) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -138,13 +145,16 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 			return get(operationId);
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
 	@Override
-	public Operation update(Operation operation) throws SQLException, OperationNotFoundException {
+	public Operation update(Operation operation) throws DaoException, OperationNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -170,12 +180,15 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 			return get(operation.getId());
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
-	private void insertOperationParameters(Operation operation, int operationId) throws SQLException {
+	private void insertOperationParameters(Operation operation, int operationId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement psParams = null;
 
@@ -192,6 +205,9 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			}
 
 			psParams.executeBatch();
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
 		}
 		finally {
 			JDBCUtils.cleanup(connection, psParams, null);

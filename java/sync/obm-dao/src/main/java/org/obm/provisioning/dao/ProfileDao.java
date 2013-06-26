@@ -32,18 +32,19 @@
 
 package org.obm.provisioning.dao;
 
-import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.beans.ProfileName;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ProfileDao {
 
-	ProfileName getProfile(ProfileId profileId) throws SQLException;
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws SQLException;
-	
+	ProfileName getProfile(ProfileId profileId) throws DaoException;
+
+	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
+
 }

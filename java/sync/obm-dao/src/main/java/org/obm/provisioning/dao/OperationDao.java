@@ -29,21 +29,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
 public interface OperationDao {
 
-	Operation get(Integer operationId) throws SQLException;
+	Operation get(Integer operationId) throws DaoException;
 
-	List<Operation> getByBatchId(Integer batchId) throws SQLException;
+	List<Operation> getByBatchId(Integer batchId) throws DaoException;
 
-	Operation create(Batch batch, Operation operation) throws SQLException;
+	Operation create(Batch batch, Operation operation) throws DaoException;
 
-	Operation update(Operation operation) throws SQLException, OperationNotFoundException;
+	Operation update(Operation operation) throws DaoException, OperationNotFoundException;
 
 }

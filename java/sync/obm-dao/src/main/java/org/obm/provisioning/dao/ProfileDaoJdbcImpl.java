@@ -42,6 +42,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.beans.ProfileName;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.push.utils.JDBCUtils;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -53,7 +55,6 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class ProfileDaoJdbcImpl implements ProfileDao {
 
-	
 	private DatabaseConnectionProvider connectionProvider;
 
 	@Inject
@@ -62,35 +63,56 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws SQLException {
+	public Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
 		Builder<ProfileEntry> profiles = ImmutableSet.builder();
-		Connection conn =  connectionProvider.getConnection();
-		PreparedStatement ps = conn.prepareStatement(
-				"    SELECT profile_id" +
-				"	   FROM Profile " +
-				"INNER JOIN Domain ON profile_domain_id = domain_id" +
-				" 	  WHERE	domain_uuid = ?");
-		ps.setString(1, domainUuid.get());
-		ResultSet resultSet = ps.executeQuery();
-		while (resultSet.next()) {
-			profiles.add(
-				ProfileEntry.builder().id(resultSet.getLong("profile_id")).build());
+
+		try {
+			conn = connectionProvider.getConnection();
+			ps = conn.prepareStatement("SELECT profile_id FROM Profile INNER JOIN Domain ON profile_domain_id = domain_id WHERE	domain_uuid = ?");
+			ps.setString(1, domainUuid.get());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				profiles.add(ProfileEntry.builder().id(rs.getLong("profile_id")).build());
+			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			JDBCUtils.cleanup(conn, ps, rs);
+		}
+
 		return profiles.build();
 	}
 
 	@Override
-	public ProfileName getProfile(ProfileId profileId) throws SQLException {
-		Connection conn =  connectionProvider.getConnection();
-		PreparedStatement ps = conn.prepareStatement(
-				"    SELECT profile_name" +
-				"	   FROM Profile " +
-				" 	  WHERE	profile_id = ?");
-		ps.setLong(1, profileId.getId());
-		ResultSet resultSet = ps.executeQuery();
-		if (resultSet.next()) {
-			return ProfileName.builder().name(resultSet.getString("profile_name")).build();
+	public ProfileName getProfile(ProfileId profileId) throws DaoException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			conn = connectionProvider.getConnection();
+			ps = conn.prepareStatement("SELECT profile_name FROM Profile WHERE profile_id = ?");
+			ps.setLong(1, profileId.getId());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return ProfileName.builder().name(rs.getString("profile_name")).build();
+			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			JDBCUtils.cleanup(conn, ps, rs);
+		}
+
 		return null;
 	}
 }

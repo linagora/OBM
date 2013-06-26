@@ -32,7 +32,6 @@ package org.obm.provisioning.dao;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +46,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -96,7 +96,7 @@ public class BatchDaoJdbcImplTest {
 		assertThat(batch.getOperations()).hasSize(2);
 	}
 
-	@Test(expected = SQLException.class)
+	@Test(expected = DaoException.class)
 	public void testCreateWithNonExistingDomain() throws Exception {
 		ObmDomain domain = ObmDomain.builder().id(123).name("nonexisting.domain").build();
 		Batch batch = Batch.builder().domain(domain).status(BatchStatus.IDLE).build();

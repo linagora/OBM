@@ -32,7 +32,6 @@ package org.obm.provisioning.dao;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +45,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
 import com.google.inject.AbstractModule;
@@ -210,7 +210,7 @@ public class OperationDaoJdbcImplTest {
 		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 	
-	@Test(expected = SQLException.class)
+	@Test(expected = DaoException.class)
 	public void testCreateWhenBatchDoesntExist() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();

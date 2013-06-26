@@ -42,6 +42,7 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.inject.Inject;
@@ -63,7 +64,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch get(Integer id) throws SQLException {
+	public Batch get(Integer id) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -80,6 +81,9 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				return batchFromCursor(rs);
 			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
@@ -88,7 +92,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch create(Batch batch) throws SQLException {
+	public Batch create(Batch batch) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -103,13 +107,16 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 			return get(JDBCUtils.lastInsertId(connection));
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
 	@Override
-	public Batch update(Batch batch) throws SQLException, BatchNotFoundException {
+	public Batch update(Batch batch) throws DaoException, BatchNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -136,13 +143,16 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 			return get(batch.getId());
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
 	@Override
-	public void delete(Integer id) throws SQLException, BatchNotFoundException {
+	public void delete(Integer id) throws DaoException, BatchNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -158,13 +168,16 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				throw new BatchNotFoundException(String.format("No such batch: %d", id));
 			}
 		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
 		}	
 	}
 
 	@Override
-	public Batch addOperation(Integer batchId, Operation operation) throws SQLException, BatchNotFoundException {
+	public Batch addOperation(Integer batchId, Operation operation) throws DaoException, BatchNotFoundException {
 		Batch batch = get(batchId);
 
 		if (batch == null) {
@@ -176,7 +189,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 		return get(batch.getId());
 	}
 
-	private Batch batchFromCursor(ResultSet rs) throws SQLException {
+	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException {
 		ObmDomain domain = ObmDomain.builder()
 				.id(rs.getInt("domain_id"))
 				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
