@@ -67,7 +67,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT * FROM Batch b INNER JOIN Domain d ON d.domain_id = b.domain WHERE b.id = ?");
+			ps = connection.prepareStatement("SELECT * FROM batch b INNER JOIN Domain d ON d.domain_id = b.domain WHERE b.id = ?");
 
 			ps.setInt(1, id);
 
@@ -91,7 +91,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("INSERT INTO Batch (status, domain) VALUES (?, ?)");
+			ps = connection.prepareStatement("INSERT INTO batch (status, domain) VALUES (?, ?)");
 
 			ps.setString(1, batch.getStatus().toString());
 			ps.setInt(2, batch.getDomain().getId());
@@ -112,7 +112,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("UPDATE Batch SET status = ?, timecommit = ? WHERE id = ?");
+			ps = connection.prepareStatement("UPDATE batch SET status = ?, timecommit = ? WHERE id = ?");
 
 			ps.setString(1, batch.getStatus().toString());
 
@@ -145,7 +145,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("DELETE FROM Batch WHERE id = ?");
+			ps = connection.prepareStatement("DELETE FROM batch WHERE id = ?");
 
 			ps.setInt(1, id);
 
