@@ -162,4 +162,16 @@ public class Batch {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("id", id)
+				.add("status", status)
+				.add("timecreate", timecreate)
+				.add("timecommit", timecommit)
+				.add("domain", domain)
+				.add("operations", operations)
+				.toString();
+	}
+
 }

@@ -145,7 +145,7 @@ public class Operation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id, status, entityType, request, error, timecreate, timecommit);
+		return Objects.hashCode(id, status, entityType, request, error, timecommit);
 	}
 
 	@Override
@@ -158,11 +158,23 @@ public class Operation {
 					&& Objects.equal(entityType, other.entityType)
 					&& Objects.equal(request, other.request)
 					&& Objects.equal(error, other.error)
-					&& Objects.equal(timecreate, other.timecreate)
 					&& Objects.equal(timecommit, other.timecommit);
 		}
 
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("id", id)
+				.add("status", status)
+				.add("entityType", entityType)
+				.add("request", request)
+				.add("error", error)
+				.add("timecreate", timecreate)
+				.add("timecommit", timecommit)
+				.toString();
 	}
 
 }

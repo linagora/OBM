@@ -132,4 +132,14 @@ public class Request {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("url", url)
+				.add("verb", verb)
+				.add("body", body)
+				.add("params", params)
+				.toString();
+	}
+
 }
