@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -43,13 +42,8 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
 import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -57,9 +51,6 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.dao.UserDao;
 
 import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.servlet.GuiceFilter;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -67,51 +58,14 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
-@GuiceModule(UserResourceTest.Env.class)
-public class UserResourceTest {
-	public static class Env extends ProvisioningService {
-		private IMocksControl mocksControl = createControl();
-		
-		public Env() {
-		}
-
-		@Override
-		protected void configureServlets() {
-			super.configureServlets();
-			bind(IMocksControl.class).toInstance(mocksControl);
-			bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
-		}
-	
-		@Provides @Singleton
-		protected Server createServer() {
-			Server server = new Server(0);
-			Context root = new Context(server, "/", Context.SESSIONS);
-			
-			root.addFilter(GuiceFilter.class, "/*", 0);
-			root.addServlet(DefaultServlet.class, "/*");
-			
-			return server;
-		}
-	}
+@GuiceModule(CommonEndPointEnvTest.Env.class)
+public class UserResourceTest extends CommonEndPointEnvTest {
 	
 	@Inject
 	private IMocksControl mocksControl;
 	
 	@Inject
 	private UserDao userDao;
-	
-	@Inject
-	private Server server;
-	
-	protected String baseUrl;
-	protected int serverPort;
-	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
-		serverPort = server.getConnectors()[0].getLocalPort();
-		baseUrl = "http://localhost:" + serverPort + ProvisioningService.PROVISIONING_URL_PREFIX;
-	}
 	
 	@Test
 	public void testUnknownUrl() throws Exception {
@@ -164,10 +118,7 @@ public class UserResourceTest {
 			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 	
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
-	}
+
 	
 	private ObmUser fakeUser() {
 		return ObmUser.builder()
