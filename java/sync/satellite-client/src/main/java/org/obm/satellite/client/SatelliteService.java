@@ -31,8 +31,10 @@ package org.obm.satellite.client;
 
 import org.obm.satellite.client.exceptions.SatteliteClientException;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public interface SatelliteService {
 
-	Connection create(Configuration configuration) throws SatteliteClientException;
+	Connection create(Configuration configuration, ObmDomain domain) throws SatteliteClientException;
 
 }

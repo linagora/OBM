@@ -29,11 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
-import java.net.InetAddress;
 
 public interface Configuration {
-
-	InetAddress getAddress();
 
 	String getUsername();
 

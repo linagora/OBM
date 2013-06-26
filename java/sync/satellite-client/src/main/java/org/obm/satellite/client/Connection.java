@@ -32,13 +32,11 @@ package org.obm.satellite.client;
 import org.obm.satellite.client.exceptions.ConnectionException;
 import org.obm.satellite.client.exceptions.SatteliteClientException;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 public interface Connection {
 
-	void updateMTA(ObmDomain domain) throws SatteliteClientException, ConnectionException;
+	void updateMTA() throws SatteliteClientException, ConnectionException;
 
-	void updateIMAPServer(ObmDomain domain) throws SatteliteClientException, ConnectionException;
+	void updateIMAPServer() throws SatteliteClientException, ConnectionException;
 
 	void shutdown() throws ConnectionException;
 
