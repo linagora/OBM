@@ -334,6 +334,7 @@ import fr.aliacom.obm.common.domain.DomainCache;
 import fr.aliacom.obm.common.domain.DomainDao;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.mailingList.MailingListBindingImpl;
 import fr.aliacom.obm.common.mailingList.MailingListHome;
 import fr.aliacom.obm.common.resource.Resource;
@@ -716,6 +717,7 @@ public class ObmSyncArchiveUtils {
 	public static Class<?>[] projectCommonClasses() {
 		return new Class<?>[] {
 				ObmDomain.class,
+				ObmDomainUuid.class,
 				Resource.class,
 				TrustToken.class,
 				ObmUser.class,
