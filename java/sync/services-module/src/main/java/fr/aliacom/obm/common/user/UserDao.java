@@ -60,7 +60,7 @@ public class UserDao {
 	public static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
-	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
+	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userobm_ext_id, userentity_entity_id";
 	private final ObmHelper obmHelper;
 	
 	@Inject
@@ -230,6 +230,7 @@ public class UserDao {
 				.lastName(rs.getString("userobm_lastname"))
 				.publicFreeBusy(computePublicFreeBusy(5, rs))
 				.commonName(rs.getString("userobm_commonname"))
+				.extId(rs.getString("userobm_ext_id"))
 				.entityId(rs.getInt("userentity_entity_id"))
 				.build();
 	}

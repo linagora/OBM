@@ -279,6 +279,7 @@ public class UserDaoTest {
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(5);
 		expect(rs.getString("userobm_login")).andReturn("login");
+		expect(rs.getString("userobm_ext_id")).andReturn("extid");
 		expect(rs.getString(2)).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
 		expect(rs.getString(5)).andReturn("yes");
 		expect(rs.getString(6)).andReturn(null);
@@ -303,6 +304,7 @@ public class UserDaoTest {
 			.firstName("firstname2")
 			.lastName("lastname2")
 			.commonName("commonname")
+			.extId("extid")
 			.publicFreeBusy(true)
 			.build();
 		
