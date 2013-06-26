@@ -40,8 +40,8 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
-import org.obm.sync.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 

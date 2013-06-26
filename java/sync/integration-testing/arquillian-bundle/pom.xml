@@ -85,6 +85,11 @@
 			<scope>compile</scope>
 			<type>pom</type>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${apache-commons-compress.version}</version>
+		</dependency>
 	</dependencies>
 	
 </project>

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.arquillian;
+package org.obm.push.arquillian;
 
 import java.util.List;
 
@@ -39,7 +39,6 @@ import org.junit.rules.TestRule;
 import org.junit.runners.model.InitializationError;
 import org.obm.filter.SlowFilterRunnerDelegation;
 import org.obm.guice.GuiceRunnerDelegation;
-import org.obm.sync.ManagedTomcatInstaller;
 
 public class ManagedTomcatSlowGuiceArquillianRunner extends Arquillian {
 

@@ -41,11 +41,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>${apache-commons-compress.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
 			<version>${obm.version}</version>

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.push.arquillian;
 
 import java.io.File;
 import java.io.FileInputStream;
