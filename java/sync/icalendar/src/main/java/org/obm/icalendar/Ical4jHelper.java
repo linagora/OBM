@@ -165,6 +165,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class Ical4jHelper {
@@ -473,7 +474,7 @@ public class Ical4jHelper {
 	private void appendIsInternal(Ical4jUser ical4jUser, Event event, Property obmDomain) {
 		boolean eventIsInternal = false;
 		if(obmDomain != null){
-			eventIsInternal = ical4jUser.getObmDomain().getUuid().equals(obmDomain.getValue());
+			eventIsInternal = ical4jUser.getObmDomain().getUuid().equals(ObmDomainUuid.of(obmDomain.getValue()));
 		}
 		event.setInternalEvent(eventIsInternal);
 		
