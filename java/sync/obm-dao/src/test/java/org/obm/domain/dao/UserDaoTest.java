@@ -43,9 +43,12 @@ import java.sql.Statement;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
@@ -59,6 +62,7 @@ import org.obm.utils.ObmHelper;
 import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -74,9 +78,10 @@ public class UserDaoTest {
 
 		@Override
 		protected void configure() {
+			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
 			bind(IMocksControl.class).toInstance(mocksControl);
 
-			bindWithMock(DatabaseConnectionProvider.class);
+			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
@@ -88,8 +93,13 @@ public class UserDaoTest {
 
 	@Inject
 	private IMocksControl mocksControl;
+	
 	@Inject
 	private ObmHelper obmHelper;
+
+	@Rule
+	@Inject
+	public H2InMemoryDatabase db;
 
 	private UserDao userDao;
 
