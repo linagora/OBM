@@ -16,6 +16,7 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.beans.ProfileName;
+import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -57,14 +58,16 @@ public class ProfileDaoJdbcImplTest {
 	
 	@Test
 	public void testGetProfilesOnExistingDomains() throws Exception {
-		Set<ProfileEntry> firstDomainProfiles = dao.getProfiles(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"));
-		Set<ProfileEntry> secondDomainProfiles = dao.getProfiles(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"));
+		ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		Set<ProfileEntry> firstDomainProfiles = dao.getProfiles(uuid1);
+		ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+		Set<ProfileEntry> secondDomainProfiles = dao.getProfiles(uuid2);
 
 		assertThat(firstDomainProfiles).containsOnly(
-				ProfileEntry.builder().id(1l).build(),
-				ProfileEntry.builder().id(2l).build());
+				ProfileEntry.builder().domainUuid(uuid1).id(1l).build(),
+				ProfileEntry.builder().domainUuid(uuid1).id(2l).build());
 		assertThat(secondDomainProfiles).containsOnly(
-				ProfileEntry.builder().id(3l).build());
+				ProfileEntry.builder().domainUuid(uuid2).id(3l).build());
 	}
 	
 	@Test
@@ -78,10 +81,8 @@ public class ProfileDaoJdbcImplTest {
 		assertThat(profileName3).isEqualTo(ProfileName.builder().name("editor").build());
 	}
 	
-	@Test
+	@Test(expected = ProfileNotFoundException.class)
 	public void testGetProfileNameOnNonExistentID() throws Exception {
-		ProfileName profileName = dao.getProfile(ProfileId.builder().id(64).build());
-		
-		assertThat(profileName).isNull();
+		dao.getProfile(ProfileId.builder().id(64).build());
 	}
 }

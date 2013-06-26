@@ -54,7 +54,7 @@
 		<dependency>
 		    <groupId>org.jboss.arquillian.container</groupId>
 		    <artifactId>arquillian-tomcat-managed-6</artifactId>
-		    <version>1.0.0.CR4</version>
+		    <version>${arquillian.tomcat.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.3.172</version>
+			<version>${h2.version}</version>
 		</dependency>
 	</dependencies>
 </project>

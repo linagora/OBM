@@ -29,23 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-package org.obm.provisioning.dao;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import java.util.Set;
+import org.obm.dbcp.DatabaseConnectionProvider;
 
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.io.Resources;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+@Singleton
+public class H2Initializer {
 
-public interface ProfileDao {
+	public static final String INITIAL_DB_SCRIPT = "dbInitialScript.sql";
+	
+	private DatabaseConnectionProvider connectionProvider;
 
-	ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	@Inject
+	private H2Initializer(DatabaseConnectionProvider connectionProvider) {
+		this.connectionProvider = connectionProvider;
+	}
+	
+	public void initialize() {
+		try {
+			Connection connection = connectionProvider.getConnection();
+			connection.prepareStatement(getInitialDBScript()).executeUpdate();
+		} catch (SQLException e) {
+			Throwables.propagate(e);
+		} catch (IOException e) {
+			Throwables.propagate(e);
+		}
+	}
 
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
-
+	private String getInitialDBScript() throws IOException {
+		URL initialDbScriptUrl = Resources.getResource(INITIAL_DB_SCRIPT);
+		return Resources.toString(initialDbScriptUrl, Charsets.UTF_8);
+	}
 }

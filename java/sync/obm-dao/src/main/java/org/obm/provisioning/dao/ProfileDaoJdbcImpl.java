@@ -43,6 +43,7 @@ import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.beans.ProfileName;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -77,7 +78,10 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
-				profiles.add(ProfileEntry.builder().id(rs.getLong("profile_id")).build());
+				profiles.add(ProfileEntry.builder()
+						.id(rs.getLong("profile_id"))
+						.domainUuid(domainUuid)
+						.build());
 			}
 		}
 		catch (SQLException e) {
@@ -91,7 +95,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public ProfileName getProfile(ProfileId profileId) throws DaoException {
+	public ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -105,6 +109,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 			if (rs.next()) {
 				return ProfileName.builder().name(rs.getString("profile_name")).build();
 			}
+			throw new ProfileNotFoundException(profileId.getId());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -112,7 +117,5 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		finally {
 			JDBCUtils.cleanup(conn, ps, rs);
 		}
-
-		return null;
 	}
 }

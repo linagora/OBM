@@ -33,6 +33,9 @@
 package org.obm.provisioning.beans;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ProfileEntry {
 	
@@ -42,6 +45,7 @@ public class ProfileEntry {
 	public static class Builder {
 		
 		private long id;
+		private ObmDomainUuid domainUuid;
 
 		private Builder() {
 			super();
@@ -52,9 +56,15 @@ public class ProfileEntry {
 			return this;
 		}
 		
+		public Builder domainUuid(ObmDomainUuid domainUuid) {
+			this.domainUuid = domainUuid;
+			return this;
+		}
+		
 		public ProfileEntry build() {
-			String url = "TODO/DOMAIN_UUID/profiles/" + id;
-			return new ProfileEntry(id, url);
+			Preconditions.checkState(domainUuid != null, "'domainuuid' should be set");
+			
+			return new ProfileEntry(id, "/" + domainUuid.get() + "/profiles/" + id);
 		}
 	}
 	

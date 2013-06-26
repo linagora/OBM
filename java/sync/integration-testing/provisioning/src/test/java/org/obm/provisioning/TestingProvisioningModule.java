@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013  Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-package org.obm.provisioning.dao;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.module.LoggerModule;
+import org.obm.dbcp.DatabaseConfigurationFixtureH2;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Set;
+import com.google.inject.name.Names;
 
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+public class TestingProvisioningModule extends ProvisioningService {
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+	@Override
+	protected void configureServlets() {
+		super.configureServlets();
 
-public interface ProfileDao {
-
-	ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException;
-
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
-
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+		
+		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
+			.toInstance(LoggerFactory.getLogger(ProvisioningService.class));
+	}
 }

@@ -29,23 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-package org.obm.provisioning.dao;
+import javax.servlet.ServletContextEvent;
 
-import java.util.Set;
+public class TestingProvisioningContextListener extends ProvisioningContextListener {
 
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
-public interface ProfileDao {
-
-	ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException;
-
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
-
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		super.contextInitialized(sce);
+		injector.getInstance(H2Initializer.class).initialize();
+	}
 }

@@ -29,23 +29,56 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-package org.obm.provisioning.dao;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
-import java.util.Set;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+public class ProvisioningContextListener implements ServletContextListener {
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+	protected Injector injector;
 
-public interface ProfileDao {
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		try {
+			injector = createInjector(sce.getServletContext());
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
+	}
 
-	ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+	}
 
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
+    private Injector createInjector(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    	
+        return Guice.createInjector(selectGuiceModule(servletContext));
+    }
 
+    @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+		
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ProvisioningService());
+	}
+
+    @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    	
+		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
+		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
+			return null;
+		}
+		return (Module) Class.forName(guiceModuleClassName).newInstance();
+	}
 }

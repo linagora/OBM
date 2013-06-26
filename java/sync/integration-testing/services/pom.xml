@@ -49,7 +49,7 @@
 		<dependency>
 		    <groupId>org.jboss.arquillian.container</groupId>
 		    <artifactId>arquillian-tomcat-managed-6</artifactId>
-		    <version>1.0.0.CR4</version>
+		    <version>${arquillian.tomcat.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>

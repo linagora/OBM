@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -32,7 +32,10 @@
 package org.obm.provisioning;
 
 import java.io.File;
-import java.util.Arrays;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import javax.servlet.ServletContextListener;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
@@ -42,45 +45,44 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
+import org.obm.DependencyResolverHelper;
 import org.obm.StaticConfigurationService;
-import org.obm.annotations.database.AutoTruncate;
-import org.obm.annotations.database.DatabaseEntity;
-import org.obm.annotations.database.DatabaseField;
-import org.obm.annotations.transactional.ITransactionAttributeBinder;
-import org.obm.annotations.transactional.Propagation;
-import org.obm.annotations.transactional.TransactionException;
-import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.annotations.transactional.Transactional;
-import org.obm.annotations.transactional.TransactionalBinder;
-import org.obm.annotations.transactional.TransactionalInterceptor;
-import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
 
 public class ProvisioningArchiveUtils {
 
-	public static WebArchive buildWebArchive(Class<? extends Module> guiceModule)
+	public static WebArchive buildWebArchive(File initialSqlScript)
 			throws IllegalArgumentException, IllegalStateException, ResolutionException,
-			CoordinateParseException, UnknownExtensionTypeException {
+			CoordinateParseException, UnknownExtensionTypeException, URISyntaxException {
 
-		JavaArchive wholeObmSyncArchive = ShrinkWrap
+		JavaArchive wholeProvisioningModuleArchive = ShrinkWrap
 				.create(JavaArchive.class, "provisioning-integration-testing-classes.jar")
-				.addClass(ProvisioningService.class);
+				.addClass(ProvisioningService.class)
+				.addClass(BatchResource.class)
+				.addClass(ProfileResource.class)
+				.addClass(ProvisioningContextListener.class)
+				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
+				.addClasses(DependencyResolverHelper.projectConfigurationClasses())
+				.addClasses(DependencyResolverHelper.projectDBCPClasses())
+				.addClasses(DependencyResolverHelper.projectUtilsClasses())
+				.addClasses(DependencyResolverHelper.projectLdapClientClasses())
+				.addClasses(DependencyResolverHelper.projectObmDaoClasses());
 			
+		URL pomXmlUrl = ClassLoader.getSystemResource("pom.xml");
 		return ShrinkWrap
 				.create(WebArchive.class)
-				.addAsWebInfResource(webXml(), "web.xml")
-				.addAsLibraries(projectDependencies())
-				.addAsLibraries(wholeObmSyncArchive)
+				.addAsWebInfResource(webXml(TestingProvisioningContextListener.class, TestingProvisioningModule.class), "web.xml")
+				.addAsResource(initialSqlScript, "dbInitialScript.sql")
+				.addAsLibraries(DependencyResolverHelper.projectDependencies(new File(pomXmlUrl.toURI())))
+				.addAsLibraries(wholeProvisioningModuleArchive)
 				.addClasses(
+						H2Initializer.class,
+						TestingProvisioningModule.class,
+						TestingProvisioningContextListener.class,
 						org.obm.Configuration.class,
 						org.obm.ConfigurationModule.class,
 						DatabaseConfigurationFixtureH2.class,
@@ -89,55 +91,25 @@ public class ProvisioningArchiveUtils {
 						H2DriverConfiguration.class);
 	}
 
-	private static File[] projectDependencies() {
-		return filterObmDependencies(allObmSyncDependencies());
-	}
-
-	private static MavenResolvedArtifact[] allObmSyncDependencies() {
-		return Maven.resolver()
-			.offline()
-			.loadPomFromFile("pom.xml")
-			.importRuntimeDependencies()
-			.resolve()
-			.withTransitivity()
-			.asResolvedArtifact();
-	}
-
-	private static File[] filterObmDependencies(MavenResolvedArtifact[] allObmSyncDependencies) {
-		return FluentIterable.from(Arrays.asList(
-				allObmSyncDependencies))
-				.filter(obmDependencyPredicate())
-				.transform(artifactAsFile()).toArray(File.class);
-	}
-
-	private static Function<MavenResolvedArtifact, File> artifactAsFile() {
-		return new Function<MavenResolvedArtifact, File>() {
-			@Override
-			public File apply(MavenResolvedArtifact input) {
-				return input.asFile();
-			}
-		};
-	}
-
-	private static Predicate<MavenResolvedArtifact> obmDependencyPredicate() {
-		return new Predicate<MavenResolvedArtifact>() {
-
-			@Override
-			public boolean apply(MavenResolvedArtifact input) {
-				String groupId = input.getCoordinate().getGroupId();
-				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
-			}
-		};
-	}
-
-	private static Asset webXml() {
+	private static Asset webXml(
+			Class<? extends ServletContextListener> classContextListener,
+			Class<? extends Module> guiceModule) {
 		return new StringAsset(
 			"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 			"<!DOCTYPE web-app PUBLIC \"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN\" \"http://java.sun.com/dtd/web-app_2_3.dtd\">" +
 			"<web-app>" +
 			
-	        	"<display-name>OBM Sync integration testing</display-name>" +
-	        	
+	        	"<display-name>OBM Provisioning integration testing</display-name>" +
+
+				"<listener>" +
+					"<listener-class>" + classContextListener.getName() + "</listener-class>" +
+				"</listener>" +
+                
+	            "<context-param>" +
+	            	"<param-name>guiceModule</param-name>" +
+	            	"<param-value>" + guiceModule.getName() +"</param-value>" +
+	        	"</context-param>" +
+	
                 "<filter>" +
 	                "<filter-name>guiceFilter</filter-name>" +
 	                "<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>" +
@@ -150,21 +122,4 @@ public class ProvisioningArchiveUtils {
 	                
 			"</web-app>");
 	}
-
-	public static Class<?>[] projectAnnotationsClasses() {
-		return new Class<?>[] {
-				ITransactionAttributeBinder.class,
-				Propagation.class,
-				TransactionalBinder.class,
-				TransactionalInterceptor.class,
-				Transactional.class,
-				TransactionalModule.class,
-				TransactionException.class,
-				TransactionProvider.class,
-				AutoTruncate.class,
-				DatabaseField.class,
-				DatabaseEntity.class
-		};
-	}
-
 }

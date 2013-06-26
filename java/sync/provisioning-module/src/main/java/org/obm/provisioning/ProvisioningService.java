@@ -3,6 +3,14 @@ package org.obm.provisioning;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.BatchDaoJdbcImpl;
+import org.obm.provisioning.dao.OperationDao;
+import org.obm.provisioning.dao.OperationDaoJdbcImpl;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -15,18 +23,32 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class ProvisioningService extends JerseyServletModule {
 
-	public static String PROVISIONING_URL_PREFIX = "/provisioning/v1";
-	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
+	public static String PROVISIONING_URL_PREFIX = "provisioning/v1";
+	public static String PROVISIONING_URL_PATTERN = "/" + PROVISIONING_URL_PREFIX + "/*";
 	
 	@Override
 	protected void configureServlets() {
 		serve(PROVISIONING_URL_PATTERN).with(GuiceProvisioningJerseyServlet.class, 
 				ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
-		
-		bind(BatchResource.class);
-		bind(UserResource.class);
 
+		bindRestResources();
+		bindDao();
+		
 		install(new LdapModule());
+		install(new TransactionalModule());
+	}
+
+	private void bindDao() {
+		bind(DomainDao.class);
+		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
+		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
+		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
+	}
+
+	private void bindRestResources() {
+		bind(BatchResource.class);
+		bind(ProfileResource.class);
+		bind(UserResource.class);
 	}
 
 	@Provides
