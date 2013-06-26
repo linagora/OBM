@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.domain.dao.UserDao;
 import org.obm.filter.SlowFilterRunner;
 
 import fr.aliacom.obm.ServicesToolBox;

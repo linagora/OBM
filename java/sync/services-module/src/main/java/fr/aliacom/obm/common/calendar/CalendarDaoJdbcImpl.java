@@ -55,6 +55,7 @@ import net.fortuna.ical4j.model.DateTime;
 
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
+import org.obm.domain.dao.UserDao;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
@@ -122,7 +123,6 @@ import fr.aliacom.obm.common.calendar.loader.EventLoader;
 import fr.aliacom.obm.common.calendar.loader.ResourceLoader;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.RFC2445;
 

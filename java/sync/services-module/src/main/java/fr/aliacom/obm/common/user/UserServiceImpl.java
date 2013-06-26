@@ -32,6 +32,7 @@
 package fr.aliacom.obm.common.user;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.domain.dao.UserDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.slf4j.Logger;
