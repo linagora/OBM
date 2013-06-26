@@ -32,15 +32,19 @@
 
 package org.obm.provisioning.dao.exceptions;
 
+import fr.aliacom.obm.common.user.UserExtId;
+
 public class UserNotFoundException extends Exception {
 
-	private String extId;
+	private UserExtId extId;
 
-	public UserNotFoundException(String extId) {
+	public UserNotFoundException(UserExtId extId) {
+		super(String.format("The user with the external id %s was not found",
+				extId.getExtId()));
 		this.extId = extId;
 	}
 
-	public String getId() {
+	public UserExtId getId() {
 		return extId;
 	}
 }
