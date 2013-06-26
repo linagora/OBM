@@ -29,14 +29,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
-public interface Configuration {
+import org.apache.http.client.HttpClient;
+import org.obm.satellite.client.exceptions.SatteliteClientException;
 
-	String getUsername();
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	String getPassword();
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	boolean isIMAPServerManaged();
+@Singleton
+public class SatelliteServiceImpl implements SatelliteService {
 
-	int getSatellitePort();
+	private HttpClient client;
+
+	@Inject
+	private SatelliteServiceImpl(HttpClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public Connection create(Configuration configuration, ObmDomain domain) throws SatteliteClientException {
+		return new ConnectionImpl(client, configuration, domain);
+	}
 
 }
