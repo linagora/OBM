@@ -35,6 +35,8 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -115,7 +117,7 @@ public class UserResourceTest {
 	public void testUnknownUrl() throws Exception {
 		HttpResponse httpResponse = get("/users/a/b");
 		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(404);
+			.isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
@@ -129,7 +131,7 @@ public class UserResourceTest {
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonUser());
 		
@@ -137,9 +139,29 @@ public class UserResourceTest {
 	
 	@Test
 	public void testGetNonExistingUser() throws Exception {
+		expect(userDao.getUser(123)).andReturn(null);
+		
+		mocksControl.replay();
+		
 		HttpResponse httpResponse = get("/users/123");
+		
+		mocksControl.verify();
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+	}
+	
+	@Test
+	public void testGetUserThrowError() throws Exception {
+		expect(userDao.getUser(1)).andThrow(new RuntimeException("bad things happen"));
+		
+		mocksControl.replay();
+		
+		HttpResponse httpResponse = get("/users/1");
+		
+		mocksControl.verify();
+		
 		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(204);
+			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 	
 	@After
@@ -184,40 +206,46 @@ public class UserResourceTest {
 	
 	private String expectedJsonUser() {
 		return  
-			"{\"uid\":1," +
-			"\"entityId\":0," +
-			"\"login\":\"user1\"," +
-			"\"commonName\":\"John Doe\"," +
-			"\"lastName\":\"Doe\"," +
-			"\"firstName\":\"Jésus\"," +
-			"\"email\":\"mails@domain\"," +
-			"\"emailAlias\":[]," +
-			"\"address1\":\"address1\"," +
-			"\"address2\":\"address2\"," +
-			"\"address3\":null," +
-			"\"expresspostal\":null," +
-			"\"homePhone\":null," +
-			"\"mobile\":\"mobile\"," +
-			"\"service\":\"service\"," +
-			"\"title\":\"title\"," +
-			"\"town\":\"town\"," +
-			"\"workFax\":null," +
-			"\"workPhone\":null," +
-			"\"zipCode\":\"zipCode\"," +
-			"\"description\":\"description\"," +
-			"\"timeCreate\":1370952000000," +
-			"\"timeUpdate\":1370955600000," +
-			"\"createdBy\":null," +
-			"\"updatedBy\":null," +
-			"\"domain\":{\"id\":1," +
-						"\"name\":\"domain\"," +
-						"\"uuid\":null," +
-						"\"aliases\":[]," +
-						"\"names\":[\"domain\"]}," +
-			"\"publicFreeBusy\":false," +
-			"\"displayName\":\"John Doe\"}";
+				"{" +
+				  "\"uid\":1," +
+				  "\"entityId\":0," +
+				  "\"login\":\"user1\"," +
+				  "\"commonName\":\"John Doe\"," +
+				  "\"lastName\":\"Doe\"," +
+				  "\"firstName\":\"Jésus\"," +
+				  "\"email\":\"mails@domain\"," +
+				  "\"emailAlias\":[]," +
+				  "\"address1\":\"address1\"," +
+				  "\"address2\":\"address2\"," +
+				  "\"address3\":null," +
+				  "\"expresspostal\":null," +
+				  "\"homePhone\":null," +
+				  "\"mobile\":\"mobile\"," +
+				  "\"service\":\"service\"," +
+				  "\"title\":\"title\"," +
+				  "\"town\":\"town\"," +
+				  "\"workFax\":null," +
+				  "\"workPhone\":null," +
+				  "\"zipCode\":\"zipCode\"," +
+				  "\"description\":\"description\"," +
+				  "\"timeCreate\":\"2013-06-11T12:00:00.000+0000\"," +
+				  "\"timeUpdate\":\"2013-06-11T13:00:00.000+0000\"," +
+				  "\"createdBy\":null," +
+				  "\"updatedBy\":null," +
+				  "\"domain\":{" +
+				    "\"id\":1," +
+				    "\"name\":\"domain\"," +
+				    "\"uuid\":null," +
+				    "\"aliases\":[]," +
+				    "\"names\":[\"domain\"]" +
+				  "}," +
+				  "\"publicFreeBusy\":false," +
+				  "\"displayName\":\"John Doe\"" +
+				"}";
 	}
 	
+	
+	@SuppressWarnings("unused")
 	private String expectedJsonUserNotImplementYet() {
 		String json =
 					"{id: 1," +

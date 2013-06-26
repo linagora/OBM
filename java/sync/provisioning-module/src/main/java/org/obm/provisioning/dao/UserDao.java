@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.dao;
 
-import javax.ws.rs.core.Response;
-
 import fr.aliacom.obm.common.user.ObmUser;
 
 public interface UserDao {
