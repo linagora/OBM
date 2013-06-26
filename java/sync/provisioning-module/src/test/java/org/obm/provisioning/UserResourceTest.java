@@ -35,8 +35,11 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
+import org.apache.http.util.EntityUtils;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -122,11 +125,14 @@ public class UserResourceTest {
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users/1");
+		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(200);
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(200);
+		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
+		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonUser());
+		
 	}
 	
 	@Test
@@ -176,37 +182,72 @@ public class UserResourceTest {
 				
 	}
 	
-	private String expectedUser() {
-		String json = 
-				"[" +
+	private String expectedJsonUser() {
+		return  
+			"{\"uid\":1," +
+			"\"entityId\":0," +
+			"\"login\":\"user1\"," +
+			"\"commonName\":\"John Doe\"," +
+			"\"lastName\":\"Doe\"," +
+			"\"firstName\":\"Jésus\"," +
+			"\"email\":\"mails@domain\"," +
+			"\"emailAlias\":[]," +
+			"\"address1\":\"address1\"," +
+			"\"address2\":\"address2\"," +
+			"\"address3\":null," +
+			"\"expresspostal\":null," +
+			"\"homePhone\":null," +
+			"\"mobile\":\"mobile\"," +
+			"\"service\":\"service\"," +
+			"\"title\":\"title\"," +
+			"\"town\":\"town\"," +
+			"\"workFax\":null," +
+			"\"workPhone\":null," +
+			"\"zipCode\":\"zipCode\"," +
+			"\"description\":\"description\"," +
+			"\"timeCreate\":1370952000000," +
+			"\"timeUpdate\":1370955600000," +
+			"\"createdBy\":null," +
+			"\"updatedBy\":null," +
+			"\"domain\":{\"id\":1," +
+						"\"name\":\"domain\"," +
+						"\"uuid\":null," +
+						"\"aliases\":[]," +
+						"\"names\":[\"domain\"]}," +
+			"\"publicFreeBusy\":false," +
+			"\"displayName\":\"John Doe\"}";
+	}
+	
+	private String expectedJsonUserNotImplementYet() {
+		String json =
 					"{id: 1," +
 					"login: user1," +
 					"lastname: Doe," +
-					"profile: Utilisateurs," +
-					"firstname: John," +
+					//"profile: Utilisateurs," +
+					"firstname: Jésus," +
 					"commonname: John Doe," +
 					"password: doe," +
-					"kind: kind," +
+					//"kind: kind," +
 					"title: title," +
 					"description: description," +
-					"company: company," +
+					//"company: company," +
 					"service: service," +
-					"direction: direction," +
-					"addresses: addresse," +
+					//"direction: direction," +
+					"addresses: address1," +
 					"town: town," +
 					"zipcode: zipcode," +
-					"business_zipcode: business_zipcode," +
-					"country: country," +
-					"phones: phones," +
+					//"business_zipcode: business_zipcode," +
+					//"country: country," +
+					//"phones: phones," +
 					"mobile: mobile," +
-					"faxes: faxes" +
-					"mail_quota: mail_quota," +
-					"mail_server: mail_server," +
-					"mails: mails," +
+					//"faxes: faxes" +
+					//"mail_quota: mail_quota," +
+					//"mail_server: mail_server," +
+					//"mails: mails," +
 					"timecreate: timecreate," +
 					"timeupdate: timeupdate," +
-					"groups: groups}" +
-				"]";
+					//"groups: groups" +
+					"}";
 		
 		return json;
 	}
