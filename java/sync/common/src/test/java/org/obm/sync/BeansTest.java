@@ -62,6 +62,7 @@ import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
@@ -107,7 +108,8 @@ public class BeansTest {
 				ParticipationChanges.class,
 				InstantMessagingId.class,
 				MavenVersion.class,
-				UserExtId.class);
+				UserExtId.class,
+				ServiceProperty.class);
 	}
 	
 	@Test
