@@ -1,7 +1,5 @@
 package org.obm.provisioning;
 
-import org.obm.provisioning.LdapModule;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -20,6 +18,7 @@ public class ProvisioningService extends JerseyServletModule {
 		serve(PROVISIONING_URL_PATTERN).with(GuiceProvisioningJerseyServlet.class, 
 				ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 		bind(BatchResource.class);
+
 		install(new LdapModule());
 	}
 
@@ -30,7 +29,7 @@ public class ProvisioningService extends JerseyServletModule {
 		private GuiceProvisioningJerseyServlet(Injector injector) {
 			super(injector);
 		}
-		
+
 	}
 
 }

@@ -31,13 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
+import com.google.inject.AbstractModule;
 
-public class LdapModule implements Module {
+public class LdapModule extends AbstractModule {
 
 	@Override
-	public void configure(Binder binder) {
-		binder.bind(LdapService.class);
+	protected void configure() {
+		bind(LdapService.class).to(LdapServiceImpl.class);
 	}
+
 }
