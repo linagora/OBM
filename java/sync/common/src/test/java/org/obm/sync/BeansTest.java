@@ -60,6 +60,7 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.host.ObmHost;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -109,7 +110,8 @@ public class BeansTest {
 				InstantMessagingId.class,
 				MavenVersion.class,
 				UserExtId.class,
-				ServiceProperty.class);
+				ServiceProperty.class,
+				ObmHost.class);
 	}
 	
 	@Test
