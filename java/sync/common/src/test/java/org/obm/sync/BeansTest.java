@@ -67,6 +67,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -105,7 +106,8 @@ public class BeansTest {
 				Phone.class,
 				ParticipationChanges.class,
 				InstantMessagingId.class,
-				MavenVersion.class);
+				MavenVersion.class,
+				UserExtId.class);
 	}
 	
 	@Test
