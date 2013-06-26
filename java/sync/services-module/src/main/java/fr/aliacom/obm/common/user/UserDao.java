@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
@@ -323,5 +324,33 @@ public class UserDao {
 		}
 		
 		return ownerId;
+	}
+	
+	public ObmUser getByExtId(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String uq = "SELECT " + USER_FIELDS
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
+				+ "WHERE userobm_domain_id=? AND userobm_ext_id=? AND userobm_archive != '1'";
+		try {
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(uq);
+			ps.setInt(1, domain.getId());
+			ps.setString(2, userExtId.getExtId());
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return createUserFromResultSet(domain, rs);
+			}
+			else {
+				throw new UserNotFoundException(userExtId);
+			}
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
 	}
 }
