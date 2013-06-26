@@ -29,18 +29,66 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.provisioning.bean;
 
-import java.util.Set;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-import org.obm.provisioning.bean.UserIdentifier;
-
-import fr.aliacom.obm.common.user.ObmUser;
-
-public interface UserDao {
-
-	ObmUser getUser(int userId);
-
-	Set<UserIdentifier> listAll();
-
+public class UserIdentifier {
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private Integer id;
+		private String url;
+		
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public Builder url(String url) {
+			this.url = url;
+			return this;
+		}
+		
+		public UserIdentifier build() {
+			Preconditions.checkState(id != null);
+			Preconditions.checkState(url != null);
+			
+			return new UserIdentifier(id, url);
+		}
+	}
+	
+	private int id;
+	private String url;
+	
+	private UserIdentifier(int id, String url) {
+		this.id = id;
+		this.url = url;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(id, url);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof UserIdentifier) {
+			UserIdentifier that = (UserIdentifier) object;
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.url, that.url);
+		}
+		return false;
+	}
 }

@@ -31,12 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import java.util.Set;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.UserDao;
 
 import com.google.inject.Inject;
@@ -57,5 +60,11 @@ public class UserResource {
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public ObmUser get(@PathParam("userId") int userId) {
 		return userDao.getUser(userId);
+	}
+	
+	@GET @Path("/")
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Set<UserIdentifier> listAll() {
+		return userDao.listAll();
 	}
 }

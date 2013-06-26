@@ -32,7 +32,6 @@ package org.obm.provisioning;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -50,13 +49,4 @@ public class BatchResourceTest extends CommonEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode())
 			.isEqualTo(404);
 	}
-	
-	protected HttpResponse get(String path) throws Exception {
-		return createRequest(path).execute().returnResponse();
-	}
-	
-	protected Request createRequest(String path) {
-		return Request.Get(baseUrl + path);
-	}
-	
 }

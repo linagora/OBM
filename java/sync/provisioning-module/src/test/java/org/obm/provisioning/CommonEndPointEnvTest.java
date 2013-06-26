@@ -33,6 +33,8 @@ package org.obm.provisioning;
 
 import static org.easymock.EasyMock.createControl;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -45,6 +47,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public abstract class CommonEndPointEnvTest {
 	public static class Env extends ProvisioningService {
@@ -72,6 +76,9 @@ public abstract class CommonEndPointEnvTest {
 		}
 	}
 	
+	protected final static ObmDomain domain
+		= ObmDomain.builder().name("domain").id(1).build();
+	
 	@Inject
 	private Server server;
 	
@@ -88,5 +95,13 @@ public abstract class CommonEndPointEnvTest {
 	@After
 	public void tearDown() throws Exception {
 		server.stop();
+	}
+	
+	protected HttpResponse get(String path) throws Exception {
+		return createRequest(path).execute().returnResponse();
+	}
+	
+	protected Request createRequest(String path) {
+		return Request.Get(baseUrl + path);
 	}
 }
