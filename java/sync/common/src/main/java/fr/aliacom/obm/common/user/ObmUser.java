@@ -59,7 +59,7 @@ public class ObmUser {
 		
 		private int uid;
 		private int entityId;
-		private String extId;
+		private UserExtId extId;
 		private String login;
 		private String commonName;
 		private String lastName;
@@ -102,7 +102,7 @@ public class ObmUser {
 			this.entityId = entityId;
 			return this;
 		}
-		public Builder extId(String extId) {
+		public Builder extId(UserExtId extId) {
 			this.extId = extId;
 			return this;
 		}
@@ -229,7 +229,7 @@ public class ObmUser {
 	private final int uid;
 	private final int entityId;
 	private final String login;
-	private final String extId;
+	private final UserExtId extId;
 	private final String commonName;
 	private final String lastName;
 	private final String firstName;
@@ -259,7 +259,7 @@ public class ObmUser {
 	private final ObmDomain domain;
 	private final boolean publicFreeBusy;
 
-	private ObmUser(int uid, int entityId, String login, String extId, String commonName,
+	private ObmUser(int uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
 			String address3, String expresspostal, String homePhone,
@@ -310,7 +310,7 @@ public class ObmUser {
 		return login;
 	}
 
-	public String getExtId() {
+	public UserExtId getExtId() {
 		return extId;
 	}
 	

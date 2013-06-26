@@ -304,7 +304,7 @@ public class UserDaoTest {
 			.firstName("firstname2")
 			.lastName("lastname2")
 			.commonName("commonname")
-			.extId("extid")
+			.extId(new UserExtId("extid"))
 			.publicFreeBusy(true)
 			.build();
 		
