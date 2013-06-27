@@ -120,6 +120,33 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
+	public void testPatchWithUnknownUrl() throws Exception {
+		expectDomain();
+		expectBatch();
+		mocksControl.replay();
+
+		HttpResponse httpResponse = patch("/batches/1/users/a/b", null);
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+	
+	@Test
+	public void testPatchConsumeInvalidData() throws Exception {
+		expectDomain();
+		expectBatch();
+		mocksControl.replay();
+
+		final StringEntity userToJson = invalidMediaTypeEntity();
+		HttpResponse httpResponse = patch("/batches/1/users/1", userToJson);
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
+	}
+	
+	@Test
 	public void testdeleteWithUnknownUrl() throws Exception {
 		expectDomain();
 		mocksControl.replay();

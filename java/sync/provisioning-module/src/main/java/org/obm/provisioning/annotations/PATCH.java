@@ -29,28 +29,17 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.provisioning.annotations;
 
-import java.util.Set;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.obm.provisioning.bean.UserIdentifier;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import javax.ws.rs.HttpMethod;
 
-import fr.aliacom.obm.common.user.ObmUser;
-
-public interface UserDao {
-
-	ObmUser get(int userId);
-
-	Set<UserIdentifier> listAll();
-
-	void create(ObmUser user) throws DaoException;
-
-	void modify(int userId, ObmUser user) throws UserNotFoundException;
-
-	void delete(int userId, boolean expunge) throws UserNotFoundException;
-	
-	void patch(int userId, ObmUser user) throws UserNotFoundException;
-
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@HttpMethod("PATCH")
+public @interface PATCH {
 }

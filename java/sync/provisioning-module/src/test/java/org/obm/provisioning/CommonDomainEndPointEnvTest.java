@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -43,7 +44,10 @@ import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -114,6 +118,7 @@ public abstract class CommonDomainEndPointEnvTest {
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
 			.build();
+	
 	protected static final Batch batch = Batch
 			.builder()
 			.id(batchId(1))
@@ -199,7 +204,11 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected HttpResponse put(String path, StringEntity content) throws ClientProtocolException, IOException {
 		return createPutRequest(path, content).execute().returnResponse();
 	}
-
+	
+	protected HttpResponse patch(String path, StringEntity content) throws ClientProtocolException, IOException, URISyntaxException {
+		return new DefaultHttpClient().execute(createPatchRequest(path, content));
+	}
+	
 	protected HttpResponse delete(String path) throws ClientProtocolException, IOException {
 		return createDeleteRequest(path).execute().returnResponse();
 	}
@@ -210,6 +219,12 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	private Request createPutRequest(String path, StringEntity content) {
 		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+	}
+	
+	private HttpRequestBase createPatchRequest(String path, StringEntity content) throws URISyntaxException {
+		final HttpPatch patch = new HttpPatch(baseUrl + "/" + domain.getUuid().get() + path);
+		patch.setEntity(content);
+		return patch;
 	}
 
 	protected Request createGetRequest(String path) {
@@ -285,5 +300,4 @@ public abstract class CommonDomainEndPointEnvTest {
 				  "\"publicFreeBusy\":false" +
 				"}";
 	}
-
 }

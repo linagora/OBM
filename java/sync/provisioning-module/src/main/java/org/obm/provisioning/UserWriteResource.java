@@ -38,6 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -64,5 +65,13 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public Response delete() throws DaoException {
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
+	}
+	
+	@PATCH
+	@Path("/{userId}")
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response patch(String user) throws DaoException {
+		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
 	}
 }
