@@ -7262,7 +7262,7 @@ function dis_calendar_export_handle($calendar, $entity = null, $entity_id = null
   header('Content-Disposition: inline; filename=ObmCalendar.ics');
   header('Cache-Control: maxage=3600');
   header('Pragma: public');
-  echo $writer->buffer;
+  echo mb_convert_encoding($writer->buffer, "UTF-8");
 }
 
 /**
