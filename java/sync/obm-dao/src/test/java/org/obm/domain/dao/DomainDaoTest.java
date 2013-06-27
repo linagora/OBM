@@ -136,6 +136,7 @@ public class DomainDaoTest {
 		expect(rs.getInt("domain_id")).andReturn(1);
 		expect(rs.getString("domain_alias")).andReturn(aliases);
 		expect(rs.getString("domain_label")).andReturn("label");
+		expect(rs.getString("domain_name")).andReturn(domainName);
 		mocksControl.replay();
 		
 		return domainDao.findDomainByName(domainName);

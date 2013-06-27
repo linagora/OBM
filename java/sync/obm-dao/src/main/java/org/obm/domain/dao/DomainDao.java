@@ -70,7 +70,7 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_id, domain_uuid, domain_label, domain_alias FROM Domain WHERE domain_name = ? "
+		String uq = "SELECT domain_name, domain_id, domain_uuid, domain_label, domain_alias FROM Domain WHERE domain_name = ? "
 				+ " OR domain_alias = ? OR domain_alias LIKE ? OR domain_alias LIKE ? OR domain_alias LIKE ? ";
 		try {
 			con = dbcp.getConnection();
@@ -81,23 +81,40 @@ public class DomainDao {
 			ps.setString(4, "%\r\n" + domainName + "\r\n%");
 			ps.setString(5, "%\r\n" + domainName);
 			rs = ps.executeQuery();
+
 			if (rs.next()) {
-				String alias = rs.getString("domain_alias");
-				
-				return ObmDomain
-						.builder()
-						.id(rs.getInt("domain_id"))
-						.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
-						.name(domainName)
-						.label(rs.getString("domain_label"))
-						.aliases(aliasToIterable(alias))
-						.build();
+				return domainFromCursor(rs);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			DBUtils.cleanup(con, ps, rs);
 		}
+		return null;
+	}
+	
+	public ObmDomain findDomainByUuid(ObmDomainUuid uuid) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String uq = "SELECT domain_name, domain_id, domain_uuid, domain_label, domain_alias FROM Domain WHERE domain_uuid = ?";
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement(uq);
+
+			ps.setString(1, uuid.get());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return domainFromCursor(rs);
+			}
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			DBUtils.cleanup(con, ps, rs);
+		}
+
 		return null;
 	}
 
@@ -139,16 +156,11 @@ public class DomainDao {
 			statement = con.createStatement();
 			rs = statement.executeQuery(query);
 			List<ObmDomain> domains = Lists.newArrayList();
+
 			while (rs.next()) {
-				domains.add(
-					ObmDomain.builder()
-						.id(rs.getInt("domain_id"))
-						.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
-						.name(rs.getString("domain_name"))
-						.label(rs.getString("domain_label"))
-						.aliases(aliasToIterable(rs.getString("domain_alias")))
-						.build());
+				domains.add(domainFromCursor(rs));
 			}
+
 			return domains;
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -160,6 +172,17 @@ public class DomainDao {
 	
 	private Iterable<String> aliasToIterable(String aliases) {
 		return aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").split(aliases);
+	}
+	
+	private ObmDomain domainFromCursor(ResultSet rs) throws SQLException {
+		return ObmDomain
+				.builder()
+				.id(rs.getInt("domain_id"))
+				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
+				.name(rs.getString("domain_name"))
+				.label(rs.getString("domain_label"))
+				.aliases(aliasToIterable(rs.getString("domain_alias")))
+				.build();
 	}
 	
 }

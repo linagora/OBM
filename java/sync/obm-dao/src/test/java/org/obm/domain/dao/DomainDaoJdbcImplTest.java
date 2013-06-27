@@ -81,6 +81,24 @@ public class DomainDaoJdbcImplTest {
 		dao.create(domainBuilder.build());
 		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(3).build());
 	}
+
+	@Test
+	public void testGetByUuidWhenDomainDoesntExist() {
+		assertThat(dao.findDomainByUuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))).isNull();
+	}
+
+	@Test
+	public void testCreateThenGetByUuid() {
+		ObmDomainUuid uuid = ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66");
+		Builder domainBuilder = ObmDomain.builder()
+			.uuid(uuid)
+			.name("mydomain")
+			.label("my domain");
+
+		dao.create(domainBuilder.build());
+
+		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(3).build());
+	}
 	
 	@Test
 	public void testCreateThenList() {
