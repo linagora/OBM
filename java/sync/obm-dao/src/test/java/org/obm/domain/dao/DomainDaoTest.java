@@ -49,6 +49,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -83,6 +84,12 @@ public class DomainDaoTest {
 	@Inject
 	private DomainDao domainDao;
 
+	private ServiceProperty obmSyncServiceProperty = ServiceProperty
+			.builder()
+			.service("sync")
+			.property("obm_sync")
+			.build();
+
 	@After
 	public void tearDown() {
 		mocksControl.verify();
@@ -98,6 +105,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
+		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
 	}
 	
 	@Test
@@ -110,6 +118,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
+		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
 	}
 	
 	@Test
@@ -122,6 +131,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
+		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
 	}
 	
 	private ObmDomain findDomain(String aliases) throws Exception {
@@ -129,22 +139,44 @@ public class DomainDaoTest {
 		Connection con = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		
-		expectFindDomainCalls(con, rs, domainName);
-		
-		expect(dbcp.getConnection()).andReturn(con);
-		expect(rs.getString("domain_uuid")).andReturn("uuid");
-		expect(rs.getInt("domain_id")).andReturn(1);
-		expect(rs.getString("domain_alias")).andReturn(aliases);
-		expect(rs.getString("domain_label")).andReturn("label");
-		expect(rs.getString("domain_name")).andReturn(domainName);
+		expectFindDomainCalls(con, rs, domainName, aliases);
+		expectFindDomainHostsCalls(con, rs);
 		mocksControl.replay();
 		
 		return domainDao.findDomainByName(domainName);
 	}
-	
-	private void expectFindDomainCalls(Connection con, ResultSet rs, String domainName) throws Exception {
+
+	private void expectFindDomainHostsCalls(Connection con, ResultSet rs) throws Exception {
 		PreparedStatement statement = mocksControl.createMock(PreparedStatement.class);
-		
+
+		expect(dbcp.getConnection()).andReturn(con);
+		expect(dbcp.getIntegerCastType()).andReturn("INTEGER");
+		expect(con.prepareStatement(isA(String.class))).andReturn(statement);
+		statement.setInt(1, 1);
+		expectLastCall();
+		expect(statement.executeQuery()).andReturn(rs);
+		expect(rs.next()).andReturn(true);
+		expect(rs.next()).andReturn(false);
+
+		rs.close();
+		expectLastCall();
+		statement.close();
+		expectLastCall();
+		con.close();
+		expectLastCall();
+
+		expect(rs.getString("serviceproperty_service")).andReturn("sync");
+		expect(rs.getString("serviceproperty_property")).andReturn("obm_sync");
+		expect(rs.getInt("host_id")).andReturn(1);
+		expect(rs.getString("host_ip")).andReturn("1.2.3.4");
+		expect(rs.getString("host_name")).andReturn("local");
+		expect(rs.getString("host_fqdn")).andReturn("local.global.virt");
+	}
+
+	private void expectFindDomainCalls(Connection con, ResultSet rs, String domainName, String aliases) throws Exception {
+		PreparedStatement statement = mocksControl.createMock(PreparedStatement.class);
+
+		expect(dbcp.getConnection()).andReturn(con);
 		expect(con.prepareStatement(isA(String.class))).andReturn(statement);
 		statement.setString(1, domainName);
 		statement.setString(2, domainName);
@@ -154,13 +186,19 @@ public class DomainDaoTest {
 		expectLastCall();
 		expect(statement.executeQuery()).andReturn(rs);
 		expect(rs.next()).andReturn(true);
-		
+
 		rs.close();
 		expectLastCall();
 		statement.close();
 		expectLastCall();
 		con.close();
 		expectLastCall();
+
+		expect(rs.getString("domain_uuid")).andReturn("uuid");
+		expect(rs.getInt("domain_id")).andReturn(1);
+		expect(rs.getString("domain_alias")).andReturn(aliases);
+		expect(rs.getString("domain_label")).andReturn("label");
+		expect(rs.getString("domain_name")).andReturn(domainName);
 	}
 
 }

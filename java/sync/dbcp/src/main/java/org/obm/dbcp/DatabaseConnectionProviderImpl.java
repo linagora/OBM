@@ -181,4 +181,10 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		}
 		return value;
 	}
+
+	@Override
+	public String getIntegerCastType() {
+		return driverConfiguration.getIntegerCastType();
+	}
+
 }

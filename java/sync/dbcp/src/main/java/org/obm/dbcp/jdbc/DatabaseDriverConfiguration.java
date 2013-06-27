@@ -48,4 +48,6 @@ public interface DatabaseDriverConfiguration {
 	boolean readOnlySupported();
 
 	String getGMTTimezoneQuery();
+
+	String getIntegerCastType();
 }

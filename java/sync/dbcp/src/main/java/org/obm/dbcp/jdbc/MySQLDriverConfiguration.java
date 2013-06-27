@@ -96,4 +96,9 @@ public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 	public String getGMTTimezoneQuery() {
 		return "SET time_zone='+00:00'";
 	}
+
+	@Override
+	public String getIntegerCastType() {
+		return "UNSIGNED INTEGER";
+	}
 }

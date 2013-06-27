@@ -41,4 +41,6 @@ public interface DatabaseConnectionProvider {
 	int lastInsertId(Connection con) throws SQLException;
 	
 	Object getJdbcObject(String dbFieldName, String dbFieldValue) throws SQLException;
+
+	String getIntegerCastType();
 }

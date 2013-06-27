@@ -35,10 +35,14 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class ObmDomain implements Serializable {
@@ -50,18 +54,20 @@ public class ObmDomain implements Serializable {
 		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
 		private String label;
+		private ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();
+			hosts = ImmutableMultimap.builder();
 		}
 
 		public Builder from(ObmDomain domain) {
 			return name(domain.name)
 				.label(domain.label)
 				.uuid(domain.uuid)
-				.aliases(domain.aliases);
+				.aliases(domain.aliases)
+				.hosts(domain.hosts);
 		}
-
 		
 		public Builder id(int id) {
 			this.id = id;
@@ -92,15 +98,29 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 		
-		public ObmDomain build() {
-			return new ObmDomain(id, name, uuid, label, aliases.build());
-		}
-
 		public Builder label(String label) {
 			this.label = label;
 			return this;
 		}
-		
+
+		public Builder host(ServiceProperty serviceProperty, ObmHost host) {
+			this.hosts.put(serviceProperty, host);
+			return this;
+		}
+
+		public Builder hosts(ServiceProperty serviceProperty, Iterable<ObmHost> hosts) {
+			this.hosts.putAll(serviceProperty, hosts);
+			return this;
+		}
+
+		public Builder hosts(Multimap<ServiceProperty, ObmHost> hosts) {
+			this.hosts.putAll(hosts);
+			return this;
+		}
+
+		public ObmDomain build() {
+			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build());
+		}
 	}
 	
 	public static Builder builder() {
@@ -112,16 +132,18 @@ public class ObmDomain implements Serializable {
 	protected ObmDomainUuid uuid;
 	protected Set<String> aliases;
 	protected String label;
-	
+	protected Multimap<ServiceProperty, ObmHost> hosts;
+
 	public ObmDomain() {
 	}
-	
-	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases) {
+
+	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
 		this.label = label;
 		this.aliases = aliases;
+		this.hosts = hosts;
 	}
 
 	public String getName() {
@@ -148,7 +170,11 @@ public class ObmDomain implements Serializable {
 	public String getLabel() {
 		return label;
 	}
-	
+
+	public Multimap<ServiceProperty, ObmHost> getHosts() {
+		return hosts;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(id, name, uuid, label, aliases);
@@ -177,6 +203,7 @@ public class ObmDomain implements Serializable {
 			.add("label", label)
 			.add("aliases", aliases)
 			.add("uuid", uuid)
+			.add("hosts", hosts)
 			.toString();
 	}
 

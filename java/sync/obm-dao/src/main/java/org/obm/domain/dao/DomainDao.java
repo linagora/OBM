@@ -40,6 +40,8 @@ import java.sql.Types;
 import java.util.List;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.utils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,14 +179,58 @@ public class DomainDao {
 	}
 	
 	private ObmDomain domainFromCursor(ResultSet rs) throws SQLException {
-		return ObmDomain
+		int id = rs.getInt("domain_id");
+		ObmDomain.Builder domainBuilder = ObmDomain
 				.builder()
-				.id(rs.getInt("domain_id"))
+				.id(id)
 				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
 				.name(rs.getString("domain_name"))
 				.label(rs.getString("domain_label"))
-				.aliases(aliasToIterable(rs.getString("domain_alias")))
-				.build();
+				.aliases(aliasToIterable(rs.getString("domain_alias")));
+
+		return fetchDomainHosts(id, domainBuilder).build();
 	}
-	
+
+	private ObmDomain.Builder fetchDomainHosts(Integer domainId, ObmDomain.Builder domainBuilder) throws SQLException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = dbcp.getConnection();
+			ps = con.prepareStatement(
+				"SELECT serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn " +
+				"FROM Domain " +
+				"INNER JOIN DomainEntity ON domainentity_domain_id = domain_id " +
+				"LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id " +
+				"LEFT JOIN Host ON host_id = CAST(serviceproperty_value AS " + dbcp.getIntegerCastType() + ") " +
+				"WHERE domain_id = ? AND host_id IS NOT NULL " +
+				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip");
+
+			ps.setInt(1, domainId);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				ServiceProperty serviceProperty = ServiceProperty
+						.builder()
+						.service(rs.getString("serviceproperty_service"))
+						.property(rs.getString("serviceproperty_property"))
+						.build();
+				ObmHost host = ObmHost
+						.builder()
+						.id(rs.getInt("host_id"))
+						.name(rs.getString("host_name"))
+						.ip(rs.getString("host_ip"))
+						.domainId(domainId)
+						.fqdn(rs.getString("host_fqdn"))
+						.build();
+
+				domainBuilder.host(serviceProperty, host);
+			}
+		} finally {
+			DBUtils.cleanup(con, ps, rs);
+		}
+
+		return domainBuilder;
+	}
 }

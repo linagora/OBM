@@ -44,17 +44,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
-
-import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -63,13 +59,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
-	
-	@Inject
-	private IMocksControl mocksControl;
-	
-	@Inject
-	private UserDao userDao;
-	
+
 	@Test
 	public void testCreateAUser() throws Exception {
 		expectDomain();

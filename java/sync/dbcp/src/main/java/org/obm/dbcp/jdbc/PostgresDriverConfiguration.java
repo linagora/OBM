@@ -78,4 +78,9 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 	public String getGMTTimezoneQuery() {
 		return "SET LOCAL TIME ZONE 'GMT'";
 	}
+
+	@Override
+	public String getIntegerCastType() {
+		return "INTEGER";
+	}
 }

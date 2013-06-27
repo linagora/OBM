@@ -54,7 +54,19 @@ import fr.aliacom.obm.common.user.ObmUser;
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
-	
+
+	@Test
+	public void testUnknownUrl() throws Exception {
+		expectDomain();
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users/a/b");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+
 	@Test
 	public void testGetAUser() throws Exception {
 		expectDomain();
@@ -178,7 +190,8 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 				    "\"name\":\"domain\"," +
 				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
 				    "\"aliases\":[]," +
-				    "\"label\":null" +
+				    "\"label\":null," +
+				    "\"hosts\":{}" +
 				  "}," +
 				  "\"publicFreeBusy\":false" +
 				"}";

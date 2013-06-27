@@ -39,8 +39,11 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
@@ -80,6 +83,33 @@ public class DomainDaoJdbcImplTest {
 			.label("my domain");
 		dao.create(domainBuilder.build());
 		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(3).build());
+	}
+
+	@Test
+	public void testGetFetchesDomainHosts() {
+		ObmDomain domain = dao.findDomainByName("test.tlse.lng");
+		ObmHost mailHost = ObmHost.builder()
+				.id(1)
+				.ip("1.2.3.4")
+				.name("mail")
+				.fqdn("mail.tlse.lng")
+				.domainId(1)
+				.build();
+		ObmHost syncHost = ObmHost.builder()
+				.id(2)
+				.ip("1.2.3.5")
+				.name("sync")
+				.fqdn("sync.tlse.lng")
+				.domainId(1)
+				.build();
+		ImmutableMultimap<ServiceProperty, ObmHost> hosts = ImmutableMultimap
+				.<ServiceProperty, ObmHost>builder()
+				.put(ServiceProperty.builder().service("mail").property("smtp_in").build(), mailHost)
+				.put(ServiceProperty.builder().service("mail").property("imap").build(), mailHost)
+				.put(ServiceProperty.builder().service("sync").property("obm_sync").build(), syncHost)
+				.build();
+
+		assertThat(domain.getHosts()).isEqualTo(hosts);
 	}
 
 	@Test

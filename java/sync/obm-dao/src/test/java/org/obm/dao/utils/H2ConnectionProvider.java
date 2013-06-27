@@ -78,4 +78,9 @@ public class H2ConnectionProvider implements DatabaseConnectionProvider {
 	public H2InMemoryDatabase geth2Instance() {
 		return h2Instance;
 	}
+
+	@Override
+	public String getIntegerCastType() {
+		return "INTEGER";
+	}
 }

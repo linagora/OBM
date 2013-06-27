@@ -44,17 +44,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-
-import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
@@ -64,13 +60,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
-	
-	@Inject
-	private IMocksControl mocksControl;
-	
-	@Inject
-	private UserDao userDao;
-	
+
 	@Test
 	public void testModifyAUser() throws Exception {
 		expectDomain();
@@ -92,7 +82,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 	public void testPutNonExistingUser() throws Exception {
 		expectDomain();
 		userDao.modify(1, fakeUser());
-		expectLastCall().andThrow(new UserNotFoundException(new UserExtId("1")));;
+		expectLastCall().andThrow(new UserNotFoundException(new UserExtId("1")));
 
 		mocksControl.replay();
 		

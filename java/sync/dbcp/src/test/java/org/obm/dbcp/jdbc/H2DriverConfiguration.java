@@ -77,4 +77,9 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 	public String getGMTTimezoneQuery() {
 		return null;
 	}
+
+	@Override
+	public String getIntegerCastType() {
+		return "INTEGER";
+	}
 }
