@@ -1,17 +1,22 @@
 package org.obm.provisioning;
 
+import java.util.Set;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.provisioning.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 
@@ -25,6 +30,7 @@ import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class ProvisioningService extends JerseyServletModule {
 
@@ -46,6 +52,26 @@ public class ProvisioningService extends JerseyServletModule {
 		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
+		bind(UserDao.class).toInstance(new UserDao() {
+			@Override
+			public ObmUser get(int userId) {
+				return null;
+			}
+			@Override
+			public Set<UserIdentifier> listAll() {
+				return null;
+			}
+			@Override
+			public void create(ObmUser user) throws DaoException {
+			}
+
+			@Override
+			public void modify(int userId, ObmUser user) throws UserNotFoundException {
+			}
+			@Override
+			public void delete(int userId, boolean expunge) throws UserNotFoundException {
+			}
+		});
 	}
 
 	private void bindRestResources() {
