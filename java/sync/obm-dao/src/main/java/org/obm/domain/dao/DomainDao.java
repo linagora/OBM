@@ -57,6 +57,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class DomainDao {
 
+	private static final String DOMAIN_FIELDS = "domain_name, domain_id, domain_uuid, domain_label, domain_alias";
+	
 	private static final Logger logger = LoggerFactory.getLogger(DomainDao.class);
 	private final DatabaseConnectionProvider dbcp;
 
@@ -70,7 +72,7 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_name, domain_id, domain_uuid, domain_label, domain_alias FROM Domain WHERE domain_name = ? "
+		String uq = "SELECT " + DOMAIN_FIELDS + " FROM Domain WHERE domain_name = ? "
 				+ " OR domain_alias = ? OR domain_alias LIKE ? OR domain_alias LIKE ? OR domain_alias LIKE ? ";
 		try {
 			con = dbcp.getConnection();
@@ -98,7 +100,7 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_name, domain_id, domain_uuid, domain_label, domain_alias FROM Domain WHERE domain_uuid = ?";
+		String uq = "SELECT " + DOMAIN_FIELDS + " FROM Domain WHERE domain_uuid = ?";
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(uq);
@@ -151,7 +153,7 @@ public class DomainDao {
 		Statement statement = null;
 		ResultSet rs = null;
 		try {
-			String query = "SELECT domain_id, domain_uuid, domain_name, domain_label, domain_alias FROM Domain";
+			String query = "SELECT " + DOMAIN_FIELDS + " FROM Domain";
 			con = dbcp.getConnection();
 			statement = con.createStatement();
 			rs = statement.executeQuery(query);
