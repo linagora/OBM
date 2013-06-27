@@ -38,6 +38,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.obm.sync.solr.SolrManager;
+
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -105,6 +107,15 @@ public class GuiceServletContextListener implements ServletContextListener {
 		Errors errors = new Errors();
 		Injector injector = (Injector) servletContextEvent.getServletContext().getAttribute(ATTRIBUTE_NAME);
 
+		try {
+			if (injector != null) {
+				injector.getInstance(SolrManager.class).stop();
+			}
+		}
+		catch (Exception e) {
+			errors.addMessage(new Message(ImmutableList.of(), "Failed to stop SolrManager.", e));
+		}
+		
 		try {
 			if (injector != null) {
 				injector.getInstance(QueueManager.class).stop();

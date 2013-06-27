@@ -213,5 +213,11 @@ public class SolrManager {
 				logger.error("Couldn't process JMS message", e);
 			}
 		}
+		
+
+	}
+	
+	public void stop() throws JMSException {
+		jmsConnection.stop();
 	}
 }
