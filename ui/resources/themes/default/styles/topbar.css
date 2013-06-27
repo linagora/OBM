@@ -59,6 +59,11 @@ a:hover {
   text-decoration: underline;  
 }
 
+.ico{
+  width:15px;
+  height:15px;
+}
+
 #banner a { 
   text-decoration: none;  
   font-family: 'Lato',sans-serif, arial;
@@ -77,7 +82,7 @@ a:hover {
 }
 
 #banner a:hover { 
-  text-decoration: underline;  
+  text-decoration: none;  
 }
 
 
@@ -97,7 +102,7 @@ img {
 p {
   margin-left: auto;
   margin-right: auto;
-} 
+}	
 
 abbr {
   cursor: help;
@@ -267,16 +272,17 @@ form {
 }
 
 #mainPanel {
-  z-index:100;
+  z-index:9;
   min-width: 800px;
   margin-left: 17.5em;
-  padding: 2.8em 1em 0em;
+  padding: 80px 1em 0em ;
 /*IE workaround*/
   height: auto!important;
   height: 1px;
 }
 
 #mainContent {
+  z-index:0;
   background-color: #F4F4F4;
   padding: 5px 0 5px;
 }
@@ -311,13 +317,13 @@ form {
   background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   box-shadow: 0px 0px 10px #AAA;
   position: absolute;
-  top: 33px;
+  top: 33.5px;
   height:auto;
   line-height: 12px;
   left: 0;
   padding-left: 105px;
   font-size: 0.9em;
-  z-index: 0;
+  z-index: 9;
 }
 
 .spreadLove a {  color: #368397; font-weight: bolder; }
@@ -329,6 +335,9 @@ form {
 /* ------------------------------------------------------------------------- */
 
 #banner {
+  position: fixed;
+  top:0;
+  left: 0;
   width: 100%;
   margin-bottom: 1em;
   min-width: 1002px;
@@ -337,14 +346,185 @@ form {
   background: #FAFAFA;
   box-shadow: 0px -1px 5px #BBB inset;
   border-bottom: 1px solid #EEE;
+  z-index: 999;
+}
+
+#banner div+div li{
+  margin: 0px;
 }
 
 #obmLogo {
   position: absolute;
-  z-index: 999;
   top:0;
   left:0;
   z-index: 99;
+}
+
+#allinonemenu{
+  display: none;
+  position: absolute;
+  top:33px;
+  max-width: 260px;
+  width: auto;
+  background-color: #FAFAFA;
+  line-height: 16px;
+  border-left: 2px solid #CCC;
+  border-right: 2px solid #CCC;
+  border-bottom: 2px solid #CCC;
+  z-index: 9999;
+  box-shadow: 0px 0px 5px #CCC;
+  border-radius: 0 0 8px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 0px;
+  padding-right: 20px;
+  padding-bottom: 15px;
+  padding-left: 5px;
+}
+
+@media screen and (max-height: 600px) {
+  #allinonemenu{
+    height: auto;
+    max-height: 400px;
+    max-width: auto;
+  }
+}
+
+#allinonemenu h3 {
+  margin:0;
+  padding-bottom: 0;
+  padding-top: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+#allinonemenu ul {
+  margin:0;
+  padding-left: 5px;
+  font-size:13px;
+}
+
+#profileMenu{
+  position: absolute;
+  width:350px;
+  right:8px;
+  top:50px;
+  background-color: #FAFAFA;
+  border: 1px solid #CCC;
+  z-index: 999;
+  line-height: 11px;
+  display: none;
+  box-shadow: 0px 0px 5px #999;
+  border-radius: 8px;
+}
+
+#profileMenu .button{
+  background-color: #368397;
+}
+
+.arrow_box { 
+  position: relative; 
+  background: #fafafa;
+  border: 4px solid #CCC; 
+}
+
+.arrow_box:after, .arrow_box:before { 
+  bottom: 100%; 
+  border: solid transparent; 
+  content: " "; 
+  height: 0; 
+  width: 0;
+  position: absolute; 
+  pointer-events: none; 
+}
+
+.arrow_box:after { 
+  border-color: rgba(250, 250, 250, 0); 
+  border-bottom-color: #fafafa; 
+  border-width: 12px; 
+  left: 90%; 
+  margin-left: -12px; 
+}
+
+.arrow_box:before { 
+  border-color: rgba(204, 204, 204, 0); 
+  border-bottom-color: #CCC; 
+  border-width: 15px; 
+  left: 90%; 
+  margin-left: -15px; 
+}
+
+#shinnyUserInfos{
+  margin-bottom: 15px;
+}
+
+#shinnyUserInfos #avatar{
+  position: absolute;
+  top:10px;
+  left:10px;
+  border-radius:10px;
+  border:2px solid #CCC;
+
+  width: 90px;
+  height: 90px;
+}
+
+#avatar img{
+  width: 80px;
+  height: 80px;
+  margin: 5px 5px 5px 5px;
+}
+
+#shinnyUserInfos #infos{
+  margin-left: 110px;
+  margin-top: 20px;
+  line-height: 20px;
+}
+
+#shinnyUserInfos #infos p{
+  font-size:18px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+#shinnyUserInfos #infos p+p{
+  font-weight: normal;
+  font-size:14px;
+  color: #777;
+}
+
+#shinnyUserInfos #infos .buttons{
+  text-align: right;
+  margin-right: 10px;
+  color:#FFF;
+}
+
+#shinnyUserInfos #infos .buttons a{
+  color:#FFF;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+#profileMenu #settings{
+  border-top: 1px solid #CCC;
+  padding: 0;
+  margin: 15px;
+}
+
+#settings h3{
+  font-size: 15px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+#settings ul{
+  list-style: none;
+  column-count: 2;
+  -moz-column-count: 2;
+  -webkit-column-count: 2;
+  padding-left:5px;
+  margin:0;
 }
 
 #information {
@@ -362,7 +542,7 @@ form {
 }
 
 #information li+li {
-  margin-right: 5px;
+  margin-right: 0;
 }
 
 #information li+li+li+li+li {
@@ -373,15 +553,14 @@ form {
   color: #999;
 }
 
-
 #information li a {
   padding-bottom: 4px;
   text-decoration: none;
 }
 
-#information li a:hover {
+#information li:hover {
   text-decoration: none;
-  border-bottom: 2px solid #368397;
+  border-bottom: none;
 }
 
 #information img {
@@ -395,6 +574,38 @@ form {
   margin: 0 0.4em 0 -0.4em;
 }
 
+.notification_popup{
+  font-family: verdana, arial;
+  display: none;
+  position: absolute;
+  z-index: 99;
+  color:#FFF;
+  font-size: 11px;
+  margin-top: 22px;
+  margin-left: -10px;
+  padding:3px 6px 3px 6px;
+  line-height: 12px;
+  border-radius:15px; 
+
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  text-shadow: 0 -1px 0px #444;
+}
+
+.notification_popup:hover{
+  background: #ff670f;
+  background: -moz-linear-gradient(top, #ff670f 0%, #ff670f 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff670f), color-stop(100%,#ff670f));
+  background: -webkit-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: -o-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: -ms-linear-gradient(top, #ff670f 0%,#ff670f 100%);
+  background: linear-gradient(to bottom, #ff670f 0%,#ff670f 100%);
+}
+
 /* ------------------------------------------------------------------------- */
 /* Section menu */
 /* ------------------------------------------------------------------------- */
@@ -404,29 +615,24 @@ form {
   padding: 0;
   font-weight: bold;
   list-style-type: none;
-  margin-left: 105px;
+  margin-left: 110px;
 }
 
 #section li {
   display: inline;
-  margin-right: 1px;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 5px;
+  padding: 0;
+  margin: 0;
+  margin-right: 10px;
+}
+
+#section li a.toplink {
   text-align: center;
-  cursor: pointer;
   font-weight: bold;
   font-size: 14px;
   color: #999;
-}
-
-#section li.hover {
-  color: #000;
-  border-bottom: 2px solid #368397;
-}
-
-#section li.hover a {
-  color: #000;
+  padding-right: 5px;
+  padding-left: 5px;
+  padding-bottom: 4px;
 }
 
 #section li.current {
@@ -435,7 +641,7 @@ form {
 }
 
 #section li.current a {
-  color: #368397;
+  color: #777;
 }
 
 #section a {
@@ -451,8 +657,9 @@ form {
   color: #999;  
 }
 
-#section a:hover {
-  color: #999;
+#section a.toplink:hover {
+  color: #000;
+  border-bottom: 2px solid #368397;
 }
 /* ------------------------------------------------------------------------- */
 /* Submenu (modules) */
@@ -502,7 +709,7 @@ form {
 /* Action bar */
 /* ------------------------------------------------------------------------- */
 
-#action {
+#action	{
   width: 99.9%;
   list-style-type: none;  
   background-color: #FFF;
@@ -929,8 +1136,8 @@ input.datePicker {
 
 /* the div that holds the date picker calendar */
 #datepicker {
-  width: 19em;
-  min-height: 17em;
+  width: 17em;
+  min-height: 16em;
   background-color: #fff;
   border-radius: 0 8px 8px 8px;
   box-shadow: 0 0 2px #777;
@@ -938,22 +1145,13 @@ input.datePicker {
 }
 
 #datepicker h1 {
-  font-size: 110%;
+  margin: 3px;
+  font-size: 120%;
   font-weight: bold;
-  margin:3px 0 3px 0;
-  padding: 0;
 }
 
-#datepicker .leftarrows{
-  float: left;
-}
-
-#datepicker .rightarrows{
-  float: right;
-}
-
-#datepicker .leftarrows a, #datepicker .rightarrows a{
-  padding: 0 2px 0 2px;
+#datepicker a {
+  margin-left: 5px;
 }
 
 #datepicker table, .miniCalendar {
@@ -961,9 +1159,9 @@ input.datePicker {
   text-align: center;
   width: 100%;
   margin-left: auto;
-  margin-right: auto;
+  margin-right:	auto;
   border: 1px solid #aaa; 
-  border-collapse: collapse;  
+  border-collapse: collapse;	
   border-spacing: 0;  
 }
 
@@ -1754,35 +1952,6 @@ ul.autocompleter-choices span.autocompleter-queried {
 ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried {
   color: #9FCFFF;
 }
-
-.user_suggestion .icon-container {
-  width: 16px;
-  min-width: 16px;
-  max-width: 16px;
-  background-image: url(../images/ico_user.gif);
-  background-repeat: no-repeat;
-  background-position: 0px center;
-  display: table-cell;
-}
-
-.contact_suggestion .icon-container {
-  width: 16px;
-  min-width: 16px;
-  max-width: 16px;
-  background-image: url(../images/ico_contact.gif);
-  background-repeat: no-repeat;
-  background-position: 0px center;
-  display: table-cell;
-}
-
-.contact_suggestion .suggestion-data-container, .user_suggestion .suggestion-data-container {
-  display: table-cell;
-}
-
-.contact_suggestion.suggestion-container, .user_suggestion.suggestion-container {
-  display: table-row;
-}
-
 /* ------------------------------------------------------------------------- */ 
 /* Update tools specific styles */
 /* ------------------------------------------------------------------------- */
@@ -1846,7 +2015,7 @@ form.button-to input {
 .obmPopup h2 {
   font-size: 100%;  
   font-weight: normal;
-  text-align:center;
+	text-align:center;
   margin: 0;
 }
 
@@ -1877,23 +2046,23 @@ form.button-to input {
   height:20px;
 }
 .editcomment{
-  background:url('../images/edit_comment.png'); 
+	background:url('../images/edit_comment.png'); 
   background-repeat: no-repeat;
-  display:inline-block;
-  background-position:top left;
-  vertical-align:middle;
-  width:24px;
-  height:20px;
+	display:inline-block;
+	background-position:top left;
+	vertical-align:middle;
+	width:24px;
+	height:20px;
 }
 .obmPopup .contentcomment {
-  background-image: url(../images/ico_very_big_comment.png);
-  background-repeat: no-repeat;
-  background-position: 10px 10px;  
-  padding-left: 116px;
-  padding-right: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-bottom: 5px;
+	background-image: url(../images/ico_very_big_comment.png);
+	background-repeat: no-repeat;
+	background-position: 10px 10px;  
+	padding-left: 116px;
+	padding-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin-bottom: 5px;
 }
 .obmPopup textarea{
     width:95%;
@@ -2096,6 +2265,9 @@ form.button-to input {
 
 #advancedSearch input, select {
   border-radius: 5px;
+  padding: 2px 3px;
+  margin-bottom: 2px;
+  margin-left: 5px;
   background-color: #FAFAFA;
   border: 1px solid #DDD;
   background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
@@ -2237,4 +2409,3 @@ form.button-to input {
  * ------------------------------------------------------------------------- */
 
 #loginForm input, #loginForm select { width: 155px; }
-

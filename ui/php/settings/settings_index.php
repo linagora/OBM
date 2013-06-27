@@ -202,6 +202,15 @@ if ($params['form_user_pref']) {
     }
   }
 
+  if ($params['topbar'] == "yes") {
+    $_SESSION['set_top_bar'] = true;
+    $set_top_bar_value = "yes";
+  } else {
+    $_SESSION['set_top_bar'] = false;
+    $set_top_bar_value = "no";
+  }
+  update_user_pref($obm['uid'], 'set_top_bar', $set_top_bar_value);
+
 }
 
 require("$obminclude/global_pref.inc");
@@ -223,6 +232,7 @@ if (($_SESSION['set_debug'] & $cdg_solr) == $cdg_solr) $dg_solr = 'checked';
 if ($_SESSION['set_menu'] == $cme_txt) $me_txt = 'checked';
 if ($_SESSION['set_menu'] == $cme_ico) $me_ico = 'checked';
 if ($_SESSION['set_menu'] == $cme_both) $me_both = 'checked';
+if ($_SESSION['set_top_bar'] == "yes") $topbar = 'checked';
 
 if ($_SESSION['set_date'] == $cda_iso) $da_iso = 'checked';
 if ($_SESSION['set_date'] == $cda_en) $da_en = 'checked';
@@ -349,6 +359,11 @@ $display['detail'] .= "
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</label></span>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</label></span>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</label></span>
+    </td>
+  </tr><tr id='settings_new_topbar'>
+    <th>$l_set_topbar</th>
+    <td>
+      <span class=\"NW\"><input type=\"checkbox\" class=\"box\" id=\"topbar\" name=\"topbar\" value=\"yes\" $topbar/></span>
     </td>
   </tr><tr id='settings_autoDispay'>
     <th><label for=\"lbl_auto_display\">$l_auto_display</label></th>
@@ -581,7 +596,7 @@ $display['detail'] .= "
   </div>
   <div class=\"detail infos\" id='themeSettings'>
   <h1>$l_cur_theme</h1>
-  <img src=\"".${"preview_".$_SESSION['set_theme']}."\" alt=\"[Theme]\"  />
+  <img src=\"".${"preview_".$_SESSION['set_theme']}."\" alt=\"[Theme]\" style=\"height: 160px;\" />
   <h1>$l_set_theme</h1>
   $dis_theme
   </div>

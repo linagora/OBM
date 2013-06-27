@@ -690,14 +690,19 @@ function refreshWaitEvent() {
         async: true,
         onComplete: function(response) {
             var elem = $('bannerWaitingEvent');
-            var count = parseInt(response.msg, 10);
-            if(count > 0){
-              elem.set('text',count);
-              elem.setStyle('display', 'inline-block');
-              resizeForBadges(elem, count);
+            if ( obm.vars.newTopbar ) {
+              var count = parseInt(response.count, 10);
+                if(count > 0){
+                  elem.set('text',response.count);
+                  elem.setStyle('display', 'inline-block');
+                  resizeForBadges(elem, count);
+                } else {
+                  elem.setStyle('display', 'none');
+                }
             } else {
-              elem.setStyle('display', 'none');
-            }
+              elem.set('text',response.msg);
+              elem.setStyle('display', 'inline-block');
+            }            
         }
   }).get({ajax : 1,action : 'get_json_waiting_events'});
 }

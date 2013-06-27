@@ -838,13 +838,9 @@ function get_json_waiting_events($id) {
       $nb_event = '0';
     }
 
-    if ($conf_obm3_topbar) {
-      $message_event = $nb_event;
-    } else{
-      $message_event = $l_waiting_events.' : '.$nb_event;
-    }
+    $message_event = $l_waiting_events.' : '.$nb_event;
 
-    $display['json'] = "{msg : '".phpStringToJsString($message_event)."'}";
+    $display['json'] = "{msg : '".phpStringToJsString($message_event)."', count : '".$nb_event."'}";
   }
 }
 

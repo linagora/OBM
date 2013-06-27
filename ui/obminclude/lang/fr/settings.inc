@@ -33,6 +33,8 @@ $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les notifications d'invitation par e-mail";
 $l_send_mail_participation = "Accepter les notifications de participation par e-mail";
 
+$l_set_topbar = "Activer la nouvelle barre de menu d'OBM";
+
 // Dates format
 $l_da_iso = "aaaa-mm-jj";
 $l_da_en = "mm/jj/aaaa";

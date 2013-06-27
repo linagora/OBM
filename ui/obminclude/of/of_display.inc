@@ -1115,6 +1115,13 @@ function display_head($p_module, $standard=true) {
     }
   }
 
+  if ( $_SESSION['set_top_bar'] ) {
+    $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$resources_path/themes/default/styles/topbar.css\" />";
+  } else {
+    $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />";
+  }
+  $set_top_bar = $_SESSION['set_top_bar'];
+
   if($standard) {
     $headers_e .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
   }
@@ -1124,7 +1131,7 @@ function display_head($p_module, $standard=true) {
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />
+  $stylecss
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm?version=$obm_version\" media=\"print\" />
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
@@ -1143,6 +1150,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.conf = new Object();
   obm.initialize = new Chain();
   obm.resize = new Chain();
+  obm.vars.newTopbar = '$set_top_bar';
   obm.vars.images.minus = '$ico_minus';
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
@@ -1241,7 +1249,7 @@ function display_menu($module) {
   global $perm, $cright_write_admin, $conf_obm3_topbar;
 
   // If a new topbar specif function is provided
-  if ($conf_obm3_topbar) {
+  if ( $_SESSION['set_top_bar'] == "yes" ) {
     return display_unified_menu($module);
   }
 
@@ -1535,7 +1543,7 @@ function display_modules($section, $module, $portlet = false) {
           }
         }
         $block .= "<a$target href='".$modules[$mod]['Url']."' title='$module_tooltip'>";
-        if ($ftext) $block .= $module_name;
+        if ($ftext || $portlet) $block .= $module_name;
         $block .= "</a></li>";
       }
     }

@@ -34,6 +34,8 @@ $l_set_debug = "Debugging level";
 $l_send_mail = "Accept meeting invitation emails";
 $l_send_mail_participation = "Accept meeting participation emails";
 
+$l_set_topbar = "Enable unified OBM Topbar";
+
 $l_update_ok = "Settings updated successfully";
 
 $l_da_iso = "yyyy-mm-dd";
