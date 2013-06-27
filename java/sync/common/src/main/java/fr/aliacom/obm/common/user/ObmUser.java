@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Function;
@@ -226,39 +227,42 @@ public class ObmUser {
 		
 	}
 	
-	private final int uid;
-	private final int entityId;
-	private final String login;
-	private final UserExtId extId;
-	private final String commonName;
-	private final String lastName;
-	private final String firstName;
-	private final String email;
-	private final Set<String> emailAlias;
+	protected int uid;
+	protected int entityId;
+	protected String login;
+	protected UserExtId extId;
+	protected String commonName;
+	protected String lastName;
+	protected String firstName;
+	protected String email;
+	protected Set<String> emailAlias;
 	
-	private final String address1;
-	private final String address2;
-	private final String address3;
+	protected String address1;
+	protected String address2;
+	protected String address3;
 
-	private final String expresspostal;
-	private final String homePhone;
-	private final String mobile;
-	private final String service;
-	private final String title;
-	private final String town;
-	private final String workFax;
-	private final String workPhone;
-	private final String zipCode;
-	private final String description;
+	protected String expresspostal;
+	protected String homePhone;
+	protected String mobile;
+	protected String service;
+	protected String title;
+	protected String town;
+	protected String workFax;
+	protected String workPhone;
+	protected String zipCode;
+	protected String description;
 
-	private final Date timeCreate;
-	private final Date timeUpdate;
-	private final ObmUser createdBy;
-	private final ObmUser updatedBy;
+	protected Date timeCreate;
+	protected Date timeUpdate;
+	protected ObmUser createdBy;
+	protected ObmUser updatedBy;
 
-	private final ObmDomain domain;
-	private final boolean publicFreeBusy;
+	protected ObmDomain domain;
+	protected boolean publicFreeBusy;
 
+	public ObmUser() {
+	}
+	
 	private ObmUser(int uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
@@ -405,8 +409,13 @@ public class ObmUser {
 	public boolean isPublicFreeBusy() {
 		return publicFreeBusy;
 	}
-
+	
 	public String getEmail() {
+		return email;
+	}
+
+	@JsonIgnore
+	public String getEmailAtDomain() {
 		return appendDomainToEmailIfRequired(email);
 	}
 
@@ -421,6 +430,7 @@ public class ObmUser {
 		return emailAddress;
 	}
 
+	@JsonIgnore
 	public String getDisplayName(){
 		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
 	}

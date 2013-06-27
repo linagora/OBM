@@ -106,7 +106,7 @@ public class ToolBox {
 
 	public static ObmUser mockObmUser(String userEmail, ObmDomain domain) {
 		ObmUser user = EasyMock.createMock(ObmUser.class);
-		EasyMock.expect(user.getEmail()).andReturn(userEmail).atLeastOnce();
+		EasyMock.expect(user.getEmailAtDomain()).andReturn(userEmail).atLeastOnce();
 		EasyMock.expect(user.getDomain()).andReturn(domain).anyTimes();
 		return user;
 	}

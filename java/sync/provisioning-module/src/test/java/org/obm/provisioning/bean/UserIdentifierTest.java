@@ -29,26 +29,32 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.provisioning.bean;
 
-import java.util.Set;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.obm.provisioning.bean.UserIdentifier;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 
-import fr.aliacom.obm.common.user.ObmUser;
-
-public interface UserDao {
-
-	ObmUser get(int userId);
-
-	Set<UserIdentifier> listAll();
-
-	void create(ObmUser user) throws DaoException;
-
-	void modify(int userId, ObmUser user) throws UserNotFoundException;
-
-	void delete(int userId, boolean expunge) throws UserNotFoundException;
-
+@Slow
+@RunWith(SlowFilterRunner.class)
+public class UserIdentifierTest {
+	@Test
+	public void buildUserIdentifier() {
+		UserIdentifier userIdentifier = UserIdentifier.builder().id(1).url("/url/").build();
+		assertThat(userIdentifier.getId()).isEqualTo(1);
+		assertThat(userIdentifier.getUrl()).isEqualTo("/url/");
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void buildUserIdentifierWithNullId() {
+		UserIdentifier.builder().url("/url/").build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void buildUserIdentifierWithNullUrl() {
+		UserIdentifier.builder().id(1).build();
+	}
 }

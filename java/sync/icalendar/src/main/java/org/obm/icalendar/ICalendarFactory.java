@@ -50,7 +50,7 @@ public class ICalendarFactory {
 	}
 	
 	public Ical4jUser createIcal4jUserFromObmUser(ObmUser obmUser) {
-		return ical4jFactory.createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
+		return ical4jFactory.createIcal4jUser(obmUser.getEmailAtDomain(), obmUser.getDomain());
 	}
 	
 	public Ical4jUser createIcal4jUserFromEmailAndDomain(String email, ObmDomain obmDomain) {

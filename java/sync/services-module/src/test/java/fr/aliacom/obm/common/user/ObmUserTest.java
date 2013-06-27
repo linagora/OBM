@@ -70,7 +70,7 @@ public class ObmUserTest {
 				.emailAndAliases(email)
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo(email + "@" +domainName);
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo(email + "@" +domainName);
 	}
 	
 	@Test
@@ -84,7 +84,7 @@ public class ObmUserTest {
 				.emailAndAliases(email)
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo(email);
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo(email);
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class ObmUserTest {
 			.emailAndAliases("")
 			.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("@obm.org");
 		assertThat(obmUser.getEmailAlias()).isEmpty();
 	}
 
@@ -182,7 +182,7 @@ public class ObmUserTest {
 				.emailAndAliases("one")
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@obm.org");
 		assertThat(obmUser.getEmailAlias()).isEmpty();
 	}
 
@@ -196,7 +196,7 @@ public class ObmUserTest {
 				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two"))
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@obm.org");
 		assertThat(obmUser.getEmailAlias()).containsOnly("two");
 	}
 
@@ -210,7 +210,7 @@ public class ObmUserTest {
 				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two", "three"))
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@obm.org");
 		assertThat(obmUser.getEmailAlias()).containsOnly("two", "three");
 	}
 
@@ -224,7 +224,7 @@ public class ObmUserTest {
 				.emailAndAliases("one@anotherdomain.org")
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@anotherdomain.org");
 		assertThat(obmUser.getEmailAlias()).isEmpty();
 	}
 
@@ -242,7 +242,7 @@ public class ObmUserTest {
 				.build();
 		
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@anotherdomain.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@anotherdomain.org");
 		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org");
 	}
 
@@ -259,7 +259,7 @@ public class ObmUserTest {
 				.emailAndAliases(dbEmails)
 				.build();
 		
-		assertThat(obmUser.getEmail()).isEqualTo("one@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isEqualTo("one@obm.org");
 		assertThat(obmUser.getEmailAlias()).containsOnly("two@anotherdomain.org", "three");
 	}
 

@@ -1203,7 +1203,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			List<Event> changedEvent) {
 		for(Event event: changedEvent) {
 			if(event.isRecurrent()) {
-				event.getRecurrence().replaceUnattendedEventExceptionByException(calendarUser.getEmail());
+				event.getRecurrence().replaceUnattendedEventExceptionByException(calendarUser.getEmailAtDomain());
 			}
 		}
 	}

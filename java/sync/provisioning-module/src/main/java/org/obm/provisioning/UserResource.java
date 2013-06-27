@@ -33,15 +33,24 @@ package org.obm.provisioning;
 
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.inject.Inject;
 
@@ -62,12 +71,49 @@ public class UserResource {
 	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public ObmUser get(@PathParam("userId") int userId) {
-		return userDao.getUser(userId);
+		return userDao.get(userId);
 	}
-
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public Set<UserIdentifier> listAll() {
 		return userDao.listAll();
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response create(ObmUser user) {
+		try {
+			userDao.create(user);
+		} catch (DaoException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+		return Response.status(Status.CREATED).build();
+	}
+
+	
+	
+	@PUT @Path("/{userId}")
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response modify(@PathParam("userId") int userId, ObmUser user) {
+		try {
+			userDao.modify(userId, user);
+		} catch(UserNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.status(Status.OK).build();
+	}
+	
+	@DELETE @Path("/{userId}")
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response delete(@PathParam("userId") int userId, @QueryParam("expunge") boolean expunge) {
+		try {
+			userDao.delete(userId, expunge);
+		} catch (UserNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		return Response.status(Status.OK).build();
 	}
 }

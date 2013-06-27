@@ -157,7 +157,7 @@ public class EventIndexer extends SolrRequest {
 		putField(sid, "category", event.getCategory());
 		putField(sid, "date", event.getStartDate());
 		putField(sid, "duration", event.getDuration());
-		putField(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
+		putField(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmailAtDomain());
 		putField(sid, "ownerId", obmUser.getUid());
 		putField(sid, "description", event.getDescription());
 

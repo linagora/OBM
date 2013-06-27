@@ -286,7 +286,7 @@ public class SessionManagement {
 		token.setUserDisplayName(databaseUser.getDisplayName());
 		token.setUserLogin(userLogin);
 
-		String userEmail = helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName());
+		String userEmail = helperService.constructEmailFromList(databaseUser.getEmailAtDomain(), obmDomain.getName());
 		token.setUserEmail(userEmail);
 
 		token.setSessionId(newSessionId());

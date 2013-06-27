@@ -34,8 +34,12 @@ package org.obm.provisioning;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
+import java.io.IOException;
+
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.StringEntity;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -122,11 +126,35 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected HttpResponse get(String path) throws Exception {
-		return createRequest(path).execute().returnResponse();
+		return createGetRequest(path).execute().returnResponse();
+	}
+	
+	protected HttpResponse post(String path, StringEntity content) throws ClientProtocolException, IOException {
+		return createPostRequest(path, content).execute().returnResponse();
+	}
+	
+	protected HttpResponse put(String path, StringEntity content) throws ClientProtocolException, IOException {
+		return createPutRequest(path, content).execute().returnResponse();
+	}
+	
+	protected HttpResponse delete(String path) throws ClientProtocolException, IOException {
+		return createDeleteRequest(path).execute().returnResponse();
 	}
 
-	protected Request createRequest(String path) {
+	private Request createPostRequest(String path, StringEntity content) {
+		return Request.Post(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+	}
+	
+	private Request createPutRequest(String path, StringEntity content) {
+		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+	}
+	
+	protected Request createGetRequest(String path) {
 		return Request.Get(baseUrl + "/" + domain.getUuid().get() + path);
+	}
+	
+	protected Request createDeleteRequest(String path) {
+		return Request.Delete(baseUrl + "/" + domain.getUuid().get() + path);
 	}
 
 }

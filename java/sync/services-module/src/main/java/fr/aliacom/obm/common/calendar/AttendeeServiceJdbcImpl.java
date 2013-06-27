@@ -79,7 +79,7 @@ public class AttendeeServiceJdbcImpl implements AttendeeService {
 					.builder()
 					.entityId(user.getEntityId())
 					.displayName(DisplayNameUtils.getDisplayName(user.getCommonName(), user.getFirstName(), user.getLastName()))
-					.email(user.getEmail())
+					.email(user.getEmailAtDomain())
 					.build();
 		}
 		

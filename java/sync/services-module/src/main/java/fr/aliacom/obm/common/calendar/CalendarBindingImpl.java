@@ -135,7 +135,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
 		CalendarInfo myself = new CalendarInfo();
-		myself.setMail(helperService.constructEmailFromList(user.getEmail(), user
+		myself.setMail(helperService.constructEmailFromList(user.getEmailAtDomain(), user
 				.getDomain().getName()));
 		myself.setUid(user.getLogin());
 		myself.setFirstname(user.getFirstName());
@@ -211,7 +211,7 @@ public class CalendarBindingImpl implements ICalendar {
 			// Create a new list using Arrays.asList(calendars), since asList returns an unmodifiable list
 			List<String> calendarEmails = new ArrayList<String>();
 			boolean hasUserEmail = false;
-			String userEmail = user.getEmail();
+			String userEmail = user.getEmailAtDomain();
 			for (String calendarEmail : calendars) {
 				// We'll add the user manually later
 				if (calendarEmail.equals(userEmail)) {
@@ -304,7 +304,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
 			if (owner != null) {
-				if (owner.getEmail().equals(calendarUser.getEmail())) {
+				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 					cancelEvent(token, calendar, notification, eventId, ev);
 				} else {
 					changeParticipationInternal(
@@ -338,7 +338,7 @@ public class CalendarBindingImpl implements ICalendar {
 		EventExtId extId = event.getExtId();
 		Event removed = calendarDao.removeEventByExtId(token, obmUser, extId, event.getSequence() + 1);
 		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
-		String obmUserEmail = obmUser.getEmail();
+		String obmUserEmail = obmUser.getEmailAtDomain();
 		changeCalendarOwnerParticipation(obmUserEmail, removed, Participation.declined());
 		notifyOnRemoveEvent(token, obmUserEmail, removed, notification);
 		return removed;
@@ -380,7 +380,7 @@ public class CalendarBindingImpl implements ICalendar {
 					return ev;
 				}
 				
-				if (owner.getEmail().equals(calendarUser.getEmail())) {
+				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 					return cancelEventByExtId(token, calendarUser, ev, notification);
 				} else {
 					changeParticipationInternal(token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
@@ -456,7 +456,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@VisibleForTesting void assertEventCanBeModified(AccessToken token, ObmUser calendarUser, Event event) throws NotAllowedException {
-		String calendar = calendarUser.getEmail();
+		String calendar = calendarUser.getEmailAtDomain();
 		
 		assertUserCanWriteOnCalendar(token, calendar);
 		
@@ -763,7 +763,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Attendee calendarOwnerAsAttendee(AccessToken token, String calendar, Event event) 
 		throws FindException {
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-		Attendee userAsAttendee = event.findAttendeeFromEmail(calendarOwner.getEmail());
+		Attendee userAsAttendee = event.findAttendeeFromEmail(calendarOwner.getEmailAtDomain());
 		return userAsAttendee;
 	}
 
@@ -974,7 +974,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private EventChanges moveConfidentalEventsOnDelegation(AccessToken token,
 			ObmUser calendarUser, EventChanges changesFromDatabase) {
 		String userEmailOfToken = token.getUserEmail();
-		boolean isNotCalendarOfLoggedUser = !userEmailOfToken.equals(calendarUser.getEmail());
+		boolean isNotCalendarOfLoggedUser = !userEmailOfToken.equals(calendarUser.getEmailAtDomain());
 		EventChanges changesToSend = isNotCalendarOfLoggedUser ?
 			changesFromDatabase.moveConfidentialEventsToRemovedEvents(userEmailOfToken) :
 			changesFromDatabase;
@@ -1087,7 +1087,7 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			ObmUser obmuser = userService.getUserFromAccessToken(token);
 			if (obmuser != null) {
-				return obmuser.getEmail();
+				return obmuser.getEmailAtDomain();
 			}
 			return "";
 
@@ -1347,7 +1347,7 @@ public class CalendarBindingImpl implements ICalendar {
 			EventExtId extId, Participation participation, int sequence, boolean notification) throws ServerFault, NotAllowedException {
 		assertUserCanWriteOnCalendar(token, calendar);
 		
-		String userEmail = userService.getUserFromAccessToken(token).getEmail();
+		String userEmail = userService.getUserFromAccessToken(token).getEmailAtDomain();
 		
 		try {
 			boolean wasDone = changeParticipationInternal(token, calendar, extId, participation, sequence,
@@ -1394,7 +1394,7 @@ public class CalendarBindingImpl implements ICalendar {
 					throws ServerFault, EventNotFoundException, ParseException, NotAllowedException {
 		assertUserCanWriteOnCalendar(token, calendar);
 		
-		String userEmail = userService.getUserFromAccessToken(token).getEmail();
+		String userEmail = userService.getUserFromAccessToken(token).getEmailAtDomain();
 		
 		try {
 			boolean wasDone = changeParticipationForRecursiveEvent(token, calendar, extId, recurrenceId, participation, sequence,
@@ -1483,13 +1483,13 @@ public class CalendarBindingImpl implements ICalendar {
 			changed = calendarDao.changeParticipation(token, calendarOwner, extId, participation);
 			logger.info(LogUtils.prefix(token) + 
 						"Calendar : event[extId:{}] change participation state for user {} " 
-						+ "new state : {}", new Object[]{extId, calendarOwner.getEmail(), participation});
+						+ "new state : {}", new Object[]{extId, calendarOwner.getEmailAtDomain(), participation});
 
 			return changed;
 		} else {
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
-					calendarOwner.getEmail() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
+					calendarOwner.getEmailAtDomain() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
 			return false;
 		}
 	}
@@ -1504,13 +1504,13 @@ public class CalendarBindingImpl implements ICalendar {
 			changed = calendarDao.changeParticipation(token, calendarOwner, extId, recurrenceId, participation);
 				logger.info(LogUtils.prefix(token) + 
 						"Calendar : event[extId:{} and recurrenceId:{}] change participation state for user {} " 
-						+ "new state : {}", new Object[]{extId, recurrenceId, calendarOwner.getEmail(), participation});
+						+ "new state : {}", new Object[]{extId, recurrenceId, calendarOwner.getEmailAtDomain(), participation});
 
 			return changed;
 		} else {
 			logger.info(LogUtils.prefix(token) + 
 					"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
-					calendarOwner.getEmail() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
+					calendarOwner.getEmailAtDomain() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
 			return false;
 		}
 	}

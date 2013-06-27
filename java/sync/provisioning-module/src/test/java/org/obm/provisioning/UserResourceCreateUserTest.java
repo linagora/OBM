@@ -31,21 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.UnsupportedEncodingException;
+
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+
+import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -53,60 +62,45 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
+public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
+	
+	@Inject
+	private IMocksControl mocksControl;
+	
+	@Inject
+	private UserDao userDao;
 	
 	@Test
-	public void testGetAUser() throws Exception {
+	public void testCreateAUser() throws Exception {
 		expectDomain();
-		expect(userDao.get(1)).andReturn(fakeUser());
+		userDao.create(fakeUser());
+		expectLastCall().once();
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users/1");
+		HttpResponse httpResponse = post("/users", obmUserToJson());
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.CREATED.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonUser());
-	}
-
-	@Test
-	public void testGetAUserOnNonExistentDomain() throws Exception {
-		expectNoDomain();
-		mocksControl.replay();
-
-		HttpResponse httpResponse = get("/users/1");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
-	public void testGetNonExistingUser() throws Exception {
+	public void testCreateUserThrowError() throws Exception {
 		expectDomain();
-		expect(userDao.get(123)).andReturn(null);
+		userDao.create(fakeUser());
+		expectLastCall().andThrow(new DaoException("bad things happen"));
+		
 		mocksControl.replay();
-
-		HttpResponse httpResponse = get("/users/123");
-
+		
+		HttpResponse httpResponse = post("/users", obmUserToJson());
+		
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
-	}
-	
-	@Test
-	public void testGetUserThrowError() throws Exception {
-		expectDomain();
-		expect(userDao.get(1)).andThrow(new RuntimeException("bad things happen"));
-		mocksControl.replay();
-
-		HttpResponse httpResponse = get("/users/1");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode())
+			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 	
 	private ObmUser fakeUser() {
@@ -116,7 +110,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 				.login("user1")
 				.lastName("Doe")
 				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
-				.firstName("Jésus")
+				.firstName("Jesus")
 				.commonName("John Doe")
 				//.kind("")					// Not implemented yet in ObmUser
 				.title("title")
@@ -140,20 +134,17 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
 				//.groups()					// Not implemented yet in ObmUser
 				.build();
-				
-				
 	}
 	
-	private String expectedJsonUser() {
-		return  
+	private StringEntity obmUserToJson() throws UnsupportedEncodingException {
+		final StringEntity userToJson = new StringEntity(
 				"{" +
 				  "\"uid\":1," +
 				  "\"entityId\":0," +
 				  "\"login\":\"user1\"," +
-				  "\"extId\":null," +
 				  "\"commonName\":\"John Doe\"," +
 				  "\"lastName\":\"Doe\"," +
-				  "\"firstName\":\"Jésus\"," +
+				  "\"firstName\":\"Jesus\"," +
 				  "\"email\":\"mails\"," +
 				  "\"emailAlias\":[]," +
 				  "\"address1\":\"address1\"," +
@@ -177,46 +168,11 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 				    "\"id\":1," +
 				    "\"name\":\"domain\"," +
 				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
-				    "\"aliases\":[]," +
-				    "\"label\":null" +
+				    "\"aliases\":[]" +
 				  "}," +
 				  "\"publicFreeBusy\":false" +
-				"}";
-	}
-	
-	
-	@SuppressWarnings("unused")
-	private String expectedJsonUserNotImplementYet() {
-		String json =
-					"{id: 1," +
-					"login: user1," +
-					"lastname: Doe," +
-					//"profile: Utilisateurs," +
-					"firstname: Jésus," +
-					"commonname: John Doe," +
-					"password: doe," +
-					//"kind: kind," +
-					"title: title," +
-					"description: description," +
-					//"company: company," +
-					"service: service," +
-					//"direction: direction," +
-					"addresses: address1," +
-					"town: town," +
-					"zipcode: zipcode," +
-					//"business_zipcode: business_zipcode," +
-					//"country: country," +
-					//"phones: phones," +
-					"mobile: mobile," +
-					//"faxes: faxes" +
-					//"mail_quota: mail_quota," +
-					//"mail_server: mail_server," +
-					//"mails: mails," +
-					"timecreate: timecreate," +
-					"timeupdate: timeupdate," +
-					//"groups: groups" +
-					"}";
-		
-		return json;
+				"}");
+		userToJson.setContentType(MediaType.APPLICATION_JSON);
+		return  userToJson;
 	}
 }

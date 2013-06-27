@@ -86,7 +86,7 @@ public class ServicesToolBox {
 
 	public static Ical4jUser getIcal4jUser(ObmUser obmUser) {
 		return Ical4jUser.Factory.create()
-				.createIcal4jUser(obmUser.getEmail(), obmUser.getDomain());
+				.createIcal4jUser(obmUser.getEmailAtDomain(), obmUser.getDomain());
 	}
 
 	public static Ical4jUser getIcal4jUserFrom(String email) {

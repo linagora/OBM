@@ -217,7 +217,7 @@ public class CalendarBindingImplTest {
 		beriaInfo.setUid(defaultUser.getLogin());
 		beriaInfo.setFirstname("Lavrenti");
 		beriaInfo.setLastname("Beria");
-		beriaInfo.setMail(defaultUser.getEmail());
+		beriaInfo.setMail(defaultUser.getEmailAtDomain());
 		beriaInfo.setRead(true);
 		beriaInfo.setWrite(true);
 		
@@ -264,8 +264,8 @@ public class CalendarBindingImplTest {
 		AccessToken accessToken = mockAccessToken();
 		HelperService rightsHelper = createMock(HelperService.class);
 		
-		rightsHelper.constructEmailFromList(eq(defaultUser.getEmail()), eq(defaultUser.getDomain().getName()));
-		expectLastCall().andReturn(defaultUser.getEmail());
+		rightsHelper.constructEmailFromList(eq(defaultUser.getEmailAtDomain()), eq(defaultUser.getDomain().getName()));
+		expectLastCall().andReturn(defaultUser.getEmailAtDomain());
 		
 		UserService userService = createMock(UserService.class);
 		userService.getUserFromAccessToken(eq(accessToken));
@@ -331,7 +331,7 @@ public class CalendarBindingImplTest {
 		HelperService rightsHelper = createMock(HelperService.class);
 		
 		rightsHelper.constructEmailFromList(eq(defaultUser.getLogin()), eq(defaultUser.getDomain().getName()));
-		expectLastCall().andReturn(defaultUser.getEmail());
+		expectLastCall().andReturn(defaultUser.getEmailAtDomain());
 		
 		UserService userService = createMock(UserService.class);
 		userService.getUserFromAccessToken(eq(accessToken));
@@ -402,7 +402,7 @@ public class CalendarBindingImplTest {
 	@Test(expected=ServerFault.class)
 	public void testCalendarOwnerNotAnAttendee() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
-		String calendar = defaultUser.getEmail();
+		String calendar = defaultUser.getEmailAtDomain();
 		EventExtId eventExtId = new EventExtId("extid");
 		
 		AccessToken accessToken = mockAccessToken(mocksControl);
@@ -414,7 +414,7 @@ public class CalendarBindingImplTest {
 		expect(event.getObmId()).andReturn(null).atLeastOnce();
 		expect(event.getEventsExceptions()).andReturn(ImmutableSet.<Event>of()).anyTimes();
 		
-		event.findAttendeeFromEmail(defaultUser.getEmail());
+		event.findAttendeeFromEmail(defaultUser.getEmailAtDomain());
 		expectLastCall().andReturn(null).atLeastOnce();
 		
 		userService.getUserFromCalendar(eq(calendar), eq(defaultUser.getDomain().getName()));
@@ -442,7 +442,7 @@ public class CalendarBindingImplTest {
 		
 		String icsData = "icsData";
 		EventExtId eventExtId = new EventExtId("extid");
-		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		fakeUserAttendee.setParticipation(Participation.needsAction());
 		
 		AccessToken accessToken = mockAccessToken();
@@ -491,7 +491,7 @@ public class CalendarBindingImplTest {
 		EventObmId oldEventWithOtherAttendeesUid = new EventObmId("2");
 
 		String otherUserEmail = "user2@domain1";
-		Attendee userAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee userAttendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		Attendee otherAttendee = ToolBox.getFakeAttendee(otherUserEmail);
 		userAttendee.setParticipation(Participation.needsAction());
 
@@ -504,7 +504,7 @@ public class CalendarBindingImplTest {
 		oldEventNoOtherAttendees.setExtId(oldEventNoOtherAttendeesExtId);
 		oldEventNoOtherAttendees.setUid(oldEventNoOtherAttendeesUid);
 		oldEventNoOtherAttendees.setAttendees(ImmutableList.of(userAttendee));
-		oldEventNoOtherAttendees.setOwner(defaultUser.getEmail());
+		oldEventNoOtherAttendees.setOwner(defaultUser.getEmailAtDomain());
 		oldEventNoOtherAttendees.setType(EventType.VEVENT);
 		oldEventNoOtherAttendees.setInternalEvent(true);
 
@@ -512,7 +512,7 @@ public class CalendarBindingImplTest {
 		oldEventWithOtherAttendees.setExtId(oldEventWithOtherAttendeesExtId);
 		oldEventWithOtherAttendees.setUid(oldEventWithOtherAttendeesUid);
 		oldEventWithOtherAttendees.setAttendees(ImmutableList.of(userAttendee, otherAttendee));
-		oldEventWithOtherAttendees.setOwner(defaultUser.getEmail());
+		oldEventWithOtherAttendees.setOwner(defaultUser.getEmailAtDomain());
 		oldEventWithOtherAttendees.setType(EventType.VEVENT);
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
@@ -522,7 +522,7 @@ public class CalendarBindingImplTest {
 
 		UserService userService = createMock(UserService.class);
 		expect(userService.getUserFromCalendar(calendar, defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
-		expect(userService.getUserFromLogin(defaultUser.getEmail(), defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
+		expect(userService.getUserFromLogin(defaultUser.getEmailAtDomain(), defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.listEventsByIntervalDate(eq(accessToken), eq(defaultUser), isA(Date.class), 
@@ -559,7 +559,7 @@ public class CalendarBindingImplTest {
 
 		event.setExtId(extId);
 		event.addAttendee(ContactAttendee.builder().displayName("Contact 1").participation(Participation.needsAction()).build());
-		event.addAttendee(UserAttendee.builder().displayName("Owner").email(user.getEmail()).participation(Participation.accepted()).build());
+		event.addAttendee(UserAttendee.builder().displayName("Owner").email(user.getEmailAtDomain()).participation(Participation.accepted()).build());
 
 		expect(helperService.canReadCalendar(token, calendar)).andReturn(true);
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).times(3);
@@ -640,7 +640,7 @@ public class CalendarBindingImplTest {
 		
 		String icsData = "icsData";
 		EventExtId eventExtId = new EventExtId("extid");
-		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee fakeUserAttendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		fakeUserAttendee.setParticipation(Participation.needsAction());
 		
 		AccessToken accessToken = mockAccessToken();
@@ -721,7 +721,7 @@ public class CalendarBindingImplTest {
 	@Test(expected=NotAllowedException.class)
 	public void testToModifyEventWithoutWriteRightOnCalendar() throws Exception {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
-		String calendar = defaultObmUser.getEmail();
+		String calendar = defaultObmUser.getEmailAtDomain();
 		Event event = new Event();
 		event.setOwner("user");
 
@@ -749,12 +749,12 @@ public class CalendarBindingImplTest {
 	public void testAttendeeHasRightToWriteOnCalendar() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
-		String calendar = defaultUser.getEmail();
+		String calendar = defaultUser.getEmailAtDomain();
 		EventExtId extId = new EventExtId("extId");
 		boolean updateAttendee = true;
 		boolean notification = false;
 		
-		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		attendee.setParticipation(Participation.needsAction());
 		
 		Event beforeEvent = new Event();
@@ -782,7 +782,7 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromCalendar(calendar, defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(beforeEvent).atLeastOnce();
 		expect(helper.canWriteOnCalendar(accessToken, calendar)).andReturn(true).once();
-		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(true).anyTimes();
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmailAtDomain())).andReturn(true).anyTimes();
 		expect(helper.eventBelongsToCalendar(beforeEvent, calendar)).andReturn(true).atLeastOnce();
 		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1, true)).andReturn(event).atLeastOnce();
 		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
@@ -811,7 +811,7 @@ public class CalendarBindingImplTest {
 		boolean updateAttendee = true;
 		boolean notification = false;
 
-		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		attendee.setParticipation(Participation.accepted());
 
 		Event beforeEvent = new Event();
@@ -838,7 +838,7 @@ public class CalendarBindingImplTest {
 				.atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(
 				beforeEvent).atLeastOnce();
-		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(false).anyTimes();
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmailAtDomain())).andReturn(false).anyTimes();
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
@@ -861,7 +861,7 @@ public class CalendarBindingImplTest {
 		boolean updateAttendee = true;
 		boolean notification = false;
 
-		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		attendee.setParticipation(Participation.needsAction());
 
 		Attendee exceptionAttendee = ToolBox.getFakeAttendee(exceptionAttendeeEmail);
@@ -925,9 +925,9 @@ public class CalendarBindingImplTest {
 				.atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(
 				beforeEvent).atLeastOnce();
-		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(true).atLeastOnce();
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmailAtDomain())).andReturn(true).atLeastOnce();
 		expect(helper.canWriteOnCalendar(accessToken, exceptionAttendee.getEmail())).andReturn(true).atLeastOnce();
-		expect(helper.eventBelongsToCalendar(beforeEvent, defaultUser.getEmail())).andReturn(true).once();
+		expect(helper.eventBelongsToCalendar(beforeEvent, defaultUser.getEmailAtDomain())).andReturn(true).once();
 		expect(
 				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
 						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
@@ -963,7 +963,7 @@ public class CalendarBindingImplTest {
 		boolean updateAttendee = true;
 		boolean notification = false;
 
-		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		attendee.setParticipation(Participation.needsAction());
 
 		Attendee exceptionAttendee = ToolBox.getFakeAttendee(exceptionAttendeeEmail);
@@ -1048,7 +1048,7 @@ public class CalendarBindingImplTest {
 	public void testCreateAnEventExceptionAndUpdateItsStatusButNotTheParent() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
 		
-		String calendar = defaultUser.getEmail();
+		String calendar = defaultUser.getEmailAtDomain();
 		String attendeeEmail = "attendee@domain1";
 		EventExtId extId = new EventExtId("extId");
 		boolean updateAttendee = true;
@@ -1056,7 +1056,7 @@ public class CalendarBindingImplTest {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.lookup("daily"));
 
-		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee attendee = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		attendee.setParticipation(Participation.accepted());
 		Attendee attendee2 = ToolBox.getFakeAttendee(attendeeEmail);
 		attendee2.setParticipation(Participation.accepted());
@@ -1308,7 +1308,7 @@ public class CalendarBindingImplTest {
 		EventExtId extId = new EventExtId("extId");
 		boolean notification = false;
 		
-		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		calOwner.setParticipation(Participation.declined());
 		
 		Event event = new Event();
@@ -1330,7 +1330,7 @@ public class CalendarBindingImplTest {
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = mockRightsHelper(calendar, accessToken);
-		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(false);
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmailAtDomain())).andReturn(false);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
@@ -1692,9 +1692,9 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testNegativeExceptionChange() throws Exception {
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
-		Attendee userAttendee = ToolBox.getFakeAttendee(user.getEmail());
+		Attendee userAttendee = ToolBox.getFakeAttendee(user.getEmailAtDomain());
 		userAttendee.setParticipation(Participation.accepted());
 		Attendee angletonAttendee = ToolBox.getFakeAttendee("james.jesus.angleton");
 		angletonAttendee.setParticipation(Participation.accepted());
@@ -1716,7 +1716,7 @@ public class CalendarBindingImplTest {
 		currentEvent.setInternalEvent(true);
 
 		UserService userService = createMock(UserService.class);
-		expect(userService.getUserFromCalendar(user.getEmail(), "test.tlse.lng"))
+		expect(userService.getUserFromCalendar(user.getEmailAtDomain(), "test.tlse.lng"))
 				.andReturn(user).atLeastOnce();
 
 		HelperService rightsHelper = createMock(HelperService.class);
@@ -1739,7 +1739,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(token, user, currentEvent.getExtId())).andReturn(
 				previousEvent).once();
 		expect(
-				calendarDao.modifyEventForcingSequence(token, user.getEmail(), currentEvent,
+				calendarDao.modifyEventForcingSequence(token, user.getEmailAtDomain(), currentEvent,
 						updateAttendees, currentEvent.getSequence(), true)).andReturn(currentEvent);
 
 		replay(token, eventChangeHandler, userService, rightsHelper, calendarDao);
@@ -1759,13 +1759,13 @@ public class CalendarBindingImplTest {
 		Event daoEvent = new Event();
 		daoEvent.setInternalEvent(false);
 
-		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmail()).build();
+		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmailAtDomain()).build();
 		
 		daoEvent.addAttendee(attendee);
 		daoEvent.setOwner(calendar);
 
 		UserService userService = createMock(UserService.class);
-		expect(userService.getUserFromCalendar(user.getEmail(), "test.tlse.lng"))
+		expect(userService.getUserFromCalendar(user.getEmailAtDomain(), "test.tlse.lng"))
 				.andReturn(user).atLeastOnce();
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
@@ -1773,7 +1773,7 @@ public class CalendarBindingImplTest {
 				daoEvent).once();
 
 		HelperService rightsHelper = createMock(HelperService.class);
-		expect(rightsHelper.canWriteOnCalendar(token, user.getEmail())).andReturn(true)
+		expect(rightsHelper.canWriteOnCalendar(token, user.getEmailAtDomain())).andReturn(true)
 				.once();
 
 		expect(userService.getUserFromLogin(daoEvent.getOwner(), "test.tlse.lng"))
@@ -2094,7 +2094,7 @@ public class CalendarBindingImplTest {
 	public void testAssertEventCanBeModifiedWhenCannotWriteOnCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 		Event eventToModify = new Event();
 		
 		HelperService helperService = createMock(HelperService.class);
@@ -2111,7 +2111,7 @@ public class CalendarBindingImplTest {
 	public void testAssertEventCanBeModifiedWhenEventDoesNotBelongToCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 		Event eventToModify = new Event();
 		
 		HelperService helperService = createMock(HelperService.class);
@@ -2129,7 +2129,7 @@ public class CalendarBindingImplTest {
 	public void testAssertEventCanBeModifiedWhenRequirementsAreOK() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 		Event eventToModify = new Event();
 		
 		HelperService helperService = createMock(HelperService.class);
@@ -2147,7 +2147,7 @@ public class CalendarBindingImplTest {
 	public void testAssertEventCanBeModifiedWhenEventBelongsToEditorInAnotherCalendar() throws Exception {
 		AccessToken token = ToolBox.mockAccessToken();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 		Event eventToModify = new Event();
 		
 		HelperService helperService = createMock(HelperService.class);
@@ -2665,7 +2665,7 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testCreateInternalEventConvertsAttendees() throws Exception {
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 		String attendeeEmail = "test@obm.org";
 
 		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
@@ -2714,7 +2714,7 @@ public class CalendarBindingImplTest {
 	public void testCreateInternalWhenOwnerUseAliasInEvent() throws Exception {
 		String userEventAlias = "alias2@obm.org";
 		ObmUser user = ToolBox.getDefaultObmUserWithEmails("main@obm.org", "alias1@obm.org", userEventAlias, "alias3@obm.org");
-		String userEmail = user.getEmail();
+		String userEmail = user.getEmailAtDomain();
 		String attendeeEmail = "test@obm.org";
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
@@ -2757,8 +2757,8 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testCreateExternalEvent() throws Exception {
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String userEmail = user.getEmail();
-		String attendeeEmail = "2" + user.getEmail();
+		String userEmail = user.getEmailAtDomain();
+		String attendeeEmail = "2" + user.getEmailAtDomain();
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2794,8 +2794,8 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testCreateExternalEventWithExceptions() throws Exception {
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String userEmail = user.getEmail();
-		String attendeeEmail = "2" + user.getEmail();
+		String userEmail = user.getEmailAtDomain();
+		String attendeeEmail = "2" + user.getEmailAtDomain();
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2844,7 +2844,7 @@ public class CalendarBindingImplTest {
 		EventExtId extId = new EventExtId("extId");
 		boolean notification = false;
 		
-		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmail());
+		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmailAtDomain());
 		calOwner.setParticipation(Participation.declined());
 		
 		Event event = new Event();
@@ -2856,7 +2856,7 @@ public class CalendarBindingImplTest {
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = mockRightsHelper(calendar, accessToken);
-		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmail())).andReturn(false);
+		expect(helper.canWriteOnCalendar(accessToken, defaultUser.getEmailAtDomain())).andReturn(false);
 		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		UserService userService = createMock(UserService.class);
@@ -3431,7 +3431,7 @@ public class CalendarBindingImplTest {
 	public void testStoreEventCreatesEventIfNotPresent() throws Exception {
 		Event event = new Event();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
 		event.setExtId(new EventExtId("ExtId"));
 		event.setInternalEvent(true);
@@ -3468,7 +3468,7 @@ public class CalendarBindingImplTest {
 	public void testStoreEventWhenNotAllowedToCreateEvent() throws Exception {
 		Event event = new Event();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
 		event.setExtId(new EventExtId("ExtId"));
 		event.setInternalEvent(true);
@@ -3490,7 +3490,7 @@ public class CalendarBindingImplTest {
 	public void testStoreEventWhenNotAllowedToModifyEvent() throws Exception {
 		Event event = new Event();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
 		event.setExtId(new EventExtId("ExtId"));
 		event.setInternalEvent(true);
@@ -3513,7 +3513,7 @@ public class CalendarBindingImplTest {
 	public void testStoreEventWhenModifiedEventDoesntBelongToUserOrCalendar() throws Exception {
 		Event event = new Event();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
 		event.setOwnerEmail("another@test");
 		event.setExtId(new EventExtId("ExtId"));
@@ -3538,7 +3538,7 @@ public class CalendarBindingImplTest {
 	public void testStoreEventModifiesEventIfPresent() throws Exception {
 		Event event = new Event();
 		ObmUser user = ToolBox.getDefaultObmUser();
-		String calendar = user.getEmail();
+		String calendar = user.getEmailAtDomain();
 
 		event.setExtId(new EventExtId("ExtId"));
 		event.setInternalEvent(true);

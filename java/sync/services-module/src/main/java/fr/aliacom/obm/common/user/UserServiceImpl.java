@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
 			throw new FindException("The domain [" + domainName + "] does not exist or is not valid");
 		}
 		ObmUser user = userDao.findUser(calendar.toLowerCase(), domain);
-		if (user == null || StringUtils.isEmpty(user.getEmail())) {
+		if (user == null || StringUtils.isEmpty(user.getEmailAtDomain())) {
 			logger.info("calendar : {} not found, archived or have no email", calendar);
 			throw new FindException("The calendar [" + calendar + "] does not exist or is not valid (it was archived or no email was associated)");
 		}

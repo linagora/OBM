@@ -230,7 +230,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 
 		return organizerHasEmailAddress(organizer) && organizerMayAttend(organizer) &&
 		organizerExpectParticipationEmails(organizer, calendarOwner.getDomain()) &&
-		!organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmail());
+		!organizer.getEmail().equalsIgnoreCase(calendarOwner.getEmailAtDomain());
 	}
 
 	private boolean organizerExpectParticipationEmails(Attendee organizer, ObmDomain domain) {
@@ -305,7 +305,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 	
 	private boolean isUserEventOwner(ObmUser user, Event event) {
-		return user.getEmail().equals(event.getOwnerEmail());
+		return user.getEmailAtDomain().equals(event.getOwnerEmail());
 	}
 	
 	private void notifyOwnerUpdate(ObmUser user, Attendee owner, Event previous, Event current, Locale locale, TimeZone timezone, AccessToken token) {
