@@ -1,5 +1,3 @@
-package org.obm.provisioning;
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Copyright (C) 2011-2012  Linagora
  *
@@ -29,30 +27,25 @@ package org.obm.provisioning;
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import javax.ws.rs.Path;
 
-import org.apache.http.HttpResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+@Path("{domain}")
+public class DomainResource {
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class BatchResourceTest extends CommonDomainEndPointEnvTest {
+	@Path("users")
+	public Class<UserResource> users() {
+		return UserResource.class;
+	}
 
-	@Test
-	public void test() throws Exception {
-		expectDomain();
-		mocksControl.replay();
+	@Path("batches")
+	public Class<BatchResource> batches() {
+		return BatchResource.class;
+	}
 
-		HttpResponse httpResponse = get("/batches/12");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(404);
+	@Path("profiles")
+	public Class<ProfileResource> profiles() {
+		return ProfileResource.class;
 	}
 }

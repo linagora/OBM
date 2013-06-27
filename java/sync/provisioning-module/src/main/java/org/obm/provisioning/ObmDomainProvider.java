@@ -1,5 +1,3 @@
-package org.obm.provisioning;
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Copyright (C) 2011-2012  Linagora
  *
@@ -29,30 +27,63 @@ package org.obm.provisioning;
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.Provider;
 
-import org.apache.http.HttpResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.domain.dao.DomainDao;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class BatchResourceTest extends CommonDomainEndPointEnvTest {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.PerRequestTypeInjectableProvider;
 
-	@Test
-	public void test() throws Exception {
-		expectDomain();
-		mocksControl.replay();
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-		HttpResponse httpResponse = get("/batches/12");
+@Singleton
+@Provider
+public class ObmDomainProvider extends PerRequestTypeInjectableProvider<Context, ObmDomain> {
 
-		mocksControl.verify();
+	private final DomainDao domainDao;
 
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(404);
+	@Inject
+	private ObmDomainProvider(DomainDao domainDao) {
+		super(ObmDomain.class);
+
+		this.domainDao = domainDao;
 	}
+
+	@Override
+	public Injectable<ObmDomain> getInjectable(ComponentContext ic, Context a) {
+		return new AbstractHttpContextInjectable<ObmDomain>() {
+
+			@Override
+			public ObmDomain getValue(HttpContext c) {
+				MultivaluedMap<String, String> pathParameters = c.getUriInfo().getPathParameters();
+				String domainUuid = pathParameters.getFirst("domain");
+
+				if (domainUuid == null) {
+					throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+				}
+
+				ObmDomain domain = domainDao.findDomainByUuid(ObmDomainUuid.of(domainUuid));
+
+				if (domain == null) {
+					throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+				}
+
+				return domain;
+			}
+
+		};
+	}
+
 }

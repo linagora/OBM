@@ -4,6 +4,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -16,25 +17,24 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Path("profiles")
 public class ProfileResource {
 
-	Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
-	
+	private final Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
+
 	@Inject
 	private ProfileDao profileDao;
 
-//	@PathParam("domainUuid")
-	private String domainUuid = "ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6";
+	@Context
+	private ObmDomain domain;
 	
 	@GET @Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getProfileEntries() {
 		try {
 			return Response
-					.ok(profileDao.getProfiles(ObmDomainUuid.of(domainUuid)))
+					.ok(profileDao.getProfiles(domain.getUuid()))
 					.build();
 		} catch (Exception e) {
 			logger.error("Cannot get profiles for given domain", e);

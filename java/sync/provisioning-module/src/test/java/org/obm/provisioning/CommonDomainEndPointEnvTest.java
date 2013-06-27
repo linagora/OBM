@@ -32,6 +32,7 @@
 package org.obm.provisioning;
 
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -41,6 +42,8 @@ import org.junit.Before;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.dao.UserDao;
 
 import com.google.inject.Inject;
@@ -49,59 +52,81 @@ import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public abstract class CommonEndPointEnvTest {
+public abstract class CommonDomainEndPointEnvTest {
+
 	public static class Env extends ProvisioningService {
 		private IMocksControl mocksControl = createControl();
-		
-		public Env() {
-		}
 
 		@Override
 		protected void configureServlets() {
 			super.configureServlets();
+
 			bind(IMocksControl.class).toInstance(mocksControl);
 			bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
+			bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
+
+			bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 		}
-	
+
 		@Provides @Singleton
 		protected Server createServer() {
 			Server server = new Server(0);
 			Context root = new Context(server, "/", Context.SESSIONS);
-			
+
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/*");
-			
+
 			return server;
 		}
 	}
-	
-	protected final static ObmDomain domain
-		= ObmDomain.builder().name("domain").id(1).build();
-	
+
+	protected final static ObmDomain domain = ObmDomain
+			.builder()
+			.name("domain")
+			.id(1)
+			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.build();
+
 	@Inject
-	private Server server;
-	
+	protected IMocksControl mocksControl;
+	@Inject
+	protected Server server;
+	@Inject
+	protected DomainDao domainDao;
+	@Inject
+	protected UserDao userDao;
+
 	protected String baseUrl;
 	protected int serverPort;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		server.start();
 		serverPort = server.getConnectors()[0].getLocalPort();
 		baseUrl = "http://localhost:" + serverPort + ProvisioningService.PROVISIONING_URL_PREFIX;
 	}
-	
+
 	@After
 	public void tearDown() throws Exception {
 		server.stop();
 	}
-	
+
+	protected void expectDomain() {
+		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain);
+	}
+
+	protected void expectNoDomain() {
+		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(null);
+	}
+
 	protected HttpResponse get(String path) throws Exception {
 		return createRequest(path).execute().returnResponse();
 	}
-	
+
 	protected Request createRequest(String path) {
-		return Request.Get(baseUrl + path);
+		return Request.Get(baseUrl + "/" + domain.getUuid().get() + path);
 	}
+
 }

@@ -42,33 +42,37 @@ import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.bean.UserIdentifier;
-import org.obm.provisioning.dao.UserDao;
 
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 
 
-//@Slow
+@Slow
 @RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonEndPointEnvTest.Env.class)
-public class UserResourceListAllUserTest extends CommonEndPointEnvTest {
-	
-	@Inject
-	private IMocksControl mocksControl;
-	
-	@Inject
-	private UserDao userDao;
-	
+@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
+public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
+
+	@Test
+	public void testListAllUserOnNonExistentDomain() throws Exception {
+		expectNoDomain();
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+
 	@Test
 	public void testListAllUser() throws Exception {
+		expectDomain();
 		expect(userDao.listAll()).andReturn(fakeListOfUserIdentifer());
-		
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
@@ -79,13 +83,12 @@ public class UserResourceListAllUserTest extends CommonEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonSetOfUser());
-		
 	}
 	
 	@Test
 	public void testListAllUserReturnNothing() throws Exception {
+		expectDomain();
 		expect(userDao.listAll()).andReturn(null);
-		
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
@@ -97,8 +100,8 @@ public class UserResourceListAllUserTest extends CommonEndPointEnvTest {
 	
 	@Test
 	public void testListAllUserReturnEmptySet() throws Exception {
+		expectDomain();
 		expect(userDao.listAll()).andReturn(fakeEmptySet());
-		
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
@@ -111,16 +114,15 @@ public class UserResourceListAllUserTest extends CommonEndPointEnvTest {
 	
 	@Test
 	public void testListAllThrowError() throws Exception {
+		expectDomain();
 		expect(userDao.listAll()).andThrow(new RuntimeException("bad things happen"));
-		
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users/");
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 	
 

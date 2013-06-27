@@ -1,5 +1,3 @@
-package org.obm.provisioning;
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Copyright (C) 2011-2012  Linagora
  *
@@ -29,30 +27,22 @@ package org.obm.provisioning;
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning.json;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.io.IOException;
 
-import org.apache.http.HttpResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class BatchResourceTest extends CommonDomainEndPointEnvTest {
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	@Test
-	public void test() throws Exception {
-		expectDomain();
-		mocksControl.replay();
+public class ObmDomainUuidJsonSerializer extends JsonSerializer<ObmDomainUuid> {
 
-		HttpResponse httpResponse = get("/batches/12");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(404);
+	@Override
+	public void serialize(ObmDomainUuid value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+		jgen.writeString(value.get());
 	}
+
 }

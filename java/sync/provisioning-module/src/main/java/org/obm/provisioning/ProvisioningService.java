@@ -1,16 +1,19 @@
 package org.obm.provisioning;
 
+
+import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.domain.dao.DomainDao;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
+import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -21,10 +24,12 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
 public class ProvisioningService extends JerseyServletModule {
 
-	public static String PROVISIONING_URL_PREFIX = "provisioning/v1";
-	public static String PROVISIONING_URL_PATTERN = "/" + PROVISIONING_URL_PREFIX + "/*";
+	public static String PROVISIONING_URL_PREFIX = "/provisioning/v1";
+	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 	
 	@Override
 	protected void configureServlets() {
@@ -35,27 +40,32 @@ public class ProvisioningService extends JerseyServletModule {
 		bindDao();
 		
 		install(new LdapModule());
-		install(new TransactionalModule());
 	}
 
 	private void bindDao() {
-		bind(DomainDao.class);
 		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 	}
 
 	private void bindRestResources() {
-		bind(BatchResource.class);
-		bind(ProfileResource.class);
-		bind(UserResource.class);
+		bind(DomainResource.class);
+
+		bind(ObmDomainProvider.class);
 	}
 
 	@Provides
 	@Singleton
 	public static ObjectMapper createObjectMapper() {
-		final ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
+		SimpleModule module = new SimpleModule("Serializers", new Version(0, 0, 0, null));
+
+		module.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer());
+		module.addDeserializer(ObmDomainUuid.class, new ObmDomainUuidJsonDeserializer());
+
 		objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+		objectMapper.registerModule(module);
+
 		return objectMapper;
 	}
 	

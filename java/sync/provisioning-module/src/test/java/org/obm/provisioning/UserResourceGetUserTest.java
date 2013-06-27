@@ -38,45 +38,39 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
 import org.apache.http.util.EntityUtils;
-import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.UserDao;
-
-import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonEndPointEnvTest.Env.class)
-public class UserResourceGetUserTest extends CommonEndPointEnvTest {
-	
-	@Inject
-	private IMocksControl mocksControl;
-	
-	@Inject
-	private UserDao userDao;
-	
+@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
+public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
+
 	@Test
 	public void testUnknownUrl() throws Exception {
+		expectDomain();
+		mocksControl.replay();
+
 		HttpResponse httpResponse = get("/users/a/b");
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.NOT_FOUND.getStatusCode());
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
-	
+
 	@Test
 	public void testGetAUser() throws Exception {
+		expectDomain();
 		expect(userDao.getUser(1)).andReturn(fakeUser());
-		
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users/1");
@@ -87,37 +81,45 @@ public class UserResourceGetUserTest extends CommonEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonUser());
-		
+	}
+
+	@Test
+	public void testGetAUserOnNonExistentDomain() throws Exception {
+		expectNoDomain();
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users/1");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testGetNonExistingUser() throws Exception {
+		expectDomain();
 		expect(userDao.getUser(123)).andReturn(null);
-		
 		mocksControl.replay();
-		
+
 		HttpResponse httpResponse = get("/users/123");
-		
+
 		mocksControl.verify();
-		
+
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 	}
 	
 	@Test
 	public void testGetUserThrowError() throws Exception {
+		expectDomain();
 		expect(userDao.getUser(1)).andThrow(new RuntimeException("bad things happen"));
-		
 		mocksControl.replay();
-		
-		HttpResponse httpResponse = get("/users/1");
-		
-		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
-	}
-	
 
+		HttpResponse httpResponse = get("/users/1");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+	}
 	
 	private ObmUser fakeUser() {
 		return ObmUser.builder()
@@ -160,6 +162,7 @@ public class UserResourceGetUserTest extends CommonEndPointEnvTest {
 				  "\"uid\":1," +
 				  "\"entityId\":0," +
 				  "\"login\":\"user1\"," +
+				  "\"extId\":null," +
 				  "\"commonName\":\"John Doe\"," +
 				  "\"lastName\":\"Doe\"," +
 				  "\"firstName\":\"Jésus\"," +
@@ -185,8 +188,9 @@ public class UserResourceGetUserTest extends CommonEndPointEnvTest {
 				  "\"domain\":{" +
 				    "\"id\":1," +
 				    "\"name\":\"domain\"," +
-				    "\"uuid\":null," +
+				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
 				    "\"aliases\":[]," +
+				    "\"label\":null," +
 				    "\"names\":[\"domain\"]" +
 				  "}," +
 				  "\"publicFreeBusy\":false," +
@@ -228,13 +232,5 @@ public class UserResourceGetUserTest extends CommonEndPointEnvTest {
 					"}";
 		
 		return json;
-	}
-	
-	protected HttpResponse get(String path) throws Exception {
-		return createRequest(path).execute().returnResponse();
-	}
-	
-	protected Request createRequest(String path) {
-		return Request.Get(baseUrl + path);
 	}
 }

@@ -37,32 +37,35 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.UserDao;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@Singleton
-@Path("users")
 public class UserResource {
-	
+
 	private final static String UTF_8 = ";charset=UTF-8";
 
 	@Inject
 	private UserDao userDao;
-	
-	@GET @Path("/{userId}")
+
+	@Context
+	private ObmDomain domain;
+
+	@GET
+	@Path("/{userId}")
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public ObmUser get(@PathParam("userId") int userId) {
 		return userDao.getUser(userId);
 	}
-	
-	@GET @Path("/")
+
+	@GET
 	@Produces(MediaType.APPLICATION_JSON + UTF_8)
 	public Set<UserIdentifier> listAll() {
 		return userDao.listAll();
