@@ -35,70 +35,45 @@ import com.google.common.base.Preconditions;
 
 public class ServiceProperty {
 
-	private final Integer id;
 	private final String service;
 	private final String property;
-	private final String value;
 
 	public static class Builder {
-		
-		private Integer id;
+
 		private String service;
 		private String property;
-		private String value;
-		
+
 		private Builder() {
 		}
 
 		public Builder from(ServiceProperty serviceProperty) {
-			return id(serviceProperty.id)
-				.service(serviceProperty.service)
-				.property(serviceProperty.property)
-				.value(serviceProperty.value);
+			return service(serviceProperty.service).property(serviceProperty.property);
 		}
 
-		
-		public Builder id(Integer id) {
-			Preconditions.checkNotNull(id);
-			this.id = id;
-			return this;
-		}
-		
 		public Builder service(String service) {
 			Preconditions.checkNotNull(service);
 			this.service = service;
 			return this;
 		}
-		
+
 		public Builder property(String property) {
 			Preconditions.checkNotNull(property);
 			this.property = property;
 			return this;
 		}
-		
-		public Builder value(String value) {
-			this.value = value;
-			return this;
-		}
-				
+
 		public ServiceProperty build() {
-			return new ServiceProperty(id, service, property, value);
+			return new ServiceProperty(service, property);
 		}
 	}
-	
+
 	public static Builder builder() {
 		return new Builder();
 	}
 
-	private ServiceProperty(Integer id, String service, String property, String value) {
-		this.id = id;
+	private ServiceProperty(String service, String property) {
 		this.service = service;
 		this.property = property;
-		this.value = value;
-	}
-
-	public Integer getId() {
-		return id;
 	}
 
 	public String getService() {
@@ -109,38 +84,25 @@ public class ServiceProperty {
 		return property;
 	}
 
-	public String getValue() {
-		return value;
-	}
-	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(id, service, property, value);
+		return Objects.hashCode(service, property);
 	}
-	
+
 	@Override
 	public final boolean equals(Object object) {
 		if (object instanceof ServiceProperty) {
 			ServiceProperty that = (ServiceProperty) object;
-			
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.service, that.service)
-				&& Objects.equal(this.property, that.property)
-				&& Objects.equal(this.value, that.value);
-			}
-		
+
+			return Objects.equal(this.service, that.service)&& Objects.equal(this.property, that.property);
+		}
+
 		return false;
 	}
-	
+
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("service", service)
-			.add("property", property)
-			.add("value", value)
-			.toString();
+		return service + '/' + property;
 	}
-
 
 }

@@ -33,30 +33,18 @@ package org.obm.sync.serviceproperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.serviceproperty.ServiceProperty;
-
 
 @RunWith(SlowFilterRunner.class)
 public class ServicePropertyTest {
 
 	@Test(expected = NullPointerException.class)
-	public void testBuildWhenNullIdGiven() {
-		ServiceProperty.builder().id(null).build();
-	}
-	
-	@Test(expected = NullPointerException.class)
 	public void testBuildWhenNullServiceGiven() {
 		ServiceProperty.builder().service(null).build();
 	}
-	
+
 	@Test(expected = NullPointerException.class)
 	public void testBuildWhenNullPropertyGiven() {
 		ServiceProperty.builder().property(null).build();
-	}
-	
-	@Test
-	public void testBuildWhenNullValueGiven() {
-		ServiceProperty.builder().value(null).build();
 	}
 
 }
