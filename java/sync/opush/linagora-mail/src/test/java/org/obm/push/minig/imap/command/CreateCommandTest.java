@@ -47,37 +47,37 @@ public class CreateCommandTest {
 	}
 	
 	@Test
-	public void testCreateMailboxChinese() throws Exception {
+	public void testCreateMailboxChinese() {
 		assertThat(new CreateCommand("中国记录").getImapCommand())
 			.isEqualTo("CREATE \"&Ti1W,YuwX1U-\"");
 	}
 
 	@Test
-	public void testCreateMailboxChineseWithUserPath() throws Exception {
+	public void testCreateMailboxChineseWithUserPath() {
 		assertThat(new CreateCommand("user/myusername/中国记录").getImapCommand())
 			.isEqualTo("CREATE \"user/myusername/&Ti1W,YuwX1U-\"");
 	}
 
 	@Test
-	public void testCreateMailboxWithPartitionNull() throws Exception {
+	public void testCreateMailboxWithPartitionNull() {
 		assertThat(new CreateCommand("user/myusername/mailbox", null).getImapCommand())
 			.isEqualTo("CREATE \"user/myusername/mailbox\"");
 	}
 	
 	@Test
-	public void testCreateMailboxWithPartitionEmpty() throws Exception {
+	public void testCreateMailboxWithPartitionEmpty() {
 		assertThat(new CreateCommand("user/myusername/mailbox", "").getImapCommand())
 		.isEqualTo("CREATE \"user/myusername/mailbox\"");
 	}
 
 	@Test
-	public void testCreateMailboxWithPartition() throws Exception {
+	public void testCreateMailboxWithPartition() {
 		assertThat(new CreateCommand("user/myusername/mailbox", "partition_name").getImapCommand())
 			.isEqualTo("CREATE \"user/myusername/mailbox\" \"partition_name\"");
 	}
 
 	@Test
-	public void testCreateMailboxWithPartitionUTF7() throws Exception {
+	public void testCreateMailboxWithPartitionUTF7() {
 		assertThat(new CreateCommand("user/myusername/mailbox", "partition_name_accent_é").getImapCommand())
 			.isEqualTo("CREATE \"user/myusername/mailbox\" \"partition_name_accent_&AOk-\"");
 	}

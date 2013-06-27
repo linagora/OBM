@@ -58,7 +58,7 @@ import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 
 import com.google.common.base.Charsets;
 
-//@Slow
+@Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 public class ProfileIntegrationTest {
 

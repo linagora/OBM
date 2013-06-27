@@ -47,13 +47,13 @@ public class DeleteCommandTest {
 	}
 	
 	@Test
-	public void testDeleteMailboxChinese() throws Exception {
+	public void testDeleteMailboxChinese() {
 		assertThat(new DeleteCommand("中国记录").getImapCommand())
 			.isEqualTo("DELETE \"&Ti1W,YuwX1U-\"");
 	}
 
 	@Test
-	public void testDeleteMailboxChineseWithUserPath() throws Exception {
+	public void testDeleteMailboxChineseWithUserPath() {
 		assertThat(new DeleteCommand("user/myusername/中国记录").getImapCommand())
 			.isEqualTo("DELETE \"user/myusername/&Ti1W,YuwX1U-\"");
 	}
