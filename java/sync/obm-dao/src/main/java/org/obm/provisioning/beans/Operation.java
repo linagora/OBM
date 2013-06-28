@@ -36,13 +36,72 @@ import com.google.common.base.Preconditions;
 
 public class Operation {
 
+	public static class Id {
+
+		public static Id valueOf(String idAsString) {
+			return builder().id(Integer.parseInt(idAsString)).build();
+		}
+
+		public static Builder builder() {
+			return new Builder();
+		}
+
+		public static class Builder {
+
+			private Integer id;
+
+			private Builder() {
+			}
+
+			public Builder id(Integer id) {
+				this.id = id;
+				return this;
+			}
+
+			public Id build() {
+				return new Id(id);
+			}
+		}
+
+		private final Integer id;
+
+		public Integer getId() {
+			return id;
+		}
+
+		private Id(Integer id) {
+			this.id = id;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(id);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Id) {
+				Id other = (Id) obj;
+
+				return Objects.equal(id, other.id);
+			}
+
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(id);
+		}
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
 
 	public static class Builder {
 
-		private Integer id;
+		private Id id;
 		private BatchStatus status;
 		private BatchEntityType entityType;
 		private Request request;
@@ -53,7 +112,7 @@ public class Operation {
 		private Builder() {
 		}
 
-		public Builder id(Integer id) {
+		public Builder id(Id id) {
 			this.id = id;
 			return this;
 		}
@@ -97,7 +156,7 @@ public class Operation {
 		}
 	}
 
-	private Integer id;
+	private Id id;
 	private BatchStatus status;
 	private BatchEntityType entityType;
 	private Request request;
@@ -105,7 +164,7 @@ public class Operation {
 	private Date timecreate;
 	private Date timecommit;
 
-	private Operation(Integer id, BatchStatus status, BatchEntityType entityType, Request request, String error, Date timecreate, Date timecommit) {
+	private Operation(Id id, BatchStatus status, BatchEntityType entityType, Request request, String error, Date timecreate, Date timecommit) {
 		this.id = id;
 		this.status = status;
 		this.entityType = entityType;
@@ -115,7 +174,7 @@ public class Operation {
 		this.timecommit = timecommit;
 	}
 
-	public Integer getId() {
+	public Id getId() {
 		return id;
 	}
 

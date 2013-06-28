@@ -197,7 +197,7 @@ public class BatchDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -216,7 +216,7 @@ public class BatchDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -233,5 +233,9 @@ public class BatchDaoJdbcImplTest {
 
 	private Batch.Id batchId(Integer id) {
 		return Batch.Id.builder().id(id).build();
+	}
+
+	private Operation.Id operationId(Integer id) {
+		return Operation.Id.builder().id(id).build();
 	}
 }

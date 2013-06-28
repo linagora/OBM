@@ -196,10 +196,10 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				.name(rs.getString("domain_name"))
 				.build();
 
-		int batchId = rs.getInt("id");
+		Batch.Id batchId = Batch.Id.builder().id(rs.getInt("id")).build();
 
 		return Batch.builder()
-				.id(Batch.Id.builder().id(batchId).build())
+				.id(batchId)
 				.status(BatchStatus.valueOf(rs.getString("status")))
 				.domain(domain)
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))

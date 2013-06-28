@@ -85,24 +85,24 @@ public class OperationDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
 		
-		assertThat(dao.get(1)).isNotNull();
+		assertThat(dao.get(operationId(1))).isNotNull();
 	}
 	
 	@Test
 	public void testGetWhenNoOperation() throws Exception {
-		assertThat(dao.get(1)).isNull();
+		assertThat(dao.get(operationId(1))).isNull();
 	}
 	
 	@Test
 	public void testGetByBatchIdNoOperationsOnExistingBatch() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		
-		assertThat(dao.getByBatchId(1)).isEmpty();
+		assertThat(dao.getByBatchId(batchId(1))).isEmpty();
 	}
 	
 	@Test
 	public void testGetByBatchIdOnNonExistingBatch() throws Exception {
-		assertThat(dao.getByBatchId(1)).isEmpty();
+		assertThat(dao.getByBatchId(batchId(1))).isEmpty();
 	}
 	
 	@Test
@@ -118,7 +118,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation1 = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request1)
 				.entityType(BatchEntityType.USER)
@@ -128,13 +128,13 @@ public class OperationDaoJdbcImplTest {
 				.verb(HttpVerb.POST)
 				.build();
 		Operation operation2 = Operation.builder()
-				.id(2)
+				.id(operationId(2))
 				.status(BatchStatus.IDLE)
 				.request(request2)
 				.entityType(BatchEntityType.GROUP)
 				.build();
 		
-		assertThat(dao.getByBatchId(1)).containsExactly(operation1, operation2);
+		assertThat(dao.getByBatchId(batchId(1))).containsExactly(operation1, operation2);
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -168,7 +168,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -195,7 +195,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -222,7 +222,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -239,7 +239,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.RUNNING)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -259,7 +259,7 @@ public class OperationDaoJdbcImplTest {
 				.param("p1", "v1")
 				.build();
 		Operation operation = Operation.builder()
-				.id(1)
+				.id(operationId(1))
 				.status(BatchStatus.RUNNING)
 				.request(request)
 				.entityType(BatchEntityType.USER)
@@ -272,5 +272,9 @@ public class OperationDaoJdbcImplTest {
 
 	private Batch.Id batchId(Integer id) {
 		return Batch.Id.builder().id(id).build();
+	}
+
+	private Operation.Id operationId(Integer id) {
+		return Operation.Id.builder().id(id).build();
 	}
 }

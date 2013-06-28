@@ -65,7 +65,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public Operation get(Integer operationId) throws DaoException {
+	public Operation get(Operation.Id operationId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -74,7 +74,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("SELECT * FROM batch_operation WHERE id = ?");
 
-			ps.setInt(1, operationId);
+			ps.setInt(1, operationId.getId());
 
 			rs = ps.executeQuery();
 
@@ -93,7 +93,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 	}
 
 	@Override
-	public List<Operation> getByBatchId(Integer batchId) throws DaoException {
+	public List<Operation> getByBatchId(Batch.Id batchId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -103,7 +103,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("SELECT * FROM batch_operation WHERE batch = ? ORDER BY id ASC");
 
-			ps.setInt(1, batchId);
+			ps.setInt(1, batchId.getId());
 
 			rs = ps.executeQuery();
 
@@ -143,7 +143,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 			insertOperationParameters(operation, operationId);
 
-			return get(operationId);
+			return get(Operation.Id.builder().id(operationId).build());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -172,10 +172,10 @@ public class OperationDaoJdbcImpl implements OperationDao {
 				ps.setTimestamp(2, new Timestamp(timecommit.getTime()));
 			}
 			ps.setString(3, operation.getError());
-			ps.setInt(4, operation.getId());
+			ps.setInt(4, operation.getId().getId());
 
 			if (ps.executeUpdate() != 1) {
-				throw new OperationNotFoundException(String.format("Operation %d not found", operation.getId()));
+				throw new OperationNotFoundException(String.format("Operation %s not found", operation.getId()));
 			}
 
 			return get(operation.getId());
@@ -223,7 +223,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 				.verb(HttpVerb.valueOf(rs.getString("verb")));
 
 		return Operation.builder()
-				.id(operationId)
+				.id(Operation.Id.builder().id(operationId).build())
 				.status(BatchStatus.valueOf(rs.getString("status")))
 				.entityType(BatchEntityType.valueOf(rs.getString("entity_type")))
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))

@@ -38,9 +38,9 @@ import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
 public interface OperationDao {
 
-	Operation get(Integer operationId) throws DaoException;
+	Operation get(Operation.Id operationId) throws DaoException;
 
-	List<Operation> getByBatchId(Integer batchId) throws DaoException;
+	List<Operation> getByBatchId(Batch.Id batchId) throws DaoException;
 
 	Operation create(Batch batch, Operation operation) throws DaoException;
 
