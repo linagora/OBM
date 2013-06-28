@@ -27,74 +27,51 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
-import java.util.Map;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
-import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.BatchDao;
-import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
+public class UserWriteResource extends AbstractBatchAwareResource {
 
-public abstract class AbstractBatchAwareResource {
-
-	public static final String UTF_8 = ";charset=UTF-8";
-
-	@Inject
-	protected BatchDao batchDao;
-
-	@Context
-	protected Batch batch;
-	@Context
-	protected UriInfo uriInfo;
-
-	protected Map<String, String> multivaluedMapToMap(MultivaluedMap<String, String> mvMap) {
-		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-
-		for (String key : mvMap.keySet()) {
-			builder.put(key, mvMap.getFirst(key));
-		}
-
-		return builder.build();
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response create(String user) throws DaoException {
+		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
 	}
 
-	protected Response addBatchOperation(String entity, HttpVerb httpVerb, BatchEntityType entityType) throws DaoException {
-		Operation operation = Operation
-				.builder()
-				.entityType(entityType)
-				.status(BatchStatus.IDLE)
-				.request(Request
-						.builder()
-						.url(uriInfo.getPath())
-						.body(entity)
-						.verb(httpVerb)
-						.params(multivaluedMapToMap(uriInfo.getQueryParameters()))
-						.build())
-				.build();
-
-		try {
-			batchDao.addOperation(batch.getId(), operation);
-		}
-		catch (BatchNotFoundException e) {
-			throw new WebApplicationException(e, Status.NOT_FOUND);
-		}
-
-		return Response.ok().build();
+	@PUT
+	@Path("/{userId}")
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response modify(String user) throws DaoException {
+		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
 	}
 
+	@DELETE
+	@Path("/{userId}")
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response delete() throws DaoException {
+		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
+	}
+	
+	@PATCH
+	@Path("/{userId}")
+	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	public Response patch(String user) throws DaoException {
+		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
+	}
 }

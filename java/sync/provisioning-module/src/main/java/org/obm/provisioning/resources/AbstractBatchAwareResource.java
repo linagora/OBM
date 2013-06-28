@@ -27,64 +27,74 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.provisioning.beans.ObmDomainEntry;
+import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+public abstract class AbstractBatchAwareResource {
 
-@Path("domains")
-public class DomainResource {
+	public static final String UTF_8 = ";charset=UTF-8";
 
 	@Inject
-	private DomainDao domainDao;
+	protected BatchDao batchDao;
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<ObmDomainEntry> list() {
-		List<ObmDomain> domains = domainDao.list();
+	@Context
+	protected Batch batch;
+	@Context
+	protected UriInfo uriInfo;
 
-		if (domains == null) {
-			return Collections.emptyList();
+	protected Map<String, String> multivaluedMapToMap(MultivaluedMap<String, String> mvMap) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
+		for (String key : mvMap.keySet()) {
+			builder.put(key, mvMap.getFirst(key));
 		}
 
-		return Lists.transform(domains, new Function<ObmDomain, ObmDomainEntry>() {
-
-			@Override
-			public ObmDomainEntry apply(ObmDomain domain) {
-				return ObmDomainEntry.builder().id(domain.getUuid().get()).build();
-			}
-
-		});
+		return builder.build();
 	}
 
-	@GET
-	@Path("{domainUuid}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) {
-		ObmDomain domain = domainDao.findDomainByUuid(domainUuid);
+	protected Response addBatchOperation(String entity, HttpVerb httpVerb, BatchEntityType entityType) throws DaoException {
+		Operation operation = Operation
+				.builder()
+				.entityType(entityType)
+				.status(BatchStatus.IDLE)
+				.request(Request
+						.builder()
+						.url(uriInfo.getPath())
+						.body(entity)
+						.verb(httpVerb)
+						.params(multivaluedMapToMap(uriInfo.getQueryParameters()))
+						.build())
+				.build();
 
-		if (domain == null) {
-			throw new WebApplicationException(Status.NOT_FOUND);
+		try {
+			batchDao.addOperation(batch.getId(), operation);
+		}
+		catch (BatchNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 
-		return domain;
+		return Response.ok().build();
 	}
+
 }

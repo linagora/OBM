@@ -27,25 +27,64 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
-@Path("{domain}")
-public class DomainBasedSubResource {
+import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.beans.ObmDomainEntry;
 
-	@Path("users")
-	public Class<UserResource> users() {
-		return UserResource.class;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
+@Path("domains")
+public class DomainResource {
+
+	@Inject
+	private DomainDao domainDao;
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ObmDomainEntry> list() {
+		List<ObmDomain> domains = domainDao.list();
+
+		if (domains == null) {
+			return Collections.emptyList();
+		}
+
+		return Lists.transform(domains, new Function<ObmDomain, ObmDomainEntry>() {
+
+			@Override
+			public ObmDomainEntry apply(ObmDomain domain) {
+				return ObmDomainEntry.builder().id(domain.getUuid().get()).build();
+			}
+
+		});
 	}
 
-	@Path("batches")
-	public Class<BatchResource> batches() {
-		return BatchResource.class;
-	}
+	@GET
+	@Path("{domainUuid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) {
+		ObmDomain domain = domainDao.findDomainByUuid(domainUuid);
 
-	@Path("profiles")
-	public Class<ProfileResource> profiles() {
-		return ProfileResource.class;
+		if (domain == null) {
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		return domain;
 	}
 }

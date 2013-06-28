@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -45,89 +45,65 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
-import com.google.common.collect.ImmutableMap;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
+public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testDeleteAUserWithTrueExpunge() throws Exception {
+	public void testGetAUser() throws Exception {
 		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
-				.andReturn(batch);
-		
+		expect(userDao.get(1)).andReturn(fakeUser());
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
+		HttpResponse httpResponse = get("/users/1");
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-	}
-	
-	@Test
-	public void testDeleteAUserWithFalseExpunge() throws Exception {
-		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
-				.andReturn(batch);
-		
-		mocksControl.replay();
-		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=false");
-		EntityUtils.consume(httpResponse.getEntity());
-		
-		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-	}
-	
-	@Test
-	public void testDeleteAUserWithDefaultFalseExpunge() throws Exception {
-		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
-				.andReturn(batch);
-		
-		mocksControl.replay();
-		
-		HttpResponse httpResponse = delete("/batches/1/users/1");
-		EntityUtils.consume(httpResponse.getEntity());
-		
-		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
+		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
 	}
 
 	@Test
-	public void testDeleteAUserWithError() throws Exception {
-		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
-				.andThrow(new DaoException());
-		
+	public void testGetAUserOnNonExistentDomain() throws Exception {
+		expectNoDomain();
 		mocksControl.replay();
-		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
-		EntityUtils.consume(httpResponse.getEntity());
-		
+
+		HttpResponse httpResponse = get("/users/1");
+
 		mocksControl.verify();
-		
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+	
+	@Test
+	public void testGetNonExistingUser() throws Exception {
+		expectDomain();
+		expect(userDao.get(123)).andReturn(null);
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users/123");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+	}
+	
+	@Test
+	public void testGetUserThrowError() throws Exception {
+		expectDomain();
+		expect(userDao.get(1)).andThrow(new RuntimeException("bad things happen"));
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users/1");
+
+		mocksControl.verify();
+
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 }

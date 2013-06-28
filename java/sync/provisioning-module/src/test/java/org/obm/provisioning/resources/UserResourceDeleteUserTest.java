@@ -3,7 +3,7 @@
  * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or
- * Patch it under the terms of the GNU Affero General Public License as
+ * modify it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version, provided you comply
  * with the Additional Terms applicable for OBM connector by Linagora
@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -45,30 +45,29 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.common.collect.ImmutableMap;
 
-
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
-	
+public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
+
 	@Test
-	public void testPatchAUser() throws Exception {
+	public void testDeleteAUserWithTrueExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1",
-						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = patch("/batches/1/users/1", obmUserToJson());
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -78,21 +77,58 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testPatchUserThrowError() throws Exception {
+	public void testDeleteAUserWithFalseExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1",
-						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
+				.andReturn(batch);
+		
+		mocksControl.replay();
+		
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=false");
+		EntityUtils.consume(httpResponse.getEntity());
+		
+		mocksControl.verify();
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
+	}
+	
+	@Test
+	public void testDeleteAUserWithDefaultFalseExpunge() throws Exception {
+		expectDomain();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
+				.andReturn(batch);
+		
+		mocksControl.replay();
+		
+		HttpResponse httpResponse = delete("/batches/1/users/1");
+		EntityUtils.consume(httpResponse.getEntity());
+		
+		mocksControl.verify();
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
+	}
+
+	@Test
+	public void testDeleteAUserWithError() throws Exception {
+		expectDomain();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = patch("/batches/1/users/1", obmUserToJson());
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
+		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 }

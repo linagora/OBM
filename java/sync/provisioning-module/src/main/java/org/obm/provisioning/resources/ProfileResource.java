@@ -1,4 +1,4 @@
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;

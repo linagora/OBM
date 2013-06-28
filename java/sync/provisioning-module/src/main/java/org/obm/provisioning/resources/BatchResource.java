@@ -1,4 +1,4 @@
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
 import java.net.URI;
 import java.net.URISyntaxException;

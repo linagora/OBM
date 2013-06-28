@@ -24,6 +24,8 @@ import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
+import org.obm.provisioning.resources.DomainBasedSubResource;
+import org.obm.provisioning.resources.DomainResource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;

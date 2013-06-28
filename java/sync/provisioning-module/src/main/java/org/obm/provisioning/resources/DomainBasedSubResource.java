@@ -27,51 +27,25 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.obm.provisioning.annotations.PATCH;
-import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.dao.exceptions.DaoException;
+@Path("{domain}")
+public class DomainBasedSubResource {
 
-public class UserWriteResource extends AbstractBatchAwareResource {
-
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
-	public Response create(String user) throws DaoException {
-		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
+	@Path("users")
+	public Class<UserResource> users() {
+		return UserResource.class;
 	}
 
-	@PUT
-	@Path("/{userId}")
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
-	public Response modify(String user) throws DaoException {
-		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
+	@Path("batches")
+	public Class<BatchResource> batches() {
+		return BatchResource.class;
 	}
 
-	@DELETE
-	@Path("/{userId}")
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
-	public Response delete() throws DaoException {
-		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
-	}
-	
-	@PATCH
-	@Path("/{userId}")
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
-	public Response patch(String user) throws DaoException {
-		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
+	@Path("profiles")
+	public Class<ProfileResource> profiles() {
+		return ProfileResource.class;
 	}
 }

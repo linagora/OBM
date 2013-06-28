@@ -1,5 +1,3 @@
-package org.obm.provisioning;
-
 /* ***** BEGIN LICENSE BLOCK *****
  * Copyright (C) 2011-2012  Linagora
  *
@@ -29,6 +27,7 @@ package org.obm.provisioning;
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+package org.obm.provisioning.resources;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -44,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
