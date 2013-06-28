@@ -32,7 +32,7 @@ package org.obm.provisioning;
 import javax.ws.rs.Path;
 
 @Path("{domain}")
-public class DomainResource {
+public class DomainBasedSubResource {
 
 	@Path("users")
 	public Class<UserResource> users() {

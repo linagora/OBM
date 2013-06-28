@@ -51,7 +51,7 @@ public class ProvisioningService extends JerseyServletModule {
 	}
 
 	private void bindRestResources() {
-		bind(DomainResource.class);
+		bind(DomainBasedSubResource.class);
 
 		bind(ObmDomainProvider.class);
 	}
