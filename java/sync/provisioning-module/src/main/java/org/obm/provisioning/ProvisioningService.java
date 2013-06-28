@@ -34,7 +34,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class ProvisioningService extends JerseyServletModule {
 
-	public static String PROVISIONING_URL_PREFIX = "/provisioning/v1";
+	public static String PROVISIONING_ROOT_PATH = "provisioning/v1";
+	public static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
 	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 	
 	@Override

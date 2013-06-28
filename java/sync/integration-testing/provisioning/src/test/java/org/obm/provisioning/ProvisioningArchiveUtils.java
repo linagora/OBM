@@ -61,16 +61,13 @@ public class ProvisioningArchiveUtils {
 
 		JavaArchive wholeProvisioningModuleArchive = ShrinkWrap
 				.create(JavaArchive.class, "provisioning-integration-testing-classes.jar")
-				.addClass(ProvisioningService.class)
-				.addClass(BatchResource.class)
-				.addClass(ProfileResource.class)
-				.addClass(ProvisioningContextListener.class)
 				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
 				.addClasses(DependencyResolverHelper.projectConfigurationClasses())
 				.addClasses(DependencyResolverHelper.projectDBCPClasses())
 				.addClasses(DependencyResolverHelper.projectUtilsClasses())
 				.addClasses(DependencyResolverHelper.projectLdapClientClasses())
-				.addClasses(DependencyResolverHelper.projectObmDaoClasses());
+				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
+				.addClasses(DependencyResolverHelper.projectProvisioningClasses());
 			
 		URL pomXmlUrl = ClassLoader.getSystemResource("pom.xml");
 		return ShrinkWrap

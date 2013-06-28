@@ -32,6 +32,7 @@
 package org.obm.provisioning.profile;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.profileUrl;
 
 import java.io.File;
 import java.io.InputStream;
@@ -48,15 +49,15 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.provisioning.ProvisioningService;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 
 import com.google.common.base.Charsets;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -72,21 +73,22 @@ public class ProfileIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testGetProfilesWhenDomainExists(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL));
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
 		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo(
-				"[{\"id\":1,\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/profiles/1\"}," +
-				"{\"id\":2,\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/profiles/2\"}]");
+				"[{\"id\":1,\"url\":\"/" + obmDomainUuid.get() + "/profiles/1\"}," +
+				"{\"id\":2,\"url\":\"/" + obmDomainUuid.get() + "/profiles/2\"}]");
 	}
 	
-	@Ignore("Remove harcoded domainUuid value in ProfileResource")
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL));
+	public void testGetProfilesWhenDomainExistsButNoProfile(@ArquillianResource URL baseURL) throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("68936f0f-2bb5-447c-87f5-efcd46f58122");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -96,8 +98,19 @@ public class ProfileIntegrationTest {
 	
 	@Test
 	@RunAsClient
+	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
+		HttpResponse httpResponse = httpClient.execute(httpGet);
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
+	}
+	
+	@Test
+	@RunAsClient
 	public void testGetProfileNameWhenProfileExists(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL) + "1");
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -107,15 +120,22 @@ public class ProfileIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL) + "1000");
+	public void testGetProfileNameWhenProfileExistsInAnotherDomain(@ArquillianResource URL baseURL) throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
 	}
-
-	private String buildRequestUrl(URL baseURL) {
-		return baseURL.toExternalForm() + ProvisioningService.PROVISIONING_URL_PREFIX + "/profiles/";
+	
+	@Test
+	@RunAsClient
+	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1000");
+		HttpResponse httpResponse = httpClient.execute(httpGet);
+		
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
 	}
 	
 	@Deployment

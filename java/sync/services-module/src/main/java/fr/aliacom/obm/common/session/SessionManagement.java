@@ -294,7 +294,7 @@ public class SessionManagement {
 		token.setVersion(getObmSyncVersion());
 		//FIXME: probably broken
 		token.setRootAccount(false);
-		token.setServiceProperties(userManagementDAO.loadUserProperties(token));
+		token.setServiceProperties(userManagementDAO.loadUserProperties(databaseUser.getUid()));
 		return token;
 	}
 

@@ -72,7 +72,10 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 
 		try {
 			conn = connectionProvider.getConnection();
-			ps = conn.prepareStatement("SELECT profile_id FROM Profile INNER JOIN Domain ON profile_domain_id = domain_id WHERE	domain_uuid = ?");
+			ps = conn.prepareStatement(
+					"SELECT profile_id FROM Profile " +
+					"INNER JOIN Domain ON profile_domain_id = domain_id " +
+					"WHERE	domain_uuid = ?");
 			ps.setString(1, domainUuid.get());
 
 			rs = ps.executeQuery();
@@ -95,15 +98,20 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException {
+	public ProfileName getProfile(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
 			conn = connectionProvider.getConnection();
-			ps = conn.prepareStatement("SELECT profile_name FROM Profile WHERE profile_id = ?");
-			ps.setLong(1, profileId.getId());
+			ps = conn.prepareStatement(
+					"SELECT profile_name FROM Profile " +
+					"INNER JOIN Domain ON profile_domain_id = domain_id " +
+					"	WHERE domain_uuid = ? " +
+					"AND profile_id = ?");
+			ps.setString(1, domainUuid.get());
+			ps.setLong(2, profileId.getId());
 			rs = ps.executeQuery();
 
 			if (rs.next()) {

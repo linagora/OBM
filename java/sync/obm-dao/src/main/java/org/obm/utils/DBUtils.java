@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DBUtils {
-	private static final Logger logger = LoggerFactory.getLogger(ObmHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(DBUtils.class);
 
 	public static void cleanup(ResultSet rs) {
 		cleanup(null, null, rs);

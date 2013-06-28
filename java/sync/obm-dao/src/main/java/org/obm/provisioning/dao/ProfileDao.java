@@ -44,7 +44,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ProfileDao {
 
-	ProfileName getProfile(ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	ProfileName getProfile(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
 
 	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
 

@@ -39,7 +39,6 @@ import java.sql.Statement;
 import java.util.Map;
 
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.utils.ObmHelper;
@@ -72,7 +71,7 @@ public class UserDao {
 		this.obmHelper = obmHelper;
 	}
 	
-	public Map<String, String> loadUserProperties(AccessToken token) {
+	public Map<String, String> loadUserProperties(int userObmId) {
 		String q = "SELECT serviceproperty_service, serviceproperty_property, serviceproperty_value "
 				+ "FROM ServiceProperty "
 				+ "INNER JOIN UserEntity ON serviceproperty_entity_id=userentity_entity_id AND userentity_user_id=?";
@@ -82,15 +81,13 @@ public class UserDao {
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(q);
-			ps.setInt(1, token.getObmId());
+			ps.setInt(1, userObmId);
 			rs = ps.executeQuery();
 			Map<String, String> map = Maps.newHashMap();
 			while (rs.next()) {
 				String k = rs.getString(1) + "/" + rs.getString(2);
 				String v = rs.getString(3);
 				map.put(k, v);
-				logger.info("found property for " + token.getUserLogin() + "@"
-						+ token.getDomain().getName() + ": " + k + " => " + v);
 				return map;
 			}
 		} catch (Exception e) {

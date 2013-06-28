@@ -84,9 +84,12 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
+import org.obm.provisioning.BatchResource;
 import org.obm.provisioning.Connection;
 import org.obm.provisioning.ConnectionException;
 import org.obm.provisioning.ConnectionImpl;
+import org.obm.provisioning.DomainResource;
+import org.obm.provisioning.GroupResource;
 import org.obm.provisioning.LdapException;
 import org.obm.provisioning.LdapGroup;
 import org.obm.provisioning.LdapGroupImpl;
@@ -98,11 +101,16 @@ import org.obm.provisioning.LdapServiceImpl;
 import org.obm.provisioning.LdapUser;
 import org.obm.provisioning.LdapUserMembership;
 import org.obm.provisioning.LdapUserMembershipImpl;
+import org.obm.provisioning.ObmDomainProvider;
+import org.obm.provisioning.ProfileResource;
+import org.obm.provisioning.ProvisioningContextListener;
+import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.UserResource;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.beans.Group;
 import org.obm.provisioning.beans.GroupExtId;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -112,6 +120,8 @@ import org.obm.provisioning.beans.ProfileName;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
@@ -123,6 +133,8 @@ import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
+import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.utils.DOMUtils;
@@ -393,6 +405,7 @@ import fr.aliacom.obm.common.setting.SettingsServiceImpl;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.trust.TrustTokenDao;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.common.user.UserSettings;
@@ -482,6 +495,22 @@ public class DependencyResolverHelper {
 				LdapUserMembershipImpl.class
 		};
 	}
+	
+	public static Class<?>[] projectProvisioningClasses() {
+		return new Class<?>[] {
+				ProvisioningService.class,
+				ProvisioningContextListener.class,
+				UserResource.class,
+				BatchResource.class,
+				GroupResource.class,
+				DomainResource.class,
+				ProfileResource.class,
+				UserIdentifier.class,
+				ObmDomainProvider.class,
+				ObmDomainUuidJsonSerializer.class,
+				ObmDomainUuidJsonDeserializer.class
+		};
+	}
 
 	public static Class<?>[] projectObmDaoClasses() {
 		return new Class<?>[] {
@@ -497,6 +526,9 @@ public class DependencyResolverHelper {
 				OperationDao.class,
 				OperationDaoJdbcImpl.class,
 				UserDao.class,
+				org.obm.domain.dao.UserDao.class,
+				GroupDao.class,
+				GroupDaoJdbcImpl.class,
 				BatchDao.class,
 				BatchDaoJdbcImpl.class,
 				Batch.class,
@@ -511,9 +543,15 @@ public class DependencyResolverHelper {
 				ObmDomain.class,
 				ObmDomainUuid.class,
 				GroupExtId.class,
-				UserResource.class,
+				Group.class,
 				ObmUser.class,
-				UserIdentifier.class
+				ObmHelper.class,
+				DBUtils.class,
+				DateProvider.class,
+				UserExtId.class,
+				DomainName.class,
+				EmailLogin.class,
+				LinkedEntity.class
 		};
 	}
 
@@ -793,6 +831,7 @@ public class DependencyResolverHelper {
 	
 	public static Class<?>[] projectCommonClasses() {
 		return new Class<?>[] {
+				UserExtId.class,
 				ObmDomain.class,
 				ObmDomainUuid.class,
 				Resource.class,

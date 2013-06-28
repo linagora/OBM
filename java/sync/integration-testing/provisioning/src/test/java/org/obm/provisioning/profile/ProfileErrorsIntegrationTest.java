@@ -32,6 +32,7 @@
 package org.obm.provisioning.profile;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.profileUrl;
 
 import java.io.File;
 import java.net.URL;
@@ -50,8 +51,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.provisioning.ProvisioningService;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -67,7 +69,8 @@ public class ProfileErrorsIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL));
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -76,14 +79,11 @@ public class ProfileErrorsIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
-		HttpGet httpGet = new HttpGet(buildRequestUrl(baseURL) + "1");
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	}
-
-	private String buildRequestUrl(URL baseURL) {
-		return baseURL.toExternalForm() + ProvisioningService.PROVISIONING_URL_PREFIX + "/profiles/";
 	}
 	
 	@Deployment

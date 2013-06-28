@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,35 +31,21 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.H2DriverConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URL;
 
-import com.google.inject.name.Names;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class TestingProvisioningModule extends ProvisioningService {
+public class ProvisioningIntegrationTestUtils {
 
-	@Override
-	protected void configureServlets() {
-		super.configureServlets();
+	public static String profileUrl(URL baseURL, ObmDomainUuid domain) {
+		return domainUrl(baseURL, domain) + "/profiles/";
+	}
 
-		install(new TransactionalModule());
-		
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
-		bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-		
-		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
-			.toInstance(LoggerFactory.getLogger(ProvisioningService.class));
+	public static String domainUrl(URL baseURL, ObmDomainUuid domain) {
+		return baseUrl(baseURL) + "/" + domain.get();
+	}
+	
+	public static String baseUrl(URL baseURL) {
+		return baseURL.toExternalForm() + ProvisioningService.PROVISIONING_ROOT_PATH;
 	}
 }

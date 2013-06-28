@@ -46,7 +46,7 @@ public class ProfileResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getProfileName(@PathParam("profileId")long profileId) {
 		try {
-			return Response.ok(profileDao.getProfile(ProfileId.builder().id(profileId).build())).build();
+			return Response.ok(profileDao.getProfile(domain.getUuid(), ProfileId.builder().id(profileId).build())).build();
 		} catch (ProfileNotFoundException e) {
 			logger.error("Profile not found", e);
 			return Response.status(Status.NOT_FOUND).build();

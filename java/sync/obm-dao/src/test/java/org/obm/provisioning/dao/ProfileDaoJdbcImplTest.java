@@ -48,6 +48,9 @@ public class ProfileDaoJdbcImplTest {
 	@Inject
 	public H2InMemoryDatabase db;
 	
+	ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+	ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+	
 
 	@Test
 	public void testGetProfilesOnNonExistentDomains() throws Exception {
@@ -58,9 +61,7 @@ public class ProfileDaoJdbcImplTest {
 	
 	@Test
 	public void testGetProfilesOnExistingDomains() throws Exception {
-		ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		Set<ProfileEntry> firstDomainProfiles = dao.getProfiles(uuid1);
-		ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 		Set<ProfileEntry> secondDomainProfiles = dao.getProfiles(uuid2);
 
 		assertThat(firstDomainProfiles).containsOnly(
@@ -72,9 +73,9 @@ public class ProfileDaoJdbcImplTest {
 	
 	@Test
 	public void testGetProfileNameByID() throws Exception {
-		ProfileName profileName1 = dao.getProfile(ProfileId.builder().id(1).build());
-		ProfileName profileName2 = dao.getProfile(ProfileId.builder().id(2).build());
-		ProfileName profileName3 = dao.getProfile(ProfileId.builder().id(3).build());
+		ProfileName profileName1 = dao.getProfile(uuid1, ProfileId.builder().id(1).build());
+		ProfileName profileName2 = dao.getProfile(uuid1, ProfileId.builder().id(2).build());
+		ProfileName profileName3 = dao.getProfile(uuid2, ProfileId.builder().id(3).build());
 		
 		assertThat(profileName1).isEqualTo(ProfileName.builder().name("admin").build());
 		assertThat(profileName2).isEqualTo(ProfileName.builder().name("user").build());
@@ -83,6 +84,11 @@ public class ProfileDaoJdbcImplTest {
 	
 	@Test(expected = ProfileNotFoundException.class)
 	public void testGetProfileNameOnNonExistentID() throws Exception {
-		dao.getProfile(ProfileId.builder().id(64).build());
+		dao.getProfile(uuid1, ProfileId.builder().id(64).build());
+	}
+	
+	@Test(expected = ProfileNotFoundException.class)
+	public void testGetProfileNameOnNonExistentDomain() throws Exception {
+		dao.getProfile(ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6"), ProfileId.builder().id(1).build());
 	}
 }

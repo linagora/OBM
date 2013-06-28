@@ -35,7 +35,7 @@ package fr.aliacom.obm.common.session;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMockBuilder;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.anyInt;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.easymock.IMocksControl;
@@ -188,7 +188,7 @@ public class SessionManagementTest {
 		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
 		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
 		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
-		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
+		expect(userDao.loadUserProperties(anyInt())).andReturn(ImmutableMap.<String, String>of());
 		control.replay();
 
 		AccessToken token = sessionManagement.login(LOGIN, null, "test", TRUSTEDIP, TRUSTEDIP, LOGIN, DOMAIN, false);
@@ -209,7 +209,7 @@ public class SessionManagementTest {
 		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
 		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
 		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
-		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
+		expect(userDao.loadUserProperties(anyInt())).andReturn(ImmutableMap.<String, String>of());
 		
 		control.replay();
 
