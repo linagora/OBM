@@ -35,6 +35,7 @@ import java.util.List;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -198,6 +199,22 @@ public class Batch {
 
 	public List<Operation> getOperations() {
 		return operations;
+	}
+
+	public int getOperationsCount() {
+		return Iterables.size(operations);
+	}
+
+	public int getOperationsDoneCount() {
+		int count = 0;
+
+		for (Operation op : operations) {
+			if (BatchStatus.SUCCESS.equals(op.getStatus())) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
 	@Override

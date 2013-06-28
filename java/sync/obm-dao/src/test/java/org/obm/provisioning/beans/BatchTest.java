@@ -71,4 +71,100 @@ public class BatchTest {
 	public void testBatchIdValueOfWithNotANumber() {
 		Batch.Id.valueOf("test");
 	}
+
+	@Test
+	public void testGetOperationsCount() {
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.operation(Operation
+						.builder()
+						.id(Operation.Id.builder().id(1).build())
+						.status(BatchStatus.SUCCESS)
+						.entityType(BatchEntityType.USER)
+						.request(Request
+								.builder()
+								.url("/")
+								.body("")
+								.verb(HttpVerb.POST)
+								.build())
+						.build())
+				.operation(Operation
+						.builder()
+						.id(Operation.Id.builder().id(2).build())
+						.status(BatchStatus.IDLE)
+						.entityType(BatchEntityType.USER)
+						.request(Request
+								.builder()
+								.url("/1")
+								.body("")
+								.verb(HttpVerb.PUT)
+								.build())
+						.build())
+				.build();
+
+		assertThat(batch.getOperationsCount()).isEqualTo(2);
+	}
+
+	@Test
+	public void testGetOperationsCountWhenNoOperations() {
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(batch.getOperationsCount()).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetOperationsDoneCount() {
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.operation(Operation
+						.builder()
+						.id(Operation.Id.builder().id(1).build())
+						.status(BatchStatus.SUCCESS)
+						.entityType(BatchEntityType.USER)
+						.request(Request
+								.builder()
+								.url("/")
+								.body("")
+								.verb(HttpVerb.POST)
+								.build())
+						.build())
+				.operation(Operation
+						.builder()
+						.id(Operation.Id.builder().id(2).build())
+						.status(BatchStatus.IDLE)
+						.entityType(BatchEntityType.USER)
+						.request(Request
+								.builder()
+								.url("/1")
+								.body("")
+								.verb(HttpVerb.PUT)
+								.build())
+						.build())
+				.build();
+
+		assertThat(batch.getOperationsDoneCount()).isEqualTo(1);
+	}
+
+	@Test
+	public void testGetOperationsDoneCountWhenNoOperations() {
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(batch.getOperationsDoneCount()).isEqualTo(0);
+	}
 }

@@ -6,16 +6,20 @@ import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
+import org.obm.provisioning.json.OperationJsonSerializer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -69,6 +73,8 @@ public class ProvisioningService extends JerseyServletModule {
 		module.addDeserializer(ObmDomainUuid.class, new ObmDomainUuidJsonDeserializer());
 		module.addSerializer(Multimap.class, new MultimapJsonSerializer());
 		module.addSerializer(ObmDomain.class, new ObmDomainJsonSerializer());
+		module.addSerializer(Operation.class, new OperationJsonSerializer());
+		module.addSerializer(Batch.class, new BatchJsonSerializer());
 
 		objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.registerModule(module);

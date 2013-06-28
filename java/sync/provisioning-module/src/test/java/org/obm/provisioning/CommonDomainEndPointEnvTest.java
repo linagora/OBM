@@ -48,50 +48,57 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.UserDao;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
+import com.google.inject.util.Modules;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public abstract class CommonDomainEndPointEnvTest {
 
-	public static class Env extends ProvisioningService {
-		private IMocksControl mocksControl = createControl();
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureServlets() {
-			super.configureServlets();
+		protected void configure() {
+			install(Modules.override(new ProvisioningService()).with(new AbstractModule() {
 
-			bind(IMocksControl.class).toInstance(mocksControl);
-			bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
-			bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
+				private IMocksControl mocksControl = createControl();
 
-			bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
+				@Override
+				protected void configure() {
+					bind(IMocksControl.class).toInstance(mocksControl);
+					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
+					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
+					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));
+
+					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
+				}
+
+				@Provides
+				@Singleton
+				protected Server createServer() {
+					Server server = new Server(0);
+					Context root = new Context(server, "/", Context.SESSIONS);
+
+					root.addFilter(GuiceFilter.class, "/*", 0);
+					root.addServlet(DefaultServlet.class, "/*");
+
+					return server;
+				}
+
+			}));
 		}
 
-		@Provides @Singleton
-		protected Server createServer() {
-			Server server = new Server(0);
-			Context root = new Context(server, "/", Context.SESSIONS);
-
-			root.addFilter(GuiceFilter.class, "/*", 0);
-			root.addServlet(DefaultServlet.class, "/*");
-
-			return server;
-		}
 	}
 
-	protected final static ObmDomain domain = ObmDomain
-			.builder()
-			.name("domain")
-			.id(1)
-			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
-			.build();
+	protected final static ObmDomain domain = ObmDomain.builder().name("domain").id(1).uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e")).build();
 
 	@Inject
 	protected IMocksControl mocksControl;
@@ -128,15 +135,15 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected HttpResponse get(String path) throws Exception {
 		return createGetRequest(path).execute().returnResponse();
 	}
-	
+
 	protected HttpResponse post(String path, StringEntity content) throws ClientProtocolException, IOException {
 		return createPostRequest(path, content).execute().returnResponse();
 	}
-	
+
 	protected HttpResponse put(String path, StringEntity content) throws ClientProtocolException, IOException {
 		return createPutRequest(path, content).execute().returnResponse();
 	}
-	
+
 	protected HttpResponse delete(String path) throws ClientProtocolException, IOException {
 		return createDeleteRequest(path).execute().returnResponse();
 	}
@@ -144,15 +151,15 @@ public abstract class CommonDomainEndPointEnvTest {
 	private Request createPostRequest(String path, StringEntity content) {
 		return Request.Post(baseUrl + "/" + domain.getUuid().get() + path).body(content);
 	}
-	
+
 	private Request createPutRequest(String path, StringEntity content) {
 		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(content);
 	}
-	
+
 	protected Request createGetRequest(String path) {
 		return Request.Get(baseUrl + "/" + domain.getUuid().get() + path);
 	}
-	
+
 	protected Request createDeleteRequest(String path) {
 		return Request.Delete(baseUrl + "/" + domain.getUuid().get() + path);
 	}
