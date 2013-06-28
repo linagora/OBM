@@ -186,12 +186,10 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 				  "\"createdBy\":null," +
 				  "\"updatedBy\":null," +
 				  "\"domain\":{" +
-				    "\"id\":1," +
+				    "\"id\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
 				    "\"name\":\"domain\"," +
-				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
-				    "\"aliases\":[]," +
 				    "\"label\":null," +
-				    "\"hosts\":{}" +
+				    "\"aliases\":[]" +
 				  "}," +
 				  "\"publicFreeBusy\":false" +
 				"}";

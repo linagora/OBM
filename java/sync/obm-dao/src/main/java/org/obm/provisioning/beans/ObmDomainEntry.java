@@ -30,45 +30,70 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package fr.aliacom.obm.common.domain;
-
-import java.io.Serializable;
+package org.obm.provisioning.beans;
 
 import com.google.common.base.Objects;
 
-public class ObmDomainUuid implements Serializable {
+public class ObmDomainEntry {
 
-	private final String uuid;
-
-	public static ObmDomainUuid of(String uuid) {
-		return new ObmDomainUuid(uuid);
+	public static Builder builder() {
+		return new Builder();
 	}
 
-	public static ObmDomainUuid valueOf(String uuid) {
-		return of(uuid);
+	public static class Builder {
+
+		private String id;
+
+		private Builder() {
+		}
+
+		public Builder id(String id) {
+			this.id = id;
+			return this;
+		}
+
+		public ObmDomainEntry build() {
+			return new ObmDomainEntry(id, "/domains/" + id);
+		}
 	}
 
-	private ObmDomainUuid(String uuid) {
-		this.uuid = uuid;
+	private final String id;
+	private final String url;
+
+	private ObmDomainEntry(String id, String url) {
+		this.id = id;
+		this.url = url;
 	}
 
-	public String get() {
-		return uuid;
+	public String getId() {
+		return id;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(uuid);
+		return Objects.hashCode(id, url);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ObmDomainUuid) {
-			ObmDomainUuid other = (ObmDomainUuid) obj;
+		if (obj instanceof ObmDomainEntry) {
+			ObmDomainEntry other = (ObmDomainEntry) obj;
 
-			return Objects.equal(uuid, other.uuid);
+			return Objects.equal(id, other.id) && Objects.equal(url, other.url);
 		}
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(this)
+				.add("id", id)
+				.add("url", url)
+				.toString();
+	}
 }

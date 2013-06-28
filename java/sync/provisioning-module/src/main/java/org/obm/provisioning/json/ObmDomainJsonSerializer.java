@@ -27,34 +27,27 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.beans;
+package org.obm.provisioning.json;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import java.io.IOException;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
+public class ObmDomainJsonSerializer extends JsonSerializer<ObmDomain> {
 
-	@Test
-	public void test() {
-		equalsVerifierUtilsTest.test(Batch.class,
-				Operation.class,
-				Request.class,
-				ObmDomainEntry.class, 
-				ProfileEntry.class,
-				Group.class,
-				ProfileId.class,
-				ProfileName.class);
+	@Override
+	public void serialize(ObmDomain value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+		jgen.writeStartObject();
+		jgen.writeStringField("id", value.getUuid().get());
+		jgen.writeStringField("name", value.getName());
+		jgen.writeStringField("label", value.getLabel());
+		jgen.writeObjectField("aliases", value.getAliases());
+		jgen.writeEndObject();
 	}
 
 }

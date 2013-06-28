@@ -27,34 +27,64 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.beans;
+package org.obm.provisioning;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import java.util.Collections;
+import java.util.List;
 
-@RunWith(SlowFilterRunner.class)
-public class BeansTest {
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
+import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.beans.ObmDomainEntry;
 
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
+@Path("domains")
+public class DomainResource {
+
+	@Inject
+	private DomainDao domainDao;
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ObmDomainEntry> list() {
+		List<ObmDomain> domains = domainDao.list();
+
+		if (domains == null) {
+			return Collections.emptyList();
+		}
+
+		return Lists.transform(domains, new Function<ObmDomain, ObmDomainEntry>() {
+
+			@Override
+			public ObmDomainEntry apply(ObmDomain domain) {
+				return ObmDomainEntry.builder().id(domain.getUuid().get()).build();
+			}
+
+		});
 	}
 
-	@Test
-	public void test() {
-		equalsVerifierUtilsTest.test(Batch.class,
-				Operation.class,
-				Request.class,
-				ObmDomainEntry.class, 
-				ProfileEntry.class,
-				Group.class,
-				ProfileId.class,
-				ProfileName.class);
-	}
+	@GET
+	@Path("{domainUuid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) {
+		ObmDomain domain = domainDao.findDomainByUuid(domainUuid);
 
+		if (domain == null) {
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
+
+		return domain;
+	}
 }

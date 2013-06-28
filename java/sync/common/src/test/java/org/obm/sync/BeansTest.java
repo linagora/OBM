@@ -66,6 +66,7 @@ import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -111,7 +112,8 @@ public class BeansTest {
 				MavenVersion.class,
 				UserExtId.class,
 				ServiceProperty.class,
-				ObmHost.class);
+				ObmHost.class,
+				ObmDomainUuid.class);
 	}
 	
 	@Test

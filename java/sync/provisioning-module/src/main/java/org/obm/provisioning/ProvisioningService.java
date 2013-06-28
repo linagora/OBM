@@ -13,6 +13,7 @@ import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.json.MultimapJsonSerializer;
+import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 
@@ -26,6 +27,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ProvisioningService extends JerseyServletModule {
@@ -52,6 +54,7 @@ public class ProvisioningService extends JerseyServletModule {
 
 	private void bindRestResources() {
 		bind(DomainBasedSubResource.class);
+		bind(DomainResource.class);
 
 		bind(ObmDomainProvider.class);
 	}
@@ -65,6 +68,7 @@ public class ProvisioningService extends JerseyServletModule {
 		module.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer());
 		module.addDeserializer(ObmDomainUuid.class, new ObmDomainUuidJsonDeserializer());
 		module.addSerializer(Multimap.class, new MultimapJsonSerializer());
+		module.addSerializer(ObmDomain.class, new ObmDomainJsonSerializer());
 
 		objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.registerModule(module);
