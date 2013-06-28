@@ -77,7 +77,7 @@ class DelegationGroups extends CronJob {
     }
 
     // automate
-    if (sizeof($groups) > 1) {
+    if (sizeof($groups) > 0) {
       exec("echo '".implode($groups, "\n")."' | $cmd_update --domain-id $domain_id --entity");
     }
 
