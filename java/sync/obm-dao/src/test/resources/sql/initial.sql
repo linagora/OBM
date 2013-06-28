@@ -135,37 +135,6 @@ CREATE DOMAIN vpartstat AS VARCHAR (16) CHECK VALUE IN (
     'IN-PROGRESS'
 );
 
-CREATE TABLE domainentity (
-    domainentity_entity_id integer NOT NULL,
-    domainentity_domain_id integer NOT NULL
-);
-ALTER TABLE domainentity ADD CONSTRAINT domainentity_pkey PRIMARY KEY (domainentity_entity_id, domainentity_domain_id);
-
-CREATE TABLE serviceproperty (
-    serviceproperty_id integer PRIMARY KEY AUTO_INCREMENT,
-    serviceproperty_service character varying(255) NOT NULL,
-    serviceproperty_property character varying(255) NOT NULL,
-    serviceproperty_entity_id integer NOT NULL,
-    serviceproperty_value text
-);
-
-CREATE TABLE host (
-    host_id integer PRIMARY KEY AUTO_INCREMENT,
-    host_domain_id integer NOT NULL,
-    host_timeupdate timestamp,
-    host_timecreate timestamp DEFAULT now(),
-    host_userupdate integer,
-    host_usercreate integer,
-    host_uid integer,
-    host_gid integer,
-    host_archive smallint DEFAULT 0 NOT NULL,
-    host_name character varying(32) NOT NULL,
-    host_fqdn character varying(255),
-    host_ip character varying(16),
-    host_delegation character varying(256) DEFAULT ''::character varying,
-    host_description character varying(128)
-);
-
 --
 -- Name: vrole; Type: TYPE; Schema: public; Owner: obm
 --
@@ -17016,8 +16985,10 @@ ALTER TABLE website
 --
 
 
-
-
+INSERT INTO entity (entity_mailing)
+    VALUES
+        (true),
+        (true);
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1);
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test2.tlse.lng', '3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf', 'test2.tlse.lng');
