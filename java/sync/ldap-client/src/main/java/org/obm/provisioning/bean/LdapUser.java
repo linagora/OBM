@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.bean;
 
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
@@ -37,9 +37,28 @@ import org.apache.directory.api.ldap.model.exception.LdapException;
 public interface LdapUser {
 
 	public interface Id {
-
+		String get();
 	}
 
+	String[] getObjectClasses();
+	String getUid();
+	int getUidNumber();
+	int getGidNumber();
+	String getLoginShell();
+	String getCn();
+	String getDisplayName();
+	String getSn();
+	String getGivenName();
+	String getHomeDirectory();
+	String getUserPassword();
+	String getWebAccess();
+	String getMailBox();
+	String getMailBoxServer();
+	String getMailAccess();
+	String getMail();
+	boolean isHiddenUser();
+	String getObmDomain();
+	
 	Entry buildEntry() throws LdapException;
-
+	LdapUser.Id getId();
 }

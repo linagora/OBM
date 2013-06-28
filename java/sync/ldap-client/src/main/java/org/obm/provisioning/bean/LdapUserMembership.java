@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,16 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.bean;
 
-public class ConnectionException extends RuntimeException {
+import org.apache.directory.api.ldap.model.entry.Modification;
 
-	public ConnectionException(Throwable exception) {
-		super(exception);
-	}
+public interface LdapUserMembership {
 
-	public ConnectionException(String message, Throwable exception) {
-		super(message, exception);
-	}
+	Modification[] buildAddModifications();
+	Modification[] buildRemoveModifications();
+	
+	String getMemberUid();
+	String getMember();
+	String getMailBox();
+
 
 }

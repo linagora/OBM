@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -33,6 +33,12 @@ package org.obm.provisioning;
 
 import java.util.List;
 
+import org.obm.provisioning.bean.LdapGroup;
+import org.obm.provisioning.bean.LdapUser;
+import org.obm.provisioning.bean.LdapUserMembership;
+import org.obm.provisioning.exception.ConnectionException;
+import org.obm.provisioning.exception.LdapException;
+
 public interface Connection {
 
 	void createUser(LdapUser ldapUser) throws LdapException, ConnectionException;
@@ -51,13 +57,13 @@ public interface Connection {
 	
 	void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
 
-	void addGroupToGroup(LdapGroupMembership ldapGroupMembership, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
+	void addGroupToGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id toLdapGroupId) throws LdapException, ConnectionException;
 	
-	void removeGroupFromGroup(LdapGroupMembership ldapGroupMembership, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
+	void removeGroupFromGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id fromLdapGroupId) throws LdapException, ConnectionException;
 
-	void addGroupsToGroup(List<LdapGroupMembership> ldapGroupMemberships, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
+	void addGroupsToGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id toLdapGroupId) throws LdapException, ConnectionException;
 	
-	void removeGroupsFromGroup(List<LdapGroupMembership> ldapGroupMemberships, LdapGroup.Id ldapGroupId) throws LdapException, ConnectionException;
+	void removeGroupsFromGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id fromLdapGroupId) throws LdapException, ConnectionException;
 	
 	void shutdown() throws ConnectionException;
 	

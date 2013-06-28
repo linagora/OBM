@@ -15,12 +15,12 @@ attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.4
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.2
-        NAME 'mailAccess'
-        DESC 'Mail access authorization. PERMIT: ok, REJECT: nok'
-        EQUALITY caseIgnoreMatch
-        SUBSTR caseIgnoreSubstringsMatch
-        SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10}
-        SINGLE-VALUE )
+    NAME 'mailAccess'
+    DESC 'Mail access authorization. PERMIT: ok, REJECT: nok'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10}
+    SINGLE-VALUE )
 attributeTypes: ( 1.3.6.1.4.1.25469.1.1.1.13
     NAME 'obmDomain'
     DESC 'OBM domain for the entity'
@@ -40,5 +40,51 @@ objectClasses: ( 1.3.6.1.4.1.25469.1.1.2.2
     SUP top STRUCTURAL
     MUST cn
     MAY ( mailBox $ mail $ mailAlias $ mailAccess $ obmDomain $ externalContactEmail $ member ) )
-
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.1
+    NAME 'webAccess'
+    DESC 'Web access authorization. PERMIT: ok, REJECT:nok'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{5}
+    SINGLE-VALUE )
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.3
+    NAME 'mailLocalOnly'
+    DESC 'Local mail restriction. non existent or local_only'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+    SINGLE-VALUE )
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.12
+    NAME 'mailBoxServer'
+    DESC 'User mailbox server'
+    EQUALITY caseIgnoreIA5Match
+    SUBSTR caseIgnoreIA5SubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+    SINGLE-VALUE )
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.14
+    NAME 'hiddenUser'
+    DESC 'User must be hidden for any/some LDAP query'
+    EQUALITY booleanMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+    SINGLE-VALUE )
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.20
+    NAME 'direction'
+    DESC 'User Direction'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+attributetypes: ( 1.3.6.1.4.1.25469.1.1.1.19
+    NAME 'delegation'
+    DESC 'User Delegation'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+objectClasses: ( 1.3.6.1.4.1.25469.1.1.2.1
+    NAME 'obmUser'
+    DESC 'OBM user description'
+    SUP top AUXILIARY
+    MUST uid
+    MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser $ direction $ delegation ) )
  

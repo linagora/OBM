@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,9 @@ import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.obm.provisioning.Configuration;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 
 public class LdapGroupImpl implements LdapGroup {
@@ -174,11 +176,41 @@ public class LdapGroupImpl implements LdapGroup {
 		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
 	}
 	
-	protected String buildDn() {
+	private String buildDn() {
 		return "cn=" + getCn() + "," + groupBaseDn.getName();
 	}
 
+	@Override
 	public LdapGroup.Id getId() {
 		return new IdImpl(getCn());
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(cn, gidNumber, mailAccess, mail, obmDomain);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof LdapGroupImpl) {
+			LdapGroupImpl that = (LdapGroupImpl) object;
+			return Objects.equal(this.cn, that.cn)
+				&& Objects.equal(this.gidNumber, that.gidNumber)
+				&& Objects.equal(this.mailAccess, that.mailAccess)
+				&& Objects.equal(this.mail, that.mail)
+				&& Objects.equal(this.obmDomain, that.obmDomain);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("cn", cn)
+			.add("gidNumber", gidNumber)
+			.add("mailAccess", mailAccess)
+			.add("mail", mail)
+			.add("obmDomain", obmDomain)
+			.toString();
 	}
 }

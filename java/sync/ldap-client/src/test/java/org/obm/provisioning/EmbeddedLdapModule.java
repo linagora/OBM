@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -38,8 +38,8 @@ import org.apache.commons.io.FileUtils;
 import org.opends.server.core.DirectoryServer;
 import org.opends.server.extensions.ConfigFileHandler;
 import org.opends.server.types.DirectoryEnvironmentConfig;
+import org.opends.server.util.TimeThread;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -55,10 +55,12 @@ public class EmbeddedLdapModule extends AbstractModule {
 	}
 	
 	@Provides @Singleton
-	@VisibleForTesting DirectoryServer provideDirectoryServer() throws Exception {
+	protected DirectoryServer provideDirectoryServer() throws Exception {
 		String tmpFolderPath = createOpenDJTemporaryEnvironment();
 		String configPath = tmpFolderPath + "config/config.ldif";
 
+		TimeThread.start();
+		
 		DirectoryServer directoryServer = DirectoryServer.getInstance();
 		directoryServer.bootstrapServer();
 		directoryServer.initializeConfiguration(ConfigFileHandler.class.getName(), configPath);
@@ -87,7 +89,13 @@ public class EmbeddedLdapModule extends AbstractModule {
 		File resourcesFolder = new File(
 				ClassLoader.getSystemClassLoader().getResource(OPENDJ_FOLDER).getPath());
 		FileUtils.copyDirectory(resourcesFolder, tmpFolder);
+		mkFolder(tmpFolderPath, "locks");
+		mkFolder(tmpFolderPath, "logs");
 
 		return tmpFolderPath;
+	}
+
+	private void mkFolder(String tmpFolderPath, String folderName) {
+		new File(tmpFolderPath, folderName).mkdir();
 	}
 }

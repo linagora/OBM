@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,31 +29,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.bean;
 
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.api.ldap.model.entry.ModificationOperation;
-import org.apache.directory.api.ldap.model.name.Dn;
+import org.obm.provisioning.Configuration;
 
-public class LdapGroupMembershipImpl implements LdapGroupMembership {
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
 
+public class LdapUserMembershipImpl implements LdapUserMembership {
+
+	public static class Builder {
+		private String memberUid;
+		private String mailBox;
+		
+		private final Configuration configuration;
+
+		@Inject
+		private Builder(Configuration configuration) {
+			this.configuration = configuration;
+		}
+		
+		public Builder memberUid(String memberUid) {
+			this.memberUid = memberUid;
+			return this;
+		}
+		
+		public Builder mailBox(String mailBox) {
+			this.mailBox = mailBox;
+			return this;
+		}
+		
+		public LdapUserMembershipImpl build() {
+			return new LdapUserMembershipImpl(memberUid, buildMember(), mailBox);
+		}
+
+		private String buildMember() {
+			return "uid=" + memberUid + "," + configuration.getUserBaseDn().getName();
+		}
+	}
+	
+	private final String memberUid;
+	private final String member;
+	private final String mailBox;
+	
+	private LdapUserMembershipImpl(String memberUid, String member, String mailBox) {
+		this.memberUid = memberUid;
+		this.member = member;
+		this.mailBox = mailBox;
+	}
+	
 	@Override
 	public String getMemberUid() {
-		// TODO Auto-generated method stub
-		return null;
+		return memberUid;
 	}
 
 	@Override
-	public Dn getMember() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getMember() {
+		return member;
 	}
 
 	@Override
 	public String getMailBox() {
-		// TODO Auto-generated method stub
-		return null;
+		return mailBox;
 	}
 
 	@Override
@@ -69,9 +109,34 @@ public class LdapGroupMembershipImpl implements LdapGroupMembership {
 	private Modification[] buildModifications(ModificationOperation operation) {
 		return new Modification[] {
 				new DefaultModification(operation, "memberUid", getMemberUid()),
-				new DefaultModification(operation, "member", getMember().getName()),
+				new DefaultModification(operation, "member", getMember()),
 				new DefaultModification(operation, "mailBox", getMailBox())
 		};
 	}
 
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(memberUid, member, mailBox);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof LdapUserMembershipImpl) {
+			LdapUserMembershipImpl that = (LdapUserMembershipImpl) object;
+			return Objects.equal(this.memberUid, that.memberUid)
+				&& Objects.equal(this.member, that.member)
+				&& Objects.equal(this.mailBox, that.mailBox);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("memberUid", memberUid)
+			.add("member", member)
+			.add("mailBox", mailBox)
+			.toString();
+	}
 }

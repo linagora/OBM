@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,19 +29,35 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.bean;
 
-import org.apache.directory.api.ldap.model.entry.Modification;
-import org.apache.directory.api.ldap.model.name.Dn;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-public interface LdapGroupMembership {
+import com.google.common.collect.ImmutableList;
 
-	Modification[] buildAddModifications();
-	Modification[] buildRemoveModifications();
+@RunWith(SlowFilterRunner.class)
+public class BeansTest {
+
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
 	
-	String getMemberUid();
-	Dn getMember();
-	String getMailBox();
-
-
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	}
+	
+	@Test
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(LdapGroupImpl.class)
+					.add(LdapUserImpl.class)
+					.add(LdapUserMembershipImpl.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
+	}
+	
 }

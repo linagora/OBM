@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -37,6 +37,7 @@ public class LdapModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(ConnectionImpl.Factory.class);
 		bind(LdapService.class).to(LdapServiceImpl.class);
 	}
 

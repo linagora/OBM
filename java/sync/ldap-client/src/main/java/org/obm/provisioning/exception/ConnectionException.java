@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,15 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.exception;
 
-public class LdapException extends RuntimeException {
+public class ConnectionException extends RuntimeException {
 
-	public LdapException(Throwable exception) {
+	public ConnectionException(Throwable exception) {
 		super(exception);
 	}
 
-	public LdapException(String message, Throwable exception) {
+	public ConnectionException(String message, Throwable exception) {
 		super(message, exception);
 	}
 
