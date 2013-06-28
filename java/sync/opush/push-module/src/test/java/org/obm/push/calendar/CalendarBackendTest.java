@@ -996,50 +996,148 @@ public class CalendarBackendTest {
 	}
 	
 	@Test
-	public void testHandleMettingResponse() throws Exception {
-		String calendarDisplayName = user.getLoginAtDomain();
-		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
-		
+	public void testHandleMettingResponseExternalCreation() throws Exception {
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+
+		boolean isInternal = false;
+		String clientId = null;
 		MSEventUid msEventUid = new MSEventUid("1");
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(msEventUid);
 		MSEmail invitation  = new MSEmail();
 		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
-
-		EventExtId eventExtId = new EventExtId("1");
-		expect(eventService.getEventExtIdFor(msEventUid, device))
-			.andReturn(eventExtId).once();
 		
-		Event event = new Event();
-		event.setUid(new EventObmId(1));
-		event.setInternalEvent(false);
-		event.setExtId(eventExtId);
-
-		Event oBMEvent = new Event();
-		oBMEvent.setUid(new EventObmId(1));
-		oBMEvent.setInternalEvent(true);
-		oBMEvent.setExtId(eventExtId);
+		EventExtId eventExtId = new EventExtId("1564");
+		Event eventFromDB = null;
+		Event eventFromMSEvent = new Event();
+		eventFromMSEvent.setUid(new EventObmId(1));
+		eventFromMSEvent.setInternalEvent(isInternal);
+		Event eventFromMSEventAfterConvertion = new Event();
+		eventFromMSEventAfterConvertion.setUid(new EventObmId(1));
+		eventFromMSEventAfterConvertion.setInternalEvent(isInternal);
+		eventFromMSEventAfterConvertion.setExtId(eventExtId);
 		
-		expect(eventConverter.isInternalEvent(event, false)).andReturn(false).once();
+		EventObmId eventCreationDbId = new EventObmId(9);
+		expect(eventConverter.isInternalEvent(eventFromDB, false)).andReturn(isInternal).once();
+		expect(eventService.getEventExtIdFor(msEventUid, device)).andReturn(eventExtId);
+		expect(calendarClient.getEventFromExtId(token, calendar, eventExtId))
+			.andThrow(new EventNotFoundException("Replying to an external invitation"));
 		
-		expectGetAndModifyEvent(eventExtId, event);
-		expect(calendarClient.changeParticipationState(token, user.getLoginAtDomain(), eventExtId, null, 0, true))
-			.andReturn(true);
-		
-		expectEventConvertion(event);
+		expect(eventConverter.convert(user, eventFromDB, msEvent, isInternal))
+			.andReturn(eventFromMSEvent).once();
 		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
 			.andReturn(null).once();
 		
-		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
+		expect(calendarClient.createEvent(token, calendar, eventFromMSEventAfterConvertion, isInternal, clientId))
+			.andReturn(eventCreationDbId).once();
+		expect(calendarClient.getEventFromId(token, calendar, eventCreationDbId))
+			.andReturn(eventFromMSEventAfterConvertion);
+		
+		expect(calendarClient.changeParticipationState(token, calendar, eventExtId, null, 0, true))
+			.andReturn(true);
+		expect(mappingService.getCollectionIdFor(device, calendarPath))
 			.andReturn(1).once();
 		
-		expectBuildCollectionPath(calendarDisplayName);
+		mockControl.replay();
+		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
+		mockControl.verify();
+		
+		assertThat(serverIdResponse).isEqualTo("1:1");
+	}
+	
+	@Test
+	public void testHandleMettingResponseExternalUpdate() throws Exception {
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+
+		boolean isInternal = false;
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		MSEmail invitation  = new MSEmail();
+		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
+		
+		EventExtId eventExtId = new EventExtId("1564");
+		Event eventFromDB = new Event();
+		Event eventFromMSEvent = new Event();
+		eventFromMSEvent.setUid(new EventObmId(1));
+		eventFromMSEvent.setInternalEvent(isInternal);
+		eventFromMSEvent.setExtId(eventExtId);
+		Event eventFromMSEventAfterConvertion = new Event();
+		eventFromMSEventAfterConvertion.setUid(new EventObmId(1));
+		eventFromMSEventAfterConvertion.setInternalEvent(isInternal);
+		eventFromMSEventAfterConvertion.setExtId(eventExtId);
+		
+		expect(eventService.getEventExtIdFor(msEventUid, device)).andReturn(eventExtId);
+		expect(eventConverter.isInternalEvent(eventFromDB, false)).andReturn(isInternal);
+		expect(calendarClient.getEventFromExtId(token, calendar, eventExtId))
+			.andReturn(eventFromDB);
+		
+		expect(eventConverter.convert(user, eventFromDB, msEvent, isInternal))
+			.andReturn(eventFromMSEvent).once();
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
+			.andReturn(null).once();
+		expect(calendarClient.modifyEvent(token, calendar, eventFromMSEvent, true, false))
+			.andReturn(eventFromMSEventAfterConvertion);
+		
+		expect(calendarClient.changeParticipationState(token, calendar, eventExtId, null, 0, true))
+			.andReturn(true);
+		expect(mappingService.getCollectionIdFor(device, calendarPath))
+			.andReturn(1).once();
 		
 		mockControl.replay();
-
 		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
-		
 		mockControl.verify();
+		
+		assertThat(serverIdResponse).isEqualTo("1:1");
+	}
+	
+	@Test
+	public void testHandleMettingResponseInternal() throws Exception {
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+
+		boolean isInternal = true;
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		MSEmail invitation  = new MSEmail();
+		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
+		
+		EventExtId eventExtId = new EventExtId("1564");
+		Event eventFromMSEvent = new Event();
+		eventFromMSEvent.setUid(new EventObmId(1));
+		eventFromMSEvent.setInternalEvent(isInternal);
+		eventFromMSEvent.setExtId(eventExtId);
+
+		Event eventFromDB = new Event();
+		eventFromDB.setUid(new EventObmId(1));
+		eventFromDB.setInternalEvent(isInternal);
+		eventFromDB.setExtId(eventExtId);
+		
+		expect(eventService.getEventExtIdFor(msEventUid, device)).andReturn(eventExtId);
+		expect(eventConverter.isInternalEvent(eventFromDB, false)).andReturn(isInternal);
+		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
+			.andReturn(eventFromDB);
+		
+		expect(eventConverter.convert(user, eventFromDB, msEvent, isInternal))
+			.andReturn(eventFromMSEvent).once();
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
+			.andReturn(null).once();
+		
+		expect(calendarClient.changeParticipationState(token, calendar, eventExtId, null, 0, true))
+			.andReturn(true);
+		expect(mappingService.getCollectionIdFor(device, calendarPath))
+			.andReturn(1).once();
+		
+		mockControl.replay();
+		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, invitation, AttendeeStatus.ACCEPT);
+		mockControl.verify();
+		
 		assertThat(serverIdResponse).isEqualTo("1:1");
 	}
 	
