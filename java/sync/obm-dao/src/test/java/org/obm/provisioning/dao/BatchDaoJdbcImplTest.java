@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.Batch;
@@ -57,6 +58,7 @@ import com.google.inject.name.Names;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
+@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(BatchDaoJdbcImplTest.Env.class)
 public class BatchDaoJdbcImplTest {
@@ -83,7 +85,7 @@ public class BatchDaoJdbcImplTest {
 
 	@Test
 	public void testGetWhenBatchNotFound() throws Exception {
-		assertThat(dao.get(123)).isNull();
+		assertThat(dao.get(batchId(123))).isNull();
 	}
 
 	@Test
@@ -93,7 +95,7 @@ public class BatchDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch_operation_param (key, value, operation) VALUES ('p1', 'v1', 1)");
 		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
 
-		Batch batch = dao.get(1);
+		Batch batch = dao.get(batchId(1));
 
 		assertThat(batch.getOperations()).hasSize(2);
 	}
@@ -112,7 +114,7 @@ public class BatchDaoJdbcImplTest {
 		Batch batch = Batch.builder().domain(domain).status(BatchStatus.IDLE).build();
 		Batch createdBatch = dao.create(batch);
 
-		assertThat(createdBatch.getId()).isEqualTo(1);
+		assertThat(createdBatch.getId()).isEqualTo(batchId(1));
 	}
 
 	@Test
@@ -132,7 +134,7 @@ public class BatchDaoJdbcImplTest {
 	@Test
 	public void testUpdate() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		Batch updatedBatch = dao.update(batch);
@@ -143,7 +145,7 @@ public class BatchDaoJdbcImplTest {
 	@Test
 	public void testUpdateActuallyWritesToDB() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		dao.update(batch);
@@ -158,7 +160,7 @@ public class BatchDaoJdbcImplTest {
 	@Test(expected = BatchNotFoundException.class)
 	public void testUpdateWhenBatchDoesntExist() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(666).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(666)).domain(domain).status(BatchStatus.RUNNING).build();
 
 		dao.update(batch);
 	}
@@ -166,7 +168,7 @@ public class BatchDaoJdbcImplTest {
 	@Test
 	public void testDelete() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
-		dao.delete(1);
+		dao.delete(batchId(1));
 
 		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch");
 
@@ -177,12 +179,12 @@ public class BatchDaoJdbcImplTest {
 
 	@Test(expected = BatchNotFoundException.class)
 	public void testDeleteWhenBatchDoesntExist() throws Exception {
-		dao.delete(1);
+		dao.delete(batchId(1));
 	}
 
 	@Test(expected = BatchNotFoundException.class)
 	public void testAddOperationWhenBatchNotFound() throws Exception {
-		dao.addOperation(1, null);
+		dao.addOperation(batchId(1), null);
 	}
 
 	@Test
@@ -201,7 +203,7 @@ public class BatchDaoJdbcImplTest {
 				.entityType(BatchEntityType.USER)
 				.build();
 
-		assertThat(dao.addOperation(1, operation).getOperations()).isNotEmpty();
+		assertThat(dao.addOperation(batchId(1), operation).getOperations()).isNotEmpty();
 	}
 
 	@Test
@@ -220,12 +222,16 @@ public class BatchDaoJdbcImplTest {
 				.entityType(BatchEntityType.USER)
 				.build();
 
-		dao.addOperation(1, operation).getOperations();
+		dao.addOperation(batchId(1), operation).getOperations();
 
 		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch_operation");
 
 		rs.next();
 
 		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
+	private Batch.Id batchId(Integer id) {
+		return Batch.Id.builder().id(id).build();
 	}
 }

@@ -8,6 +8,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.provisioning.beans.Batch;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class BatchResource {
@@ -18,7 +20,7 @@ public class BatchResource {
 	@GET
 	@Path("/{batchId}")
 	@Produces("application/json")
-	public Response status(@PathParam("batchId") String batchId) {
+	public Response status(@PathParam("batchId") Batch.Id batchId) {
 		return Response.status(Status.NOT_FOUND).build();
 	}
 

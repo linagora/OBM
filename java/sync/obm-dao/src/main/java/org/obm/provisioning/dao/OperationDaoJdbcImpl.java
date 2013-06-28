@@ -135,7 +135,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			ps.setString(3, operation.getRequest().getBody());
 			ps.setString(4, operation.getRequest().getVerb().toString());
 			ps.setString(5, operation.getEntityType().toString());
-			ps.setInt(6, batch.getId());
+			ps.setInt(6, batch.getId().getId());
 
 			ps.executeUpdate();
 

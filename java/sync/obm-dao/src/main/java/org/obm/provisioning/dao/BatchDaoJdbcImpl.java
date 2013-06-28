@@ -64,7 +64,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch get(Integer id) throws DaoException {
+	public Batch get(Batch.Id id) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -73,7 +73,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("SELECT * FROM batch b INNER JOIN Domain d ON d.domain_id = b.domain WHERE b.id = ?");
 
-			ps.setInt(1, id);
+			ps.setInt(1, id.getId());
 
 			rs = ps.executeQuery();
 
@@ -105,7 +105,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 			ps.executeUpdate();
 
-			return get(JDBCUtils.lastInsertId(connection));
+			return get(Batch.Id.builder().id(JDBCUtils.lastInsertId(connection)).build());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -133,12 +133,12 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			} else {
 				ps.setTimestamp(2, new Timestamp(timecommit.getTime()));
 			}
-			ps.setInt(3, batch.getId());
+			ps.setInt(3, batch.getId().getId());
 
 			int updateCount = ps.executeUpdate();
 			
 			if (updateCount != 1) {
-				throw new BatchNotFoundException(String.format("No such batch: %d", batch.getId()));
+				throw new BatchNotFoundException(String.format("No such batch: %s", batch.getId()));
 			}
 
 			return get(batch.getId());
@@ -152,7 +152,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public void delete(Integer id) throws DaoException, BatchNotFoundException {
+	public void delete(Batch.Id id) throws DaoException, BatchNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -160,12 +160,12 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("DELETE FROM batch WHERE id = ?");
 
-			ps.setInt(1, id);
+			ps.setInt(1, id.getId());
 
 			int updateCount = ps.executeUpdate();
 			
 			if (updateCount != 1) {
-				throw new BatchNotFoundException(String.format("No such batch: %d", id));
+				throw new BatchNotFoundException(String.format("No such batch: %s", id));
 			}
 		}
 		catch (SQLException e) {
@@ -177,11 +177,11 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch addOperation(Integer batchId, Operation operation) throws DaoException, BatchNotFoundException {
+	public Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException {
 		Batch batch = get(batchId);
 
 		if (batch == null) {
-			throw new BatchNotFoundException(String.format("Batch %d not found", batchId));
+			throw new BatchNotFoundException(String.format("No such batch: %s", batchId));
 		}
 
 		operationDao.create(batch, operation);
@@ -199,7 +199,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 		int batchId = rs.getInt("id");
 
 		return Batch.builder()
-				.id(batchId)
+				.id(Batch.Id.builder().id(batchId).build())
 				.status(BatchStatus.valueOf(rs.getString("status")))
 				.domain(domain)
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))

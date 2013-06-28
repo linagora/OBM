@@ -40,13 +40,72 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class Batch {
 
+	public static class Id {
+
+		public static Id valueOf(String idAsString) {
+			return builder().id(Integer.parseInt(idAsString)).build();
+		}
+
+		public static Builder builder() {
+			return new Builder();
+		}
+
+		public static class Builder {
+
+			private Integer id;
+
+			private Builder() {
+			}
+
+			public Builder id(Integer id) {
+				this.id = id;
+				return this;
+			}
+
+			public Id build() {
+				return new Id(id);
+			}
+		}
+
+		private final Integer id;
+
+		public Integer getId() {
+			return id;
+		}
+
+		private Id(Integer id) {
+			this.id = id;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(id);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Id) {
+				Id other = (Id) obj;
+
+				return Objects.equal(id, other.id);
+			}
+
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(id);
+		}
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
 
 	public static class Builder {
 
-		private Integer id;
+		private Id id;
 		private BatchStatus status;
 		private Date timecreate;
 		private Date timecommit;
@@ -57,7 +116,7 @@ public class Batch {
 			operations = ImmutableList.builder();
 		}
 
-		public Builder id(Integer id) {
+		public Builder id(Id id) {
 			this.id = id;
 			return this;
 		}
@@ -101,14 +160,14 @@ public class Batch {
 
 	}
 
-	private Integer id;
+	private Id id;
 	private BatchStatus status;
 	private Date timecreate;
 	private Date timecommit;
 	private ObmDomain domain;
 	private List<Operation> operations;
 
-	private Batch(Integer id, BatchStatus status, Date timecreate, Date timecommit, ObmDomain domain, List<Operation> operations) {
+	private Batch(Id id, BatchStatus status, Date timecreate, Date timecommit, ObmDomain domain, List<Operation> operations) {
 		this.id = id;
 		this.status = status;
 		this.timecreate = timecreate;
@@ -117,7 +176,7 @@ public class Batch {
 		this.operations = operations;
 	}
 
-	public Integer getId() {
+	public Id getId() {
 		return id;
 	}
 

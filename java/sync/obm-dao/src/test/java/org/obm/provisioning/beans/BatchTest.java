@@ -57,4 +57,18 @@ public class BatchTest {
 		assertThat(batch.getStatus()).isEqualTo(BatchStatus.IDLE);
 	}
 
+	@Test
+	public void testBatchIdValueOf() {
+		assertThat(Batch.Id.valueOf("1")).isEqualTo(Batch.Id.builder().id(1).build());
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testBatchIdValueOfWithNull() {
+		Batch.Id.valueOf(null);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testBatchIdValueOfWithNotANumber() {
+		Batch.Id.valueOf("test");
+	}
 }

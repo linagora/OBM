@@ -36,14 +36,14 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 
 public interface BatchDao {
 
-	Batch get(Integer id) throws DaoException;
+	Batch get(Batch.Id id) throws DaoException;
 
 	Batch create(Batch batch) throws DaoException;
 
 	Batch update(Batch batch) throws DaoException, BatchNotFoundException;
 
-	void delete(Integer id) throws DaoException, BatchNotFoundException;
+	void delete(Batch.Id id) throws DaoException, BatchNotFoundException;
 
-	Batch addOperation(Integer batchId, Operation operation) throws DaoException, BatchNotFoundException;
+	Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException;
 
 }

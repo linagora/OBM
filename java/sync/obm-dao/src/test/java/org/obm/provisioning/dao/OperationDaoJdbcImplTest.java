@@ -140,7 +140,7 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testCreate() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -161,7 +161,7 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testCreateActuallyWritesToDB() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -188,7 +188,7 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testCreateActuallyWritesParametersToDB() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -215,7 +215,7 @@ public class OperationDaoJdbcImplTest {
 	@Test(expected = DaoException.class)
 	public void testCreateWhenBatchDoesntExist() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		Batch batch = Batch.builder().id(1).domain(domain).status(BatchStatus.RUNNING).build();
+		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
 				.url("/batches/1/users")
 				.verb(HttpVerb.POST)
@@ -268,5 +268,9 @@ public class OperationDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		
 		dao.update(operation);
+	}
+
+	private Batch.Id batchId(Integer id) {
+		return Batch.Id.builder().id(id).build();
 	}
 }
