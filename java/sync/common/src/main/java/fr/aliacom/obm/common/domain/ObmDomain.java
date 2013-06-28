@@ -34,7 +34,6 @@ package fr.aliacom.obm.common.domain;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -127,15 +126,12 @@ public class ObmDomain implements Serializable {
 		return new Builder();
 	}
 	
-	protected Integer id;
-	protected String name;
-	protected ObmDomainUuid uuid;
-	protected Set<String> aliases;
-	protected String label;
-	protected Multimap<ServiceProperty, ObmHost> hosts;
-
-	public ObmDomain() {
-	}
+	private final Integer id;
+	private final String name;
+	private final ObmDomainUuid uuid;
+	private final Set<String> aliases;
+	private final String label;
+	private final Multimap<ServiceProperty, ObmHost> hosts;
 
 	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts) {
 		this.id = id;
@@ -162,7 +158,6 @@ public class ObmDomain implements Serializable {
 		return aliases;
 	}
 
-	@JsonIgnore
 	public Set<String> getNames() {
 		return Sets.union(ImmutableSet.of(name), aliases);
 	}

@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Function;
@@ -45,6 +44,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -52,6 +52,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class ObmUser {
 	
 	public static final String EMAIL_FIELD_SEPARATOR = "\r\n";
+	public static final int MAXIMUM_SUPPORTED_ADDRESSES = 3;
 
 	public static Builder builder() {
 		return new Builder();
@@ -214,6 +215,25 @@ public class ObmUser {
 			return this;
 		}
 		
+
+		public Builder mails(Iterable<String> mails) {
+			email = Iterables.get(mails, 0, null);
+			emailAlias = Sets.newHashSet();
+			final Iterable<String> skipFirstOne = Iterables.skip(mails, 1);
+			if (!Iterables.isEmpty(skipFirstOne)) {	
+				Iterables.addAll(emailAlias, skipFirstOne);	
+			}
+			return this;
+		}
+		
+		public Builder addresses(Iterable<String> addresses) {
+			Preconditions.checkArgument(Iterables.size(addresses) <= MAXIMUM_SUPPORTED_ADDRESSES);
+			address1 = Iterables.get(addresses, 0, null);
+			address2 = Iterables.get(addresses, 1, null);
+			address3 = Iterables.get(addresses, 2, null);
+			return this;
+		}
+		
 		public ObmUser build() {
 			Preconditions.checkNotNull(uid);
 			Preconditions.checkNotNull(login);
@@ -227,41 +247,38 @@ public class ObmUser {
 		
 	}
 	
-	protected int uid;
-	protected int entityId;
-	protected String login;
-	protected UserExtId extId;
-	protected String commonName;
-	protected String lastName;
-	protected String firstName;
-	protected String email;
-	protected Set<String> emailAlias;
+	private final int uid;
+	private final int entityId;
+	private final String login;
+	private final UserExtId extId;
+	private final String commonName;
+	private final String lastName;
+	private final String firstName;
+	private final String email;
+	private final Set<String> emailAlias;
 	
-	protected String address1;
-	protected String address2;
-	protected String address3;
+	private final String address1;
+	private final String address2;
+	private final String address3;
 
-	protected String expresspostal;
-	protected String homePhone;
-	protected String mobile;
-	protected String service;
-	protected String title;
-	protected String town;
-	protected String workFax;
-	protected String workPhone;
-	protected String zipCode;
-	protected String description;
+	private final String expresspostal;
+	private final String homePhone;
+	private final String mobile;
+	private final String service;
+	private final String title;
+	private final String town;
+	private final String workFax;
+	private final String workPhone;
+	private final String zipCode;
+	private final String description;
 
-	protected Date timeCreate;
-	protected Date timeUpdate;
-	protected ObmUser createdBy;
-	protected ObmUser updatedBy;
+	private final Date timeCreate;
+	private final Date timeUpdate;
+	private final ObmUser createdBy;
+	private final ObmUser updatedBy;
 
-	protected ObmDomain domain;
-	protected boolean publicFreeBusy;
-
-	public ObmUser() {
-	}
+	private final ObmDomain domain;
+	private final boolean publicFreeBusy;
 	
 	private ObmUser(int uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
@@ -414,7 +431,6 @@ public class ObmUser {
 		return email;
 	}
 
-	@JsonIgnore
 	public String getEmailAtDomain() {
 		return appendDomainToEmailIfRequired(email);
 	}
@@ -430,7 +446,6 @@ public class ObmUser {
 		return emailAddress;
 	}
 
-	@JsonIgnore
 	public String getDisplayName(){
 		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
 	}

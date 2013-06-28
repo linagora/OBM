@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,68 +29,58 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.json;
 
-import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.io.IOException;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.dao.exceptions.DaoException;
-
-import com.google.common.collect.ImmutableMap;
-
+import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
-
+public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTest {
+	
+	@Ignore("Not Working yet because injected value(ObmDomain) is wrong.")
 	@Test
-	public void testModifyAUser() throws Exception {
-		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT, ImmutableMap.<String, String>of())))
-				.andReturn(batch);
-		
+	public void testObmUserDeserializer() throws Exception {
+		userDao.create(fakeUser());
+		expectLastCall().once();
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = put("/batches/1/users/1", obmUserToJson());
+		HttpResponse httpResponse = post("/tests", obmUserToJson());
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
+		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
 	}
-
-	@Test
-	public void testPutUserThrowError() throws Exception {
-		expectDomain();
-		expectBatch();
-		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT, ImmutableMap.<String, String>of())))
-				.andThrow(new DaoException());
-		
-		mocksControl.replay();
-		
-		HttpResponse httpResponse = put("/batches/1/users/1", obmUserToJson());
-		
-		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+	
+	@Override
+	protected HttpResponse post(String path, StringEntity content) throws ClientProtocolException, IOException {
+		return createPostForTestingRequest(path, content).execute().returnResponse();
+	}
+	
+	private Request createPostForTestingRequest(String path, StringEntity content) {
+		return Request.Post(baseUrl + path).body(content);
 	}
 }

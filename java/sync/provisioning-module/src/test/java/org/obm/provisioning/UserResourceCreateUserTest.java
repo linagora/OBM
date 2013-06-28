@@ -93,5 +93,4 @@ public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode())
 			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
-
 }

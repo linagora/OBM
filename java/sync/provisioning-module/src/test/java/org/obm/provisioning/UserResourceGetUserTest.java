@@ -48,24 +48,13 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
-
-	@Test
-	public void testUnknownUrl() throws Exception {
-		expectDomain();
-		mocksControl.replay();
-
-		HttpResponse httpResponse = get("/users/a/b");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
-	}
 
 	@Test
 	public void testGetAUser() throws Exception {
@@ -80,7 +69,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonUser());
+		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
 	}
 
 	@Test
@@ -119,115 +108,5 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
-	}
-	
-	private ObmUser fakeUser() {
-		return ObmUser.builder()
-				.domain(domain)
-				.uid(1)
-				.login("user1")
-				.lastName("Doe")
-				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
-				.firstName("Jésus")
-				.commonName("John Doe")
-				//.kind("")					// Not implemented yet in ObmUser
-				.title("title")
-				.description("description")
-				//.company("")				// Not implemented yet in ObmUser
-				.service("service")
-				//.direction()				// Not implemented yet in ObmUser
-				.address1("address1")
-				.address2("address2")
-				.town("town")
-				.zipCode("zipCode")
-				//.business_zipcode()		// Not implemented yet in ObmUser
-				//.country()				// Not implemented yet in ObmUser
-				//.phones()					// Not implemented yet in ObmUser
-				.mobile("mobile")
-				//.faxes()					// Not implemented yet in ObmUser
-				//.mail_quota()				// Not implemented yet in ObmUser
-				//.mail_server()			// Not implemented yet in ObmUser
-				.emailAndAliases("mails")
-				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
-				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
-				//.groups()					// Not implemented yet in ObmUser
-				.build();
-				
-				
-	}
-	
-	private String expectedJsonUser() {
-		return  
-				"{" +
-				  "\"uid\":1," +
-				  "\"entityId\":0," +
-				  "\"login\":\"user1\"," +
-				  "\"extId\":null," +
-				  "\"commonName\":\"John Doe\"," +
-				  "\"lastName\":\"Doe\"," +
-				  "\"firstName\":\"Jésus\"," +
-				  "\"email\":\"mails\"," +
-				  "\"emailAlias\":[]," +
-				  "\"address1\":\"address1\"," +
-				  "\"address2\":\"address2\"," +
-				  "\"address3\":null," +
-				  "\"expresspostal\":null," +
-				  "\"homePhone\":null," +
-				  "\"mobile\":\"mobile\"," +
-				  "\"service\":\"service\"," +
-				  "\"title\":\"title\"," +
-				  "\"town\":\"town\"," +
-				  "\"workFax\":null," +
-				  "\"workPhone\":null," +
-				  "\"zipCode\":\"zipCode\"," +
-				  "\"description\":\"description\"," +
-				  "\"timeCreate\":\"2013-06-11T12:00:00.000+0000\"," +
-				  "\"timeUpdate\":\"2013-06-11T13:00:00.000+0000\"," +
-				  "\"createdBy\":null," +
-				  "\"updatedBy\":null," +
-				  "\"domain\":{" +
-				    "\"id\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
-				    "\"name\":\"domain\"," +
-				    "\"label\":null," +
-				    "\"aliases\":[]" +
-				  "}," +
-				  "\"publicFreeBusy\":false" +
-				"}";
-	}
-	
-	
-	@SuppressWarnings("unused")
-	private String expectedJsonUserNotImplementYet() {
-		String json =
-					"{id: 1," +
-					"login: user1," +
-					"lastname: Doe," +
-					//"profile: Utilisateurs," +
-					"firstname: Jésus," +
-					"commonname: John Doe," +
-					"password: doe," +
-					//"kind: kind," +
-					"title: title," +
-					"description: description," +
-					//"company: company," +
-					"service: service," +
-					//"direction: direction," +
-					"addresses: address1," +
-					"town: town," +
-					"zipcode: zipcode," +
-					//"business_zipcode: business_zipcode," +
-					//"country: country," +
-					//"phones: phones," +
-					"mobile: mobile," +
-					//"faxes: faxes" +
-					//"mail_quota: mail_quota," +
-					//"mail_server: mail_server," +
-					//"mails: mails," +
-					"timecreate: timecreate," +
-					"timeupdate: timeupdate," +
-					//"groups: groups" +
-					"}";
-		
-		return json;
 	}
 }

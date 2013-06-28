@@ -54,6 +54,7 @@ import org.junit.Before;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
+import org.obm.DateUtils;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.beans.Batch;
@@ -74,6 +75,8 @@ import com.google.inject.util.Modules;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -91,6 +94,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
 					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));
+					bind(ResourceForTest.class);
 
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 				}
@@ -265,39 +269,71 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected String obmUserToJsonString() {
-		return "{" +
-				  "\"uid\":1," +
-				  "\"entityId\":0," +
-				  "\"login\":\"user1\"," +
-				  "\"commonName\":\"John Doe\"," +
-				  "\"lastName\":\"Doe\"," +
-				  "\"firstName\":\"Jesus\"," +
-				  "\"email\":\"mails\"," +
-				  "\"emailAlias\":[]," +
-				  "\"address1\":\"address1\"," +
-				  "\"address2\":\"address2\"," +
-				  "\"address3\":null," +
-				  "\"expresspostal\":null," +
-				  "\"homePhone\":null," +
-				  "\"mobile\":\"mobile\"," +
-				  "\"service\":\"service\"," +
-				  "\"title\":\"title\"," +
-				  "\"town\":\"town\"," +
-				  "\"workFax\":null," +
-				  "\"workPhone\":null," +
-				  "\"zipCode\":\"zipCode\"," +
-				  "\"description\":\"description\"," +
-				  "\"timeCreate\":\"2013-06-11T12:00:00.000+0000\"," +
-				  "\"timeUpdate\":\"2013-06-11T13:00:00.000+0000\"," +
-				  "\"createdBy\":null," +
-				  "\"updatedBy\":null," +
-				  "\"domain\":{" +
-				    "\"id\":1," +
-				    "\"name\":\"domain\"," +
-				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
-				    "\"aliases\":[]" +
-				  "}," +
-				  "\"publicFreeBusy\":false" +
-				"}";
+		return 	
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"lastname\":\"Doe\"," +
+				"\"profile\":\"Not implemented yet\"," +
+				"\"firstname\":\"Jesus\"," +
+				"\"commonname\":\"John Doe\"," +
+				"\"password\":\"Not implemented yet\"," +
+				"\"kind\":\"Not implemented yet\"," +
+				"\"title\":\"title\"," +
+				"\"description\":\"description\"," +
+				"\"company\":\"Not implemented yet\"," +
+				"\"service\":\"service\"," +
+				"\"direction\":\"Not implemented yet\"," +
+				"\"addresses\":[\"address1\",\"address2\"]," +
+				"\"town\":\"town\"," +
+				"\"zipcode\":\"zipcode\"," +
+				"\"business_zipcode\":\"Not implemented yet\"," +
+				"\"country\":\"Not implemented yet\"," +
+				"\"phones\":[\"Not implemented yet\"]," +
+				"\"mobile\":\"mobile\"," +
+				"\"faxes\":[\"Not implemented yet\"]," +
+				"\"mail_quota\":\"Not implemented yet\"," +
+				"\"mail_server\":\"Not implemented yet\"," +
+				"\"mails\":[\"john@domain\"]," +
+				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
+				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
+				"\"groups\":[\"Not implemented yet\"]" +
+			"}";
+	}
+	
+	protected ObmUser fakeUser() {
+		return ObmUser.builder()
+				.domain(domain)
+				.uid(1)
+				.extId(new UserExtId("extId"))
+				.login("user1")
+				.lastName("Doe")
+				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
+				.firstName("Jesus")
+				.commonName("John Doe")
+				//.kind("")					// Not implemented yet in ObmUser
+				.title("title")
+				.description("description")
+				//.company("")				// Not implemented yet in ObmUser
+				.service("service")
+				//.direction()				// Not implemented yet in ObmUser
+				.address1("address1")
+				.address2("address2")
+				.town("town")
+				.zipCode("zipcode")
+				//.business_zipcode()		// Not implemented yet in ObmUser
+				//.country()				// Not implemented yet in ObmUser
+				//.phones()					// Not implemented yet in ObmUser
+				.mobile("mobile")
+				//.faxes()					// Not implemented yet in ObmUser
+				//.mail_quota()				// Not implemented yet in ObmUser
+				//.mail_server()			// Not implemented yet in ObmUser
+				.emailAndAliases("john")
+				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
+				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
+				//.groups()					// Not implemented yet in ObmUser
+				.build();
+				
+				
 	}
 }

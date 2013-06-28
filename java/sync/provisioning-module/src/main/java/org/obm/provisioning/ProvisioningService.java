@@ -3,6 +3,8 @@ package org.obm.provisioning;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.codehaus.jackson.map.DeserializationConfig.Feature;
+import org.codehaus.jackson.map.InjectableValues;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
@@ -19,6 +21,8 @@ import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
+import org.obm.provisioning.json.ObmUserJsonDeserializer;
+import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 
 import com.google.common.collect.ImmutableMap;
@@ -33,6 +37,7 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class ProvisioningService extends JerseyServletModule {
 
@@ -67,20 +72,23 @@ public class ProvisioningService extends JerseyServletModule {
 	@Provides
 	@Singleton
 	public static ObjectMapper createObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		SimpleModule module = new SimpleModule("Serializers", new Version(0, 0, 0, null));
+		SimpleModule module =
+				new SimpleModule("Serializers", new Version(0, 0, 0, null))
+				.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer())
+				.addDeserializer(ObmDomainUuid.class, new ObmDomainUuidJsonDeserializer())
+				.addSerializer(Multimap.class, new MultimapJsonSerializer())
+				.addSerializer(ObmDomain.class, new ObmDomainJsonSerializer())
+				.addSerializer(Operation.class, new OperationJsonSerializer())
+				.addSerializer(Batch.class, new BatchJsonSerializer())
+				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
+				.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer());
 
-		module.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer());
-		module.addDeserializer(ObmDomainUuid.class, new ObmDomainUuidJsonDeserializer());
-		module.addSerializer(Multimap.class, new MultimapJsonSerializer());
-		module.addSerializer(ObmDomain.class, new ObmDomainJsonSerializer());
-		module.addSerializer(Operation.class, new OperationJsonSerializer());
-		module.addSerializer(Batch.class, new BatchJsonSerializer());
-
-		objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-		objectMapper.registerModule(module);
-
-		return objectMapper;
+		return new ObjectMapper()
+				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)
+				.configure(Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+				.withModule(module)
+				.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, ObmDomain.builder().build()));
+				
 	}
 
 	@Provides
