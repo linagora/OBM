@@ -89,7 +89,6 @@ import org.obm.provisioning.Connection;
 import org.obm.provisioning.ConnectionException;
 import org.obm.provisioning.ConnectionImpl;
 import org.obm.provisioning.DomainResource;
-import org.obm.provisioning.GroupResource;
 import org.obm.provisioning.LdapException;
 import org.obm.provisioning.LdapGroup;
 import org.obm.provisioning.LdapGroupImpl;
@@ -502,7 +501,6 @@ public class DependencyResolverHelper {
 				ProvisioningContextListener.class,
 				UserResource.class,
 				BatchResource.class,
-				GroupResource.class,
 				DomainResource.class,
 				ProfileResource.class,
 				UserIdentifier.class,
