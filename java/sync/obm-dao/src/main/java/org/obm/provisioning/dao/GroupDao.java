@@ -35,6 +35,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public interface GroupDao {
@@ -43,16 +44,18 @@ public interface GroupDao {
 	 * Retrieve group information by group id. This will only retrieve group information, not the
 	 * members of the group.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group
 	 * @return							Group information without expanded users or groups
 	 * @throws GroupNotFoundException	If the group with the passed extId is not found
 	 * @throws DaoException				If an exception occurred retrieving the data
 	 */
-	Group get(GroupExtId extId) throws GroupNotFoundException, DaoException;
+	Group get(ObmDomain domain, GroupExtId extId) throws GroupNotFoundException, DaoException;
 	
 	/**
 	 * Recursively get group information and members.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group
 	 * @param includeUsers				If true, users will be included in returned group information
 	 * @param groupDepth				The search depth for nested groups. 
@@ -61,7 +64,7 @@ public interface GroupDao {
 	 * @throws DaoException				If the group with the passed extId is not found.
 	 * @throws GroupNotFoundException	If an exception occurred retrieving the data.
 	 */
-	Group getRecursive(GroupExtId extId, boolean includeUsers, int groupDepth) throws DaoException, GroupNotFoundException;
+	Group getRecursive(ObmDomain domain, GroupExtId extId, boolean includeUsers, int groupDepth) throws DaoException, GroupNotFoundException;
 
 	/**
 	 * Create a group with the specified information
@@ -70,66 +73,72 @@ public interface GroupDao {
 	 * @return							The created group.
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 */
-	Group create(Group info) throws DaoException;
+	Group create(ObmDomain domain, Group info) throws DaoException;
 	
 	/**
 	 * Update the group with the specified information.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param info						The group information to use for updating.
 	 * @return							The updated group.
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group is not found.
 	 */
-	Group update(Group info) throws DaoException, GroupNotFoundException;
+	Group update(ObmDomain domain, Group info) throws DaoException, GroupNotFoundException;
 	
 	/**
 	 * Remove a group from the database.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group to remove.
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group is not found.
 	 */
-	void delete(GroupExtId extId) throws DaoException, GroupNotFoundException;
+	void delete(ObmDomain domain, GroupExtId extId) throws DaoException, GroupNotFoundException;
 
 	/**
 	 * Add a user to a group. The user must exist.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group.		
 	 * @param user						The user to add to the group
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group is not found.
 	 * @throws UserNotFoundException	If the user is not found.
 	 */
-	void addUser(GroupExtId extId, ObmUser user) throws DaoException, GroupNotFoundException, UserNotFoundException;
+	void addUser(ObmDomain domain, GroupExtId extId, ObmUser user) throws DaoException, GroupNotFoundException, UserNotFoundException;
 	
 	/**
 	 * Adds a subgroup to a group. The subgroup must exist.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group.
 	 * @param subgroup					The subgroup to add.
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group or subgroup is not found
 	 */
-	void addSubgroup(GroupExtId extId, Group subgroup) throws DaoException, GroupNotFoundException;
+	void addSubgroup(ObmDomain domain, GroupExtId extId, Group subgroup) throws DaoException, GroupNotFoundException;
 	
 	/**
 	 * Remove a user from a group.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group.
 	 * @param user						The user to remove from the group.
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group is not found.
 	 * @throws UserNotFoundException	If the user is not found.
 	 */
-	void removeUser(GroupExtId extId, ObmUser user) throws DaoException, GroupNotFoundException, UserNotFoundException;
+	void removeUser(ObmDomain domain, GroupExtId extId, ObmUser user) throws DaoException, GroupNotFoundException, UserNotFoundException;
 	
 	/**
 	 * Remove a subgroup from a group.
 	 * 
+	 * @param domain					The domain of the group
 	 * @param extId						The external id of the group.
 	 * @param subgroup					The subgroup to remove from the group
 	 * @throws DaoException				If an exception occurred retrieving the data.
 	 * @throws GroupNotFoundException	If the group is not found.
 	 */
-	void removeSubgroup(GroupExtId extId, Group subgroup) throws DaoException, GroupNotFoundException;	
+	void removeSubgroup(ObmDomain domain, GroupExtId extId, Group subgroup) throws DaoException, GroupNotFoundException;	
 }

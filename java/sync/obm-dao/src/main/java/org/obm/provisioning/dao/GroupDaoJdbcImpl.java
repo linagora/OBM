@@ -59,21 +59,19 @@ public class GroupDaoJdbcImpl implements GroupDao {
     
     private DatabaseConnectionProvider connectionProvider;
 	private UserDao userDao;
-	private ObmDomain domain;
 
     @Inject
-    private GroupDaoJdbcImpl(DatabaseConnectionProvider connectionProvider, UserDao userDao, ObmDomain domain) {
+    private GroupDaoJdbcImpl(DatabaseConnectionProvider connectionProvider, UserDao userDao) {
         this.connectionProvider = connectionProvider;
         this.userDao = userDao;
-        this.domain = domain;
     }
 
     @Override
-    public Group get(GroupExtId id) throws DaoException, GroupNotFoundException {
+    public Group get(ObmDomain domain, GroupExtId id) throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	try {
     		conn = connectionProvider.getConnection();
-	    	return this.getGroupBuilder(id, conn).build();
+	    	return this.getGroupBuilder(conn, domain, id).build();
     	} catch (SQLException e) {
     		throw new DaoException(e);
     	} finally {
@@ -81,7 +79,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
     	}
     }
     		
-    private Group.Builder getGroupBuilder(GroupExtId id, Connection conn) throws SQLException, GroupNotFoundException {
+    private Group.Builder getGroupBuilder(Connection conn, ObmDomain domain, GroupExtId id) throws SQLException, GroupNotFoundException {
     	PreparedStatement ps = null;
     	ResultSet rs = null;
     	try {
@@ -89,7 +87,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	        ps = conn.prepareStatement(
 	                "      SELECT group_name, group_desc" +
 	                "        FROM UGroup " +
-	                "  INNER JOIN Domain ON profile_domain_id = domain_id" +
+	                "  INNER JOIN Domain ON group_domain_id = domain_id" +
 	                "       WHERE domain_uuid = ?" +
 	                "         AND group_ext_id = ?" +
 	                "       LIMIT 1");
@@ -112,13 +110,13 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
     
     @Override
-    public Group getRecursive(GroupExtId id, boolean includeUsers, int groupDepth) throws DaoException, GroupNotFoundException {
+    public Group getRecursive(ObmDomain domain, GroupExtId id, boolean includeUsers, int groupDepth) throws DaoException, GroupNotFoundException {
     	Group.Builder groupBuilder = Group.builder();
     	Connection conn = null;
     	
     	try {
     		conn = connectionProvider.getConnection();
-    		return buildRecursiveGroup(groupBuilder, conn, id, includeUsers, groupDepth);
+    		return buildRecursiveGroup(groupBuilder, conn, domain, id, includeUsers, groupDepth);
     	} catch (SQLException e) {
     		throw new DaoException(e);
     	} finally {
@@ -126,11 +124,11 @@ public class GroupDaoJdbcImpl implements GroupDao {
     	}
     }
     
-    private Group buildRecursiveGroup(Group.Builder groupBuilder, Connection conn, GroupExtId id, boolean includeUsers, int groupDepth) throws SQLException, GroupNotFoundException {
+    private Group buildRecursiveGroup(Group.Builder groupBuilder, Connection conn, ObmDomain domain, GroupExtId id, boolean includeUsers, int groupDepth) throws SQLException, GroupNotFoundException {
     	PreparedStatement ps = null;
     	ResultSet rs = null;
     	
-    	int internalGroupId = getInternalGroupId(id, conn);
+    	int internalGroupId = getInternalGroupId(conn, domain, id);
     	
     	if (includeUsers) {
     		try {
@@ -142,7 +140,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	 	                "       WHERE group_id = ?" +
 	 	                "         AND domain_uuid = ?");
     			ps.setInt(1, internalGroupId);
-    			ps.setString(2, this.domain.getUuid().get());
+    			ps.setString(2, domain.getUuid().get());
     			rs = ps.executeQuery();
 	 	        
 	 	        while (rs.next()) {
@@ -170,13 +168,13 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	 	                "         AND domain_uuid = ?");
 	 	        
 	 	        ps.setInt(1, internalGroupId);
-	 	        ps.setString(2, this.domain.getUuid().get());
+	 	        ps.setString(2, domain.getUuid().get());
 	 	        rs = ps.executeQuery();
 	 	        
 	 	        while (rs.next()) {
 	 	        	GroupExtId subid = GroupExtId.of(rs.getString("groupgroup_child_id")); 
-	 	        	Group.Builder subgroup = getGroupBuilder(subid, conn);
-	 	        	groupBuilder.subgroup(buildRecursiveGroup(subgroup, conn, subid, includeUsers, childDepth));
+	 	        	Group.Builder subgroup = getGroupBuilder(conn, domain, subid);
+	 	        	groupBuilder.subgroup(buildRecursiveGroup(subgroup, conn, domain, subid, includeUsers, childDepth));
 	 	        }
         	} finally {
         		JDBCUtils.cleanup(null, ps, rs);
@@ -188,7 +186,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public Group create(Group info) throws DaoException {
+    public Group create(ObmDomain domain, Group info) throws DaoException {
       	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
@@ -200,7 +198,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	                "             (SELECT domain_id FROM Domain WHERE domain_uuid = ?," +
 	                "              ?, ?, ?)");
 	        
-	        ps.setString(1, this.domain.getUuid().get());
+	        ps.setString(1, domain.getUuid().get());
 	        ps.setString(2, info.getExtId().getId());
 	        ps.setString(3, info.getName());
 	        ps.setString(4, info.getDescription());
@@ -212,7 +210,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		}
     	
     	try {
-    		return get(info.getExtId());
+    		return get(domain, info.getExtId());
     	} catch (GroupNotFoundException e) {
     		// This shouldn't happen
     		return null;
@@ -220,7 +218,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public Group update(Group info) throws DaoException, GroupNotFoundException {
+    public Group update(ObmDomain domain, Group info) throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
@@ -236,7 +234,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	        ps.setString(1, info.getName());
 	        ps.setString(2, info.getDescription());
 	        ps.setString(3, info.getExtId().getId());
-	        ps.setString(4, this.domain.getUuid().get());
+	        ps.setString(4, domain.getUuid().get());
 	        
 	        if (ps.executeUpdate() < 1) {
 	        	throw new GroupNotFoundException(info.getExtId());
@@ -247,11 +245,11 @@ public class GroupDaoJdbcImpl implements GroupDao {
 			JDBCUtils.cleanup(conn, ps, null);
 		}
     	
-    	return get(info.getExtId());
+    	return get(domain, info.getExtId());
     }
 
     @Override
-    public void delete(GroupExtId id) throws DaoException, GroupNotFoundException {
+    public void delete(ObmDomain domain, GroupExtId id) throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
@@ -263,7 +261,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	        
 	        
 	        ps.setString(1, id.getId());
-	        ps.setString(2, this.domain.getUuid().get());
+	        ps.setString(2, domain.getUuid().get());
 	        
 	        if (ps.executeUpdate() < 1) {
 	        	throw new GroupNotFoundException(id);
@@ -275,7 +273,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		}
     }
     
-    private int getInternalGroupId(GroupExtId extId, Connection conn) throws SQLException, GroupNotFoundException {
+    private int getInternalGroupId(Connection conn, ObmDomain domain, GroupExtId extId) throws SQLException, GroupNotFoundException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 	    try {	
@@ -288,7 +286,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	    			"       LIMIT 1");
 
 	    	ps.setString(1, extId.getId());
-	    	ps.setString(2, this.domain.getUuid().get());
+	    	ps.setString(2, domain.getUuid().get());
 	    	rs = ps.executeQuery();
 	    	if (rs.next()) {
 	    		return rs.getInt("group_id");
@@ -301,12 +299,12 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public void addUser(GroupExtId id, ObmUser user) throws DaoException, GroupNotFoundException {
+    public void addUser(ObmDomain domain, GroupExtId id, ObmUser user) throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
 	    	conn = connectionProvider.getConnection();
-	    	int internalId = getInternalGroupId(id, conn);
+	    	int internalId = getInternalGroupId(conn, domain, id);
 	        ps = conn.prepareStatement(
 	                " INSERT INTO UserObmGroup" +
 	                "		      (userobmgroup_group_id, userobmgroup_user_id)" +
@@ -323,19 +321,19 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public void addSubgroup(GroupExtId id, Group subgroup) throws DaoException, GroupNotFoundException {
+    public void addSubgroup(ObmDomain domain, GroupExtId id, Group subgroup) throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
     		conn = connectionProvider.getConnection();
-	    	int internalId = getInternalGroupId(id, conn);
+	    	int internalId = getInternalGroupId(conn, domain, id);
 	        ps = conn.prepareStatement(
 	                " INSERT INTO GroupGroup" +
 	                "		      (groupgroup_parent_id, groupgroup_child_id)" +
 	                "      VALUES (?,?)");
 
 	        ps.setInt(1, internalId);
-	        ps.setInt(2, getInternalGroupId(subgroup.getExtId(), conn)); 
+	        ps.setInt(2, getInternalGroupId(conn, domain, subgroup.getExtId())); 
 	        ps.executeUpdate();
     	} catch (SQLException e) {
 			throw new DaoException(e);
@@ -345,12 +343,12 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public void removeUser(GroupExtId id, ObmUser user)  throws DaoException, GroupNotFoundException, UserNotFoundException {
+    public void removeUser(ObmDomain domain, GroupExtId id, ObmUser user)  throws DaoException, GroupNotFoundException, UserNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
 	    	conn = connectionProvider.getConnection();
-	    	int internalId = getInternalGroupId(id, conn);
+	    	int internalId = getInternalGroupId(conn, domain, id);
 	        ps = conn.prepareStatement(
 	                " DELETE FROM UserObmGroup" +
 	                "		WHERE userobmgroup_group_id = ?" +
@@ -371,19 +369,19 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
     @Override
-    public void removeSubgroup(GroupExtId id, Group subgroup)  throws DaoException, GroupNotFoundException {
+    public void removeSubgroup(ObmDomain domain, GroupExtId id, Group subgroup)  throws DaoException, GroupNotFoundException {
     	Connection conn = null;
     	PreparedStatement ps = null;
     	try {
     		conn = connectionProvider.getConnection();
-	    	int internalId = getInternalGroupId(id, conn);
+	    	int internalId = getInternalGroupId(conn, domain, id);
 	        ps = conn.prepareStatement(
 	                " DELETE FROM GroupGroup" +
 	                "		WHERE groupgroup_parent_id = ?" +
 	                "         AND groupgroup_child_id = ?");
 
 	        ps.setInt(1, internalId);
-	        ps.setInt(2, getInternalGroupId(subgroup.getExtId(), conn)); 
+	        ps.setInt(2, getInternalGroupId(conn, domain, subgroup.getExtId())); 
 	        ps.executeUpdate();
     	} catch (SQLException e) {
 			throw new DaoException(e);
