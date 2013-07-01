@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.satellite.client.exceptions.SatteliteClientException;
 import org.obm.sync.host.ObmHost;
@@ -57,6 +58,7 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
+@Slow
 @RunWith(SlowFilterRunner.class)
 public class ConnectionImplTest {
 

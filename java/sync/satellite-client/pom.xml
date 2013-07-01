@@ -53,11 +53,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>com.linagora.obm</groupId>
-            <artifactId>locator</artifactId>
-            <version>${obm.version}</version>
-        </dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 		</dependency>
