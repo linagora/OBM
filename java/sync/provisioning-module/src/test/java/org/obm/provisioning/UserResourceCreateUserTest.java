@@ -31,28 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.UnsupportedEncodingException;
-
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
-import fr.aliacom.obm.common.user.ObmUser;
+import com.google.common.collect.ImmutableMap;
 
 
 @Slow
@@ -63,106 +60,38 @@ public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCreateAUser() throws Exception {
 		expectDomain();
-		userDao.create(fakeUser());
-		expectLastCall().once();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
+				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/users", obmUserToJson());
+		HttpResponse httpResponse = post("/batches/1/users", obmUserToJson());
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.CREATED.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 	
 	@Test
 	public void testCreateUserThrowError() throws Exception {
 		expectDomain();
-		userDao.create(fakeUser());
-		expectLastCall().andThrow(new DaoException("bad things happen"));
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
+				.andThrow(new DaoException());
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/users", obmUserToJson());
+		HttpResponse httpResponse = post("/batches/1/users", obmUserToJson());
 		
 		mocksControl.verify();
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode())
 			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
-	
-	private ObmUser fakeUser() {
-		return ObmUser.builder()
-				.domain(domain)
-				.uid(1)
-				.login("user1")
-				.lastName("Doe")
-				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
-				.firstName("Jesus")
-				.commonName("John Doe")
-				//.kind("")					// Not implemented yet in ObmUser
-				.title("title")
-				.description("description")
-				//.company("")				// Not implemented yet in ObmUser
-				.service("service")
-				//.direction()				// Not implemented yet in ObmUser
-				.address1("address1")
-				.address2("address2")
-				.town("town")
-				.zipCode("zipCode")
-				//.business_zipcode()		// Not implemented yet in ObmUser
-				//.country()				// Not implemented yet in ObmUser
-				//.phones()					// Not implemented yet in ObmUser
-				.mobile("mobile")
-				//.faxes()					// Not implemented yet in ObmUser
-				//.mail_quota()				// Not implemented yet in ObmUser
-				//.mail_server()			// Not implemented yet in ObmUser
-				.emailAndAliases("mails")
-				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
-				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
-				//.groups()					// Not implemented yet in ObmUser
-				.build();
-	}
-	
-	private StringEntity obmUserToJson() throws UnsupportedEncodingException {
-		final StringEntity userToJson = new StringEntity(
-				"{" +
-				  "\"uid\":1," +
-				  "\"entityId\":0," +
-				  "\"login\":\"user1\"," +
-				  "\"commonName\":\"John Doe\"," +
-				  "\"lastName\":\"Doe\"," +
-				  "\"firstName\":\"Jesus\"," +
-				  "\"email\":\"mails\"," +
-				  "\"emailAlias\":[]," +
-				  "\"address1\":\"address1\"," +
-				  "\"address2\":\"address2\"," +
-				  "\"address3\":null," +
-				  "\"expresspostal\":null," +
-				  "\"homePhone\":null," +
-				  "\"mobile\":\"mobile\"," +
-				  "\"service\":\"service\"," +
-				  "\"title\":\"title\"," +
-				  "\"town\":\"town\"," +
-				  "\"workFax\":null," +
-				  "\"workPhone\":null," +
-				  "\"zipCode\":\"zipCode\"," +
-				  "\"description\":\"description\"," +
-				  "\"timeCreate\":\"2013-06-11T12:00:00.000+0000\"," +
-				  "\"timeUpdate\":\"2013-06-11T13:00:00.000+0000\"," +
-				  "\"createdBy\":null," +
-				  "\"updatedBy\":null," +
-				  "\"domain\":{" +
-				    "\"id\":1," +
-				    "\"name\":\"domain\"," +
-				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
-				    "\"aliases\":[]" +
-				  "}," +
-				  "\"publicFreeBusy\":false" +
-				"}");
-		userToJson.setContentType(MediaType.APPLICATION_JSON);
-		return  userToJson;
-	}
+
 }

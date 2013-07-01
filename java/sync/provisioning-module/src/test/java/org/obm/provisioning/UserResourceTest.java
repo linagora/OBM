@@ -33,14 +33,12 @@ package org.obm.provisioning;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,9 +55,10 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetWithUnknownUrl() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users/a/b");
+		HttpResponse httpResponse = get("/batches/1/users/a/b");
 
 		mocksControl.verify();
 
@@ -67,11 +66,12 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testPostWithUnknownUrl() throws ClientProtocolException, IOException {
+	public void testPostWithUnknownUrl() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
-		HttpResponse httpResponse = post("/users/a/b", null);
+		HttpResponse httpResponse = post("/batches/1/users/a/b", null);
 
 		mocksControl.verify();
 
@@ -79,12 +79,13 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testPostConsumeInvalidData() throws ClientProtocolException, IOException {
+	public void testPostConsumeInvalidData() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
 		final StringEntity userToJson = invalidMediaTypeEntity();
-		HttpResponse httpResponse = post("/users", userToJson);
+		HttpResponse httpResponse = post("/batches/1/users", userToJson);
 
 		mocksControl.verify();
 
@@ -92,11 +93,12 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testPutWithUnknownUrl() throws ClientProtocolException, IOException {
+	public void testPutWithUnknownUrl() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
-		HttpResponse httpResponse = put("/users/a/b", null);
+		HttpResponse httpResponse = put("/batches/1/users/a/b", null);
 
 		mocksControl.verify();
 
@@ -104,12 +106,13 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testPutConsumeInvalidData() throws ClientProtocolException, IOException {
+	public void testPutConsumeInvalidData() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
 		final StringEntity userToJson = invalidMediaTypeEntity();
-		HttpResponse httpResponse = put("/users/1", userToJson);
+		HttpResponse httpResponse = put("/batches/1/users/1", userToJson);
 
 		mocksControl.verify();
 
@@ -117,11 +120,11 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testdeleteWithUnknownUrl() throws ClientProtocolException, IOException {
+	public void testdeleteWithUnknownUrl() throws Exception {
 		expectDomain();
 		mocksControl.replay();
 
-		HttpResponse httpResponse = delete("/users/1&expuuge=true");
+		HttpResponse httpResponse = delete("/batches/1/userss/1");
 
 		mocksControl.verify();
 

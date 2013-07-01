@@ -45,56 +45,14 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
-
-import com.google.inject.Inject;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class BatchResourceTest extends CommonDomainEndPointEnvTest {
-
-	@Inject
-	private BatchDao dao;
-
-	private Batch batch = Batch
-			.builder()
-			.id(batchId(1))
-			.domain(domain)
-			.status(BatchStatus.ERROR)
-			.operation(Operation
-					.builder()
-					.id(operationId(1))
-					.status(BatchStatus.SUCCESS)
-					.entityType(BatchEntityType.USER)
-					.request(Request
-							.builder()
-							.url("/users")
-							.verb(HttpVerb.POST)
-							.body("{\"id\":123456}")
-							.build())
-					.build())
-			.operation(Operation
-					.builder()
-					.id(operationId(2))
-					.status(BatchStatus.ERROR)
-					.entityType(BatchEntityType.USER)
-					.error("Invalid User")
-					.request(Request
-							.builder()
-							.url("/users/1")
-							.verb(HttpVerb.PATCH)
-							.body("{}")
-							.build())
-					.build())
-			.build();
 
 	@Test
 	public void testDeleteWithUnknownDomain() throws Exception {
@@ -111,7 +69,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteWithUnknownBatch() throws Exception {
 		expectDomain();
-		dao.delete(batchId(1));
+		batchDao.delete(batchId(1));
 		expectLastCall().andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 
@@ -125,7 +83,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDelete() throws Exception {
 		expectDomain();
-		dao.delete(batchId(1));
+		batchDao.delete(batchId(1));
 		expectLastCall();
 		mocksControl.replay();
 
@@ -144,7 +102,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 				.domain(domain);
 
 		expectDomain();
-		expect(dao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
+		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
 		mocksControl.replay();
 
 		HttpResponse response = post("/batches", null);
@@ -174,7 +132,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCreateOnError() throws Exception {
 		expectDomain();
-		expect(dao.create(isA(Batch.class))).andThrow(new DaoException());
+		expect(batchDao.create(isA(Batch.class))).andThrow(new DaoException());
 		mocksControl.replay();
 
 		HttpResponse response = post("/batches", null);
@@ -187,7 +145,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetWithUnknownBatch() throws Exception {
 		expectDomain();
-		expect(dao.get(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andReturn(null);
 		mocksControl.replay();
 
 		HttpResponse response = get("/batches/12");
@@ -212,7 +170,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetOnError() throws Exception {
 		expectDomain();
-		expect(dao.get(batchId(12))).andThrow(new DaoException());
+		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
 		mocksControl.replay();
 
 		HttpResponse response = get("/batches/12");
@@ -225,7 +183,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGet() throws Exception {
 		expectDomain();
-		expect(dao.get(batchId(12))).andReturn(batch);
+		expect(batchDao.get(batchId(12))).andReturn(batch);
 		mocksControl.replay();
 
 		HttpResponse response = get("/batches/12");
@@ -257,11 +215,4 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 				"}");
 	}
 
-	private Batch.Id batchId(Integer id) {
-		return Batch.Id.builder().id(id).build();
-	}
-
-	private Operation.Id operationId(Integer id) {
-		return Operation.Id.builder().id(id).build();
-	}
 }

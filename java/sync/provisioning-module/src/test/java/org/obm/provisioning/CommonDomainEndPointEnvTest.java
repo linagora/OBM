@@ -35,6 +35,10 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -48,8 +52,14 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -98,7 +108,43 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	}
 
-	protected final static ObmDomain domain = ObmDomain.builder().name("domain").id(1).uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e")).build();
+	protected static final ObmDomain domain = ObmDomain
+			.builder()
+			.name("domain")
+			.id(1)
+			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.build();
+	protected static final Batch batch = Batch
+			.builder()
+			.id(batchId(1))
+			.domain(domain)
+			.status(BatchStatus.ERROR)
+			.operation(Operation
+					.builder()
+					.id(operationId(1))
+					.status(BatchStatus.SUCCESS)
+					.entityType(BatchEntityType.USER)
+					.request(org.obm.provisioning.beans.Request
+							.builder()
+							.url("/users")
+							.verb(HttpVerb.POST)
+							.body("{\"id\":123456}")
+							.build())
+					.build())
+			.operation(Operation
+					.builder()
+					.id(operationId(2))
+					.status(BatchStatus.ERROR)
+					.entityType(BatchEntityType.USER)
+					.error("Invalid User")
+					.request(org.obm.provisioning.beans.Request
+							.builder()
+							.url("/users/1")
+							.verb(HttpVerb.PATCH)
+							.body("{}")
+							.build())
+					.build())
+			.build();
 
 	@Inject
 	protected IMocksControl mocksControl;
@@ -108,6 +154,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected DomainDao domainDao;
 	@Inject
 	protected UserDao userDao;
+	@Inject
+	protected BatchDao batchDao;
 
 	protected String baseUrl;
 	protected int serverPort;
@@ -128,8 +176,16 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain);
 	}
 
+	protected void expectBatch() throws DaoException {
+		expect(batchDao.get(batch.getId())).andReturn(batch);
+	}
+
 	protected void expectNoDomain() {
 		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(null);
+	}
+
+	protected void expectNoBatch() throws DaoException {
+		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
 
 	protected HttpResponse get(String path) throws Exception {
@@ -162,6 +218,72 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	protected Request createDeleteRequest(String path) {
 		return Request.Delete(baseUrl + "/" + domain.getUuid().get() + path);
+	}
+
+	public static Batch.Id batchId(Integer id) {
+		return Batch.Id.builder().id(id).build();
+	}
+
+	public static Operation.Id operationId(Integer id) {
+		return Operation.Id.builder().id(id).build();
+	}
+
+	protected Operation operation(BatchEntityType entityType, String path, String entity, HttpVerb verb, Map<String, String> params) {
+		return Operation
+				.builder()
+				.entityType(entityType)
+				.status(BatchStatus.IDLE)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.url(domain.getUuid().get() + path)
+						.body(entity)
+						.verb(verb)
+						.params(params)
+						.build())
+				.build();
+	}
+
+	protected StringEntity obmUserToJson() throws UnsupportedEncodingException {
+		final StringEntity userToJson = new StringEntity(obmUserToJsonString());
+		userToJson.setContentType(MediaType.APPLICATION_JSON);
+		return  userToJson;
+	}
+
+	protected String obmUserToJsonString() {
+		return "{" +
+				  "\"uid\":1," +
+				  "\"entityId\":0," +
+				  "\"login\":\"user1\"," +
+				  "\"commonName\":\"John Doe\"," +
+				  "\"lastName\":\"Doe\"," +
+				  "\"firstName\":\"Jesus\"," +
+				  "\"email\":\"mails\"," +
+				  "\"emailAlias\":[]," +
+				  "\"address1\":\"address1\"," +
+				  "\"address2\":\"address2\"," +
+				  "\"address3\":null," +
+				  "\"expresspostal\":null," +
+				  "\"homePhone\":null," +
+				  "\"mobile\":\"mobile\"," +
+				  "\"service\":\"service\"," +
+				  "\"title\":\"title\"," +
+				  "\"town\":\"town\"," +
+				  "\"workFax\":null," +
+				  "\"workPhone\":null," +
+				  "\"zipCode\":\"zipCode\"," +
+				  "\"description\":\"description\"," +
+				  "\"timeCreate\":\"2013-06-11T12:00:00.000+0000\"," +
+				  "\"timeUpdate\":\"2013-06-11T13:00:00.000+0000\"," +
+				  "\"createdBy\":null," +
+				  "\"updatedBy\":null," +
+				  "\"domain\":{" +
+				    "\"id\":1," +
+				    "\"name\":\"domain\"," +
+				    "\"uuid\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
+				    "\"aliases\":[]" +
+				  "}," +
+				  "\"publicFreeBusy\":false" +
+				"}";
 	}
 
 }

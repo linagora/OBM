@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response.Status;
@@ -45,10 +45,11 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
-import fr.aliacom.obm.common.user.UserExtId;
-
+import com.google.common.collect.ImmutableMap;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
@@ -58,12 +59,14 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteAUserWithTrueExpunge() throws Exception {
 		expectDomain();
-		userDao.delete(1, true);
-		expectLastCall().once();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
+				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/users/1?expunge=true");
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -75,12 +78,14 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteAUserWithFalseExpunge() throws Exception {
 		expectDomain();
-		userDao.delete(1, false);
-		expectLastCall().once();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
+				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/users/1?expunge=false");
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=false");
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -92,12 +97,14 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteAUserWithDefaultFalseExpunge() throws Exception {
 		expectDomain();
-		userDao.delete(1, false);
-		expectLastCall().once();
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
+				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/users/1");
+		HttpResponse httpResponse = delete("/batches/1/users/1");
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -105,35 +112,22 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
-	
+
 	@Test
-	public void testDeleteNonExistingUser() throws Exception {
+	public void testDeleteAUserWithError() throws Exception {
 		expectDomain();
-		userDao.delete(1, false);
-		expectLastCall().andThrow(new UserNotFoundException(new UserExtId("1")));
-
-		mocksControl.replay();
-		
-		HttpResponse httpResponse = delete("/users/1?expunge=false");
-
-		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
-	}
-	
-	@Test
-	public void testPutUserThrowError() throws Exception {
-		expectDomain();
-		userDao.delete(1, false);
-		expectLastCall().andThrow(new RuntimeException("bad things happen"));
+		expectBatch();
+		expect(batchDao.addOperation(batch.getId(),
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
+				.andThrow(new DaoException());
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/users/1");
+		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
+		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 }

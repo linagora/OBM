@@ -74,4 +74,9 @@ public class BatchResource {
 
 		return Response.ok().build();
 	}
+
+	@Path("{batchId}/users")
+	public Class<UserWriteResource> users() {
+		return UserWriteResource.class;
+	}
 }

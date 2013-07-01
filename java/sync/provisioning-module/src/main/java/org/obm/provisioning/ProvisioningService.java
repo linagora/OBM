@@ -61,6 +61,7 @@ public class ProvisioningService extends JerseyServletModule {
 		bind(DomainResource.class);
 
 		bind(ObmDomainProvider.class);
+		bind(BatchProvider.class);
 	}
 
 	@Provides
