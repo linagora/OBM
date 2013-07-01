@@ -91,7 +91,7 @@ public class SyncKeysDaoEhcacheImplTest {
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManager.shutdown();
 	}
 	
 	@Test

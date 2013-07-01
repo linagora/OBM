@@ -35,7 +35,9 @@ import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +46,8 @@ import org.junit.runner.RunWith;
 
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.filter.SlowFilterRunner;
+
+import com.google.inject.Provider;
 
 @RunWith(SlowFilterRunner.class)
 public class TransactionalBinderTest {
@@ -54,52 +58,55 @@ public class TransactionalBinderTest {
 	private TransactionConfiguration mockTransactionConfiguration;
 	
 	private TransactionalBinder attributeBinder;
+	private Provider<TransactionManager> mockTransactionManagerProvider;
+	private IMocksControl control;
 	
 	@Before
 	public void init(){
-		this.mockTransactional = EasyMock.createStrictMock(Transactional.class); 
-		this.mockTransaction = EasyMock.createStrictMock(Transaction.class);
-		this.mockTransactionManager = EasyMock.createStrictMock(TransactionManager.class); 
-		this.mockTransactionConfiguration = EasyMock.createStrictMock(TransactionConfiguration.class);
+		control = createControl();
+		this.mockTransactional = control.createMock(Transactional.class); 
+		this.mockTransaction = control.createMock(Transaction.class);
+		this.mockTransactionManager = control.createMock(TransactionManager.class);
+		this.mockTransactionManagerProvider = control.createMock(Provider.class);
+		this.mockTransactionConfiguration = control.createMock(TransactionConfiguration.class);
 		
-		this.attributeBinder = new TransactionalBinder(mockTransactionManager);
+		expect(mockTransactionManagerProvider.get()).andReturn(mockTransactionManager).anyTimes();
+		
+		this.attributeBinder = new TransactionalBinder(mockTransactionManagerProvider);
 	}
 	
 	@Test
 	public void testBindTransactionalWithNotNullTransactional() throws TransactionException, SystemException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testBindTransactionalWithNullTransactional() throws TransactionException, SystemException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(null).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(null).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test
 	public void testGetCurrentTransactionalWithExistingTransaction() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(2);
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(2);
 
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		Transactional transactionalReturned = attributeBinder.getTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 		
 		Assert.assertEquals(mockTransactional, transactionalReturned);
 	}
@@ -107,94 +114,87 @@ public class TransactionalBinderTest {
 	@Test(expected=TransactionException.class)
 	public void testGetCurrentTransactionalWithoutExistingTransaction() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(null).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(null).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.getTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testGetCurrentTransactionalWithUnknownTransaction() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.getTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test
 	public void testInvalidateTransactionalWithExistingTransaction() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(2);
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(2);
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 		
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testInvalidateTransactionalWithoutExistingTransaction() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(null).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(null).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testGetCurrentTransactionalWithInvalidateTransaction() throws SystemException, TransactionException {
 		
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(3);
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).times(3);
 		
-		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();		
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
 		attributeBinder.getTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testBindTransactionalThrowingSystemException() throws TransactionException, SystemException{
 		
-		EasyMock.expect(mockTransactionConfiguration.getTimeOutInSecond()).andReturn(60).once();
-		EasyMock.expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
+		expect(mockTransactionConfiguration.getTimeOutInSecond()).andReturn(60).once();
+		expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
 	@Test(expected=TransactionException.class)
 	public void testGetCurrentTransactionalThrowingSystemException() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
-		EasyMock.expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
+		expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		Transactional mockTransactionalReturned = attributeBinder.getTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		
+		control.verify();
 		
 		Assert.assertEquals(mockTransactional, mockTransactionalReturned);
 	}
@@ -202,20 +202,15 @@ public class TransactionalBinderTest {
 	@Test(expected=TransactionException.class)
 	public void testInvalidateTransactionalThrowingSystemException() throws SystemException, TransactionException{
 		
-		EasyMock.expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
-		EasyMock.expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
+		expect(mockTransactionManager.getTransaction()).andReturn(mockTransaction).once();
+		expect(mockTransactionManager.getTransaction()).andThrow(new SystemException()).once();
 		
-		Object[] mocks = getMocksObjects();
-		EasyMock.replay(mocks);
+		control.replay();
 		
 		attributeBinder.bindTransactionalToCurrentTransaction(mockTransactional);
 		attributeBinder.invalidateTransactionalInCurrentTransaction();
-		EasyMock.verify(mocks);
+		control.verify();
 	}
 	
-	private Object[] getMocksObjects() {
-		Object[] mocks = {mockTransactional, mockTransaction, mockTransactionManager, mockTransactionConfiguration };
-		return mocks;
-	}
 	
 }

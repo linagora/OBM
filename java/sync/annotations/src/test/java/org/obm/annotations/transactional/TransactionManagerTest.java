@@ -38,7 +38,6 @@ import static org.junit.Assert.assertTrue;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -46,17 +45,16 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-
-import bitronix.tm.TransactionManagerServices;
-
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class)
 public class TransactionManagerTest {
 
-	private TransactionManager tm;
+	private BitronixTransactionManager tm;
 
 	@Before
 	public void setUp() {
@@ -68,6 +66,7 @@ public class TransactionManagerTest {
 		if (tm.getStatus() != Status.STATUS_NO_TRANSACTION) {
 			tm.rollback();
 		}
+		tm.shutdown();
 	}
 	
 	@Test

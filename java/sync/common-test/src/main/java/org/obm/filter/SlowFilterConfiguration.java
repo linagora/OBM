@@ -31,18 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.filter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class SlowFilterConfiguration {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Inherited
-public @interface Slow {
-	
-	public static final String SLOW_CONFIGURATION_ENVIRONMENT_KEY = "RunSlowTest"; 
-	public static final String FAST_CONFIGURATION_ENVIRONMENT_KEY = "RunFastTest";
-	
+	public String getConfigurationValue(String key) {
+		return System.getProperty(key);
+	}
+
 }

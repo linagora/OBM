@@ -37,7 +37,6 @@ import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -51,6 +50,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
@@ -60,7 +60,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 	
 	public UnsynchronizedItemDaoEhcacheImplTest() {
 		super();
@@ -79,7 +79,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		this.transactionManager.rollback();
 		this.objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		this.transactionManager.shutdown();
 	}
 	
 	@Test

@@ -44,6 +44,7 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -51,6 +52,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
+	private BitronixTransactionManager transactionManager;
 
 	public ObjectStoreManagerTest() {
 		super();
@@ -59,13 +61,14 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	@Before
 	public void init() throws IOException {
 		logger = EasyMock.createNiceMock(Logger.class);
-		this.opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
 	}
 
 	@After
 	public void shutdown() {
 		opushCacheManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManager.shutdown();
 	}
 
 	@Test

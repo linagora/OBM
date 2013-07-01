@@ -31,80 +31,128 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.filter;
 
+import static org.easymock.EasyMock.*;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.lang.annotation.Annotation;
 
-import org.junit.Assert;
+import org.easymock.IMocksControl;
+import org.junit.Before;
 import org.junit.Test;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRule;
 
-import org.junit.runner.RunWith;
-
-@RunWith(SlowFilterRunner.class)
 public class SlowFilterRuleTest {
 
+	private SlowFilterRule testee;
+	private Slow slowAnnotation;
+	private IMocksControl control;
+
+	@Before
+	public void setup() {
+		control = createNiceControl();
+		testee = new SlowFilterRule();
+		testee.slowFilterConfiguration = control.createMock(SlowFilterConfiguration.class);
+		slowAnnotation = new Slow() {
+			
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return null;
+			}
+		};
+	}
+	
 	@Test
 	public void testHasToRunTestWhenNoAnnotation() {
 		Slow methodAnnotation = null;
-		boolean hasToRunTest = new SlowFilterRule().hasToRunTest(methodAnnotation);
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertTrue(hasToRunTest);
+		control.verify();		
+		assertThat(hasToRunTest).isTrue();
 	}
 	
 	@Test
-	public void testConfigurationAllowSlowTestsWhenNotConfigurated() {
-		String configurationValue = null;
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
+	public void testHasToRunTestWhenSlowAnnotation() {
+		Slow methodAnnotation = slowAnnotation;
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertFalse(allowedByConfiguraiton);
-	}
-	
-	@Test
-	public void testConfigurationAllowSlowTestsWhenConfiguratedWithBadValue() {
-		String configurationValue = "not expected value";
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
-		
-		Assert.assertFalse(allowedByConfiguraiton);
+		control.verify();
+		assertThat(hasToRunTest).isTrue();
 	}
 
 	@Test
-	public void testConfigurationAllowSlowTestsWhenConfiguratedWithFalse() {
-		String configurationValue = "false";
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
+	public void testHasToRunTestWhenNoAnnotationAndFastOnlyConfiguration() {
+		Slow methodAnnotation = null;
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("false");
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertFalse(allowedByConfiguraiton);
+		assertThat(hasToRunTest).isTrue();
 	}
 	
 	@Test
-	public void testConfigurationAllowSlowTestsWhenConfiguratedWithFalseCase() {
-		String configurationValue = "FaLsE";
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
+	public void testSkipTestWhenNoAnnotationAndSlowOnlyConfiguration() {
+		Slow methodAnnotation = null;
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("false");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertFalse(allowedByConfiguraiton);
+		assertThat(hasToRunTest).isFalse();
 	}
 
-
 	@Test
-	public void testConfigurationAllowSlowTestsWhenConfiguratedWithTrue() {
-		String configurationValue = "true";
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
+	public void testSkipTestWhenAnnotationAndFastOnlyConfiguration() {
+		Slow methodAnnotation = slowAnnotation;
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("false");
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertTrue(allowedByConfiguraiton);
+		assertThat(hasToRunTest).isFalse();
 	}
 	
 	@Test
-	public void testConfigurationAllowSlowTestsWhenConfiguratedWithTrueCase() {
-		String configurationValue = "TrUe";
-		boolean allowedByConfiguraiton = SlowFilterRule.configurationAllowSlowTests(configurationValue);
+	public void testSkipTestWhenAnnotationAndSlowOnlyConfiguration() {
+		Slow methodAnnotation = slowAnnotation;
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("false");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
 		
-		Assert.assertTrue(allowedByConfiguraiton);
+		assertThat(hasToRunTest).isTrue();
 	}
+
+	@Test
+	public void testHasToRunTestWhenAnnotationAndBothConfigurations() {
+		Slow methodAnnotation = slowAnnotation;		
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		control.replay();
+
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
+		
+		assertThat(hasToRunTest).isTrue();
+	}
+	
+	@Test
+	public void testHasToRunTestWhenNoAnnotationAndBothConfigurations() {
+		Slow methodAnnotation = null;
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		expect(testee.slowFilterConfiguration.getConfigurationValue(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY)).andReturn("true");
+		control.replay();
+		boolean hasToRunTest = testee.hasToRunTest(methodAnnotation);
+		
+		assertThat(hasToRunTest).isTrue();
+	}
+
 
 	@Test @Slow
 	public void testSlowTestIsntRunIfNotAllowed() {
-		boolean allowedByConfiguration = new SlowFilterRule().hasToRunTest(newSlowAnnotation());
+		boolean allowedByConfiguration = testee.hasToRunTest(newSlowAnnotation());
 		
-		Assert.assertTrue(allowedByConfiguration);
+		assertThat(allowedByConfiguration).isTrue();
 	}
 
 	private Slow newSlowAnnotation() {
