@@ -87,6 +87,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.Connection;
 import org.obm.provisioning.ConnectionException;
 import org.obm.provisioning.ConnectionImpl;
+import org.obm.provisioning.BatchProvider;
 import org.obm.provisioning.LdapException;
 import org.obm.provisioning.LdapGroup;
 import org.obm.provisioning.LdapGroupImpl;
@@ -110,6 +111,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.Group;
 import org.obm.provisioning.beans.GroupExtId;
 import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.ObmDomainEntry;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.ProfileId;
@@ -130,14 +132,21 @@ import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.provisioning.json.BatchJsonSerializer;
+import org.obm.provisioning.json.MultimapJsonSerializer;
+import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
+import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
+import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
+import org.obm.provisioning.resources.UserWriteResource;
+import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.utils.DOMUtils;
@@ -514,7 +523,18 @@ public class DependencyResolverHelper {
 				ObmUserJsonDeserializer.class,
 				ObmUserJsonSerializer.class,
 				UserJsonFields.class,
-				PATCH.class
+				PATCH.class,
+				MultimapJsonSerializer.class,
+				ObmDomainJsonSerializer.class,
+				AbstractBatchAwareResource.class,
+				BatchProvider.class,
+				DomainResource.class,
+				ProfileResource.class,
+				ProvisioningContextListener.class,
+				UserWriteResource.class,
+				BatchJsonSerializer.class,
+				OperationJsonSerializer.class,
+				ObmDomainEntry.class
 		};
 	}
 

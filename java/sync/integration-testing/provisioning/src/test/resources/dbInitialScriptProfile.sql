@@ -66,6 +66,35 @@ CREATE TABLE profile (
     profile_name character varying(64)
 );
 
+CREATE TABLE domainentity (
+    domainentity_entity_id integer NOT NULL,
+    domainentity_domain_id integer NOT NULL
+);
+
+CREATE TABLE serviceproperty (
+    serviceproperty_id integer PRIMARY KEY AUTO_INCREMENT,
+    serviceproperty_service character varying(255) NOT NULL,
+    serviceproperty_property character varying(255) NOT NULL,
+    serviceproperty_entity_id integer NOT NULL,
+    serviceproperty_value text
+);
+
+CREATE TABLE host (
+    host_id integer PRIMARY KEY AUTO_INCREMENT,
+    host_domain_id integer NOT NULL,
+    host_timeupdate timestamp,
+    host_timecreate timestamp DEFAULT now(),
+    host_userupdate integer,
+    host_usercreate integer,
+    host_uid integer,
+    host_gid integer,
+    host_archive smallint DEFAULT 0 NOT NULL,
+    host_name character varying(32) NOT NULL,
+    host_fqdn character varying(255),
+    host_ip character varying(16),
+    host_delegation character varying(256) DEFAULT '',
+    host_description character varying(128)
+);
 
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 
