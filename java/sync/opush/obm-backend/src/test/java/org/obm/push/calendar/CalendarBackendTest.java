@@ -1012,63 +1012,110 @@ public class CalendarBackendTest {
 		calendarClient.removeEventById(token, "test@test", event.getObmId(), event.getSequence(), true);
 		expectLastCall();
 	}
+
 	
 	@Test
-	public void testHandleMettingResponseOnExternalEvent() throws Exception {
-		String calendarDisplayName = user.getLoginAtDomain();
-		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
-		
+	public void testHandleMettingResponseExternalCreation() throws Exception {
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+		expect(mappingService.getCollectionIdFor(device, calendarPath)).andReturn(1);
+
+		boolean isInternal = false;
+		String clientId = null;
 		MSEventUid msEventUid = new MSEventUid("1");
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(msEventUid);
-		MSEmail invitation  = new MSEmail();
-		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
-
-		EventExtId eventExtId = new EventExtId("1");
-		Event event = new Event();
-		event.setUid(new EventObmId(1));
-		event.setInternalEvent(false);
-		event.setExtId(eventExtId);
-
-		ICalendar iCalendar = icalendar("simpleEvent.ics");
 		
+		EventExtId eventExtId = new EventExtId("1564");
+		Event eventFromICS = new Event();
+		eventFromICS.setUid(new EventObmId(150));
+		eventFromICS.setInternalEvent(isInternal);
+		eventFromICS.setExtId(eventExtId);
+		eventFromICS.setSequence(12);
+		
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
 		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
 			.andReturn(null).once();
 		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
-			.andReturn(ImmutableList.of(event)).once();
+			.andReturn(ImmutableList.of(eventFromICS)).once();
 		
-		expectGetAndModifyEvent(eventExtId, event);
-		expect(calendarClient.changeParticipationState(token, user.getLoginAtDomain(), eventExtId, null, 0, true))
+		EventObmId eventCreationDbId = new EventObmId(9);
+		expect(calendarClient.getEventFromExtId(token, calendar, eventExtId))
+			.andThrow(new EventNotFoundException("Replying to an external invitation"));
+		
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT)).andReturn(Participation.accepted());
+		expect(calendarClient.createEvent(token, calendar, eventFromICS, isInternal, clientId))
+			.andReturn(eventCreationDbId).once();
+		expect(calendarClient.getEventFromId(token, calendar, eventCreationDbId))
+			.andReturn(eventFromICS);
+		
+		expect(calendarClient.changeParticipationState(token, calendar,
+				eventExtId, Participation.accepted(), eventFromICS.getSequence(), true))
 			.andReturn(true);
 		
-		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
+		mockControl.replay();
+		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
+		mockControl.verify();
+		
+		assertThat(serverIdResponse).isEqualTo("1:150");
+	}
+	
+	@Test
+	public void testHandleMettingResponseExternalUpdate() throws Exception {
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+		expect(mappingService.getCollectionIdFor(device, calendarPath)).andReturn(1);
+
+		boolean isInternal = false;
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		
+		EventExtId eventExtId = new EventExtId("1564");
+		Event eventFromDB = new Event();
+		eventFromDB.setUid(new EventObmId(100));
+		eventFromDB.setSequence(5);
+		Event eventFromICS = new Event();
+		eventFromICS.setInternalEvent(isInternal);
+		eventFromICS.setExtId(eventExtId);
+		Event eventWithMergedInfos = new Event();
+		eventWithMergedInfos.setUid(eventFromDB.getUid());
+		eventWithMergedInfos.setSequence(eventFromDB.getSequence());
+		eventWithMergedInfos.setInternalEvent(eventFromICS.isInternalEvent());
+		eventWithMergedInfos.setExtId(eventFromICS.getExtId());
+
+		ICalendar iCalendar = icalendar("simpleEvent.ics");
+		expect(ical4jUserFactory.createIcal4jUser(user.getEmail(), token.getDomain()))
 			.andReturn(null).once();
+		expect(ical4jHelper.parseICSEvent(iCalendar.getICalendar(), null, token.getObmId()))
+			.andReturn(ImmutableList.of(eventFromICS)).once();
 		
-		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
-			.andReturn(1).once();
+		expect(calendarClient.getEventFromExtId(token, calendar, eventExtId)).andReturn(eventFromDB);
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT)).andReturn(Participation.accepted());
+		expect(calendarClient.modifyEvent(token, calendar, eventFromICS, true, false))
+			.andReturn(eventWithMergedInfos);
 		
-		expectBuildCollectionPath(calendarDisplayName);
+		expect(calendarClient.changeParticipationState(token, calendar, 
+				eventExtId, Participation.accepted(), eventFromDB.getSequence(), true))
+			.andReturn(true);
 		
 		mockControl.replay();
-
 		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
-		
 		mockControl.verify();
-		assertThat(serverIdResponse).isEqualTo("1:1");
+		
+		assertThat(serverIdResponse).isEqualTo("1:100");
 	}
 	
 	@Test
 	public void testHandleMettingResponseOnInternalEvent() throws Exception {
-		String calendarDisplayName = user.getLoginAtDomain();
-		String defaultCalendarName = rootCalendarPath + calendarDisplayName;
+		String calendar = user.getLoginAtDomain();
+		String calendarPath = rootCalendarPath + calendar;
+		expectBuildCollectionPath(calendar);
+		expect(mappingService.getCollectionIdFor(device, calendarPath)).andReturn(1);
 		
-		MSEventUid msEventUid = new MSEventUid("1");
-		MSEvent msEvent = new MSEvent();
-		msEvent.setUid(msEventUid);
-		MSEmail invitation  = new MSEmail();
-		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
-
-		EventExtId eventExtId = new EventExtId("1");
+		EventExtId eventExtId = new EventExtId("145");
 		Event iCSEvent = new Event();
 		iCSEvent.setInternalEvent(true);
 		iCSEvent.setExtId(eventExtId);
@@ -1081,30 +1128,24 @@ public class CalendarBackendTest {
 			.andReturn(ImmutableList.of(iCSEvent)).once();
 		
 		Event oBMEvent = new Event();
-		oBMEvent.setUid(new EventObmId(1));
+		oBMEvent.setUid(new EventObmId(180));
 		oBMEvent.setInternalEvent(true);
 		oBMEvent.setExtId(eventExtId);
 		
 		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
 			.andReturn(oBMEvent).once();
 		
-		expect(calendarClient.changeParticipationState(token, user.getLoginAtDomain(), eventExtId, null, 0, true))
+		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT)).andReturn(Participation.accepted());
+		expect(calendarClient.changeParticipationState(token, calendar,
+				eventExtId, Participation.accepted(), 0, true))
 			.andReturn(true);
-		
-		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT))
-			.andReturn(null).once();
-		
-		expect(mappingService.getCollectionIdFor(device, defaultCalendarName))
-			.andReturn(1).once();
-		
-		expectBuildCollectionPath(calendarDisplayName);
 		
 		mockControl.replay();
 
 		String serverIdResponse = calendarBackend.handleMeetingResponse(userDataRequest, iCalendar, AttendeeStatus.ACCEPT);
 		
 		mockControl.verify();
-		assertThat(serverIdResponse).isEqualTo("1:1");
+		assertThat(serverIdResponse).isEqualTo("1:180");
 	}
 	
 	private void expectGetAndModifyEvent(EventExtId eventExtId, Event event) 
