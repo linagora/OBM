@@ -30,44 +30,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning;
+package org.obm.provisioning.dao.exceptions;
 
-import com.google.common.base.Objects;
+import org.obm.provisioning.GroupExtId;
 
-/**
- * Represents a group external id
- */
-public class GroupExtId {
-    private String id;
+public class GroupRecursionException extends Exception {
+    private GroupExtId extId, parentId;
 
-    public static GroupExtId valueOf(String id) {
-        return new GroupExtId(id);
+    public GroupRecursionException(GroupExtId extId, GroupExtId parentId) {
+        super("The group " + extId.getId() +
+              " is already contained in one of its parents, " +
+              parentId.getId());
+        this.extId = extId;
+        this.parentId = parentId;
     }
 
-    private GroupExtId(String id) {
-        this.id = id;
+    public GroupExtId getExtId() {
+        return extId;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof GroupExtId) {
-            GroupExtId other = (GroupExtId) obj;
-            return Objects.equal(id, other.getId());
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this).add("id", id).toString();
+    public GroupExtId getParentId() {
+        return parentId;
     }
 }

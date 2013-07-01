@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -33,6 +33,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.ProfileId;
+import org.obm.provisioning.ProfileName;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 @RunWith(SlowFilterRunner.class)
@@ -47,11 +51,11 @@ public class BeansTest {
 
     @Test
     public void test() {
-        equalsVerifierUtilsTest.test(Batch.class,
-                Operation.class,
-                Request.class,
-                ObmDomainEntry.class,
-                ProfileEntry.class);
+        equalsVerifierUtilsTest.test(
+                Group.class,
+                GroupExtId.class,
+                ProfileId.class,
+                ProfileName.class);
     }
 
 }

@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,31 +27,56 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.provisioning.beans;
 
-import org.junit.Before;
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @RunWith(SlowFilterRunner.class)
-public class BeansTest {
+public class GroupTest {
 
-    private EqualsVerifierUtils equalsVerifierUtilsTest;
-
-    @Before
-    public void init() {
-        equalsVerifierUtilsTest = new EqualsVerifierUtils();
+    @Test(expected = NullPointerException.class)
+    public void testBuildWhenNoExtId() {
+        Group.builder()
+             .name("test")
+             .description("test")
+             .build();
     }
 
     @Test
-    public void test() {
-        equalsVerifierUtilsTest.test(Batch.class,
-                Operation.class,
-                Request.class,
-                ObmDomainEntry.class,
-                ProfileEntry.class);
-    }
+    public void testBuild() {
+        ObmUser testuser = ObmUser.builder()
+                                  .uid(2)
+                                  .login("testuser")
+                                  .domain(ObmDomain.builder().id(3).build())
+                                  .build();
 
+        Group testsubgroup = Group.builder()
+                                  .extId(GroupExtId.valueOf("groupExtId"))
+                                  .build();
+
+        Group group = Group.builder()
+                           .extId(GroupExtId.valueOf("testId"))
+                           .name("name")
+                           .description("description")
+                           .user(testuser)
+                           .subgroup(testsubgroup)
+                           .build();
+
+        assertThat(group.getExtId().getId()).isEqualTo("testId");
+        assertThat(group.getName()).isEqualTo("name");
+        assertThat(group.getDescription()).isEqualTo("description");
+
+        assertThat(group.getUsers()).containsExactly(testuser);
+        assertThat(group.getSubgroups()).containsExactly(testsubgroup);
+    }
 }

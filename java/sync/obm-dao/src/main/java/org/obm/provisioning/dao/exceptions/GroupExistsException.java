@@ -30,44 +30,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning;
+package org.obm.provisioning.dao.exceptions;
 
-import com.google.common.base.Objects;
+import org.obm.provisioning.GroupExtId;
 
-/**
- * Represents a group external id
- */
-public class GroupExtId {
-    private String id;
+public class GroupExistsException extends Exception {
+    private GroupExtId extId;
 
-    public static GroupExtId valueOf(String id) {
-        return new GroupExtId(id);
+    public GroupExistsException(GroupExtId extId) {
+        super("The Group " + extId + " already exists");
+        this.extId = extId;
     }
 
-    private GroupExtId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof GroupExtId) {
-            GroupExtId other = (GroupExtId) obj;
-            return Objects.equal(id, other.getId());
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this).add("id", id).toString();
+    public GroupExtId getExtId() {
+        return extId;
     }
 }
