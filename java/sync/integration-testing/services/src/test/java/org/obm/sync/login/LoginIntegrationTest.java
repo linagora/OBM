@@ -162,7 +162,6 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(token.getConversationUid()).isEqualTo(0);
 		assertThat(token.getDomain()).isEqualTo(
 				ObmDomain.builder()
-				         .id(0)
 				         .name("domain.org")
 				         .uuid(ObmDomainUuid.of("b55911e6-6848-4f16-abd4-52d94b6901a6"))
 				         .build());

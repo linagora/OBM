@@ -63,6 +63,7 @@ public class ObmSyncArchiveUtils {
 				.addAsResource("Messages_en.properties")
 				.addAsResource("Messages_fr.properties")
 				.addClasses(LifecycleListener.class)
+				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
 				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
 				.addClasses(DependencyResolverHelper.projectConfigurationClasses())
 				.addClasses(DependencyResolverHelper.projectDBCPClasses())
