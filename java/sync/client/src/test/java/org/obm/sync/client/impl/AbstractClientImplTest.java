@@ -1,6 +1,10 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
+<<<<<<< HEAD
  * Copyright (C) 2011-2012  Linagora
+=======
+ * Copyright (C) 2013 Linagora
+>>>>>>> dbb8bd3... - [OBMFULL-5147] write test for Http Post body params encoding
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -33,73 +37,156 @@ package org.obm.sync.client.impl;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.List;
-import java.util.Map.Entry;
+import java.io.IOException;
+import java.util.Enumeration;
 
-import org.apache.http.NameValuePair;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
+
+import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.ObmUser;
+
 
 @RunWith(SlowFilterRunner.class)
 public class AbstractClientImplTest {
 
-	private SyncClientException execptionFactory;
-	private HttpClient httpClient;
-	private IMocksControl mocks;
-	private AbstractClientImpl testee;
-
+	private TestServlet testServlet;
+	private ImmutableMultimap<String, String> params;
+	private IMocksControl control;
+	private SyncClientException syncClientException;
+	private Logger logger;
+	private DefaultHttpClient defaultHttpClient;
+	private Locator locator;
+	private TestClient client;
+	private int serverPort;
+	private AccessToken at;
+	private Server server;
+	
 	@Before
-	public void setUp() {
-		mocks = createControl();
+	public void setup() throws Exception {
+		control = createControl();
+		syncClientException = control.createMock(SyncClientException.class);
+		logger = control.createMock(Logger.class);
+		locator = control.createMock(Locator.class);
+		defaultHttpClient = new DefaultHttpClient();
+		client = new TestClient(syncClientException, logger, defaultHttpClient);
 		
-		Logger logger = LoggerFactory.getLogger(getClass());
-		execptionFactory = mocks.createMock(SyncClientException.class);
-		httpClient = mocks.createMock(HttpClient.class);
-		testee = new AbstractClientImpl(execptionFactory, logger, httpClient) {
-			
-			@Override
-			protected Locator getLocator() {
-				throw new IllegalAccessError();
-			}
-		};
+		testServlet = new TestServlet();
+		server = new Server(0);
+		Context root = new Context(server, "/", Context.SESSIONS);
+		root.addServlet(new ServletHolder(testServlet), "/*");
+		server.start();
+		serverPort = server.getConnectors()[0].getLocalPort();
+
+		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
+		at = ToolBox.mockAccessToken(control);
+		expect(locator.backendUrl(defaultObmUser.getLogin() + "@" + defaultObmUser.getDomain().getName())).andReturn("http://localhost:" + serverPort + "/test");
+	}
+
+	@After
+	public void shutdown() throws Exception {
+		server.stop();
+		defaultHttpClient.getConnectionManager().shutdown();
+	}
+	
+	@Test
+	public void testBodyForm() {
+		control.replay();
+		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("foo", "bar");
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(sentParams);
 	}
 
 	@Test
-	public void testSetPostParameterUseBodyFormWithUTF8Charset() {
-		Multimap<String, String> parameters = ImmutableMultimap.of("name", "value");
-		Request request = mocks.createMock(Request.class);
-		expect(request.bodyForm(formParams(parameters), Charsets.UTF_8)).andReturn(request);
+	public void testBodyFormMultipleValues() {
+		control.replay();
+		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("foo", "bar", "foo", "taz");
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(sentParams);
+	}
+	
+	@Test
+	public void testBodyFormValueEncoding() {
+		control.replay();
+		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("key", "élément");
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(sentParams);
+	}
+	
+	@Test
+	public void testBodyFormKeyEncoding() {
+		control.replay();
+		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("clé", "element");
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(sentParams);
+	}
+	
+	@Test
+	public void testBodyFormBothEncoding() {
+		control.replay();
+		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("clé", "élément");
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(sentParams);
+	}
+	
+	private final class TestClient extends AbstractClientImpl {
+		private TestClient(
+				SyncClientException exceptionFactory, Logger obmSyncLogger,
+				HttpClient httpClient) {
+			super(exceptionFactory, obmSyncLogger, httpClient);
+		}
+
+		@Override
+		protected Locator getLocator() {
+			return locator;
+		}
 		
-		mocks.replay();
-		testee.setPostRequestParameters(request, parameters);
-		mocks.verify();
+		public void callServlet(AccessToken at, Multimap<String, String> params) {
+			executeVoid(at, "/test", params);
+		}
 	}
 
-	private List<NameValuePair> formParams(Multimap<String, String> parameters) {
-		return FluentIterable
-				.from(parameters.entries())
-				.transform(new Function<Entry<String, String>, NameValuePair>() {
+	private class TestServlet extends HttpServlet {
 
-					@Override
-					public NameValuePair apply(Entry<String, String> input) {
-						return new BasicNameValuePair(input.getKey(), input.getValue());
-					}
-				}).toList();
+		@Override
+		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			Builder<String, String> builder = ImmutableMultimap.<String, String>builder();
+			Enumeration<String> names = req.getParameterNames();
+			while(names.hasMoreElements()) {
+				String name = names.nextElement();
+				builder.putAll(name, req.getParameterValues(name));
+			}
+			params = builder.build();
+		}
 	}
+	
 }
