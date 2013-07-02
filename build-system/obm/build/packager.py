@@ -160,25 +160,10 @@ class Packager(object):
             "%s' " % perl_module_compat
         command += "--define 'perl_vendorlib " \
             "%s' " % perl_vendorlib
-	return command
-
-    def _override_python(self):
-        if self.osversion == 'el5':
-            pyver = "2.4"
-        elif self.osversion == 'el6':
-            pyver = "2.6"
-        else:
-            raise PackagingError("Unknown OS version : %s" % \
-                    self.osversion)
-        python_sitelib = "/usr/lib/python" + pyver + "/site-packages"
-        command = "--define 'python_sitelib " \
-            "%s' " % python_sitelib
-        command += "--define 'pyver " \
-            "%s' " %pyver
         return command
 
     def _override_platform(self):
-        return self._override_python() + self._override_perl()
+        return self._override_perl()
 
     def build(self):
         """
