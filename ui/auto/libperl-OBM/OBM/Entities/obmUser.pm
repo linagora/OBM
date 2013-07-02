@@ -689,7 +689,7 @@ sub getMailboxAcl {
     my $self = shift;
     my $mailBoxAcl = undef;
 
-    if( !$self->getArchive() && $self->isMailActive() ) {
+    if( $self->isMailActive() ) {
         $mailBoxAcl = $self->{'entityDesc'}->{'mailbox_acl'};
     }
 
