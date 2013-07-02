@@ -16,8 +16,6 @@ License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: obm-java-%{version}.tar.gz
 Source1: obm-sync.postinst
-Source2: local-healthcheck-opush
-Source3: local-healthcheck-locator
 
 BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
@@ -148,8 +146,6 @@ cp opush/config-sample/mail_conf.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp opush/config-sample/remote_console.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp opush/config-sample/policy.ini $RPM_BUILD_ROOT%{_sysconfdir}/opush/
 cp -r opush/push/target/opush/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/opush/
-install -d -m 755 $RPM_BUILD_ROOT/%{_datadir}/obm-local-healthcheck/060-Opush
-install -p -m 644 %{SOURCE2}/*.py $RPM_BUILD_ROOT/%{_datadir}/obm-local-healthcheck/060-Opush/
 
 # spushnik
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/spushnik
@@ -163,8 +159,6 @@ mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-locator
 cp -r obm-locator/target/obm-locator/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator/
-install -d -m 755 $RPM_BUILD_ROOT/%{_datadir}/obm-local-healthcheck/030-Locator
-install -p -m 644 %{SOURCE3}/*.py $RPM_BUILD_ROOT/%{_datadir}/obm-local-healthcheck/030-Locator/
 
 # obm-jetty-common-libs
 mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
