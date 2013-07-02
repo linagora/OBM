@@ -32,7 +32,6 @@
 package org.obm.push.protocol.data;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Set;
 
@@ -47,12 +46,12 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
+import org.obm.push.utils.SerializableInputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
-import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 
 public class MSEmailEncoder {
@@ -121,6 +120,7 @@ public class MSEmailEncoder {
 
 	private void serializeBody(Element parent, MSEmailBody body) throws IOException {
 		MSEmailBodyType bodyType = body.getBodyType();
+		SerializableInputStream mimeData = body.getMimeData();
 		Integer estimatedDataSize = body.getEstimatedDataSize();
 
 		Element bodyElement = DOMUtils.createElement(parent, ASAirs.BODY.asASValue());
@@ -128,17 +128,7 @@ public class MSEmailEncoder {
 		DOMUtils.createElementAndText(bodyElement, ASAirs.TYPE.asASValue(), bodyType.asXmlValue());
 		DOMUtils.createElementAndText(bodyElement, ASAirs.TRUNCATED.asASValue(), body.isTruncated());
 		DOMUtils.createElementAndTextIfNotNull(bodyElement, ASAirs.ESTIMATED_DATA_SIZE.asASValue(), estimatedDataSize);
-		encodeData(body, bodyElement);
-	}
-
-	@VisibleForTesting void encodeData(MSEmailBody body, Element bodyElement) throws IOException {
-		if (body.getBodyType().isCDataEncoded()) {
-			DOMUtils.createElementAndCDataText(bodyElement, ASAirs.DATA.asASValue(), 
-					body.getMimeData(), body.getCharset());
-		} else {
-			String html = CharStreams.toString(new InputStreamReader(body.getMimeData(), body.getCharset()));
-			DOMUtils.createElementAndText(bodyElement, ASAirs.DATA.asASValue(), html);
-		}
+		DOMUtils.createElementAndCDataText(bodyElement, ASAirs.DATA.asASValue(), mimeData, body.getCharset());
 	}
 
 	private void serializeAttachments(Element parent, Set<MSAttachement> attachments) {

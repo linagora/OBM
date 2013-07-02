@@ -48,6 +48,9 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.protocol.data.MSEmailEncoder;
+import org.obm.push.protocol.data.TimeZoneConverter;
+import org.obm.push.protocol.data.TimeZoneEncoder;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.SerializableInputStream;
@@ -96,51 +99,5 @@ public class MSEmailEncoderTest {
 					.truncated(true)
 					.build())
 			.build();
-	}
-	
-	@Test
-	public void testEncodeDataPlainText() throws Exception {
-		Document reply = DOMUtils.createDoc(null, "Sync");
-		Element root = reply.getDocumentElement();
-		
-		MSEmailBody emailBody = MSEmailBody.builder()
-			.mimeData(new SerializableInputStream(new ByteArrayInputStream("text".getBytes())))
-			.bodyType(MSEmailBodyType.PlainText)
-			.estimatedDataSize(10)
-			.charset(Charsets.UTF_8)
-			.truncated(true)
-			.build();
-		
-		msEmailEncoder.encodeData(emailBody, root);
-		String result = DOMUtils.serialize(reply);
-		
-		String expectedData = "<AirSyncBase:Data>" +
-				"<![CDATA[text]]>" +
-				"</AirSyncBase:Data>";
-		assertThat(result).contains(expectedData);
-		
-	}
-	
-	@Test
-	public void testEncodeDataHtml() throws Exception {
-		Document reply = DOMUtils.createDoc(null, "Sync");
-		Element root = reply.getDocumentElement();
-		
-		MSEmailBody emailBody = MSEmailBody.builder()
-			.mimeData(new SerializableInputStream(new ByteArrayInputStream("<html></html>".getBytes())))
-			.bodyType(MSEmailBodyType.HTML)
-			.estimatedDataSize(10)
-			.charset(Charsets.UTF_8)
-			.truncated(true)
-			.build();
-		
-		msEmailEncoder.encodeData(emailBody, root);
-		String result = DOMUtils.serialize(reply);
-		
-		String expectedData = "<AirSyncBase:Data>" +
-				"&lt;html&gt;&lt;/html&gt;" +
-				"</AirSyncBase:Data>";
-		assertThat(result).contains(expectedData);
-		
 	}
 }
