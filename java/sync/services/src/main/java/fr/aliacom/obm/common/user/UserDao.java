@@ -171,12 +171,12 @@ public class UserDao {
 		return new EmailLogin(email);
 	}
 	
-	public ObmUser findUser(String email, ObmDomain domain) {
+	public ObmUser findUser(String emailOrLogin, ObmDomain domain) {
 		Connection con = null;
 		Integer id = null;
 		try {
 			con = obmHelper.getConnection();
-			id = userIdFromEmail(con, email, domain.getId());
+			id = userIdFromEmail(con, emailOrLogin, domain.getId());
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
 		} finally {
