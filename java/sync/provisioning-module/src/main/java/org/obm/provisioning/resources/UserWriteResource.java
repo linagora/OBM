@@ -35,7 +35,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.obm.provisioning.annotations.PATCH;
@@ -46,31 +45,31 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 public class UserWriteResource extends AbstractBatchAwareResource {
 
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	@Consumes(JSON_WITH_UTF8)
+	@Produces(JSON_WITH_UTF8)
 	public Response create(String user) throws DaoException {
 		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
 	}
 
 	@PUT
 	@Path("/{userId}")
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	@Consumes(JSON_WITH_UTF8)
+	@Produces(JSON_WITH_UTF8)
 	public Response modify(String user) throws DaoException {
 		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
 	}
 
 	@DELETE
 	@Path("/{userId}")
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	@Produces(JSON_WITH_UTF8)
 	public Response delete() throws DaoException {
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
 	}
 	
 	@PATCH
 	@Path("/{userId}")
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
+	@Consumes(JSON_WITH_UTF8)
+	@Produces(JSON_WITH_UTF8)
 	public Response patch(String user) throws DaoException {
 		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
 	}

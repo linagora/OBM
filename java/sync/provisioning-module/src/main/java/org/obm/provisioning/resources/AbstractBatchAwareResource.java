@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -54,6 +55,7 @@ import com.google.inject.Inject;
 public abstract class AbstractBatchAwareResource {
 
 	public static final String UTF_8 = ";charset=UTF-8";
+	public static final String JSON_WITH_UTF8 = MediaType.APPLICATION_JSON + UTF_8;
 
 	@Inject
 	protected BatchDao batchDao;
