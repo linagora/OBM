@@ -101,7 +101,9 @@ import org.obm.provisioning.LdapUserMembershipImpl;
 import org.obm.provisioning.ObmDomainProvider;
 import org.obm.provisioning.ProvisioningContextListener;
 import org.obm.provisioning.ProvisioningService;
+import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.bean.UserIdentifier;
+import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -130,6 +132,8 @@ import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
+import org.obm.provisioning.json.ObmUserJsonDeserializer;
+import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.ProfileResource;
@@ -506,7 +510,11 @@ public class DependencyResolverHelper {
 				UserIdentifier.class,
 				ObmDomainProvider.class,
 				ObmDomainUuidJsonSerializer.class,
-				ObmDomainUuidJsonDeserializer.class
+				ObmDomainUuidJsonDeserializer.class,
+				ObmUserJsonDeserializer.class,
+				ObmUserJsonSerializer.class,
+				UserJsonFields.class,
+				PATCH.class
 		};
 	}
 
