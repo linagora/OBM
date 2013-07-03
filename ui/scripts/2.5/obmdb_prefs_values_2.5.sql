@@ -82,6 +82,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Public free busy
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_public_fb','0');
 
+-- Default all day event opacity
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_allday_opacity','TRANSPARENT');
+
 -- -----------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'
 -- user NULL represent default values (affected to new users for ex:)
