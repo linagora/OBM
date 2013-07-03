@@ -34,7 +34,6 @@ package org.obm.sync;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import javax.ws.rs.Produces;
 
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
@@ -65,7 +64,7 @@ public class MessageQueueModule extends AbstractModule {
 		lifecycleListeners.addBinding().to(QueueManager.class);
 	}
 	
-	@Produces @Singleton
+	@Provides @Singleton
 	public static Configuration hornetQConfiguration(ConfigurationService configurationService) {
 		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
 		return HornetQConfiguration.configuration()
