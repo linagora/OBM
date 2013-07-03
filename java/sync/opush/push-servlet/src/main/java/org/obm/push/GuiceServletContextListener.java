@@ -81,16 +81,18 @@ public class GuiceServletContextListener implements ServletContextListener {
     }
     
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
-    	Errors errors = new Errors();
-    	for (LifecycleListener listener: listeners) {
-    		try {
-    			listener.shutdown();
-    		} catch (Throwable t) {
-    			errors.addMessage(new Message(ImmutableList.of(), "Error during listener shutdown", t));
-    		}
+    	if (injector != null) {
+	    	Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+	    	Errors errors = new Errors();
+	    	for (LifecycleListener listener: listeners) {
+	    		try {
+	    			listener.shutdown();
+	    		} catch (Throwable t) {
+	    			errors.addMessage(new Message(ImmutableList.of(), "Error during listener shutdown", t));
+	    		}
+	    	}
+			errors.throwConfigurationExceptionIfErrorsExist();
     	}
-		errors.throwConfigurationExceptionIfErrorsExist();
     }
     
 }
