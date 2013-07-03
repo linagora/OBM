@@ -118,7 +118,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		
 		ObmDomain domain = (ObmDomain) ctxt.findInjectableValue(ObmDomain.class.getName(), null, null);
 		
-		return builder.uid(123456789).domain(domain).build();
+		return builder.domain(domain).build();
 	}
 
 	private void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields) {

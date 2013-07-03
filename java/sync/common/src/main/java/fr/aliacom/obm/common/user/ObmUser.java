@@ -59,7 +59,7 @@ public class ObmUser {
 	}
 	public static class Builder {
 		
-		private int uid;
+		private Integer uid;
 		private int entityId;
 		private UserExtId extId;
 		private String login;
@@ -217,17 +217,16 @@ public class ObmUser {
 		
 
 		public Builder mails(Iterable<String> mails) {
-			email = Iterables.get(mails, 0, null);
+			Preconditions.checkNotNull(mails);
+			email = Iterables.getFirst(mails, null);
 			emailAlias = Sets.newHashSet();
-			final Iterable<String> skipFirstOne = Iterables.skip(mails, 1);
-			if (!Iterables.isEmpty(skipFirstOne)) {	
-				Iterables.addAll(emailAlias, skipFirstOne);	
-			}
+			Iterables.addAll(emailAlias, Iterables.skip(mails, 1));
 			return this;
 		}
 		
 		public Builder addresses(Iterable<String> addresses) {
-			Preconditions.checkArgument(Iterables.size(addresses) <= MAXIMUM_SUPPORTED_ADDRESSES);
+			Preconditions.checkNotNull(addresses);
+			Preconditions.checkState(Iterables.size(addresses) <= MAXIMUM_SUPPORTED_ADDRESSES);
 			address1 = Iterables.get(addresses, 0, null);
 			address2 = Iterables.get(addresses, 1, null);
 			address3 = Iterables.get(addresses, 2, null);
@@ -235,11 +234,12 @@ public class ObmUser {
 		}
 		
 		public ObmUser build() {
-			Preconditions.checkNotNull(uid);
-			Preconditions.checkNotNull(login);
-			Preconditions.checkNotNull(domain);
+			Preconditions.checkState(uid != null || extId != null);
+			Preconditions.checkState(login != null);
+			Preconditions.checkState(domain != null);
 			
-			return new ObmUser(uid, entityId, login, extId, commonName, lastName, firstName, email, emailAlias,
+			return new ObmUser(
+					uid, entityId, login, extId, commonName, lastName, firstName, email, emailAlias,
 					address1, address2, address3, expresspostal, homePhone, mobile, service, title, town,
 					workFax, workPhone, zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy);
@@ -247,7 +247,7 @@ public class ObmUser {
 		
 	}
 	
-	private final int uid;
+	private final Integer uid;
 	private final int entityId;
 	private final String login;
 	private final UserExtId extId;
@@ -280,7 +280,7 @@ public class ObmUser {
 	private final ObmDomain domain;
 	private final boolean publicFreeBusy;
 	
-	private ObmUser(int uid, int entityId, String login, UserExtId extId, String commonName,
+	public ObmUser(Integer uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
 			String address3, String expresspostal, String homePhone,
@@ -468,6 +468,10 @@ public class ObmUser {
 						return appendDomainToEmailIfRequired(input.get(0), input.get(1));
 					}
 				});
+	}
+	
+	public Set<String> getAddresses() {
+		return Sets.newHashSet(address1, address2, address3);
 	}
 	
 	@Override
