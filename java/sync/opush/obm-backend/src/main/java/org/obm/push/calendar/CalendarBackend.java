@@ -194,10 +194,10 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		try {
 			CalendarInfo[] cals = getCalendarClient(udr).listCalendars(token);
 			for (CalendarInfo ci : cals) {
-				CollectionPath collectionPath = collectionPathOfCalendar(udr, ci.getMail());
+				CollectionPath collectionPath = collectionPathOfCalendar(udr, ci.getUid());
 				builder.put(collectionPath, OpushCollection.builder()
 							.collectionPath(collectionPath)
-							.displayName(ci.getMail() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX)
+							.displayName(ci.getUid() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX)
 							.build());
 			}
 		} catch (ServerFault e) {
@@ -211,7 +211,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		return PathsToCollections.builder()
 				.put(collectionPath, OpushCollection.builder()
 						.collectionPath(collectionPath)
-						.displayName(udr.getUser().getLoginAtDomain() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX)
+						.displayName(udr.getUser().getLogin() + DEFAULT_CALENDAR_DISPLAYNAME_SUFFIX)
 						.build())
 				.build();
 	}
@@ -251,11 +251,11 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 	}
 	
 	private boolean isDefaultCalendarCollectionPath(UserDataRequest udr, CollectionPath collectionPath) {
-		return udr.getUser().getLoginAtDomain().equalsIgnoreCase(collectionPath.backendName());
+		return udr.getUser().getLogin().equalsIgnoreCase(collectionPath.backendName());
 	}
 
 	private CollectionPath defaultCalendar(UserDataRequest udr) {
-		return collectionPathOfCalendar(udr, udr.getUser().getLoginAtDomain());
+		return collectionPathOfCalendar(udr, udr.getUser().getLogin());
 	}
 
 	private CollectionPath collectionPathOfCalendar(UserDataRequest udr, String calendar) {
