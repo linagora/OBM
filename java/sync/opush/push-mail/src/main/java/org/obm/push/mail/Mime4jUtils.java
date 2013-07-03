@@ -36,6 +36,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -238,6 +240,10 @@ public class Mime4jUtils {
 		messageWriter.writeBody(message, out);
 		message.dispose();
 		return new ByteArrayInputStream(out.toByteArray());
+	}
+	
+	public Reader toReader(Message message) throws IOException {
+		return new InputStreamReader(toInputStream(message), message.getCharset());
 	}
 
 	public String toString(Body message) throws IOException{

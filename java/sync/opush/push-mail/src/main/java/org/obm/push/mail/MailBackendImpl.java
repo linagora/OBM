@@ -31,10 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -649,10 +654,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		try {
 			boolean isScheduleMeeting = !TNEFUtils.isScheduleMeetingRequest(sendEmail.getMessage());
 
-			Address from = getAddress(sendEmail.getFrom());
 			if (!sendEmail.isInvitation() && isScheduleMeeting) {
-				sendEmail(udr, from, sendEmail.getTo(),
-						sendEmail.getCc(), sendEmail.getCci(), sendEmail.getMessage(), saveInSent);	
+				sendEmail(udr, sendEmail, saveInSent);
 			} else {
 				logger.warn("OPUSH blocks email invitation sending by PDA. Now that obm-sync handle email sending on event creation/modification/deletion, we must filter mail from PDA for these actions.");
 			}
@@ -663,17 +666,14 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		}
 	}
 
-	@VisibleForTesting void sendEmail(UserDataRequest udr, Address from, Set<Address> setTo, Set<Address> setCc, Set<Address> setCci, InputStream mimeMail,
-			boolean saveInSent) throws ProcessingEmailException, StoreEmailException {
-		
-		InputStream streamMail = null;
+	@VisibleForTesting void sendEmail(UserDataRequest udr, SendEmail email, boolean saveInSent) {
+		InputStream emailStream = null;
 		try {
-			streamMail = new ByteArrayInputStream(FileUtils.streamBytes(mimeMail, true));
-			streamMail.mark(streamMail.available());
-			
-			smtpSender.sendEmail(udr, from, setTo, setCc, setCci, streamMail);
+			emailStream = loadEmailInMemory(email);
+			smtpSender.sendEmail(udr, validateFrom(email.getFrom()), email.getTo(), email.getCc(), email.getCci(), emailStream);
 			if (saveInSent) {
-				mailboxService.storeInSent(udr, streamMail);
+				emailStream.reset();
+				mailboxService.storeInSent(udr, multipleTimesReadable(emailStream, email.getMimeMessage().getCharset()));
 			} else {
 				logger.info("The email mustn't be stored in Sent folder.{saveInSent=false}");
 			}
@@ -685,12 +685,24 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
+		} catch (IllegalCharsetNameException e) {
+			throw new ProcessingEmailException(e);
 		} finally {
-			IOUtils.closeQuietly(streamMail);
+			IOUtils.closeQuietly(emailStream);
 		}
 	}
 
-	private Address getAddress(String from) throws ProcessingEmailException {
+	private InputStream loadEmailInMemory(SendEmail email) throws IOException {
+		InputStream emailStream = new ByteArrayInputStream(FileUtils.streamBytes(email.getMessage(), true));
+		emailStream.mark(0);
+		return emailStream;
+	}
+
+	private Reader multipleTimesReadable(InputStream streamMail, String charsetName) {
+		return new BufferedReader(new InputStreamReader(streamMail, Charset.forName(charsetName)));
+	}
+
+	private Address validateFrom(String from) throws ProcessingEmailException {
 		if(from == null || !from.contains("@")){
 			throw new ProcessingEmailException(""+from+"is not a valid email");
 		}

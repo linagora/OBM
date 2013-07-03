@@ -33,9 +33,9 @@ package org.minig.imap.impl;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.CharArrayReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,10 +49,10 @@ public class LineTerminationCorrecterTest {
 		String lines = "good line\r\n" +
 				"good line\r\n" +
 				"good line\r\n";
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(lines.getBytes());
-
-		ByteArrayOutputStream correctLineTermination = LineTerminationCorrecter.correctLineTermination(inputStream);
-		assertThat(new String(correctLineTermination.toByteArray())).isEqualTo(lines);
+		Reader toCorrect = new CharArrayReader(lines.toCharArray());
+		
+		assertThat(LineTerminationCorrecter.correctLineTermination(toCorrect))
+			.isEqualTo(lines);
 	}
 	
 	@Test
@@ -65,10 +65,10 @@ public class LineTerminationCorrecterTest {
 				"bad line\r\n" +
 				"bad line\r\n" +
 				"good line\r\n";
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(lines.getBytes());
-
-		ByteArrayOutputStream correctLineTermination = LineTerminationCorrecter.correctLineTermination(inputStream);
-		assertThat(new String(correctLineTermination.toByteArray())).isEqualTo(expectedLines);
+		Reader toCorrect = new CharArrayReader(lines.toCharArray());
+		
+		assertThat(LineTerminationCorrecter.correctLineTermination(toCorrect))
+			.isEqualTo(expectedLines);
 	}
 	
 	@Test
@@ -81,18 +81,18 @@ public class LineTerminationCorrecterTest {
 				"bad line\r\n" +
 				"bad line\r\n" +
 				"good line\r\n";
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(lines.getBytes());
-
-		ByteArrayOutputStream correctLineTermination = LineTerminationCorrecter.correctLineTermination(inputStream);
-		assertThat(new String(correctLineTermination.toByteArray())).isEqualTo(expectedLines);
+		Reader toCorrect = new CharArrayReader(lines.toCharArray());
+		
+		assertThat(LineTerminationCorrecter.correctLineTermination(toCorrect))
+			.isEqualTo(expectedLines);
 	}
 	
 	@Test
 	public void testCorrectLineTerminationEmpty() throws IOException {
 		String lines = "";
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(lines.getBytes());
-
-		ByteArrayOutputStream correctLineTermination = LineTerminationCorrecter.correctLineTermination(inputStream);
-		assertThat(new String(correctLineTermination.toByteArray())).isEqualTo(lines);
+		Reader toCorrect = new CharArrayReader(lines.toCharArray());
+		
+		assertThat(LineTerminationCorrecter.correctLineTermination(toCorrect))
+			.isEqualTo(lines);
 	}
 }

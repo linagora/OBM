@@ -34,6 +34,7 @@ package org.obm.push.mail.imap.command;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -177,14 +178,11 @@ public class UIDFetchFlagsTest {
 		return expectedFlagsList;
 	}
 
-	private InputStream emailStream() {
-		return StreamMailTestsUtils.newInputStreamFromString("data");
-	}
-
 	private long messageWithFlagsToInbox(Flag... flags) throws OpushLocatorException, IMAPException {
+		Reader emailStream = StreamMailTestsUtils.newReaderFromString("data");
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
-		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream(), list(flags));
+		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream, list(flags));
 		MessageSet uidSearch = client.uidSearch(SearchQuery.MATCH_ALL_EVEN_DELETED);
 		long newEmailUid = Iterables.getOnlyElement(uidSearch);
 		return newEmailUid;

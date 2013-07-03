@@ -33,6 +33,7 @@
 package org.obm.push.minig.imap.impl;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.SocketAddress;
 import java.util.Collection;
 import java.util.Collections;
@@ -298,8 +299,8 @@ public class ClientSupport {
 		return run(new UnSubscribeCommand(mailbox));
 	}
 
-	public boolean append(String mailbox, InputStream in, FlagsList fl) {
-		return run(new AppendCommand(mailbox, in, fl));
+	public boolean append(String mailbox, Reader message, FlagsList fl) {
+		return run(new AppendCommand(mailbox, message, fl));
 	}
 
 	public void expunge() {

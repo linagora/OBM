@@ -33,6 +33,7 @@
 package org.obm.push.minig.imap;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public interface StoreClient {
 	
 	ListResult listAll();
 
-	boolean append(String mailbox, InputStream in, FlagsList fl);
+	boolean append(String mailbox, Reader message, FlagsList fl);
 	
 	QuotaInfo quota(String mailbox);
 

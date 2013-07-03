@@ -31,10 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
@@ -330,7 +328,7 @@ public class ReplyEmail extends SendEmail {
 	private TextBody appendQuotedMailToPlainText(TextBody plainTextPart, String repliedEmail) throws NotQuotableEmailException {
 		try {	
 			StringBuilder bodyTextPlainBuilder = new StringBuilder();
-			bodyTextPlainBuilder.append(cleanLineBreaks(plainTextPart.getInputStream()));
+			bodyTextPlainBuilder.append(cleanLineBreaks(plainTextPart.getReader()));
 			bodyTextPlainBuilder.append(quoteOnLineBreaks(repliedEmail));
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
 			return basicBodyFactory.textBody(bodyTextPlainBuilder.toString(), plainTextPart.getMimeCharset());
@@ -351,9 +349,8 @@ public class ReplyEmail extends SendEmail {
 		return stringBuilder.toString();
 	}
 	
-	private String cleanLineBreaks(InputStream content) throws IOException {
-		ByteArrayOutputStream outputStream = LineTerminationCorrecter.correctLineTermination(content);
-		return new String(outputStream.toByteArray());
+	private String cleanLineBreaks(Reader content) throws IOException {
+		return LineTerminationCorrecter.correctLineTermination(content);
 	}
 
 	private TextBody appendRepliedMailToHtml(TextBody htmlPart, String repliedEmail) throws NotQuotableEmailException {
@@ -368,11 +365,11 @@ public class ReplyEmail extends SendEmail {
 			final Element bodyNode = DOMUtils.getUniqueElement(replyHtmlDoc.getDocumentElement(), "BODY");
 			bodyNode.appendChild(quoteBlock);
 
-			final ByteArrayInputStream inputStream = new ByteArrayInputStream(DOMUtils.serializeHtmlDocument(replyHtmlDoc).getBytes());
+			StringReader replyHtmlDocReader = new StringReader(DOMUtils.serializeHtmlDocument(replyHtmlDoc));
 
 			BasicBodyFactory basicBodyFactory = new BasicBodyFactory();
 			return basicBodyFactory.textBody( 
-					cleanLineBreaks(inputStream), 
+					cleanLineBreaks(replyHtmlDocReader), 
 					htmlPart.getMimeCharset());
 			
 		} catch (TransformerException e) {

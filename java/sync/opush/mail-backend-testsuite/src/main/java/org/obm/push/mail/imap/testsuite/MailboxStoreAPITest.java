@@ -36,6 +36,7 @@ import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Set;
 
@@ -46,8 +47,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -56,6 +57,7 @@ import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.ThrowingInputStream;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.imap.MailboxTestUtils;
 
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -89,11 +91,12 @@ public abstract class MailboxStoreAPITest {
 	public void tearDown() {
 		greenMail.stop();
 	}
-	
 	@Test
 	public void testStoreInInboxContentAfterStoring() throws Exception {
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, true);
+		
+		MailboxTestUtils.storeInInbox(udr, mailboxService, emailData);
+		
 		InputStream fetchedMailStream = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		InputStream expectedEmailData = loadEmail("plainText.eml");
 		Assertions.assertThat(fetchedMailStream).hasContentEqualTo(expectedEmailData);
@@ -102,7 +105,8 @@ public abstract class MailboxStoreAPITest {
 	@Test
 	public void testStoreInInboxInvitation() throws Exception {
 		InputStream emailData = loadEmail("androidInvit.eml");
-		mailboxService.storeInInbox(udr, emailData, true);
+
+		MailboxTestUtils.storeInInbox(udr, mailboxService, emailData);
 
 		InputStream expected = loadEmail("androidInvit.eml");
 		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
@@ -113,7 +117,9 @@ public abstract class MailboxStoreAPITest {
 	public void testStoreInInboxNotAnEmail() throws Exception {
 		byte[] data = new byte[]{'t','e','s','t', '\r', '\n', '\r', '\n'};
 		InputStream notAnEmailData = new ByteArrayInputStream(data);
-		mailboxService.storeInInbox(udr, notAnEmailData, true);
+
+		MailboxTestUtils.storeInInbox(udr, mailboxService, notAnEmailData);
+		
 		InputStream fetchedContent = mailboxService.fetchMailStream(udr, inboxPath, 1);
 		Assertions.assertThat(fetchedContent).hasContentEqualTo(new ByteArrayInputStream(data));
 	}
@@ -121,7 +127,7 @@ public abstract class MailboxStoreAPITest {
 	@Test(expected=MailException.class)
 	public void testStoreInInboxThrowExceptionWhenStreamFail() throws Exception {
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		mailboxService.storeInInbox(udr, failingEmailStream, true);
+		mailboxService.storeInInbox(udr, new InputStreamReader(failingEmailStream), true);
 	}
 	
 	@Test(expected=MailException.class)
@@ -129,7 +135,7 @@ public abstract class MailboxStoreAPITest {
 		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
-			mailboxService.storeInInbox(udr, failingEmailStream, true);
+			mailboxService.storeInInbox(udr, new InputStreamReader(failingEmailStream), true);
 		} catch (MailException e) {
 			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);
@@ -141,7 +147,9 @@ public abstract class MailboxStoreAPITest {
 	public void testStoreInInboxReadStatusTrue() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, true);
+
+		MailboxTestUtils.storeInInbox(udr, mailboxService, emailData, true);
+		
 		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isTrue();
@@ -151,11 +159,12 @@ public abstract class MailboxStoreAPITest {
 	public void testStoreInInboxReadStatusFalse() throws Exception {
 		Date before = new Date(0);
 		InputStream emailData = loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, emailData, false);
+
+		MailboxTestUtils.storeInInbox(udr, mailboxService, emailData, false);
+		
 		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Email element = Iterables.getOnlyElement(emails);
 		Assertions.assertThat(element.isRead()).isFalse();
 	}
-
 
 }

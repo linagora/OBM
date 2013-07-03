@@ -32,13 +32,8 @@
 package org.minig.imap.impl;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
-
-import com.google.common.io.CharStreams;
+import java.io.Reader;
 
 /*
  * Corrects Android bug, 
@@ -51,21 +46,19 @@ public class LineTerminationCorrecter {
 	private final static String LF = "\n";
 	private final static String CRLF = CR + LF;
 	
-	public static ByteArrayOutputStream correctLineTermination(InputStream inputStream) throws IOException {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
+	public static String correctLineTermination(Reader reader) throws IOException {
+		StringBuilder result = new StringBuilder();
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			List<String> lines = CharStreams.readLines(bufferedReader);
-			for (String line: lines) {
-				outputStream.write(appendLineTermination(line).getBytes());
+			BufferedReader bufferedReader = new BufferedReader(reader);
+			String lineContent = bufferedReader.readLine();
+			while (lineContent != null) {
+				result.append(appendLineTermination(lineContent));
+				lineContent = bufferedReader.readLine();
 			}
+			return result.toString();
 		} finally {
-			inputStream.close();
-			outputStream.flush();
-			outputStream.close();
+			reader.close();
 		}
-		return outputStream;
 	}
 
 	private static String appendLineTermination(String line) {

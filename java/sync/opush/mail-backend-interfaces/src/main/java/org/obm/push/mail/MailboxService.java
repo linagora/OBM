@@ -33,6 +33,7 @@ package org.obm.push.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -81,7 +82,7 @@ public interface MailboxService {
 	 * Store the mail's inputstream in INBOX.
 	 * The mailContent is only guaranteed to be streamed if it's a SharedInputStream.
 	 */
-	void storeInInbox(UserDataRequest udr, InputStream mailContent, boolean isRead) throws MailException;
+	void storeInInbox(UserDataRequest udr, Reader mailContent, boolean isRead) throws MailException;
 
 	boolean getLoginWithDomain();
 
@@ -113,7 +114,7 @@ public interface MailboxService {
 
 	Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet uid, MimePart mimePart) throws IOException;
 
-	void storeInSent(UserDataRequest udr, InputStream mailContent) throws MailException;
+	void storeInSent(UserDataRequest udr, Reader mailContent) throws MailException;
 
 	long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException;
 	

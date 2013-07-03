@@ -35,9 +35,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.configuration.EmailConfiguration.IMAP_INBOX_NAME;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
@@ -51,8 +52,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
@@ -253,7 +254,7 @@ public abstract class MailboxServiceTest {
 	public void testStoreInInbox() throws Exception {
 		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
 
-		mailboxService.storeInInbox(udr, tinyInputStream, true);
+		MailboxTestUtils.storeInInbox(udr, mailboxService, tinyInputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(IMAP_INBOX_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("test\r\n\r\n");
@@ -266,7 +267,7 @@ public abstract class MailboxServiceTest {
 		mailboxService.createFolder(udr, newFolder);
 
 		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
-		mailboxService.storeInSent(udr, inputStream);
+		MailboxTestUtils.storeInSent(udr, mailboxService, inputStream);
 
 		InputStream fetchMailStream = mailboxService.fetchMailStream(udr, mailboxPath(EmailConfiguration.IMAP_SENT_NAME), 1l);
 		InputStream expectedEmailData = StreamMailTestsUtils.newInputStreamFromString("mail sent\r\n\r\n");
@@ -279,16 +280,16 @@ public abstract class MailboxServiceTest {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(udr, newFolder);
 
-		InputStream inputStream = null;
-		mailboxService.storeInSent(udr, inputStream);
+		Reader reader = null;
+		mailboxService.storeInSent(udr, reader);
 	}
 
-	@Test
+	@Test(expected=MailException.class)
 	public void testStoreInSentBoxWithNoDirectlyResetableInputStream() throws Exception {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(udr, newFolder);
 
-		InputStream emailData = new BufferedInputStream(loadEmail("plainText.eml"));
+		Reader emailData = new InputStreamReader(loadEmail("plainText.eml"));
 		boolean isResetable = true;
 		try {
 			emailData.reset();
@@ -296,8 +297,12 @@ public abstract class MailboxServiceTest {
 			isResetable = false;
 		}
 
-		mailboxService.storeInSent(udr, emailData);
-		assertThat(isResetable).isFalse();
+		try {
+			mailboxService.storeInSent(udr, emailData);
+		} catch (Exception e) {
+			assertThat(isResetable).isFalse();
+			throw e;
+		}
 	}
 
 	@Test
@@ -305,7 +310,7 @@ public abstract class MailboxServiceTest {
 		MailboxFolder newFolder = folder(EmailConfiguration.IMAP_SENT_NAME);
 		mailboxService.createFolder(udr, newFolder);
 
-		InputStream inputStream = StreamMailTestsUtils.newInputStreamFromString("mail sent");
+		Reader inputStream = StreamMailTestsUtils.newReaderFromString("mail sent");
 		consumeInputStream(inputStream);
 
 		mailboxService.storeInSent(udr, inputStream);
@@ -321,9 +326,9 @@ public abstract class MailboxServiceTest {
 		String trash = EmailConfiguration.IMAP_TRASH_NAME;
 		MailboxFolder trashFolder = folder(trash);
 		mailboxService.createFolder(udr, trashFolder);
-		
-		final InputStream tinyInputStream = StreamMailTestsUtils.newInputStreamFromString("test");
-		mailboxService.storeInInbox(udr, tinyInputStream, true);
+
+		Reader tinyReader = StreamMailTestsUtils.newReaderFromString("test");
+		mailboxService.storeInInbox(udr, tinyReader, true);
 		
 		String inboxCollectionName = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
 		String trashCollectionName = testUtils.mailboxPath(trash);
@@ -365,7 +370,7 @@ public abstract class MailboxServiceTest {
 		assertThat(emails).hasSize(1);
 	}
 
-	private void consumeInputStream(InputStream inputStream) throws IOException {
+	private void consumeInputStream(Reader inputStream) throws IOException {
 		while (inputStream.read() != -1) {
 			// consume Inputstream
 		}		

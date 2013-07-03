@@ -33,8 +33,8 @@ package org.obm.push.minig.imap.command;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
 import org.junit.Test;
 import org.obm.push.mail.bean.Flag;
@@ -46,7 +46,8 @@ public class AppendCommandTest {
 	
 	@Test
 	public void testBuildCommandWithGoodLineTermination() {
-		String literalData = "Date: Fri, 11 Jan 2013 14:36:00 +0100\r\n" +
+		String literalData = 
+			"Date: Fri, 11 Jan 2013 14:36:00 +0100\r\n" +
 			"Subject: 4\r\n" +
 			"Message-ID: <rh5pqfydtxrupaxxogntvspf.1357911342934@email.android.com>\r\n" +
 			"Importance: normal\r\n" +
@@ -54,8 +55,8 @@ public class AppendCommandTest {
 			"To: userb@antoine.org\r\n" +
 			"MIME-Version: 1.0\r\n" +
 			"Content-Type: multipart/mixed; boundary=\"--_com.android.email_2674861553604\"\r\n";
-		InputStream inputStream = new ByteArrayInputStream(literalData.getBytes());
-		AppendCommand appendCommand = new AppendCommand("INBOX", inputStream, new FlagsList(ImmutableList.of(Flag.SEEN)));
+		Reader literalDataReader = new StringReader(literalData);
+		AppendCommand appendCommand = new AppendCommand("INBOX", literalDataReader, new FlagsList(ImmutableList.of(Flag.SEEN)));
 		CommandArgument buildCommand = appendCommand.buildCommand();
 		
 		assertThat(buildCommand.getLiteralData()).isEqualTo(literalData.getBytes());
@@ -63,7 +64,8 @@ public class AppendCommandTest {
 	
 	@Test
 	public void testBuildCommandWithBadTermination() {
-		String literalData = "Date: Fri, 11 Jan 2013 14:36:00 +0100\r\n" +
+		String literalData = 
+			"Date: Fri, 11 Jan 2013 14:36:00 +0100\r\n" +
 			"Subject: 4\r" +
 			"Message-ID: <rh5pqfydtxrupaxxogntvspf.1357911342934@email.android.com>\n" +
 			"Importance: normal\r\n" +
@@ -79,8 +81,8 @@ public class AppendCommandTest {
 				"To: userb@antoine.org\r\n" +
 				"MIME-Version: 1.0\r\n" +
 				"Content-Type: multipart/mixed; boundary=\"--_com.android.email_2674861553604\"\r\n";
-		InputStream inputStream = new ByteArrayInputStream(literalData.getBytes());
-		AppendCommand appendCommand = new AppendCommand("INBOX", inputStream, new FlagsList(ImmutableList.of(Flag.SEEN)));
+		Reader literalDataReader = new StringReader(literalData);
+		AppendCommand appendCommand = new AppendCommand("INBOX", literalDataReader, new FlagsList(ImmutableList.of(Flag.SEEN)));
 		CommandArgument buildCommand = appendCommand.buildCommand();
 		
 		assertThat(buildCommand.getLiteralData()).isEqualTo(expectedLiteralData.getBytes());

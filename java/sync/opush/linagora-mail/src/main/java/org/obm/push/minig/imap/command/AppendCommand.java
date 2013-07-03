@@ -33,21 +33,23 @@
 package org.obm.push.minig.imap.command;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import org.minig.imap.impl.LineTerminationCorrecter;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.minig.imap.CommandIOException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
+import com.google.common.base.Charsets;
+
 public class AppendCommand extends Command<Boolean> {
 
 	private final static String IMAP_COMMAND = "APPEND";
-	private InputStream in;
+	private Reader in;
 	private String mailbox;
 	private FlagsList flags;
 
-	public AppendCommand(String mailbox, InputStream message, FlagsList flags) {
+	public AppendCommand(String mailbox, Reader message, FlagsList flags) {
 		this.mailbox = mailbox;
 		this.in = message;
 		this.flags = flags;
@@ -71,7 +73,7 @@ public class AppendCommand extends Command<Boolean> {
 		}
 
 		try {
-			byte[] mailData = LineTerminationCorrecter.correctLineTermination(in).toByteArray();
+			byte[] mailData = LineTerminationCorrecter.correctLineTermination(in).getBytes(Charsets.UTF_8);
 			cmd.append("{");
 			cmd.append(mailData.length);
 			cmd.append("}");

@@ -41,6 +41,7 @@ import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +148,7 @@ public class MailBackendTest {
 				anyObject(InputStream.class));
 		expectLastCall().once();
 		
-		mailboxService.storeInSent(anyObject(UserDataRequest.class), anyObject(InputStream.class));
+		mailboxService.storeInSent(anyObject(UserDataRequest.class), anyObject(Reader.class));
 		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, authenticationService, new Mime4jUtils(),

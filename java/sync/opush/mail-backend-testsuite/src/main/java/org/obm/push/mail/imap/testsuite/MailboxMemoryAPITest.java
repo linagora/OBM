@@ -56,8 +56,8 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -68,6 +68,7 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.greenmail.ClosableProcess;
 import org.obm.push.mail.greenmail.ExternalProcessException;
 import org.obm.push.mail.greenmail.GreenMailExternalProcess;
+import org.obm.push.mail.imap.MailboxTestUtils;
 import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.service.OpushLocatorService;
 
@@ -141,8 +142,10 @@ public abstract class MailboxMemoryAPITest {
 	public void testStoreInInboxMoreThanMemorySize() throws Exception {
 		Date before = new Date();
 		File data = generateBigEmail(getTwiceThisHeapSize());
-		final InputStream heavyInputStream = new SharedFileInputStream(data);
-		mailboxService.storeInInbox(udr, heavyInputStream, true);
+		InputStream heavyInputStream = new SharedFileInputStream(data);
+		
+		MailboxTestUtils.storeInInbox(udr, mailboxService, heavyInputStream);
+		
 		Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 		Assertions.assertThat(emails).hasSize(1);
 	}
@@ -151,9 +154,9 @@ public abstract class MailboxMemoryAPITest {
 	@Test
 	public void testFetchPartMoreThanMemorySize() throws Exception {
 		File data = generateBigEmail(maxHeapSize);
-		final InputStream heavyInputStream = new SharedFileInputStream(data);
-		mailboxService.storeInInbox(udr, heavyInputStream, true);
-
+		InputStream heavyInputStream = new SharedFileInputStream(data);
+		MailboxTestUtils.storeInInbox(udr, mailboxService, heavyInputStream);
+		
 		InputStream fetchPart = uidFetchPart(1, "1");
 		
 		Assertions.assertThat(fetchPart).hasContentEqualTo(new RandomGeneratedInputStream(maxHeapSize));

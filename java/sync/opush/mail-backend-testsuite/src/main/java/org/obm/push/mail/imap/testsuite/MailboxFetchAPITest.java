@@ -138,7 +138,7 @@ public abstract class MailboxFetchAPITest {
 		bcc(Lists.newArrayList(new Address("d@test"))).build();
 		
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, inputStream, true);
+		mailboxService.storeInInbox(udr, new InputStreamReader(inputStream), true);
 		
 		Collection<UIDEnvelope> uidEnvelopes = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(1l));
 
@@ -148,7 +148,7 @@ public abstract class MailboxFetchAPITest {
 	@Test(expected=MailException.class)
 	public void testFetchEnvelopeWithWrongUID() throws MailException, IOException {
 		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, inputStream, true);
+		mailboxService.storeInInbox(udr, new InputStreamReader(inputStream), true);
 		
 		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(2l));
 	}

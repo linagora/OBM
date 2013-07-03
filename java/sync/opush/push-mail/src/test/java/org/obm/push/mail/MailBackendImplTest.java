@@ -33,18 +33,22 @@ package org.obm.push.mail;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.james.mime4j.dom.Message;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -862,7 +866,9 @@ public class MailBackendImplTest {
 	}
 	
 	@Test
-	public void testSendEmailWithBigInputStream() throws Exception {
+	public void testSendEmailWithBigInputStreamNoSaveInSent() throws Exception {
+		boolean saveInSent = false;
+
 		Set<Address> addrs = Sets.newHashSet();
 		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class),
 				anyObject(addrs.getClass()),
@@ -870,13 +876,74 @@ public class MailBackendImplTest {
 				anyObject(addrs.getClass()), anyObject(InputStream.class));
 		expectLastCall().once();
 		
+		SendEmail sendEmail = control.createMock(SendEmail.class);
+		expect(sendEmail.getFrom()).andReturn("test@test.fr");
+		expect(sendEmail.getTo()).andReturn(addrs);
+		expect(sendEmail.getCc()).andReturn(addrs);
+		expect(sendEmail.getCci()).andReturn(addrs);
+		expect(sendEmail.getMessage()).andReturn(loadEmail("bigEml.eml"));
+		
 		control.replay();
-		testee.sendEmail(udr,
-				new Address("test@test.fr"),
-				addrs,
-				addrs,
-				addrs,
-				loadEmail("bigEml.eml"), false);
+		testee.sendEmail(udr, sendEmail, saveInSent);
 		control.verify();
+	}
+	
+	@Test
+	public void testSendEmailWithBigInputStreamSaveInSent() throws Exception {
+		boolean saveInSent = true;
+		
+		Set<Address> addrs = Sets.newHashSet();
+		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()), anyObject(InputStream.class));
+		expectLastCall().once();
+		
+		Message message = control.createMock(Message.class);
+		expect(message.getCharset()).andReturn("UTF-8");
+		SendEmail sendEmail = control.createMock(SendEmail.class);
+		expect(sendEmail.getFrom()).andReturn("test@test.fr");
+		expect(sendEmail.getTo()).andReturn(addrs);
+		expect(sendEmail.getCc()).andReturn(addrs);
+		expect(sendEmail.getCci()).andReturn(addrs);
+		expect(sendEmail.getMimeMessage()).andReturn(message);
+		expect(sendEmail.getMessage()).andReturn(loadEmail("bigEml.eml"));
+		
+		mailboxService.storeInSent(eq(udr), isA(BufferedReader.class));
+		expectLastCall();
+		
+		control.replay();
+		testee.sendEmail(udr, sendEmail, saveInSent);
+		control.verify();
+	}
+	
+	@Test(expected=ProcessingEmailException.class)
+	public void testSendEmailWithBigInputStreamSaveInSentUnknownCharset() throws Exception {
+		boolean saveInSent = true;
+		
+		Set<Address> addrs = Sets.newHashSet();
+		smtpSender.sendEmail(anyObject(UserDataRequest.class), anyObject(Address.class),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()),
+				anyObject(addrs.getClass()), anyObject(InputStream.class));
+		expectLastCall().once();
+		
+		Message message = control.createMock(Message.class);
+		expect(message.getCharset()).andReturn("I'm not a charset!");
+		SendEmail sendEmail = control.createMock(SendEmail.class);
+		expect(sendEmail.getFrom()).andReturn("test@test.fr");
+		expect(sendEmail.getTo()).andReturn(addrs);
+		expect(sendEmail.getCc()).andReturn(addrs);
+		expect(sendEmail.getCci()).andReturn(addrs);
+		expect(sendEmail.getMimeMessage()).andReturn(message);
+		expect(sendEmail.getMessage()).andReturn(loadEmail("bigEml.eml"));
+		
+		control.replay();
+		try {
+			testee.sendEmail(udr, sendEmail, saveInSent);
+		} catch (Exception e) {
+			control.verify();
+			throw e;
+		}
 	}
 }

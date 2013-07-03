@@ -34,6 +34,7 @@ package org.obm.push.mail.smtp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.util.Collection;
 import java.util.Set;
 
 import org.columba.ristretto.smtp.SMTPException;
@@ -124,8 +125,8 @@ public class SmtpSenderImpl implements SmtpSender {
 		}
 	}
 
-	private org.columba.ristretto.message.Address[] getAllRistrettoRecipients(Set<Address> to,
-			Set<Address> cc, Set<Address> bcc) {
+	private org.columba.ristretto.message.Address[] getAllRistrettoRecipients(Collection<Address> to,
+			Collection<Address> cc, Collection<Address> bcc) {
 		if (to == null) {
 			to = ImmutableSet.of();
 		}

@@ -33,6 +33,7 @@
 package org.obm.push.minig.imap;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -209,8 +210,8 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	public boolean append(String mailbox, InputStream in, FlagsList fl) {
-		return clientSupport.append(findMailboxNameWithServerCase(mailbox), in, fl);
+	public boolean append(String mailbox, Reader message, FlagsList fl) {
+		return clientSupport.append(findMailboxNameWithServerCase(mailbox), message, fl);
 	}
 
 	@Override
