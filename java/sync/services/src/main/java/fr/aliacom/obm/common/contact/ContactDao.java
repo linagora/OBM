@@ -564,12 +564,9 @@ public class ContactDao {
 			Map<String, InstantMessagingId> imIdentifiers) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper imIds = new StringSQLCollectionHelper(imIdentifiers.keySet());
 			ps = con
-			.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
-					+ imIds.asPlaceHolders() + ")");
+			.prepareStatement("DELETE FROM IM WHERE im_entity_id=?");
 			ps.setInt(1, entityId);
-			imIds.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -592,11 +589,8 @@ public class ContactDao {
 	private void createOrUpdateWebsites(final Connection con, final Contact c) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(c.listWebSitesLabel());
-			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN (" + 
-					labels.asPlaceHolders() + ")");
+			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=?");
 			ps.setInt(1, c.getEntityId());
-			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -634,12 +628,9 @@ public class ContactDao {
 			Map<String, Address> addresses) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(addresses.keySet());
 			ps = con
-			.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
-					+ labels.asPlaceHolders() + ")");
+			.prepareStatement("DELETE FROM Address WHERE address_entity_id=?");
 			ps.setInt(1, entityId);
-			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -671,12 +662,9 @@ public class ContactDao {
 			Map<String, EmailAddress> emails) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper emailStrings = new StringSQLCollectionHelper(emails.keySet());
 			ps = con
-			.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
-					+ emailStrings.asPlaceHolders() + ")");
+			.prepareStatement("DELETE FROM Email WHERE email_entity_id=?");
 			ps.setInt(1, entityId);
-			emailStrings.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
@@ -699,12 +687,9 @@ public class ContactDao {
 			Map<String, Phone> phones) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(phones.keySet());
 			ps = con
-			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
-					+ labels.asPlaceHolders() + ")");
+			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=?");
 			ps.setInt(1, entityId);
-			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
 			ps.close();
