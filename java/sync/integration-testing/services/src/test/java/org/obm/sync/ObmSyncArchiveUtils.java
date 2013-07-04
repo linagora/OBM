@@ -329,7 +329,6 @@ import fr.aliacom.obm.common.calendar.loader.filter.DeclinedAttendeeFilter;
 import fr.aliacom.obm.common.calendar.loader.filter.EventFilter;
 import fr.aliacom.obm.common.contact.AddressBookBindingImpl;
 import fr.aliacom.obm.common.contact.ContactDao;
-import fr.aliacom.obm.common.contact.ContactMerger;
 import fr.aliacom.obm.common.contact.ContactPrivacy;
 import fr.aliacom.obm.common.contact.ContactUpdates;
 import fr.aliacom.obm.common.contact.FolderUpdates;
@@ -660,7 +659,6 @@ public class ObmSyncArchiveUtils {
 				ResourceNotFoundException.class,
 				AddressBookBindingImpl.class,
 				ContactDao.class,
-				ContactMerger.class,
 				ContactPrivacy.class,
 				ContactUpdates.class,
 				FolderUpdates.class,
