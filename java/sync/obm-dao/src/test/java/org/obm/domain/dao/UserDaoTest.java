@@ -51,7 +51,6 @@ import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.base.DomainName;
@@ -318,7 +317,7 @@ public class UserDaoTest {
 			.firstName("firstname2")
 			.lastName("lastname2")
 			.commonName("commonname")
-			.extId(new UserExtId("extid"))
+			.extId(UserExtId.builder().extId("extid").build())
 			.publicFreeBusy(true)
 			.build();
 		

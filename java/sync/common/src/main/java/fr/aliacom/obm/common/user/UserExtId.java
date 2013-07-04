@@ -33,20 +33,45 @@
 package fr.aliacom.obm.common.user;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class UserExtId {
 
+	public static UserExtId valueOf(String extId) {
+		return builder().extId(extId).build();
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private String extId;
+
+		private Builder() {
+		}
+
+		public Builder extId(String extId) {
+			this.extId = extId;
+			return this;
+		}
+
+		public UserExtId build() {
+			Preconditions.checkState(extId != null);
+
+			return new UserExtId(extId);
+		}
+
+	}
+
 	private final String extId;
 
-	public UserExtId(String extId) {
+	private UserExtId(String extId) {
 		this.extId = extId;
 	}
 
 	public String getExtId() {
-		return extId;
-	}
-
-	public String serializeToString() {
 		return extId;
 	}
 
@@ -56,6 +81,7 @@ public class UserExtId {
 			UserExtId other = (UserExtId) obj;
 			return Objects.equal(extId, other.extId);
 		}
+
 		return false;
 	}
 
@@ -66,7 +92,10 @@ public class UserExtId {
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this).add("extId", extId).toString();
+		return Objects
+				.toStringHelper(this)
+				.add("extId", extId)
+				.toString();
 	}
 
 }

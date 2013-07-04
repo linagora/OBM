@@ -139,6 +139,9 @@ import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
+import org.obm.provisioning.json.OperationJsonSerializer;
+import org.obm.provisioning.json.UserExtIdJsonDeserializer;
+import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -146,7 +149,6 @@ import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
-import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.utils.DOMUtils;
@@ -534,7 +536,9 @@ public class DependencyResolverHelper {
 				UserWriteResource.class,
 				BatchJsonSerializer.class,
 				OperationJsonSerializer.class,
-				ObmDomainEntry.class
+				ObmDomainEntry.class,
+				UserExtIdJsonDeserializer.class,
+				UserExtIdJsonSerializer.class
 		};
 	}
 

@@ -50,7 +50,10 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.bean.UserIdentifier;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+
+import fr.aliacom.obm.common.user.UserExtId;
 
 
 @Slow
@@ -125,16 +128,12 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
-	
 
-	
 	private Set<UserIdentifier> fakeListOfUserIdentifer() {
-		UserIdentifier userIdentifier1
-			= UserIdentifier.builder().id(1).url("/users/1").build();
-		UserIdentifier userIdentifier2
-			= UserIdentifier.builder().id(2).url("/users/2").build();
-		
-		return Sets.newHashSet(userIdentifier1, userIdentifier2);
+		UserIdentifier userIdentifier1 = UserIdentifier.builder().id(UserExtId.builder().extId("1").build()).url("/users/1").build();
+		UserIdentifier userIdentifier2 = UserIdentifier.builder().id(UserExtId.builder().extId("2").build()).url("/users/2").build();
+
+		return ImmutableSet.of(userIdentifier1, userIdentifier2);
 	}
 	
 	private Set<UserIdentifier> fakeEmptySet() {
@@ -143,8 +142,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	
 	private String expectedJsonSetOfUser() {
 		return "[" +
-					"{\"id\":2,\"url\":\"/users/2\"}," +
-					"{\"id\":1,\"url\":\"/users/1\"}" +
+					"{\"id\":\"1\",\"url\":\"/users/1\"}," +
+					"{\"id\":\"2\",\"url\":\"/users/2\"}" +
 				"]";
 	}
 }

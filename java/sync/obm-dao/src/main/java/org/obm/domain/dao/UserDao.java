@@ -230,7 +230,7 @@ public class UserDao {
 				.lastName(rs.getString("userobm_lastname"))
 				.publicFreeBusy(computePublicFreeBusy(5, rs))
 				.commonName(rs.getString("userobm_commonname"))
-				.extId(new UserExtId(rs.getString("userobm_ext_id")))
+				.extId(UserExtId.builder().extId(rs.getString("userobm_ext_id")).build())
 				.entityId(rs.getInt("userentity_entity_id"))
 				.build();
 	}

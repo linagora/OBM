@@ -26,6 +26,8 @@ import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.provisioning.json.UserExtIdJsonDeserializer;
+import org.obm.provisioning.json.UserExtIdJsonSerializer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -40,6 +42,7 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class ProvisioningService extends JerseyServletModule {
 
@@ -84,6 +87,8 @@ public class ProvisioningService extends JerseyServletModule {
 				.addSerializer(Batch.class, new BatchJsonSerializer())
 				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
 				.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer());
+				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer());
+				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer());
 
 		return new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)

@@ -34,25 +34,28 @@ package org.obm.provisioning.bean;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import fr.aliacom.obm.common.user.UserExtId;
+
 public class UserIdentifier {
+
 	public static Builder builder() {
 		return new Builder();
 	}
-	
+
 	public static class Builder {
-		private Integer id;
+		private UserExtId id;
 		private String url;
-		
-		public Builder id(int id) {
+
+		public Builder id(UserExtId id) {
 			this.id = id;
 			return this;
 		}
-		
+
 		public Builder url(String url) {
 			this.url = url;
 			return this;
 		}
-		
+
 		public UserIdentifier build() {
 			Preconditions.checkState(id != null);
 			Preconditions.checkState(url != null);
@@ -61,15 +64,15 @@ public class UserIdentifier {
 		}
 	}
 	
-	private int id;
+	private UserExtId id;
 	private String url;
 	
-	private UserIdentifier(int id, String url) {
+	private UserIdentifier(UserExtId id, String url) {
 		this.id = id;
 		this.url = url;
 	}
 	
-	public int getId() {
+	public UserExtId getId() {
 		return id;
 	}
 	
@@ -89,6 +92,16 @@ public class UserIdentifier {
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.url, that.url);
 		}
+
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("id", id)
+				.add("url", url)
+				.toString();
+	}
+
 }
