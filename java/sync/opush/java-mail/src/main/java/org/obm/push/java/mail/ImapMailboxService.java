@@ -45,7 +45,6 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
-import org.apache.commons.io.input.ReaderInputStream;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
@@ -62,6 +61,7 @@ import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -367,7 +367,7 @@ public class ImapMailboxService implements MailboxService {
 	}
 	
 	@Override
-	public void storeInSent(UserDataRequest udr, Reader mailContent) throws MailException {
+	public void storeInSent(UserDataRequest udr, EmailReader mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
 			String sentboxPath = 
@@ -412,21 +412,21 @@ public class ImapMailboxService implements MailboxService {
 	}
 
 	@Override
-	public void storeInInbox(UserDataRequest udr, Reader mailContent, boolean isRead) throws MailException {
+	public void storeInInbox(UserDataRequest udr, EmailReader mailContent, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
 		String inboxPath = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
 		storeInFolder(udr, mailContent, isRead, inboxPath);
 	}
 	
-	private void storeInFolder(UserDataRequest udr, Reader mailContent, boolean isRead, String collectionPath) 
+	private void storeInFolder(UserDataRequest udr, EmailReader mailContent, boolean isRead, String collectionPath) 
 			throws MailException {
 		
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			ImapStore store = openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
 			resetInputStream(mailContent);
-			Message message = store.createMessage(new ReaderInputStream(mailContent));
+			Message message = store.createMessage(mailContent.toInputStream());
 			message.setFlag(Flags.Flag.SEEN, isRead);
 			store.appendMessage(currentOpushImapFolder(), message);
 		} catch (ImapCommandException e) {

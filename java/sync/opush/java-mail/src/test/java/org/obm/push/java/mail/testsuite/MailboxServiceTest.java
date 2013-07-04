@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.java.mail.testsuite;
 
+import java.io.IOException;
+
 import org.junit.Ignore;
 import org.obm.guice.GuiceModule;
 import org.obm.push.java.mail.MailEnvModule;
+import org.obm.push.mail.MailException;
 
 @GuiceModule(MailEnvModule.class)
 public class MailboxServiceTest extends
@@ -51,5 +54,10 @@ public class MailboxServiceTest extends
 		 *		args.writeString(u);
 		 *		args.writeString(p);
 		 */
+	}
+
+	@Ignore("EmailReader does not allow to use the reader then use the stream")
+	@Override
+	public void testStoreInSentBoxAfterToConsumeIt() throws MailException, IOException {
 	}
 }

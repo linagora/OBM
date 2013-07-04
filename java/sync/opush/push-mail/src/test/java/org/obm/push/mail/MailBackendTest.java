@@ -41,7 +41,6 @@ import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +75,7 @@ import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
@@ -148,7 +148,7 @@ public class MailBackendTest {
 				anyObject(InputStream.class));
 		expectLastCall().once();
 		
-		mailboxService.storeInSent(anyObject(UserDataRequest.class), anyObject(Reader.class));
+		mailboxService.storeInSent(anyObject(UserDataRequest.class), anyObject(EmailReader.class));
 		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, authenticationService, new Mime4jUtils(),

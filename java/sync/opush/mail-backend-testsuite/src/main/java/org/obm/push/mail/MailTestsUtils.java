@@ -34,8 +34,10 @@ package org.obm.push.mail;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.Charset;
 
 import javax.mail.FolderClosedException;
 import javax.net.SocketFactory;
@@ -43,7 +45,9 @@ import javax.net.SocketFactory;
 import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.obm.push.mail.bean.EmailReader;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 
 public class MailTestsUtils {
@@ -67,6 +71,14 @@ public class MailTestsUtils {
 	
 	public static InputStream loadEmail(String name) throws IOException {
 		return new ByteArrayInputStream(ByteStreams.toByteArray(ClassLoader.getSystemResourceAsStream("eml/" + name)));
+	}
+
+	public static EmailReader readableEmail(String name) {
+		return readableEmail(name, Charsets.UTF_8);
+	}
+
+	public static EmailReader readableEmail(String name, Charset charset) {
+		return new EmailReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("eml/" + name), charset));
 	}
 	
 	public static void waitForGreenmailAvailability(String imapHost, int imapPort) throws InterruptedException {

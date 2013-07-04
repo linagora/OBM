@@ -36,7 +36,6 @@ import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Set;
 
@@ -56,6 +55,7 @@ import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.RandomGeneratedInputStream;
 import org.obm.push.mail.ThrowingInputStream;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.MailboxTestUtils;
 
@@ -127,7 +127,7 @@ public abstract class MailboxStoreAPITest {
 	@Test(expected=MailException.class)
 	public void testStoreInInboxThrowExceptionWhenStreamFail() throws Exception {
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
-		mailboxService.storeInInbox(udr, new InputStreamReader(failingEmailStream), true);
+		mailboxService.storeInInbox(udr, new EmailReader(failingEmailStream), true);
 	}
 	
 	@Test(expected=MailException.class)
@@ -135,7 +135,7 @@ public abstract class MailboxStoreAPITest {
 		Date before = new Date(0);
 		InputStream failingEmailStream = new ThrowingInputStream(new RandomGeneratedInputStream(1000), 50);
 		try {
-			mailboxService.storeInInbox(udr, new InputStreamReader(failingEmailStream), true);
+			mailboxService.storeInInbox(udr, new EmailReader(failingEmailStream), true);
 		} catch (MailException e) {
 			Set<Email> emails = mailboxService.fetchEmails(udr, inboxPath, before);
 			Assertions.assertThat(emails).isNotNull().hasSize(0);

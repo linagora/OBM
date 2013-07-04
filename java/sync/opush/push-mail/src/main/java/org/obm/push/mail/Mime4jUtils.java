@@ -37,7 +37,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -63,6 +62,7 @@ import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.utils.FileUtils;
 import org.obm.push.utils.MimeContentType;
 
@@ -242,8 +242,8 @@ public class Mime4jUtils {
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 	
-	public Reader toReader(Message message) throws IOException {
-		return new InputStreamReader(toInputStream(message), message.getCharset());
+	public EmailReader toReader(Message message) throws IOException {
+		return new EmailReader(new InputStreamReader(toInputStream(message), message.getCharset()));
 	}
 
 	public String toString(Body message) throws IOException{

@@ -33,7 +33,6 @@ package org.obm.push.mail;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -42,6 +41,7 @@ import java.util.Set;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -82,7 +82,7 @@ public interface MailboxService {
 	 * Store the mail's inputstream in INBOX.
 	 * The mailContent is only guaranteed to be streamed if it's a SharedInputStream.
 	 */
-	void storeInInbox(UserDataRequest udr, Reader mailContent, boolean isRead) throws MailException;
+	void storeInInbox(UserDataRequest udr, EmailReader mailContent, boolean isRead) throws MailException;
 
 	boolean getLoginWithDomain();
 
@@ -114,7 +114,7 @@ public interface MailboxService {
 
 	Map<Long, IMAPHeaders> fetchPartHeaders(UserDataRequest udr, String collectionPath, MessageSet uid, MimePart mimePart) throws IOException;
 
-	void storeInSent(UserDataRequest udr, Reader mailContent) throws MailException;
+	void storeInSent(UserDataRequest udr, EmailReader mailContent) throws MailException;
 
 	long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException;
 	

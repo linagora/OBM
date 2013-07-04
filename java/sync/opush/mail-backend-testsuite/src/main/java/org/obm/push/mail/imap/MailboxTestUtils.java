@@ -31,10 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Date;
 import java.util.Set;
 
@@ -49,11 +46,11 @@ import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.user.UserException;
@@ -92,7 +89,7 @@ public class MailboxTestUtils {
 	}
 
 	public static void storeInInbox(UserDataRequest udr, MailboxService mailboxService, InputStream email, boolean read) {
-		mailboxService.storeInInbox(udr, bufferedReader(email), read);
+		mailboxService.storeInInbox(udr, emailReader(email), read);
 	}
 
 	public static void storeInInbox(UserDataRequest udr, MailboxService mailboxService, InputStream email) {
@@ -100,11 +97,11 @@ public class MailboxTestUtils {
 	}
 
 	public static void storeInSent(UserDataRequest udr, MailboxService mailboxService, InputStream email) {
-		mailboxService.storeInSent(udr, bufferedReader(email));
+		mailboxService.storeInSent(udr, emailReader(email));
 	}
 
-	public static Reader bufferedReader(InputStream email) {
-		return new BufferedReader(new InputStreamReader(email, Charsets.UTF_8));
+	public static EmailReader emailReader(InputStream email) {
+		return new EmailReader(email);
 	}
 	
 	public void deliverToUserInbox(GreenMailUser user, MimeMessage message, Date internalDate) throws UserException {

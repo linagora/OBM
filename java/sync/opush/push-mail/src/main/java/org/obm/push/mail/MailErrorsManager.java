@@ -31,12 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -103,15 +101,10 @@ public class MailErrorsManager implements ErrorsManager {
 		}
 		try {
 			Message mm = prepareMessage(udr, subject, body.toString(), new ByteArrayInputStream(errorMail));
-			Reader in = mime4jUtils.toReader(mm);
-			manager.storeInInbox(udr, multipleTimesReadableReader(in), false);
+			manager.storeInInbox(udr, mime4jUtils.toReader(mm), false);
 		} catch (Throwable e) {
 			logger.error("Error during storing error mail in the inbox folder", e);
 		}
-	}
-	
-	private Reader multipleTimesReadableReader(Reader reader) {
-		return new BufferedReader(reader);
 	}
 
 	/* package */ Message prepareMessage(UserDataRequest udr, String subject, String body, InputStream errorMail) throws FileNotFoundException, IOException, ParseException {
@@ -164,8 +157,7 @@ public class MailErrorsManager implements ErrorsManager {
 		
 		try {
 			Message mm = buildErrorMessage(udr, e.getLoadedData(), e.getQuota());
-			Reader in = mime4jUtils.toReader(mm);
-			manager.storeInInbox(udr, multipleTimesReadableReader(in), false);
+			manager.storeInInbox(udr, mime4jUtils.toReader(mm), false);
 		} catch (Throwable t) {
 			logger.error("Error during storing error mail in the inbox folder", t);
 		}

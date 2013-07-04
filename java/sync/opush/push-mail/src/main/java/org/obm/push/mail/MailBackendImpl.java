@@ -31,13 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.Collection;
@@ -98,6 +96,7 @@ import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.StoreEmailException;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
@@ -698,8 +697,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		return emailStream;
 	}
 
-	private Reader multipleTimesReadable(InputStream streamMail, String charsetName) {
-		return new BufferedReader(new InputStreamReader(streamMail, Charset.forName(charsetName)));
+	private EmailReader multipleTimesReadable(InputStream streamMail, String charsetName) {
+		return new EmailReader(new InputStreamReader(streamMail, Charset.forName(charsetName)));
 	}
 
 	private Address validateFrom(String from) throws ProcessingEmailException {

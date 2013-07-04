@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 
 import com.google.common.base.Charsets;
 
@@ -47,8 +48,12 @@ public class StreamMailTestsUtils {
 		return newInputStreamFromString("From: toto" + crlf + crlf);
 	}
 	
+	public static ByteArrayInputStream newInputStreamFromString(String content, Charset charset) {
+		return new ByteArrayInputStream(new String(content).getBytes(charset));
+	}
+	
 	public static ByteArrayInputStream newInputStreamFromString(String content) {
-		return new ByteArrayInputStream(new String(content).getBytes(Charsets.UTF_8));
+		return newInputStreamFromString(content, Charsets.UTF_8);
 	}
 	
 	public static Reader newReaderFromString(String content) {

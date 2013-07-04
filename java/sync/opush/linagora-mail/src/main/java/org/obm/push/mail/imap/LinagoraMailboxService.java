@@ -55,6 +55,7 @@ import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -320,7 +321,7 @@ public class LinagoraMailboxService implements MailboxService {
 	}	
 	
 	@Override
-	public void storeInSent(UserDataRequest udr, Reader mailContent) throws MailException {
+	public void storeInSent(UserDataRequest udr, EmailReader mailContent) throws MailException {
 		logger.info("Store mail in folder[SentBox]");
 		if (mailContent != null) {
 			String sentboxPath = 
@@ -381,7 +382,7 @@ public class LinagoraMailboxService implements MailboxService {
 	}
 		
 	@Override
-	public void storeInInbox(UserDataRequest udr, Reader mailContent, boolean isRead) throws MailException {
+	public void storeInInbox(UserDataRequest udr, EmailReader mailContent, boolean isRead) throws MailException {
 		logger.info("Store mail in folder[Inbox]");
 		String inboxPath = 
 				collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);

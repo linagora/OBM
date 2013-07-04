@@ -68,6 +68,7 @@ import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.bean.Address;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Envelope;
@@ -127,7 +128,7 @@ public abstract class MailboxFetchAPITest {
 
 	@Ignore("AppendCommand should send optional message's internal date-time in command")
 	@Test
-	public void testFetchEnvelope() throws MailException, IOException {
+	public void testFetchEnvelope() throws MailException {
 		Envelope envelope = Envelope.builder().date(date("2010-09-17T17:12:26")).
 		messageID("<20100917151246.2A9384BA1@lenny>").
 		subject("my subject").
@@ -137,8 +138,8 @@ public abstract class MailboxFetchAPITest {
 		cc(Lists.newArrayList(new Address("c@test"))).
 		bcc(Lists.newArrayList(new Address("d@test"))).build();
 		
-		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, new InputStreamReader(inputStream), true);
+		EmailReader readableEmail = MailTestsUtils.readableEmail("plainText.eml");
+		mailboxService.storeInInbox(udr, readableEmail, true);
 		
 		Collection<UIDEnvelope> uidEnvelopes = mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(1l));
 
@@ -146,9 +147,9 @@ public abstract class MailboxFetchAPITest {
 	}
 	
 	@Test(expected=MailException.class)
-	public void testFetchEnvelopeWithWrongUID() throws MailException, IOException {
-		InputStream inputStream = MailTestsUtils.loadEmail("plainText.eml");
-		mailboxService.storeInInbox(udr, new InputStreamReader(inputStream), true);
+	public void testFetchEnvelopeWithWrongUID() throws MailException {
+		EmailReader readableEmail = MailTestsUtils.readableEmail("plainText.eml");
+		mailboxService.storeInInbox(udr, readableEmail, true);
 		
 		mailboxService.fetchEnvelope(udr, testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME), MessageSet.singleton(2l));
 	}

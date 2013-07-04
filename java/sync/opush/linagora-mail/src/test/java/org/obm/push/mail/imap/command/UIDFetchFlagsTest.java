@@ -33,7 +33,6 @@ package org.obm.push.mail.imap.command;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;

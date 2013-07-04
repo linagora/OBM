@@ -41,7 +41,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -81,6 +80,7 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.WindowingIndexKey;
@@ -909,7 +909,7 @@ public class MailBackendImplTest {
 		expect(sendEmail.getMimeMessage()).andReturn(message);
 		expect(sendEmail.getMessage()).andReturn(loadEmail("bigEml.eml"));
 		
-		mailboxService.storeInSent(eq(udr), isA(BufferedReader.class));
+		mailboxService.storeInSent(eq(udr), isA(EmailReader.class));
 		expectLastCall();
 		
 		control.replay();
