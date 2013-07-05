@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -221,6 +223,8 @@ public class UserDao {
 	}
 
 	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
+		String extId = rs.getString("userobm_ext_id");
+		
 		return ObmUser.builder()
 				.uid(rs.getInt(1))
 				.login(rs.getString("userobm_login"))
@@ -230,7 +234,7 @@ public class UserDao {
 				.lastName(rs.getString("userobm_lastname"))
 				.publicFreeBusy(computePublicFreeBusy(5, rs))
 				.commonName(rs.getString("userobm_commonname"))
-				.extId(UserExtId.builder().extId(rs.getString("userobm_ext_id")).build())
+				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 				.entityId(rs.getInt("userentity_entity_id"))
 				.build();
 	}
@@ -351,5 +355,33 @@ public class UserDao {
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
 		}
+	}
+
+	public List<ObmUser> list(ObmDomain domain) throws SQLException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<ObmUser> users = Lists.newArrayList();
+
+		String query = "SELECT " + USER_FIELDS + " FROM UserObm " + 
+				"INNER JOIN UserEntity ON userentity_user_id = userobm_id " + 
+				"LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL " + 
+				"LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id " + 
+				"WHERE userobm_domain_id = ? AND userobm_archive != '1'";
+
+		try {
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setInt(1, domain.getId());
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				users.add(createUserFromResultSet(domain, rs));
+			}
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+
+		return users;
 	}
 }

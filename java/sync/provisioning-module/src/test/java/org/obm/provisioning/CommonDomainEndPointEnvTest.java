@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -57,13 +56,13 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.DateUtils;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
-import org.obm.provisioning.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.inject.AbstractModule;
@@ -209,7 +208,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		return createPutRequest(path, content).execute().returnResponse();
 	}
 	
-	protected HttpResponse patch(String path, StringEntity content) throws ClientProtocolException, IOException, URISyntaxException {
+	protected HttpResponse patch(String path, StringEntity content) throws ClientProtocolException, IOException {
 		return new DefaultHttpClient().execute(createPatchRequest(path, content));
 	}
 	
@@ -225,7 +224,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(content);
 	}
 	
-	private HttpRequestBase createPatchRequest(String path, StringEntity content) throws URISyntaxException {
+	private HttpRequestBase createPatchRequest(String path, StringEntity content) {
 		final HttpPatch patch = new HttpPatch(baseUrl + "/" + domain.getUuid().get() + path);
 		patch.setEntity(content);
 		return patch;
@@ -305,7 +304,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		return ObmUser.builder()
 				.domain(domain)
 				.uid(1)
-				.extId(new UserExtId("extId"))
+				.extId(userExtId("extId"))
 				.login("user1")
 				.lastName("Doe")
 				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
@@ -335,5 +334,9 @@ public abstract class CommonDomainEndPointEnvTest {
 				.build();
 				
 				
+	}
+
+	protected UserExtId userExtId(String extId) {
+		return UserExtId.builder().extId(extId).build();
 	}
 }

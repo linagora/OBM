@@ -37,22 +37,26 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(SlowFilterRunner.class)
 public class UserIdentifierTest {
+
+	private static final ObmDomainUuid domainUuid = ObmDomainUuid.of("ecdea37f-038e-46d3-9e43-82ec5f6e9bfd");
+
 	@Test
 	public void buildUserIdentifier() {
 		UserExtId extId = UserExtId.builder().extId("1").build();
-		UserIdentifier userIdentifier = UserIdentifier.builder().id(extId).url("/url/").build();
+		UserIdentifier userIdentifier = UserIdentifier.builder().id(extId).domainUuid(domainUuid).build();
 
 		assertThat(userIdentifier.getId()).isEqualTo(extId);
-		assertThat(userIdentifier.getUrl()).isEqualTo("/url/");
+		assertThat(userIdentifier.getUrl()).isEqualTo("/ecdea37f-038e-46d3-9e43-82ec5f6e9bfd/users/1");
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void buildUserIdentifierWithNullId() {
-		UserIdentifier.builder().url("/url/").build();
+		UserIdentifier.builder().domainUuid(domainUuid).build();
 	}
 	
 	@Test(expected=IllegalStateException.class)

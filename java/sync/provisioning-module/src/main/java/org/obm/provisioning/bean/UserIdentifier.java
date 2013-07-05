@@ -34,6 +34,7 @@ package org.obm.provisioning.bean;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class UserIdentifier {
@@ -44,23 +45,23 @@ public class UserIdentifier {
 
 	public static class Builder {
 		private UserExtId id;
-		private String url;
+		private ObmDomainUuid domainUuid;
 
 		public Builder id(UserExtId id) {
 			this.id = id;
 			return this;
 		}
 
-		public Builder url(String url) {
-			this.url = url;
+		public Builder domainUuid(ObmDomainUuid domainUuid) {
+			this.domainUuid = domainUuid;
 			return this;
 		}
 
 		public UserIdentifier build() {
 			Preconditions.checkState(id != null);
-			Preconditions.checkState(url != null);
+			Preconditions.checkState(domainUuid != null);
 			
-			return new UserIdentifier(id, url);
+			return new UserIdentifier(id, "/" + domainUuid.get() + "/users/" + id.getExtId());
 		}
 	}
 	

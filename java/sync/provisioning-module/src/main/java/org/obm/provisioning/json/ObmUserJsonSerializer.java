@@ -85,7 +85,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		mails.addAll(value.getEmailAlias());
 		
 		jgen.writeStartObject();
-		jgen.writeStringField(ID.asSpecificationValue(), value.getExtId().serializeToString());
+		jgen.writeObjectField(ID.asSpecificationValue(), value.getExtId());
 		jgen.writeStringField(LOGIN.asSpecificationValue(), value.getLogin());
 		jgen.writeStringField(LASTNAME.asSpecificationValue(), value.getLastName());
 		jgen.writeStringField(PROFILE.asSpecificationValue(), NOT_IMPLEMENTED_YET);

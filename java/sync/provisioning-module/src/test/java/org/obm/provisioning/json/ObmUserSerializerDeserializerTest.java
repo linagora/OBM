@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.json;
 
-import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -61,8 +60,6 @@ public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTe
 	@Ignore("Not Working yet because injected value(ObmDomain) is wrong.")
 	@Test
 	public void testObmUserDeserializer() throws Exception {
-		userDao.create(fakeUser());
-		expectLastCall().once();
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = post("/tests", obmUserToJson());

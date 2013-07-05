@@ -24,10 +24,10 @@ import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
-import org.obm.provisioning.resources.DomainBasedSubResource;
-import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
+import org.obm.provisioning.resources.DomainBasedSubResource;
+import org.obm.provisioning.resources.DomainResource;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -86,8 +86,8 @@ public class ProvisioningService extends JerseyServletModule {
 				.addSerializer(Operation.class, new OperationJsonSerializer())
 				.addSerializer(Batch.class, new BatchJsonSerializer())
 				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
-				.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer());
-				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer());
+				.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer())
+				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer())
 				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer());
 
 		return new ObjectMapper()

@@ -123,6 +123,7 @@ public class BeansTest {
 			.withPrefabValues(ObmUser.class, 
 					ObmUser.builder()
 						.login("creator")
+						.uid(1)
 						.emailAndAliases("createdBy@obm.org")
 						.domain(ObmDomain.builder()
 							.id(3)
@@ -131,6 +132,7 @@ public class BeansTest {
 						.build(), 
 					ObmUser.builder()
 						.login("updater")
+						.uid(1)
 						.emailAndAliases("updatedBy@obm.org")
 						.domain(ObmDomain.builder()
 							.id(3)

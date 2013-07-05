@@ -34,7 +34,7 @@ package org.obm.provisioning.resources;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -48,11 +48,10 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
-import org.obm.provisioning.bean.UserIdentifier;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableList;
 
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 
@@ -76,7 +75,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUser() throws Exception {
 		expectDomain();
-		expect(userDao.listAll()).andReturn(fakeListOfUserIdentifer());
+		expect(userDao.list(domain)).andReturn(fakeListOfUser());
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
@@ -92,20 +91,21 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUserReturnNothing() throws Exception {
 		expectDomain();
-		expect(userDao.listAll()).andReturn(null);
+		expect(userDao.list(domain)).andReturn(null);
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
 		
 		mocksControl.verify();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo("[]");
 	}
 	
 	@Test
-	public void testListAllUserReturnEmptySet() throws Exception {
+	public void testListAllUserReturnEmptyList() throws Exception {
 		expectDomain();
-		expect(userDao.listAll()).andReturn(fakeEmptySet());
+		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users");
@@ -119,7 +119,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllThrowError() throws Exception {
 		expectDomain();
-		expect(userDao.listAll()).andThrow(new RuntimeException("bad things happen"));
+		expect(userDao.list(domain)).andThrow(new RuntimeException("bad things happen"));
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users/");
@@ -129,21 +129,29 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
-	private Set<UserIdentifier> fakeListOfUserIdentifer() {
-		UserIdentifier userIdentifier1 = UserIdentifier.builder().id(UserExtId.builder().extId("1").build()).url("/users/1").build();
-		UserIdentifier userIdentifier2 = UserIdentifier.builder().id(UserExtId.builder().extId("2").build()).url("/users/2").build();
-
-		return ImmutableSet.of(userIdentifier1, userIdentifier2);
-	}
-	
-	private Set<UserIdentifier> fakeEmptySet() {
-		return Sets.newHashSet();
+	private List<ObmUser> fakeListOfUser() {
+		return ImmutableList.of(fakeUser(1), fakeUser(2));
 	}
 	
 	private String expectedJsonSetOfUser() {
 		return "[" +
-					"{\"id\":\"1\",\"url\":\"/users/1\"}," +
-					"{\"id\":\"2\",\"url\":\"/users/2\"}" +
+					"{\"id\":\"ExtId1\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/users/ExtId1\"}," +
+					"{\"id\":\"ExtId2\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/users/ExtId2\"}" +
 				"]";
+	}
+
+	private ObmUser fakeUser(int id) {
+		return ObmUser
+				.builder()
+				.login("user" + id)
+				.uid(id)
+				.extId(UserExtId.builder().extId("ExtId" + id).build())
+				.lastName("Lastname")
+				.firstName("Firstname")
+				.commonName("")
+				.domain(domain)
+				.emailAndAliases("user" + id)
+				.publicFreeBusy(true)
+				.build();
 	}
 }

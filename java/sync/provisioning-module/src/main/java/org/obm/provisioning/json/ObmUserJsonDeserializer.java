@@ -155,7 +155,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 			// NOT IMPLEMENTED YET
 			break;
 		case ID:
-			builder.extId(new UserExtId(getCurrentTokenTextValue(jsonNode, jsonFields)));
+			builder.extId(UserExtId.builder().extId(getCurrentTokenTextValue(jsonNode, jsonFields)).build());
 			break;
 		case KIND:
 			// NOT IMPLEMENTED YET

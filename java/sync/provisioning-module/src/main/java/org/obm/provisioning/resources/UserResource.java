@@ -31,21 +31,29 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
-import java.util.Set;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.Status;
 
+import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.bean.UserIdentifier;
-import org.obm.provisioning.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class UserResource {
 
@@ -56,15 +64,33 @@ public class UserResource {
 	private ObmDomain domain;
 
 	@GET
-	@Path("/{userId}")
+	@Path("{userExtId}")
 	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser get(@PathParam("userId") int userId) {
-		return userDao.get(userId);
+	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
+		try {
+			return userDao.getByExtId(userExtId, domain);
+		}
+		catch (UserNotFoundException e) {
+			throw new WebApplicationException(Status.NOT_FOUND);
+		}
 	}
-	
+
 	@GET
 	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public Set<UserIdentifier> listAll() {
-		return userDao.listAll();
+	public List<UserIdentifier> listAll() throws SQLException {
+		List<ObmUser> users = userDao.list(domain);
+
+		if (users == null) {
+			return Collections.emptyList();
+		}
+
+		return Lists.transform(users, new Function<ObmUser, UserIdentifier>() {
+
+			@Override
+			public UserIdentifier apply(ObmUser user) {
+				return UserIdentifier.builder().id(user.getExtId()).domainUuid(domain.getUuid()).build();
+			}
+
+		});
 	}
 }

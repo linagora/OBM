@@ -67,6 +67,7 @@ import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckHandler;
 import org.obm.healthcheck.HealthCheckModule;
@@ -125,7 +126,6 @@ import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
-import org.obm.provisioning.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
@@ -556,7 +556,6 @@ public class DependencyResolverHelper {
 				OperationDao.class,
 				OperationDaoJdbcImpl.class,
 				UserDao.class,
-				org.obm.domain.dao.UserDao.class,
 				GroupDao.class,
 				GroupDaoJdbcImpl.class,
 				BatchDao.class,

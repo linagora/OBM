@@ -35,28 +35,18 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
-import org.obm.provisioning.dao.UserDao;
-import org.obm.provisioning.dao.exceptions.DaoException;
-
-import com.google.inject.Inject;
+import org.obm.provisioning.resources.AbstractBatchAwareResource;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 @Path("tests")
 public class ResourceForTest {
-
-	private final static String UTF_8 = ";charset=UTF-8";
-	
-	@Inject
-	private UserDao userDao;
 	
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON + UTF_8)
-	@Produces(MediaType.APPLICATION_JSON + UTF_8)
-	public ObmUser create(ObmUser user) throws DaoException {
-		userDao.create(user);
+	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	public ObmUser create(ObmUser user) {
 		return user;
 	}
 	

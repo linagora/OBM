@@ -54,9 +54,21 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
+	public void testUnknownUrl() throws Exception {
+		expectDomain();
+		mocksControl.replay();
+
+		HttpResponse httpResponse = get("/users/a/b");
+
+		mocksControl.verify();
+
+		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
 	public void testGetAUser() throws Exception {
 		expectDomain();
-		expect(userDao.get(1)).andReturn(fakeUser());
+		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/users/1");
@@ -84,7 +96,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetNonExistingUser() throws Exception {
 		expectDomain();
-		expect(userDao.get(123)).andReturn(null);
+		expect(userDao.getByExtId(userExtId("123"), domain)).andReturn(null);
 		mocksControl.replay();
 
 		HttpResponse httpResponse = get("/users/123");
@@ -97,7 +109,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetUserThrowError() throws Exception {
 		expectDomain();
-		expect(userDao.get(1)).andThrow(new RuntimeException("bad things happen"));
+		expect(userDao.getByExtId(userExtId("1"), domain)).andThrow(new RuntimeException("bad things happen"));
 		mocksControl.replay();
 
 		HttpResponse httpResponse = get("/users/1");
@@ -106,4 +118,5 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
+
 }

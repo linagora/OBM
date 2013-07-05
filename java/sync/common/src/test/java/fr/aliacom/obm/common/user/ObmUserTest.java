@@ -45,7 +45,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @RunWith(SlowFilterRunner.class)
 public class ObmUserTest {
 	
-	private static final UserExtId userExtId = new UserExtId("extId");
+	private static final UserExtId userExtId = UserExtId.builder().extId("extId").build();
 
 	@Test(expected=IllegalStateException.class)
 	public void testLoginPrecondition() {
