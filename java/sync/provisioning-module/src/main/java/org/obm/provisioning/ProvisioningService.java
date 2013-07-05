@@ -4,7 +4,6 @@ package org.obm.provisioning;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
-import org.codehaus.jackson.map.InjectableValues;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
@@ -102,8 +101,7 @@ public class ProvisioningService extends JerseyServletModule {
 		return new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)
 				.configure(Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-				.withModule(module)
-				.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, ObmDomain.builder().build()));
+				.withModule(module);
 				
 	}
 

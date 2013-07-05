@@ -105,6 +105,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(ResourceForTest.class);
 					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
+					bind(DomainBasedSubResourceForTest.class);
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
@@ -320,7 +321,6 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected ObmUser fakeUser() {
 		return ObmUser.builder()
 				.domain(domain)
-				.uid(1)
 				.extId(userExtId("extId"))
 				.login("user1")
 				.lastName("Doe")
@@ -344,7 +344,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				//.faxes()					// Not implemented yet in ObmUser
 				//.mail_quota()				// Not implemented yet in ObmUser
 				//.mail_server()			// Not implemented yet in ObmUser
-				.emailAndAliases("john")
+				.emailAndAliases("john@domain")
 				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
 				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
 				//.groups()					// Not implemented yet in ObmUser

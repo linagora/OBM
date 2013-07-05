@@ -33,18 +33,12 @@ package org.obm.provisioning.json;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.io.IOException;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -57,12 +51,12 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	
-	@Ignore("Not Working yet because injected value(ObmDomain) is wrong.")
 	@Test
 	public void testObmUserDeserializer() throws Exception {
+		expectDomain();
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/tests", obmUserToJson());
+		HttpResponse httpResponse = post("/tests/serialization", obmUserToJson());
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -70,14 +64,5 @@ public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTe
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
-	}
-	
-	@Override
-	protected HttpResponse post(String path, StringEntity content) throws ClientProtocolException, IOException {
-		return createPostForTestingRequest(path, content).execute().returnResponse();
-	}
-	
-	private Request createPostForTestingRequest(String path, StringEntity content) {
-		return Request.Post(baseUrl + path).body(content);
 	}
 }

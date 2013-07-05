@@ -33,15 +33,18 @@ package org.obm.provisioning;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@Path("tests")
 public class ResourceForTest {
+
+	@Context
+	ObmDomain domain;
 	
 	@POST
 	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
