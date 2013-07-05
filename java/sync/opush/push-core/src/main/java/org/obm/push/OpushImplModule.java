@@ -33,6 +33,7 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
@@ -40,6 +41,7 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PolicyConfigurationService;
 import org.obm.push.backend.PolicyConfigurationServiceFileImpl;
 import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.configuration.OpushConfigurationModule;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ClientIdServiceImpl;
 import org.obm.push.impl.CollectionPathHelper;
@@ -91,19 +93,22 @@ public class OpushImplModule extends AbstractModule {
 	 * Opush must accepts only one requests per client to prevent lock timeout on same resources
 	 */
 	private static final int MAX_REQUESTS_PER_CLIENT = 1;
-	private static final String APPLICATION_NAME = "opush";
 	private static final String APPLICATION_ORIGIN = "o-push";
+	private GlobalAppConfiguration globalAppConfiguration;
 	
+	public OpushImplModule(GlobalAppConfiguration globalAppConfiguration) {
+		this.globalAppConfiguration = globalAppConfiguration;
+	}
 
 	@Override
 	protected void configure() {
+		install(new ConfigurationModule(globalAppConfiguration));
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
 		install(new DaoModule());
 		install(qosModule());
 		install(new OpushServletModule());
-		install(new ConfigurationModule());
-		install(new org.obm.push.configuration.ConfigurationModule());
+		install(new OpushConfigurationModule());
 		bind(BackendWindowingService.class).to(BackendWindowingServiceImpl.class);
 		bind(IHierarchyExporter.class).to(HierarchyExporter.class);
 		bind(IContentsExporter.class).to(ContentsExporter.class);
@@ -113,7 +118,6 @@ public class OpushImplModule extends AbstractModule {
 		bind(PushPublishAndSubscribe.Factory.class).to(PushPublishAndSubscribeImpl.Factory.class);
 		bind(MappingService.class).to(MappingServiceImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
-		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(TimeZoneEncoder.class).to(TimeZoneEncoderImpl.class);
 		bind(TimeZoneConverter.class).to(TimeZoneConverterImpl.class);
 		bind(Base64ASTimeZoneDecoder.class).to(Base64ASTimeZoneDecoderImpl.class);

@@ -78,7 +78,7 @@
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
 			<type>test-jar</type>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>

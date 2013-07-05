@@ -33,7 +33,6 @@ package org.obm.opush.env;
 
 import org.easymock.IMocksControl;
 import org.obm.Configuration;
-import org.obm.ConfigurationModule;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.guice.AbstractOverrideModule;
@@ -54,7 +53,6 @@ public final class OpushConfigurationModule extends AbstractOverrideModule {
 	
 	@Override
 	protected void configureImpl() {
-		install(new ConfigurationModule(configuration));
 		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
 		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));

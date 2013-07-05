@@ -45,18 +45,14 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 public class IniFile {
 
-	@Singleton
 	public static class Factory {
 
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		
-		@Inject
-		protected Factory() {
+		public Factory() {
 			super();
 		}
 		

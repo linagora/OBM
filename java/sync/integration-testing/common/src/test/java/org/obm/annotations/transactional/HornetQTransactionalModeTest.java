@@ -44,6 +44,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.TestConfigurationModule;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -68,9 +70,10 @@ public class HornetQTransactionalModeTest {
 		
 		@Override
 		protected void configure() {
+			TransactionConfiguration transactionConfiguration = new TestTransactionConfiguration();
 			install(new TransactionalModule());
+			install(new TestConfigurationModule(transactionConfiguration));
 			install(messageQueueModule);
-			install(new TestConfigurationModule());
 		}
 	}
 	

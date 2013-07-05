@@ -37,13 +37,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationFactoryFileImpl;
 import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
@@ -62,6 +58,7 @@ import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener{
 
+	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
 	private static final String APPLICATION_NAME = "obm-autoconf";
 
 	@Override
@@ -76,8 +73,10 @@ public class GuiceServletContextListener implements ServletContextListener{
             failStartup(e.getMessage());
         }   
     }
-    
+
+	
 	private Injector createInjector() {
+		final GlobalAppConfiguration globalConfiguration = new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
@@ -86,12 +85,9 @@ public class GuiceServletContextListener implements ServletContextListener{
             			serve("/autoconfiguration/*").with(AutoconfService.class);
             		}
             	});
-            	install(new ConfigurationModule());
-            	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
+            	install(new ConfigurationModule(globalConfiguration));
             	bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
             	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-            	bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-            	bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
             	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
             	bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             }

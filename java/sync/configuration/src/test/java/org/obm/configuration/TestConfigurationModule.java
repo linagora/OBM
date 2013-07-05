@@ -42,9 +42,15 @@ import com.google.inject.name.Names;
 
 public class TestConfigurationModule extends AbstractModule {
 	
+	private final TransactionConfiguration transactionConfiguration;
+
+	public TestConfigurationModule(TransactionConfiguration transactionConfiguration) {
+		this.transactionConfiguration = transactionConfiguration;
+	}
+	
 	@Override
 	protected void configure() {
-		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
 		Logger logger = createNiceMock(Logger.class);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(logger);
 	}

@@ -38,13 +38,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationFactoryFileImpl;
 import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
@@ -64,6 +60,8 @@ import com.google.inject.spi.Message;
 public class GuiceServletContextListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
+
+	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
 	private static final String APPLICATION_NAME = "obm-locator";
 
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -82,20 +80,18 @@ public class GuiceServletContextListener implements ServletContextListener {
 	}
 
 	private Injector createInjector() {
+		final GlobalAppConfiguration globalConfiguration = new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
 		return Guice.createInjector(new AbstractModule() {
 
 			@Override
 			protected void configure() {
-				bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-				bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
+				install(new ConfigurationModule(globalConfiguration));
 				bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-				bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 				bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 				bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 				bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 				install(new TransactionalModule());
 				install(new LocatorServletModule());
-				install(new ConfigurationModule());
 			}
 		});
 	}

@@ -29,24 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.push.configuration;
+
+import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.impl.OpushSyncPermsConfigurationService;
 
 import com.google.inject.AbstractModule;
 
-public class ConfigurationModule extends AbstractModule {
+public class OpushConfigurationModule extends AbstractModule {
 	
-	private final GlobalAppConfiguration globalAppConfiguration;
-
-	public ConfigurationModule(GlobalAppConfiguration globalAppConfiguration) {
-		super();
-		this.globalAppConfiguration = globalAppConfiguration;
-	}
-
 	@Override
 	protected void configure() {
-		bind(ConfigurationService.class).toInstance(globalAppConfiguration.getConfigurationService());
-		bind(DatabaseConfiguration.class).toInstance(globalAppConfiguration.getDatabaseConfiguration());
-		bind(TransactionConfiguration.class).toInstance(globalAppConfiguration.getTransactionConfiguration());
+		bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
+		bind(RemoteConsoleConfiguration.class).to(RemoteConsoleConfigurationFileImpl.class);
 	}
-	
+
 }

@@ -46,6 +46,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.LifecycleListener;
@@ -68,11 +69,12 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 	@Inject DOMUtils domUtils;
 	
+	protected abstract GlobalAppConfiguration globalConfiguration();
 	protected abstract Module overrideModule() throws Exception;
 	protected abstract void onModuleInstalled();
 	
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(new OpushModule(), new PendingQueryFilterModule());
+		OverriddenModuleBuilder override = Modules.override(new OpushModule(globalConfiguration()), new PendingQueryFilterModule());
 		try {
 			install(override.with(overrideModule()));
 			onModuleInstalled();

@@ -42,22 +42,24 @@ public final class ConfigurationModule extends AbstractModule {
 
 	public interface PolicyConfigurationProvider extends Provider<String> {}
 	
-	private final Configuration configuration;
-	private final Class<? extends TransactionConfiguration> transactionConfigurationImpl;
+	private final TransactionConfiguration transactionConfiguration;
+	private final ConfigurationService configurationService;
 
 	public ConfigurationModule(Configuration configuration) {
-		this(configuration, DefaultTransactionConfiguration.class);
+		this.configurationService = new StaticConfigurationService(configuration);
+		this.transactionConfiguration = new DefaultTransactionConfiguration.Factory()
+			.create(configuration.applicationName, configurationService);
 	}
 	
-	public ConfigurationModule(Configuration configuration, Class<? extends TransactionConfiguration> transactionConfigurationImpl) {
-		this.configuration = configuration;
-		this.transactionConfigurationImpl = transactionConfigurationImpl;
+	public ConfigurationModule(Configuration configuration, TransactionConfiguration transactionConfiguration) {
+		this.configurationService = new StaticConfigurationService(configuration);
+		this.transactionConfiguration= transactionConfiguration;
 	}
 	
 	@Override
 	protected void configure() {
-		bind(TransactionConfiguration.class).to(transactionConfigurationImpl);
-		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
+		bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
+		bind(ConfigurationService.class).toInstance(configurationService);
 	}
 	
 }

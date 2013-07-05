@@ -98,5 +98,6 @@ public class Configuration {
 	public Charset defautEncoding = Charsets.UTF_8;
 	public int trustTokenTimeoutInSeconds = 10;
 	public int solrCheckingInterval = 10;
+	public String applicationName = "opush";
 
 }

@@ -35,11 +35,7 @@ package org.obm.configuration;
 import org.obm.push.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
-@Singleton
 public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 
     private static final String DB_TYPE_KEY = "dbtype";
@@ -53,9 +49,22 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 	private IniFile iniFile;
 
-    @Inject
-    DatabaseConfigurationImpl(IniFile.Factory iniFileFactory, @Named("globalConfigurationFile") String globalConfigurationFile) {
-        iniFile = iniFileFactory.build(globalConfigurationFile);
+	public static class Factory {
+		
+		protected IniFile.Factory iniFileFactory;
+
+		public Factory() {
+			iniFileFactory = new IniFile.Factory();
+		}
+		
+		public DatabaseConfigurationImpl create(String globalConfigurationFile) {
+			return new DatabaseConfigurationImpl(iniFileFactory.build(globalConfigurationFile));
+		}
+	}
+	
+    @VisibleForTesting
+    DatabaseConfigurationImpl(IniFile globalConfigurationIniFile) {
+        iniFile = globalConfigurationIniFile;
     }
 
     @Override

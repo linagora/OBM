@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,28 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.configuration;
+package org.obm.configuration;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.configuration.TransactionConfiguration;
-import org.obm.push.impl.OpushSyncPermsConfigurationService;
+public class GlobalAppConfiguration {
 
-import com.google.inject.AbstractModule;
+	private final ConfigurationService configurationService;
+	private final DatabaseConfiguration databaseConfiguration;
+	private final TransactionConfiguration transactionConfiguration;
 
-public class ConfigurationModule extends AbstractModule {
-	
-	@Override
-	protected void configure() {
-		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
-		bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
-		bind(RemoteConsoleConfiguration.class).to(RemoteConsoleConfigurationFileImpl.class);
+	public GlobalAppConfiguration(ConfigurationService configurationService, 
+			DatabaseConfiguration databaseConfiguration, 
+			TransactionConfiguration transactionConfiguration) {
+				this.configurationService = configurationService;
+				this.databaseConfiguration = databaseConfiguration;
+				this.transactionConfiguration = transactionConfiguration;
 	}
 
+	public ConfigurationService getConfigurationService() {
+		return configurationService;
+	}
+	
+	public DatabaseConfiguration getDatabaseConfiguration() {
+		return databaseConfiguration;
+	}
+	
+	public TransactionConfiguration getTransactionConfiguration() {
+		return transactionConfiguration;
+	}
+	
 }

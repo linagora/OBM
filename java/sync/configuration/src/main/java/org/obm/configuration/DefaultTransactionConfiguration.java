@@ -33,18 +33,26 @@ package org.obm.configuration;
 
 import java.io.File;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import com.google.common.annotations.VisibleForTesting;
 
-@Singleton
 public class DefaultTransactionConfiguration implements TransactionConfiguration {
+	
+	public static class Factory {
+		
+		public Factory() {
+			super();
+		}
+		
+		public DefaultTransactionConfiguration create(String applicationName, ConfigurationService configurationService) {
+			return new DefaultTransactionConfiguration(applicationName, configurationService);
+		}
+	}
 
 	private final String applicationName;
 	private final ConfigurationService configurationService;
-
-	@Inject
-	private DefaultTransactionConfiguration(final @Named("application-name")String applicationName, ConfigurationService configurationService) {
+	
+	@VisibleForTesting
+	DefaultTransactionConfiguration(String applicationName, ConfigurationService configurationService) {
 		this.applicationName = applicationName;
 		this.configurationService = configurationService;
 	}

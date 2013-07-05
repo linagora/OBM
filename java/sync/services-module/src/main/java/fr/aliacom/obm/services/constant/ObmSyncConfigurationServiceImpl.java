@@ -39,16 +39,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
-/**
- * Configuration service
- */
-@Singleton
 public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl implements ObmSyncConfigurationService {
 
 	private static final String DEFAULT_TEMPLATE_FOLDER = "/usr/share/obm-sync/resources";
@@ -63,11 +56,22 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	private static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	public static class Factory extends ConfigurationServiceImpl.Factory {
+		
+		public Factory() {
+			super();
+		}
+		
+		@Override
+		public ObmSyncConfigurationServiceImpl create(String globalConfigurationFile, String applicationName) {
+			return new ObmSyncConfigurationServiceImpl(iniFileFactory.build(globalConfigurationFile), applicationName);
+		}
+	}
 	
-	@Inject
 	@VisibleForTesting
-	ObmSyncConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, @Named("globalConfigurationFile") String globalConfigurationFile) {
-		super(iniFileFactory, applicationName, globalConfigurationFile);
+	ObmSyncConfigurationServiceImpl(IniFile globalConfigurationIniFile, String applicationName) {
+		super(globalConfigurationIniFile, applicationName);
 	}
 
 	@Override

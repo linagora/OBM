@@ -32,7 +32,9 @@
 package org.obm.sync;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.ConfigurationFactoryFileImpl;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 
@@ -40,10 +42,14 @@ import com.google.inject.AbstractModule;
 
 public class ObmSyncModule extends AbstractModule {
 
+	private static final String APPLICATION_NAME = "sync";
+	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
+	
 	@Override
 	protected void configure() {
+		final GlobalAppConfiguration globalConfiguration = new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		install(new ConfigurationModule(globalConfiguration));
 		install(new ObmSyncServletModule());
-		install(new ConfigurationModule());
 		install(new ObmSyncServicesModule());
 		install(new MessageQueueModule());
 		install(new TransactionalModule());

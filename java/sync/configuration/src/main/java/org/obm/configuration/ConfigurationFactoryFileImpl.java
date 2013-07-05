@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,22 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import com.google.inject.AbstractModule;
+public class ConfigurationFactoryFileImpl {
 
-public class ConfigurationModule extends AbstractModule {
-	
-	private final GlobalAppConfiguration globalAppConfiguration;
-
-	public ConfigurationModule(GlobalAppConfiguration globalAppConfiguration) {
-		super();
-		this.globalAppConfiguration = globalAppConfiguration;
-	}
-
-	@Override
-	protected void configure() {
-		bind(ConfigurationService.class).toInstance(globalAppConfiguration.getConfigurationService());
-		bind(DatabaseConfiguration.class).toInstance(globalAppConfiguration.getDatabaseConfiguration());
-		bind(TransactionConfiguration.class).toInstance(globalAppConfiguration.getTransactionConfiguration());
+	public GlobalAppConfiguration buildConfiguration(String globalConfigurationFile, String applicationName) {
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(globalConfigurationFile, applicationName);
+		return new GlobalAppConfiguration(
+				configurationService,
+				new DatabaseConfigurationImpl.Factory().create(globalConfigurationFile),
+				new DefaultTransactionConfiguration.Factory().create(applicationName, configurationService));
 	}
 	
 }

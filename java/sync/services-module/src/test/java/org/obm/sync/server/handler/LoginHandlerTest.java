@@ -310,8 +310,8 @@ public class LoginHandlerTest {
 			bindMock(ObmSmtpConf.class);
 			bindMock(ITemplateLoader.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
-			bind(ObmSyncConfigurationService.class).to(ObmSyncConfigurationServiceImpl.class);
-			
+			bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync"));
+		 	
 			expect(domainService.findDomainByName(isA(String.class))).andAnswer(new IAnswer<ObmDomain>() {
 				@Override
 				public ObmDomain answer() throws Throwable {

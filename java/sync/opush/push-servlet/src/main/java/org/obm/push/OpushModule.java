@@ -30,6 +30,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
+import org.obm.configuration.ConfigurationFactoryFileImpl;
+import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
@@ -46,12 +48,24 @@ import com.google.inject.name.Names;
 public class OpushModule extends AbstractModule {
 
 	private final static String JAVA_MAIL_MODULE = "javaMail";
+	private static final String APPLICATION_NAME = "opush";
+	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
+
 	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
+	private GlobalAppConfiguration globalConfiguration;
+	
+	public OpushModule() {
+		this(new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME));
+	}
+	
+	public OpushModule(GlobalAppConfiguration globalConfiguration) {
+		this.globalConfiguration = globalConfiguration;
+	}
 	
 	@Override
 	protected void configure() {
 		installImapModule();
-		install(new OpushImplModule());
+		install(new OpushImplModule(globalConfiguration));
 		install(new OpushMailModule());
 		install(new ObmBackendModule());
 		install(new LoggerModule());

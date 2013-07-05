@@ -41,14 +41,11 @@ import javax.naming.ConfigurationException;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.push.utils.IniFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
-@Singleton
 public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
@@ -80,15 +77,27 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private static final String GLOBAL_DOMAIN = "global.virt";
 
+	public static class Factory {
+		
+		protected IniFile.Factory iniFileFactory;
+
+		public Factory() {
+			iniFileFactory = new IniFile.Factory();
+		}
+		
+		public ConfigurationServiceImpl create(String globalConfigurationFile, String applicationName) {
+			return new ConfigurationServiceImpl(iniFileFactory.build(globalConfigurationFile), applicationName);
+		}
+	}
+	
 	private final ImmutableMap<String, TimeUnit> timeUnits;
 
 	private final String applicationName;
 	protected final IniFile iniFile;
 
-    @Inject
-	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, 
-			@Named("globalConfigurationFile") String globalConfigurationFile) {
-		this.iniFile = iniFileFactory.build(globalConfigurationFile);
+	@VisibleForTesting 
+	protected ConfigurationServiceImpl(IniFile globalConfigurationIniFile, String applicationName) {
+		this.iniFile = globalConfigurationIniFile;
 		this.applicationName = applicationName;
 		this.timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
 								"seconds", TimeUnit.SECONDS,

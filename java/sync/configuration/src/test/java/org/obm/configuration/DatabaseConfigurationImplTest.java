@@ -32,7 +32,6 @@
 
 package org.obm.configuration;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
@@ -41,7 +40,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.utils.IniFile;
-import org.obm.push.utils.IniFile.Factory;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,10 +52,8 @@ public class DatabaseConfigurationImplTest {
 		IMocksControl control = createControl();
 		IniFile iniFile = control.createMock(IniFile.class);
 		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
-		Factory factory = control.createMock(IniFile.Factory.class);
-		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		control.replay();
-		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory, "fakeFilePath");
+		databaseConfigurationImpl = new DatabaseConfigurationImpl(iniFile);
 	}
 	
     @Test

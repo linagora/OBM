@@ -41,7 +41,12 @@ import org.easymock.IMocksControl;
 import org.obm.Configuration;
 import org.obm.DateUtils;
 import org.obm.StaticConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
@@ -63,13 +68,15 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ClassToInstanceAgregateView<Object> mockMap;
 	private final IMocksControl mocksControl;
-	private Configuration configuration;
+	private final Configuration configuration;
+	private final TransactionConfiguration transactionConfiguration;
 	
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
 		mocksControl = createControl();
 		configuration = new Configuration();
 		configuration.dataDir = Files.createTempDir();
+		transactionConfiguration = new TestTransactionConfiguration();
 	}
 
 	@Provides
@@ -117,6 +124,56 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 		return new DaoModule(mocksControl);
 	}
 
+	@Override
+	protected GlobalAppConfiguration globalConfiguration() {
+		return new GlobalAppConfiguration(new StaticConfigurationService(configuration), databaseConfiguration(), transactionConfiguration);
+	}
+	
+	protected DatabaseConfiguration databaseConfiguration() {
+		return new DatabaseConfiguration() {
+
+			@Override
+			public boolean isPostgresSSLNonValidating() {
+				return false;
+			}
+
+			@Override
+			public boolean isPostgresSSLEnabled() {
+				return false;
+			}
+
+			@Override
+			public DatabaseFlavour getDatabaseSystem() {
+				return null;
+			}
+
+			@Override
+			public String getDatabasePassword() {
+				return null;
+			}
+
+			@Override
+			public String getDatabaseName() {
+				return null;
+			}
+
+			@Override
+			public Integer getDatabaseMaxConnectionPoolSize() {
+				return null;
+			}
+
+			@Override
+			public String getDatabaseLogin() {
+				return null;
+			}
+
+			@Override
+			public String getDatabaseHost() {
+				return null;
+			}
+		};
+	}
+	
 	protected OpushConfigurationModule configuration() {
 		return new OpushConfigurationModule(configuration, mocksControl);
 	}

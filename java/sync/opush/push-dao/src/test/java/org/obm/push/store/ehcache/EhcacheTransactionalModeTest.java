@@ -53,6 +53,8 @@ import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -72,8 +74,9 @@ public class EhcacheTransactionalModeTest {
 	public static class Module extends AbstractModule {
 		@Override
 		protected void configure() {
+			TransactionConfiguration transactionConfiguration = new TestTransactionConfiguration();
 			install(new TransactionalModule());
-			install(new TestConfigurationModule());
+			install(new TestConfigurationModule(transactionConfiguration));
 		}
 	}
 

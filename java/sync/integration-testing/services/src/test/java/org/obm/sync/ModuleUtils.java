@@ -76,7 +76,7 @@ public class ModuleUtils {
 						FileUtils.deleteDirectory(configuration.dataDir);						
 					}
 				});
-				install(new ConfigurationModule(configuration, TestTransactionConfiguration.class));
+				install(new ConfigurationModule(configuration, new TestTransactionConfiguration()));
 				bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
 				bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncStaticConfigurationService.
