@@ -37,6 +37,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 import com.google.common.collect.Iterables;
@@ -143,4 +145,13 @@ public class DateUtils {
 	public static boolean isValidTimeZoneIdentifier(String tzId) {
 		return Iterables.contains(Arrays.asList(TimeZone.getAvailableIDs()), tzId);
 	}
+
+	public static Date date(String dateAsString) {
+		return new DateTime(dateAsString).toDate();
+	}
+
+	public static Date dateUTC(String dateAsString) {
+		return new DateTime(dateAsString, DateTimeZone.UTC).toDate();
+	}
+
 }

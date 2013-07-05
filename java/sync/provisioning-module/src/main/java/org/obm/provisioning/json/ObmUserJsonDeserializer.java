@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.json;
 
-import static org.obm.DateUtils.date;
 import static org.obm.provisioning.bean.UserJsonFields.ADDRESSES;
 import static org.obm.provisioning.bean.UserJsonFields.BUSINESS_ZIPCODE;
 import static org.obm.provisioning.bean.UserJsonFields.COMMONNAME;
@@ -58,6 +57,7 @@ import static org.obm.provisioning.bean.UserJsonFields.TIMEUPDATE;
 import static org.obm.provisioning.bean.UserJsonFields.TITLE;
 import static org.obm.provisioning.bean.UserJsonFields.TOWN;
 import static org.obm.provisioning.bean.UserJsonFields.ZIPCODE;
+import static org.obm.push.utils.DateUtils.date;
 
 import java.io.IOException;
 import java.util.Collection;

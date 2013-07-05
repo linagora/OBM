@@ -36,6 +36,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -187,5 +188,82 @@ public class DateUtilsTest {
 	@Test
 	public void testIsValidTimeZoneIdentifierWithAmericaGuadeloupe() {
 		assertThat(DateUtils.isValidTimeZoneIdentifier("America/Guadeloupe")).isTrue();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testDateWithEmptyString() {
+		DateUtils.date("");
+	}
+
+	@Test
+	public void testDateWithNull() {
+		Date before = new Date();
+
+		assertThat(DateUtils.date(null)).isAfterOrEqualsTo(before);
+	}
+
+	@Test
+	public void testDate() {
+		assertThat(DateUtils.date("2013-07-05T12:13:14")).isEqualTo(new GregorianCalendar(2013, 6, 5, 12, 13, 14).getTime());
+	}
+
+	@Test
+	public void testDateWithZSuffix() {
+		GregorianCalendar calendar = new GregorianCalendar(2013, 6, 5, 14, 13, 14);
+
+		calendar.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+		assertThat(DateUtils.date("2013-07-05T12:13:14Z")).isEqualTo(calendar.getTime());
+	}
+
+	@Test
+	public void testDateWithNoSeconds() {
+		assertThat(DateUtils.date("2013-07-05T12:13")).isEqualTo(new GregorianCalendar(2013, 6, 5, 12, 13, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithNoMinutes() {
+		assertThat(DateUtils.date("2013-07-05T12")).isEqualTo(new GregorianCalendar(2013, 6, 5, 12, 0, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithNoTime() {
+		assertThat(DateUtils.date("2013-07-05")).isEqualTo(new GregorianCalendar(2013, 6, 5, 0, 0, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithYearMonth() {
+		assertThat(DateUtils.date("2013-07")).isEqualTo(new GregorianCalendar(2013, 6, 1, 0, 0, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithYear() {
+		assertThat(DateUtils.date("2013")).isEqualTo(new GregorianCalendar(2013, 0, 1, 0, 0, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithTimeOffset() {
+		assertThat(DateUtils.date("2013-07-05T12:00:00+0400")).isEqualTo(new GregorianCalendar(2013, 6, 5, 10, 0, 0).getTime());
+	}
+
+	@Test
+	public void testDateWithNegativeTimeOffset() {
+		assertThat(DateUtils.date("2013-07-05T12:00:00-0400")).isEqualTo(new GregorianCalendar(2013, 6, 5, 18, 0, 0).getTime());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testDateUTCWithEmptyString() {
+		DateUtils.dateUTC("");
+	}
+
+	@Test
+	public void testDateUTCWithNull() {
+		Date before = new Date();
+
+		assertThat(DateUtils.dateUTC(null)).isAfterOrEqualsTo(before);
+	}
+
+	@Test
+	public void testDateUTC() {
+		assertThat(DateUtils.dateUTC("2013-07-05T12:13:14")).isEqualTo(new GregorianCalendar(2013, 6, 5, 14, 13, 14).getTime());
 	}
 }
