@@ -9,8 +9,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProvisioningService;
-import org.obm.provisioning.beans.ProfileId;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.slf4j.Logger;

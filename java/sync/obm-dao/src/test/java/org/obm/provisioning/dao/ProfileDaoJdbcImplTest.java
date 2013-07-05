@@ -13,9 +13,9 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.ProfileId;
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 
 import com.google.inject.AbstractModule;

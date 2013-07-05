@@ -34,9 +34,9 @@ package org.obm.provisioning.dao;
 
 import java.util.Set;
 
+import org.obm.provisioning.ProfileId;
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 

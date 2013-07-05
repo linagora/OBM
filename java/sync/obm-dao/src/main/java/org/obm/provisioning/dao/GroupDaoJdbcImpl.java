@@ -39,8 +39,8 @@ import java.sql.SQLException;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
-import org.obm.provisioning.beans.Group;
-import org.obm.provisioning.beans.GroupExtId;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;

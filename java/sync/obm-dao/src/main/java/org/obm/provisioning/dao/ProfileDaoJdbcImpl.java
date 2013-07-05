@@ -39,9 +39,9 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.provisioning.ProfileId;
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.beans.ProfileId;
-import org.obm.provisioning.beans.ProfileName;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.push.utils.JDBCUtils;

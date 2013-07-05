@@ -1,4 +1,4 @@
-package org.obm.provisioning.beans;
+package org.obm.provisioning;
 
 import java.util.Set;
 

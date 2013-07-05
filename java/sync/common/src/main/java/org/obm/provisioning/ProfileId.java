@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning.beans;
+package org.obm.provisioning;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;

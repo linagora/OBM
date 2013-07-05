@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,55 +30,24 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning.beans;
+package org.obm.provisioning;
 
-import com.google.common.base.Objects;
 
-public class ProfileName {
+/**
+ * Represents a group external id
+ */
+public class GroupExtId {
+	private String id;
 
-	public static Builder builder() {
-		return new Builder();
-	}
-	public static class Builder {
-		
-		private String name;
-
-		private Builder() {
-			super();
-		}
-		
-		public Builder name(String name) {
-			this.name = name;
-			return this;
-		}
-		
-		public ProfileName build() {
-			return new ProfileName(name);
-		}
-		
-	}
-	
-	private final String name;
-
-	private ProfileName(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
+	public static GroupExtId of(String id) {
+		return new GroupExtId(id);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(name);
+	private GroupExtId(String id) {
+		this.id = id;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ProfileName) {
-			ProfileName other = (ProfileName) obj;
-			return Objects.equal(name, other.name);
-		}		
-		return false;
+	public String getId() {
+		return id;
 	}
 }

@@ -32,7 +32,7 @@
 
 package org.obm.provisioning.dao.exceptions;
 
-import org.obm.provisioning.beans.GroupExtId;
+import org.obm.provisioning.GroupExtId;
 
 public class GroupNotFoundException extends Exception {
 
