@@ -53,9 +53,11 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.ProfileName;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.host.ObmHost;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.base.Joiner;
@@ -301,6 +303,36 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_lastname")).andReturn("lastname2");
 		expect(rs.getString("userobm_commonname")).andReturn("commonname");
 		expect(rs.getInt("userentity_entity_id")).andReturn(6);
+		expect(rs.getString("userobm_password")).andReturn("password");
+		expect(rs.getString("userobm_perms")).andReturn("user");
+		expect(rs.getString("userobm_kind")).andReturn(null);
+		expect(rs.getString("userobm_title")).andReturn(null);
+		expect(rs.getString("userobm_description")).andReturn(null);
+		expect(rs.getString("userobm_company")).andReturn(null);
+		expect(rs.getString("userobm_service")).andReturn(null);
+		expect(rs.getString("userobm_direction")).andReturn(null);
+		expect(rs.getString("userobm_address1")).andReturn(null);
+		expect(rs.getString("userobm_address2")).andReturn(null);
+		expect(rs.getString("userobm_address3")).andReturn(null);
+		expect(rs.getString("userobm_phone")).andReturn(null);
+		expect(rs.getString("userobm_phone2")).andReturn(null);
+		expect(rs.getString("userobm_mobile")).andReturn(null);
+		expect(rs.getString("userobm_fax")).andReturn(null);
+		expect(rs.getString("userobm_fax2")).andReturn(null);
+		expect(rs.getString("userobm_town")).andReturn(null);
+		expect(rs.getString("userobm_zipcode")).andReturn(null);
+		expect(rs.getString("userobm_expresspostal")).andReturn(null);
+		expect(rs.getString("userobm_country_iso3166")).andReturn("0");
+		expect(rs.getInt("userobm_mail_quota")).andReturn(100);
+		expect(rs.wasNull()).andReturn(false);
+		expect(rs.getInt("userobm_mail_server_id")).andReturn(1);
+		expect(rs.getString("host_name")).andReturn("host");
+		expect(rs.getString("host_ip")).andReturn("ip");
+		expect(rs.getString("host_fqdn")).andReturn("fqdn");
+		expect(rs.getTimestamp("userobm_timecreate")).andReturn(null);
+		expect(rs.getTimestamp("userobm_timeupdate")).andReturn(null);
+		expect(rs.getInt("userobm_userupdate")).andReturn(0);
+		expect(rs.getInt("userobm_usercreate")).andReturn(0);
 		
 		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
 
@@ -319,6 +351,18 @@ public class UserDaoTest {
 			.commonName("commonname")
 			.extId(UserExtId.builder().extId("extid").build())
 			.publicFreeBusy(true)
+			.password("password")
+			.mailQuota(100)
+			.profileName(ProfileName.builder().name("user").build())
+			.countryCode("0")
+			.mailHost(ObmHost
+					.builder()
+					.id(1)
+					.name("host")
+					.ip("ip")
+					.fqdn("fqdn")
+					.domainId(domain.getId())
+					.build())
 			.build();
 		
 		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);

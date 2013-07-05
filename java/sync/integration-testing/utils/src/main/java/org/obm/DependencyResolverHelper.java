@@ -271,6 +271,7 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.obm.sync.exception.ObmUserNotFoundException;
+import org.obm.sync.host.ObmHost;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.AddressBookChanges;
@@ -860,6 +861,7 @@ public class DependencyResolverHelper {
 	
 	public static Class<?>[] projectCommonClasses() {
 		return new Class<?>[] {
+				ObmHost.class,
 				UserExtId.class,
 				ObmDomain.class,
 				ObmDomainUuid.class,

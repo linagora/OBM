@@ -71,4 +71,9 @@ public class ObmDomainUuid implements Serializable {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return uuid;
+	}
+
 }

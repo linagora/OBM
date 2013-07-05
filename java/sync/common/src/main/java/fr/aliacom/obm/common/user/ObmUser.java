@@ -35,6 +35,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.obm.provisioning.ProfileName;
+import org.obm.sync.host.ObmHost;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Function;
@@ -74,13 +76,10 @@ public class ObmUser {
 		private String address3;
 
 		private String expresspostal;
-		private String homePhone;
 		private String mobile;
 		private String service;
 		private String title;
 		private String town;
-		private String workFax;
-		private String workPhone;
 		private String zipCode;
 		private String description;
 
@@ -91,6 +90,19 @@ public class ObmUser {
 
 		private ObmDomain domain;
 		private boolean publicFreeBusy;
+
+		private String password;
+		private ProfileName profileName;
+		private String kind;
+		private String company;
+		private String direction;
+		private String countryCode;
+		private String phone;
+		private String phone2;
+		private String fax;
+		private String fax2;
+		private int mailQuota;
+		private ObmHost mailHost;
 		
 		private Builder() {
 			super();
@@ -140,10 +152,6 @@ public class ObmUser {
 			this.expresspostal = expresspostal;
 			return this;
 		}
-		public Builder homePhone(String homePhone) {
-			this.homePhone = homePhone;
-			return this;
-		}
 		public Builder mobile(String mobile) {
 			this.mobile = mobile;
 			return this;
@@ -158,14 +166,6 @@ public class ObmUser {
 		}
 		public Builder town(String town) {
 			this.town = town;
-			return this;
-		}
-		public Builder workFax(String workFax) {
-			this.workFax = workFax;
-			return this;
-		}
-		public Builder workPhone(String workPhone) {
-			this.workPhone = workPhone;
 			return this;
 		}
 		public Builder zipCode(String zipCode) {
@@ -200,7 +200,54 @@ public class ObmUser {
 			this.publicFreeBusy = publicFreeBusy;
 			return this;
 		}
-
+		public Builder profileName(ProfileName profileName) {
+			this.profileName = profileName;
+			return this;
+		}
+		public Builder kind(String kind) {
+			this.kind = kind;
+			return this;
+		}
+		public Builder company(String company) {
+			this.company = company;
+			return this;
+		}
+		public Builder direction(String direction) {
+			this.direction = direction;
+			return this;
+		}
+		public Builder countryCode(String countryCode) {
+			this.countryCode = countryCode;
+			return this;
+		}
+		public Builder phone(String phone) {
+			this.phone = phone;
+			return this;
+		}
+		public Builder phone2(String phone2) {
+			this.phone2 = phone2;
+			return this;
+		}
+		public Builder fax(String fax) {
+			this.fax = fax;
+			return this;
+		}
+		public Builder fax2(String fax2) {
+			this.fax2 = fax2;
+			return this;
+		}
+		public Builder mailQuota(int mailQuota) {
+			this.mailQuota = mailQuota;
+			return this;
+		}
+		public Builder mailHost(ObmHost mailHost) {
+			this.mailHost = mailHost;
+			return this;
+		}
+		public Builder password(String password) {
+			this.password = password;
+			return this;
+		}
 		public Builder emailAndAliases(String emailAndAliases) {
 			email = null;
 			emailAlias = Sets.newHashSet();
@@ -240,9 +287,10 @@ public class ObmUser {
 			
 			return new ObmUser(
 					uid, entityId, login, extId, commonName, lastName, firstName, email, emailAlias,
-					address1, address2, address3, expresspostal, homePhone, mobile, service, title, town,
-					workFax, workPhone, zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
-					domain, publicFreeBusy);
+					address1, address2, address3, expresspostal, mobile, service, title, town,
+					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
+					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
+					phone, phone2, fax, fax2, mailQuota, mailHost, password);
 		}
 		
 	}
@@ -262,13 +310,10 @@ public class ObmUser {
 	private final String address3;
 
 	private final String expresspostal;
-	private final String homePhone;
 	private final String mobile;
 	private final String service;
 	private final String title;
 	private final String town;
-	private final String workFax;
-	private final String workPhone;
 	private final String zipCode;
 	private final String description;
 
@@ -279,16 +324,31 @@ public class ObmUser {
 
 	private final ObmDomain domain;
 	private final boolean publicFreeBusy;
+
+	private final String password;
+	private final ProfileName profileName;
+	private final String kind;
+	private final String company;
+	private final String direction;
+	private final String countryCode;
+	private final String phone;
+	private final String phone2;
+	private final String fax;
+	private final String fax2;
+	private final int mailQuota;
+	private final ObmHost mailHost;
 	
 	public ObmUser(Integer uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
-			String address3, String expresspostal, String homePhone,
+			String address3, String expresspostal,
 			String mobile, String service, String title, String town,
-			String workFax, String workPhone, String zipCode,
+			String zipCode,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
-			boolean publicFreeBusy) {
+			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
+			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
+			int mailQuota, ObmHost mailHost, String password) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -302,13 +362,10 @@ public class ObmUser {
 		this.address2 = address2;
 		this.address3 = address3;
 		this.expresspostal = expresspostal;
-		this.homePhone = homePhone;
 		this.mobile = mobile;
 		this.service = service;
 		this.title = title;
 		this.town = town;
-		this.workFax = workFax;
-		this.workPhone = workPhone;
 		this.zipCode = zipCode;
 		this.description = description;
 		this.timeCreate = timeCreate;
@@ -317,6 +374,18 @@ public class ObmUser {
 		this.updatedBy = updatedBy;
 		this.domain = domain;
 		this.publicFreeBusy = publicFreeBusy;
+		this.profileName = profileName;
+		this.kind = kind;
+		this.company = company;
+		this.direction = direction;
+		this.countryCode = countryCode;
+		this.phone = phone;
+		this.phone2 = phone2;
+		this.fax = fax;
+		this.fax2 = fax2;
+		this.mailQuota = mailQuota;
+		this.mailHost = mailHost;
+		this.password = password;
 	}
 
 	public int getUid() {
@@ -367,9 +436,6 @@ public class ObmUser {
 		return expresspostal;
 	}
 
-	public String getHomePhone() {
-		return homePhone;
-	}
 
 	public String getMobile() {
 		return mobile;
@@ -387,13 +453,6 @@ public class ObmUser {
 		return town;
 	}
 
-	public String getWorkFax() {
-		return workFax;
-	}
-
-	public String getWorkPhone() {
-		return workPhone;
-	}
 
 	public String getZipCode() {
 		return zipCode;
@@ -474,12 +533,60 @@ public class ObmUser {
 		return Sets.newHashSet(address1, address2, address3);
 	}
 	
+	public ProfileName getProfileName() {
+		return profileName;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public String getCompany() {
+		return company;
+	}
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public String getPhone2() {
+		return phone2;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public String getFax2() {
+		return fax2;
+	}
+
+	public int getMailQuota() {
+		return mailQuota;
+	}
+
+	public ObmHost getMailHost() {
+		return mailHost;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
-				emailAlias, address1, address2, address3, expresspostal, homePhone, mobile,
-				service, title, town, workFax, workPhone, zipCode,	description, timeCreate,
-				timeUpdate, createdBy, updatedBy, domain, publicFreeBusy);
+				emailAlias, address1, address2, address3, expresspostal, mobile,
+				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
+				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password);
 	}
 	
 	@Override
@@ -499,21 +606,28 @@ public class ObmUser {
 				&& Objects.equal(this.address2, that.address2)
 				&& Objects.equal(this.address3, that.address3)
 				&& Objects.equal(this.expresspostal, that.expresspostal)
-				&& Objects.equal(this.homePhone, that.homePhone)
 				&& Objects.equal(this.mobile, that.mobile)
 				&& Objects.equal(this.service, that.service)
 				&& Objects.equal(this.title, that.title)
 				&& Objects.equal(this.town, that.town)
-				&& Objects.equal(this.workFax, that.workFax)
-				&& Objects.equal(this.workPhone, that.workPhone)
 				&& Objects.equal(this.zipCode, that.zipCode)
 				&& Objects.equal(this.description, that.description)
-				&& Objects.equal(this.timeCreate, that.timeCreate)
-				&& Objects.equal(this.timeUpdate, that.timeUpdate)
 				&& Objects.equal(this.createdBy, that.createdBy)
 				&& Objects.equal(this.updatedBy, that.updatedBy)
 				&& Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.publicFreeBusy, that.publicFreeBusy);
+				&& Objects.equal(this.publicFreeBusy, that.publicFreeBusy)
+				&& Objects.equal(this.profileName, that.profileName)
+				&& Objects.equal(this.kind, that.kind)
+				&& Objects.equal(this.company, that.company)
+				&& Objects.equal(this.direction, that.direction)
+				&& Objects.equal(this.countryCode, that.countryCode)
+				&& Objects.equal(this.phone, that.phone)
+				&& Objects.equal(this.phone2, that.phone2)
+				&& Objects.equal(this.fax, that.fax)
+				&& Objects.equal(this.fax2, that.fax2)
+				&& Objects.equal(this.mailQuota, that.mailQuota)
+				&& Objects.equal(this.mailHost, that.mailHost)
+				&& Objects.equal(this.password, that.password);
 		}
 		return false;
 	}
@@ -534,13 +648,10 @@ public class ObmUser {
 			.add("address2", address2)
 			.add("address3", address3)
 			.add("expresspostal", expresspostal)
-			.add("homePhone", homePhone)
 			.add("mobile", mobile)
 			.add("service", service)
 			.add("title", title)
 			.add("town", town)
-			.add("workFax", workFax)
-			.add("workPhone", workPhone)
 			.add("zipCode", zipCode)
 			.add("description", description)
 			.add("timeCreate", timeCreate)
@@ -549,6 +660,17 @@ public class ObmUser {
 			.add("updatedBy", updatedBy)
 			.add("domain", domain)
 			.add("publicFreeBusy", publicFreeBusy)
+			.add("profileName", profileName)
+			.add("kind", kind)
+			.add("company", company)
+			.add("direction", direction)
+			.add("countryCode", countryCode)
+			.add("phone", phone)
+			.add("phone2", phone2)
+			.add("fax", fax)
+			.add("fax2", fax2)
+			.add("mailQuota", mailQuota)
+			.add("mailHost", mailHost)
 			.toString();
 	}
 }

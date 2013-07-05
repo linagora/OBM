@@ -43,6 +43,8 @@ import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.ProfileName;
+import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
@@ -83,18 +85,41 @@ public class UserDaoJdbcImplTest {
 			.uuid(ObmDomainUuid.of("3af47236-3638-458e-9c3e-5eebbaa8f9ae"))
 			.name("domain")
 			.build();
+	private final ObmHost mailHost = ObmHost
+			.builder()
+			.id(1)
+			.name("mail")
+			.fqdn("mail.tlse.lng")
+			.ip("1.2.3.4")
+			.domainId(domain.getId())
+			.build();
 
 	@Test
 	public void testList() throws Exception {
 		List<ObmUser> users = ImmutableList.of(
 				sampleUser(1, 3),
 				sampleUser(2, 4),
-				sampleUser(3, 5));
+				sampleUser(3, 5),
+				sampleUserWithoutMail(4, 6));
 
 		assertThat(dao.list(domain)).isEqualTo(users);
 	}
 
-	private ObmUser sampleUser(int id, int entityId) {
+	@Test
+	public void testFindUserById() {
+		ObmUser user = sampleUser(1, 3);
+
+		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
+	}
+
+	@Test
+	public void testFindUserByIdWhenUserHasNoMail() {
+		ObmUser user = sampleUserWithoutMail(4, 6);
+
+		assertThat(dao.findUserById(4, domain)).isEqualTo(user);
+	}
+
+	private ObmUser.Builder sampleUserBuilder(int id, int entityId) {
 		return ObmUser
 				.builder()
 				.login("user" + id)
@@ -104,8 +129,20 @@ public class UserDaoJdbcImplTest {
 				.firstName("Firstname")
 				.commonName("")
 				.domain(domain)
+				.profileName(ProfileName.builder().name("user").build())
+				.password("user" + id)
+				.countryCode("0");
+	}
+	private ObmUser sampleUser(int id, int entityId) {
+		return sampleUserBuilder(id, entityId)
+				.mailHost(mailHost)
 				.emailAndAliases("user" + id)
-				.publicFreeBusy(true)
+				.build();
+	}
+
+	private ObmUser sampleUserWithoutMail(int id, int entityId) {
+		return sampleUserBuilder(id, entityId)
+				.emailAndAliases("")
 				.build();
 	}
 }

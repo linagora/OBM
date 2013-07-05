@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,9 +41,12 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
+import org.obm.sync.host.ObmHost;
 import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +69,47 @@ public class UserDao {
 	public static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
-	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userobm_ext_id, userentity_entity_id";
+	private static final String USER_FIELDS = 
+			"userobm_id, " +
+			"userobm_email, " +
+			"userobm_firstname, " +
+			"userobm_lastname, " +
+			"userobm_commonname, " +
+			"userobm_login, " +
+			"userobm_ext_id, " +
+			"userobm_password, " +
+			"userobm_perms, " + // Profile
+			"userobm_kind, " +
+			"userobm_title, " +
+			"userobm_description, " +
+			"userobm_company, " +
+			"userobm_service, " +
+			"userobm_direction, " +
+			"userobm_address1, " +
+			"userobm_address2, " +
+			"userobm_address3, " +
+			"userobm_town, " +
+			"userobm_zipcode, " +
+			"userobm_expresspostal, " + // BusinessZipCode
+			"userobm_country_iso3166, " +
+			"userobm_phone, " +
+			"userobm_phone2, " +
+			"userobm_mobile, " +
+			"userobm_fax, " +
+			"userobm_fax2, " +
+			"userobm_mail_quota, " +
+			"userobm_mail_server_id, " +
+			"userobm_timecreate, " +
+			"userobm_timeupdate, " +
+			"userobm_usercreate, " +
+			"userobm_userupdate, " +
+			"defpref.userobmpref_value, " +
+			"userpref.userobmpref_value, " +
+			"userentity_entity_id, " +
+			"host_name, " +
+			"host_fqdn, " +
+			"host_ip";
+
 	private final ObmHelper obmHelper;
 	
 	@Inject
@@ -202,6 +247,7 @@ public class UserDao {
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
 				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
@@ -236,6 +282,49 @@ public class UserDao {
 				.commonName(rs.getString("userobm_commonname"))
 				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 				.entityId(rs.getInt("userentity_entity_id"))
+				.password(rs.getString("userobm_password"))
+				.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
+				.kind(rs.getString("userobm_kind"))
+				.title(emptyToNull(rs.getString("userobm_title")))
+				.description(rs.getString("userobm_description"))
+				.company(rs.getString("userobm_company"))
+				.service(rs.getString("userobm_service"))
+				.direction(rs.getString("userobm_direction"))
+				.address1(rs.getString("userobm_address1"))
+				.address2(rs.getString("userobm_address2"))
+				.address3(rs.getString("userobm_address3"))
+				.town(rs.getString("userobm_town"))
+				.zipCode(rs.getString("userobm_zipcode"))
+				.expresspostal(rs.getString("userobm_expresspostal"))
+				.countryCode(rs.getString("userobm_country_iso3166"))
+				.phone(emptyToNull(rs.getString("userobm_phone")))
+				.phone2(emptyToNull(rs.getString("userobm_phone2")))
+				.mobile(emptyToNull(rs.getString("userobm_mobile")))
+				.fax(emptyToNull(rs.getString("userobm_fax")))
+				.fax2(emptyToNull(rs.getString("userobm_fax2")))
+				.mailQuota(rs.getInt("userobm_mail_quota"))
+				.mailHost(hostFromCursor(rs, domain))
+				.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
+				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
+				.createdBy(findUserById(rs.getInt("userobm_usercreate"), domain))
+				.updatedBy(findUserById(rs.getInt("userobm_userupdate"), domain))
+				.build();
+	}
+
+	private ObmHost hostFromCursor(ResultSet rs, ObmDomain domain) throws SQLException {
+		int id = rs.getInt("userobm_mail_server_id");
+
+		if (rs.wasNull()) {
+			return null;
+		}
+
+		return ObmHost
+				.builder()
+				.id(id)
+				.name(rs.getString("host_name"))
+				.fqdn(rs.getString("host_fqdn"))
+				.ip(rs.getString("host_ip"))
+				.domainId(domain.getId())
 				.build();
 	}
 	
@@ -248,6 +337,7 @@ public class UserDao {
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
 				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
 				+ "WHERE userobm_id=? ";
@@ -337,6 +427,7 @@ public class UserDao {
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
 				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_ext_id=? AND userobm_archive != '1'";
@@ -365,6 +456,7 @@ public class UserDao {
 
 		String query = "SELECT " + USER_FIELDS + " FROM UserObm " + 
 				"INNER JOIN UserEntity ON userentity_user_id = userobm_id " + 
+				"LEFT JOIN Host ON host_id = userobm_mail_server_id " +
 				"LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL " + 
 				"LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id " + 
 				"WHERE userobm_domain_id = ? AND userobm_archive != '1'";
@@ -384,4 +476,5 @@ public class UserDao {
 
 		return users;
 	}
+
 }

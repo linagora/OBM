@@ -125,6 +125,27 @@ CREATE TABLE domain (
 ALTER TABLE domain ALTER COLUMN domain_id SET DEFAULT nextval('domain_domain_id_seq');
 CREATE SEQUENCE domain_domain_id_seq INCREMENT BY 1 CACHE 1;
 
+CREATE TABLE domainentity (
+    domainentity_entity_id integer NOT NULL,
+    domainentity_domain_id integer NOT NULL
+);
+
+CREATE TABLE host (
+    host_id integer NOT NULL,
+    host_domain_id integer NOT NULL,
+    host_timeupdate timestamp,
+    host_timecreate timestamp DEFAULT now(),
+    host_userupdate integer,
+    host_usercreate integer,
+    host_uid integer,
+    host_gid integer,
+    host_archive smallint DEFAULT 0 NOT NULL,
+    host_name character varying(32) NOT NULL,
+    host_fqdn character varying(255),
+    host_ip character varying(16),
+    host_delegation character varying(256) DEFAULT '',
+    host_description character varying(128)
+);
 
 --
 -- Table event
@@ -674,8 +695,12 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
         (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3'),
         (2, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2'),;
 
-INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE), (TRUE), (TRUE);
+INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE), (TRUE), (TRUE), (TRUE), (TRUE);
 INSERT INTO userentity (userentity_entity_id, userentity_user_id) VALUES (1, 1), (2, 2), (3, 3), (4, 4);
+INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id)
+    VALUES
+        (1, 6),
+        (2, 7);
 INSERT INTO calendarentity (calendarentity_entity_id, calendarentity_calendar_id) VALUES (1, 1), (2, 2), (3, 3), (4, 4);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
     VALUES
