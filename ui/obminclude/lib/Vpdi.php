@@ -158,7 +158,7 @@ class Vpdi {
           $current_profile = $profile;
         } else {
           array_unshift($properties, $p);
-          $children = self::expand(&$properties, $profile);
+          $children = self::expand($properties, $profile);
           if ($current_entity !== null) {
             $current_entity->addProperty($children[0]);
           } else {
