@@ -38,6 +38,7 @@ import java.util.UUID;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 
 import org.fest.util.Files;
 import org.obm.configuration.ConfigurationService;
@@ -51,7 +52,6 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 
-import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.base.Function;
@@ -73,7 +73,7 @@ public class WindowingStepdefs {
 	private ConfigurationService configurationService;
 	
 	private final WindowingService windowingService;
-	private final BitronixTransactionManager tm;
+	private final TransactionManager tm;
 	private final ObjectStoreManager storeManager;
 
 	private WindowingIndexKey windowingIndexKey;
@@ -110,8 +110,8 @@ public class WindowingStepdefs {
 	public void shutdown() throws IllegalStateException, SecurityException, SystemException {
 		tm.rollback();
 		storeManager.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 		Files.delete(new File(configurationService.getDataDirectory()));
-		tm.shutdown();
 	}
 	
 	@Given("user has (\\d+) elements in INBOX")

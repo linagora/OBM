@@ -40,17 +40,16 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
 public class TransactionalBinder implements ITransactionAttributeBinder {
-	private final Provider<TransactionManager> transactionManagerProvider;
+	private final TransactionManager transactionManager;
 	private Map<Transaction, Transactional> transactionAttributeCache;
 
 	@Inject
-	public TransactionalBinder(Provider<TransactionManager> transactionManagerProvider) {
-		this.transactionManagerProvider = transactionManagerProvider;
+	public TransactionalBinder(TransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
 		WeakHashMap<Transaction, Transactional> weakHashMap = new WeakHashMap<Transaction, Transactional>();
 		this.transactionAttributeCache = Collections.synchronizedMap(weakHashMap);
 	}
@@ -81,7 +80,7 @@ public class TransactionalBinder implements ITransactionAttributeBinder {
 
 	private Transaction getCurrentTransaction() throws TransactionException {
 		try {
-			Transaction transaction = transactionManagerProvider.get().getTransaction();
+			Transaction transaction = transactionManager.getTransaction();
 			if (transaction == null) {
 				throw new TransactionException(
 						"No active transaction have been found");

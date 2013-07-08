@@ -43,9 +43,6 @@ import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -54,27 +51,16 @@ import com.google.inject.name.Named;
 @Singleton
 public class TransactionProvider implements Provider<TransactionManager>, LifecycleListener {
 	
-	private Supplier<BitronixTransactionManager> transactionManagerSupplier;
+	private BitronixTransactionManager transactionManager;
 
 	@Inject
-	public TransactionProvider(final TransactionConfiguration configuration,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
-		final int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
+	public TransactionProvider(TransactionConfiguration configuration,
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws SystemException {
+		int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
 		configurationLogger.info("Transaction timeout in seconds : {}", transactionTimeOutInSecond);
 		configureBitronix(configuration);
-		transactionManagerSupplier = Suppliers.memoize(new Supplier<BitronixTransactionManager>() {
-			@Override
-			public BitronixTransactionManager get() {
-				try {
-					BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
-					transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
-					return transactionManager;
-				} catch (SystemException e) {
-					throw Throwables.propagate(e);
-				}
-			}
-		});
-		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
 	}
 
 	private void configureBitronix(TransactionConfiguration configuration) {
@@ -90,11 +76,11 @@ public class TransactionProvider implements Provider<TransactionManager>, Lifecy
 	
 	@Override
 	public TransactionManager get() {
-		return transactionManagerSupplier.get();
+		return transactionManager;
 	}
 	
 	@Override
 	public void shutdown() throws Exception {
-		transactionManagerSupplier.get().shutdown();
+		transactionManager.shutdown();
 	}
 }

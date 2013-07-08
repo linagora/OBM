@@ -96,7 +96,7 @@ public class SnapshotDaoEhcacheImplTest {
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
-		transactionManager.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

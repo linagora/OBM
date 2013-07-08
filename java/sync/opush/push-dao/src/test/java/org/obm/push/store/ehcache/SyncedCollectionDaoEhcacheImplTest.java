@@ -37,6 +37,7 @@ import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -54,7 +55,6 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
 
-import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -63,7 +63,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private BitronixTransactionManager transactionManager;
+	private TransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
@@ -80,7 +80,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
-		transactionManager.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

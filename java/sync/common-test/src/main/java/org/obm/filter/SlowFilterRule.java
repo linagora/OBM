@@ -40,11 +40,8 @@ import com.google.common.base.Strings;
 
 public final class SlowFilterRule implements TestRule {
 
-	@VisibleForTesting SlowFilterConfiguration slowFilterConfiguration;
-	
-	public SlowFilterRule() {
-		slowFilterConfiguration = new SlowFilterConfiguration();
-	}
+	private static final String SLOW_CONFIGURATION_VALUE = System.getProperty(Slow.CONFIGURATION_ENVIRONMENT_KEY);
+	private static final boolean SLOW_TEST_ALLOWED = configurationAllowSlowTests(SLOW_CONFIGURATION_VALUE);
 	
 	@Override
 	public Statement apply(final Statement test, final Description description) {
@@ -62,33 +59,10 @@ public final class SlowFilterRule implements TestRule {
 	}
 
 	@VisibleForTesting boolean hasToRunTest(Slow methodAnnotation) {
-		return (fastTest(methodAnnotation) && enableFastTests())
-				|| (slowTest(methodAnnotation) && enableSlowTests());
+		return  (methodAnnotation == null) || SLOW_TEST_ALLOWED;
 	}
 
-	private boolean enableFastTests() {
-		return keyEnabled(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY, true);
+	@VisibleForTesting static boolean configurationAllowSlowTests(String configurationValue) {
+		return !Strings.isNullOrEmpty(configurationValue) && Boolean.parseBoolean(configurationValue);
 	}
-
-	private boolean enableSlowTests() {
-		return keyEnabled(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY, true);
-	}
-
-	private boolean keyEnabled(String key, boolean defaultValue) {
-		String slowProperty = slowFilterConfiguration.getConfigurationValue(key);
-		if (Strings.isNullOrEmpty(slowProperty)) {
-			return defaultValue;
-		} else {
-			return  Boolean.parseBoolean(slowProperty);
-		}
-	}
-	
-	private boolean fastTest(Slow methodAnnotation) {
-		return methodAnnotation == null;
-	}
-
-	private boolean slowTest(Slow methodAnnotation) {
-		return methodAnnotation != null;
-	}
-	
 }
