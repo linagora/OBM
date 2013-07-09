@@ -62,7 +62,6 @@ public class Address implements IMergeable, Serializable {
 		this.state = state;
 	}
 
-	@DatabaseField(table = ADDRESS_TABLE, column = "address_country")
 	public String getCountry() {
 		return country;
 	}
