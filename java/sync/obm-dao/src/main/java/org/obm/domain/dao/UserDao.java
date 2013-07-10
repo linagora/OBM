@@ -38,6 +38,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
@@ -596,6 +597,122 @@ public class UserDao {
 			obmHelper.linkEntity(conn, "UserEntity", "user_id", userId);
 
 			return findUserById(userId, user.getDomain());
+		} finally {
+			obmHelper.cleanup(conn, ps, null);
+		}
+	}
+
+	public ObmUser update(ObmUser user) throws SQLException, UserNotFoundException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String query = "UPDATE UserObm SET " +
+                    "userobm_timeupdate = ?, " +
+                    "userobm_userupdate = ?, " +
+                    "userobm_ext_id = ?, " +
+                    "userobm_login = ?, " +
+                    "userobm_password = ?, " +
+                    "userobm_perms = ?, " +
+                    "userobm_kind = ?, " +
+                    "userobm_commonname = ?, " +
+                    "userobm_lastname = ?, " +
+                    "userobm_firstname = ?, " +
+                    "userobm_title = ?, " +
+                    "userobm_company = ?, " +
+                    "userobm_direction = ?, " +
+                    "userobm_service = ?, " +
+                    "userobm_address1 = ?, " +
+                    "userobm_address2 = ?, " +
+                    "userobm_address3 = ?, " +
+                    "userobm_zipcode = ?, " +
+                    "userobm_town = ?, " +
+                    "userobm_expresspostal = ?, " +
+                    "userobm_country_iso3166 = ?, " +
+                    "userobm_phone = ?, " +
+                    "userobm_phone2 = ?, " +
+                    "userobm_mobile = ?, " +
+                    "userobm_fax = ?, " +
+                    "userobm_fax2 = ?, " +
+                    "userobm_description = ?, " +
+                    "userobm_email = ?, " +
+                    "userobm_mail_server_id = ?, " +
+                    "userobm_mail_quota = ? " +
+                    "WHERE userobm_id = ?";
+
+		try {
+			int idx = 1;
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(query);
+
+			ps.setTimestamp(idx++, new Timestamp(obmHelper.selectNow(conn).getTime()));
+
+			if (user.getUpdatedBy() != null) {
+				ps.setInt(idx++, user.getUpdatedBy().getUid());
+			} else {
+				ps.setNull(idx++, Types.INTEGER);
+			}
+
+			if (user.getExtId() != null) {
+				ps.setString(idx++, user.getExtId().getExtId());
+			} else {
+				ps.setNull(idx++, Types.VARCHAR);
+			}
+
+			ps.setString(idx++, user.getLogin());
+			ps.setString(idx++, Strings.nullToEmpty(user.getPassword()));
+
+			if (user.getProfileName() != null) {
+				ps.setString(idx++, user.getProfileName().getName());
+			} else {
+				ps.setNull(idx++, Types.VARCHAR);
+			}
+
+			ps.setString(idx++, user.getKind());
+			ps.setString(idx++, user.getCommonName());
+			ps.setString(idx++, user.getLastName());
+			ps.setString(idx++, user.getFirstName());
+			ps.setString(idx++, user.getTitle());
+			ps.setString(idx++, user.getCompany());
+			ps.setString(idx++, user.getDirection());
+			ps.setString(idx++, user.getService());
+			ps.setString(idx++, user.getAddress1());
+			ps.setString(idx++, user.getAddress2());
+			ps.setString(idx++, user.getAddress3());
+			ps.setString(idx++, user.getZipCode());
+			ps.setString(idx++, user.getTown());
+			ps.setString(idx++, user.getExpresspostal());
+			ps.setString(idx++, user.getCountryCode());
+			ps.setString(idx++, user.getPhone());
+			ps.setString(idx++, user.getPhone2());
+			ps.setString(idx++, user.getMobile());
+			ps.setString(idx++, user.getFax());
+			ps.setString(idx++, user.getFax2());
+			ps.setString(idx++, user.getDescription());
+
+			if (user.getEmail() != null && user.getMailHost() != null) {
+				ps.setString(idx++, Joiner
+						.on(DB_INNER_FIELD_SEPARATOR)
+						.skipNulls()
+						.join(Iterables
+								.concat(Collections.singleton(user.getEmail()),
+										user.getEmailAlias())));
+				ps.setInt(idx++, user.getMailHost().getId());
+				ps.setInt(idx++, user.getMailQuota());
+			} else {
+				ps.setString(idx++, "");
+				ps.setNull(idx++, Types.INTEGER);
+				ps.setInt(idx++, 0);
+			}
+
+			ps.setInt(idx++, user.getUid());
+
+			int updateCount = ps.executeUpdate();
+
+			if (updateCount != 1) {
+				throw new UserNotFoundException(String.format("No user found with id %d and login %s", user.getUid(), user.getLogin()));
+			}
+
+			return findUserById(user.getUid(), user.getDomain());
 		} finally {
 			obmHelper.cleanup(conn, ps, null);
 		}

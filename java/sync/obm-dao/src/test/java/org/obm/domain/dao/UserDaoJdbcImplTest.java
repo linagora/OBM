@@ -45,6 +45,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableList;
@@ -183,6 +184,92 @@ public class UserDaoJdbcImplTest {
 				.uid(createdUser.getUid())
 				.entityId(createdUser.getEntityId())
 				.build()).isEqualTo(createdUser);
+	}
+
+	@Test
+	public void testGetAfterCreate() throws SQLException {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.address1("1 OBM Street")
+				.address2("2 OBM Street")
+				.address3("3 OBM Street")
+				.town("OBMCity")
+				.countryCode("OB")
+				.zipCode("OBMZip")
+				.expresspostal("OBMExpressPostal")
+				.phone("+OBM 123456")
+				.phone2("+OBM 789")
+				.mobile("+OBMMobile 123")
+				.fax("+OBMFax 123456")
+				.fax2("+OBMFax 789")
+				.company("Linagora")
+				.service("OBMDev")
+				.direction("LGS")
+				.title("Software Dev")
+				.emailAndAliases("jdoe\r\njohn.doe")
+				.kind("Mr")
+				.mailHost(mailHost)
+				.mailQuota(500)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		assertThat(dao.findUserById(createdUser.getUid(), domain)).isEqualTo(userBuilder
+				.uid(createdUser.getUid())
+				.entityId(createdUser.getEntityId())
+				.build());
+	}
+
+	@Test(expected = UserNotFoundException.class)
+	public void testUpdateWhenUserDoestExist() throws SQLException, UserNotFoundException {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(666)
+				.login("lucifer")
+				.domain(domain)
+				.build();
+
+		dao.update(user);
+	}
+
+	@Test
+	public void testUpdate() throws SQLException, UserNotFoundException {
+		ObmUser user = sampleUserBuilder(1, 3)
+				.firstName("John")
+				.lastName("Doe")
+				.build();
+
+		assertThat(dao.update(user)).isEqualTo(user);
+	}
+
+	@Test
+	public void testUpdateClearingEmailingForUser() throws SQLException, UserNotFoundException {
+		ObmUser user = sampleUserBuilder(1, 3)
+				.emailAndAliases("")
+				.mailHost(null)
+				.profileName(ProfileName.valueOf("admin"))
+				.build();
+
+		assertThat(dao.update(user)).isEqualTo(user);
+	}
+
+	@Test
+	public void testGetAfterUpdate() throws SQLException, UserNotFoundException {
+		ObmUser user = sampleUserBuilder(1, 3)
+				.firstName("John")
+				.lastName("Doe")
+				.build();
+
+		dao.update(user);
+
+		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
 	}
 
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId) {
