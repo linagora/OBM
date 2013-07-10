@@ -229,6 +229,15 @@ form {
   margin: 0;
 }
 
+#webmail_iframe {
+  position:absolute;
+  top: 55px;
+  left: 0;
+  border:none;
+  width:100%;
+  height:94%;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Support OBM ! */
 /* ------------------------------------------------------------------------- */
@@ -252,6 +261,7 @@ form {
   top: 2.8em;
   right: 0px;
   font-size: 1em;
+  z-index: 9999;
 }
 
 .spreadLove a {  color: #368397; }
@@ -271,6 +281,7 @@ form {
   background-image: url('../images/banner_border.png');
   background-repeat: repeat-x;
   background-position: bottom;
+  z-index: 999;
 }
 
 #obmLogo {

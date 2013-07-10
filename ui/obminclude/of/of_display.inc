@@ -940,12 +940,6 @@ function display_page(&$display) {
 
     return;
   }
-/*
-$display["supportOBMBanner"] = "<h2 class=\"spreadLove\"><div>"
-  .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
-  ."</div><div class=\"supportUs\">"
-  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
-  ."</div></h2>";*/
 
   echo $display['head'] . $display['header'] . "
     <!-- left panel -->
@@ -968,8 +962,6 @@ $display["supportOBMBanner"] = "<h2 class=\"spreadLove\"><div>"
     </div>
     <!-- left panel end -->
     <div id=\"mainPanel\" >  ";
-
-echo $display["supportOBMBanner"];
 
 echo "$display[title]
     $display[action]
@@ -1115,16 +1107,23 @@ function display_head($p_module, $standard=true) {
     }
   }
 
-  if ( $_SESSION['set_top_bar'] ) {
+  if ( $_SESSION['set_top_bar'] && $_SESSION['set_theme'] == "default" ) {
     $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$resources_path/themes/default/styles/topbar.css\" />";
   } else {
     $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />";
   }
-  $set_top_bar = $_SESSION['set_top_bar'];
+  $set_top_bar = ($_SESSION['set_top_bar'] && $_SESSION['set_theme'] == 'default') ? true : false;
 
   if($standard) {
     $headers_e .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
   }
+
+  $supportOBMBanner = "<h2 class=\"spreadLove\"><div>"
+  .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
+  ."</div><div class=\"supportUs\">"
+  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
+  ."</div></h2>";
+
   return "$headers_e
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     
 <head>
@@ -1230,6 +1229,8 @@ function display_head($p_module, $standard=true) {
   } else if (document.f_entity && document.f_entity.elements[0]) {
     document.f_entity.elements[0].focus();
   } \">
+$supportOBMBanner
+
 "
 .display_debug()
 ;
@@ -1249,7 +1250,7 @@ function display_menu($module) {
   global $perm, $cright_write_admin, $conf_obm3_topbar;
 
   // If a new topbar specif function is provided
-  if ( $_SESSION['set_top_bar'] == "yes" ) {
+  if ( $_SESSION['set_top_bar'] == "yes" && $_SESSION['set_theme'] == "default") {
     return display_unified_menu($module);
   }
 
@@ -1367,7 +1368,7 @@ function display_unified_menu($module) {
 
   $data = array("template");
   $data["template"]["logo_ico"] = $ico_obm;
-  $data["template"]["logo_url"] = "$path/obm.php?redirect=false";
+  $data["template"]["logo_url"] = "$path/obm.php";
 
   $data["template"]["ico_obm"] = $ico_obm;
   $data["template"]["ico_spinner"] = $GLOBALS[ico_spinner];

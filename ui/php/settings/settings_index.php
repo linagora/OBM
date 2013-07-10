@@ -60,6 +60,8 @@ if ($params['theme'] != '') {
   update_user_pref($obm['uid'], 'set_theme', $_SESSION['set_theme']);
 }
 
+$is_default_theme = ($_SESSION['set_theme'] == 'default') ? true : false;
+
 // Validate user preferences
 if ($params['form_user_pref']) {
 
@@ -202,14 +204,18 @@ if ($params['form_user_pref']) {
     }
   }
 
-  if ($params['topbar'] == "yes") {
-    $_SESSION['set_top_bar'] = true;
-    $set_top_bar_value = "yes";
-  } else {
-    $_SESSION['set_top_bar'] = false;
-    $set_top_bar_value = "no";
+  if($is_default_theme){
+
+    if ($params['topbar'] == "yes") {
+      $_SESSION['set_top_bar'] = true;
+      $set_top_bar_value = "yes";
+    } else {
+      $_SESSION['set_top_bar'] = false;
+      $set_top_bar_value = "no";
+    }
+
+    update_user_pref($obm['uid'], 'set_top_bar', $set_top_bar_value);
   }
-  update_user_pref($obm['uid'], 'set_top_bar', $set_top_bar_value);
 
 }
 
@@ -232,7 +238,13 @@ if (($_SESSION['set_debug'] & $cdg_solr) == $cdg_solr) $dg_solr = 'checked';
 if ($_SESSION['set_menu'] == $cme_txt) $me_txt = 'checked';
 if ($_SESSION['set_menu'] == $cme_ico) $me_ico = 'checked';
 if ($_SESSION['set_menu'] == $cme_both) $me_both = 'checked';
-if ($_SESSION['set_top_bar'] == "yes") $topbar = 'checked';
+
+if ($_SESSION['set_top_bar'] == "yes" && $is_default_theme) $topbar = 'checked';
+
+$disable_checkbox = '';
+if (!$is_default_theme) {
+  $disable_checkbox = 'disabled="disabled"';
+}
 
 if ($_SESSION['set_date'] == $cda_iso) $da_iso = 'checked';
 if ($_SESSION['set_date'] == $cda_en) $da_en = 'checked';
@@ -363,7 +375,7 @@ $display['detail'] .= "
   </tr><tr id='settings_new_topbar'>
     <th>$l_set_topbar</th>
     <td>
-      <span class=\"NW\"><input type=\"checkbox\" class=\"box\" id=\"topbar\" name=\"topbar\" value=\"yes\" $topbar/></span>
+      <span class=\"NW\"><input type=\"checkbox\" class=\"box\" id=\"topbar\" name=\"topbar\" value=\"yes\" $topbar $disable_checkbox/></span>
     </td>
   </tr><tr id='settings_autoDispay'>
     <th><label for=\"lbl_auto_display\">$l_auto_display</label></th>
