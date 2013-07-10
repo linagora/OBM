@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012 Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -42,12 +42,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.h2.tools.RunScript;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
+import com.google.common.io.Closer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -130,15 +129,15 @@ public class H2InMemoryDatabase extends ExternalResource {
 	 * @throws Exception If an error occurs while importing the schema.
 	 */
 	protected void importSchema() throws Exception {
+		Closer closer = Closer.create();
 		Reader reader = null;
-		InputStream stream = getClass().getClassLoader().getResourceAsStream(schema);
-
+		InputStream stream = closer.register(getClass().getClassLoader().getResourceAsStream(schema));
 		try {
-			RunScript.execute(getConnection(), reader = new InputStreamReader(stream));
+			reader = closer.register(new InputStreamReader(stream));
+			RunScript.execute(getConnection(), reader);
 		}
 		finally {
-			IOUtils.closeQuietly(reader);
-			IOUtils.closeQuietly(stream);
+			closer.close();
 		}
 	}
 
@@ -162,11 +161,10 @@ public class H2InMemoryDatabase extends ExternalResource {
 
 		// Populate parameters in prepared statement
 		// This should infer the actual SQL type of each parameter automatically
-		if (!ArrayUtils.isEmpty(parameters)) {
+		if (parameters != null) {
 			for (int i = 0; i < parameters.length; i++)
 				statement.setObject(i + 1, parameters[i]);
 		}
-
 		return statement;
 	}
 

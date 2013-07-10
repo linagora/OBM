@@ -107,6 +107,7 @@
 		<module>annotations</module>
 		<module>autoconf</module>
 		<module>common-test</module>
+		<module>common-dao-test</module>
 		<module>integration-testing</module>
 		<module>webapp-common-dependencies</module>
     	<module>icalendar</module>
