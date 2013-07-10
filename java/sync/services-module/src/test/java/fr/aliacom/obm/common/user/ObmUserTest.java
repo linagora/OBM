@@ -168,7 +168,7 @@ public class ObmUserTest {
 			.emailAndAliases("")
 			.build();
 		
-		assertThat(obmUser.getEmailAtDomain()).isEqualTo("@obm.org");
+		assertThat(obmUser.getEmailAtDomain()).isNull();
 		assertThat(obmUser.getEmailAlias()).isEmpty();
 	}
 

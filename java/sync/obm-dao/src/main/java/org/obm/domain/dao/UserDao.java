@@ -38,6 +38,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +54,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -283,7 +288,7 @@ public class UserDao {
 				.commonName(rs.getString("userobm_commonname"))
 				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 				.entityId(rs.getInt("userentity_entity_id"))
-				.password(rs.getString("userobm_password"))
+				.password(Strings.emptyToNull(rs.getString("userobm_password")))
 				.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
 				.kind(rs.getString("userobm_kind"))
 				.title(emptyToNull(rs.getString("userobm_title")))
@@ -445,7 +450,7 @@ public class UserDao {
 				throw new UserNotFoundException(userExtId);
 			}
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(conn, ps, rs);
 		}
 	}
 
@@ -472,10 +477,128 @@ public class UserDao {
 				users.add(createUserFromResultSet(domain, rs));
 			}
 		} finally {
-			obmHelper.cleanup(null, ps, rs);
+			obmHelper.cleanup(conn, ps, rs);
 		}
 
 		return users;
+	}
+
+	public ObmUser create(ObmUser user) throws SQLException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		String q = "INSERT INTO UserObm (" +
+				"userobm_domain_id, " +
+				"userobm_usercreate, " +
+				"userobm_ext_id, " +
+				"userobm_login, " +
+				"userobm_password, " +
+				"userobm_perms, " +
+				"userobm_kind, " +
+				"userobm_commonname, " +
+				"userobm_lastname, " +
+				"userobm_firstname, " +
+				"userobm_title, " +
+				"userobm_company, " +
+				"userobm_direction, " +
+				"userobm_service, " +
+				"userobm_address1, " +
+				"userobm_address2, " +
+				"userobm_address3, " +
+				"userobm_zipcode, " +
+				"userobm_town, " +
+				"userobm_expresspostal, " +
+				"userobm_country_iso3166, " +
+				"userobm_phone, " +
+				"userobm_phone2, " +
+				"userobm_mobile, " +
+				"userobm_fax, " +
+				"userobm_fax2, " +
+				"userobm_description, " +
+				"userobm_email, " +
+				"userobm_mail_server_id, " +
+				"userobm_mail_quota" +
+				") VALUES (" +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
+				")";
+
+		try {
+			int idx = 1;
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(q);
+
+			ps.setInt(idx++, user.getDomain().getId());
+
+			if (user.getCreatedBy() != null) {
+				ps.setInt(idx++, user.getCreatedBy().getUid());
+			} else {
+				ps.setNull(idx++, Types.INTEGER);
+			}
+
+			if (user.getExtId() != null) {
+				ps.setString(idx++, user.getExtId().getExtId());
+			} else {
+				ps.setNull(idx++, Types.VARCHAR);
+			}
+
+			ps.setString(idx++, user.getLogin());
+			ps.setString(idx++, Strings.nullToEmpty(user.getPassword()));
+
+			if (user.getProfileName() != null) {
+				ps.setString(idx++, user.getProfileName().getName());
+			} else {
+				ps.setNull(idx++, Types.VARCHAR);
+			}
+
+			ps.setString(idx++, user.getKind());
+			ps.setString(idx++, user.getCommonName());
+			ps.setString(idx++, user.getLastName());
+			ps.setString(idx++, user.getFirstName());
+			ps.setString(idx++, user.getTitle());
+			ps.setString(idx++, user.getCompany());
+			ps.setString(idx++, user.getDirection());
+			ps.setString(idx++, user.getService());
+			ps.setString(idx++, user.getAddress1());
+			ps.setString(idx++, user.getAddress2());
+			ps.setString(idx++, user.getAddress3());
+			ps.setString(idx++, user.getZipCode());
+			ps.setString(idx++, user.getTown());
+			ps.setString(idx++, user.getExpresspostal());
+			ps.setString(idx++, user.getCountryCode());
+			ps.setString(idx++, user.getPhone());
+			ps.setString(idx++, user.getPhone2());
+			ps.setString(idx++, user.getMobile());
+			ps.setString(idx++, user.getFax());
+			ps.setString(idx++, user.getFax2());
+			ps.setString(idx++, user.getDescription());
+
+			if (user.getEmail() != null && user.getMailHost() != null) {
+				ps.setString(idx++, Joiner
+						.on(DB_INNER_FIELD_SEPARATOR)
+						.skipNulls()
+						.join(Iterables
+								.concat(Collections.singleton(user.getEmail()),
+										user.getEmailAlias())));
+				ps.setInt(idx++, user.getMailHost().getId());
+				ps.setInt(idx++, user.getMailQuota());
+			} else {
+				ps.setString(idx++, "");
+				ps.setNull(idx++, Types.INTEGER);
+				ps.setInt(idx++, 0);
+			}
+
+			ps.executeUpdate();
+
+			int userId = obmHelper.lastInsertId(conn);
+
+			obmHelper.linkEntity(conn, "UserEntity", "user_id", userId);
+
+			return findUserById(userId, user.getDomain());
+		} finally {
+			obmHelper.cleanup(conn, ps, null);
+		}
 	}
 
 }

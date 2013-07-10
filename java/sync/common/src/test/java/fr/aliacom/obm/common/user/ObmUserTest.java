@@ -214,7 +214,7 @@ public class ObmUserTest {
 				.build();
 		
 		assertThat(user.getEmail()).isNull();
-		assertThat(user.getEmailAlias()).isNull();
+		assertThat(user.getEmailAlias()).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)

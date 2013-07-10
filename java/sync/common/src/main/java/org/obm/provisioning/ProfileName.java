@@ -36,9 +36,14 @@ import com.google.common.base.Objects;
 
 public class ProfileName {
 
+	public static ProfileName valueOf(String name) {
+		return builder().name(name).build();
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
+
 	public static class Builder {
 		
 		private String name;

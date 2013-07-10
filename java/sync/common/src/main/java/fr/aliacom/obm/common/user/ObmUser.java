@@ -251,7 +251,12 @@ public class ObmUser {
 		public Builder emailAndAliases(String emailAndAliases) {
 			email = null;
 			emailAlias = Sets.newHashSet();
-			Iterable<String> emailAndAlias = Splitter.on(EMAIL_FIELD_SEPARATOR).split(emailAndAliases);
+
+			Iterable<String> emailAndAlias = Splitter
+					.on(EMAIL_FIELD_SEPARATOR)
+					.omitEmptyStrings()
+					.split(emailAndAliases);
+
 			for (String emailOrAlias: emailAndAlias) {
 				if (email == null) {
 					email = emailOrAlias;	
@@ -286,7 +291,8 @@ public class ObmUser {
 			Preconditions.checkState(domain != null);
 			
 			return new ObmUser(
-					uid, entityId, login, extId, commonName, lastName, firstName, email, emailAlias,
+					uid, entityId, login, extId, commonName, lastName, firstName,
+					email, Objects.firstNonNull(emailAlias, ImmutableSet.<String>of()),
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,

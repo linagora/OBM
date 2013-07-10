@@ -31,6 +31,7 @@ package org.obm.domain.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Rule;
@@ -54,6 +55,7 @@ import com.google.inject.name.Names;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
@@ -119,6 +121,70 @@ public class UserDaoJdbcImplTest {
 		assertThat(dao.findUserById(4, domain)).isEqualTo(user);
 	}
 
+	@Test
+	public void testCreateSimpleUserWithNoMail() throws SQLException {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		assertThat(createdUser.getUid()).isGreaterThan(0);
+		assertThat(createdUser.getEntityId()).isGreaterThan(0);
+		assertThat(userBuilder
+				.uid(createdUser.getUid())
+				.entityId(createdUser.getEntityId())
+				.build()).isEqualTo(createdUser);
+	}
+
+	@Test
+	public void testCreate() throws SQLException {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.address1("1 OBM Street")
+				.address2("2 OBM Street")
+				.address3("3 OBM Street")
+				.town("OBMCity")
+				.countryCode("OB")
+				.zipCode("OBMZip")
+				.expresspostal("OBMExpressPostal")
+				.phone("+OBM 123456")
+				.phone2("+OBM 789")
+				.mobile("+OBMMobile 123")
+				.fax("+OBMFax 123456")
+				.fax2("+OBMFax 789")
+				.company("Linagora")
+				.service("OBMDev")
+				.direction("LGS")
+				.title("Software Dev")
+				.emailAndAliases("jdoe\r\njohn.doe")
+				.kind("Mr")
+				.mailHost(mailHost)
+				.mailQuota(500)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		assertThat(createdUser.getUid()).isGreaterThan(0);
+		assertThat(createdUser.getEntityId()).isGreaterThan(0);
+		assertThat(userBuilder
+				.uid(createdUser.getUid())
+				.entityId(createdUser.getEntityId())
+				.build()).isEqualTo(createdUser);
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId) {
 		return ObmUser
 				.builder()
@@ -129,7 +195,7 @@ public class UserDaoJdbcImplTest {
 				.firstName("Firstname")
 				.commonName("")
 				.domain(domain)
-				.profileName(ProfileName.builder().name("user").build())
+				.profileName(ProfileName.valueOf("user"))
 				.password("user" + id)
 				.countryCode("0");
 	}
