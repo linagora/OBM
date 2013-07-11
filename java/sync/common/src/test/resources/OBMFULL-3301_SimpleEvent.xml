@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<event allDay="false" isInternal="true" sequence="3" type="VEVENT" xmlns="http://www.obm.org/xsd/sync/event.xsd">
+<event anonymized="false" allDay="false" isInternal="true" sequence="3" type="VEVENT" xmlns="http://www.obm.org/xsd/sync/event.xsd">
 	<timeupdate>1292580000000</timeupdate>
 	<timecreate>1289988000000</timecreate>
 	<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>

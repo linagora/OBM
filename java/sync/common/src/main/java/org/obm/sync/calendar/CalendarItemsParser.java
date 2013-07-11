@@ -128,6 +128,7 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		ev.setDescription(s(e, "description"));
 		ev.setStartDate(d(e, "date"));
 		ev.setPrivacy(getPrivacy(e));
+		ev.setAnonymized(getAnonymized(e));
 		ev.setPriority(i(e, "priority", DEFAULT_PRIORITY_VALUE));
 		ev.setDuration(i(e, "duration", DEFAULT_DURATION_VALUE));
 		ev.setCategory(s(e, "category"));
@@ -152,6 +153,11 @@ public class CalendarItemsParser extends AbstractItemsParser {
 			}
 		}
 		return ev;
+	}
+
+	private boolean getAnonymized(Element e) {
+		return e.hasAttribute("anonymized") ? "true".equals(e
+				.getAttribute("anonymized")) : false;
 	}
 
 	private EventPrivacy getPrivacy(Element e) {

@@ -77,7 +77,7 @@ public class XmlResponderTest {
 		ImmutableMap<ServerCapability, String> caps =
 				ImmutableMap.of(
 						ServerCapability.CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION, "true");
-		
+
 		expect(at.getUserSettings()).andReturn(new UserSettings(settings)).once();
 		expect(at.getServerCapabilities()).andReturn(caps).once();
 		expect(at.getUserDisplayName()).andReturn(null).once();
@@ -88,7 +88,7 @@ public class XmlResponderTest {
 		XMLAssert.assertXMLEqual(loadXMLFile("tokenWithFiveUserSettings.xml"), DOMUtils.serialize(doc));
 		verify(at);
 	}
-	
+
 	@Test
 	public void testToXMLAllCapabilities() throws Exception {
 		ImmutableMap.Builder<ServerCapability, String> builder = ImmutableMap.builder();

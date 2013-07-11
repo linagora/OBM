@@ -165,6 +165,71 @@ private CalendarItemsWriter writer;
 	}
 
 	@Test
+	public void testGetXMLDocumentFromAnonymizedEvent() throws SAXException, IOException, TransformerException {
+		Event event = new Event();
+		
+		event.setExtId(new EventExtId("Ext"));
+		event.setTitle("Anonymized");
+		event.addAttendee(UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build());
+		event.setAnonymized(true);
+
+		String expectedXML = loadXmlFile("AnonymizedSimpleEvent.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(event);
+
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testGetXMLDocumentFromNotAnonymizedEvent() throws SAXException, IOException, TransformerException {
+		Event event = new Event();
+
+		event.setExtId(new EventExtId("Ext"));
+		event.setTitle("Not Anonymized");
+		event.addAttendee(UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build());
+		event.setAnonymized(false);
+
+		String expectedXML = loadXmlFile("NotAnonymizedSimpleEvent.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(event);
+
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testGetXMLDocumentWithNoAnonymizedAttributeEvent() throws SAXException, IOException, TransformerException {
+		Event event = new Event();
+
+		event.setExtId(new EventExtId("Ext"));
+		event.setTitle("Not Anonymized");
+		event.addAttendee(UserAttendee
+				.builder()
+				.displayName("John Do")
+				.email("john@do.fr")
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.CHAIR)
+				.asOrganizer()
+				.build());
+
+		String expectedXML = loadXmlFile("NotAnonymizedSimpleEvent.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(event);
+
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
 	public void testGetXMLDocumentFromListOfEvent() throws SAXException, IOException, TransformerException {
 		Event event = getFakeEvent(Participation.needsAction());
 		Event eventClone = event.clone();

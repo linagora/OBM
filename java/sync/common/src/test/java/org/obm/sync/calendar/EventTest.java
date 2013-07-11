@@ -65,7 +65,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isTrue();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneDayLess() {
 		Event event = new Event();
@@ -74,7 +74,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isTrue();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneHourLess() {
 		Event event = new Event();
@@ -83,7 +83,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isTrue();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneSecondLess() {
 		Event event = new Event();
@@ -92,7 +92,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isTrue();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneMinuteMore() {
 		Event event = new Event();
@@ -101,7 +101,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isFalse();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneYearMore() {
 		Event event = new Event();
@@ -110,7 +110,7 @@ public class EventTest {
 		event.setStartDate(calendar.getTime());
 		assertThat(event.isEventInThePast()).isFalse();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastStartInThePastEndInFuture() {
 		Event event = new Event();
@@ -120,7 +120,7 @@ public class EventTest {
 		event.setDuration(3600);
 		assertThat(event.isEventInThePast()).isFalse();
 	}
-	
+
 	@Test
 	public void testIsEventInThePastOneOccurrenceInFuture() {
 		Event event = new Event();
@@ -135,7 +135,7 @@ public class EventTest {
 		event.setRecurrence(recurrence);
 		assertThat(event.isEventInThePast()).isFalse();
 	}
-	
+
 	@Test
 	public void testModifiedSinceNullLastsync() {
 		Event event = new Event();
@@ -143,7 +143,7 @@ public class EventTest {
 		boolean modified = event.modifiedSince(null);
 		assertThat(modified).isTrue();
 	}
-	
+
 	@Test
 	public void testModifiedSinceZeroLastsync() {
 		Event event = new Event();
@@ -151,17 +151,17 @@ public class EventTest {
 		boolean modified = event.modifiedSince(new Date(0));
 		assertThat(modified).isTrue();
 	}
-	
+
 	@Test
 	public void testModifiedSinceLastsyncBeforeTimecreate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());
-		calendar.add(Calendar.MONTH, -1);	
+		calendar.add(Calendar.MONTH, -1);
 		boolean modified = event.modifiedSince(calendar.getTime());
 		assertThat(modified).isTrue();
 	}
-	
+
 	@Test
 	public void testModifiedLastSyncAfterTimecreateBeforeTimeupdate() {
 		Event event = new Event();
@@ -173,7 +173,7 @@ public class EventTest {
 		boolean modified = event.modifiedSince(calendar.getTime());
 		assertThat(modified).isTrue();
 	}
-	
+
 	@Test
 	public void testModifiedSinceLastsyncAfterTimecreateAfterTimeupdate() {
 		Event event = new Event();
@@ -185,13 +185,13 @@ public class EventTest {
 		boolean modified = event.modifiedSince(calendar.getTime());
 		assertThat(modified).isFalse();
 	}
-	
+
 	@Test
 	public void testModifiedSinceLastsyncAfterTimeCreate() {
 		Event event = new Event();
 		Calendar calendar = Calendar.getInstance();
 		event.setTimeCreate(calendar.getTime());
-		calendar.add(Calendar.MONTH, 1);	
+		calendar.add(Calendar.MONTH, 1);
 		boolean modified = event.modifiedSince(calendar.getTime());
 		assertThat(modified).isFalse();
 	}
@@ -231,22 +231,22 @@ public class EventTest {
 		calendarUpdate.add(Calendar.HOUR, 1);
 		event.setTimeCreate(dateStart);
 		event.setStartDate(dateStart);
-		
+
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
-		
+
 		HashSet<Event> eventExceptions = Sets.newHashSet();
 		Event exception = event.clone();
 		exception.setTimeCreate(dateStart);
 		exception.setTimeUpdate(calendarUpdate.getTime());
 		eventExceptions.add(exception);
-		
-		recurrence.setEventExceptions(eventExceptions);		
+
+		recurrence.setEventExceptions(eventExceptions);
 		event.setRecurrence(recurrence);
-		
+
 		assertThat(event.exceptionModifiedSince(dateStart)).isTrue();
 	}
-	
+
 	@Test
 	public void testRecurrentEventHasNotAnyModifiedException(){
 		Event event = new Event();
@@ -256,21 +256,21 @@ public class EventTest {
 		calendarUpdate.add(Calendar.HOUR, 1);
 		event.setTimeCreate(dateStart);
 		event.setStartDate(dateStart);
-		
+
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		event.setRecurrence(recurrence);
-		
+
 		assertThat(event.exceptionModifiedSince(dateStart)).isFalse();
 	}
-	
+
 	@Test
 	public void testEventClone() {
 		Event newEvent = createOneEvent(5);
 		Event clone = newEvent.clone();
 		assertThat(newEvent).isEqualTo(clone);
 	}
-	
+
 	@Test
 	public void testModifiedEventClone() {
 		Event newEvent = createOneEvent(5);
@@ -278,37 +278,37 @@ public class EventTest {
 		clone.setDescription("event updated");
 		assertThat(clone).isNotSameAs(newEvent);
 	}
-	
+
 	@Test
 	public void testEventRecurrenceClone() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-		
+
 		Event eventCloned = newEvent.clone();
 		assertThat(newEvent).isEqualTo(eventCloned);
 	}
-	
+
 	@Test
 	public void testModifiedEventRecurrenceClone() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		recurrence.setFrequence(10);
 		newEvent.setRecurrence(recurrence);
-		
+
 		Event eventCloned = newEvent.clone();
 		EventRecurrence recurrenceCloned = eventCloned.getRecurrence();
 		recurrenceCloned.setFrequence(25);
-		
+
 		assertThat(newEvent).isNotSameAs(eventCloned);
 	}
-	
+
 	@Test
 	public void testHasNoImportantChangesEvent() {
 		Event event = createOneEvent(5);
 		assertThat(event.hasImportantChanges(event)).isFalse();
 	}
-	
+
 	@Test
 	public void testGetEventExceptionsWithImportantChangesWithNullRecurrence() {
 		Event before = createOneEvent(5);
@@ -327,19 +327,19 @@ public class EventTest {
 		after.addEventException(secondOccurrence);
 		assertThat(after.getEventExceptionsWithImportantChanges(before)).containsSequence(secondOccurrence);
 	}
-	
+
 	@Test
 	public void testHasImportantChangesEventRecurrence() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-	
+
 		Event updateEvent = newEvent.clone();
 		updateEvent.setDescription("Date updated");
 		Calendar calendarUpdate = Calendar.getInstance();
 		calendarUpdate.add(Calendar.HOUR, 4);
 		updateEvent.setStartDate(calendarUpdate.getTime());
-		
+
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isTrue();
 	}
 
@@ -348,53 +348,53 @@ public class EventTest {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-	
+
 		Event updateEvent = newEvent.clone();
 		updateEvent.setDescription("there are not important changes");
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasNotImportantChangesEventAdddingAttendees() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-	
+
 		Event updateEvent = newEvent.clone();
 		updateEvent.setAttendees(createAttendees(8));
-		
+
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesEventWithAddingAttendeesAndUpdatedLocation() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-	
+
 		Event updateEvent = newEvent.clone();
 		updateEvent.setAttendees(createAttendees(6));
 		updateEvent.setLocation("to Paris");
-		
+
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isTrue();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesEventWithUpdatedRecurrence() {
 		Event newEvent = createOneEvent(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(newEvent.getStartDate());
 		newEvent.setRecurrence(recurrence);
-	
+
 		Event updateEvent = newEvent.clone();
 		EventRecurrence updateRecurrence = updateEvent.getRecurrence();
-		
+
 		Calendar calendarUpdate = Calendar.getInstance();
 		calendarUpdate.add(Calendar.HOUR, 4);
 		updateRecurrence.setEnd(calendarUpdate.getTime());
-		
+
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isTrue();
 	}
-	
+
 	@Test
 	public void testModifiedEventExceptionHasImportantChanges() {
 		Event before = createOneEvent(5);
@@ -402,21 +402,21 @@ public class EventTest {
 		DateTime recurrenceEnd = new DateTime(before.getStartDate()).plusDays(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(recurrenceEnd.toDate());
 		before.setRecurrence(recurrence);
-		
+
 		DateTime dateTime = new DateTime(before.getStartDate());
 		Event secondOccurrence = before.getOccurrence(dateTime.plusDays(1).toDate());
-		
+
 		DateTime secondOccurrenceRecurrenceId = new DateTime(secondOccurrence.getStartDate());
 		secondOccurrence.setStartDate(secondOccurrenceRecurrenceId.plusHours(10).toDate());
-		
+
 		recurrence.getEventExceptions().add(secondOccurrence);
-		
+
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
-		
+
 		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setStartDate(new DateTime(firstException.getStartDate()).plusHours(4).toDate());
-		
+
 		assertThat(after.hasImportantChanges(before)).isTrue();
 	}
 
@@ -427,25 +427,25 @@ public class EventTest {
 		DateTime recurrenceEnd = new DateTime(before.getStartDate()).plusDays(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(recurrenceEnd.toDate());
 		before.setRecurrence(recurrence);
-		
+
 		DateTime dateTime = new DateTime(before.getStartDate());
 		Event secondOccurrence = before.getOccurrence(dateTime.plusDays(1).toDate());
-		
+
 		DateTime secondOccurrenceRecurrenceId = new DateTime(secondOccurrence.getStartDate());
 		secondOccurrence.setStartDate(secondOccurrenceRecurrenceId.plusHours(10).toDate());
-		
+
 		recurrence.getEventExceptions().add(secondOccurrence);
-		
+
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
-		
+
 		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setDescription("my very different description");
-		
+
 		assertThat(after.hasImportantChanges(before)).isFalse();
 	}
 
-	
+
 	@Test
 	public void testModifiedEventExceptionHasImportantChangesExceptedEventException() {
 		Event before = createOneEvent(5);
@@ -453,24 +453,24 @@ public class EventTest {
 		DateTime recurrenceEnd = new DateTime(before.getStartDate()).plusDays(5);
 		EventRecurrence recurrence = createDailyRecurrenceUntil(recurrenceEnd.toDate());
 		before.setRecurrence(recurrence);
-		
+
 		DateTime dateTime = new DateTime(before.getStartDate());
 		Event secondOccurrence = before.getOccurrence(dateTime.plusDays(1).toDate());
-		
+
 		DateTime secondOccurrenceRecurrenceId = new DateTime(secondOccurrence.getStartDate());
 		secondOccurrence.setStartDate(secondOccurrenceRecurrenceId.plusHours(10).toDate());
 
 		recurrence.getEventExceptions().add(secondOccurrence);
-		
+
 		Event after = before.clone();
 		EventRecurrence updateRecurrence = after.getRecurrence();
-		
+
 		Event firstException = Iterables.getOnlyElement(updateRecurrence.getEventExceptions());
 		firstException.setStartDate(new DateTime(firstException.getStartDate()).plusHours(4).toDate());
-		
+
 		assertThat(after.hasImportantChangesExceptedEventException(before)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasNotImportantChangesEventWithNullImportantParameter() {
 		Event newEvent = createOneEvent(5);
@@ -478,7 +478,7 @@ public class EventTest {
 		Event updateEvent = newEvent.clone();
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasNotImportantChangesEventWithEmptyImportantChange() {
 		Event newEvent = createOneEvent(5);
@@ -486,7 +486,7 @@ public class EventTest {
 		Event updateEvent = newEvent.clone();
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesEventWithNullImportantChangeToEventCloned() {
 		Event newEvent = createOneEvent(5);
@@ -494,7 +494,7 @@ public class EventTest {
 		updateEvent.setLocation(null);
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isTrue();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesEventWithEmptyImportantChangeToEventCloned() {
 		Event newEvent = createOneEvent(5);
@@ -502,7 +502,7 @@ public class EventTest {
 		updateEvent.setLocation("");
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isTrue();
 	}
-	
+
 	@Test
 	public void testHasNotImportantChangesEventCompareEmptyAndNullImportantChange() {
 		Event newEvent = createOneEvent(5);
@@ -511,52 +511,52 @@ public class EventTest {
 		updateEvent.setLocation("");
 		assertThat(updateEvent.hasImportantChanges(newEvent)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasChangesOnAllEventAttributesExceptedExceptionWithoutChanges() {
 		Event ev1 = createOneEvent(3);
 		Event ev2 = ev1.clone();
-		
+
 		boolean change = ev1.hasChangesExceptedEventException(ev2);
-		
+
 		assertThat(change).isFalse();
 	}
-	
+
 	@Test
 	public void testHasChangesOnAllEventAttributesExceptedExceptionWithChanges() {
 		Event ev1 = createOneEvent(3);
 		Event ev2 = ev1.clone();
-		
+
 		ev2.setTitle("Change: "+ev2.getTitle());
-		
+
 		boolean change = ev1.hasChangesExceptedEventException(ev2);
-		
+
 		assertThat(change).isTrue();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesExceptedEventExceptionWithoutChanges() {
 		Event before = createOneEvent(3);
 		Event after = before.clone();
-		
+
 		EventRecurrence recurrence = createDailyRecurrenceUntil(before.getStartDate());
 		after.setRecurrence(recurrence);
-		
+
 		assertThat(after.hasImportantChangesExceptedEventException(before)).isTrue();
 	}
-	
+
 	@Test
 	public void testHasImportantChangesExceptedEventExceptionWithChanges() {
 		Event ev1 = createOneEvent(3);
 		Event ev2 = ev1.clone();
-		
+
 		ev2.setLocation("a new location");
-		
+
 		boolean change = ev1.hasImportantChangesExceptedEventException(ev2);
-		
+
 		assertThat(change).isTrue();
 	}
-	
+
 	@Test
 	public void getOccurrenceWithoutException(){
 		Event ev1 = createOneEvent(3);
@@ -564,34 +564,34 @@ public class EventTest {
 		cal.setTime(ev1.getStartDate());
 		cal.set(2012, 12, 12);
 		Date recurrenceId = cal.getTime();
-		
-		
+
+
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		recurrence.setFrequence(1);
 		ev1.setRecurrence(recurrence);
-		
+
 		Event instance = ev1.getOccurrence(recurrenceId);
-		
+
 		assertThat(instance).isNotNull();
 		assertThat(recurrenceId).isEqualTo(instance.getStartDate());
 		assertThat(recurrenceId).isEqualTo(instance.getRecurrenceId());
 		assertThat(RecurrenceKind.none).isEqualTo(instance.getRecurrence().getKind());
 	}
-	
+
 	@Test
 	public void getOccurrenceWithException(){
 		Calendar cal = Calendar.getInstance();
 		cal.set(2012, 12, 12);
 		Date recurrenceId = cal.getTime();
-		
+
 		Event ev1 = createOneEvent(3);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		recurrence.setFrequence(1);
 		Event exception = createOneEvent(2);
 		exception.setRecurrenceId(recurrenceId);
-		recurrence.addEventException(exception);		
+		recurrence.addEventException(exception);
 		ev1.setRecurrence(recurrence);
 
 		Event instance = ev1.getOccurrence(recurrenceId);
@@ -666,7 +666,7 @@ public class EventTest {
 		Event event = new Event();
 		event.setAlert(-10);
 	}
-	
+
 	@Test
 	public void testAlertNullInteger() {
 		Event event = new Event();
@@ -790,7 +790,7 @@ public class EventTest {
 		event.setAllday(true);
 		event.setDuration(10);
 	}
-	
+
 	@Test
 	public void testDurationThenAllDayThenNotAllDay() {
 		Event event = new Event();
@@ -800,7 +800,7 @@ public class EventTest {
 		assertThat(event.getDuration()).isEqualTo(10);
 		assertThat(event.isAllday()).isEqualTo(false);
 	}
-	
+
 	@Test
 	public void testEndDateAllDay() {
 		Event event = new Event();
@@ -808,21 +808,21 @@ public class EventTest {
 		event.setStartDate(date("2004-12-11T11:15:10"));
 		assertThat(event.getEndDate()).isEqualTo(date("2004-12-12T11:15:10"));
 	}
-	
+
 	@Test
 	public void testEndDateNullStartDateAndAllDay() {
 		Event event = new Event();
 		event.setAllday(true);
 		assertThat(event.getEndDate()).isNull();
 	}
-	
+
 	@Test
 	public void testEndDateNullStartDate() {
 		Event event = new Event();
 		event.setDuration(10);
 		assertThat(event.getEndDate()).isNull();
 	}
-	
+
 	@Test
 	public void testEndDate() {
 		Event event = new Event();
@@ -830,14 +830,14 @@ public class EventTest {
 		event.setStartDate(date("2004-12-11T11:15:10Z"));
 		assertThat(event.getEndDate()).isEqualTo(date("2004-12-11T11:17:10Z"));
 	}
-	
+
 	@Test
 	public void testEndDateUndefinedDuration() {
 		Event event = new Event();
 		event.setStartDate(date("2004-12-11T11:15:10Z"));
 		assertThat(event.getEndDate()).isEqualTo(date("2004-12-11T11:15:10Z"));
 	}
-	
+
 	private Event createOneEvent(int nbAttendees) {
 		Date currentDate = new Date();
 		Event event = new Event();
@@ -866,7 +866,7 @@ public class EventTest {
 		event.setUid(new EventObmId(1));
 		return event;
 	}
-	
+
 	private List<Attendee> createAttendees(int count) {
 		List<Attendee> attendees = new ArrayList<Attendee>();
 		for (int i = 0; i < count; i++) {
@@ -879,14 +879,14 @@ public class EventTest {
 					.participationRole(ParticipationRole.REQ)
 					.participation(Participation.needsAction())
 					.build();
-			
+
 			attendee.setOrganizer(isOrganizer(i));
-			
+
 			attendees.add(attendee);
 		}
 		return attendees;
 	}
-	
+
 	private boolean isOrganizer(int id) {
 		if (id == 0) {
 			return true;
@@ -894,7 +894,7 @@ public class EventTest {
 			return false;
 		}
 	}
-	
+
 	private EventRecurrence createDailyRecurrenceUntil(Date endDate) {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
@@ -910,11 +910,11 @@ public class EventTest {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
-		
+
 		DateTime recurrenceEndDate = new DateTime(before.getStartDate()).plusDays(3);
 		EventRecurrence eventRecurrence = createDailyRecurrenceUntil(recurrenceEndDate.toDate());
 		before.setRecurrence(eventRecurrence);
-		
+
 		Event after = before.clone();
 
 		Event eventException = before.getOccurrence(recurrenceStartDate.plusDays(1).toDate());
@@ -922,7 +922,7 @@ public class EventTest {
 		after.addEventException(eventException);
 
 		List<Event> changes = after.getEventExceptionsWithImportantChanges(before);
-		
+
 		assertThat(changes).isEmpty();
 	}
 
@@ -931,10 +931,10 @@ public class EventTest {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
-		
+
 		Event after = before.clone();
 		after.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		assertThat(after.hasImportantChanges(before)).isTrue();
 	}
 
@@ -943,11 +943,11 @@ public class EventTest {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
-		
+
 		Event after = before.clone();
-		
+
 		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		assertThat(after.hasImportantChanges(before)).isTrue();
 	}
 
@@ -957,55 +957,55 @@ public class EventTest {
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
 		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		Event after = before.clone();
 		after.addException(recurrenceStartDate.plusDays(1).toDate());
-		
+
 		assertThat(after.hasImportantChanges(before)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasImportantChangeExceptedEventExceptionWithRemovedOccurrence() {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
 		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		Event after = before.clone();
 		after.addException(recurrenceStartDate.plusDays(1).toDate());
-		
+
 		assertThat(after.hasImportantChangesExceptedEventException(before)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasImportantChangeWithRemovedExceptionalOccurrence() {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
 		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		Event after = before.clone();
 		Date secondOccurrenceDate = recurrenceStartDate.plusDays(1).toDate();
-		
+
 		before.addEventException(before.getOccurrence(secondOccurrenceDate));
 		after.addException(secondOccurrenceDate);
-		
+
 		assertThat(after.hasImportantChanges(before)).isFalse();
 	}
-	
+
 	@Test
 	public void testHasImportantChangeExceptedEventExceptionWithRemovedExceptionalOccurrence() {
 		Event before = new Event();
 		DateTime recurrenceStartDate = new DateTime(2012, Calendar.FEBRUARY, 23, 14, 0);
 		before.setStartDate(recurrenceStartDate.toDate());
 		before.setRecurrence(createDailyRecurrenceUntil(recurrenceStartDate.plusDays(4).toDate()));
-		
+
 		Event after = before.clone();
 		Date secondOccurrenceDate = recurrenceStartDate.plusDays(1).toDate();
-		
+
 		before.addEventException(before.getOccurrence(secondOccurrenceDate));
 		after.addException(secondOccurrenceDate);
-		
+
 		assertThat(after.hasImportantChangesExceptedEventException(before)).isFalse();
 	}
 
@@ -1231,7 +1231,7 @@ public class EventTest {
 		Collection<Date> deletedExceptions = after.getNegativeExceptionsChanges(before);
 		assertThat(deletedExceptions).containsOnly(addedException);
 	}
-	
+
 	@Test
 	public void testExtIdIsPropagatedToEventExceptions() {
 		String extIdString = "parent-extid";
@@ -1261,6 +1261,7 @@ public class EventTest {
 		event.setCategory("category");
 		event.setPriority(2);
 		event.setAllday(false);
+		event.setAnonymized(false);
 		event.setType(EventType.VEVENT);
 		event.setOpacity(EventOpacity.TRANSPARENT);
 		event.setTimeCreate(new DateTime(2012, Calendar.APRIL, 24, 14, 0).toDate());
@@ -1281,6 +1282,7 @@ public class EventTest {
 	private Event createPrivateAnonymizedEvent() {
 		Event event = new Event();
 		event.setPrivacy(EventPrivacy.PRIVATE);
+		event.setAnonymized(true);
 		event.setUid(new EventObmId(2));
 		event.setExtId(new EventExtId("my_event"));
 		event.setOwner("owner");
@@ -1307,15 +1309,15 @@ public class EventTest {
 	public void testAnonymizePublicEvent() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 
-		assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
 	}
-	
+
 	@Test
 	public void testAnonymizeConfidentialEvent() {
 		Event confidentialEvent = createNonRecurrentEventWithMostFields();
 		confidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
 
-		assertThat(confidentialEvent.anonymizePrivateItems()).isEqualTo(confidentialEvent);
+		assertThat(confidentialEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(confidentialEvent);
 	}
 
 	@Test
@@ -1325,7 +1327,15 @@ public class EventTest {
 
 		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
 
-		assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
+	}
+
+	@Test
+	public void testIsAnonymizedEvent() {
+		Event privateEvent = createNonRecurrentEventWithMostFields();
+		privateEvent.setPrivacy(EventPrivacy.PRIVATE);
+
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser()).isAnonymized()).isTrue();
 	}
 
 	@Test
@@ -1342,7 +1352,7 @@ public class EventTest {
 
 		publicEvent.setRecurrence(recurrence);
 
-		assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
 	}
 
 	@Test
@@ -1372,9 +1382,9 @@ public class EventTest {
 
 		privateAnonymizedEvent.setRecurrence(anonymizedRecurrence);
 
-		assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
 	}
-	
+
 	@Test
 	public void testDeclinedAttendeeWithoutDelegationEndsUpInNeedsAction() {
 		Event event = createNonRecurrentEventWithMostFields();
@@ -1386,7 +1396,7 @@ public class EventTest {
 
 		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 	}
-	
+
 	public void testAcceptedAttendeeWithoutDelegationEndsUpInNeedsAction() {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
@@ -1394,10 +1404,10 @@ public class EventTest {
 		att1.setParticipation(Participation.accepted());
 		att1.setCanWriteOnCalendar(false);
 		event.updateParticipation();
-		
+
 		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 	}
-	
+
 	@Test
 	public void testDeclinedAttendeeWithDelegationEndsUpAutoAccepted() {
 		Event event = createNonRecurrentEventWithMostFields();
@@ -1406,10 +1416,10 @@ public class EventTest {
 		att1.setParticipation(Participation.declined());
 		att1.setCanWriteOnCalendar(true);
 		event.updateParticipation();
-		
+
 		assertThat(att1.getParticipation()).isEqualTo(Participation.accepted());
 	}
-	
+
 	@Test
 	public void testNeedsActionAttendeeWithDelegationEndsUpAutoAccepted() {
 		Event event = createNonRecurrentEventWithMostFields();
@@ -1418,7 +1428,7 @@ public class EventTest {
 		att1.setParticipation(Participation.needsAction());
 		att1.setCanWriteOnCalendar(true);
 		event.updateParticipation();
-		
+
 		assertThat(att1.getParticipation()).isEqualTo(Participation.accepted());
 	}
 
@@ -1439,7 +1449,7 @@ public class EventTest {
 		event.setTitle(title);
 		assertThat(event.getTitle().length()).isEqualTo(Event.DATABASE_TITLE_MAX_LENGTH);
 	}
-	
+
 	@Test
 	public void testNullTitle() {
 		Event event = new Event();
@@ -1447,7 +1457,7 @@ public class EventTest {
 		event.setTitle(title);
 		assertThat(event.getTitle()).isNull();
 	}
-	
+
 	@Test
 	public void testChangeAttendeesParticipation() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
@@ -1484,64 +1494,64 @@ public class EventTest {
 			assertThat(updatedAttendee.getParticipation().getComment()).isEqualTo(Comment.EMPTY);
 		}
 	}
-	
+
 	@Test
 	public void testAddOrReplaceAttendeeWhenNoAttendee() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.setAttendees(Lists.<Attendee>newArrayList());
 
 		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
-		
+
 		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
 
 		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
 	}
-	
+
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendee() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
 		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
-		
+
 		publicEvent.addOrReplaceAttendee("user@domain", newAttendee);
 
 		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
 	}
-	
+
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendeeOtherCase() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
 		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
-		
+
 		publicEvent.addOrReplaceAttendee("User@domain", newAttendee);
 
 		assertThat(publicEvent.getAttendees()).containsOnly(newAttendee);
 	}
-	
+
 	@Test
 	public void testAddOrReplaceAttendeeWhenSameAttendeeReplacingOtherEmail() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.setAttendees(ImmutableList.of(UserAttendee.builder().email("user@domain").build()));
 
 		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
-		
+
 		publicEvent.addOrReplaceAttendee("otheruser@domain", newAttendee);
 
 		assertThat(publicEvent.getAttendees()).containsOnly(
 				UserAttendee.builder().email("user@domain").build(),
 				newAttendee);
 	}
-	
+
 	@Test(expected=NullPointerException.class)
 	public void testAddOrReplaceAttendeeWhenNullAddess() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 		publicEvent.addAttendee(UserAttendee.builder().email("user@domain").build());
 
 		Attendee newAttendee = UserAttendee.builder().email("user@domain").build();
-		
+
 		publicEvent.addOrReplaceAttendee(null, newAttendee);
 	}
 
@@ -1552,7 +1562,7 @@ public class EventTest {
 
 		publicEvent.addOrReplaceAttendee("user@domain", null);
 	}
-	
+
 	@Test
 	public void testFindOwner() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
@@ -1601,59 +1611,59 @@ public class EventTest {
 
 		assertThat(event.findAttendeeFromEmail(email)).isEqualTo(organizer);
 	}
-	
+
 	@Test(expected=NullPointerException.class)
 	public void testWithOrganizerIfNoneOnNullOrganizer() {
 		new Event().withOrganizerIfNone(null);
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testWithOrganizerIfNoneOnNotOrganizerAttendee() {
 		Attendee organizer = ContactAttendee.builder().asAttendee().email("organizer@domain").build();
 		new Event().withOrganizerIfNone(organizer);
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testWithOrganizerIfNoneOnNullEmailOrganizer() {
 		Attendee organizer = ContactAttendee.builder().asOrganizer().email(null).build();
 		new Event().withOrganizerIfNone(organizer);
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testWithOrganizerIfNoneOnEmptyEmailOrganizer() {
 		Attendee organizer = ContactAttendee.builder().asOrganizer().email("").build();
 		new Event().withOrganizerIfNone(organizer);
 	}
-	
+
 	@Test
 	public void testWithOrganizerIfNoneOnEventWithOrgnanizer() {
 		Attendee organizer = ContactAttendee.builder().asOrganizer().email("organizer@domain").build();
 		Attendee initialOrganizer = ContactAttendee.builder().asOrganizer().email("initialOrganizer@domain").build();
 		Event event = new Event();
 		event.addAttendee(initialOrganizer);
-		
+
 		assertThat(event.withOrganizerIfNone(organizer).findOrganizer()).isEqualTo(initialOrganizer);
 	}
-	
+
 	@Test
 	public void testWithOrganizerIfNoneOnEventWithAttendeeButNoOrgnanizer() {
 		Attendee organizer = ContactAttendee.builder().asOrganizer().email("organizer@domain").build();
 		Attendee attendee = ContactAttendee.builder().asAttendee().email("notorganizer@domain").build();
 		Event event = new Event();
 		event.addAttendee(attendee);
-		
+
 		assertThat(event.withOrganizerIfNone(organizer).findOrganizer()).isEqualTo(organizer);
 	}
-	
+
 	@Test
 	public void testWithOrganizerIfNoneOnEventWithAttendeeWithSameEmail() {
 		Attendee organizer = ContactAttendee.builder().asOrganizer().email("will_be_organizer@domain").build();
 		Attendee attendee = ContactAttendee.builder().asAttendee().email("will_be_organizer@domain").build();
 		Event event = new Event();
 		event.addAttendee(attendee);
-		
+
 		Attendee newEventOrganizer = event.withOrganizerIfNone(organizer).findOrganizer();
-		
+
 		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualToComparingFieldByField(organizer);
 	}
 }

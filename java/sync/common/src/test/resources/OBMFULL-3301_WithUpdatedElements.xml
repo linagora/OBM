@@ -2,7 +2,7 @@
 	<calendar-changes lastSync="1330953989000" xmlns="http://www.obm.org/xsd/sync/calendar-changes.xsd">
 	<removed/>
 	<updated>
-		<event allDay="false" isInternal="true" sequence="3" type="VEVENT">
+		<event anonymized="false" allDay="false" isInternal="true" sequence="3" type="VEVENT">
 		<timeupdate>1292580000000</timeupdate>
 		<timecreate>1289988000000</timecreate>
 		<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>
@@ -26,7 +26,7 @@
 		<exception>1295258400000</exception>
 		</exceptions>
 		<eventExceptions>
-		<eventException allDay="false" isInternal="true" sequence="3" type="VEVENT">
+		<eventException anonymized="false" allDay="false" isInternal="true" sequence="3" type="VEVENT">
 		<timeupdate>1292580000000</timeupdate>
 		<timecreate>1289988000000</timecreate>
 		<recurrenceId>1295258400000</recurrenceId>

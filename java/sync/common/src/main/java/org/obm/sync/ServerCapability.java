@@ -50,5 +50,9 @@ public enum ServerCapability {
 	/**
 	 * Used to advertise support for pagination in list* endpoints.
 	 */
-	CALENDAR_HANDLER_SUPPORTS_PAGINATION
+	CALENDAR_HANDLER_SUPPORTS_PAGINATION,
+	/**
+	 * Advertise support for anonymized events
+	 */
+	SERVER_SIDE_ANONYMIZATION
 }

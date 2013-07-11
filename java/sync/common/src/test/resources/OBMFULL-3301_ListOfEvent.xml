@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <events xmlns="http://www.obm.org/xsd/sync/events.xsd">
-	<event allDay="false" isInternal="true" sequence="3" type="VEVENT">
+	<event anonymized="false" allDay="false" isInternal="true" sequence="3" type="VEVENT">
 		<timeupdate>1292580000000</timeupdate>
 		<timecreate>1289988000000</timecreate>
 		<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>
@@ -25,7 +25,7 @@
 		</exceptions><eventExceptions/>
 		</recurrence>
 	</event>
-	<event allDay="false" isInternal="true" sequence="3" type="VEVENT">
+	<event anonymized="false" allDay="false" isInternal="true" sequence="3" type="VEVENT">
 		<timeupdate>1292580000000</timeupdate>
 		<timecreate>1289988000000</timecreate>
 		<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>
