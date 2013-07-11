@@ -37,13 +37,19 @@ class SyncStatus extends AbstractUserStatus {
   const SYNC_URL = "http://%HOST%:8080/obm-sync/services";
   
   public function executeForDomain($domain) {
+    global $obm;
+
     $user = $this->getTestUser();
     $servers = of_domain_get_domain_syncserver($domain["id"]);
     
     foreach ($servers as $server) {
       $host = $server[0];      
       $url = str_replace("%HOST%", $host["ip"], self::SYNC_URL);
-      $loginResult = self::callSync($url, "login/doLogin", $user);
+      $loginResult = self::callSync($url, "login/doLogin", array(
+          "login" => $user['login'] . '@' . $domain['name'],
+          "password" => $user['password'],
+          "origin" => $user['origin']
+      ));
 
       if (is_array($loginResult)) {
         return self::failure($domain['name'], $host['ip'], $loginResult);
@@ -57,10 +63,13 @@ class SyncStatus extends AbstractUserStatus {
         if (is_array($abSyncResult)) {
           return self::failure($domain['name'], $host['ip'], $abSyncResult);
         }
-        
+
+        $obm['domain_id'] = $domain['id']; //So that get_user_id works as expected
+        $userInfo = get_user_info(get_user_id($user['login']));
+
         $calSyncResult = self::callSync($url, "calendar/getSyncWithSortedChanges", array(
             "sid" => $sid,
-            "calendar" => $user['login'],
+            "calendar" => $userInfo['email'],
             "lastSync" => time() * 1000
         ));
         
