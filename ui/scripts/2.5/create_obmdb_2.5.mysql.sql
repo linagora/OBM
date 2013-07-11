@@ -4605,8 +4605,10 @@ CREATE TABLE `opush_event_mapping` (
   `device_id` int(11) NOT NULL,
   `event_uid` varchar(300) NOT NULL,
   `event_ext_id` varchar(300) NOT NULL,
+  `event_ext_id_hash` binary(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `opush_event_mapping_device_id_opush_device_id_fkey` (`device_id`),
+  UNIQUE KEY `opush_event_mapping_device_id_event_ext_id_fkey` (`device_id`,`event_ext_id_hash`),
   CONSTRAINT `opush_event_mapping_device_id_opush_device_id_fkey` FOREIGN KEY (`device_id`) REFERENCES `opush_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
