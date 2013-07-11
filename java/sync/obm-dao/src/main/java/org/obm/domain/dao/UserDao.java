@@ -718,4 +718,25 @@ public class UserDao {
 		}
 	}
 
+	public void delete(ObmUser user) throws SQLException, UserNotFoundException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+
+		try {
+			connection = obmHelper.getConnection();
+			ps = connection.prepareStatement("DELETE FROM UserObm WHERE userobm_id = ?");
+
+			ps.setInt(1, user.getUid());
+
+			int updateCount = ps.executeUpdate();
+
+			if (updateCount != 1) {
+				throw new UserNotFoundException(String.format("No user found with id %d.", user.getUid()));
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(connection, ps, null);
+		}
+	}
+
 }

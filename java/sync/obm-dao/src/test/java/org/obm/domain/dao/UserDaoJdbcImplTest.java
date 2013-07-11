@@ -272,6 +272,37 @@ public class UserDaoJdbcImplTest {
 		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
 	}
 
+	@Test
+	public void testGetAfterDelete() throws Exception {
+		dao.delete(sampleUser(1, 3));
+
+		assertThat(dao.findUserById(1, domain)).isNull();
+	}
+
+	@Test
+	public void testListAfterDelete() throws Exception {
+		dao.delete(sampleUser(1, 3));
+
+		List<ObmUser> users = ImmutableList.of(
+				sampleUser(2, 4),
+				sampleUser(3, 5),
+				sampleUserWithoutMail(4, 6));
+
+		assertThat(dao.list(domain)).isEqualTo(users);
+	}
+
+	@Test(expected = UserNotFoundException.class)
+	public void testDeleteWhenUserDoesntExist() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(666)
+				.login("lucifer")
+				.domain(domain)
+				.build();
+
+		dao.delete(user);
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId) {
 		return ObmUser
 				.builder()
