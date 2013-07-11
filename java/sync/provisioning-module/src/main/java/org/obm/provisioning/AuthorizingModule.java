@@ -31,53 +31,34 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import javax.servlet.ServletContext;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.resources.AbstractBatchAwareResource;
+import obm.org.provisioning.authentication.ObmJDBCAuthorizingRealm;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
+import org.apache.shiro.guice.web.ShiroWebModule;
+import org.apache.shiro.realm.Realm;
 
-public class ResourceForTest {
+public class AuthorizingModule extends ShiroWebModule {
+	
+	public AuthorizingModule(ServletContext servletContext) {
+		super(servletContext);
+	}
 
-	@Context
-	ObmDomain domain;
-	
-	@POST
-	@Path("/serialization")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) throws DaoException {
-		return user;
+	@Override
+	protected void configureShiroWeb() {
+			try {
+				bindRealm().toConstructor(ObmJDBCAuthorizingRealm.class.getConstructor());
+			} catch (SecurityException e) {
+				throw e;
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException("NoSuchMethodException", e);
+			}
+		
+		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
+		
+		addFilterChain("/provisioning/v1/*/do/**", AUTHC_BASIC);
+		
+		expose(Realm.class);
 	}
-	
-	@GET
-	@Path("/authorization")
-	@RequiresRoles("all")
-	public Response authorize() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authorization2")
-	@RequiresRoles("not_all")
-	public Response authorize2() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authentication")
-	@RequiresAuthentication
-	public Response authenticate() throws DaoException {
-        return Response.ok("authenticated").build();
-	}
+
 }

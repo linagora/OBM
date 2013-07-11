@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import javax.servlet.ServletContext;
+
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.TestTransactionConfiguration;
@@ -49,6 +51,10 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.name.Names;
 
 public class TestingProvisioningModule extends ProvisioningService {
+
+	public TestingProvisioningModule(ServletContext servletContext) {
+		super(servletContext);
+	}
 
 	@Override
 	protected void configureServlets() {

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import javax.servlet.ServletContext;
+
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
@@ -47,6 +49,12 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 
 public class ObmSyncModule extends AbstractModule {
+	
+	private ServletContext servletContext;
+	
+	public ObmSyncModule(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
 	private static final String APPLICATION_NAME = "sync";
 	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
@@ -65,7 +73,7 @@ public class ObmSyncModule extends AbstractModule {
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
 		install(new DatabaseMetadataModule());
-		install(new ProvisioningService());
+		install(new ProvisioningService(servletContext));
 	}
 
 	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {

@@ -1,6 +1,9 @@
 package org.obm.provisioning;
 
 
+import javax.servlet.ServletContext;
+
+import org.apache.shiro.guice.aop.ShiroAopModule;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
@@ -54,9 +57,16 @@ public class ProvisioningService extends JerseyServletModule {
 	public static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
 	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 
+	private ServletContext servletContext;
+	
+	public ProvisioningService(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+	
 	@Override
 	protected void configureServlets() {
-		serve(PROVISIONING_URL_PATTERN).with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
+		serve(PROVISIONING_URL_PATTERN)
+			.with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 
 		bindRestResources();
 		bindDao();
@@ -64,6 +74,9 @@ public class ProvisioningService extends JerseyServletModule {
 		install(new BatchProcessingModule());
 		install(new LdapModule());
 		install(new SatelliteClientModule());
+		
+		install(new ShiroAopModule());
+		install(new AuthorizingModule(servletContext));
 	}
 
 	private void bindDao() {

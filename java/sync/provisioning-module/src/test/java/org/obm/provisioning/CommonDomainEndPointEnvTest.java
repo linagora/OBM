@@ -47,6 +47,10 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.codehaus.jackson.map.InjectableValues;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.easymock.IMocksControl;
@@ -75,8 +79,6 @@ import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.util.Modules;
 
@@ -89,9 +91,18 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	public static class Env extends AbstractModule {
 
+		private Server server;
+		private Context context;
+		
 		@Override
 		protected void configure() {
-			install(Modules.override(new ProvisioningService()).with(new AbstractModule() {
+			
+			server = createServer();
+			bind(Server.class).toInstance(server);
+			
+			context = createContext(server);
+			
+			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new AbstractModule() {
 
 				private IMocksControl mocksControl = createControl();
 
@@ -111,22 +122,23 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				}
-
-				@Provides
-				@Singleton
-				protected Server createServer() {
-					Server server = new Server(0);
-					Context root = new Context(server, "/", Context.SESSIONS);
-
-					root.addFilter(GuiceFilter.class, "/*", 0);
-					root.addServlet(DefaultServlet.class, "/*");
-
-					return server;
-				}
-
 			}));
 		}
-
+		
+		private Context createContext(Server server) {
+			Context root = new Context(server, "/", Context.SESSIONS);
+			
+			root.addFilter(ShiroFilter.class, "/*", 0);
+			root.addFilter(GuiceFilter.class, "/*", 0);
+			root.addServlet(DefaultServlet.class, "/*");
+			
+			return root;
+		}
+		
+		private Server createServer() {
+			Server server = new Server(0);
+			return server;
+		}
 	}
 
 	protected static final ObmDomain domain = ObmDomain
@@ -180,6 +192,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected BatchDao batchDao;
 	@Inject
 	protected ObjectMapper objectMapper;
+	@Inject
+	protected Realm realm;
 
 	protected String baseUrl;
 	protected int serverPort;
@@ -191,6 +205,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		baseUrl = "http://localhost:" + serverPort + ProvisioningService.PROVISIONING_URL_PREFIX;
 
 		objectMapper.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, domain));
+		SecurityUtils.setSecurityManager(new DefaultWebSecurityManager(realm));
 	}
 
 	@After

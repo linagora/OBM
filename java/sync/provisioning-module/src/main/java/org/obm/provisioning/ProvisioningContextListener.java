@@ -35,6 +35,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.SecurityManager;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -51,6 +54,8 @@ public class ProvisioningContextListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			injector = createInjector(sce.getServletContext());
+			SecurityManager securityManager = injector.getInstance(SecurityManager.class);
+			SecurityUtils.setSecurityManager(securityManager);
 		} catch (Exception e) {
 			Throwables.propagate(e);
 		}
@@ -69,7 +74,7 @@ public class ProvisioningContextListener implements ServletContextListener {
     @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
-		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ProvisioningService());
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ProvisioningService(servletContext));
 	}
 
     @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)

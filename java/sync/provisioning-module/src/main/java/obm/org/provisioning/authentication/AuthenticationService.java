@@ -29,55 +29,16 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package obm.org.provisioning.authentication;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import java.util.Collection;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.resources.AbstractBatchAwareResource;
+public interface AuthenticationService {
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
-
-public class ResourceForTest {
-
-	@Context
-	ObmDomain domain;
+	public String getPassword(String username, String password, String domain);
 	
-	@POST
-	@Path("/serialization")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) throws DaoException {
-		return user;
-	}
+	public Collection<String> getRoles(String username);
 	
-	@GET
-	@Path("/authorization")
-	@RequiresRoles("all")
-	public Response authorize() throws DaoException {
-		return Response.ok("authorized").build();
-	}
+	public Collection<String> getPermissions(String username);
 	
-	@GET
-	@Path("/authorization2")
-	@RequiresRoles("not_all")
-	public Response authorize2() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authentication")
-	@RequiresAuthentication
-	public Response authenticate() throws DaoException {
-        return Response.ok("authenticated").build();
-	}
 }

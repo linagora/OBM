@@ -29,55 +29,55 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package obm.org.provisioning.authentication;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import org.apache.shiro.authc.AccountException;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.resources.AbstractBatchAwareResource;
+import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
-
-public class ResourceForTest {
-
-	@Context
-	ObmDomain domain;
+@Singleton
+public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	
-	@POST
-	@Path("/serialization")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) throws DaoException {
-		return user;
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal) {
+		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+		
+		String username = (String) principal.getPrimaryPrincipal();
+		
+		if (username == null) {
+			throw new AccountException("Null usernames are not allowed by this realm.");
+		}
+
+		if (username.equals("user1")) {
+			authorizationInfo.addRole("all");
+		} else {
+			authorizationInfo.addRole("not_all");
+		}
+		
+		return authorizationInfo;
 	}
-	
-	@GET
-	@Path("/authorization")
-	@RequiresRoles("all")
-	public Response authorize() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authorization2")
-	@RequiresRoles("not_all")
-	public Response authorize2() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authentication")
-	@RequiresAuthentication
-	public Response authenticate() throws DaoException {
-        return Response.ok("authenticated").build();
+
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
+			throws AuthenticationException {
+		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
+		String username = upToken.getUsername();
+
+		if (username == null) {
+			throw new AccountException("Null usernames are not allowed by this realm.");
+		}
+		
+		String password = "password";
+		return new SimpleAuthenticationInfo(username, password, this.getName());
 	}
 }

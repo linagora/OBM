@@ -81,7 +81,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 	@VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 
-		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule());
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule(servletContext));
 	}
 
 	@VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)

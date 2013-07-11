@@ -31,10 +31,10 @@ package org.obm.provisioning;
 
 import javax.ws.rs.Path;
 
-@Path("{domain}/tests")
+@Path("{domain}/do")
 public class DomainBasedSubResourceForTest {
 	
-	@Path("/serialization")
+	@Path("/tests/on")
 	public Class<ResourceForTest> tests() {
 		return ResourceForTest.class;
 	}

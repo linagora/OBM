@@ -37,7 +37,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +60,7 @@ public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTe
 		expectDomain();
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/tests/serialization", obmUserToJson());
+		HttpResponse httpResponse = post("/do/tests/on/serialization", "user", "password", obmUserToJson());
 		EntityUtils.consume(httpResponse.getEntity());
 		
 		mocksControl.verify();
@@ -64,5 +68,17 @@ public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTe
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
+	}
+	
+	private HttpResponse post(String path, String username, String password, StringEntity content) throws Exception {
+		return createPostRequestWithAuth(path, username, password, content).execute().returnResponse();
+	}
+	
+	private Request createPostRequestWithAuth(String path, String username, String password, StringEntity content) {
+		final Request request = Request.Post(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+		request.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials(username, password), "UTF-8", false));
+		return request;
 	}
 }
