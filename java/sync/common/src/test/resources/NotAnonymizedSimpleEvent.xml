@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="http://www.obm.org/xsd/sync/event.xsd" anonymized="false" allDay="false" isInternal="false" sequence="0" type="VEVENT">
+<extId>Ext</extId>
+<opacity>OPAQUE</opacity>
+<title>Not Anonymized</title>
+<tz>Europe/Paris</tz>
+<duration>0</duration>
+<priority>0</priority>
+<privacy>0</privacy>
+<attendees>
+<attendee displayName="John Do" email="john@do.fr" isOrganizer="true" percent="0" required="CHAIR" state="NEEDS-ACTION"/>
+</attendees>
+<recurrence kind="none"/>
+</event>

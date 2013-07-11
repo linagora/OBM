@@ -1,33 +1,33 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * Copyright (C) 2011-2014  Linagora
  *
- * This program is free software: you can redistribute it and/or 
- * modify it under the terms of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
- * License, or (at your option) any later version, provided you comply 
- * with the Additional Terms applicable for OBM connector by Linagora 
- * pursuant to Section 7 of the GNU Affero General Public License, 
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
- * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
- * from infringing Linagora intellectual property rights over its trademarks 
- * and commercial brands. Other Additional Terms apply, 
- * see <http://www.linagora.com/licenses/> for more details. 
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version, provided you comply
+ * with the Additional Terms applicable for OBM connector by Linagora
+ * pursuant to Section 7 of the GNU Affero General Public License,
+ * subsections (b), (c), and (e), pursuant to which you must notably (i) retain
+ * the “Message sent thanks to OBM, Free Communication by Linagora”
+ * signature notice appended to any and all outbound messages
+ * (notably e-mail and meeting requests), (ii) retain all hypertext links between
+ * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain
+ * from infringing Linagora intellectual property rights over its trademarks
+ * and commercial brands. Other Additional Terms apply,
+ * see <http://www.linagora.com/licenses/> for more details.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
- * for more details. 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License 
- * and its applicable Additional Terms for OBM along with this program. If not, 
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
- * OBM connectors. 
- * 
+ * You should have received a copy of the GNU Affero General Public License
+ * and its applicable Additional Terms for OBM along with this program. If not,
+ * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3
+ * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to
+ * OBM connectors.
+ *
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
@@ -57,17 +57,20 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import fr.aliacom.obm.common.user.ObmUser;
+
 public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializable {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	public static final int DATABASE_TITLE_MAX_LENGTH = 255;
 	public static final String EVENT_TABLE = "Event";
-	
+
 	private String title;
 	private String description;
 	private EventObmId uid;
 	private EventExtId extId;
 	private EventPrivacy privacy;
+	private boolean anonymized;
 	private EventMeetingStatus meetingStatus;
 	private String owner;
 	private String ownerDisplayName;
@@ -97,9 +100,9 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	private Date recurrenceId;
 	private boolean internalEvent;
-	
+
 	private int sequence;
-	
+
 	public Event() {
 		attendees = new LinkedList<Attendee>();
 		type = EventType.VEVENT;
@@ -168,7 +171,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public void setAllday(boolean allDay) {
 		this.allday = allDay;
 	}
-	
+
 	public Collection<Attendee> getUserAttendees() {
 		return Collections2.filter(attendees, Predicates.instanceOf(UserAttendee.class));
 	}
@@ -187,14 +190,14 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	public void addAttendees(Collection<? extends Attendee> attendees) {
 		if(this.attendees == null){
-			this.attendees = new LinkedList<Attendee>(); 
+			this.attendees = new LinkedList<Attendee>();
 		}
 		this.attendees.addAll(attendees);
 	}
-	
+
 	public void setAttendees(List<? extends Attendee> attendees) {
 		this.attendees.clear();
-		
+
 		if (attendees != null) {
 			addAttendees(attendees);
 		}
@@ -353,11 +356,11 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public Integer getEntityId() {
 		return entityId;
 	}
-	
+
 	public void setEntityId(Integer entityId) {
 		this.entityId = entityId;
 	}
-	
+
 	@Override
 	public Event clone() {
 		Event event = new Event();
@@ -378,6 +381,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		event.creatorEmail = creatorEmail;
 		event.priority = priority;
 		event.privacy = privacy;
+		event.anonymized = anonymized;
 		event.recurrence = recurrence.clone();
 		event.timeUpdate = timeUpdate;
 		event.timezoneName = timezoneName;
@@ -425,7 +429,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public Date getTimeCreate() {
 		return timeCreate;
 	}
-	
+
 	public boolean isEventInThePast() {
 		Date end = getEndDate();
 		Date now = new Date();
@@ -498,7 +502,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		return false;
 	}
-	
+
 	public boolean exceptionModifiedSince(Date reference){
 		boolean exceptionModified = false;
 		for (Event event: recurrence.getEventExceptions()) {
@@ -509,11 +513,11 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		return exceptionModified;
 	}
-	
+
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
 	}
-	
+
 	public int getSequence() {
 		return sequence;
 	}
@@ -528,7 +532,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		return null;
 	}
-	
+
 	public Attendee findOrganizer() {
 		for (Attendee att : attendees) {
 			if (att.isOrganizer()) {
@@ -537,7 +541,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		return null;
 	}
-	
+
 	public Attendee findOwner() {
 		return findAttendeeFromEmail(ownerEmail);
 	}
@@ -546,7 +550,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public Integer getIndex() {
 		return getObmId().getIndex();
 	}
-	
+
 	public boolean hasImportantChanges(Event event) {
 		if (hasImportantChangesExceptedEventException(event)) {
 			return true;
@@ -701,7 +705,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	public void addException(Date recurrenceId) {
 		recurrence.addException(recurrenceId);
 	}
-	
+
 	public void updateParticipation() {
 		changeAttendeesParticipation();
 		Set<Event> eventsExceptions = getEventsExceptions();
@@ -709,7 +713,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 			event.changeAttendeesParticipation();
 		}
 	}
-	
+
 	private void changeAttendeesParticipation() {
 		for (Attendee att: getAttendees()) {
 			if (att.isCanWriteOnCalendar()) {
@@ -720,7 +724,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 			att.getParticipation().setComment(Comment.EMPTY);
 		}
 	}
-	
+
 
 	public boolean hasAnyExceptionAtDate(Date exceptionDateToFind) {
 		return recurrence.hasAnyExceptionAtDate(exceptionDateToFind);
@@ -728,13 +732,13 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(title, description, uid, extId, privacy, owner,
+		return Objects.hashCode(title, description, uid, extId, privacy, anonymized, owner,
 				ownerDisplayName, ownerEmail, creatorDisplayName, creatorEmail, location,
 				startDate, duration, alert, category, priority, allday, attendees, recurrence, type,
 				completion, percent, opacity, entityId, timeUpdate, timeCreate, timezoneName,
 				recurrenceId, internalEvent, sequence, meetingStatus);
 	}
-	
+
 	@Override
 	public final boolean equals(Object object) {
 		if (object instanceof Event) {
@@ -744,6 +748,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 				&& Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.extId, that.extId)
 				&& Objects.equal(this.privacy, that.privacy)
+				&& Objects.equal(this.anonymized, that.anonymized)
 				&& Objects.equal(this.meetingStatus, that.meetingStatus)
 				&& Objects.equal(this.owner, that.owner)
 				&& Objects.equal(this.ownerDisplayName, that.ownerDisplayName)
@@ -787,16 +792,31 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	}
 
 	@Override
-	public Event anonymizePrivateItems() {
-		if (this.privacy == EventPrivacy.PRIVATE) {
-			return this.anonymize();
+	public Event anonymizePrivateItems(ObmUser caller) {
+		Preconditions.checkNotNull(caller);
+		if (this.privacy == EventPrivacy.PRIVATE && !isUserAttendeePresent(caller)) {
+			return this.anonymize(caller);
 		} else {
 			return this;
 		}
 	}
 
-	private Event anonymize() {
+	public boolean isUserAttendeePresent(ObmUser caller) {
+		Collection<Attendee> attendees = this.getUserAttendees();
+
+		for ( Attendee attendee : attendees ) {
+			if ( attendee.getEntityId() != null && attendee.getEntityId() == caller.getEntityId() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private Event anonymize(ObmUser calendarUser) {
 		Event anonymizedEvent = new Event();
+
+		anonymizedEvent.setAnonymized(true);
 
 		anonymizedEvent.owner = this.owner;
 		anonymizedEvent.ownerDisplayName = this.ownerDisplayName;
@@ -828,7 +848,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		anonymizedEvent.percent = this.percent;
 
 		anonymizedEvent.recurrenceId = this.recurrenceId;
-		anonymizedEvent.recurrence = this.recurrence.anonymizePrivateItems();
+		anonymizedEvent.recurrence = this.recurrence.anonymizePrivateItems(calendarUser);
 
 		return anonymizedEvent;
 	}
@@ -843,4 +863,13 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		attendees.add(newAttendee);
 	}
+
+	public boolean isAnonymized() {
+		return anonymized;
+	}
+
+	public void setAnonymized(boolean anonymized) {
+		this.anonymized = anonymized;
+	}
+
 }

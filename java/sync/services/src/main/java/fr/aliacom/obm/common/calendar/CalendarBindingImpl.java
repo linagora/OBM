@@ -939,8 +939,11 @@ public class CalendarBindingImpl implements ICalendar {
 			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
 			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
 
-			return userHasReadOnlyDelegation
-					? changesToSend.anonymizePrivateItems(): inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), changesToSend);
+			if (userHasReadOnlyDelegation) {
+				return changesToSend.anonymizePrivateItems(userService.getUserFromAccessToken(token));
+			}
+
+			return inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), changesToSend);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());

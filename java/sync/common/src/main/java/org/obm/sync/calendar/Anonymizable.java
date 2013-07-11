@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import fr.aliacom.obm.common.user.ObmUser;
+
 public interface Anonymizable<T> {
-	public T anonymizePrivateItems();
+	public T anonymizePrivateItems(ObmUser caller);
 }

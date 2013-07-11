@@ -55,6 +55,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @RunWith(SlowFilterRunner.class)
 public class EventTest {
@@ -1263,6 +1264,7 @@ public class EventTest {
 		event.setCategory("category");
 		event.setPriority(2);
 		event.setAllday(false);
+		event.setAnonymized(false);
 		event.setType(EventType.VEVENT);
 		event.setOpacity(EventOpacity.TRANSPARENT);
 		event.setTimeCreate(new DateTime(2012, Calendar.APRIL, 24, 14, 0).toDate());
@@ -1283,6 +1285,7 @@ public class EventTest {
 	private Event createPrivateAnonymizedEvent() {
 		Event event = new Event();
 		event.setPrivacy(EventPrivacy.PRIVATE);
+		event.setAnonymized(true);
 		event.setUid(new EventObmId(2));
 		event.setExtId(new EventExtId("my_event"));
 		event.setOwner("owner");
@@ -1309,7 +1312,7 @@ public class EventTest {
 	public void testAnonymizePublicEvent() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 
-		assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
 	}
 	
 	@Test
@@ -1317,7 +1320,7 @@ public class EventTest {
 		Event confidentialEvent = createNonRecurrentEventWithMostFields();
 		confidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
 
-		assertThat(confidentialEvent.anonymizePrivateItems()).isEqualTo(confidentialEvent);
+		assertThat(confidentialEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(confidentialEvent);
 	}
 
 	@Test
@@ -1327,7 +1330,15 @@ public class EventTest {
 
 		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
 
-		assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
+	}
+
+	@Test
+	public void testIsAnonymizedEvent() {
+		Event privateEvent = createNonRecurrentEventWithMostFields();
+		privateEvent.setPrivacy(EventPrivacy.PRIVATE);
+		
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser()).isAnonymized()).isTrue();
 	}
 
 	@Test
@@ -1344,7 +1355,7 @@ public class EventTest {
 
 		publicEvent.setRecurrence(recurrence);
 
-		assertThat(publicEvent.anonymizePrivateItems()).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
 	}
 
 	@Test
@@ -1374,7 +1385,7 @@ public class EventTest {
 
 		privateAnonymizedEvent.setRecurrence(anonymizedRecurrence);
 
-		assertThat(privateEvent.anonymizePrivateItems()).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
 	}
 	
 	@Test
@@ -1602,5 +1613,38 @@ public class EventTest {
 		event.addAttendee(UserAttendee.builder().email("user2@obm.com").build());
 
 		assertThat(event.findAttendeeFromEmail(email)).isEqualTo(organizer);
+	}
+
+	@Test
+	public void testIsUserAttendeePresent() {
+		Event event = new Event();
+		ObmUser user = ToolBox.getDefaultObmUser();
+		UserAttendee attendee = UserAttendee.builder().entityId(user.getEntityId()).build();
+
+		event.addAttendee(attendee);
+		assertThat(event.isUserAttendeePresent(user)).isEqualTo(true);
+	}
+
+	@Test
+	public void testIsNotUserAttendee() {
+		Event event = new Event();
+		UserAttendee attendee = UserAttendee.builder().build();
+
+		event.addAttendee(attendee);
+		assertThat(event.isUserAttendeePresent(ToolBox.getDefaultObmUser())).isEqualTo(false);
+	}
+
+	@Test
+	public void testIsNotUserAttendeeWithNoAttendees() {
+		Event event = new Event();
+
+		assertThat(event.isUserAttendeePresent(ToolBox.getDefaultObmUser())).isEqualTo(false);
+	}
+
+	@Test
+	public void testIsNotUserAttendeeWithNoUser() {
+		Event event = new Event();
+
+		assertThat(event.isUserAttendeePresent(null)).isEqualTo(false);
 	}
 }

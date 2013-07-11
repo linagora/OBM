@@ -177,6 +177,7 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		}
 		parent.setAttribute("sequence", String.valueOf(event.getSequence()));
 		parent.setAttribute("isInternal", String.valueOf(event.isInternalEvent()));
+		parent.setAttribute("anonymized", String.valueOf(event.isAnonymized()));
 		createIfNotNull(parent, "timeupdate", DateHelper.asString(event.getTimeUpdate()));
 		createIfNotNull(parent, "timecreate", DateHelper.asString(event.getTimeCreate()));
 		createIfNotNull(parent, "recurrenceId", DateHelper.asString(event.getRecurrenceId()));

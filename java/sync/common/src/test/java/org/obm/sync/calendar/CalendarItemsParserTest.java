@@ -480,4 +480,61 @@ public class CalendarItemsParserTest {
 		assertThat(resourceInfo.isRead()).isTrue();
 		assertThat(resourceInfo.isWrite()).isFalse();
 	}
+	
+	@Test
+	public void testParseAnonymizedEvent() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<event anonymized=\"true\" allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"true\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
+		"<title>fake rdv</title>" +
+		"<owner>john@do.fr</owner>" +
+		"<date>1295258400000</date>" +
+		"<duration>3600</duration>" +
+		"<attendees>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\" isOrganizer=\"true\"/>" +
+		"</attendees>" +
+		"</event>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+
+		assertThat(ev.isAnonymized()).isTrue();
+	}
+
+	@Test
+	public void testParseNotAnonymizedEvent() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<event anonymized=\"false\" allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"true\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
+		"<title>fake rdv</title>" +
+		"<owner>john@do.fr</owner>" +
+		"<date>1295258400000</date>" +
+		"<duration>3600</duration>" +
+		"<attendees>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\" isOrganizer=\"true\"/>" +
+		"</attendees>" +
+		"</event>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+
+		assertThat(ev.isAnonymized()).isFalse();
+	}
+
+	@Test
+	public void testParseWithNoAnonymizedAttributeEvent() throws SAXException, IOException, FactoryConfigurationError {
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<event allDay=\"false\" id=\"\" type=\"VEVENT\" isInternal=\"true\" sequence=\"0\" xmlns=\"http://www.obm.org/xsd/sync/event.xsd\">" +
+		"<extId>2bf7db53-8820-4fe5-9a78-acc6d3262149</extId>" +
+		"<title>fake rdv</title>" +
+		"<owner>john@do.fr</owner>" +
+		"<date>1295258400000</date>" +
+		"<duration>3600</duration>" +
+		"<attendees>" +
+		"<attendee displayName=\"John Do\" email=\"john@do.fr\" percent=\"0\" required=\"CHAIR\" state=\"NEEDS-ACTION\" isOrganizer=\"true\"/>" +
+		"</attendees>" +
+		"</event>";
+		Document doc = DOMUtils.parse(new ByteArrayInputStream(xml.getBytes()));
+		Event ev = parser.parseEvent(doc.getDocumentElement());
+
+		assertThat(ev.isAnonymized()).isFalse();
+	}
 }
