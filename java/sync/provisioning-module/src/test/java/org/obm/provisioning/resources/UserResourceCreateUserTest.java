@@ -53,7 +53,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import com.google.common.collect.ImmutableMap;
 
 
-@Slow
+//@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {

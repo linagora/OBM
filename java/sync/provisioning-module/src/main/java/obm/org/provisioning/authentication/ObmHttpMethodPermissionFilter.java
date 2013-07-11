@@ -29,43 +29,50 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package obm.org.provisioning.authentication;
 
-import javax.servlet.ServletContext;
+import java.util.HashMap;
+import java.util.Map;
 
-import obm.org.provisioning.authentication.ObmHttpMethodPermissionFilter;
-import obm.org.provisioning.authentication.ObmJDBCAuthorizingRealm;
+import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
 
-import org.apache.shiro.guice.web.ShiroWebModule;
-import org.apache.shiro.realm.Realm;
-
-import com.google.inject.Key;
-
-public class AuthorizingModule extends ShiroWebModule {
+public class ObmHttpMethodPermissionFilter extends HttpMethodPermissionFilter {
 	
-	public AuthorizingModule(ServletContext servletContext) {
-		super(servletContext);
-	}
+    private static final String CREATE_ACTION = "create";
+    private static final String READ_ACTION = "read";
+    private static final String UPDATE_ACTION = "update";
+    private static final String DELETE_ACTION = "delete";
+    private static final String PATCH_ACTION = "patch";
+	
+	private final Map<String, String> httpMethodActions = new HashMap<String, String>();
+	
+    private static enum HttpMethodAction {
 
-	@Override
-	protected void configureShiroWeb() {
-			try {
-				bindRealm().toConstructor(ObmJDBCAuthorizingRealm.class.getConstructor());
-			} catch (SecurityException e) {
-				throw e;
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException("NoSuchMethodException", e);
-			}
-		
-		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
-		
-		Key<ObmHttpMethodPermissionFilter> customHttpMethodPermissionFilter = Key.get(ObmHttpMethodPermissionFilter.class);
-		
-		addFilterChain("/provisioning/v1/*/batches/*/users/**", ANON);
-		addFilterChain("/provisioning/v1/*/batches/*/profiles/**", ANON);
-		addFilterChain("/provisioning/v1/*/batches/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
-		
-		expose(Realm.class);
-	}
+        DELETE(DELETE_ACTION),
+        GET(READ_ACTION),
+        POST(CREATE_ACTION),
+        PUT(UPDATE_ACTION),
+        PATCH(PATCH_ACTION);
 
+        private final String action;
+
+        private HttpMethodAction(String action) {
+            this.action = action;
+        }
+
+        public String getAction() {
+            return this.action;
+        }
+    }
+	
+    public ObmHttpMethodPermissionFilter() {
+        for (HttpMethodAction methodAction : HttpMethodAction.values()) {
+            httpMethodActions.put(methodAction.name().toLowerCase(), methodAction.getAction());
+        }
+    }
+    
+    @Override
+    protected Map<String, String> getHttpMethodActions() {
+        return this.httpMethodActions;
+    }
 }

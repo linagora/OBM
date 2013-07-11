@@ -33,12 +33,14 @@ package obm.org.provisioning.authentication;
 
 import java.util.Collection;
 
-public interface AuthenticationService {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	public String getPassword(String username, String password, String domain);
+public interface AuthenticationService {
 	
 	public Collection<String> getRoles(String username);
 	
 	public Collection<String> getPermissions(String username);
+
+	public String getPassword(String login, ObmDomain domain);
 	
 }

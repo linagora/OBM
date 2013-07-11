@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.BatchDao;
@@ -39,6 +40,7 @@ public class BatchResource {
 
 	@GET
 	@Path("{batchId}")
+	@RequiresPermissions("batches:read")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		Batch batch = batchProcessor.getRunningBatch(batchId);
@@ -57,6 +59,7 @@ public class BatchResource {
 	}
 
 	@POST
+	@RequiresPermissions("batches:create")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response create() throws DaoException, URISyntaxException {
 		Batch batch = Batch
@@ -73,6 +76,7 @@ public class BatchResource {
 	}
 
 	@DELETE
+	@RequiresPermissions("batches:delete")
 	@Path("{batchId}")
 	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		try {

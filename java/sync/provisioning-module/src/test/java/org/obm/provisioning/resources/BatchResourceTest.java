@@ -29,15 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -51,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 @Slow
@@ -64,41 +64,53 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteWithUnknownDomain() throws Exception {
 		expectNoDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		mocksControl.replay();
-
-		HttpResponse response = delete("/batches/1");
+		
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.delete("/batches/1");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testDeleteWithUnknownBatch() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		batchDao.delete(batchId(1));
 		expectLastCall().andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 
-		HttpResponse response = delete("/batches/1");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.delete("/batches/1");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testDelete() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		batchDao.delete(batchId(1));
 		expectLastCall();
 		mocksControl.replay();
 
-		HttpResponse response = delete("/batches/1");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/batches/1");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 	}
 
 	@Test
@@ -109,155 +121,194 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 				.domain(domain);
 
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
 		mocksControl.replay();
-
-		HttpResponse response = post("/batches", null);
-
-		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.CREATED.getStatusCode());
-		assertThat(response.getFirstHeader("Location").getValue()).isEqualTo(baseUrl + '/' + domain.getUuid().get() + "/batches/1");
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+		
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.CREATED.getStatusCode())
+			.header("Location", baseUrl + '/' + domain.getUuid().get() + "/batches/1")
+			.body(containsString(
 				"{" +
 					"\"id\":1" +
-				"}");
+				"}")).
+		when()
+			.post("/batches");
+
+		mocksControl.verify();
 	}
 
 	@Test
 	public void testCreateWithUnknownDomain() throws Exception {
 		expectNoDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		mocksControl.replay();
-
-		HttpResponse response = post("/batches", null);
+		
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.post("/batches");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testCreateOnError() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.create(isA(Batch.class))).andThrow(new DaoException());
 		mocksControl.replay();
 
-		HttpResponse response = post("/batches", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.post("/batches");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
 	@Test
 	public void testGetWithUnknownBatch() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.get(batchId(12))).andReturn(null);
+		
 		mocksControl.replay();
-
-		HttpResponse response = get("/batches/12");
+		
+		given()
+			.auth().basic("username", "password").
+			expect()
+				.statusCode(Status.NOT_FOUND.getStatusCode()).
+			when()
+				.get("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testGetWithUnknownDomain() throws Exception {
 		expectNoDomain();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
-
-		HttpResponse response = get("/batches/12");
+		
+		given()
+			.auth().basic("username", "password").
+			expect()
+				.statusCode(Status.NOT_FOUND.getStatusCode()).
+			when()
+				.get("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testGetOnError() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
+		
 		mocksControl.replay();
 
-		HttpResponse response = get("/batches/12");
+		given()
+			.auth().basic("username", "password").
+			expect()
+				.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+			when()
+				.get("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
 	@Test
 	public void testGet() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.get(batchId(12))).andReturn(batch);
+		
 		mocksControl.replay();
-
-		HttpResponse response = get("/batches/12");
+		
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(
+						"{" +
+							"\"id\":1," +
+							"\"status\":\"ERROR\"," +
+							"\"operationCount\":2," +
+							"\"operationDone\":1," +
+							"\"operations\":[" +
+								"{" +
+									"\"status\":\"SUCCESS\"," +
+									"\"entityType\":\"USER\"," +
+									"\"entity\":{\"id\":123456}," +
+									"\"operation\":\"POST\"," +
+									"\"error\":null" +
+								"}," +
+								"{" +
+									"\"status\":\"ERROR\"," +
+									"\"entityType\":\"USER\"," +
+									"\"entity\":{}," +
+									"\"operation\":\"PATCH\"," +
+									"\"error\":\"Invalid User\"" +
+								"}" +
+							"]" +
+						"}")).
+		when()
+			.get("/batches/12");
+		
 
 		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
-				"{" +
-					"\"id\":1," +
-					"\"status\":\"ERROR\"," +
-					"\"operationCount\":2," +
-					"\"operationDone\":1," +
-					"\"operations\":[" +
-						"{" +
-							"\"status\":\"SUCCESS\"," +
-							"\"entityType\":\"USER\"," +
-							"\"entity\":{\"id\":123456}," +
-							"\"operation\":\"POST\"," +
-							"\"error\":null" +
-						"}," +
-						"{" +
-							"\"status\":\"ERROR\"," +
-							"\"entityType\":\"USER\"," +
-							"\"entity\":{}," +
-							"\"operation\":\"PATCH\"," +
-							"\"error\":\"Invalid User\"" +
-						"}" +
-					"]" +
-				"}");
 	}
 
 	@Test
 	public void testGetWhenBatchIsRunning() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
+		expectIsAuthenticatedAndIsAuthorized();
 		mocksControl.replay();
 
-		HttpResponse response = get("/batches/12");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(
+						"{" +
+							"\"id\":1," +
+							"\"status\":\"ERROR\"," +
+							"\"operationCount\":2," +
+							"\"operationDone\":1," +
+							"\"operations\":[" +
+								"{" +
+									"\"status\":\"SUCCESS\"," +
+									"\"entityType\":\"USER\"," +
+									"\"entity\":{\"id\":123456}," +
+									"\"operation\":\"POST\"," +
+									"\"error\":null" +
+								"}," +
+								"{" +
+									"\"status\":\"ERROR\"," +
+									"\"entityType\":\"USER\"," +
+									"\"entity\":{}," +
+									"\"operation\":\"PATCH\"," +
+									"\"error\":\"Invalid User\"" +
+								"}" +
+							"]" +
+						"}")).
+		when()
+			.get("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
-				"{" +
-					"\"id\":1," +
-					"\"status\":\"ERROR\"," +
-					"\"operationCount\":2," +
-					"\"operationDone\":1," +
-					"\"operations\":[" +
-						"{" +
-							"\"status\":\"SUCCESS\"," +
-							"\"entityType\":\"USER\"," +
-							"\"entity\":{\"id\":123456}," +
-							"\"operation\":\"POST\"," +
-							"\"error\":null" +
-						"}," +
-						"{" +
-							"\"status\":\"ERROR\"," +
-							"\"entityType\":\"USER\"," +
-							"\"entity\":{}," +
-							"\"operation\":\"PATCH\"," +
-							"\"error\":\"Invalid User\"" +
-						"}" +
-					"]" +
-				"}");
 	}
 
 	@Test
@@ -265,57 +316,79 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(null);
+		expectIsAuthenticatedAndIsAuthorized();
 		mocksControl.replay();
 
-		HttpResponse response = put("/batches/12", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.put("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testCommitWithAlreadyRunningBatch() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
 		mocksControl.replay();
 
-		HttpResponse response = put("/batches/12", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.put("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
 	}
 
 	@Test
 	public void testCommitOnError() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall().andThrow(new ProcessingException());
 		mocksControl.replay();
 
-		HttpResponse response = put("/batches/12", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.put("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
 	@Test
 	public void testCommit() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall();
 		mocksControl.replay();
 
-		HttpResponse response = put("/batches/12", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.put("/batches/12");
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+	}
+	
+	private void expectIsAuthenticatedAndIsAuthorized() {
+		expectPasswordReturns("username", "password");
+		expectAuthorizingReturns("username",
+				ImmutableSet.of(""), ImmutableSet.of("batches:create", "batches:read", "batches:update", "batches:delete"));
 	}
 }

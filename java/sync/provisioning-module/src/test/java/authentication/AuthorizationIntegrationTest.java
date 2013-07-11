@@ -68,7 +68,6 @@ public class AuthorizationIntegrationTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testSubjectCannotAuthenticate() throws Exception {
-//		expectDomain();
 		mocksControl.replay();
 		
 		HttpResponse httpResponse = get("/do/tests/on/authentication", "user1", "password2");

@@ -36,9 +36,12 @@ import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+
+import obm.org.provisioning.authentication.AuthenticationService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -81,6 +84,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.util.Modules;
+import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -119,6 +123,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DomainBasedSubResourceForTest.class);
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
+					bind(AuthenticationService.class).toInstance(mocksControl.createMock(AuthenticationService.class));
+					bind(ObmDomain.class).toInstance(domain);
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				}
@@ -194,6 +200,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected ObjectMapper objectMapper;
 	@Inject
 	protected Realm realm;
+	@Inject
+	private AuthenticationService authenticationService;
 
 	protected String baseUrl;
 	protected int serverPort;
@@ -206,6 +214,8 @@ public abstract class CommonDomainEndPointEnvTest {
 
 		objectMapper.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, domain));
 		SecurityUtils.setSecurityManager(new DefaultWebSecurityManager(realm));
+		RestAssured.baseURI = baseUrl + "/" + domain.getUuid().get();
+		RestAssured.port = serverPort;
 	}
 
 	@After
@@ -229,36 +239,53 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
 
+	protected void expectPasswordReturns(String login, String password) {
+		expect(authenticationService.getPassword(login, domain)).andReturn(password);
+	}
+	
+	protected void expectAuthorizingReturns(String login, Collection<String> roles, Collection<String> permissions) {
+		expect(authenticationService.getRoles(login)).andReturn(roles);
+		expect(authenticationService.getPermissions(login)).andReturn(permissions);
+	}
+	
 	protected HttpResponse get(String path) throws Exception {
 		return createGetRequest(path).execute().returnResponse();
 	}
 
-	protected HttpResponse post(String path, StringEntity content) throws ClientProtocolException, IOException {
+	protected HttpResponse post(String path, StringEntity content)
+			throws ClientProtocolException, IOException {
 		return createPostRequest(path, content).execute().returnResponse();
 	}
 
-	protected HttpResponse put(String path, StringEntity content) throws ClientProtocolException, IOException {
+	protected HttpResponse put(String path, StringEntity content)
+			throws ClientProtocolException, IOException {
 		return createPutRequest(path, content).execute().returnResponse();
 	}
-	
-	protected HttpResponse patch(String path, StringEntity content) throws ClientProtocolException, IOException {
-		return new DefaultHttpClient().execute(createPatchRequest(path, content));
+
+	protected HttpResponse patch(String path, StringEntity content)
+			throws ClientProtocolException, IOException {
+		return new DefaultHttpClient()
+				.execute(createPatchRequest(path, content));
 	}
-	
-	protected HttpResponse delete(String path) throws ClientProtocolException, IOException {
+
+	protected HttpResponse delete(String path) throws ClientProtocolException,
+			IOException {
 		return createDeleteRequest(path).execute().returnResponse();
 	}
 
 	private Request createPostRequest(String path, StringEntity content) {
-		return Request.Post(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+		return Request.Post(baseUrl + "/" + domain.getUuid().get() + path)
+				.body(content);
 	}
 
 	private Request createPutRequest(String path, StringEntity content) {
-		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(content);
+		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(
+				content);
 	}
-	
+
 	private HttpRequestBase createPatchRequest(String path, StringEntity content) {
-		final HttpPatch patch = new HttpPatch(baseUrl + "/" + domain.getUuid().get() + path);
+		final HttpPatch patch = new HttpPatch(baseUrl + "/"
+				+ domain.getUuid().get() + path);
 		patch.setEntity(content);
 		return patch;
 	}
@@ -270,7 +297,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected Request createDeleteRequest(String path) {
 		return Request.Delete(baseUrl + "/" + domain.getUuid().get() + path);
 	}
-
+	
 	public static Batch.Id batchId(Integer id) {
 		return Batch.Id.builder().id(id).build();
 	}

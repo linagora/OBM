@@ -32,15 +32,11 @@
 package org.obm.provisioning;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 
@@ -60,24 +56,4 @@ public class ResourceForTest {
 		return user;
 	}
 	
-	@GET
-	@Path("/authorization")
-	@RequiresRoles("all")
-	public Response authorize() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authorization2")
-	@RequiresRoles("not_all")
-	public Response authorize2() throws DaoException {
-		return Response.ok("authorized").build();
-	}
-	
-	@GET
-	@Path("/authentication")
-	@RequiresAuthentication
-	public Response authenticate() throws DaoException {
-        return Response.ok("authenticated").build();
-	}
 }

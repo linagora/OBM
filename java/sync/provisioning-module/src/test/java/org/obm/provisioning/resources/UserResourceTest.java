@@ -148,11 +148,12 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testdeleteWithUnknownUrl() throws Exception {
+	public void testDeleteWithUnknownUrl() throws Exception {
 		expectDomain();
+		expectBatch();
 		mocksControl.replay();
 
-		HttpResponse httpResponse = delete("/batches/1/userss/1");
+		HttpResponse httpResponse = delete("/batches/1/users/1/a/b");
 
 		mocksControl.verify();
 

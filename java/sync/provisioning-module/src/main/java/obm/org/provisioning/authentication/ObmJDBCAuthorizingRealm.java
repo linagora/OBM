@@ -42,26 +42,32 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
+	
+	@Inject
+	private AuthenticationService authenticationService;
+	
+	@Inject
+	private ObmDomain domain;
 	
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal) {
 		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
 		
-		String username = (String) principal.getPrimaryPrincipal();
+		String login = (String) principal.getPrimaryPrincipal();
 		
-		if (username == null) {
+		if (login == null) {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
-
-		if (username.equals("user1")) {
-			authorizationInfo.addRole("all");
-		} else {
-			authorizationInfo.addRole("not_all");
-		}
+		
+		authorizationInfo.addRoles(authenticationService.getRoles(login));
+		authorizationInfo.addStringPermissions(authenticationService.getPermissions(login));
 		
 		return authorizationInfo;
 	}
@@ -71,13 +77,13 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 			throws AuthenticationException {
 		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 
-		String username = upToken.getUsername();
+		String login = upToken.getUsername();
 
-		if (username == null) {
+		if (login == null) {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
 		
-		String password = "password";
-		return new SimpleAuthenticationInfo(username, password, this.getName());
+		String password = authenticationService.getPassword(login, domain);
+		return new SimpleAuthenticationInfo(login, password, this.getName());
 	}
 }
