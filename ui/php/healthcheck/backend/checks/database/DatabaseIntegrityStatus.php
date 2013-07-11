@@ -49,13 +49,18 @@ class DatabaseIntegrityStatus implements Check {
   function execute() {
     $obm_q = new DB_OBM();
     $db_type = $obm_q->type;
-    
+    $error_messages = array("The OBM database is not properly installed.");
     if ($db_type == 'PGSQL') {
       return $this->checkDeletedEventSequenceExists($obm_q) ?
         new CheckResult(checkStatus::OK) :
-        new CheckResult(checkStatus::ERROR, array("The OBM database is not properly installed."));
+        new CheckResult(checkStatus::ERROR, $error_messages);
     } else {
-      return new CheckResult(CheckStatus::OK, array("No test are implemented against mysql yet."));
+      $ok = $this->checkEventExtIdHashExists($obm_q);
+      if ( !$ok ) {
+        $error_messages[] = "column event_ext_id_hash missing in table opush_event_mapping";
+        return new CheckResult(checkStatus::ERROR, $error_messages);
+      }
+      return new CheckResult(checkStatus::OK);
     }
   }
 
@@ -69,5 +74,17 @@ class DatabaseIntegrityStatus implements Check {
     
     return false;
   }
+
+  function checkEventExtIdHashExists($obm_q) {
+    $query = "select count(*) as c from opush_event_mapping where event_ext_id_hash = 0";
+
+    $obm_q->query($query);
+    if ($obm_q->num_rows()) {
+      return true;
+    }
+
+    return false;
+  }
+  
   
 }
