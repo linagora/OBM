@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package authentication;
+package org.obm.provisioning.authentication;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;

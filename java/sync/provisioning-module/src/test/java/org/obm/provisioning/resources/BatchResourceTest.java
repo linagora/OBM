@@ -50,7 +50,6 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 @Slow
@@ -384,11 +383,5 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 			.put("/batches/12");
 
 		mocksControl.verify();
-	}
-	
-	private void expectIsAuthenticatedAndIsAuthorized() {
-		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username",
-				ImmutableSet.of(""), ImmutableSet.of("batches:create", "batches:read", "batches:update", "batches:delete"));
 	}
 }

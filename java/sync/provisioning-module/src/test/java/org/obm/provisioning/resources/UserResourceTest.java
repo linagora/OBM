@@ -31,15 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static com.jayway.restassured.RestAssured.given;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -57,112 +54,155 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/batches/1/users/a/b");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/batches/1/users/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testPostWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = post("/batches/1/users/a/b", null);
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.post("/batches/1/users/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testPostConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
-
-		final StringEntity userToJson = invalidMediaTypeEntity();
-		HttpResponse httpResponse = post("/batches/1/users", userToJson);
+		
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
+		when()
+			.post("/batches/1/users");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
 	}
 	
 	@Test
 	public void testPutWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = put("/batches/1/users/a/b", null);
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.put("/batches/1/users/1/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testPutConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		final StringEntity userToJson = invalidMediaTypeEntity();
-		HttpResponse httpResponse = put("/batches/1/users/1", userToJson);
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
+		when()
+			.put("/batches/1/users/1");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
 	}
 	
 	@Test
 	public void testPatchWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = patch("/batches/1/users/a/b", null);
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.patch("/batches/1/users/1/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testPatchConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		final StringEntity userToJson = invalidMediaTypeEntity();
-		HttpResponse httpResponse = patch("/batches/1/users/1", userToJson);
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
+		when()
+			.patch("/batches/1/users/1");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode());
 	}
 	
 	@Test
 	public void testDeleteWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
-
-		HttpResponse httpResponse = delete("/batches/1/users/1/a/b");
+		
+		given()
+			.auth().basic("username", "password")
+			.body(invalidMediaTypeEntity()).
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.delete("/batches/1/users/1/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
-	private StringEntity invalidMediaTypeEntity()
+	private String invalidMediaTypeEntity()
 			throws UnsupportedEncodingException {
-		final StringEntity userToJson = new StringEntity(
+		return 
 				"{" +
 				  "\"uid\":1," +
 				  "\"entityId\":0," +
@@ -196,8 +236,6 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 				    "\"aliases\":[]" +
 				  "}," +
 				  "\"publicFreeBusy\":false" +
-				"}");
-		userToJson.setContentType(MediaType.TEXT_PLAIN);
-		return userToJson;
+				"}";
 	}
 }

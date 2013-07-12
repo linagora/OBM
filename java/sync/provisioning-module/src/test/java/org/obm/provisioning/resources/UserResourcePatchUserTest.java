@@ -31,15 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -51,6 +47,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.common.collect.ImmutableMap;
+import com.jayway.restassured.http.ContentType;
 
 
 @Slow
@@ -61,6 +58,7 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testPatchAUser() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
@@ -69,18 +67,21 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = patch("/batches/1/users/1", obmUserToJson());
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.patch("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 	
 	@Test
 	public void testPatchUserThrowError() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
@@ -89,11 +90,15 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = patch("/batches/1/users/1", obmUserToJson());
+		given()
+			.auth().basic("username", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.patch("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
+
 }

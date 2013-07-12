@@ -37,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
@@ -45,6 +46,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 public class UserWriteResource extends AbstractBatchAwareResource {
 
 	@POST
+	@RequiresPermissions("users:create")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response create(String user) throws DaoException {
@@ -52,6 +54,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@PUT
+	@RequiresPermissions("users:update")
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
@@ -60,6 +63,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@DELETE
+	@RequiresPermissions("users:delete")
 	@Path("/{userId}")
 	@Produces(JSON_WITH_UTF8)
 	public Response delete() throws DaoException {
@@ -67,6 +71,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 	
 	@PATCH
+	@RequiresPermissions("users:patch")
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)

@@ -143,9 +143,8 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 
 		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
-
-	@Override
-	protected HttpResponse get(String path) throws Exception {
+	
+	private HttpResponse get(String path) throws Exception {
 		return Request.Get(baseUrl + path).execute().returnResponse();
 	}
 

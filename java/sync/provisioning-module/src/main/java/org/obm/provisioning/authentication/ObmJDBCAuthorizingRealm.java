@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package obm.org.provisioning.authentication;
+package org.obm.provisioning.authentication;
 
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;

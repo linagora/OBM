@@ -33,11 +33,10 @@ package org.obm.provisioning;
 
 import javax.servlet.ServletContext;
 
-import obm.org.provisioning.authentication.ObmHttpMethodPermissionFilter;
-import obm.org.provisioning.authentication.ObmJDBCAuthorizingRealm;
-
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
+import org.obm.provisioning.authentication.ObmHttpMethodPermissionFilter;
+import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
 
 import com.google.inject.Key;
 
@@ -61,9 +60,10 @@ public class AuthorizingModule extends ShiroWebModule {
 		
 		Key<ObmHttpMethodPermissionFilter> customHttpMethodPermissionFilter = Key.get(ObmHttpMethodPermissionFilter.class);
 		
-		addFilterChain("/provisioning/v1/*/batches/*/users/**", ANON);
 		addFilterChain("/provisioning/v1/*/batches/*/profiles/**", ANON);
+		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
 		addFilterChain("/provisioning/v1/*/batches/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
+		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
 		
 		expose(Realm.class);
 	}

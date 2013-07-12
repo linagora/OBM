@@ -31,15 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -61,74 +57,85 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteAUserWithTrueExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password")
+			.parameter("expunge", true).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 	
 	@Test
 	public void testDeleteAUserWithFalseExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=false");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password")
+			.parameter("expunge", false).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 	
 	@Test
 	public void testDeleteAUserWithDefaultFalseExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/batches/1/users/1");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 
 	@Test
 	public void testDeleteAUserWithError() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = delete("/batches/1/users/1?expunge=true");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.delete("/batches/1/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 }

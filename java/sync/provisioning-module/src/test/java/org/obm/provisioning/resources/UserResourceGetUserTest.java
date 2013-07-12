@@ -31,15 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -56,67 +53,90 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testUnknownUrl() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users/a/b");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/users/a/b");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testGetAUser() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users/1");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(obmUserToJsonString())).
+		when()
+			.get("/users/1");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
 	}
 
 	@Test
 	public void testGetAUserOnNonExistentDomain() throws Exception {
 		expectNoDomain();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users/1");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/users/1");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 	
 	@Test
 	public void testGetNonExistingUser() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.getByExtId(userExtId("123"), domain)).andReturn(null);
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users/123");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NO_CONTENT.getStatusCode()).
+		when()
+			.get("/users/123");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NO_CONTENT.getStatusCode());
 	}
 	
 	@Test
 	public void testGetUserThrowError() throws Exception {
 		expectDomain();
-		expect(userDao.getByExtId(userExtId("1"), domain)).andThrow(new RuntimeException("bad things happen"));
+		expectIsAuthenticatedAndIsAuthorized();
+		expect(userDao.getByExtId(userExtId("123"), domain)).andThrow(new RuntimeException("bad things happen"));
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users/1");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.get("/users/123");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
 }

@@ -34,22 +34,13 @@ package org.obm.provisioning;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import obm.org.provisioning.authentication.AuthenticationService;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -69,6 +60,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.provisioning.authentication.AuthenticationService;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -80,6 +72,7 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
@@ -248,54 +241,10 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(authenticationService.getPermissions(login)).andReturn(permissions);
 	}
 	
-	protected HttpResponse get(String path) throws Exception {
-		return createGetRequest(path).execute().returnResponse();
-	}
-
-	protected HttpResponse post(String path, StringEntity content)
-			throws ClientProtocolException, IOException {
-		return createPostRequest(path, content).execute().returnResponse();
-	}
-
-	protected HttpResponse put(String path, StringEntity content)
-			throws ClientProtocolException, IOException {
-		return createPutRequest(path, content).execute().returnResponse();
-	}
-
-	protected HttpResponse patch(String path, StringEntity content)
-			throws ClientProtocolException, IOException {
-		return new DefaultHttpClient()
-				.execute(createPatchRequest(path, content));
-	}
-
-	protected HttpResponse delete(String path) throws ClientProtocolException,
-			IOException {
-		return createDeleteRequest(path).execute().returnResponse();
-	}
-
-	private Request createPostRequest(String path, StringEntity content) {
-		return Request.Post(baseUrl + "/" + domain.getUuid().get() + path)
-				.body(content);
-	}
-
-	private Request createPutRequest(String path, StringEntity content) {
-		return Request.Put(baseUrl + "/" + domain.getUuid().get() + path).body(
-				content);
-	}
-
-	private HttpRequestBase createPatchRequest(String path, StringEntity content) {
-		final HttpPatch patch = new HttpPatch(baseUrl + "/"
-				+ domain.getUuid().get() + path);
-		patch.setEntity(content);
-		return patch;
-	}
-
-	protected Request createGetRequest(String path) {
-		return Request.Get(baseUrl + "/" + domain.getUuid().get() + path);
-	}
-
-	protected Request createDeleteRequest(String path) {
-		return Request.Delete(baseUrl + "/" + domain.getUuid().get() + path);
+	protected void expectIsAuthenticatedAndIsAuthorized() {
+		expectPasswordReturns("username", "password");
+		expectAuthorizingReturns("username",
+				ImmutableSet.of(""), ImmutableSet.of("users:*", "batches:*", "profiles:*"));
 	}
 	
 	public static Batch.Id batchId(Integer id) {

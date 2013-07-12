@@ -29,50 +29,18 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package obm.org.provisioning.authentication;
+package org.obm.provisioning.authentication;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
-import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class ObmHttpMethodPermissionFilter extends HttpMethodPermissionFilter {
+public interface AuthenticationService {
 	
-    private static final String CREATE_ACTION = "create";
-    private static final String READ_ACTION = "read";
-    private static final String UPDATE_ACTION = "update";
-    private static final String DELETE_ACTION = "delete";
-    private static final String PATCH_ACTION = "patch";
+	public Collection<String> getRoles(String username);
 	
-	private final Map<String, String> httpMethodActions = new HashMap<String, String>();
+	public Collection<String> getPermissions(String username);
+
+	public String getPassword(String login, ObmDomain domain);
 	
-    private static enum HttpMethodAction {
-
-        DELETE(DELETE_ACTION),
-        GET(READ_ACTION),
-        POST(CREATE_ACTION),
-        PUT(UPDATE_ACTION),
-        PATCH(PATCH_ACTION);
-
-        private final String action;
-
-        private HttpMethodAction(String action) {
-            this.action = action;
-        }
-
-        public String getAction() {
-            return this.action;
-        }
-    }
-	
-    public ObmHttpMethodPermissionFilter() {
-        for (HttpMethodAction methodAction : HttpMethodAction.values()) {
-            httpMethodActions.put(methodAction.name().toLowerCase(), methodAction.getAction());
-        }
-    }
-    
-    @Override
-    protected Map<String, String> getHttpMethodActions() {
-        return this.httpMethodActions;
-    }
 }

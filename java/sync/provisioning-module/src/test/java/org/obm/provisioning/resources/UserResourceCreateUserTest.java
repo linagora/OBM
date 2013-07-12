@@ -31,15 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -51,9 +47,10 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.common.collect.ImmutableMap;
+import com.jayway.restassured.http.ContentType;
 
 
-//@Slow
+@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
@@ -62,36 +59,43 @@ public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
 	public void testCreateAUser() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/batches/1/users", obmUserToJson());
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/batches/1/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
 	}
 	
 	@Test
 	public void testCreateUserThrowError() throws Exception {
 		expectDomain();
 		expectBatch();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/batches/1/users", obmUserToJson());
+		given()
+			.auth().basic("username", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.post("/batches/1/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode())
-			.isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 }

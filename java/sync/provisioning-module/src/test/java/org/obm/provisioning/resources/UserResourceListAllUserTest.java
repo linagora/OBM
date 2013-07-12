@@ -31,17 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.ContentType;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -63,70 +60,93 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUserOnNonExistentDomain() throws Exception {
 		expectNoDomain();
+		expectIsAuthenticatedAndIsAuthorized();
+		
 		mocksControl.replay();
 
-		HttpResponse httpResponse = get("/users");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/users");
 
 		mocksControl.verify();
-
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
 	}
 
 	@Test
 	public void testListAllUser() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.list(domain)).andReturn(fakeListOfUser());
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users");
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(expectedJsonSetOfUser())).
+		when()
+			.get("/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(expectedJsonSetOfUser());
 	}
 	
 	@Test
 	public void testListAllUserReturnNothing() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.list(domain)).andReturn(null);
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("[]")).
+		when()
+			.get("/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo("[]");
 	}
 	
 	@Test
 	public void testListAllUserReturnEmptyList() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("[]")).
+		when()
+			.get("/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo("[]");
 	}
 	
 	@Test
 	public void testListAllThrowError() throws Exception {
 		expectDomain();
+		expectIsAuthenticatedAndIsAuthorized();
 		expect(userDao.list(domain)).andThrow(new RuntimeException("bad things happen"));
+		
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = get("/users/");
+		given()
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.get("/users");
 		
 		mocksControl.verify();
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
 	}
 
 	private List<ObmUser> fakeListOfUser() {
