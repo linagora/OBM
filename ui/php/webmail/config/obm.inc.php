@@ -72,6 +72,7 @@ $rcmail_config['session_lifetime'] = $rcSessionLifetime;
 $rcmail_config["plugins"][] = "multiple_smtp_server";
 $rcmail_config["plugins"][] = "obm_addressbook";
 $rcmail_config["plugins"][] = "unread";
+$rcmail_config["pluguns"][] = "obm_identities";
 
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
