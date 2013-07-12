@@ -1,5 +1,9 @@
 package org.obm.provisioning.resources;
 
+import static org.obm.provisioning.bean.Permissions.batches_create;
+import static org.obm.provisioning.bean.Permissions.batches_delete;
+import static org.obm.provisioning.bean.Permissions.batches_read;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -40,7 +44,7 @@ public class BatchResource {
 
 	@GET
 	@Path("{batchId}")
-	@RequiresPermissions("batches:read")
+	@RequiresPermissions(batches_read)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		Batch batch = batchProcessor.getRunningBatch(batchId);
@@ -59,7 +63,7 @@ public class BatchResource {
 	}
 
 	@POST
-	@RequiresPermissions("batches:create")
+	@RequiresPermissions(batches_create)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response create() throws DaoException, URISyntaxException {
 		Batch batch = Batch
@@ -76,7 +80,7 @@ public class BatchResource {
 	}
 
 	@DELETE
-	@RequiresPermissions("batches:delete")
+	@RequiresPermissions(batches_delete)
 	@Path("{batchId}")
 	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		try {

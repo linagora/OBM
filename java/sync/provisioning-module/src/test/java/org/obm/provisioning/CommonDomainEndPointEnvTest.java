@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -74,6 +75,7 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -259,7 +261,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
 
-	protected void expectPasswordReturns(String login, String password) {
+	protected void expectPasswordReturns(String login, String password) throws SQLException, UserNotFoundException {
 		expect(authenticationService.getPassword(login, domain)).andReturn(password);
 	}
 	
@@ -268,7 +270,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(authenticationService.getPermissions(login)).andReturn(permissions);
 	}
 	
-	protected void expectIsAuthenticatedAndIsAuthorized() {
+	protected void expectIsAuthenticatedAndIsAuthorized() throws SQLException, UserNotFoundException {
 		expectPasswordReturns("username", "password");
 		expectAuthorizingReturns("username",
 				ImmutableSet.of(""), ImmutableSet.of("users:*", "batches:*", "profiles:*"));

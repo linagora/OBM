@@ -1,5 +1,6 @@
 package org.obm.provisioning.resources;
 
+import static org.obm.provisioning.bean.Permissions.profiles_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
 import javax.ws.rs.GET;
@@ -34,7 +35,7 @@ public class ProfileResource {
 	
 	@GET
 	@Path("/")
-	@RequiresPermissions("profiles:read")
+	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
 	public Response getProfileEntries() {
 		try {
@@ -49,7 +50,7 @@ public class ProfileResource {
 	
 	@GET
 	@Path("/{profileId}")
-	@RequiresPermissions("profiles:read")
+	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
 	public Response getProfileName(@PathParam("profileId")long profileId) {
 		try {

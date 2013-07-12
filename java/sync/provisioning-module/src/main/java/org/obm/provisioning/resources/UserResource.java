@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static org.obm.provisioning.bean.Permissions.users_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
 import java.sql.SQLException;
@@ -68,7 +69,7 @@ public class UserResource {
 
 	@GET
 	@Path("{userExtId}")
-	@RequiresPermissions("users:read")
+	@RequiresPermissions(users_read)
 	@Produces(JSON_WITH_UTF8)
 	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
 		try {
@@ -80,7 +81,7 @@ public class UserResource {
 	}
 
 	@GET
-	@RequiresPermissions("users:read")
+	@RequiresPermissions(users_read)
 	@Produces(JSON_WITH_UTF8)
 	public List<UserIdentifier> listAll() throws SQLException {
 		List<ObmUser> users = userDao.list(domain);

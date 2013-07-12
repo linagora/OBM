@@ -43,6 +43,11 @@ public class UserNotFoundException extends Exception {
 				extId.getExtId()));
 		this.extId = extId;
 	}
+	
+	public UserNotFoundException(String login) {
+		super(String.format("The user with the login %s was not found",
+				login));
+	}
 
 	public UserNotFoundException() {
 	}

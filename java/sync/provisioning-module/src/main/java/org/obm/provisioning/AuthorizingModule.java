@@ -65,6 +65,7 @@ public class AuthorizingModule extends ShiroWebModule {
 		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "profiles"));
 		addFilterChain("/provisioning/v1/*/batches/*", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
 		addFilterChain("/provisioning/v1/*/batches", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
+
 		
 		expose(Realm.class);
 	}

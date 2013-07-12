@@ -32,69 +32,35 @@
 package org.obm.provisioning.authentication;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
-import org.apache.shiro.authc.AccountException;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
+import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Singleton
-public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
+public class AuthenticationServiceImpl implements AuthenticationService {
 	
 	@Inject
-	private AuthenticationService authenticationService;
-	
-	@Inject
-	private ObmDomain domain;
-	
+	private UserDao userDao;
+
 	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal) {
-		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
-		
-		String login = (String) principal.getPrimaryPrincipal();
-		
-		if (login == null) {
-			throw new AccountException("Null usernames are not allowed by this realm.");
-		}
-		
-		authorizationInfo.addRoles(authenticationService.getRoles(login));
-		authorizationInfo.addStringPermissions(authenticationService.getPermissions(login));
-		
-		return authorizationInfo;
+	public String getPassword(String login, ObmDomain domain) throws SQLException, UserNotFoundException {
+		return userDao.getPasswordOf(login, domain);
 	}
 
 	@Override
-	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-
-		String login = upToken.getUsername();
-
-		if (login == null) {
-			throw new AccountException("Null usernames are not allowed by this realm.");
-		}
-		
-		String password;
-		
-		try {
-			password = authenticationService.getPassword(login, domain);
-		} catch (SQLException e) {
-			throw new AuthenticationException(e);
-		} catch (UserNotFoundException e) {
-			throw new AuthenticationException(e);
-		}
-		
-		return new SimpleAuthenticationInfo(login, password, this.getName());
+	public Collection<String> getRoles(String username) {
+		// HIGH Auto-generated method stub
+		return null;
 	}
+
+	@Override
+	public Collection<String> getPermissions(String username) {
+		// HIGH Auto-generated method stub
+		return null;
+	}
+
 }

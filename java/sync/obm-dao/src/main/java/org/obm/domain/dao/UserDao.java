@@ -257,14 +257,13 @@ public class UserDao {
 		ResultSet rs = null;
 
 		ObmUser obmUser = null;
-		String uq = "SELECT " + USER_FIELDS + " "
-				+ "FROM UserObm "
-				    + "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
-				    + "LEFT JOIN Host ON host_id = userobm_mail_server_id "
-				    + "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
-				    + "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
-				+ "WHERE userobm_domain_id=? "+
-                    "AND userobm_login=? AND userobm_archive != '1'";
+		String uq = "SELECT " + USER_FIELDS
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
+				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
+				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
@@ -491,6 +490,30 @@ public class UserDao {
 		}
 
 		return users;
+	}
+	
+	public String getPasswordOf(String login, ObmDomain domain) throws SQLException, UserNotFoundException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		String query = "SELECT userobm_password FROM UserObm WHERE userobm_login = ? AND userobm_domain_id = ?";
+		
+		try {
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, login);
+			ps.setInt(2, domain.getId());
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				return rs.getString("userobm_password"); 
+			} else {
+				throw new UserNotFoundException(login);
+			}
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
 	}
 
 	public ObmUser create(ObmUser user) throws SQLException, DaoException {

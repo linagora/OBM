@@ -29,6 +29,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static org.obm.provisioning.bean.Permissions.users_create;
+import static org.obm.provisioning.bean.Permissions.users_delete;
+import static org.obm.provisioning.bean.Permissions.users_patch;
+import static org.obm.provisioning.bean.Permissions.users_update;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -46,7 +51,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 public class UserWriteResource extends AbstractBatchAwareResource {
 
 	@POST
-	@RequiresPermissions("users:create")
+	@RequiresPermissions(users_create)
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response create(String user) throws DaoException {
@@ -54,7 +59,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@PUT
-	@RequiresPermissions("users:update")
+	@RequiresPermissions(users_update)
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
@@ -63,7 +68,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@DELETE
-	@RequiresPermissions("users:delete")
+	@RequiresPermissions(users_delete)
 	@Path("/{userId}")
 	@Produces(JSON_WITH_UTF8)
 	public Response delete() throws DaoException {
@@ -71,7 +76,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	}
 	
 	@PATCH
-	@RequiresPermissions("users:patch")
+	@RequiresPermissions(users_patch)
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
