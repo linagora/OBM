@@ -1,4 +1,4 @@
-﻿<script language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : admin_pref.inc                                           //

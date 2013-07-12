@@ -1,4 +1,4 @@
-﻿<script language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM   - Language : English                                                //
 //       - File     : check_date_js.inc                                      //
