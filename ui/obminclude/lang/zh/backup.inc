@@ -1,4 +1,4 @@
-﻿<script language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Chinese                                                   //
 //     - File     : backup.inc                                               //

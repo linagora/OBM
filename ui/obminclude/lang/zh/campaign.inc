@@ -1,4 +1,4 @@
-﻿<script language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : Language : en
 //      - File : obminclude/en/campaign.inc
