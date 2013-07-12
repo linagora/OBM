@@ -17117,3 +17117,8 @@ INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (11, 1
 INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (12, 13);
 INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (13, 14);
 INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (19, 20);
+
+INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedir)
+    VALUES
+        ('obmsatelliterequest', 'osrpassword', ''),
+        ('cyrus', 'cyrus', '');
