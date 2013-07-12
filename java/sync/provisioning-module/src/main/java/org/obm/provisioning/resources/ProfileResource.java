@@ -1,14 +1,16 @@
 package org.obm.provisioning.resources;
 
+import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.dao.ProfileDao;
@@ -30,8 +32,10 @@ public class ProfileResource {
 	@Context
 	private ObmDomain domain;
 	
-	@GET @Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("/")
+	@RequiresPermissions("profiles:read")
+	@Produces(JSON_WITH_UTF8)
 	public Response getProfileEntries() {
 		try {
 			return Response
@@ -43,8 +47,10 @@ public class ProfileResource {
 		}
 	}
 	
-	@GET @Path("/{profileId}")
-	@Produces(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("/{profileId}")
+	@RequiresPermissions("profiles:read")
+	@Produces(JSON_WITH_UTF8)
 	public Response getProfileName(@PathParam("profileId")long profileId) {
 		try {
 			return Response.ok(profileDao.getProfile(domain.getUuid(), ProfileId.builder().id(profileId).build())).build();

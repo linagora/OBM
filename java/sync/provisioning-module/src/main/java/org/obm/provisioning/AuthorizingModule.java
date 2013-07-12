@@ -59,11 +59,12 @@ public class AuthorizingModule extends ShiroWebModule {
 		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
 		
 		Key<ObmHttpMethodPermissionFilter> customHttpMethodPermissionFilter = Key.get(ObmHttpMethodPermissionFilter.class);
-		
-		addFilterChain("/provisioning/v1/*/batches/*/profiles/**", ANON);
-		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
-		addFilterChain("/provisioning/v1/*/batches/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
+
 		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
+		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
+		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "profiles"));
+		addFilterChain("/provisioning/v1/*/batches/*", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
+		addFilterChain("/provisioning/v1/*/batches", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
 		
 		expose(Realm.class);
 	}

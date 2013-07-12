@@ -66,11 +66,14 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
+import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -110,6 +113,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
 					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));
 					bind(UserSystemDao.class).toInstance(mocksControl.createMock(UserSystemDao.class));
+					bind(ProfileDao.class).toInstance(mocksControl.createMock(ProfileDao.class));
 					bind(ResourceForTest.class);
 					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
@@ -139,12 +143,23 @@ public abstract class CommonDomainEndPointEnvTest {
 			return server;
 		}
 	}
-
+	
 	protected static final ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.build();
+	
+	protected static final ProfileName profileName = ProfileName
+			.builder()
+			.name("profile")
+			.build();
+	
+	protected static final ProfileEntry profileEntry = ProfileEntry
+			.builder()
+			.domainUuid(domain.getUuid())
+			.id(1)
 			.build();
 	
 	protected static final Batch batch = Batch
@@ -192,6 +207,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	@Inject
 	protected ObjectMapper objectMapper;
 	@Inject
+	protected ProfileDao profileDao;
+	@Inject
 	protected Realm realm;
 	@Inject
 	private AuthenticationService authenticationService;
@@ -222,6 +239,16 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	protected void expectBatch() throws DaoException {
 		expect(batchDao.get(batch.getId())).andReturn(batch);
+	}
+	
+	protected void expectProfiles() throws DaoException {
+		expect(profileDao.getProfiles(domain.getUuid())).andReturn(
+				ImmutableSet.of(profileEntry, profileEntry));
+	}
+	
+	protected void expectProfile() throws DaoException, ProfileNotFoundException {
+		expect(profileDao.getProfile(domain.getUuid(),
+				ProfileId.builder().id(profileEntry.getId()).build())).andReturn(profileName);
 	}
 
 	protected void expectNoDomain() {
