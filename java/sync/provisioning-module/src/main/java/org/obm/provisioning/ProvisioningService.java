@@ -12,12 +12,18 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
+import org.obm.provisioning.authentication.AuthenticationService;
+import org.obm.provisioning.authentication.AuthenticationServiceImpl;
+import org.obm.provisioning.authorization.AuthorizationService;
+import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
+import org.obm.provisioning.dao.PermissionDao;
+import org.obm.provisioning.dao.PermissionDaoHardcodedImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.json.BatchJsonSerializer;
@@ -58,11 +64,11 @@ public class ProvisioningService extends JerseyServletModule {
 	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 
 	private ServletContext servletContext;
-	
+
 	public ProvisioningService(ServletContext servletContext) {
 		this.servletContext = servletContext;
 	}
-	
+
 	@Override
 	protected void configureServlets() {
 		serve(PROVISIONING_URL_PATTERN)
@@ -72,6 +78,7 @@ public class ProvisioningService extends JerseyServletModule {
 		bindDao();
 
 		install(new BatchProcessingModule());
+		bindServices();
 		install(new LdapModule());
 		install(new SatelliteClientModule());
 		
@@ -85,14 +92,19 @@ public class ProvisioningService extends JerseyServletModule {
 		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(DateProvider.class).to(ObmHelper.class);
+		bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
 	}
 
 	private void bindRestResources() {
 		bind(DomainBasedSubResource.class);
 		bind(DomainResource.class);
-
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
+	}
+
+	private void bindServices() {
+		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
+		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 	}
 
 	@Provides

@@ -31,36 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
-import java.sql.SQLException;
-import java.util.Collection;
-
 import org.obm.domain.dao.UserDao;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
+@Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
-	
-	@Inject
+
 	private UserDao userDao;
 
-	@Override
-	public String getPassword(String login, ObmDomain domain) throws SQLException, UserNotFoundException {
-		return userDao.getPasswordOf(login, domain);
+	@Inject
+	private AuthenticationServiceImpl(UserDao userDao) {
+		this.userDao = userDao;
 	}
 
 	@Override
-	public Collection<String> getRoles(String username) {
-		// HIGH Auto-generated method stub
-		return null;
+	public String getPasswordForUser(String login, ObmDomain domain) {
+		ObmUser user = userDao.findUserByLogin(login, domain);
+		return user.getPassword();
 	}
-
-	@Override
-	public Collection<String> getPermissions(String username) {
-		// HIGH Auto-generated method stub
-		return null;
-	}
-
 }

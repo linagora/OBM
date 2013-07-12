@@ -32,12 +32,22 @@
 
 package org.obm.provisioning.dao.exceptions;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class UserNotFoundException extends Exception {
 
 	private UserExtId extId;
+	private String login;
+	private ObmDomainUuid domainId;
 
+	public UserNotFoundException(String login, ObmDomainUuid domainId) {
+		super(String.format("The user with login %s with domain id %s was not found", login,
+				domainId.get()));
+		this.login = login;
+		this.domainId = domainId;
+	}
+	
 	public UserNotFoundException(UserExtId extId) {
 		super(String.format("The user with the external id %s was not found",
 				extId.getExtId()));
@@ -66,5 +76,13 @@ public class UserNotFoundException extends Exception {
 
 	public UserExtId getId() {
 		return extId;
+	}
+	
+	public ObmDomainUuid getDomainId() {
+		return domainId;
+	}
+	
+	public String getLogin() {
+		return login;
 	}
 }

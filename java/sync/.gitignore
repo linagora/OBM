@@ -12,4 +12,5 @@ dist/
 *.out
 *.log
 *.tlog
+bin/
 message-queue/data/

@@ -53,7 +53,7 @@ import com.google.common.collect.ImmutableSet;
 public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testSubjectCannotGetWithWrongPassword() throws Exception {
+	public void testSubjectCannotGetWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		mocksControl.replay();
 		
@@ -68,7 +68,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testSubjectCannotPostWithWrongPassword() throws Exception {
+	public void testSubjectCannotPostWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		mocksControl.replay();
 		
@@ -83,7 +83,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testSubjectCannotDeleteWithWrongPassword() throws Exception {
+	public void testSubjectCannotDeleteWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		mocksControl.replay();
 		
@@ -100,7 +100,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:create, delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:create, delete"));
 		mocksControl.replay();
 		
 		given()
@@ -116,7 +116,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:read, delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:read, delete"));
 		mocksControl.replay();
 		
 		given()
@@ -132,7 +132,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:read, create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:read, create"));
 		mocksControl.replay();
 		
 		given()
@@ -150,7 +150,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:read"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:read"));
 		mocksControl.replay();
 		
 		given()
@@ -173,7 +173,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:create"));
 		mocksControl.replay();
 		
 		given()
@@ -191,7 +191,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		batchDao.delete(batchId(1));
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:delete"));
 		mocksControl.replay();
 		
 		given()

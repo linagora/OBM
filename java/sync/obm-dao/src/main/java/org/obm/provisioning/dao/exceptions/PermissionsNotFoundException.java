@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,25 +30,28 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning.dao;
+package org.obm.provisioning.dao.exceptions;
 
-import java.util.Set;
-
-import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-public interface ProfileDao {
+public class PermissionsNotFoundException extends Exception {
 
-	ProfileName getProfile(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	private ProfileName profile;
+	private ObmDomain domain;
+
+	public PermissionsNotFoundException(ProfileName profile, ObmDomain domain) {
+		super(String.format("No permissions found for profile %s on domain %s", profile.getName(), domain.getName()));
+		this.profile = profile;
+		this.domain = domain;
+	}
+
+	public ProfileName getProfile() {
+		return profile;
+	}
 	
-	ProfileName getProfileForUser(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
-
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
-
+	public ObmDomain getObmDomain() {
+		return domain;
+	}
 }

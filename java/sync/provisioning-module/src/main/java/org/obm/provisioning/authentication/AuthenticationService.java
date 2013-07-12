@@ -31,19 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
-import java.sql.SQLException;
-import java.util.Collection;
-
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public interface AuthenticationService {
-	
-	public Collection<String> getRoles(String username);
-	
-	public Collection<String> getPermissions(String username);
-
-	public String getPassword(String login, ObmDomain domain) throws SQLException, UserNotFoundException;
+	public String getPasswordForUser(String login, ObmDomain domain);
 	
 }

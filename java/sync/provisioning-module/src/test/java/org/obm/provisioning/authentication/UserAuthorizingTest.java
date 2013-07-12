@@ -57,9 +57,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testSubjectCannotPutWithWrongPassword() throws Exception {
+	public void testSubjectCannotPutWithWrongPassword() {
 		expectPasswordReturns("username", "password");
-		
 		mocksControl.replay();
 		
 		given()
@@ -73,7 +72,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testSubjectCannotPatchWithWrongPassword() throws Exception {
+	public void testSubjectCannotPatchWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		
 		mocksControl.replay();
@@ -91,7 +90,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:create, delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:create, delete"));
 		
 		mocksControl.replay();
 		
@@ -108,7 +107,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read, delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read, delete"));
 		
 		mocksControl.replay();
 		
@@ -125,7 +124,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read, create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
 		
 		mocksControl.replay();
 		
@@ -142,7 +141,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotPatchWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read, create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
 		
 		mocksControl.replay();
 		
@@ -159,7 +158,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotPutWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read, create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
 		
 		mocksControl.replay();
 		
@@ -177,7 +176,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetUserWithReadPermission() throws Exception {
 		expectDomain();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read"));
 		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
 		
 		mocksControl.replay();
@@ -196,7 +195,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetListOfUserWithReadPermission() throws Exception {
 		expectDomain();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:read"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:read"));
 		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
 		
 		mocksControl.replay();
@@ -216,7 +215,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:create"));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users", "", HttpVerb.POST, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
@@ -238,7 +237,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:delete"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:delete"));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
@@ -260,7 +259,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:update"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:update"));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", "", HttpVerb.PUT, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
@@ -282,7 +281,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("users:patch"));
+		expectAuthorizingReturns("username", ImmutableSet.of("users:patch"));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
 						"", HttpVerb.PATCH, ImmutableMap.<String, String>of())))

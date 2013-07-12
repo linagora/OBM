@@ -44,6 +44,7 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.common.collect.ImmutableSet;
@@ -120,6 +121,38 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 				return ProfileName.builder().name(rs.getString("profile_name")).build();
 			}
 			throw new ProfileNotFoundException(profileId.getId());
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			JDBCUtils.cleanup(conn, ps, rs);
+		}
+	}
+
+	@Override
+	public ProfileName getProfileForUser(String login, ObmDomainUuid domainId)
+			throws DaoException, UserNotFoundException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			conn = connectionProvider.getConnection();
+			ps = conn.prepareStatement(
+					"SELECT userobm_perms " +
+					"FROM UserObm " +
+					"INNER JOIN Domain ON userobm_domain_id = domain_id " +
+					"WHERE domain_uuid = ? " +
+					"AND userobm_login = ?");
+			ps.setString(1, domainId.get());
+			ps.setString(2, login);
+			rs = ps.executeQuery();
+		
+			if (rs.next()) {
+				return ProfileName.builder().name(rs.getString("userobm_perms")).build();
+			}
+			throw new UserNotFoundException(login, domainId);
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);

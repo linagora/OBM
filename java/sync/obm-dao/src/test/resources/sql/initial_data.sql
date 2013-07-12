@@ -54,7 +54,8 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
         (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
         (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
         (1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
-        (2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1);
+        (2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
+        (2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1);
         
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     VALUES
@@ -62,7 +63,8 @@ INSERT INTO userentity (userentity_entity_id, userentity_user_id)
         (4, 2),
         (5, 3),
         (6, 4),
-        (7, 5);
+        (7, 5),
+        (8, 6);
 
 INSERT INTO ugroup (group_id, group_domain_id, group_ext_id, group_name, group_desc)
     VALUES

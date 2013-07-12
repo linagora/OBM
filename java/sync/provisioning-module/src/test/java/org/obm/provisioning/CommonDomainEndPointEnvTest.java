@@ -35,7 +35,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -62,6 +61,9 @@ import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.authentication.AuthenticationService;
+import org.obm.provisioning.authentication.AuthenticationServiceImpl;
+import org.obm.provisioning.authorization.AuthorizationService;
+import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -69,13 +71,14 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -116,13 +119,15 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));
 					bind(UserSystemDao.class).toInstance(mocksControl.createMock(UserSystemDao.class));
 					bind(ProfileDao.class).toInstance(mocksControl.createMock(ProfileDao.class));
+					bind(PermissionDao.class).toInstance(mocksControl.createMock(PermissionDao.class));
 					bind(ResourceForTest.class);
 					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
 					bind(DomainBasedSubResourceForTest.class);
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
-					bind(AuthenticationService.class).toInstance(mocksControl.createMock(AuthenticationService.class));
+					bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
+					bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 					bind(ObmDomain.class).toInstance(domain);
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
@@ -146,6 +151,10 @@ public abstract class CommonDomainEndPointEnvTest {
 		}
 	}
 	
+	protected static final ProfileName adminProfile = ProfileName.builder().name("admin").build();
+
+	protected static final ProfileName userProfile = ProfileName.builder().name("user").build();
+
 	protected static final ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
@@ -211,12 +220,14 @@ public abstract class CommonDomainEndPointEnvTest {
 	@Inject
 	protected ProfileDao profileDao;
 	@Inject
-	protected Realm realm;
+	protected PermissionDao roleDao;
 	@Inject
-	private AuthenticationService authenticationService;
+	protected Realm realm;
 
 	protected String baseUrl;
 	protected int serverPort;
+	@Inject
+	private UUIDFactory uuidFactory;
 
 	@Before
 	public void setUp() throws Exception {
@@ -260,20 +271,24 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected void expectNoBatch() throws DaoException {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
-
-	protected void expectPasswordReturns(String login, String password) throws SQLException, UserNotFoundException {
-		expect(authenticationService.getPassword(login, domain)).andReturn(password);
+	
+	protected void expectPasswordReturns(String login, String password) {
+		ObmUser user = ObmUser.builder().login(login).password(password).domain(domain).lastName(login).firstName(login).extId(UserExtId.builder().extId(uuidFactory.randomUUID().toString()).build()).build();
+		expect(userDao.findUserByLogin(login, domain)).andReturn(user).once();
 	}
 	
-	protected void expectAuthorizingReturns(String login, Collection<String> roles, Collection<String> permissions) {
-		expect(authenticationService.getRoles(login)).andReturn(roles);
-		expect(authenticationService.getPermissions(login)).andReturn(permissions);
+	protected void expectAuthorizingReturns(String login, Collection<String> permissions, ProfileName profile) throws Exception {
+		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(profile).atLeastOnce();
+		expect(roleDao.getPermissionsForProfile(profile, domain)).andReturn(permissions).atLeastOnce();
 	}
 	
-	protected void expectIsAuthenticatedAndIsAuthorized() throws SQLException, UserNotFoundException {
+	protected void expectAuthorizingReturns(String login, Collection<String> permissions) throws Exception {
+		expectAuthorizingReturns(login, permissions, userProfile);
+	}
+	
+	protected void expectIsAuthenticatedAndIsAuthorized() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username",
-				ImmutableSet.of(""), ImmutableSet.of("users:*", "batches:*", "profiles:*"));
+		expectAuthorizingReturns("username", ImmutableSet.of("*:*"), adminProfile);
 	}
 	
 	public static Batch.Id batchId(Integer id) {

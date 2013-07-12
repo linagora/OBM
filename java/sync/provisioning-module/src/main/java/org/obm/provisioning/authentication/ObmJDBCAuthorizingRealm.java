@@ -31,10 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
-import java.sql.SQLException;
-
 import org.apache.shiro.authc.AccountException;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -43,7 +40,8 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.provisioning.authorization.AuthorizationException;
+import org.obm.provisioning.authorization.AuthorizationService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -57,6 +55,9 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	private AuthenticationService authenticationService;
 	
 	@Inject
+	private AuthorizationService authorizationService;
+
+	@Inject
 	private ObmDomain domain;
 	
 	@Override
@@ -69,10 +70,12 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
 		
-		authorizationInfo.addRoles(authenticationService.getRoles(login));
-		authorizationInfo.addStringPermissions(authenticationService.getPermissions(login));
-		
-		return authorizationInfo;
+		try {
+			authorizationInfo.addStringPermissions(authorizationService.getPermissions(login, domain));
+			return authorizationInfo;
+		} catch (AuthorizationException e) {
+			throw new org.apache.shiro.authz.AuthorizationException(e);
+		}
 	}
 
 	@Override
@@ -85,16 +88,7 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
 		
-		String password;
-		
-		try {
-			password = authenticationService.getPassword(login, domain);
-		} catch (SQLException e) {
-			throw new AuthenticationException(e);
-		} catch (UserNotFoundException e) {
-			throw new AuthenticationException(e);
-		}
-		
+		String password = authenticationService.getPasswordForUser(login, domain);
 		return new SimpleAuthenticationInfo(login, password, this.getName());
 	}
 }

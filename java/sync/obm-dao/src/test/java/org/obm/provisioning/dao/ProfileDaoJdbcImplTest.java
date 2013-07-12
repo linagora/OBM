@@ -17,6 +17,7 @@ import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -38,7 +39,6 @@ public class ProfileDaoJdbcImplTest {
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
-
 	}
 
 	@Inject
@@ -50,7 +50,6 @@ public class ProfileDaoJdbcImplTest {
 	
 	ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 	ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
-	
 
 	@Test
 	public void testGetProfilesOnNonExistentDomains() throws Exception {
@@ -90,5 +89,19 @@ public class ProfileDaoJdbcImplTest {
 	@Test(expected = ProfileNotFoundException.class)
 	public void testGetProfileNameOnNonExistentDomain() throws Exception {
 		dao.getProfile(ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6"), ProfileId.builder().id(1).build());
+	}
+	
+	@Test
+	public void testGetProfileForUser() throws Exception {
+		ProfileName userProfile = dao.getProfileForUser("user2", uuid1);
+		ProfileName adminProfile = dao.getProfileForUser("user2", uuid2);
+		
+		assertThat(userProfile).isEqualTo(ProfileName.builder().name("user").build());
+		assertThat(adminProfile).isEqualTo(ProfileName.builder().name("admin").build());
+	}
+	
+	@Test(expected = UserNotFoundException.class)
+	public void testGetProfileForNonExistentUser() throws Exception {
+		dao.getProfileForUser("non-existent-user", uuid1);
 	}
 }

@@ -50,7 +50,7 @@ import com.google.common.collect.ImmutableSet;
 public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testSubjectCannotGetProfilesWithWrongPassword() throws Exception {
+	public void testSubjectCannotGetProfilesWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		mocksControl.replay();
 		
@@ -65,7 +65,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testSubjectCannotGetProfileWithWrongPassword() throws Exception {
+	public void testSubjectCannotGetProfileWithWrongPassword() {
 		expectPasswordReturns("username", "password");
 		mocksControl.replay();
 		
@@ -82,7 +82,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotGetProfilesWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("batches:*", "users:*"));
+		expectAuthorizingReturns("username", ImmutableSet.of("batches:*", "users:*"));
 		mocksControl.replay();
 		
 		given()
@@ -98,7 +98,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPermissions() throws Exception {
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("profiles:create"));
+		expectAuthorizingReturns("username", ImmutableSet.of("profiles:create"));
 		mocksControl.replay();
 		
 		given()
@@ -116,7 +116,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectProfiles();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("profiles:read"));
+		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
 		mocksControl.replay();
 		
 		given()
@@ -134,7 +134,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectProfile();
 		expectPasswordReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of(""), ImmutableSet.of("profiles:read"));
+		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
 		mocksControl.replay();
 		
 		given()

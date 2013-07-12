@@ -33,8 +33,6 @@ package org.obm.provisioning.resources;
 
 import static com.jayway.restassured.RestAssured.given;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
@@ -200,8 +198,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 	}
 	
-	private String invalidMediaTypeEntity()
-			throws UnsupportedEncodingException {
+	private String invalidMediaTypeEntity() {
 		return 
 				"{" +
 				  "\"uid\":1," +
