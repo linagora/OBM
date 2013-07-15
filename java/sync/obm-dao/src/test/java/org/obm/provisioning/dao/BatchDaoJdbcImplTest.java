@@ -124,7 +124,7 @@ public class BatchDaoJdbcImplTest {
 
 		dao.create(batch);
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM Batch");
+		ResultSet rs = db.execute("SELECT COUNT(id) FROM Batch");
 
 		rs.next();
 
@@ -150,7 +150,7 @@ public class BatchDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		dao.update(batch);
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch WHERE id=1 AND status='RUNNING'");
+		ResultSet rs = db.execute("SELECT COUNT(id) FROM batch WHERE id=1 AND status='RUNNING'");
 
 		rs.next();
 
@@ -170,7 +170,7 @@ public class BatchDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		dao.delete(batchId(1));
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch");
+		ResultSet rs = db.execute("SELECT COUNT(id) FROM batch");
 
 		rs.next();
 
@@ -224,7 +224,7 @@ public class BatchDaoJdbcImplTest {
 
 		dao.addOperation(batchId(1), operation).getOperations();
 
-		ResultSet rs = db.execute("SELECT COUNT(*) FROM batch_operation");
+		ResultSet rs = db.execute("SELECT COUNT(id) FROM batch_operation");
 
 		rs.next();
 
