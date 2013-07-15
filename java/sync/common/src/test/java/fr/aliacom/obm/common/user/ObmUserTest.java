@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -226,5 +227,69 @@ public class ObmUserTest {
 				.login("login")
 				.mails(null)
 				.build();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testThreeFaxesBuilder() {
+		ObmUser
+			.builder()
+			.domain(ObmDomain.builder().build())
+			.uid(1)
+			.login("login")
+			.faxes(Sets.newHashSet("1", "2", "3"))
+			.build();
+	}
+
+	@Test
+	public void testTwoFaxesBuilder() {
+		ObmUser user = ObmUser
+			.builder()
+			.domain(ObmDomain.builder().build())
+			.uid(1)
+			.login("login")
+			.faxes(ImmutableSet.of("1", "2"))
+			.build();
+
+		assertThat(user.getFax()).isEqualTo("1");
+		assertThat(user.getFax2()).isEqualTo("2");
+	}
+
+	@Test
+	public void testOneFaxBuilder() {
+		ObmUser user = ObmUser
+			.builder()
+			.domain(ObmDomain.builder().build())
+			.uid(1)
+			.login("login")
+			.faxes(ImmutableSet.of("1"))
+			.build();
+
+		assertThat(user.getFax()).isEqualTo("1");
+		assertThat(user.getFax2()).isNull();
+	}
+
+	@Test
+	public void testNoFaxBuilder() {
+		ObmUser user = ObmUser
+			.builder()
+			.domain(ObmDomain.builder().build())
+			.uid(1)
+			.login("login")
+			.faxes(ImmutableSet.<String>of())
+			.build();
+
+		assertThat(user.getFax()).isNull();
+		assertThat(user.getFax2()).isNull();
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testBuilderWithNullFaxes() {
+		ObmUser
+			.builder()
+			.domain(ObmDomain.builder().build())
+			.uid(1)
+			.login("login")
+			.faxes(null)
+			.build();
 	}
 }

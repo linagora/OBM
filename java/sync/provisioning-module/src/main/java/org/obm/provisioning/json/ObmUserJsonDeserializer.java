@@ -61,7 +61,6 @@ import static org.obm.push.utils.DateUtils.date;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.jackson.JsonNode;
@@ -69,11 +68,11 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.bean.UserJsonFields;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -82,12 +81,11 @@ import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
-	
+
 	private Builder builder = ObmUser.builder();
 
 	@Override
-	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt)
-			throws IOException, JsonProcessingException {
+	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode jsonNode = jp.readValueAsTree();
 		addFieldValueToBuilder(jsonNode, ID);
 		addFieldValueToBuilder(jsonNode, LOGIN);
@@ -115,113 +113,116 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		addFieldValueToBuilder(jsonNode, MAILS);
 		addFieldValueToBuilder(jsonNode, TIMECREATE);
 		addFieldValueToBuilder(jsonNode, TIMEUPDATE);
-		
+
 		ObmDomain domain = (ObmDomain) ctxt.findInjectableValue(ObmDomain.class.getName(), null, null);
-		
+
 		return builder.domain(domain).build();
 	}
 
 	private void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields) {
-		switch(jsonFields) {
-		case ADDRESSES:
-			Collection<String> addresses = getCurrentTokenTextValues(jsonNode, jsonFields);
-			builder.addresses(addresses);
-			break;
-		case BUSINESS_ZIPCODE:
-			// NOT IMPLEMENTED YET
-			break;
-		case COMMONNAME:
-			builder.commonName(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case COMPANY:
-			// NOT IMPLEMENTED YET
-			break;
-		case COUNTRY:
-			// NOT IMPLEMENTED YET
-			break;
-		case DESCRIPTION:
-			builder.description(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case DIRECTION:
-			// NOT IMPLEMENTED YET
-			break;
-		case FAXES:
-			// NOT IMPLEMENTED YET
-			break;
-		case FIRSTNAME:
-			builder.firstName(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case GROUPS:
-			// NOT IMPLEMENTED YET
-			break;
-		case ID:
-			builder.extId(UserExtId.builder().extId(getCurrentTokenTextValue(jsonNode, jsonFields)).build());
-			break;
-		case KIND:
-			// NOT IMPLEMENTED YET
-			break;
-		case LASTNAME:
-			builder.lastName(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case LOGIN:
-			builder.login(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case MAILS:
-			Collection<String> mails = getCurrentTokenTextValues(jsonNode, jsonFields);
-			builder.mails(mails);
-			break;
-		case MAIL_QUOTA:
-			// NOT IMPLEMENTED YET
-			break;
-		case MAIL_SERVER:
-			// NOT IMPLEMENTED YET
-			break;
-		case MOBILE:
-			builder.mobile(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case PASSWORD:
-			// NOT IMPLEMENTED YET
-			break;
-		case PHONES:
-			break;
-		case PROFILE:
-			// NOT IMPLEMENTED YET
-			break;
-		case SERVICE:
-			builder.service(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case TIMECREATE:
-			builder.timeCreate(date(getCurrentTokenTextValue(jsonNode, jsonFields)));
-			break;
-		case TIMEUPDATE:
-			builder.timeUpdate(date(getCurrentTokenTextValue(jsonNode, jsonFields)));
-			break;
-		case TITLE:
-			builder.title(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case TOWN:
-			builder.town(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
-		case ZIPCODE:
-			builder.zipCode(getCurrentTokenTextValue(jsonNode, jsonFields));
-			break;
+		JsonNode value = getCurrentTokenTextValue(jsonNode, jsonFields);
+
+		if (value == null) {
+			return;
+		}
+
+		switch (jsonFields) {
+			case ADDRESSES:
+				builder.addresses(getCurrentTokenTextValues(value));
+				break;
+			case BUSINESS_ZIPCODE:
+				builder.expresspostal(value.asText());
+				break;
+			case COMMONNAME:
+				builder.commonName(value.asText());
+				break;
+			case COMPANY:
+				builder.company(value.asText());
+				break;
+			case COUNTRY:
+				builder.countryCode(value.asText());
+				break;
+			case DESCRIPTION:
+				builder.description(value.asText());
+				break;
+			case DIRECTION:
+				builder.direction(value.asText());
+				break;
+			case FAXES:
+				builder.faxes(getCurrentTokenTextValues(jsonNode));
+				break;
+			case FIRSTNAME:
+				builder.firstName(value.asText());
+				break;
+			case GROUPS:
+				// NOT IMPLEMENTED YET
+				break;
+			case ID:
+				builder.extId(UserExtId.builder().extId(value.asText()).build());
+				break;
+			case KIND:
+				builder.kind(value.asText());
+				break;
+			case LASTNAME:
+				builder.lastName(value.asText());
+				break;
+			case LOGIN:
+				builder.login(value.asText());
+				break;
+			case MAILS:
+				builder.mails(getCurrentTokenTextValues(jsonNode));
+				break;
+			case MAIL_QUOTA:
+				builder.mailQuota(Integer.parseInt(value.asText()));
+				break;
+			case MAIL_SERVER:
+				// NOT IMPLEMENTED YET
+				break;
+			case MOBILE:
+				builder.mobile(value.asText());
+				break;
+			case PASSWORD:
+				builder.password(value.asText());
+				break;
+			case PHONES:
+				break;
+			case PROFILE:
+				builder.profileName(ProfileName.valueOf(value.asText()));
+				break;
+			case SERVICE:
+				builder.service(value.asText());
+				break;
+			case TIMECREATE:
+				builder.timeCreate(date(value.asText()));
+				break;
+			case TIMEUPDATE:
+				builder.timeUpdate(date(value.asText()));
+				break;
+			case TITLE:
+				builder.title(value.asText());
+				break;
+			case TOWN:
+				builder.town(value.asText());
+				break;
+			case ZIPCODE:
+				builder.zipCode(value.asText());
+				break;
 		}
 	}
 
-	private Collection<String> getCurrentTokenTextValues(JsonNode jsonNode, UserJsonFields jsonFields) {
-		Iterator<JsonNode> values = jsonNode.findValue(jsonFields.asSpecificationValue()).getElements();
-		List<JsonNode> asList = Lists.newArrayList();
-		Iterators.addAll(asList, values);
-		Collection<String> asStrings = Collections2.transform(asList, new Function<JsonNode, String>() {
+	private Collection<String> getCurrentTokenTextValues(JsonNode value) {
+		List<JsonNode> asList = Lists.newArrayList(value.getElements());
+
+		return Collections2.transform(asList, new Function<JsonNode, String>() {
 			@Override
 			public String apply(JsonNode input) {
 				return input.asText();
 			}
 		});
-		return asStrings;
 	}
 
-	private String getCurrentTokenTextValue(JsonNode json, UserJsonFields jsonFields) {
-		return json.findValue(jsonFields.asSpecificationValue()).asText();
+	private JsonNode getCurrentTokenTextValue(JsonNode json, UserJsonFields jsonFields) {
+		return json.findValue(jsonFields.asSpecificationValue());
 	}
+
 }
