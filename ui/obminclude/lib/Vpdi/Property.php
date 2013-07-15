@@ -85,7 +85,11 @@ class Vpdi_Property {
         $line.= ';'.$name.'='.implode(',', $values);
       }
     }
-    $line.= ':'.$this->value;
+    $line.= ':'.str_replace(
+      array("\n","\r"),
+      array('\n','\r'),
+      $this->value
+    );
     
     return $line;
   }
