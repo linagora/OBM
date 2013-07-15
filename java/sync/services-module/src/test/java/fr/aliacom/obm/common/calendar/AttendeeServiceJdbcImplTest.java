@@ -46,6 +46,7 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -130,8 +131,8 @@ public class AttendeeServiceJdbcImplTest {
 		externalContact = externalContact();
 		resource = resource();
 		userDao = createMockBuilder(UserDao.class)
-				.withConstructor(ObmHelper.class)
-				.withArgs(obmHelper)
+				.withConstructor(ObmHelper.class, ObmInfoDao.class)
+				.withArgs(obmHelper, null)
 				.addMockedMethod("findUser")
 				.createMock(mocksControl);
 		contactDao = createMockBuilder(ContactDao.class)

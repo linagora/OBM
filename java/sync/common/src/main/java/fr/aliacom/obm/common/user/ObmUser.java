@@ -104,6 +104,9 @@ public class ObmUser {
 		private String fax2;
 		private int mailQuota;
 		private ObmHost mailHost;
+
+		private Integer uidNumber;
+		private Integer gidNumber;
 		
 		private Builder() {
 			super();
@@ -293,6 +296,15 @@ public class ObmUser {
 			address3 = Iterables.get(addresses, 2, null);
 			return this;
 		}
+
+		public Builder uidNumber(Integer uidNumber) {
+			this.uidNumber = uidNumber;
+			return this;
+		}
+		public Builder gidNumber(Integer gidNumber) {
+			this.gidNumber = gidNumber;
+			return this;
+		}
 		
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
@@ -305,7 +317,7 @@ public class ObmUser {
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
-					phone, phone2, fax, fax2, mailQuota, mailHost, password);
+					phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber);
 		}
 		
 	}
@@ -352,6 +364,9 @@ public class ObmUser {
 	private final String fax2;
 	private final int mailQuota;
 	private final ObmHost mailHost;
+
+	private final Integer uidNumber;
+	private final Integer gidNumber;
 	
 	public ObmUser(Integer uid, int entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
@@ -363,7 +378,7 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
 			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
-			int mailQuota, ObmHost mailHost, String password) {
+			int mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -401,6 +416,8 @@ public class ObmUser {
 		this.mailQuota = mailQuota;
 		this.mailHost = mailHost;
 		this.password = password;
+		this.uidNumber = uidNumber;
+		this.gidNumber = gidNumber;
 	}
 
 	public int getUid() {
@@ -596,12 +613,20 @@ public class ObmUser {
 		return password;
 	}
 
+	public Integer getUidNumber() {
+		return uidNumber;
+	}
+
+	public Integer getGidNumber() {
+		return gidNumber;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
 				emailAlias, address1, address2, address3, expresspostal, mobile,
 				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
-				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password);
+				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber);
 	}
 	
 	@Override
@@ -642,7 +667,9 @@ public class ObmUser {
 				&& Objects.equal(this.fax2, that.fax2)
 				&& Objects.equal(this.mailQuota, that.mailQuota)
 				&& Objects.equal(this.mailHost, that.mailHost)
-				&& Objects.equal(this.password, that.password);
+				&& Objects.equal(this.password, that.password)
+				&& Objects.equal(this.uidNumber, that.uidNumber)
+				&& Objects.equal(this.gidNumber, that.gidNumber);
 		}
 		return false;
 	}
@@ -686,6 +713,8 @@ public class ObmUser {
 			.add("fax2", fax2)
 			.add("mailQuota", mailQuota)
 			.add("mailHost", mailHost)
+			.add("uidNumber", uidNumber)
+			.add("gidNumber", gidNumber)
 			.toString();
 	}
 }

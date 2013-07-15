@@ -71,6 +71,7 @@ public class UserDaoJdbcImplTest {
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 			bind(DomainDao.class);
+			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		}
 
 	}
@@ -123,7 +124,7 @@ public class UserDaoJdbcImplTest {
 	}
 
 	@Test
-	public void testCreateSimpleUserWithNoMail() throws SQLException {
+	public void testCreateSimpleUserWithNoMail() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
@@ -140,11 +141,55 @@ public class UserDaoJdbcImplTest {
 		assertThat(userBuilder
 				.uid(createdUser.getUid())
 				.entityId(createdUser.getEntityId())
+				.uidNumber(UserDao.FIRST_UID)
+				.gidNumber(UserDao.DEFAULT_GID)
 				.build()).isEqualTo(createdUser);
 	}
 
 	@Test
-	public void testCreate() throws SQLException {
+	public void testCreateMultipleUsersIncrementsUid() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.address1("1 OBM Street")
+				.address2("2 OBM Street")
+				.address3("3 OBM Street")
+				.town("OBMCity")
+				.countryCode("OB")
+				.zipCode("OBMZip")
+				.expresspostal("OBMExpressPostal")
+				.phone("+OBM 123456")
+				.phone2("+OBM 789")
+				.mobile("+OBMMobile 123")
+				.fax("+OBMFax 123456")
+				.fax2("+OBMFax 789")
+				.company("Linagora")
+				.service("OBMDev")
+				.direction("LGS")
+				.title("Software Dev")
+				.emailAndAliases("jdoe\r\njohn.doe")
+				.kind("Mr")
+				.mailHost(mailHost)
+				.mailQuota(500)
+				.domain(domain);
+
+		ObmUser createdUser1 = dao.create(userBuilder.build());
+		ObmUser createdUser2 = dao.create(userBuilder.build());
+		ObmUser createdUser3 = dao.create(userBuilder.build());
+
+		assertThat(createdUser1.getUidNumber()).isEqualTo(UserDao.FIRST_UID);
+		assertThat(createdUser2.getUidNumber()).isEqualTo(UserDao.FIRST_UID + 1);
+		assertThat(createdUser3.getUidNumber()).isEqualTo(UserDao.FIRST_UID + 2);
+	}
+
+	@Test
+	public void testCreate() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
@@ -183,11 +228,13 @@ public class UserDaoJdbcImplTest {
 		assertThat(userBuilder
 				.uid(createdUser.getUid())
 				.entityId(createdUser.getEntityId())
+				.uidNumber(UserDao.FIRST_UID)
+				.gidNumber(UserDao.DEFAULT_GID)
 				.build()).isEqualTo(createdUser);
 	}
 
 	@Test
-	public void testGetAfterCreate() throws SQLException {
+	public void testGetAfterCreate() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
@@ -217,6 +264,8 @@ public class UserDaoJdbcImplTest {
 				.kind("Mr")
 				.mailHost(mailHost)
 				.mailQuota(500)
+				.uidNumber(123)
+				.gidNumber(456)
 				.domain(domain);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
@@ -315,6 +364,8 @@ public class UserDaoJdbcImplTest {
 				.domain(domain)
 				.profileName(ProfileName.valueOf("user"))
 				.password("user" + id)
+				.uidNumber(1000)
+				.gidNumber(512)
 				.countryCode("0");
 	}
 	private ObmUser sampleUser(int id, int entityId) {

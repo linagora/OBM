@@ -67,6 +67,8 @@ import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
@@ -624,7 +626,9 @@ public class DependencyResolverHelper {
 				UserSystemDao.class,
 				UserSystemDaoJdbcImpl.class,
 				ObmSystemUser.class,
-				ObmHost.class
+				ObmHost.class,
+				ObmInfoDao.class,
+				ObmInfoDaoJdbcImpl.class
 		};
 	}
 

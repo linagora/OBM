@@ -41,6 +41,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,7 @@ public class TestingProvisioningModule extends ProvisioningService {
 		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
 		bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
 			.toInstance(LoggerFactory.getLogger(ProvisioningService.class));

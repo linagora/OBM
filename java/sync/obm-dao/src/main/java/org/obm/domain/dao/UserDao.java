@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.obm.provisioning.ProfileName;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.base.DomainName;
@@ -73,6 +74,8 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class UserDao {
 
 	public static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
+	public static final int DEFAULT_GID = 1000;
+	public static final int FIRST_UID = 1001;
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private static final String USER_FIELDS = 
@@ -109,6 +112,8 @@ public class UserDao {
 			"userobm_timeupdate, " +
 			"userobm_usercreate, " +
 			"userobm_userupdate, " +
+			"userobm_uid, " +
+			"userobm_gid, " +
 			"defpref.userobmpref_value, " +
 			"userpref.userobmpref_value, " +
 			"userentity_entity_id, " +
@@ -117,11 +122,13 @@ public class UserDao {
 			"host_ip";
 
 	private final ObmHelper obmHelper;
+	private final ObmInfoDao obmInfoDao;
 	
 	@Inject
 	@VisibleForTesting
-	UserDao(ObmHelper obmHelper) {
+	UserDao(ObmHelper obmHelper, ObmInfoDao obmInfoDao) {
 		this.obmHelper = obmHelper;
+		this.obmInfoDao = obmInfoDao;
 	}
 	
 	public Map<String, String> loadUserProperties(int userObmId) {
@@ -315,6 +322,8 @@ public class UserDao {
 				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
 				.createdBy(findUserById(rs.getInt("userobm_usercreate"), domain))
 				.updatedBy(findUserById(rs.getInt("userobm_userupdate"), domain))
+				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
+				.gidNumber(JDBCUtils.getInteger(rs, "userobm_gid"))
 				.build();
 	}
 
@@ -484,7 +493,7 @@ public class UserDao {
 		return users;
 	}
 
-	public ObmUser create(ObmUser user) throws SQLException {
+	public ObmUser create(ObmUser user) throws SQLException, DaoException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 
@@ -518,11 +527,13 @@ public class UserDao {
 				"userobm_description, " +
 				"userobm_email, " +
 				"userobm_mail_server_id, " +
-				"userobm_mail_quota" +
+				"userobm_mail_quota," +
+				"userobm_uid," +
+				"userobm_gid" +
 				") VALUES (" +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
 				")";
 
 		try {
@@ -590,6 +601,17 @@ public class UserDao {
 				ps.setInt(idx++, 0);
 			}
 
+			if (user.getUidNumber() != null) {
+				ps.setInt(idx++, user.getUidNumber());
+			} else {
+				ps.setInt(idx++, getAndIncrementUidMaxUsed());
+			}
+			if (user.getGidNumber() != null) {
+				ps.setInt(idx++, user.getGidNumber());
+			} else {
+				ps.setInt(idx++, DEFAULT_GID);
+			}
+
 			ps.executeUpdate();
 
 			int userId = obmHelper.lastInsertId(conn);
@@ -599,6 +621,16 @@ public class UserDao {
 			return findUserById(userId, user.getDomain());
 		} finally {
 			obmHelper.cleanup(conn, ps, null);
+		}
+	}
+
+	private int getAndIncrementUidMaxUsed() throws DaoException {
+		Integer uid = obmInfoDao.getUidMaxUsed();
+
+		if (uid == null) {
+			return obmInfoDao.insertUidMaxUsed(FIRST_UID);
+		} else {
+			return obmInfoDao.updateUidMaxUsed(uid + 1);
 		}
 	}
 

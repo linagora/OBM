@@ -85,6 +85,7 @@ public class UserDaoTest {
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+			bindWithMock(ObmInfoDao.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {
@@ -97,6 +98,8 @@ public class UserDaoTest {
 	
 	@Inject
 	private ObmHelper obmHelper;
+	@Inject
+	private ObmInfoDao obmInfoDao;
 
 	@Rule
 	@Inject
@@ -107,8 +110,8 @@ public class UserDaoTest {
 	@Before
 	public void setUp() {
 		userDao = createMockBuilder(UserDao.class)
-					.withConstructor(ObmHelper.class)
-					.withArgs(obmHelper)
+					.withConstructor(ObmHelper.class, ObmInfoDao.class)
+					.withArgs(obmHelper, obmInfoDao)
 					.addMockedMethod("userIdFromEmailQuery")
 					.addMockedMethod("userIdFromLogin")
 					.createMock(mocksControl);
@@ -166,7 +169,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, login.get(), domain, null);
@@ -182,7 +185,7 @@ public class UserDaoTest {
 		String domain = "obm.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domain, null);
@@ -201,7 +204,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, null);
@@ -220,7 +223,7 @@ public class UserDaoTest {
 				.join("rasta.rocket", "tEst.cOm", "obm.org");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, domainFromDbAliases);
@@ -236,7 +239,7 @@ public class UserDaoTest {
 		DomainName domain = new DomainName("test.com");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 0);
 		
@@ -251,7 +254,7 @@ public class UserDaoTest {
 		String domain = "test.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDao dao = new UserDao(obmHelper);
+		UserDao dao = new UserDao(obmHelper, obmInfoDao);
 		
 		expectEmailQueryCalls(connection, rs, 4);
 		expectMatchingUserOfEmailQuery(rs, 1, "useraa", domain, null);
@@ -324,6 +327,10 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_expresspostal")).andReturn(null);
 		expect(rs.getString("userobm_country_iso3166")).andReturn("0");
 		expect(rs.getInt("userobm_mail_quota")).andReturn(100);
+		expect(rs.getInt("userobm_uid")).andReturn(1001);
+		expect(rs.wasNull()).andReturn(false);
+		expect(rs.getInt("userobm_gid")).andReturn(1000);
+		expect(rs.wasNull()).andReturn(false);
 		expect(rs.wasNull()).andReturn(false);
 		expect(rs.getInt("userobm_mail_server_id")).andReturn(1);
 		expect(rs.getString("host_name")).andReturn("host");
@@ -363,6 +370,8 @@ public class UserDaoTest {
 					.fqdn("fqdn")
 					.domainId(domain.getId())
 					.build())
+			.uidNumber(1001)
+			.gidNumber(1000)
 			.build();
 		
 		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);

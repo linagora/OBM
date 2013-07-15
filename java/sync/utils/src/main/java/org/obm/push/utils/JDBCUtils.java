@@ -183,4 +183,13 @@ public class JDBCUtils {
 		Preconditions.checkNotNull(fieldName);
 		return Math.max(0, rs.getInt(fieldName));
 	}
+
+	public static Integer getInteger(ResultSet rs, String fieldName) throws SQLException {
+		Preconditions.checkNotNull(rs);
+		Preconditions.checkNotNull(fieldName);
+
+		int value = rs.getInt(fieldName);
+
+		return !rs.wasNull() ? value : null;
+	}
 }

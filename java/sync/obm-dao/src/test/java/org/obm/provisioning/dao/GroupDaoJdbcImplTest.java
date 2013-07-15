@@ -45,6 +45,8 @@ import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -78,6 +80,7 @@ public class GroupDaoJdbcImplTest {
 
             bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
             bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+            bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
             bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
         }
 

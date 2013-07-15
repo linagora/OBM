@@ -27,50 +27,16 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl;
+package org.obm.domain.dao;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.obm.domain.dao.UserDao;
-import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
-import com.google.inject.Inject;
+public interface ObmInfoDao {
 
-import fr.aliacom.obm.common.user.ObmUser;
+	Integer getUidMaxUsed() throws DaoException;
 
-public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcessor {
+	int updateUidMaxUsed(int uid) throws DaoException;
 
-	private final UserDao userDao;
-	private final ObjectMapper objectMapper;
-
-	@Inject
-	public CreateUserOperationProcessor(UserDao userDao, ObjectMapper objectMapper) {
-		super(BatchEntityType.USER, HttpVerb.POST);
-
-		this.userDao = userDao;
-		this.objectMapper = objectMapper;
-	}
-
-	@Override
-	public void process(Operation operation) throws ProcessingException {
-		ObmUser user = null;
-		String requestBody = operation.getRequest().getBody();
-
-		try {
-			user = objectMapper.readValue(requestBody, ObmUser.class);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
-		}
-
-		try {
-			userDao.create(user);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot insert new user '%' (%s) in database.", user.getLogin(), user.getExtId()), e);
-		}
-	}
+	int insertUidMaxUsed(int uid) throws DaoException;
 
 }

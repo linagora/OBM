@@ -35,6 +35,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 
@@ -51,5 +53,6 @@ public class DatabaseModule extends AbstractModule {
 		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
+		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 	}
 }

@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -289,4 +293,41 @@ public class JDBCUtilsTest {
 			throw e;
 		}
 	}
+
+	@Test
+	public void testGetIntegerWhenValueIsNull() throws SQLException {
+		ResultSet rs = createMock(ResultSet.class);
+
+		expect(rs.getInt("field")).andReturn(0);
+		expect(rs.wasNull()).andReturn(true);
+		replay(rs);
+
+		assertThat(JDBCUtils.getInteger(rs, "field")).isNull();
+
+		verify(rs);
+	}
+
+	@Test
+	public void testGetInteger() throws SQLException {
+		ResultSet rs = createMock(ResultSet.class);
+
+		expect(rs.getInt("field")).andReturn(1);
+		expect(rs.wasNull()).andReturn(false);
+		replay(rs);
+
+		assertThat(JDBCUtils.getInteger(rs, "field")).isEqualTo(1);
+
+		verify(rs);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetIntegerWithNullResultSet() throws SQLException {
+		JDBCUtils.getInteger(null, "field");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testGetIntegerWithNullFieldName() throws SQLException {
+		JDBCUtils.getInteger(createMock(ResultSet.class), null);
+	}
+
 }
