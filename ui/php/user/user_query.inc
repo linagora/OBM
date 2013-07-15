@@ -708,6 +708,7 @@ function run_query_user_insert($user) {
     $domain_id = sql_parse_id($obm['domain_id']);
   }
   $query = "INSERT INTO UserObm (
+    userobm_ext_id,
     userobm_domain_id,
     userobm_timeupdate,
     userobm_timecreate,
@@ -753,6 +754,7 @@ function run_query_user_insert($user) {
     $query_insert_mail_vacation
     $query_insert_samba
   ) VALUES (
+    UUID(),
     $domain_id,
     NOW(),
     NOW(),
