@@ -47,4 +47,29 @@ CREATE TABLE batch_operation_param
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+ALTER TABLE ONLY userobm ALTER userobm_ext_id TYPE CHARACTER(36);
+
+UPDATE ONLY userobm
+SET userobm_ext_id = UUID()
+WHERE userobm_ext_id IS NULL;
+
+ALTER TABLE ONLY userobm ALTER userobm_ext_id SET NOT NULL;
+CREATE UNIQUE INDEX userobm_ext_id_unique_idx ON userobm (userobm_domain_id, userobm_ext_id);
+
+ALTER TABLE ONLY userobm
+    ADD CONSTRAINT userobm_ext_id_unique_idx UNIQUE USING INDEX userobm_ext_id_unique_idx;
+
+ALTER TABLE ONLY p_userobm ALTER userobm_ext_id TYPE CHARACTER(36);
+
+UPDATE ONLY p_userobm pu
+SET userobm_ext_id = u.userobm_ext_id
+FROM userobm u
+WHERE pu.userobm_id = u.userobm_id;
+
+ALTER TABLE ONLY p_userobm ALTER userobm_ext_id SET NOT NULL;
+CREATE UNIQUE INDEX p_userobm_ext_id_unique_idx ON p_userobm (userobm_domain_id, userobm_ext_id);
+
+ALTER TABLE ONLY p_userobm
+    ADD CONSTRAINT p_userobm_ext_id_unique_idx UNIQUE USING INDEX p_userobm_ext_id_unique_idx;
+
 COMMIT;
