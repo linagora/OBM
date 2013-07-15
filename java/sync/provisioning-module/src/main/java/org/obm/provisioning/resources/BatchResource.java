@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -20,6 +21,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.processing.BatchProcessor;
 
 import com.google.inject.Inject;
 
@@ -32,12 +34,20 @@ public class BatchResource {
 
 	@Inject
 	private BatchDao batchDao;
+	@Inject
+	private BatchProcessor batchProcessor;
 
 	@GET
 	@Path("{batchId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException {
-		Batch batch = batchDao.get(batchId);
+		Batch batch = batchProcessor.getRunningBatch(batchId);
+
+		if (batch != null) {
+			return batch;
+		}
+
+		batch = batchDao.get(batchId);
 
 		if (batch == null) {
 			throw new WebApplicationException(Status.NOT_FOUND);
@@ -70,6 +80,30 @@ public class BatchResource {
 		}
 		catch (BatchNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
+		}
+
+		return Response.ok().build();
+	}
+
+	@PUT
+	@Path("{batchId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response commit(@PathParam("batchId") Batch.Id batchId) throws DaoException {
+		Batch batch = batchProcessor.getRunningBatch(batchId);
+
+		if (batch == null) {
+			batch = batchDao.get(batchId);
+
+			if (batch == null) {
+				throw new WebApplicationException(Status.NOT_FOUND);
+			}
+
+			try {
+				batchProcessor.process(batch);
+			}
+			catch (Exception e) {
+				throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+			}
 		}
 
 		return Response.ok().build();

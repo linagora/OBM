@@ -47,7 +47,11 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
-        <dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-multibindings</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
@@ -136,6 +140,13 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+	<dependency>
+		<groupId>com.linagora.obm</groupId>
+		<artifactId>dbcp</artifactId>
+		<version>${obm.version}</version>
+		<type>test-jar</type>
+		<scope>test</scope>
+	</dependency>
 		    <dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>

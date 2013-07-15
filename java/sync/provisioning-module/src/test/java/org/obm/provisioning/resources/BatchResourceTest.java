@@ -48,11 +48,18 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.BatchProcessor;
+
+import com.google.inject.Inject;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class BatchResourceTest extends CommonDomainEndPointEnvTest {
+
+	@Inject
+	private BatchProcessor batchProcessor;
 
 	@Test
 	public void testDeleteWithUnknownDomain() throws Exception {
@@ -145,6 +152,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetWithUnknownBatch() throws Exception {
 		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(null);
 		mocksControl.replay();
 
@@ -170,6 +178,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetOnError() throws Exception {
 		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
 		mocksControl.replay();
 
@@ -183,6 +192,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGet() throws Exception {
 		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		mocksControl.replay();
 
@@ -215,4 +225,97 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 				"}");
 	}
 
+	@Test
+	public void testGetWhenBatchIsRunning() throws Exception {
+		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
+		mocksControl.replay();
+
+		HttpResponse response = get("/batches/12");
+
+		mocksControl.verify();
+
+		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+				"{" +
+					"\"id\":1," +
+					"\"status\":\"ERROR\"," +
+					"\"operationCount\":2," +
+					"\"operationDone\":1," +
+					"\"operations\":[" +
+						"{" +
+							"\"status\":\"SUCCESS\"," +
+							"\"entityType\":\"USER\"," +
+							"\"entity\":{\"id\":123456}," +
+							"\"operation\":\"POST\"," +
+							"\"error\":null" +
+						"}," +
+						"{" +
+							"\"status\":\"ERROR\"," +
+							"\"entityType\":\"USER\"," +
+							"\"entity\":{}," +
+							"\"operation\":\"PATCH\"," +
+							"\"error\":\"Invalid User\"" +
+						"}" +
+					"]" +
+				"}");
+	}
+
+	@Test
+	public void testCommitWithUnknownBatch() throws Exception {
+		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andReturn(null);
+		mocksControl.replay();
+
+		HttpResponse response = put("/batches/12", null);
+
+		mocksControl.verify();
+
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
+	}
+
+	@Test
+	public void testCommitWithAlreadyRunningBatch() throws Exception {
+		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
+		mocksControl.replay();
+
+		HttpResponse response = put("/batches/12", null);
+
+		mocksControl.verify();
+
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+	}
+
+	@Test
+	public void testCommitOnError() throws Exception {
+		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andReturn(batch);
+		batchProcessor.process(batch);
+		expectLastCall().andThrow(new ProcessingException());
+		mocksControl.replay();
+
+		HttpResponse response = put("/batches/12", null);
+
+		mocksControl.verify();
+
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+	}
+
+	@Test
+	public void testCommit() throws Exception {
+		expectDomain();
+		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andReturn(batch);
+		batchProcessor.process(batch);
+		expectLastCall();
+		mocksControl.replay();
+
+		HttpResponse response = put("/batches/12", null);
+
+		mocksControl.verify();
+
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
+	}
 }

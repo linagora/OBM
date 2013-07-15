@@ -1,10 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
-<<<<<<< HEAD
  * Copyright (C) 2013  Linagora
-=======
- * Copyright (C) 2011-2012  Linagora
->>>>>>> - [OBMFULL-5136] LDAP Client implementation
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -72,6 +68,8 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserSystemDao;
+import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckHandler;
 import org.obm.healthcheck.HealthCheckModule;
@@ -89,25 +87,30 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
+import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.BatchProvider;
 import org.obm.provisioning.Connection;
+import org.obm.provisioning.ConnectionException;
 import org.obm.provisioning.ConnectionImpl;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.LdapException;
+import org.obm.provisioning.LdapGroup;
+import org.obm.provisioning.LdapGroupImpl;
+import org.obm.provisioning.LdapGroupMembership;
+import org.obm.provisioning.LdapGroupMembershipImpl;
 import org.obm.provisioning.LdapModule;
 import org.obm.provisioning.LdapService;
 import org.obm.provisioning.LdapServiceImpl;
+import org.obm.provisioning.LdapUser;
+import org.obm.provisioning.LdapUserMembership;
+import org.obm.provisioning.LdapUserMembershipImpl;
 import org.obm.provisioning.ObmDomainProvider;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningContextListener;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.annotations.PATCH;
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapGroupImpl;
-import org.obm.provisioning.bean.LdapUser;
-import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.bean.LdapUserMembershipImpl;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.provisioning.beans.Batch;
@@ -131,9 +134,11 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ConnectionException;
 import org.obm.provisioning.exception.LdapException;
+import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
@@ -144,6 +149,14 @@ import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
+import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.OperationProcessor;
+import org.obm.provisioning.processing.Processor;
+import org.obm.provisioning.processing.impl.BatchProcessorImpl;
+import org.obm.provisioning.processing.impl.CreateUserOperationProcessor;
+import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
+import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
+import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -181,6 +194,11 @@ import org.obm.push.utils.stream.SizeLimitExceededException;
 import org.obm.push.utils.stream.SizeLimitingInputStream;
 import org.obm.push.utils.type.UnsignedShort;
 import org.obm.push.utils.xml.XmlCharacterFilter;
+import org.obm.satellite.client.Configuration;
+import org.obm.satellite.client.SatelliteClientModule;
+import org.obm.satellite.client.SatelliteService;
+import org.obm.satellite.client.SatelliteServiceImpl;
+import org.obm.satellite.client.exceptions.SatteliteClientException;
 import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
 import org.obm.sync.GuiceServletContextListener;
@@ -419,6 +437,7 @@ import fr.aliacom.obm.common.setting.SettingBindingImpl;
 import fr.aliacom.obm.common.setting.SettingDao;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.setting.SettingsServiceImpl;
+import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.trust.TrustTokenDao;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -505,11 +524,24 @@ public class DependencyResolverHelper {
 				LdapException.class, 
 				LdapGroup.class, 
 				LdapGroupImpl.class,
-				LdapUserMembership.class, 
-				LdapUserMembershipImpl.class,
+				LdapGroupMembership.class, 
+				LdapGroupMembershipImpl.class,
 				LdapUser.class, 
 				LdapUserMembership.class,
 				LdapUserMembershipImpl.class
+		};
+	}
+
+	public static Class<?>[] projectSatelliteClientClasses() {
+		return new Class<?>[] { 
+				org.obm.satellite.client.exceptions.ConnectionException.class,
+				SatteliteClientException.class,
+				Configuration.class,
+				org.obm.satellite.client.Connection.class,
+				org.obm.satellite.client.ConnectionImpl.class,
+				SatelliteClientModule.class,
+				SatelliteService.class,
+				SatelliteServiceImpl.class
 		};
 	}
 	
@@ -541,7 +573,17 @@ public class DependencyResolverHelper {
 				OperationJsonSerializer.class,
 				ObmDomainEntry.class,
 				UserExtIdJsonDeserializer.class,
-				UserExtIdJsonSerializer.class
+				UserExtIdJsonSerializer.class,
+				BatchProcessingModule.class,
+				BatchProcessor.class,
+				BatchProcessorImpl.class,
+				OperationProcessor.class,
+				Processor.class,
+				CreateUserOperationProcessor.class,
+				ParallelBatchProcessor.class,
+				HttpVerbBasedOperationProcessor.class,
+				EntityTypeBasedOperationProcessor.class,
+				ProcessingException.class
 		};
 	}
 
@@ -583,7 +625,12 @@ public class DependencyResolverHelper {
 				UserExtId.class,
 				DomainName.class,
 				EmailLogin.class,
-				LinkedEntity.class
+				LinkedEntity.class,
+				SystemUserNotFoundException.class,
+				UserSystemDao.class,
+				UserSystemDaoJdbcImpl.class,
+				ObmSystemUser.class,
+				ObmHost.class
 		};
 	}
 
@@ -986,7 +1033,8 @@ public class DependencyResolverHelper {
 				DateHelper.class,
 				DisplayNameUtils.class,
 				MailUtils.class,
-				XTrustProvider.class
+				XTrustProvider.class,
+				ObmSystemUser.class
 		};
 	}
 }

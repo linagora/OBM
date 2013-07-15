@@ -47,6 +47,8 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.codehaus.jackson.map.InjectableValues;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -54,9 +56,12 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.DateUtils;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -64,6 +69,9 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.satellite.client.SatelliteService;
+import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -93,9 +101,14 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
 					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));
+					bind(UserSystemDao.class).toInstance(mocksControl.createMock(UserSystemDao.class));
 					bind(ResourceForTest.class);
+					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
+					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
 
+					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
+					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				}
 
 				@Provides
@@ -164,6 +177,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected UserDao userDao;
 	@Inject
 	protected BatchDao batchDao;
+	@Inject
+	protected ObjectMapper objectMapper;
 
 	protected String baseUrl;
 	protected int serverPort;
@@ -173,6 +188,8 @@ public abstract class CommonDomainEndPointEnvTest {
 		server.start();
 		serverPort = server.getConnectors()[0].getLocalPort();
 		baseUrl = "http://localhost:" + serverPort + ProvisioningService.PROVISIONING_URL_PREFIX;
+
+		objectMapper.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, domain));
 	}
 
 	@After

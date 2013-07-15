@@ -8,6 +8,8 @@ import org.codehaus.jackson.map.InjectableValues;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.domain.dao.UserSystemDao;
+import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.BatchDao;
@@ -28,6 +30,9 @@ import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.satellite.client.SatelliteClientModule;
+import org.obm.sync.date.DateProvider;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -57,13 +62,17 @@ public class ProvisioningService extends JerseyServletModule {
 		bindRestResources();
 		bindDao();
 
+		install(new BatchProcessingModule());
 		install(new LdapModule());
+		install(new SatelliteClientModule());
 	}
 
 	private void bindDao() {
 		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
+		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
+		bind(DateProvider.class).to(ObmHelper.class);
 	}
 
 	private void bindRestResources() {
