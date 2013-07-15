@@ -58,6 +58,8 @@ import com.google.common.collect.ImmutableMap;
 @RunWith(SlowFilterRunner.class)
 public class ReplyEmailTest {
 
+	private static final String LINEBREAK = "\r\n";
+	
 	private Mime4jUtils mime4jUtils;
 
 	@Before
@@ -122,6 +124,29 @@ public class ReplyEmailTest {
 		TextBody body = (TextBody) message.getBody();
 		String messageAsString = mime4jUtils.toString(body);
 		assertThat(messageAsString).contains("response text").contains("\n> origin").contains("\n> Cordialement");
+	}
+
+	@Test
+	public void testReplyTextToHtml() throws IOException, MimeException, NotQuotableEmailException {
+		MSEmail original = MSMailTestsUtils.createMSEmailHtmlText("<b>origin</b>\n<b>Cordialement</b>");
+		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
+
+		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
+				ImmutableMap.<String, MSAttachementData>of());
+		Message message = replyEmail.getMimeMessage();
+		assertThat(message.isMultipart()).isFalse();
+		assertThat(message.getMimeType()).isEqualTo("text/html");
+		assertThat(message.getBody()).isInstanceOf(TextBody.class);
+		TextBody body = (TextBody) message.getBody();
+		String messageAsString = mime4jUtils.toString(body);
+		assertThat(messageAsString).containsIgnoringCase(
+				"<BODY>response text<BR>" + LINEBREAK +
+				"<BLOCKQUOTE style=\"border-left:1px solid black; padding-left:1px;\">" + LINEBREAK +
+				"<B><B>origin</B>" + LINEBREAK +
+				"<B>Cordialement</B></B>" + LINEBREAK +
+				"</BLOCKQUOTE>" + LINEBREAK +
+				"</BODY>" + LINEBREAK +
+				"</HTML>");
 	}
 	
 	@Test
