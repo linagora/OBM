@@ -31,8 +31,82 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-public interface CyrusImapService {
+import java.util.List;
 
-	Connection login(String host, String login, String password);
+import org.obm.push.minig.imap.StoreClient;
+
+public class ConnectionImpl implements Connection {
+
+	private StoreClient storeClient;
+
+	public ConnectionImpl(StoreClient storeClient) {
+		this.storeClient = storeClient;
+	}
 	
+	@Override
+	public void createUserMailboxes(Partition partition, ImapPath... paths)
+			throws ImapOperationException, ConnectionException {
+		for (ImapPath path : paths) {
+			storeClient.create(path.format(), partition.getName());
+		}
+	}
+
+	@Override
+	public List<Acl> getAcl(ImapPath path) throws ImapOperationException,
+			ConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAcl(ImapPath path, Acl... acls)
+			throws ImapOperationException, ConnectionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<ImapPath> listMailboxes(String user)
+			throws ImapOperationException, ConnectionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(ImapPath path) throws ImapOperationException,
+			ConnectionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rename(ImapPath source, ImapPath target, Partition partition)
+			throws ImapOperationException, ConnectionException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Quota getQuota(ImapPath path) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setQuota(ImapPath path, Quota quota) {
+		storeClient.setQuota(path.format(), quota.getLimit());
+	}
+
+	@Override
+	public void removeQuota(ImapPath path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void shutdown() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

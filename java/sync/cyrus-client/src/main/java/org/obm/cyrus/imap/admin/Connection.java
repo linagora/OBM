@@ -33,7 +33,13 @@ package org.obm.cyrus.imap.admin;
 
 import java.util.List;
 
+import org.obm.push.minig.imap.StoreClient;
+
 public interface Connection {
+	
+	interface Factory {
+		Connection create(StoreClient storeClient);
+	}
 	
 	void createUserMailboxes(Partition partition, ImapPath... paths) 
 			throws ImapOperationException, ConnectionException;

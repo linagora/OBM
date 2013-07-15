@@ -31,16 +31,77 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-public interface ImapPath {
+import java.util.List;
 
-	interface Builder {
-		
-		Builder user(String user);
-		
-		Builder path(String path);
-		
-		ImapPath build();
-		
+import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+public class ImapPath {
+
+	public final static String PATH_SEPARATOR = "/";
+
+	public static class Builder {
+
+		private String user;
+		List<String> pathFragments;
+
+		private Builder() {
+			pathFragments = Lists.newArrayList();
+		}
+
+		public Builder user(String user) {
+			this.user = user;
+			return this;
+		}
+
+		public Builder pathFragment(String pathFragment) {
+			if (pathFragment.contains(PATH_SEPARATOR)) {
+				throw new IllegalArgumentException(String.format(
+						"The path fragment %s should not "
+								+ "contain the path separator %s",
+						pathFragment, PATH_SEPARATOR));
+			}
+			pathFragments.add(pathFragment);
+			return this;
+		}
+
+		public ImapPath build() {
+			ImmutableList<String> immutableFragments = ImmutableList
+					.copyOf(pathFragments);
+			return new ImapPath(user, immutableFragments);
+		}
+
 	}
-	
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	private String user;
+	ImmutableList<String> pathFragments;
+
+	private ImapPath(String user, ImmutableList<String> pathFragments) {
+		this.user = user;
+		this.pathFragments = pathFragments;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public ImmutableList<String> getPathFragments() {
+		return pathFragments;
+	}
+
+	public String format() {
+		if (pathFragments.size() > 0) {
+			String path = StringUtils.join(pathFragments, PATH_SEPARATOR);
+			return String.format("user%s%s%s%s", PATH_SEPARATOR, user,
+					PATH_SEPARATOR, path);
+		} else {
+			return String.format("user%s%s", PATH_SEPARATOR, user);
+		}
+	}
 }

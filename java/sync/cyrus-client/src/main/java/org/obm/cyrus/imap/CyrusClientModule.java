@@ -29,10 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.cyrus.imap.admin;
+package org.obm.cyrus.imap;
 
-public interface CyrusImapService {
+import org.obm.cyrus.imap.admin.Connection;
+import org.obm.cyrus.imap.admin.ConnectionImpl;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
+import org.obm.push.LinagoraImapModule;
 
-	Connection login(String host, String login, String password);
-	
+import com.google.inject.AbstractModule;
+
+public class CyrusClientModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+		this.install(new LinagoraImapModule());
+		bind(CyrusImapService.class).to(CyrusImapServiceImpl.class);
+		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
+	}
+
 }
