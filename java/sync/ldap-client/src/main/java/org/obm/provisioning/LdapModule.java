@@ -37,7 +37,7 @@ public class LdapModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(ConnectionImpl.Factory.class);
+		//bind(ConnectionImpl.Factory.class);
 		bind(LdapService.class).to(LdapServiceImpl.class);
 	}
 

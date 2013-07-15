@@ -90,27 +90,23 @@ import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.BatchProvider;
 import org.obm.provisioning.Connection;
-import org.obm.provisioning.ConnectionException;
 import org.obm.provisioning.ConnectionImpl;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
-import org.obm.provisioning.LdapException;
-import org.obm.provisioning.LdapGroup;
-import org.obm.provisioning.LdapGroupImpl;
-import org.obm.provisioning.LdapGroupMembership;
-import org.obm.provisioning.LdapGroupMembershipImpl;
 import org.obm.provisioning.LdapModule;
 import org.obm.provisioning.LdapService;
 import org.obm.provisioning.LdapServiceImpl;
-import org.obm.provisioning.LdapUser;
-import org.obm.provisioning.LdapUserMembership;
-import org.obm.provisioning.LdapUserMembershipImpl;
 import org.obm.provisioning.ObmDomainProvider;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningContextListener;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.annotations.PATCH;
+import org.obm.provisioning.bean.LdapGroup;
+import org.obm.provisioning.bean.LdapGroupImpl;
+import org.obm.provisioning.bean.LdapUser;
+import org.obm.provisioning.bean.LdapUserMembership;
+import org.obm.provisioning.bean.LdapUserMembershipImpl;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.provisioning.beans.Batch;
@@ -524,8 +520,6 @@ public class DependencyResolverHelper {
 				LdapException.class, 
 				LdapGroup.class, 
 				LdapGroupImpl.class,
-				LdapGroupMembership.class, 
-				LdapGroupMembershipImpl.class,
 				LdapUser.class, 
 				LdapUserMembership.class,
 				LdapUserMembershipImpl.class
