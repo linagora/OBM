@@ -64,4 +64,20 @@ public class OperationTest {
 
 		assertThat(op.getRequest().getVerb()).isEqualTo(HttpVerb.GET);
 	}
+
+	@Test
+	public void testFrom() {
+		Operation op = Operation
+				.builder()
+				.request(Request
+						.builder()
+						.url("/url")
+						.verb(HttpVerb.GET)
+						.build())
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.build();
+
+		assertThat(Operation.builder().from(op).build()).isEqualTo(op);
+	}
 }

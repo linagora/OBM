@@ -31,11 +31,13 @@ package org.obm.provisioning.beans;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -111,10 +113,20 @@ public class Batch {
 		private Date timecreate;
 		private Date timecommit;
 		private ObmDomain domain;
-		private ImmutableList.Builder<Operation> operations;
+		private Map<Operation.Id, Operation> operations;
 
 		private Builder() {
-			operations = ImmutableList.builder();
+			operations = Maps.newLinkedHashMap();
+		}
+
+		public Builder from(Batch batch) {
+			return builder()
+					.id(batch.id)
+					.status(batch.status)
+					.domain(batch.domain)
+					.timecreate(batch.timecreate)
+					.timecommit(batch.timecommit)
+					.operations(batch.operations);
 		}
 
 		public Builder id(Id id) {
@@ -143,12 +155,14 @@ public class Batch {
 		}
 
 		public Builder operations(List<Operation> operations) {
-			this.operations.addAll(operations);
+			for (Operation operation : operations) {
+				this.operations.put(operation.getId(), operation);
+			}
 			return this;
 		}
 		
 		public Builder operation(Operation operation) {
-			this.operations.add(operation);
+			this.operations.put(operation.getId(), operation);
 			return this;
 		}
 
@@ -156,7 +170,7 @@ public class Batch {
 			Preconditions.checkState(status != null, "'status' should be set");
 			Preconditions.checkState(domain != null, "'domain' should be set");
 
-			return new Batch(id, status, timecreate, timecommit, domain, operations.build());
+			return new Batch(id, status, timecreate, timecommit, domain, ImmutableList.copyOf(operations.values()));
 		}
 
 	}

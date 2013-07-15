@@ -112,6 +112,17 @@ public class Operation {
 		private Builder() {
 		}
 
+		public Builder from(Operation operation) {
+			return builder()
+					.id(operation.id)
+					.status(operation.status)
+					.entityType(operation.entityType)
+					.request(operation.request)
+					.error(operation.error)
+					.timecreate(operation.timecreate)
+					.timecommit(operation.timecommit);
+		}
+
 		public Builder id(Id id) {
 			this.id = id;
 			return this;

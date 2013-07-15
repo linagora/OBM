@@ -141,6 +141,15 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				throw new BatchNotFoundException(String.format("No such batch: %s", batch.getId()));
 			}
 
+			for (Operation operation : batch.getOperations()) {
+				try {
+					operationDao.update(operation);
+				}
+				catch (Exception e) {
+					throw new DaoException(e); // This should never happen...
+				}
+			}
+
 			return get(batch.getId());
 		}
 		catch (SQLException e) {

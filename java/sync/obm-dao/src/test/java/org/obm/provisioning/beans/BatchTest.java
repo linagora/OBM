@@ -34,6 +34,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.provisioning.beans.Operation.Id;
+
+import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.ToolBox;
 
@@ -81,7 +84,7 @@ public class BatchTest {
 				.domain(ToolBox.getDefaultObmDomain())
 				.operation(Operation
 						.builder()
-						.id(Operation.Id.builder().id(1).build())
+						.id(operationId(1))
 						.status(BatchStatus.SUCCESS)
 						.entityType(BatchEntityType.USER)
 						.request(Request
@@ -129,7 +132,7 @@ public class BatchTest {
 				.domain(ToolBox.getDefaultObmDomain())
 				.operation(Operation
 						.builder()
-						.id(Operation.Id.builder().id(1).build())
+						.id(operationId(1))
 						.status(BatchStatus.SUCCESS)
 						.entityType(BatchEntityType.USER)
 						.request(Request
@@ -166,5 +169,93 @@ public class BatchTest {
 				.build();
 
 		assertThat(batch.getOperationsDoneCount()).isEqualTo(0);
+	}
+
+	@Test
+	public void testFrom() {
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.operation(Operation
+						.builder()
+						.id(operationId(1))
+						.status(BatchStatus.SUCCESS)
+						.entityType(BatchEntityType.USER)
+						.request(Request
+								.builder()
+								.url("/")
+								.body("")
+								.verb(HttpVerb.POST)
+								.build())
+						.build())
+				.build();
+
+		assertThat(Batch.builder().from(batch).build()).isEqualTo(batch);
+	}
+
+	@Test
+	public void testOperationsInsertionOrderIsMaintained() {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.status(BatchStatus.SUCCESS)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.url("/")
+						.body("")
+						.verb(HttpVerb.POST)
+						.build());
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.operation(opBuilder.id(operationId(1)).build())
+				.operation(opBuilder.id(operationId(2)).build())
+				.operation(opBuilder.id(operationId(3)).build())
+				.operation(opBuilder.id(operationId(4)).build())
+				.operation(opBuilder.id(operationId(5)).build())
+				.build();
+
+		assertThat(batch.getOperations()).isEqualTo(ImmutableList.of(
+				opBuilder.id(operationId(1)).build(),
+				opBuilder.id(operationId(2)).build(),
+				opBuilder.id(operationId(3)).build(),
+				opBuilder.id(operationId(4)).build(),
+				opBuilder.id(operationId(5)).build()));
+	}
+
+	@Test
+	public void testOperationsAreReplacedWhenReInserted() {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.status(BatchStatus.SUCCESS)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.url("/")
+						.body("")
+						.verb(HttpVerb.POST)
+						.build());
+		Batch batch = Batch
+				.builder()
+				.id(Batch.Id.builder().id(1).build())
+				.status(BatchStatus.IDLE)
+				.domain(ToolBox.getDefaultObmDomain())
+				.operation(opBuilder.id(operationId(1)).build())
+				.operation(opBuilder.id(operationId(2)).build())
+				.operation(opBuilder.id(operationId(2)).build())
+				.operation(opBuilder.id(operationId(2)).build())
+				.build();
+
+		assertThat(batch.getOperations()).isEqualTo(ImmutableList.of(
+				opBuilder.id(operationId(1)).build(),
+				opBuilder.id(operationId(2)).build()));
+	}
+
+	private Id operationId(int id) {
+		return Operation.Id.builder().id(id).build();
 	}
 }

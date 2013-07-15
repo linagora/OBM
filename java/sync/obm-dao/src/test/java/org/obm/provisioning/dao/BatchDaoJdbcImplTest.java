@@ -43,6 +43,7 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.Batch.Builder;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
@@ -140,6 +141,44 @@ public class BatchDaoJdbcImplTest {
 		Batch updatedBatch = dao.update(batch);
 
 		assertThat(updatedBatch.getStatus()).isEqualTo(BatchStatus.RUNNING);
+	}
+
+	@Test
+	public void testUpdateAlsoUpdatesOperations() throws Exception {
+		ObmDomain domain = ToolBox.getDefaultObmDomain();
+		Request request = Request.builder()
+				.url("/batches/1/users")
+				.verb(HttpVerb.POST)
+				.param("p1", "v1")
+				.build();
+		Operation.Builder operationBuilder = Operation.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.request(request)
+				.entityType(BatchEntityType.USER);
+		Operation operation = operationBuilder
+				.build();
+		Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE);
+		Batch batch = batchBuilder.build();
+
+		batch = dao.create(batch);
+		batch = dao.addOperation(batch.getId(), operation);
+
+		batch = batchBuilder
+				.status(BatchStatus.SUCCESS)
+				.operation(operationBuilder
+						.status(BatchStatus.ERROR)
+						.build())
+				.build();
+
+		Batch updatedBatch = dao.update(batch);
+
+		assertThat(updatedBatch.getStatus()).isEqualTo(BatchStatus.SUCCESS);
+		assertThat(updatedBatch.getOperations().get(0).getStatus()).isEqualTo(BatchStatus.ERROR);
 	}
 
 	@Test
