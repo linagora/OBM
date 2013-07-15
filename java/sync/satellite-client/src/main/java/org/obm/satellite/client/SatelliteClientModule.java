@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -29,16 +29,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
-public interface Configuration {
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.SystemDefaultHttpClient;
 
-	public static final int DEFAULT_SATELLITE_PORT = 30000;
+import com.google.inject.AbstractModule;
 
-	String getUsername();
+public class SatelliteClientModule extends AbstractModule {
 
-	String getPassword();
-
-	boolean isIMAPServerManaged();
-
-	int getSatellitePort();
+	@Override
+	protected void configure() {
+		bind(HttpClient.class).to(SystemDefaultHttpClient.class);
+		bind(SatelliteService.class).to(SatelliteServiceImpl.class);
+	}
 
 }
