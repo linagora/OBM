@@ -244,13 +244,14 @@ public class UserDao {
 		ResultSet rs = null;
 
 		ObmUser obmUser = null;
-		String uq = "SELECT " + USER_FIELDS
-				+ " FROM UserObm "
-				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
-				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
-				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
-				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
-				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
+		String uq = "SELECT " + USER_FIELDS + " "
+				+ "FROM UserObm "
+				    + "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				    + "LEFT JOIN Host ON host_id = userobm_mail_server_id "
+				    + "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
+				    + "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
+				+ "WHERE userobm_domain_id=? "+
+                    "AND userobm_login=? AND userobm_archive != '1'";
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(uq);
