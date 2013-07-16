@@ -35,7 +35,7 @@ public class Partition {
 
 	private String name;
 
-	public static Partition of(String name) {
+	public static Partition valueOf(String name) {
 		return new Partition(name);
 	}
 

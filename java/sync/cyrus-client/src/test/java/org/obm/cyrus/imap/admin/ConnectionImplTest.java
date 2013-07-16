@@ -61,7 +61,7 @@ public class ConnectionImplTest {
 		control.replay();
 	
 		Connection conn = new ConnectionImpl(mockClient);
-		conn.createUserMailboxes(Partition.of("partition"),
+		conn.createUserMailboxes(Partition.valueOf("partition"),
 				ImapPath.builder().user("ident4@vm.obm.org").build(),
 				ImapPath.builder().user("ident4@vm.obm.org").pathFragment("Trash").build()
 				);
