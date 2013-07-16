@@ -46,6 +46,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -99,6 +100,7 @@ public class MailBackendImplTest {
 	private EmailChangesFetcher serverEmailChangesBuilder;
 	private MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private WindowingService windowingService;
+	private EmailConfiguration emailConfiguration;
 
 	private MailBackendImpl testee;
 
@@ -121,11 +123,12 @@ public class MailBackendImplTest {
 		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
 		mailBackendSyncDataFactory = control.createMock(MailBackendSyncDataFactory.class);
 		windowingService = control.createMock(WindowingService.class);
+		emailConfiguration = control.createMock(EmailConfiguration.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, snapshotService,
 				serverEmailChangesBuilder, mappingService, null, null, null, mailBackendSyncDataFactory,
-				windowingService);
+				windowingService, emailConfiguration);
 	}
 	
 	@Test

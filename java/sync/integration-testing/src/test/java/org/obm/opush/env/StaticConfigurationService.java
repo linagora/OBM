@@ -105,6 +105,11 @@ public class StaticConfigurationService implements ConfigurationService {
 		}
 
 		@Override
+		public ExpungePolicy expungePolicy() {
+			return ExpungePolicy.ALWAYS;
+		}
+		
+		@Override
 		public int imapPort() {
 			return configuration.imapPort;
 		}

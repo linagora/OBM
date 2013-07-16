@@ -121,7 +121,6 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 	@Override
 	public void deleteMessage(Message messageToDelete) throws MessagingException {
 		folder.setFlags(new Message[]{messageToDelete}, new Flags(Flags.Flag.DELETED), true);
-		expunge();
 	}
 
 	@Override

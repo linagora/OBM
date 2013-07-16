@@ -35,6 +35,7 @@ package org.obm.configuration;
 
 import org.obm.push.utils.IniFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -50,6 +51,7 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
 	private static final String BACKEND_IMAP_ACTIVATE_TLS = "imap.activateTLS";
 	private static final String BACKEND_IMAP_TIMEOUT_VALUE = "imap.timeoutInMs";
+	private static final String BACKEND_IMAP_EXPUNGE_POLICY = "imap.expungePolicy";
 	private static final String BACKEND_MESSAGE_MAX_SIZE = "message.maxSize";
 	private static final String BACKEND_MESSAGE_BLOCK_SIZE = "message.blockSize";
 	
@@ -59,7 +61,7 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	private final IniFile iniFile;
 	
 	@Inject
-	private EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
+	@VisibleForTesting EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
 		iniFile = iniFileFactory.build(BACKEND_CONF_FILE);
 	}	
 	
@@ -76,6 +78,15 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	@Override
 	public boolean loginWithDomain() {
 		return isOptionEnabled(BACKEND_IMAP_LOGIN_WITH_DOMAIN);
+	}
+	
+	@Override
+	public ExpungePolicy expungePolicy() {
+		String expungePolicy = iniFile.getStringValue(BACKEND_IMAP_EXPUNGE_POLICY);
+		if ("never".equalsIgnoreCase(expungePolicy)) {
+			return ExpungePolicy.NEVER;
+		}
+		return ExpungePolicy.ALWAYS;
 	}
 	
 	@Override

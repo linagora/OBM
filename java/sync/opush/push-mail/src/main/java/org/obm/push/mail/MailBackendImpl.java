@@ -50,6 +50,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfiguration.ExpungePolicy;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.DataDelta;
@@ -152,6 +153,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private final WindowingService windowingService;
 
+	private EmailConfiguration emailConfiguration;
+
 
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
@@ -164,7 +167,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			MSEmailFetcher msEmailFetcher,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
 			MailBackendSyncDataFactory mailBackendSyncDataFactory,
-			WindowingService windowingService)  {
+			WindowingService windowingService,
+			EmailConfiguration emailConfiguration)  {
 
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
@@ -177,6 +181,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.msEmailFetcher = msEmailFetcher;
 		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
 		this.windowingService = windowingService;
+		this.emailConfiguration = emailConfiguration;
 	}
 
 	@Override
@@ -426,6 +431,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				} else {
 					mailboxService.delete(udr, destinationCollectionPath, MessageSet.singleton(uid));
 				}
+				expunge(udr, destinationCollectionPath);
 			}	
 		} catch (MailException e) {
 			throw new ProcessingEmailException(e);
@@ -476,6 +482,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			final Integer dstFolderId = mappingService.getCollectionIdFor(udr.getDevice(), dstFolder);
 			MessageSet messages = mailboxService.move(udr, srcFolder, dstFolder, MessageSet.singleton(currentMailUid));
 			if (!messages.isEmpty()) {
+				expunge(udr, srcFolder);
 				return ServerId.buildServerIdString(dstFolderId, Iterables.getOnlyElement(messages));	
 			}
 			throw new ItemNotFoundException("The item to move may not exists anymore");
@@ -765,6 +772,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			final Integer devDbId = udr.getDevice().getDatabaseId();
 			int collectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 			mailboxService.purgeFolder(udr, devDbId, collectionPath, collectionId);
+			expunge(udr, collectionPath);
 			if (deleteSubFolder) {
 				logger.warn("deleteSubFolder isn't implemented because opush doesn't yet manage folders");
 			}	
@@ -774,6 +782,12 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (LocatorClientException e) {
 			throw new ProcessingEmailException(e);
+		}
+	}
+
+	private void expunge(UserDataRequest udr, String collectionPath) {
+		if (ExpungePolicy.NEVER != emailConfiguration.expungePolicy()) {
+			mailboxService.expunge(udr, collectionPath);
 		}
 	}
 	

@@ -269,7 +269,8 @@ public class ImapMailboxService implements MailboxService {
 		}
 	}
 	
-	/* package */ void expunge(UserDataRequest udr, String collectionPath) throws MailException {
+	@Override
+	public void expunge(UserDataRequest udr, String collectionPath) throws MailException {
 		try {
 			String mailboxName = parseMailBoxName(udr, collectionPath);
 			openImapFolderAndGetCorrespondingImapStore(udr, mailboxName);
@@ -451,7 +452,6 @@ public class ImapMailboxService implements MailboxService {
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
 			store.uidStore(messages, fl, true);
-			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
 					mailboxName, time, Iterables.size(messages));

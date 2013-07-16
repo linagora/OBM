@@ -126,4 +126,6 @@ public interface MailboxService {
 	long fetchUIDNext(UserDataRequest udr, String collectionPath) throws MailException;
 	
 	long fetchUIDValidity(UserDataRequest udr, String collectionPath) throws MailException;
+
+	void expunge(UserDataRequest udr, String collectionPath);
 }

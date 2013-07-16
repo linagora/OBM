@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfiguration.ExpungePolicy;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
@@ -106,9 +107,11 @@ public class MailBackendTest {
 	private WindowingService windowingService;
 	private Provider<Builder> collectionPathBuilderProvider;
 	private CollectionPath.Builder collectionPathBuilder;
+	private EmailConfiguration emailConfiguration;
 
 	private IMocksControl mocksControl;
 	private MailBackend testee;
+
 
 
 	@Before
@@ -127,9 +130,10 @@ public class MailBackendTest {
 		mailboxService = mocksControl.createMock(MailboxService.class);
 		mappingService = mocksControl.createMock(MappingService.class);
 		windowingService = mocksControl.createMock(WindowingService.class);
+		emailConfiguration = mocksControl.createMock(EmailConfiguration.class);
 		
 		testee = new MailBackendImpl(mailboxService, null, null, null, null, null, mappingService,
-				null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService, emailConfiguration);
 	}
 	
 	@Test
@@ -151,7 +155,7 @@ public class MailBackendTest {
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, authenticationService, new Mime4jUtils(),
 				mockOpushConfigurationService(), null, null, mappingService, null, null,
-				collectionPathBuilderProvider, null, windowingService);
+				collectionPathBuilderProvider, null, windowingService, emailConfiguration);
 
 		mocksControl.replay();
 		
@@ -373,7 +377,7 @@ public class MailBackendTest {
 		
 		mocksControl.replay();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService, emailConfiguration);
 		Collection<OpushCollection> specialFolders = mailBackend.listSpecialFolders(udr).collections();
 		mocksControl.verify();
 
@@ -397,7 +401,7 @@ public class MailBackendTest {
 		
 		mocksControl.replay();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, null,
-				null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService, emailConfiguration);
 		Collection<OpushCollection> subscribedFolders = mailBackend.listSubscribedFolders(udr).collections();
 		mocksControl.verify();
 
@@ -423,7 +427,7 @@ public class MailBackendTest {
 		
 		mocksControl.replay();
 		MailBackendImpl mailBackend = new MailBackendImpl(mailboxService, null, null, null, null, null, mappingService,
-				null, null, collectionPathBuilderProvider, null, windowingService);
+				null, null, collectionPathBuilderProvider, null, windowingService, emailConfiguration);
 		CollectionChange itemChange = mailBackend.createCollectionChange(udr, collection);
 		mocksControl.verify();
 		
@@ -455,6 +459,10 @@ public class MailBackendTest {
 		
 		mailboxService.delete(udr, trashCollectionPath.collectionPath(), MessageSet.singleton(itemId));
 		expectLastCall();
+
+		expect(emailConfiguration.expungePolicy()).andReturn(ExpungePolicy.ALWAYS).once();
+		mailboxService.expunge(udr, trashCollectionPath.collectionPath());
+		expectLastCall().once();
 		
 		mocksControl.replay();
 		 
