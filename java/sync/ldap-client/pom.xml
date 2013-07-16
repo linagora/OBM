@@ -22,6 +22,11 @@
 	
 	<dependencies>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>

@@ -41,9 +41,20 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.obm.provisioning.Configuration;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.ObmUser;
+
 public class LdapUser {
+
+	private final static String[] DEFAULT_OBJECT_CLASSES = {
+		"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" };
+
+	private final static String DEFAULT_WEB_ACCESS = "REJECT";
+	private final static String DEFAULT_EMAIL_ACCESS = "REJECT";
+	private final static int DEFAULT_CYRUS_PORT = 24;
+	private final static boolean DEFAULT_HIDDEN_USER = false;
 	
 	public class Id {
 
@@ -85,7 +96,51 @@ public class LdapUser {
 		private Builder(Configuration configuration) {
 			this.configuration = configuration;
 		}
-		
+	
+		public Builder fromObmUser(ObmUser obmUser) {
+			String displayName = buildDisplayName(obmUser);
+			this.objectClasses = DEFAULT_OBJECT_CLASSES;
+			this.uid = obmUser.getLogin().toLowerCase();
+			this.uidNumber = obmUser.getUidNumber();
+			this.gidNumber = obmUser.getGidNumber();
+			this.cn = displayName;
+			this.displayName = displayName;
+			this.sn = Strings.isNullOrEmpty(obmUser.getLastName()) ? obmUser.getLastName() : obmUser.getLogin();
+			this.givenName = obmUser.getFirstName();
+			this.homeDirectory = buildHomeDirectory(obmUser);
+			this.userPassword = obmUser.getPassword();
+			this.webAccess = DEFAULT_WEB_ACCESS;
+			this.mailBox = obmUser.getEmailAtDomain();
+			this.mailBoxServer = buildMailboxServer(obmUser);
+			this.mailAccess = DEFAULT_EMAIL_ACCESS;
+			this.hiddenUser = DEFAULT_HIDDEN_USER;
+			return this;
+		}
+	
+		private String buildDisplayName(ObmUser obmUser) {
+			String cn;
+			if (!Strings.isNullOrEmpty(obmUser.getFirstName())
+					&& !Strings.isNullOrEmpty(obmUser.getLastName())) {
+				cn = String.format("%s %s", obmUser.getFirstName(), obmUser.getLastName());
+			}
+			else if (!Strings.isNullOrEmpty(obmUser.getLastName())) {
+				cn = obmUser.getLastName();
+			}
+			else {
+				cn = obmUser.getLogin();
+			}
+			return cn;
+		}
+	
+		private String buildHomeDirectory(ObmUser obmUser) {
+			return String.format("/home/%s", obmUser.getLogin().toLowerCase());
+		}
+
+		private String buildMailboxServer(ObmUser obmUser) {
+			return String.format("lmtp:%s:%d", obmUser.getMailHost().getIp(),
+					DEFAULT_CYRUS_PORT);
+		}
+
 		public Builder objectClasses(String[] objectClasses) {
 			this.objectClasses = objectClasses;
 			return this;
