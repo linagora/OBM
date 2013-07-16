@@ -52,6 +52,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
@@ -115,6 +116,7 @@ public class MailboxBackendTest {
 	private SnapshotService snapshotService;
 	private WindowingService windowingService;
 	private SmtpSender smtpSender;
+	private EmailConfiguration emailConfiguration;
 
 	@Before
 	public void setUp() {
@@ -138,9 +140,10 @@ public class MailboxBackendTest {
 		snapshotService = mocks.createMock(SnapshotService.class);
 		windowingService = mocks.createMock(WindowingService.class);
 		smtpSender = mocks.createMock(SmtpSender.class);
+		emailConfiguration = mocks.createMock(EmailConfiguration.class);
 		
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, snapshotService,
-				null, mappingService, msEmailFetcher, null, null, null, windowingService, smtpSender);
+				null, mappingService, msEmailFetcher, null, null, null, windowingService, smtpSender, emailConfiguration);
 	}
 	
 	@Test(expected=ItemNotFoundException.class)

@@ -53,6 +53,7 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
 	private static final String BACKEND_IMAP_ACTIVATE_TLS = "imap.activateTLS";
 	private static final String BACKEND_IMAP_TIMEOUT_VALUE = "imap.timeoutInMs";
+	private static final String BACKEND_IMAP_EXPUNGE_POLICY = "imap.expungePolicy";
 	private static final String BACKEND_MESSAGE_MAX_SIZE = "message.maxSize";
 	private static final String BACKEND_MESSAGE_BLOCK_SIZE = "message.blockSize";
 	
@@ -82,6 +83,15 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	@Override
 	public boolean loginWithDomain() {
 		return isOptionEnabled(BACKEND_IMAP_LOGIN_WITH_DOMAIN);
+	}
+	
+	@Override
+	public ExpungePolicy expungePolicy() {
+		String expungePolicy = iniFile.getStringValue(BACKEND_IMAP_EXPUNGE_POLICY);
+		if ("never".equalsIgnoreCase(expungePolicy)) {
+			return ExpungePolicy.NEVER;
+		}
+		return ExpungePolicy.ALWAYS;
 	}
 	
 	@Override

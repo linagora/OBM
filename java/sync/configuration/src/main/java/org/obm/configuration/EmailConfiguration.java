@@ -37,6 +37,10 @@ public interface EmailConfiguration {
 		ALWAYS, NEVER
 	}
 
+	enum ExpungePolicy {
+		ALWAYS, NEVER
+	}
+	
 	public static final String IMAP_PROTOCOL = "imap";
 	public static final String IMAP_INBOX_NAME = "INBOX";
 	public static final String IMAP_DRAFTS_NAME = "Drafts";
@@ -47,6 +51,8 @@ public interface EmailConfiguration {
 
 	boolean loginWithDomain();
 
+	ExpungePolicy expungePolicy();
+	
 	int getMessageMaxSize();
 	
 	int imapPort();

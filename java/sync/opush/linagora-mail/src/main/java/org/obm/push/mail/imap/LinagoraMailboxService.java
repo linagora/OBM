@@ -241,7 +241,6 @@ public class LinagoraMailboxService implements MailboxService {
 			fl.add(Flag.DELETED);
 			logger.info("delete conv id = {}", messages);
 			store.uidStore(messages, fl, true);
-			store.expunge();
 		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {
@@ -282,7 +281,6 @@ public class LinagoraMailboxService implements MailboxService {
 		fl.add(Flag.DELETED);
 		logger.info("delete conv id = {}", messages);
 		store.uidStore(messages, fl, true);
-		store.expunge();
 	}
 	
 	private void assertMoveItemIsSupported(StoreClient store) throws UnsupportedBackendFunctionException {
@@ -371,7 +369,6 @@ public class LinagoraMailboxService implements MailboxService {
 			FlagsList fl = new FlagsList();
 			fl.add(Flag.DELETED);
 			store.uidStore(messages, fl, true);
-			store.expunge();
 			time = System.currentTimeMillis() - time;
 			logger.info("Mailbox folder[ {} ] was purged in {} millisec. {} messages have been deleted",
 					collectionPath, time, Iterables.size(messages));
@@ -402,7 +399,6 @@ public class LinagoraMailboxService implements MailboxService {
 			}
 			resetInputStream(mailContent);
 			store.append(folderName, mailContent, fl);
-			store.expunge();
 		} catch (IMAPException e) {
 			throw new MailException(e);
 		} catch (CommandIOException e) {
@@ -565,6 +561,20 @@ public class LinagoraMailboxService implements MailboxService {
 			StoreClient store = imapClientProvider.getImapClient(udr);
 			String mailBoxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
 			return store.uidValidity(mailBoxName);
+		} catch (OpushLocatorException e) {
+			throw new MailException(e);
+		} catch (IMAPException e) {
+			throw new MailException(e);
+		}
+	}
+	
+	@Override
+	public void expunge(UserDataRequest udr, String collectionPath) {
+		try {
+			StoreClient store = imapClientProvider.getImapClient(udr);
+			String mailBoxName = extractMailboxNameFromCollectionPath(udr, collectionPath);
+			store.select(mailBoxName);
+			store.expunge();
 		} catch (OpushLocatorException e) {
 			throw new MailException(e);
 		} catch (IMAPException e) {

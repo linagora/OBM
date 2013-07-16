@@ -40,15 +40,16 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
+import org.obm.configuration.EmailConfiguration.ExpungePolicy;
 import org.obm.push.utils.IniFile;
 import org.obm.push.utils.IniFile.Factory;
 
 public class EmailConfigurationImplTest {
 
-	private EmailConfigurationImpl config;
+	private EmailConfigurationImpl testee;
 	private IMocksControl mocksControl;
 	private IniFile iniFile;
-
+	
 	@Before
 	public void setup() {
 		mocksControl = createControl();
@@ -59,7 +60,7 @@ public class EmailConfigurationImplTest {
 		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		replay(factory);
 
-		config = new EmailConfigurationImpl(factory);
+		testee = new EmailConfigurationImpl(factory);
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn(null);
 		mocksControl.replay();
 
-		assertThat(config.mailboxNameCheckPolicy()).isEqualTo(EmailConfigurationImpl.MAILBOX_NAME_CHECK_POLICY_DEFAULT);
+		assertThat(testee.mailboxNameCheckPolicy()).isEqualTo(EmailConfigurationImpl.MAILBOX_NAME_CHECK_POLICY_DEFAULT);
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn("ALWAYS");
 		mocksControl.replay();
 
-		assertThat(config.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
+		assertThat(testee.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn("always");
 		mocksControl.replay();
 
-		assertThat(config.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
+		assertThat(testee.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
 	}
 
 	@Test
@@ -91,7 +92,7 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn("aLWayS");
 		mocksControl.replay();
 
-		assertThat(config.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
+		assertThat(testee.mailboxNameCheckPolicy()).isEqualTo(MailboxNameCheckPolicy.ALWAYS);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -99,7 +100,7 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn("nonexistent");
 		mocksControl.replay();
 
-		config.mailboxNameCheckPolicy();
+		testee.mailboxNameCheckPolicy();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -107,7 +108,50 @@ public class EmailConfigurationImplTest {
 		expect(iniFile.getStringValue(EmailConfigurationImpl.BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY)).andReturn("");
 		mocksControl.replay();
 
-		config.mailboxNameCheckPolicy();
+		testee.mailboxNameCheckPolicy();
+	}
+	
+
+	
+	
+	@Test
+	public void testExpungeDefaultValue() {
+		expect(iniFile.getStringValue("imap.expungePolicy")).andReturn(null);
+		mocksControl.replay();
+		assertThat(testee.expungePolicy()).isEqualTo(ExpungePolicy.ALWAYS);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testExpungeInvalidValue() {
+		expect(iniFile.getStringValue("imap.expungePolicy")).andReturn("foo");
+		mocksControl.replay();
+		assertThat(testee.expungePolicy()).isEqualTo(ExpungePolicy.ALWAYS);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testExpungeAlways() {
+		expect(iniFile.getStringValue("imap.expungePolicy")).andReturn("always");
+		mocksControl.replay();
+		assertThat(testee.expungePolicy()).isEqualTo(ExpungePolicy.ALWAYS);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testExpungeNever() {
+		expect(iniFile.getStringValue("imap.expungePolicy")).andReturn("never");
+		mocksControl.replay();
+		assertThat(testee.expungePolicy()).isEqualTo(ExpungePolicy.NEVER);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testExpungeNeverStrangeCase() {
+		expect(iniFile.getStringValue("imap.expungePolicy")).andReturn("nEvEr");
+		mocksControl.replay();
+		assertThat(testee.expungePolicy()).isEqualTo(ExpungePolicy.NEVER);
+		mocksControl.verify();
 	}
 
 }

@@ -60,6 +60,11 @@ public class GreenMailEmailConfiguration implements EmailConfiguration {
 	}
 
 	@Override
+	public ExpungePolicy expungePolicy() {
+		return ExpungePolicy.ALWAYS;
+	}
+	
+	@Override
 	public int getMessageMaxSize() {
 		return 102400;
 	}
