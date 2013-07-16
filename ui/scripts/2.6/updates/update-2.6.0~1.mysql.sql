@@ -43,4 +43,19 @@ CREATE TABLE IF NOT EXISTS batch_operation_param
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+UPDATE UserObm
+SET userobm_ext_id = UUID()
+WHERE userobm_ext_id IS NULL;
+
+ALTER TABLE UserObm MODIFY userobm_ext_id CHARACTER(36) NOT NULL;
+ALTER TABLE UserObm ADD UNIQUE (userobm_domain_id, userobm_ext_id);
+
+UPDATE P_UserObm pu
+INNER JOIN UserObm u
+ON u.userobm_id = pu.userobm_id
+SET pu.userobm_ext_id = u.userobm_ext_id;
+
+ALTER TABLE P_UserObm MODIFY userobm_ext_id CHARACTER(36) NOT NULL;
+ALTER TABLE P_UserObm ADD UNIQUE (userobm_domain_id, userobm_ext_id);
+
 COMMIT;
