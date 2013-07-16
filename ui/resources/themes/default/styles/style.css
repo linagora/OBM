@@ -456,6 +456,7 @@ form {
 
 #shinnyUserInfos{
   margin-bottom: 15px;
+  min-height: 80px;
 }
 
 #shinnyUserInfos #avatar{
