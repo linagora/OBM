@@ -72,7 +72,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPutWithWrongPassword() {
-		expectAuthenticatingReturns("username", "password");
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -87,7 +87,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPatchWithWrongPassword() {
-		expectAuthenticatingReturns("username", "password");
+		expectSuccessfulAuthentication("username", "password");
 		
 		mocksControl.replay();
 		
@@ -103,9 +103,9 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:create, delete"));
-		
+		expectDomain();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:create, delete")));
 		mocksControl.replay();
 		
 		given()
@@ -113,16 +113,17 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
-			.get("/batches/1/users/1");
+			.get("/users/1");
 		
 		mocksControl.verify();
 	}
 	
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read, delete"));
-		
+		expectDomain();
+		expectBatch();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, delete")));
 		mocksControl.replay();
 		
 		given()
@@ -130,16 +131,17 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
-			.post("/batches/1/users/1");
+			.post("/batches/1/users");
 		
 		mocksControl.verify();
 	}
 	
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
-		
+		expectDomain();
+		expectBatch();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
 		
 		given()
@@ -154,9 +156,10 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPatchWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
-		
+		expectDomain();
+		expectBatch();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
 		
 		given()
@@ -171,9 +174,10 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPutWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read, create"));
-		
+		expectDomain();
+		expectBatch();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
 		
 		given()
@@ -189,8 +193,8 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCanGetUserWithReadPermission() throws Exception {
 		expectDomain();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read")));
 		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
 		
 		mocksControl.replay();
@@ -208,10 +212,9 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testSubjectCanGetListOfUserWithReadPermission() throws Exception {
 		expectDomain();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:read"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read")));
 		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
-		
 		mocksControl.replay();
 		
 		given()
@@ -228,12 +231,11 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanPostUserWithCreatePermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:create"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:create")));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users", "", HttpVerb.POST, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
-		
 		mocksControl.replay();
 		
 		given()
@@ -250,12 +252,11 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanDeleteUserWithDeletePermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:delete"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:delete")));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
-		
 		mocksControl.replay();
 		
 		given()
@@ -272,12 +273,11 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanPutUserWithUpdatePermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:update"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:update")));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", "", HttpVerb.PUT, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
-		
 		mocksControl.replay();
 		
 		given()
@@ -294,8 +294,8 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanPatchUserWithUpdatePermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("users:patch"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:patch")));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
 						"", HttpVerb.PATCH, ImmutableMap.<String, String>of())))

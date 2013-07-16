@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProvisioningService;
+import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public class ProfileResource {
 	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
 	public Response getProfileEntries() {
+		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 		try {
 			return Response
 					.ok(profileDao.getProfiles(domain.getUuid()))
@@ -53,6 +55,7 @@ public class ProfileResource {
 	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
 	public Response getProfileName(@PathParam("profileId")long profileId) {
+		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 		try {
 			return Response.ok(profileDao.getProfile(domain.getUuid(), ProfileId.builder().id(profileId).build())).build();
 		} catch (ProfileNotFoundException e) {

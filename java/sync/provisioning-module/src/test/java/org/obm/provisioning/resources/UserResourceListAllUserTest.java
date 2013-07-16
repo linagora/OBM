@@ -58,10 +58,9 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testListAllUserOnNonExistentDomain() throws Exception {
+	public void testListAllUserOnNonExistentDomain() {
 		expectNoDomain();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -77,9 +76,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUser() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.list(domain)).andReturn(fakeListOfUser());
-		
 		mocksControl.replay();
 		
 		given()
@@ -96,9 +94,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUserReturnNothing() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.list(domain)).andReturn(null);
-		
 		mocksControl.replay();
 		
 		given()
@@ -115,9 +112,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllUserReturnEmptyList() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
-		
 		mocksControl.replay();
 		
 		given()
@@ -134,9 +130,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testListAllThrowError() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.list(domain)).andThrow(new RuntimeException("bad things happen"));
-		
 		mocksControl.replay();
 		
 		given()

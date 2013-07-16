@@ -46,8 +46,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
@@ -69,9 +69,9 @@ public class UserResource {
 
 	@GET
 	@Path("{userExtId}")
-	@RequiresPermissions(users_read)
 	@Produces(JSON_WITH_UTF8)
 	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		try {
 			return userDao.getByExtId(userExtId, domain);
 		}
@@ -81,9 +81,9 @@ public class UserResource {
 	}
 
 	@GET
-	@RequiresPermissions(users_read)
 	@Produces(JSON_WITH_UTF8)
 	public List<UserIdentifier> listAll() throws SQLException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		List<ObmUser> users = userDao.list(domain);
 
 		if (users == null) {

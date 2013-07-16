@@ -52,8 +52,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -70,8 +69,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPostWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -88,8 +86,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPostConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -107,8 +104,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPutWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -126,8 +122,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPutConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -145,8 +140,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPatchWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -164,8 +158,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testPatchConsumeInvalidData() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -183,8 +176,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteWithUnknownUrl() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()

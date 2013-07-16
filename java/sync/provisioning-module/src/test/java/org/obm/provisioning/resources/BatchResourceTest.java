@@ -61,11 +61,10 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	private BatchProcessor batchProcessor;
 
 	@Test
-	public void testDeleteWithUnknownDomain() throws Exception {
+	public void testDeleteWithUnknownDomain() {
 		expectNoDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
-		
 		given()
 			.auth().basic("username@domain", "password").
 		expect()
@@ -79,7 +78,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDeleteWithUnknownBatch() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		batchDao.delete(batchId(1));
 		expectLastCall().andThrow(new BatchNotFoundException());
 		mocksControl.replay();
@@ -97,7 +96,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testDelete() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		batchDao.delete(batchId(1));
 		expectLastCall();
 		mocksControl.replay();
@@ -120,7 +119,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 				.domain(domain);
 
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
 		mocksControl.replay();
 		
@@ -140,9 +139,9 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testCreateWithUnknownDomain() throws Exception {
+	public void testCreateWithUnknownDomain() {
 		expectNoDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -158,7 +157,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCreateOnError() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.create(isA(Batch.class))).andThrow(new DaoException());
 		mocksControl.replay();
 
@@ -176,9 +175,8 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetWithUnknownBatch() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andReturn(null);
-		
 		mocksControl.replay();
 		
 		given()
@@ -192,10 +190,9 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetWithUnknownDomain() throws Exception {
+	public void testGetWithUnknownDomain() {
 		expectNoDomain();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -212,9 +209,8 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetOnError() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
-		
 		mocksControl.replay();
 
 		given()
@@ -231,9 +227,8 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGet() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andReturn(batch);
-		
 		mocksControl.replay();
 		
 		given()
@@ -274,7 +269,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetWhenBatchIsRunning() throws Exception {
 		expectDomain();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()
@@ -313,9 +308,9 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCommitWithUnknownBatch() throws Exception {
 		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(null);
-		expectIsAuthenticatedAndIsAuthorized();
 		mocksControl.replay();
 
 		given()
@@ -331,7 +326,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCommitWithAlreadyRunningBatch() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
 		mocksControl.replay();
 
@@ -348,7 +343,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCommitOnError() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);
@@ -368,7 +363,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testCommit() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);

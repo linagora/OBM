@@ -65,7 +65,7 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetProfilesWithWrongPassword() {
-		expectAuthenticatingReturns("username", "password");
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -77,10 +77,10 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPassword() {
-		expectAuthenticatingReturns("username", "password");
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 		
 		given()
@@ -92,11 +92,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCannotGetProfilesWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("batches:*", "users:*"));
+		expectDomain();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:*"), domainAwarePerm("users:*")));
 		mocksControl.replay();
 		
 		given()
@@ -108,11 +109,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPermissions() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("profiles:create"));
+		expectDomain();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("profiles:create")));
 		mocksControl.replay();
 		
 		given()
@@ -124,13 +126,13 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCanGetProfilesWithReadPermission() throws Exception {
 		expectDomain();
 		expectProfiles();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("profiles:read")));
 		mocksControl.replay();
 		
 		given()
@@ -142,13 +144,13 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCanGetProfileWithReadPermission() throws Exception {
-		expectDomain();
 		expectProfile();
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
+		expectDomain();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username",  ImmutableSet.of(domainAwarePerm("profiles:read")));
 		mocksControl.replay();
 		
 		given()

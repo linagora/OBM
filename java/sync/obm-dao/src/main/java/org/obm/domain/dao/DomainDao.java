@@ -59,7 +59,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class DomainDao {
 
-	private static final String DOMAIN_FIELDS = "domain_name, domain_id, domain_uuid, domain_label, domain_alias";
+	private static final String DOMAIN_FIELDS = "domain_name, domain_id, domain_uuid, domain_label, domain_alias, domain_global";
 	
 	private static final Logger logger = LoggerFactory.getLogger(DomainDao.class);
 	private final DatabaseConnectionProvider dbcp;
@@ -186,7 +186,8 @@ public class DomainDao {
 				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
 				.name(rs.getString("domain_name"))
 				.label(rs.getString("domain_label"))
-				.aliases(aliasToIterable(rs.getString("domain_alias")));
+				.aliases(aliasToIterable(rs.getString("domain_alias")))
+				.global(rs.getBoolean("domain_global"));
 
 		return fetchDomainHosts(id, domainBuilder).build();
 	}

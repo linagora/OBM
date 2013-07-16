@@ -42,9 +42,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.annotations.PATCH;
+import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -52,37 +51,36 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 public class UserWriteResource extends AbstractBatchAwareResource {
 
 	@POST
-	@RequiresPermissions(users_create)
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response create(String user) throws DaoException {
-		SecurityUtils.getSubject();
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_create);
 		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
 	}
 
 	@PUT
-	@RequiresPermissions(users_update)
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response modify(String user) throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_update);
 		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
 	}
 
 	@DELETE
-	@RequiresPermissions(users_delete)
 	@Path("/{userId}")
 	@Produces(JSON_WITH_UTF8)
 	public Response delete() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_delete);
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
 	}
 	
 	@PATCH
-	@RequiresPermissions(users_patch)
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response patch(String user) throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, users_patch);
 		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
 	}
 }

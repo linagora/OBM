@@ -89,8 +89,8 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
-import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.AuthorizingModule;
+import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.BatchProvider;
 import org.obm.provisioning.Connection;
 import org.obm.provisioning.ConnectionImpl;
@@ -107,11 +107,11 @@ import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.authentication.AuthenticationService;
 import org.obm.provisioning.authentication.AuthenticationServiceImpl;
-import org.obm.provisioning.authentication.ObmHttpMethodPermissionFilter;
 import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
 import org.obm.provisioning.authorization.AuthorizationException;
 import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
+import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.LdapGroup;
 import org.obm.provisioning.bean.LdapGroupImpl;
 import org.obm.provisioning.bean.LdapUser;
@@ -594,12 +594,12 @@ public class DependencyResolverHelper {
 				AuthorizingModule.class,
 				ObmJDBCAuthorizingRealm.class,
 				AuthenticationService.class,
-				ObmHttpMethodPermissionFilter.class,
 				AuthenticationServiceImpl.class,
 				AuthorizationService.class,
 				AuthorizationServiceImpl.class,
 				AuthorizationException.class,
-				PermissionsNotFoundException.class
+				PermissionsNotFoundException.class,
+				ResourceAuthorizationHelper.class
 		};
 	}
 

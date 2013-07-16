@@ -57,7 +57,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteAUserWithTrueExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
 				.andReturn(batch);
@@ -79,7 +79,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteAUserWithFalseExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
 				.andReturn(batch);
@@ -101,7 +101,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteAUserWithDefaultFalseExpunge() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
@@ -122,7 +122,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 	public void testDeleteAUserWithError() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
 				.andThrow(new DaoException());

@@ -35,13 +35,10 @@ import javax.servlet.ServletContext;
 
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
-import org.obm.provisioning.authentication.ObmHttpMethodPermissionFilter;
 import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
 
-import com.google.inject.Key;
-
 public class AuthorizingModule extends ShiroWebModule {
-	
+
 	public AuthorizingModule(ServletContext servletContext) {
 		super(servletContext);
 	}
@@ -57,16 +54,12 @@ public class AuthorizingModule extends ShiroWebModule {
 			}
 		
 		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
-		
-		Key<ObmHttpMethodPermissionFilter> customHttpMethodPermissionFilter = Key.get(ObmHttpMethodPermissionFilter.class);
 
-		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
-		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "users"));
-		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "profiles"));
-		addFilterChain("/provisioning/v1/*/batches/*", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
-		addFilterChain("/provisioning/v1/*/batches", AUTHC_BASIC, config(customHttpMethodPermissionFilter, "batches"));
-
-		
+		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC);
+		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC);
+		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC);
+		addFilterChain("/provisioning/v1/*/batches/*", AUTHC_BASIC);
+		addFilterChain("/provisioning/v1/*/batches", AUTHC_BASIC);
 		expose(Realm.class);
 	}
 

@@ -37,7 +37,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -52,7 +51,7 @@ public class ResourceForTest {
 	@Path("/serialization")
 	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
 	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) throws DaoException {
+	public ObmUser create(ObmUser user) {
 		return user;
 	}
 	

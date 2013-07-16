@@ -59,7 +59,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 	public void testModifyAUser() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT, ImmutableMap.<String, String>of())))
 				.andReturn(batch);
@@ -81,7 +81,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 	public void testPutUserThrowError() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT, ImmutableMap.<String, String>of())))
 				.andThrow(new DaoException());

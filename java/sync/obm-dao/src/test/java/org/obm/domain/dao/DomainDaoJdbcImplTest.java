@@ -82,7 +82,7 @@ public class DomainDaoJdbcImplTest {
 			.name("mydomain")
 			.label("my domain");
 		dao.create(domainBuilder.build());
-		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(3).build());
+		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(3).global(false).build());
 	}
 
 	@Test
@@ -123,11 +123,12 @@ public class DomainDaoJdbcImplTest {
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(uuid)
 			.name("mydomain")
-			.label("my domain");
+			.label("my domain")
+			.global(false);
 
 		dao.create(domainBuilder.build());
 
-		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(3).build());
+		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(3).global(false).build());
 	}
 	
 	@Test
@@ -135,7 +136,8 @@ public class DomainDaoJdbcImplTest {
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")
-			.label("my domain");
+			.label("my domain")
+			.global(false);
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
 				domainBuilder.id(3).build(), 
@@ -144,12 +146,14 @@ public class DomainDaoJdbcImplTest {
 					.label("test2.tlse.lng")
 					.name("test2.tlse.lng")
 					.id(2)
+					.global(false)
 					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 					.label("test.tlse.lng")
 					.name("test.tlse.lng")
 					.id(1)
+					.global(false)
 					.build()
 					);
 	}
@@ -160,7 +164,8 @@ public class DomainDaoJdbcImplTest {
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")
 			.label("my domain")
-			.alias("myalias");
+			.alias("myalias")
+			.global(false);
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
 				domainBuilder.id(3).alias("myalias").build(), 
@@ -169,12 +174,14 @@ public class DomainDaoJdbcImplTest {
 					.label("test2.tlse.lng")
 					.name("test2.tlse.lng")
 					.id(2)
+					.global(false)
 					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 					.label("test.tlse.lng")
 					.name("test.tlse.lng")
 					.id(1)
+					.global(false)
 					.build()
 					);
 	}
@@ -185,6 +192,7 @@ public class DomainDaoJdbcImplTest {
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")
 			.label("my domain")
+			.global(false)
 			.aliases(ImmutableList.of("myalias1", "myalias2"));
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
@@ -194,11 +202,13 @@ public class DomainDaoJdbcImplTest {
 					.label("test2.tlse.lng")
 					.name("test2.tlse.lng")
 					.id(2)
+					.global(false)
 					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 					.label("test.tlse.lng")
 					.name("test.tlse.lng")
+					.global(false)
 					.id(1)
 					.build()
 				);

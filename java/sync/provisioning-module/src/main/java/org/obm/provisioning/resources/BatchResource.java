@@ -1,8 +1,10 @@
 package org.obm.provisioning.resources;
 
 import static org.obm.provisioning.bean.Permissions.batches_create;
+import static org.obm.provisioning.bean.Permissions.batches_update;
 import static org.obm.provisioning.bean.Permissions.batches_delete;
 import static org.obm.provisioning.bean.Permissions.batches_read;
+import static org.obm.provisioning.bean.Permissions.batches_update;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,7 +22,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.AuthorizationException;
+import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.BatchDao;
@@ -44,9 +47,9 @@ public class BatchResource {
 
 	@GET
 	@Path("{batchId}")
-	@RequiresPermissions(batches_read)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException {
+	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, batches_read);
 		Batch batch = batchProcessor.getRunningBatch(batchId);
 
 		if (batch != null) {
@@ -63,9 +66,9 @@ public class BatchResource {
 	}
 
 	@POST
-	@RequiresPermissions(batches_create)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response create() throws DaoException, URISyntaxException {
+	public Response create() throws DaoException, URISyntaxException, AuthorizationException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, batches_create);
 		Batch batch = Batch
 				.builder()
 				.domain(domain)
@@ -80,9 +83,9 @@ public class BatchResource {
 	}
 
 	@DELETE
-	@RequiresPermissions(batches_delete)
 	@Path("{batchId}")
-	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException {
+	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, batches_delete);
 		try {
 			batchDao.delete(batchId);
 		}
@@ -97,6 +100,7 @@ public class BatchResource {
 	@Path("{batchId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response commit(@PathParam("batchId") Batch.Id batchId) throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, batches_update);
 		Batch batch = batchProcessor.getRunningBatch(batchId);
 
 		if (batch == null) {

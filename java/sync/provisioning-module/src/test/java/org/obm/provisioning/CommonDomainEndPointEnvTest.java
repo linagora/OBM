@@ -243,8 +243,12 @@ public abstract class CommonDomainEndPointEnvTest {
 		server.stop();
 	}
 
+	protected String domainAwarePerm(String permission) {
+		return String.format("%s:%s", domain.getUuid().get(), permission);
+	}
+
 	protected void expectDomain() {
-		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain);
+		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain).atLeastOnce();
 	}
 
 	protected void expectBatch() throws DaoException {
@@ -269,7 +273,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
 	
-	protected void expectAuthenticatingReturns(String login, String password) {
+	protected void expectSuccessfulAuthentication(String login, String password) {
 		ObmUser user = ObmUser.builder()
 						.login(login)
 						.password(password)
@@ -285,19 +289,15 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(userDao.findUserByLogin(login, domain)).andReturn(user).once();
 	}
 	
-	protected void expectAuthorizingReturns(String login, Collection<String> permissions, ProfileName profile) throws Exception {
-		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(profile).atLeastOnce();
-		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
-		expect(roleDao.getPermissionsForProfile(profile, domain)).andReturn(permissions).atLeastOnce();
-	}
-	
 	protected void expectAuthorizingReturns(String login, Collection<String> permissions) throws Exception {
-		expectAuthorizingReturns(login, permissions, userProfile);
+		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(adminProfile).atLeastOnce();
+		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
+		expect(roleDao.getPermissionsForProfile(adminProfile, domain)).andReturn(permissions).atLeastOnce();
 	}
 	
-	protected void expectIsAuthenticatedAndIsAuthorized() throws Exception {
-		expectAuthenticatingReturns("username", "password");
-		expectAuthorizingReturns("username", ImmutableSet.of("*:*"), adminProfile);
+	protected void expectSuccessfulAuthenticationAndFullAuthorization() throws Exception {
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of("*"));
 	}
 	
 	public static Batch.Id batchId(Integer id) {
@@ -396,8 +396,6 @@ public abstract class CommonDomainEndPointEnvTest {
 				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
 				//.groups()					// Not implemented yet in ObmUser
 				.build();
-				
-				
 	}
 
 	protected UserExtId userExtId(String extId) {

@@ -106,6 +106,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
 		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	
 	@Test
@@ -119,6 +120,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
 		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	
 	@Test
@@ -132,6 +134,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	
 	private ObmDomain findDomain(String aliases) throws Exception {
@@ -199,6 +202,7 @@ public class DomainDaoTest {
 		expect(rs.getString("domain_alias")).andReturn(aliases);
 		expect(rs.getString("domain_label")).andReturn("label");
 		expect(rs.getString("domain_name")).andReturn(domainName);
+		expect(rs.getBoolean("domain_global")).andReturn(false);
 	}
 
 }

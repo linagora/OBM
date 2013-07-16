@@ -15,7 +15,7 @@ public class ConnectionImplTest {
 	private IMocksControl control;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		control = createControl();
 	}
 	

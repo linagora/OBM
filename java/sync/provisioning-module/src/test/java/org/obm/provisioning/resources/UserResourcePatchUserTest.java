@@ -58,7 +58,7 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testPatchAUser() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
@@ -81,7 +81,7 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testPatchUserThrowError() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",

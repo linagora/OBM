@@ -53,6 +53,7 @@ public class ObmDomain implements Serializable {
 		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
 		private String label;
+		private Boolean global;
 		private ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		
 		private Builder() {
@@ -65,7 +66,8 @@ public class ObmDomain implements Serializable {
 				.label(domain.label)
 				.uuid(domain.uuid)
 				.aliases(domain.aliases)
-				.hosts(domain.hosts);
+				.hosts(domain.hosts)
+				.global(domain.global);
 		}
 		
 		public Builder id(int id) {
@@ -116,9 +118,14 @@ public class ObmDomain implements Serializable {
 			this.hosts.putAll(hosts);
 			return this;
 		}
+		
+		public Builder global(Boolean global) {
+			this.global = global;
+			return this;
+		}
 
 		public ObmDomain build() {
-			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build());
+			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global);
 		}
 	}
 	
@@ -132,14 +139,20 @@ public class ObmDomain implements Serializable {
 	private final Set<String> aliases;
 	private final String label;
 	private final Multimap<ServiceProperty, ObmHost> hosts;
+	private final Boolean global;
 
-	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts) {
+	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts, Boolean global) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
 		this.label = label;
 		this.aliases = aliases;
 		this.hosts = hosts;
+		this.global = global;
+	}
+
+	public Boolean getGlobal() {
+		return global;
 	}
 
 	public String getName() {
@@ -172,7 +185,7 @@ public class ObmDomain implements Serializable {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(id, name, uuid, label, aliases);
+		return Objects.hashCode(id, name, uuid, label, aliases, global);
 	}
 
 	@Override
@@ -184,7 +197,8 @@ public class ObmDomain implements Serializable {
 				&& Objects.equal(this.name, that.name)
 				&& Objects.equal(this.label, that.label)
 				&& Objects.equal(this.uuid, that.uuid)
-				&& Objects.equal(this.aliases, that.aliases);
+				&& Objects.equal(this.aliases, that.aliases)
+				&& Objects.equal(this.global, that.global);
 		}
 		
 		return false;
@@ -199,6 +213,7 @@ public class ObmDomain implements Serializable {
 			.add("aliases", aliases)
 			.add("uuid", uuid)
 			.add("hosts", hosts)
+			.add("global", global)
 			.toString();
 	}
 

@@ -52,6 +52,8 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public abstract class AbstractBatchAwareResource {
 
 	public static final String UTF_8 = ";charset=UTF-8";
@@ -64,6 +66,8 @@ public abstract class AbstractBatchAwareResource {
 	protected Batch batch;
 	@Context
 	protected UriInfo uriInfo;
+	@Context
+	protected ObmDomain domain;
 
 	protected Map<String, String> multivaluedMapToMap(MultivaluedMap<String, String> mvMap) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();

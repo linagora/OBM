@@ -51,10 +51,9 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testUnknownUrl() throws Exception {
+	public void testUnknownUrl() {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -70,9 +69,8 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetAUser() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
-		
 		mocksControl.replay();
 		
 		given()
@@ -87,10 +85,9 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetAUserOnNonExistentDomain() throws Exception {
+	public void testGetAUserOnNonExistentDomain() {
 		expectNoDomain();
-		expectIsAuthenticatedAndIsAuthorized();
-		
+		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
 
 		given()
@@ -106,9 +103,8 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetNonExistingUser() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.getByExtId(userExtId("123"), domain)).andReturn(null);
-		
 		mocksControl.replay();
 
 		given()
@@ -124,9 +120,8 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetUserThrowError() throws Exception {
 		expectDomain();
-		expectIsAuthenticatedAndIsAuthorized();
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(userDao.getByExtId(userExtId("123"), domain)).andThrow(new RuntimeException("bad things happen"));
-		
 		mocksControl.replay();
 
 		given()

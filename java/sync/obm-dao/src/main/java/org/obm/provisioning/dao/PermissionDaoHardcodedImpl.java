@@ -7,6 +7,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -14,7 +15,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @Singleton
 public class PermissionDaoHardcodedImpl implements PermissionDao {
 
-	private enum ProfileToPermissionsMapping {
+	private enum ProfilePermissionsTemplates {
 		
 		ADMIN("admin", ImmutableList.of("*:*")),
 		DELEGATE_ADMIN("admin_delegue", ImmutableList.of("batches:read,create,delete", "users:*", "groups:*", "profiles:*")),
@@ -22,37 +23,53 @@ public class PermissionDaoHardcodedImpl implements PermissionDao {
 		USER("user", ImmutableList.of("users:read", "groups:read", "profiles:*"));
 		
 		private String profile;
-		private Collection<String> permissions;
+		private Collection<String> permissionsTemplate;
 		
-		ProfileToPermissionsMapping(String profile, Collection<String> roles) {
+		ProfilePermissionsTemplates(String profile, Collection<String> permissionsTemplate) {
 			this.profile = profile;
-			this.permissions = roles;
+			this.permissionsTemplate = permissionsTemplate;
 		}
 		
-		Collection<String> getPermissions() {
-			return permissions;
+		Collection<String> getPermissionsTemplate() {
+			return permissionsTemplate;
 		}
 		
 		String getProfile() {
 			return profile;
 		}
 		
-	    public static ProfileToPermissionsMapping get(String profile) { 
-	        for(ProfileToPermissionsMapping p2p : values()) {
-	            if(p2p.getProfile().equals(profile)) return p2p;
+	    public static ProfilePermissionsTemplates get(String profile) {
+	        for(ProfilePermissionsTemplates permissionsTemplates : values()) {
+	            if(permissionsTemplates.getProfile().equals(profile)) {
+	            		return permissionsTemplates;
+	            }
 	        }
 	        return null;
 	    }
 	}
 	
+	private String domainPermission(ObmDomain domain) {
+		if (domain.getGlobal() == true) {
+			return "*";
+		} else {
+			return domain.getUuid().get();
+		}
+	}
+	
 	@Override
 	public Collection<String> getPermissionsForProfile(ProfileName profile, ObmDomain domain) throws DaoException, PermissionsNotFoundException {
-
-		ProfileToPermissionsMapping p2r = ProfileToPermissionsMapping.get(profile.getName());
-		if (p2r != null) {
-			return p2r.getPermissions();
+		
+		ProfilePermissionsTemplates ppt = ProfilePermissionsTemplates.get(profile.getName());
+		if (ppt != null) {
+			
+			Collection<String> permissionsTemplate = ppt.getPermissionsTemplate();
+			Collection<String> permissions = Lists.newArrayListWithCapacity(ppt.getPermissionsTemplate().size());
+			
+			for (String permissionTemplate : permissionsTemplate) {
+				permissions.add(String.format("%s:%s", domainPermission(domain), permissionTemplate));
+			}
+			return permissions;
 		}
 		throw new PermissionsNotFoundException(profile, domain);
 	}
-
 }
