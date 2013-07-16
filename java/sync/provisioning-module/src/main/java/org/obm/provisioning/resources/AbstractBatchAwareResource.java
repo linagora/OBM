@@ -87,7 +87,7 @@ public abstract class AbstractBatchAwareResource {
 				.status(BatchStatus.IDLE)
 				.request(Request
 						.builder()
-						.url(uriInfo.getPath())
+						.resourcePath(uriInfo.getPath())
 						.body(entity)
 						.verb(httpVerb)
 						.params(multivaluedMapToMap(uriInfo.getQueryParameters()))

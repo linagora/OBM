@@ -85,7 +85,7 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testGet() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
-		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
 		
 		assertThat(dao.get(operationId(1))).isNotNull();
 	}
@@ -110,12 +110,12 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testGetByBatchId() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
-		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
 		db.executeUpdate("INSERT INTO batch_operation_param (key, value, operation) VALUES ('p1', 'v1', 1)");
-		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
 		
 		Request request1 = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -126,7 +126,7 @@ public class OperationDaoJdbcImplTest {
 				.entityType(BatchEntityType.USER)
 				.build();
 		Request request2 = Request.builder()
-				.url("/batches/1/groups")
+				.resourcePath("/batches/1/groups")
 				.verb(HttpVerb.POST)
 				.build();
 		Operation operation2 = Operation.builder()
@@ -144,7 +144,7 @@ public class OperationDaoJdbcImplTest {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -165,7 +165,7 @@ public class OperationDaoJdbcImplTest {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -192,7 +192,7 @@ public class OperationDaoJdbcImplTest {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -219,7 +219,7 @@ public class OperationDaoJdbcImplTest {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -236,7 +236,7 @@ public class OperationDaoJdbcImplTest {
 	@Test
 	public void testupdate() throws Exception {
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();
@@ -248,7 +248,7 @@ public class OperationDaoJdbcImplTest {
 				.build();
 		
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
-		db.executeUpdate("INSERT INTO batch_operation (status, url, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
 		
 		assertThat(dao.update(operation).getStatus()).isEqualTo(BatchStatus.RUNNING);
 	}
@@ -256,7 +256,7 @@ public class OperationDaoJdbcImplTest {
 	@Test(expected = OperationNotFoundException.class)
 	public void testupdateWhenOperationDoesntExist() throws Exception {
 		Request request = Request.builder()
-				.url("/batches/1/users")
+				.resourcePath("/batches/1/users")
 				.verb(HttpVerb.POST)
 				.param("p1", "v1")
 				.build();

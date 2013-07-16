@@ -190,7 +190,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					.entityType(BatchEntityType.USER)
 					.request(org.obm.provisioning.beans.Request
 							.builder()
-							.url("/users")
+							.resourcePath("/users")
 							.verb(HttpVerb.POST)
 							.body("{\"id\":123456}")
 							.build())
@@ -203,7 +203,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					.error("Invalid User")
 					.request(org.obm.provisioning.beans.Request
 							.builder()
-							.url("/users/1")
+							.resourcePath("/users/1")
 							.verb(HttpVerb.PATCH)
 							.body("{}")
 							.build())
@@ -320,7 +320,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url(domain.getUuid().get() + path)
+						.resourcePath(domain.getUuid().get() + path)
 						.body(entity)
 						.verb(verb)
 						.params(params)

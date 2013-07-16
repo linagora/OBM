@@ -129,10 +129,10 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("INSERT INTO batch_operation (status, url, body, verb, entity_type, batch) VALUES (?, ?, ?, ?, ?, ?)");
+			ps = connection.prepareStatement("INSERT INTO batch_operation (status, resource_path, body, verb, entity_type, batch) VALUES (?, ?, ?, ?, ?, ?)");
 
 			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, operation.getStatus().toString()));
-			ps.setString(2, operation.getRequest().getUrl());
+			ps.setString(2, operation.getRequest().getResourcePath());
 			ps.setString(3, operation.getRequest().getBody());
 			ps.setObject(4, dbcp.getJdbcObject(ObmHelper.HTTP_VERB, operation.getRequest().getVerb().toString()));
 			ps.setObject(5, dbcp.getJdbcObject(ObmHelper.BATCH_ENTITY_TYPE, operation.getEntityType().toString()));
@@ -219,7 +219,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 		int operationId = rs.getInt("id");
 
 		Request.Builder requestBuilder = Request.builder()
-				.url(rs.getString("url"))
+				.resourcePath(rs.getString("resource_path"))
 				.body(rs.getString("body"))
 				.verb(HttpVerb.valueOf(rs.getString("verb")));
 

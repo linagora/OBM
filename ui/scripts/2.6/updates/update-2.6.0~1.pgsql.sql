@@ -24,7 +24,7 @@ CREATE TABLE batch_operation
   timecreate timestamp without time zone NOT NULL DEFAULT NOW(),
   timecommit timestamp without time zone,
   error text,
-  url text NOT NULL,
+  resource_path text NOT NULL,
   body text,
   verb http_verb NOT NULL,
   entity_type batch_entity_type NOT NULL,

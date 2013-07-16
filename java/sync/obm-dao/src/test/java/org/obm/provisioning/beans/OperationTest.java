@@ -40,7 +40,7 @@ public class OperationTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testBuildWhenNoStatus() {
-		Request request = Request.builder().url("/url").verb(HttpVerb.GET).build();
+		Request request = Request.builder().resourcePath("/url").verb(HttpVerb.GET).build();
 
 		Operation.builder().request(request).entityType(BatchEntityType.USER).build();
 	}
@@ -52,14 +52,14 @@ public class OperationTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testBuildWhenNoEntityType() {
-		Request request = Request.builder().url("/url").verb(HttpVerb.GET).build();
+		Request request = Request.builder().resourcePath("/url").verb(HttpVerb.GET).build();
 
 		Operation.builder().request(request).status(BatchStatus.IDLE).build();
 	}
 
 	@Test
 	public void testBuild() {
-		Request request = Request.builder().url("/url").verb(HttpVerb.GET).build();
+		Request request = Request.builder().resourcePath("/url").verb(HttpVerb.GET).build();
 		Operation op = Operation.builder().request(request).status(BatchStatus.IDLE).entityType(BatchEntityType.USER).build();
 
 		assertThat(op.getRequest().getVerb()).isEqualTo(HttpVerb.GET);
@@ -71,7 +71,7 @@ public class OperationTest {
 				.builder()
 				.request(Request
 						.builder()
-						.url("/url")
+						.resourcePath("/url")
 						.verb(HttpVerb.GET)
 						.build())
 				.status(BatchStatus.IDLE)

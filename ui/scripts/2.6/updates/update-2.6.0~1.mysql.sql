@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `batch_operation`
   `timecreate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `timecommit` timestamp,
   `error` text,
-  `url` text NOT NULL,
+  `resource_path` text NOT NULL,
   `body` text,
   `verb` ENUM('PUT', 'PATCH', 'GET', 'POST', 'DELETE') NOT NULL,
   `entity_type` ENUM('GROUP', 'USER') NOT NULL,

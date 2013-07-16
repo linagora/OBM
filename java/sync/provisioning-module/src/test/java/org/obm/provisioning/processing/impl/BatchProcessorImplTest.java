@@ -140,7 +140,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url("/users/")
+						.resourcePath("/users/")
 						.verb(HttpVerb.POST)
 						.body(	"{" +
 									"\"invalid\": \"json\"" +
@@ -183,7 +183,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url("/users/")
+						.resourcePath("/users/")
 						.verb(HttpVerb.POST)
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
@@ -273,7 +273,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url("/users/")
+						.resourcePath("/users/")
 						.verb(HttpVerb.POST)
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
@@ -412,7 +412,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(Request
 						.builder()
-						.url("/users/")
+						.resourcePath("/users/")
 						.verb(HttpVerb.POST)
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
@@ -465,7 +465,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(Request
 						.builder()
-						.url("/users/extIdUser1")
+						.resourcePath("/users/extIdUser1")
 						.param(Request.ITEM_ID_KEY, "extIdUser1")
 						.verb(HttpVerb.DELETE)
 						.build());
@@ -517,7 +517,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(Request
 						.builder()
-						.url("/users/extIdUser1")
+						.resourcePath("/users/extIdUser1")
 						.param(Request.ITEM_ID_KEY, "extIdUser1")
 						.param(Request.EXPUNGE_KEY, "true")
 						.verb(HttpVerb.DELETE)
@@ -572,7 +572,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url("/users/1")
+						.resourcePath("/users/1")
 						.verb(HttpVerb.PUT)
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
@@ -649,7 +649,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.entityType(BatchEntityType.USER)
 				.request(org.obm.provisioning.beans.Request
 						.builder()
-						.url("/users/extIdUser1")
+						.resourcePath("/users/extIdUser1")
 						.param(Request.ITEM_ID_KEY, "extIdUser1")
 						.verb(HttpVerb.PATCH)
 						.body(	"{" +

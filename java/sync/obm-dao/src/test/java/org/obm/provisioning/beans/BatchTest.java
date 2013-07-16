@@ -89,7 +89,7 @@ public class BatchTest {
 						.entityType(BatchEntityType.USER)
 						.request(Request
 								.builder()
-								.url("/")
+								.resourcePath("/")
 								.body("")
 								.verb(HttpVerb.POST)
 								.build())
@@ -101,7 +101,7 @@ public class BatchTest {
 						.entityType(BatchEntityType.USER)
 						.request(Request
 								.builder()
-								.url("/1")
+								.resourcePath("/1")
 								.body("")
 								.verb(HttpVerb.PUT)
 								.build())
@@ -137,7 +137,7 @@ public class BatchTest {
 						.entityType(BatchEntityType.USER)
 						.request(Request
 								.builder()
-								.url("/")
+								.resourcePath("/")
 								.body("")
 								.verb(HttpVerb.POST)
 								.build())
@@ -149,7 +149,7 @@ public class BatchTest {
 						.entityType(BatchEntityType.USER)
 						.request(Request
 								.builder()
-								.url("/1")
+								.resourcePath("/1")
 								.body("")
 								.verb(HttpVerb.PUT)
 								.build())
@@ -185,7 +185,7 @@ public class BatchTest {
 						.entityType(BatchEntityType.USER)
 						.request(Request
 								.builder()
-								.url("/")
+								.resourcePath("/")
 								.body("")
 								.verb(HttpVerb.POST)
 								.build())
@@ -203,7 +203,7 @@ public class BatchTest {
 				.entityType(BatchEntityType.USER)
 				.request(Request
 						.builder()
-						.url("/")
+						.resourcePath("/")
 						.body("")
 						.verb(HttpVerb.POST)
 						.build());
@@ -235,7 +235,7 @@ public class BatchTest {
 				.entityType(BatchEntityType.USER)
 				.request(Request
 						.builder()
-						.url("/")
+						.resourcePath("/")
 						.body("")
 						.verb(HttpVerb.POST)
 						.build());

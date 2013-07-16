@@ -46,12 +46,12 @@ public class RequestTest {
 	
 	@Test(expected = IllegalStateException.class)
 	public void testBuildWhenNoVerb() {
-		Request.builder().url("/url").build();
+		Request.builder().resourcePath("/url").build();
 	}
 	
 	@Test
 	public void testBuild() {
-		Request request = Request.builder().verb(HttpVerb.GET).url("/url").build();
+		Request request = Request.builder().verb(HttpVerb.GET).resourcePath("/url").build();
 		
 		assertThat(request.getVerb()).isEqualTo(HttpVerb.GET);
 		assertThat(request.getParams()).isEmpty();
@@ -59,20 +59,20 @@ public class RequestTest {
 	
 	@Test
 	public void testBuildWithItemId() {
-		Request request = Request.builder().verb(HttpVerb.GET).itemId("1").url("/url/1").build();
+		Request request = Request.builder().verb(HttpVerb.GET).itemId("1").resourcePath("/url/1").build();
 		
 		assertThat(request.getParams()).contains(MapEntry.entry("itemId", "1"));
 	}
 	
 	@Test
 	public void testBuildWithItemIdAndPostVerb() {
-		Request request = Request.builder().verb(HttpVerb.POST).itemId("1").url("/url/1").build();
+		Request request = Request.builder().verb(HttpVerb.POST).itemId("1").resourcePath("/url/1").build();
 		
 		assertThat(request.getParams()).isEmpty();
 	}
 	
 	@Test public void testBuildWithEmptyItemId() {
-		Request request = Request.builder().verb(HttpVerb.GET).itemId("").url("/url/1").build();
+		Request request = Request.builder().verb(HttpVerb.GET).itemId("").resourcePath("/url/1").build();
 		
 		assertThat(request.getParams()).isEmpty();
 	}

@@ -97,7 +97,7 @@ public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperat
 		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
 
 		if (Strings.isNullOrEmpty(itemId)) {
-			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getUrl()));
+			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getResourcePath()));
 		}
 
 		return UserExtId.valueOf(itemId);

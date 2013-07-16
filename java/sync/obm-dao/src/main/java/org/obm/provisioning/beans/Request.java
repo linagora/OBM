@@ -47,7 +47,7 @@ public class Request {
 	
 	public static class Builder {
 		
-		private String url;
+		private String resourcePath;
 		private HttpVerb verb;
 		private ImmutableMap.Builder<String, String> params;
 		private String body;
@@ -57,8 +57,8 @@ public class Request {
 			this.params = ImmutableMap.builder();
 		}
 
-		public Builder url(String url) {
-			this.url = url;
+		public Builder resourcePath(String resourcePath) {
+			this.resourcePath = resourcePath;
 			return this;
 		}
 		
@@ -88,11 +88,11 @@ public class Request {
 		}
 		
 		public Request build() {
-			Preconditions.checkState(url != null, "'url' should be set");
+			Preconditions.checkState(resourcePath != null, "'resourcePath' should be set");
 			Preconditions.checkState(verb != null, "'verb' should be set");
 			addItemIdToParams();
 			
-			return new Request(url, verb, params.build(), body);
+			return new Request(resourcePath, verb, params.build(), body);
 		}
 		
 		private void addItemIdToParams() {
@@ -102,20 +102,20 @@ public class Request {
 		}
 	}
 	
-	private String url;
+	private String resourcePath;
 	private HttpVerb verb;
 	private Map<String, String> params;
 	private String body;
 
-	private Request(String url, HttpVerb verb, Map<String, String> params, String body) {
-		this.url = url;
+	private Request(String resourcePath, HttpVerb verb, Map<String, String> params, String body) {
+		this.resourcePath = resourcePath;
 		this.verb = verb;
 		this.params = params;
 		this.body = body;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getResourcePath() {
+		return resourcePath;
 	}
 
 	public HttpVerb getVerb() {
@@ -132,7 +132,7 @@ public class Request {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(url, verb, body, params);
+		return Objects.hashCode(resourcePath, verb, body, params);
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class Request {
 		if (obj instanceof Request) {
 			Request other = (Request) obj;
 			
-			return Objects.equal(url, other.url)
+			return Objects.equal(resourcePath, other.resourcePath)
 					&& Objects.equal(verb, other.verb)
 					&& Objects.equal(body, other.body)
 					&& Objects.equal(params, other.params);
@@ -152,7 +152,7 @@ public class Request {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-				.add("url", url)
+				.add("resourcePath", resourcePath)
 				.add("verb", verb)
 				.add("body", body)
 				.add("params", params)
