@@ -39,7 +39,7 @@ public class PermissionDaoHardcodedImpl implements PermissionDao {
 		
 	    public static ProfileToPermissionsMapping get(String profile) { 
 	        for(ProfileToPermissionsMapping p2p : values()) {
-	            if(p2p.getProfile() == profile) return p2p;
+	            if(p2p.getProfile().equals(profile)) return p2p;
 	        }
 	        return null;
 	    }

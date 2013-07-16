@@ -86,6 +86,16 @@ CREATE TABLE host (
     host_description character varying(128)
 );
 
+CREATE TABLE profile (
+    profile_id integer PRIMARY KEY AUTO_INCREMENT,
+    profile_domain_id integer NOT NULL,
+    profile_timeupdate timestamp,
+    profile_timecreate timestamp,
+    profile_userupdate integer,
+    profile_usercreate integer,
+    profile_name character varying(64)
+);
+
 CREATE TABLE userobm (
     userobm_id integer PRIMARY KEY AUTO_INCREMENT,
     userobm_domain_id integer NOT NULL,
@@ -182,9 +192,14 @@ INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global)
 	('test3.tlse.lng', '68936f0f-2bb5-447c-87f5-efcd46f58122', 'test3.tlse.lng', false),
 	('global.virt', '123456789', 'global.virt', true);
 
+INSERT INTO profile (profile_domain_id, profile_name) VALUES (1, 'admin');
+INSERT INTO profile (profile_domain_id, profile_name) VALUES (1, 'user');
+INSERT INTO profile (profile_domain_id, profile_name) VALUES (2, 'editor');
+INSERT INTO profile (profile_domain_id, profile_name) VALUES (4, 'admin');
+
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES
-        (4, 'admin0','admin0','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1);
+        (4, 'admin0','admin0','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1);
 
 INSERT INTO userobmpref (userobmpref_id, userobmpref_user_id, userobmpref_option, userobmpref_value)
     VALUES

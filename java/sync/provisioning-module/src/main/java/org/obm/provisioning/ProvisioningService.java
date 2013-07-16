@@ -4,6 +4,7 @@ package org.obm.provisioning;
 import javax.servlet.ServletContext;
 
 import org.apache.shiro.guice.aop.ShiroAopModule;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
@@ -71,6 +72,9 @@ public class ProvisioningService extends JerseyServletModule {
 
 	@Override
 	protected void configureServlets() {
+		bind(ShiroFilter.class).in(Singleton.class);
+		filter("/*", "").through(ShiroFilter.class);
+		
 		serve(PROVISIONING_URL_PATTERN)
 			.with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 

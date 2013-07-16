@@ -128,7 +128,6 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
 					bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-					bind(ObmDomain.class).toInstance(domain);
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				}
@@ -138,7 +137,6 @@ public abstract class CommonDomainEndPointEnvTest {
 		private Context createContext(Server server) {
 			Context root = new Context(server, "/", Context.SESSIONS);
 
-			root.addFilter(ShiroFilter.class, "/*", 0);
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/*");
 			

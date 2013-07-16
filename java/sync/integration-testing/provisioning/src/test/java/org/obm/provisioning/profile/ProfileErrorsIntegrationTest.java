@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.profile;
 
+//import static com.jayway.restassured.RestAssured.given;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.profileUrl;
 
@@ -40,7 +41,9 @@ import java.net.URL;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -52,6 +55,8 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+
+import com.google.common.base.Charsets;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -68,9 +73,15 @@ public class ProfileErrorsIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWheqnNoTable(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -81,6 +92,11 @@ public class ProfileErrorsIntegrationTest {
 	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

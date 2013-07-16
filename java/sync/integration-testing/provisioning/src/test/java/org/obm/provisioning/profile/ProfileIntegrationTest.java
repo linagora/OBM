@@ -42,7 +42,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -75,6 +77,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfilesWhenDomainExists(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -89,6 +96,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfilesWhenDomainExistsButNoProfile(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("68936f0f-2bb5-447c-87f5-efcd46f58122");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -101,6 +113,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
@@ -111,6 +128,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfileNameWhenProfileExists(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -123,6 +145,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfileNameWhenProfileExistsInAnotherDomain(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
@@ -133,6 +160,11 @@ public class ProfileIntegrationTest {
 	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1000");
+		httpGet.addHeader(
+				BasicScheme.authenticate(
+						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
+						Charsets.UTF_8.name(),
+						false));
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
@@ -141,6 +173,6 @@ public class ProfileIntegrationTest {
 	@Deployment
 	public static WebArchive createDeployment() throws Exception {
 		return ProvisioningArchiveUtils.buildWebArchive(
-				new File(ClassLoader.getSystemResource("dbInitialScriptProfile.sql").toURI()));
+				new File(ClassLoader.getSystemResource("dbInitialScript.sql").toURI()));
 	}
 }

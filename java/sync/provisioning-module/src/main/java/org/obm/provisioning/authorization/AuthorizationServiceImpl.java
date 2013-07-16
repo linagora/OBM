@@ -19,13 +19,13 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
 	private ProfileDao profileDao;
-	private PermissionDao roleDao;
+	private PermissionDao permissionDao;
 	private DomainDao domainDao;
 	
 	@Inject
 	private AuthorizationServiceImpl(ProfileDao profileDao, PermissionDao roleDao, DomainDao domainDao) {
 		this.profileDao = profileDao;
-		this.roleDao = roleDao;
+		this.permissionDao = roleDao;
 		this.domainDao = domainDao;
 	}
 	
@@ -35,7 +35,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 		try {
 			domain = domainDao.findDomainByName(domainName);
 			ProfileName profile = profileDao.getProfileForUser(login, domain.getUuid());
-			return roleDao.getPermissionsForProfile(profile, domain);
+			return permissionDao.getPermissionsForProfile(profile, domain);
 		} catch (DaoException e) {
 			throw new AuthorizationException(login, domain, true, e);
 		} catch (UserNotFoundException e) {
