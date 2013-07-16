@@ -47,4 +47,9 @@ public class ImapPathTest {
 		ImapPath imapPath = ImapPath.builder().user("ident4@vm.obm.org").build();
 		assertThat(imapPath.format()).isEqualTo("user/ident4@vm.obm.org");
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testImapPathWithSeparatorInFragment() {
+		ImapPath.builder().user("ident4@vm.obm.org").pathFragment("folder1/folder2").build();
+	}
 }
