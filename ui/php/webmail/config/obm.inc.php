@@ -57,6 +57,17 @@ $rcmail_config['compose_extwin'] = true;
 
 // session name.
 $rcmail_config['session_name'] = 'roundcube_obm_sessid';
+// session lifetime
+if ( $cs_lifetime ) {
+  $rcSessionLifetime = round($cs_lifetime/60) + 1;
+} else {
+  // session life cookie
+  $rcSessionLifetime = 0;
+}
+$rcmail_config['session_lifetime'] = $rcSessionLifetime;
+
+
+
 
 // setup required OBM modules
 $rcmail_config["plugins"][] = "multiple_smtp_server";
