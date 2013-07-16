@@ -65,14 +65,15 @@ import com.google.inject.Singleton;
 public class ConnectionImpl implements Connection {
 
 	@Singleton
-	public static class Factory {
+	public static class Factory implements Connection.Factory {
 		private final Configuration configuration;
 		
 		@Inject
 		private Factory(Configuration configuration) {
 			this.configuration = configuration;
 		}
-	
+
+		@Override
 		public ConnectionImpl create() {
 			return new ConnectionImpl(configuration);
 		}

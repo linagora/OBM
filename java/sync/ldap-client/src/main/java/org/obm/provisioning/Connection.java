@@ -41,6 +41,10 @@ import org.obm.provisioning.exception.LdapException;
 
 public interface Connection {
 
+	public interface Factory {
+		public Connection create();
+	}
+
 	void createUser(LdapUser ldapUser) throws LdapException, ConnectionException;
 	
 	void deleteUser(LdapUser.Id ldapUser) throws LdapException, ConnectionException;
