@@ -31,22 +31,177 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.name.Dn;
+import org.obm.provisioning.Configuration;
 
-public interface LdapGroup {
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
 
-	public interface Id {
-		String get();
+public class LdapGroup {
+	
+	public class Id {
+
+		private final String id;
+		
+		public Id(String id) {
+			this.id = id;
+		}
+		
+		public String get() {
+			return id;
+		}
 	}
 	
-	String[] getObjectClasses();
-	String getCn();
-	int getGidNumber();
-	String getMailAccess();
-	String getMail();
-	String getObmDomain();
+	public static class Builder {
+		
+		private String[] objectClasses;
+		private String cn;
+		private int gidNumber;
+		private String mailAccess;
+		private String mail;
+		private String obmDomain;
+
+		private final Configuration configuration;
+
+		@Inject
+		private Builder(Configuration configuration) {
+			this.configuration = configuration;
+		}
+		
+		public Builder objectClasses(String[] objectClasses) {
+			this.objectClasses = objectClasses;
+			return this;
+		}
+
+		public Builder cn(String cn) {
+			this.cn = cn;
+			return this;
+		}
+
+		public Builder gidNumber(int gidNumber) {
+			this.gidNumber = gidNumber;
+			return this;
+		}
+
+		public Builder mailAccess(String mailAccess) {
+			this.mailAccess = mailAccess;
+			return this;
+		}
+
+		public Builder mail(String mail) {
+			this.mail = mail;
+			return this;
+		}
+
+		public Builder obmDomain(String obmDomain) {
+			this.obmDomain = obmDomain;
+			return this;
+		}
+		
+		public LdapGroup build() {
+			return new LdapGroup(configuration.getGroupBaseDn(), objectClasses, cn, gidNumber, mailAccess, mail, obmDomain);
+		}
+	}
 	
-	Entry buildEntry() throws LdapException;
-	LdapGroup.Id getId();
+	private final Dn groupBaseDn;
+	private final String[] objectClasses;
+	private final String cn;
+	private final int gidNumber;
+	private final String mailAccess;
+	private final String mail;
+	private final String obmDomain;
+	
+	private LdapGroup(Dn groupBaseDn, String[] objectClasses, String cn, int gidNumber,
+			String mailAccess, String mail, String obmDomain) {
+		this.groupBaseDn = groupBaseDn;
+		this.objectClasses = objectClasses;
+		this.cn = cn;
+		this.gidNumber = gidNumber;
+		this.mailAccess = mailAccess;
+		this.mail = mail;
+		this.obmDomain = obmDomain;
+	}
+
+	public String[] getObjectClasses() {
+		return objectClasses;
+	}
+
+	public String getCn() {
+		return cn;
+	}
+
+	public int getGidNumber() {
+		return gidNumber;
+	}
+
+	public String getMailAccess() {
+		return mailAccess;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public String getObmDomain() {
+		return obmDomain;
+	}
+	
+	public Entry buildEntry() throws LdapException {
+		String dn = buildDn();
+		
+		List<String> attributes = new ArrayList<String>();
+		for (String objectClass: getObjectClasses()) {
+			attributes.add("objectClass: " + objectClass);
+		}
+		attributes.add("cn: " + getCn());
+		attributes.add("gidNumber: " + getGidNumber());
+		attributes.add("mailAccess: " + getMailAccess());
+		attributes.add("mail: " + getMail());
+		attributes.add("obmDomain: " + getObmDomain());
+		
+		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
+	}
+	
+	private String buildDn() {
+		return "cn=" + getCn() + "," + groupBaseDn.getName();
+	}
+
+	public Id getId() {
+		return new Id(getCn());
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(cn, gidNumber, mailAccess, mail, obmDomain);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof LdapGroup) {
+			LdapGroup that = (LdapGroup) object;
+			return Objects.equal(this.cn, that.cn)
+				&& Objects.equal(this.gidNumber, that.gidNumber)
+				&& Objects.equal(this.mailAccess, that.mailAccess)
+				&& Objects.equal(this.mail, that.mail)
+				&& Objects.equal(this.obmDomain, that.obmDomain);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("cn", cn)
+			.add("gidNumber", gidNumber)
+			.add("mailAccess", mailAccess)
+			.add("mail", mail)
+			.add("obmDomain", obmDomain)
+			.toString();
+	}
 }

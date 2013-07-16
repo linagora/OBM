@@ -45,11 +45,9 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapGroupImpl;
+import org.obm.provisioning.bean.LdapUser;
 import org.obm.provisioning.bean.LdapUser.Id;
-import org.obm.provisioning.bean.LdapUserImpl;
 import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.bean.LdapUserMembershipImpl;
 import org.obm.provisioning.exception.ConnectionException;
 import org.obm.provisioning.exception.LdapException;
 import org.opends.messages.Message;
@@ -75,9 +73,9 @@ public class ConnectionImplTest {
 
 	@Inject ConnectionImpl.Factory connectionFactory;
 	@Inject DirectoryServer directoryServer;
-	@Inject Provider<LdapGroupImpl.Builder> groupBuilderProvider;
-	@Inject Provider<LdapUserImpl.Builder> userBuilderProvider;
-	@Inject Provider<LdapUserMembershipImpl.Builder> groupMemberShipProvider;
+	@Inject Provider<LdapGroup.Builder> groupBuilderProvider;
+	@Inject Provider<LdapUser.Builder> userBuilderProvider;
+	@Inject Provider<LdapUserMembership.Builder> groupMemberShipProvider;
 	private ConnectionImpl connection;
 	
 	@Before
@@ -125,7 +123,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testCreateGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -149,7 +147,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testDeleteGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -173,7 +171,7 @@ public class ConnectionImplTest {
 
 	@Test
 	public void testCreateUser() throws Exception {
-		LdapUserImpl ldapUser = userBuilderProvider.get()
+		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
 				.uid("test")
 				.uidNumber(1008)
@@ -222,7 +220,7 @@ public class ConnectionImplTest {
 
 	@Test
 	public void testDeleteUser() throws Exception {
-		LdapUserImpl ldapUser = userBuilderProvider.get()
+		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
 				.uid("test")
 				.uidNumber(1008)
@@ -259,7 +257,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUserToGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -293,7 +291,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUsersToEmptyGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -327,7 +325,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUsersToGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -368,7 +366,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUserToGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -408,7 +406,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUsersToGroup() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -448,7 +446,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUsersToGroupOnlyOneRemaining() throws Exception {
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -501,7 +499,7 @@ public class ConnectionImplTest {
 				.mailBox("test2@test.obm.org")
 				.build();
 		
-		LdapGroupImpl group = groupBuilderProvider.get()
+		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -513,7 +511,7 @@ public class ConnectionImplTest {
 		LdapGroup.Id groupId = group.getId();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupId);
 		
-		LdapGroupImpl toGroup = groupBuilderProvider.get()
+		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("toGroup")
 				.gidNumber(1001)
@@ -538,7 +536,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveGroupFromGroup() throws Exception {
-		LdapGroupImpl fromGroup = groupBuilderProvider.get()
+		LdapGroup fromGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -559,7 +557,7 @@ public class ConnectionImplTest {
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupId);
 		
-		LdapGroupImpl group = groupBuilderProvider.get()
+		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("subgroup")
 				.gidNumber(1001)
@@ -593,7 +591,7 @@ public class ConnectionImplTest {
 				.mailBox("test2@test.obm.org")
 				.build();
 		
-		LdapGroupImpl group = groupBuilderProvider.get()
+		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -605,7 +603,7 @@ public class ConnectionImplTest {
 		LdapGroup.Id groupId = group.getId();
 		connection.addUsersToGroup(ImmutableList.of(userMembership), groupId);
 		
-		LdapGroupImpl group2 = groupBuilderProvider.get()
+		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group2")
 				.gidNumber(1001)
@@ -617,7 +615,7 @@ public class ConnectionImplTest {
 		LdapGroup.Id groupId2 = group2.getId();
 		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupId2);
 		
-		LdapGroupImpl toGroup = groupBuilderProvider.get()
+		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("subgroup")
 				.gidNumber(1001)
@@ -651,7 +649,7 @@ public class ConnectionImplTest {
 				.mailBox("test2@test.obm.org")
 				.build();
 		
-		LdapGroupImpl fromGroup = groupBuilderProvider.get()
+		LdapGroup fromGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -663,7 +661,7 @@ public class ConnectionImplTest {
 		LdapGroup.Id fromGroupId = fromGroup.getId();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupId);
 		
-		LdapGroupImpl group = groupBuilderProvider.get()
+		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("subgroup")
 				.gidNumber(1001)
@@ -675,7 +673,7 @@ public class ConnectionImplTest {
 		LdapGroup.Id groupId = group.getId();
 		connection.addUsersToGroup(ImmutableList.of(userMembership), groupId);
 
-		LdapGroupImpl group2 = groupBuilderProvider.get()
+		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("subgroup2")
 				.gidNumber(1001)
@@ -702,7 +700,7 @@ public class ConnectionImplTest {
 	public void testRestartOnRequestCounterReached() {
 		MyConnection myConnection = new MyConnection(new OneRequestCounterConfiguration());
 
-		LdapGroupImpl ldapGroup = groupBuilderProvider.get()
+		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group1")
 				.gidNumber(1001)
@@ -710,7 +708,7 @@ public class ConnectionImplTest {
 				.mail("group1@test.obm.org")
 				.obmDomain("test.obm.org")
 				.build();
-		LdapGroupImpl ldapGroup2 = groupBuilderProvider.get()
+		LdapGroup ldapGroup2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn("group2")
 				.gidNumber(1001)

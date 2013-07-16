@@ -53,9 +53,9 @@ public class BeansTest {
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
-					.add(LdapGroupImpl.class)
-					.add(LdapUserImpl.class)
-					.add(LdapUserMembershipImpl.class)
+					.add(LdapGroup.class)
+					.add(LdapUser.class)
+					.add(LdapUserMembership.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

@@ -31,16 +31,107 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.bean;
 
+import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
+import org.obm.provisioning.Configuration;
 
-public interface LdapUserMembership {
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
 
-	Modification[] buildAddModifications();
-	Modification[] buildRemoveModifications();
+public class LdapUserMembership {
+
+	public static class Builder {
+		private String memberUid;
+		private String mailBox;
+		
+		private final Configuration configuration;
+
+		@Inject
+		private Builder(Configuration configuration) {
+			this.configuration = configuration;
+		}
+		
+		public Builder memberUid(String memberUid) {
+			this.memberUid = memberUid;
+			return this;
+		}
+		
+		public Builder mailBox(String mailBox) {
+			this.mailBox = mailBox;
+			return this;
+		}
+		
+		public LdapUserMembership build() {
+			return new LdapUserMembership(memberUid, buildMember(), mailBox);
+		}
+
+		private String buildMember() {
+			return "uid=" + memberUid + "," + configuration.getUserBaseDn().getName();
+		}
+	}
 	
-	String getMemberUid();
-	String getMember();
-	String getMailBox();
+	private final String memberUid;
+	private final String member;
+	private final String mailBox;
+	
+	private LdapUserMembership(String memberUid, String member, String mailBox) {
+		this.memberUid = memberUid;
+		this.member = member;
+		this.mailBox = mailBox;
+	}
+	
+	public String getMemberUid() {
+		return memberUid;
+	}
+
+	public String getMember() {
+		return member;
+	}
+
+	public String getMailBox() {
+		return mailBox;
+	}
+
+	public Modification[] buildAddModifications() {
+		return buildModifications(ModificationOperation.ADD_ATTRIBUTE);
+	}
+
+	public Modification[] buildRemoveModifications() {
+		return buildModifications(ModificationOperation.REMOVE_ATTRIBUTE);
+	}
+
+	private Modification[] buildModifications(ModificationOperation operation) {
+		return new Modification[] {
+				new DefaultModification(operation, "memberUid", getMemberUid()),
+				new DefaultModification(operation, "member", getMember()),
+				new DefaultModification(operation, "mailBox", getMailBox())
+		};
+	}
 
 
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(memberUid, member, mailBox);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof LdapUserMembership) {
+			LdapUserMembership that = (LdapUserMembership) object;
+			return Objects.equal(this.memberUid, that.memberUid)
+				&& Objects.equal(this.member, that.member)
+				&& Objects.equal(this.mailBox, that.mailBox);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("memberUid", memberUid)
+			.add("member", member)
+			.add("mailBox", mailBox)
+			.toString();
+	}
 }
