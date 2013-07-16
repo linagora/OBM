@@ -71,7 +71,7 @@ function generate_token(){
 ///////////////////////////////////////////////////////////////////////////////
 $display['head'] = display_head('Webmail', false);
 
-$display['header'] = display_menu($module).$spreadlove;
+$display['header'] = display_menu($module);
 
 $get_params = params_for_iframe($token);
 
