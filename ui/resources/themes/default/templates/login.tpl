@@ -124,7 +124,6 @@
       #loginForm .error{
         background-color: #fafafa;
         text-align: center;
-        padding-left: 30%;
       }
 
       #loginContainer fieldset+fieldset{
