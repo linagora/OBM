@@ -17013,6 +17013,7 @@ INSERT INTO entity (entity_mailing)
         (true),
         (true),
         (true),
+        (true),
         (true); // <- Groups
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng');

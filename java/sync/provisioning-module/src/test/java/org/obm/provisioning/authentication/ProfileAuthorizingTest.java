@@ -50,12 +50,26 @@ import com.google.common.collect.ImmutableSet;
 public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testSubjectCannotGetProfilesWithWrongPassword() {
-		expectPasswordReturns("username", "password");
+	public void testSubjectCannotAuthenticateWithNoDomain() {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "wrongPassword").
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.get("/profiles");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testSubjectCannotGetProfilesWithWrongPassword() {
+		expectAuthenticatingReturns("username", "password");
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("username@domain", "wrongPassword").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -66,11 +80,11 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPassword() {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "wrongPassword").
+			.auth().basic("username@domain", "wrongPassword").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -81,12 +95,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetProfilesWithWrongPermissions() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:*", "users:*"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -97,12 +111,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPermissions() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("profiles:create"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -115,12 +129,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetProfilesWithReadPermission() throws Exception {
 		expectDomain();
 		expectProfiles();
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -133,12 +147,12 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetProfileWithReadPermission() throws Exception {
 		expectDomain();
 		expectProfile();
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("profiles:read"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()

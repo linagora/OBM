@@ -58,7 +58,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
@@ -76,7 +76,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode())
 			.body(containsString(obmUserToJsonString())).
@@ -94,7 +94,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
@@ -112,7 +112,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NO_CONTENT.getStatusCode()).
 		when()
@@ -130,7 +130,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()

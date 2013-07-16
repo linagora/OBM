@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -66,24 +68,25 @@ public class ProvisioningContextListener implements ServletContextListener {
 	}
 
     private Injector createInjector(ServletContext servletContext)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
     	
         return Guice.createInjector(selectGuiceModule(servletContext));
     }
 
     @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
 		
 		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ProvisioningService(servletContext));
 	}
 
     @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
-    		throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
     	
 		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
 		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
 			return null;
 		}
-		return (Module) Class.forName(guiceModuleClassName).newInstance();
+		return (Module) Class.forName(guiceModuleClassName).getConstructor(ServletContext.class)
+				.newInstance(servletContext);
 	}
 }

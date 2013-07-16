@@ -57,7 +57,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
@@ -75,7 +75,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
@@ -93,7 +93,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
@@ -112,7 +112,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
@@ -131,7 +131,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
@@ -150,7 +150,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
@@ -169,7 +169,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode()).
@@ -188,7 +188,7 @@ public class UserResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.body(invalidMediaTypeEntity()).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).

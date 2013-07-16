@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import javax.servlet.ServletContext;
+
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
@@ -46,6 +48,9 @@ import com.google.inject.util.Modules;
 import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
 public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
+	
+	public CalendarBindingImplIntegrationTestModule(ServletContext servletContext) {
+	}
 
 	@Override
 	protected void configure() {

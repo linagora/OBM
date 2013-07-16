@@ -65,7 +65,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.parameter("expunge", true).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
@@ -87,7 +87,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.parameter("expunge", false).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
@@ -109,7 +109,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -130,7 +130,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()

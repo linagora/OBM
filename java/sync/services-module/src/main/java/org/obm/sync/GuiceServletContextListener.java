@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TimeZone;
@@ -74,24 +76,29 @@ public class GuiceServletContextListener implements ServletContextListener {
 	} 
 
 	private Injector createInjector(ServletContext servletContext)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
 
 		return Guice.createInjector(selectGuiceModule(servletContext));
 	}
+
 	@VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
 
 		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ObmSyncModule(servletContext));
 	}
 
-	@VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
-			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-
+    @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+    	
 		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
 		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
 			return null;
 		}
-		return (Module) Class.forName(guiceModuleClassName).newInstance();
+
+		final Class<?> forName = Class.forName(guiceModuleClassName);
+		final Constructor<?> constructor = forName.getConstructor(ServletContext.class);
+		return (Module) constructor
+				.newInstance(servletContext);
 	}
 
 	private void failStartup(String message) { 

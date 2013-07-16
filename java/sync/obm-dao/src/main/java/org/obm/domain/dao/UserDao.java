@@ -491,30 +491,6 @@ public class UserDao {
 
 		return users;
 	}
-	
-	public String getPasswordOf(String login, ObmDomain domain) throws SQLException, UserNotFoundException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		
-		String query = "SELECT userobm_password FROM UserObm WHERE userobm_login = ? AND userobm_domain_id = ?";
-		
-		try {
-			conn = obmHelper.getConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, login);
-			ps.setInt(2, domain.getId());
-			rs = ps.executeQuery();
-			
-			if (rs.next()) {
-				return rs.getString("userobm_password"); 
-			} else {
-				throw new UserNotFoundException(login);
-			}
-		} finally {
-			obmHelper.cleanup(null, ps, rs);
-		}
-	}
 
 	public ObmUser create(ObmUser user) throws SQLException, DaoException {
 		Connection conn = null;

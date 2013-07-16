@@ -67,7 +67,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.content(obmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
@@ -89,7 +89,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password")
+			.auth().basic("username@domain", "password")
 			.content(obmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).

@@ -42,6 +42,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -55,6 +56,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	public Response create(String user) throws DaoException {
+		SecurityUtils.getSubject();
 		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
 	}
 

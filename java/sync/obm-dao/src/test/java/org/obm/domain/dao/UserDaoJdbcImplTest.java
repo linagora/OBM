@@ -108,17 +108,6 @@ public class UserDaoJdbcImplTest {
 
 		assertThat(dao.list(domain)).isEqualTo(users);
 	}
-	
-	@Test
-	public void testGetPassword() throws SQLException, UserNotFoundException {
-		assertThat(dao.getPasswordOf("user1", domain)).isEqualTo("user1");
-		assertThat(dao.getPasswordOf("user2", domain)).isEqualTo("user2");
-	}
-	
-	@Test(expected=UserNotFoundException.class)
-	public void testGetPasswordThrowUserNotFound() throws SQLException, UserNotFoundException {
-		dao.getPasswordOf("user15464", domain);
-	}
 
 	@Test
 	public void testFindUserById() {

@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.domain.dao.DomainDao;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -40,6 +41,7 @@ public class AuthorizationServiceImplTest {
 			bind(IMocksControl.class).toInstance(mocksControl);
 			bind(PermissionDao.class).toInstance(mocksControl.createMock(PermissionDao.class));
 			bind(ProfileDao.class).toInstance(mocksControl.createMock(ProfileDao.class));
+			bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
 			bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 		}
 	}
@@ -49,6 +51,8 @@ public class AuthorizationServiceImplTest {
 	ProfileDao profileDao;
 	@Inject
 	PermissionDao permissionsDao;
+	@Inject
+	DomainDao domainDao;
 	@Inject
 	AuthorizationService authService;
 	
@@ -64,11 +68,12 @@ public class AuthorizationServiceImplTest {
 		
 		DaoException daoEx = new DaoException();
 		
+		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
 		expect(profileDao.getProfileForUser("user1", dummyUuid)).andThrow(daoEx).once();
 		mocksControl.replay();
 		
 		try {
-			authService.getPermissions("user1", dummyDomain);
+			authService.getPermissions("user1", dummyDomain.getName());
 		}
 		catch (AuthorizationException e) {
 			assertThat(e.getCause()).isEqualTo(daoEx);
@@ -83,12 +88,13 @@ public class AuthorizationServiceImplTest {
 		
 		DaoException daoEx = new DaoException();
 		
+		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
 		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile).once();
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andThrow(daoEx).once();
 		mocksControl.replay();
 		
 		try {
-			authService.getPermissions("user1", dummyDomain);
+			authService.getPermissions("user1", dummyDomain.getName());
 		}
 		catch (AuthorizationException e) {
 			assertThat(e.getCause()).isEqualTo(daoEx);
@@ -103,11 +109,12 @@ public class AuthorizationServiceImplTest {
 		
 		UserNotFoundException userEx = new UserNotFoundException("user1", dummyUuid);
 		
+		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
 		expect(profileDao.getProfileForUser("user1", dummyUuid)).andThrow(userEx).once();
 		mocksControl.replay();
 		
 		try {
-			authService.getPermissions("user1", dummyDomain);
+			authService.getPermissions("user1", dummyDomain.getName());
 		}
 		catch (AuthorizationException e) {
 			assertThat(e.getCause()).isEqualTo(userEx);
@@ -122,12 +129,13 @@ public class AuthorizationServiceImplTest {
 		
 		PermissionsNotFoundException permEx = new PermissionsNotFoundException(adminProfile, dummyDomain);
 		
+		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
 		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile).once();
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andThrow(permEx).once();
 		mocksControl.replay();
 		
 		try {
-			authService.getPermissions("user1", dummyDomain);
+			authService.getPermissions("user1", dummyDomain.getName());
 		}
 		catch (AuthorizationException e) {
 			assertThat(e.getCause()).isEqualTo(permEx);
@@ -139,10 +147,11 @@ public class AuthorizationServiceImplTest {
 	
 	@Test
 	public void testGetPermissions() throws Exception	{
+		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
 		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile);
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andReturn(adminRoles);
 		mocksControl.replay();
-		Collection<String> roles = authService.getPermissions("user1", dummyDomain);
+		Collection<String> roles = authService.getPermissions("user1", dummyDomain.getName());
 		assertThat(roles).isEqualTo(adminRoles);
 		mocksControl.verify();
 	}

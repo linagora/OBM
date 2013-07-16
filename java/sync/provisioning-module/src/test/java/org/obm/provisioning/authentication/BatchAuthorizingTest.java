@@ -53,12 +53,26 @@ import com.google.common.collect.ImmutableSet;
 public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testSubjectCannotGetWithWrongPassword() {
-		expectPasswordReturns("username", "password");
+	public void testSubjectCannotAuthenticateWithNoDomain() {
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "wrongPassword").
+			.auth().basic("username", "password").
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.get("/batches/1");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testSubjectCannotGetWithWrongPassword() {
+		expectAuthenticatingReturns("username", "password");
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("username@domain", "wrongPassword").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -69,11 +83,11 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPostWithWrongPassword() {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "wrongPassword").
+			.auth().basic("username@domain", "wrongPassword").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -84,11 +98,11 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotDeleteWithWrongPassword() {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "wrongPassword").
+			.auth().basic("username@domain", "wrongPassword").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -99,12 +113,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:create, delete"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -115,12 +129,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:read, delete"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -131,12 +145,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:read, create"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
@@ -149,12 +163,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetBatchWithReadPermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:read"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -172,12 +186,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		expectDomain();
 		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:create"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.CREATED.getStatusCode()).
 		when()
@@ -190,12 +204,12 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanDeleteBatchWithDeletePermission() throws Exception {
 		expectDomain();
 		batchDao.delete(batchId(1));
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:delete"));
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()

@@ -68,7 +68,8 @@ public class ProvisioningArchiveUtils {
 				.addClasses(DependencyResolverHelper.projectLdapClientClasses())
 				.addClasses(DependencyResolverHelper.projectSatelliteClientClasses())
 				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
-				.addClasses(DependencyResolverHelper.projectProvisioningClasses());
+				.addClasses(DependencyResolverHelper.projectProvisioningClasses())
+				.addClasses(DependencyResolverHelper.projectCommonClasses());
 			
 		URL pomXmlUrl = ClassLoader.getSystemResource("pom.xml");
 		return ShrinkWrap

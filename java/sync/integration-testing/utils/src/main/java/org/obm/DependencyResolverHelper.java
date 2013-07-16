@@ -90,6 +90,7 @@ import org.obm.locator.LocatorClientImpl;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.BatchProcessingModule;
+import org.obm.provisioning.AuthorizingModule;
 import org.obm.provisioning.BatchProvider;
 import org.obm.provisioning.Connection;
 import org.obm.provisioning.ConnectionImpl;
@@ -104,6 +105,13 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningContextListener;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.annotations.PATCH;
+import org.obm.provisioning.authentication.AuthenticationService;
+import org.obm.provisioning.authentication.AuthenticationServiceImpl;
+import org.obm.provisioning.authentication.ObmHttpMethodPermissionFilter;
+import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
+import org.obm.provisioning.authorization.AuthorizationException;
+import org.obm.provisioning.authorization.AuthorizationService;
+import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.bean.LdapGroup;
 import org.obm.provisioning.bean.LdapGroupImpl;
 import org.obm.provisioning.bean.LdapUser;
@@ -125,12 +133,15 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
+import org.obm.provisioning.dao.PermissionDao;
+import org.obm.provisioning.dao.PermissionDaoHardcodedImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
+import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
@@ -579,7 +590,16 @@ public class DependencyResolverHelper {
 				ParallelBatchProcessor.class,
 				HttpVerbBasedOperationProcessor.class,
 				EntityTypeBasedOperationProcessor.class,
-				ProcessingException.class
+				ProcessingException.class,
+				AuthorizingModule.class,
+				ObmJDBCAuthorizingRealm.class,
+				AuthenticationService.class,
+				ObmHttpMethodPermissionFilter.class,
+				AuthenticationServiceImpl.class,
+				AuthorizationService.class,
+				AuthorizationServiceImpl.class,
+				AuthorizationException.class,
+				PermissionsNotFoundException.class
 		};
 	}
 
@@ -628,7 +648,9 @@ public class DependencyResolverHelper {
 				ObmSystemUser.class,
 				ObmHost.class,
 				ObmInfoDao.class,
-				ObmInfoDaoJdbcImpl.class
+				ObmInfoDaoJdbcImpl.class,
+				PermissionDao.class,
+				PermissionDaoHardcodedImpl.class
 		};
 	}
 

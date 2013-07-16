@@ -137,7 +137,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		
 		private Context createContext(Server server) {
 			Context root = new Context(server, "/", Context.SESSIONS);
-			
+
 			root.addFilter(ShiroFilter.class, "/*", 0);
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/*");
@@ -272,13 +272,25 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
 	
-	protected void expectPasswordReturns(String login, String password) {
-		ObmUser user = ObmUser.builder().login(login).password(password).domain(domain).lastName(login).firstName(login).extId(UserExtId.builder().extId(uuidFactory.randomUUID().toString()).build()).build();
+	protected void expectAuthenticatingReturns(String login, String password) {
+		ObmUser user = ObmUser.builder()
+						.login(login)
+						.password(password)
+						.domain(domain)
+						.lastName(login)
+						.firstName(login)
+						.extId(UserExtId
+								.builder()
+								.extId(uuidFactory.randomUUID().toString())
+								.build())
+						.build();
+		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
 		expect(userDao.findUserByLogin(login, domain)).andReturn(user).once();
 	}
 	
 	protected void expectAuthorizingReturns(String login, Collection<String> permissions, ProfileName profile) throws Exception {
 		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(profile).atLeastOnce();
+		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
 		expect(roleDao.getPermissionsForProfile(profile, domain)).andReturn(permissions).atLeastOnce();
 	}
 	
@@ -287,7 +299,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 	
 	protected void expectIsAuthenticatedAndIsAuthorized() throws Exception {
-		expectPasswordReturns("username", "password");
+		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("*:*"), adminProfile);
 	}
 	

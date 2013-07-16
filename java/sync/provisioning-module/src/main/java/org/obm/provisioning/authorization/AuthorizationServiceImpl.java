@@ -2,6 +2,7 @@ package org.obm.provisioning.authorization;
 
 import java.util.Collection;
 
+import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
@@ -19,17 +20,20 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
 	private ProfileDao profileDao;
 	private PermissionDao roleDao;
+	private DomainDao domainDao;
 	
 	@Inject
-	private AuthorizationServiceImpl(ProfileDao profileDao, PermissionDao roleDao) {
+	private AuthorizationServiceImpl(ProfileDao profileDao, PermissionDao roleDao, DomainDao domainDao) {
 		this.profileDao = profileDao;
 		this.roleDao = roleDao;
+		this.domainDao = domainDao;
 	}
 	
 	@Override
-	public Collection<String> getPermissions(String login, ObmDomain domain) throws AuthorizationException {
-		
+	public Collection<String> getPermissions(String login, String domainName) throws AuthorizationException {
+		ObmDomain domain = null;
 		try {
+			domain = domainDao.findDomainByName(domainName);
 			ProfileName profile = profileDao.getProfileForUser(login, domain.getUuid());
 			return roleDao.getPermissionsForProfile(profile, domain);
 		} catch (DaoException e) {

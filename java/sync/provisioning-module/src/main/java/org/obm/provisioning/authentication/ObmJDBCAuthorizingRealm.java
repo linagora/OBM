@@ -46,8 +46,6 @@ import org.obm.provisioning.authorization.AuthorizationService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 @Singleton
 public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	
@@ -56,22 +54,20 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	
 	@Inject
 	private AuthorizationService authorizationService;
-
-	@Inject
-	private ObmDomain domain;
 	
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal) {
-		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+		String loginAtDomain = (String) principal.getPrimaryPrincipal();
 		
-		String login = (String) principal.getPrimaryPrincipal();
-		
-		if (login == null) {
+		if (loginAtDomain == null) {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
 		
+		String[] loginParts = splitLogin(loginAtDomain);
+		
 		try {
-			authorizationInfo.addStringPermissions(authorizationService.getPermissions(login, domain));
+			SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+			authorizationInfo.addStringPermissions(authorizationService.getPermissions(loginParts[0], loginParts[1]));
 			return authorizationInfo;
 		} catch (AuthorizationException e) {
 			throw new org.apache.shiro.authz.AuthorizationException(e);
@@ -81,14 +77,24 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
 		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-
-		String login = upToken.getUsername();
-
-		if (login == null) {
+		
+		String loginAtDomain = upToken.getUsername();
+		if (loginAtDomain == null) {
 			throw new AccountException("Null usernames are not allowed by this realm.");
 		}
 		
-		String password = authenticationService.getPasswordForUser(login, domain);
-		return new SimpleAuthenticationInfo(login, password, this.getName());
+		String[] loginParts = splitLogin(loginAtDomain);
+		String password = authenticationService.getPasswordForUser(loginParts[0], loginParts[1]);
+		
+		return new SimpleAuthenticationInfo(loginAtDomain, password, this.getName());
+
+	}
+
+	private String[] splitLogin(String loginAtDomain) {
+		String[] loginParts = loginAtDomain.split("@");
+		if (loginParts.length != 2) {
+			throw new AccountException("Usernames must be login@domain form for by this realm.");
+		}
+		return loginParts;
 	}
 }

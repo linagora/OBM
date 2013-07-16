@@ -31,9 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 
 public interface AuthenticationService {
-	public String getPasswordForUser(String login, ObmDomain domain);
+	public String getPasswordForUser(String login, String domainName);
 	
 }

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
+import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 
 import com.google.inject.Inject;
@@ -43,14 +44,17 @@ import fr.aliacom.obm.common.user.ObmUser;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private UserDao userDao;
+	private DomainDao domainDao;
 
 	@Inject
-	private AuthenticationServiceImpl(UserDao userDao) {
+	private AuthenticationServiceImpl(UserDao userDao, DomainDao domainDao) {
 		this.userDao = userDao;
+		this.domainDao = domainDao;
 	}
 
 	@Override
-	public String getPasswordForUser(String login, ObmDomain domain) {
+	public String getPasswordForUser(String login, String domainName) {
+		ObmDomain domain = domainDao.findDomainByName(domainName);
 		ObmUser user = userDao.findUserByLogin(login, domain);
 		return user.getPassword();
 	}
