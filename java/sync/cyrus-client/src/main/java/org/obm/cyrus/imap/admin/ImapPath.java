@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.apache.commons.lang.StringUtils;
-
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 public class ImapPath {
 
@@ -91,12 +91,8 @@ public class ImapPath {
 	}
 
 	public String format() {
-		if (pathFragments.size() > 0) {
-			String path = StringUtils.join(pathFragments, PATH_SEPARATOR);
-			return String.format("user%s%s%s%s", PATH_SEPARATOR, user,
-					PATH_SEPARATOR, path);
-		} else {
-			return String.format("user%s%s", PATH_SEPARATOR, user);
-		}
+		return Joiner.on(PATH_SEPARATOR)
+				.join(Iterables.concat(ImmutableList.of("user", user),
+						pathFragments));
 	}
 }
