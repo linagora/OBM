@@ -31,12 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public class ImapPath {
 
@@ -45,10 +42,10 @@ public class ImapPath {
 	public static class Builder {
 
 		private String user;
-		List<String> pathFragments;
+		ImmutableList.Builder<String> pathFragments;
 
 		private Builder() {
-			pathFragments = Lists.newArrayList();
+			pathFragments = ImmutableList.builder();
 		}
 
 		public Builder user(String user) {
@@ -68,9 +65,7 @@ public class ImapPath {
 		}
 
 		public ImapPath build() {
-			ImmutableList<String> immutableFragments = ImmutableList
-					.copyOf(pathFragments);
-			return new ImapPath(user, immutableFragments);
+			return new ImapPath(user, pathFragments.build());
 		}
 
 	}
