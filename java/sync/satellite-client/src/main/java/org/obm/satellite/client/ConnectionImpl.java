@@ -50,7 +50,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ConnectionImpl implements Connection {
 
-	public static final String SATELLITE_PROTOCOL = "http";
 	public static final String SATELLITE_MTA_PATH = "/postfixsmtpinmaps/host/%s";
 	public static final String SATELLITE_IMAP_PATH = "/cyruspartition/host/add/%s";
 
@@ -108,7 +107,7 @@ public class ConnectionImpl implements Connection {
 	private void post(String hostName, String host, String path) {
 		try {
 			URI uri = new URIBuilder()
-			.setScheme(SATELLITE_PROTOCOL)
+			.setScheme(configuration.getSatelliteProtocol().getScheme())
 			.setHost(host)
 			.setPort(configuration.getSatellitePort())
 			.setPath(String.format(path, hostName))

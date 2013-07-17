@@ -29,17 +29,76 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 public class SatelliteClientModule extends AbstractModule {
 
+	private static final KeyManager[] TRUST_ALL_KEY_MANAGERS = null;
+
 	@Override
 	protected void configure() {
-		bind(HttpClient.class).to(SystemDefaultHttpClient.class);
 		bind(SatelliteService.class).to(SatelliteServiceImpl.class);
 	}
 
+	@Provides
+	private HttpClient provideHttpClient() {
+		return configureSsl(new SystemDefaultHttpClient());
+	}
+
+	private HttpClient configureSsl(HttpClient client) {
+		try {
+			SSLContext sslContext = buildSSLContext(TRUST_ALL_KEY_MANAGERS);
+
+			client
+				.getConnectionManager()
+				.getSchemeRegistry()
+				.register(new Scheme("https", 443, new SSLSocketFactory(sslContext, new AllowAllHostnameVerifier())));
+		} catch (KeyManagementException e) {
+			throw new IllegalArgumentException("Could not initialize a ssl context", e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalArgumentException("Could not initialize a ssl context", e);
+		}
+
+		return client;
+	}
+
+	protected SSLContext buildSSLContext(KeyManager[] keyManagers) throws NoSuchAlgorithmException, KeyManagementException {
+		SSLContext sslContext = SSLContext.getInstance("TLS");
+
+		sslContext.init(keyManagers, trustAllx509Manager(), null);
+
+		return sslContext;
+	}
+
+	private TrustManager[] trustAllx509Manager() {
+		X509TrustManager trustAllx509Manager = new X509TrustManager() {
+			public X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+
+			public void checkClientTrusted(X509Certificate[] certs, String authType) {
+			}
+
+			public void checkServerTrusted(X509Certificate[] certs, String authType) {
+			}
+		};
+
+		return new TrustManager[] {trustAllx509Manager};
+	}
 }

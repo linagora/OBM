@@ -31,6 +31,21 @@ package org.obm.satellite.client;
 
 public interface Configuration {
 
+	public enum SatelliteProtocol {
+		HTTP("http"),
+		HTTPS("https");
+
+		private final String scheme;
+
+		private SatelliteProtocol(String scheme) {
+			this.scheme = scheme;
+		}
+
+		public String getScheme() {
+			return scheme;
+		}
+	}
+
 	public static final int DEFAULT_SATELLITE_PORT = 30000;
 
 	String getUsername();
@@ -40,5 +55,7 @@ public interface Configuration {
 	boolean isIMAPServerManaged();
 
 	int getSatellitePort();
+
+	SatelliteProtocol getSatelliteProtocol();
 
 }

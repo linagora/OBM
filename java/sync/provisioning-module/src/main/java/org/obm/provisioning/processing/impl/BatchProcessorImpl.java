@@ -222,6 +222,11 @@ public class BatchProcessorImpl implements BatchProcessor {
 			return DEFAULT_SATELLITE_PORT;
 		}
 
+		@Override
+		public SatelliteProtocol getSatelliteProtocol() {
+			return SatelliteProtocol.HTTPS;
+		}
+
 	}
 
 }

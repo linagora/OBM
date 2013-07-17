@@ -52,6 +52,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.satellite.client.Configuration.SatelliteProtocol;
 import org.obm.satellite.client.exceptions.SatteliteClientException;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -95,6 +96,7 @@ public class ConnectionImplTest {
 
 	@Test
 	public void testUpdateMTA() {
+		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
 		expect(configuration.getPassword()).andReturn("pass");
@@ -109,6 +111,7 @@ public class ConnectionImplTest {
 
 	@Test(expected = SatteliteClientException.class)
 	public void testUpdateMTAOnError() {
+		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
 		expect(configuration.getPassword()).andReturn("pass");
@@ -121,6 +124,7 @@ public class ConnectionImplTest {
 
 	@Test
 	public void testUpdateIMAPServer() {
+		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
 		expect(configuration.getPassword()).andReturn("pass");
@@ -146,6 +150,7 @@ public class ConnectionImplTest {
 
 	@Test(expected = SatteliteClientException.class)
 	public void testUpdateIMAPServerOnError() {
+		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
 		expect(configuration.getPassword()).andReturn("pass");
