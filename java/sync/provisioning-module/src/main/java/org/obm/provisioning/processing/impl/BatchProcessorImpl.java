@@ -32,6 +32,7 @@ package org.obm.provisioning.processing.impl;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Batch.Builder;
@@ -86,6 +87,7 @@ public class BatchProcessorImpl implements BatchProcessor {
 	}
 
 	@Override
+	@Transactional
 	public void process(Batch batch) throws ProcessingException {
 		Id batchId = batch.getId();
 		Batch.Builder batchBuilder = Batch

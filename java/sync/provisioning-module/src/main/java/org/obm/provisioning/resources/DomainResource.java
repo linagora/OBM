@@ -40,6 +40,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.beans.ObmDomainEntry;
 
@@ -58,6 +59,7 @@ public class DomainResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(readOnly = true)
 	public List<ObmDomainEntry> list() {
 		List<ObmDomain> domains = domainDao.list();
 
@@ -78,6 +80,7 @@ public class DomainResource {
 	@GET
 	@Path("{domainUuid}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(readOnly = true)
 	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) {
 		ObmDomain domain = domainDao.findDomainByUuid(domainUuid);
 

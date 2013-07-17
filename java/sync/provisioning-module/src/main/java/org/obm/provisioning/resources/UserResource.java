@@ -46,6 +46,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.UserIdentifier;
@@ -70,6 +71,7 @@ public class UserResource {
 	@GET
 	@Path("{userExtId}")
 	@Produces(JSON_WITH_UTF8)
+	@Transactional(readOnly = true)
 	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		try {
@@ -82,6 +84,7 @@ public class UserResource {
 
 	@GET
 	@Produces(JSON_WITH_UTF8)
+	@Transactional(readOnly = true)
 	public List<UserIdentifier> listAll() throws SQLException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		List<ObmUser> users = userDao.list(domain);

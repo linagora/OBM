@@ -13,6 +13,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningService;
@@ -41,6 +42,7 @@ public class ProfileResource {
 	@GET
 	@Path("/")
 	@Produces(JSON_WITH_UTF8)
+	@Transactional(readOnly = true)
 	public Set<ProfileEntry> getProfileEntries() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 
@@ -50,6 +52,7 @@ public class ProfileResource {
 	@GET
 	@Path("/{profileId}")
 	@Produces(JSON_WITH_UTF8)
+	@Transactional(readOnly = true)
 	public ProfileName getProfileName(@PathParam("profileId") ProfileId profileId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 

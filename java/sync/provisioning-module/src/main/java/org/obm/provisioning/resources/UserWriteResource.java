@@ -42,6 +42,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -53,6 +54,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@POST
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
+	@Transactional
 	public Response create(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_create);
 		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
@@ -62,6 +64,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
+	@Transactional
 	public Response modify(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_update);
 		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
@@ -70,6 +73,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@DELETE
 	@Path("/{userId}")
 	@Produces(JSON_WITH_UTF8)
+	@Transactional
 	public Response delete() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_delete);
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
@@ -79,6 +83,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Path("/{userId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
+	@Transactional
 	public Response patch(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_patch);
 		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);

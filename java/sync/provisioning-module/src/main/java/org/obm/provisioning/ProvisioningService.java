@@ -37,8 +37,12 @@ import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
+import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.provisioning.resources.ProfileResource;
+import org.obm.provisioning.resources.UserResource;
+import org.obm.provisioning.resources.UserWriteResource;
 import org.obm.satellite.client.SatelliteClientModule;
 import org.obm.sync.date.DateProvider;
 import org.obm.utils.ObmHelper;
@@ -102,6 +106,11 @@ public class ProvisioningService extends ServletModule {
 	private void bindRestResources() {
 		bind(DomainBasedSubResource.class);
 		bind(DomainResource.class);
+		bind(BatchResource.class);
+		bind(ProfileResource.class);
+		bind(UserResource.class);
+		bind(UserWriteResource.class);
+
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
 	}

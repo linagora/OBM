@@ -1,7 +1,6 @@
 package org.obm.provisioning.resources;
 
 import static org.obm.provisioning.bean.Permissions.batches_create;
-import static org.obm.provisioning.bean.Permissions.batches_update;
 import static org.obm.provisioning.bean.Permissions.batches_delete;
 import static org.obm.provisioning.bean.Permissions.batches_read;
 import static org.obm.provisioning.bean.Permissions.batches_update;
@@ -23,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.shiro.authz.AuthorizationException;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
@@ -48,6 +48,7 @@ public class BatchResource {
 	@GET
 	@Path("{batchId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional(readOnly = true)
 	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_read);
 		Batch batch = batchProcessor.getRunningBatch(batchId);
@@ -67,6 +68,7 @@ public class BatchResource {
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public Response create() throws DaoException, URISyntaxException, AuthorizationException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_create);
 		Batch batch = Batch
@@ -84,6 +86,7 @@ public class BatchResource {
 
 	@DELETE
 	@Path("{batchId}")
+	@Transactional
 	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_delete);
 		try {
@@ -99,6 +102,7 @@ public class BatchResource {
 	@PUT
 	@Path("{batchId}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Transactional
 	public Response commit(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_update);
 		Batch batch = batchProcessor.getRunningBatch(batchId);
