@@ -39,6 +39,13 @@ public class ConnectionImpl implements Connection {
 
 	private StoreClient storeClient;
 
+	public class Factory implements Connection.Factory {
+		@Override
+		public ConnectionImpl create(StoreClient storeClient) {
+			return new ConnectionImpl(storeClient);
+		}
+	}
+
 	public ConnectionImpl(StoreClient storeClient) {
 		this.storeClient = storeClient;
 	}
