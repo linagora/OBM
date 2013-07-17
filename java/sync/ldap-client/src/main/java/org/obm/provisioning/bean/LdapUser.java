@@ -53,7 +53,8 @@ public class LdapUser {
 		"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" };
 
 	private final static String DEFAULT_WEB_ACCESS = "REJECT";
-	private final static String DEFAULT_EMAIL_ACCESS = "REJECT";
+	private final static String FORBIDDEN_EMAIL_ACCESS = "REJECT";
+	private final static String PERMITTED_EMAIL_ACCESS = "PERMIT";
 	private final static int DEFAULT_CYRUS_PORT = 24;
 	private final static boolean DEFAULT_HIDDEN_USER = false;
 	
@@ -129,7 +130,7 @@ public class LdapUser {
 					obmUser.getLogin().toLowerCase(),
 					obmUser.getDomain().getName());
 			this.mailBoxServer = buildMailboxServer(obmUser);
-			this.mailAccess = DEFAULT_EMAIL_ACCESS;
+			this.mailAccess = buildEmailAccess(obmUser);
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
 			return this;
 		}
@@ -161,6 +162,12 @@ public class LdapUser {
 					: null;
 		}
 
+		private String buildEmailAccess(ObmUser obmUser) {
+			return obmUser.getEmail() != null ?
+					PERMITTED_EMAIL_ACCESS :
+					FORBIDDEN_EMAIL_ACCESS;
+		}
+	
 		public Builder objectClasses(String[] objectClasses) {
 			this.objectClasses = objectClasses;
 			return this;

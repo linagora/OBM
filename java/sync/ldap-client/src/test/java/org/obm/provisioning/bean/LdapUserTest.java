@@ -171,7 +171,7 @@ public class LdapUserTest {
 				.webAccess("REJECT")
 				.mailBox("richard.sorge@gru.gov.ru")
 				.mailBoxServer("lmtp:255.255.255.0:24")
-				.mailAccess("REJECT")
+				.mailAccess("PERMIT")
 				.hiddenUser(false)
 				.build();
 		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUser()).build();
