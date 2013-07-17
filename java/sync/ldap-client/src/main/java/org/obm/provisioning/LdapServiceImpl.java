@@ -31,11 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import org.obm.provisioning.LdapManager;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class LdapServiceImpl implements LdapService {
 
+	private LdapManager.Factory ldapManagerFactory;
+	
+	@Inject
+	public LdapServiceImpl(LdapManager.Factory ldapManagerFactory) {
+		this.ldapManagerFactory = ldapManagerFactory;
+	}
+	
 	@Override
-	public Connection create(Configuration configuration) {
-		return new ConnectionImpl(configuration);
+	public LdapManager buildManager() {
+		return ldapManagerFactory.create();
 	}
 
 }
