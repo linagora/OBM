@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.bean;
+package org.obm.provisioning.ldap.client.bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
-import org.obm.provisioning.Configuration;
+import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;

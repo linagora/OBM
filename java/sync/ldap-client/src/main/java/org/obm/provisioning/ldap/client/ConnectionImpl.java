@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,10 +48,10 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapUser;
-import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.exception.ConnectionException;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
+import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -85,21 +85,21 @@ public class ConnectionImpl implements Connection {
 	private LdapConnection connection;
 	private AtomicInteger requestCounter;
 
-	protected ConnectionImpl(Configuration configuration) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	protected ConnectionImpl(Configuration configuration) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		this.configuration = configuration;
 		requestCounter = new AtomicInteger();
 		initializeConnection();
 	}
 	
-	private void initializeConnection() throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	private void initializeConnection() throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			requestCounter.set(0);
 			connection = new LdapNetworkConnection(configuration.getNetworkConfiguration());
 			connection.bind(configuration.getBindDn(), configuration.getBindPassword());
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		} catch (IOException e) {
-			throw new org.obm.provisioning.exception.ConnectionException(e);
+			throw new org.obm.provisioning.ldap.client.exception.ConnectionException(e);
 		}
 	}
 
@@ -116,39 +116,39 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void createUser(LdapUser ldapUser) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void createUser(LdapUser ldapUser) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			createEntry(ldapUser.buildEntry());
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
 	@Override
-	public void createGroup(LdapGroup ldapGroup) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void createGroup(LdapGroup ldapGroup) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			createEntry(ldapGroup.buildEntry());
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
-	private void createEntry(Entry entry) throws org.obm.provisioning.exception.LdapException {
+	private void createEntry(Entry entry) throws org.obm.provisioning.ldap.client.exception.LdapException {
 		try {
 			connection.add(entry);
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
 	@Override
-	public void deleteUser(LdapUser.Id ldapUserId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void deleteUser(LdapUser.Id ldapUserId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			connection.delete(getUserDnFromUserId(ldapUserId));
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
@@ -157,12 +157,12 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void deleteGroup(LdapGroup.Id ldapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void deleteGroup(LdapGroup.Id ldapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			connection.delete(getGroupDnFromGroupId(ldapGroupId));
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
@@ -184,12 +184,12 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		modifyGroup(ldapGroupId, ldapUserMembership.buildAddModifications());
 	}
 	
 	@Override
-	public void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		Modification[] modifications = new Modification[0];
 		for (LdapUserMembership ldapUserMembership: ldapUserMemberships) {
 			modifications = ObjectArrays.concat(modifications, ldapUserMembership.buildAddModifications(), Modification.class);
@@ -197,23 +197,23 @@ public class ConnectionImpl implements Connection {
 		modifyGroup(ldapGroupId, modifications);
 	}
 	
-	private void modifyGroup(LdapGroup.Id ldapGroupId, Modification[] modifications) throws org.obm.provisioning.exception.LdapException {
+	private void modifyGroup(LdapGroup.Id ldapGroupId, Modification[] modifications) throws org.obm.provisioning.ldap.client.exception.LdapException {
 		try {
 			Dn group = getGroupDnFromGroupId(ldapGroupId);
 			connection.modify(group, modifications);
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 
 	@Override
-	public void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		modifyGroup(ldapGroupId, ldapUserMembership.buildRemoveModifications());
 	}
 
 	@Override
-	public void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Id ldapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		Modification[] modifications = new Modification[0];
 		for (LdapUserMembership ldapUserMembership: ldapUserMemberships) {
 			modifications = ObjectArrays.concat(modifications, ldapUserMembership.buildRemoveModifications(), Modification.class);
@@ -231,26 +231,26 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void addGroupToGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id toLdapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void addGroupToGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id toLdapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			Entry entry = getGroupEntry(ldapGroupId);
 			Entry toEntry = getGroupEntry(toLdapGroupId);
 			
 			modifyGroupByGroup(toEntry, entry, ModificationOperation.ADD_ATTRIBUTE);
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 
 	@Override
-	public void removeGroupFromGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id fromLdapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void removeGroupFromGroup(LdapGroup.Id ldapGroupId, LdapGroup.Id fromLdapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			Entry entry = getGroupEntry(ldapGroupId);
 			Entry fromEntry = getGroupEntry(fromLdapGroupId);
 			
 			modifyGroupByGroup(fromEntry, entry, ModificationOperation.REMOVE_ATTRIBUTE);
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
@@ -270,20 +270,20 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void addGroupsToGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id toLdapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void addGroupsToGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id toLdapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			modifyMembersFromGroups(ldapGroupIds, toLdapGroupId, ModificationOperation.ADD_ATTRIBUTE);
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 
 	@Override
-	public void removeGroupsFromGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id fromLdapGroupId) throws org.obm.provisioning.exception.LdapException, ConnectionException {
+	public void removeGroupsFromGroup(List<LdapGroup.Id> ldapGroupIds, LdapGroup.Id fromLdapGroupId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			modifyMembersFromGroups(ldapGroupIds, fromLdapGroupId, ModificationOperation.REMOVE_ATTRIBUTE);
 		} catch (LdapException e) {
-			throw new org.obm.provisioning.exception.LdapException(e);
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	

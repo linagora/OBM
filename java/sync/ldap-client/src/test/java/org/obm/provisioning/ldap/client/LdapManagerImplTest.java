@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
@@ -40,7 +40,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.bean.LdapUser;
+import org.obm.provisioning.ldap.client.Connection;
+import org.obm.provisioning.ldap.client.LdapManagerImpl;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 

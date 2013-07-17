@@ -29,10 +29,26 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
-public interface LdapService {
+import org.obm.provisioning.ldap.client.LdapManager;
 
-	LdapManager buildManager();
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class LdapServiceImpl implements LdapService {
+
+	private LdapManager.Factory ldapManagerFactory;
 	
+	@Inject
+	public LdapServiceImpl(LdapManager.Factory ldapManagerFactory) {
+		this.ldapManagerFactory = ldapManagerFactory;
+	}
+	
+	@Override
+	public LdapManager buildManager() {
+		return ldapManagerFactory.create();
+	}
+
 }

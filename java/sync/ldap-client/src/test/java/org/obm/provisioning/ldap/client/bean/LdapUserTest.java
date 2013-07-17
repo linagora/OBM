@@ -1,11 +1,12 @@
-package org.obm.provisioning.bean;
+package org.obm.provisioning.ldap.client.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.EmbeddedLdapModule;
+import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 

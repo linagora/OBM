@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -44,12 +44,14 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapUser;
-import org.obm.provisioning.bean.LdapUser.Id;
-import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.exception.ConnectionException;
-import org.obm.provisioning.exception.LdapException;
+import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.ConnectionImpl;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
+import org.obm.provisioning.ldap.client.bean.LdapUser.Id;
+import org.obm.provisioning.ldap.client.exception.ConnectionException;
+import org.obm.provisioning.ldap.client.exception.LdapException;
 import org.opends.messages.Message;
 import org.opends.server.backends.MemoryBackend;
 import org.opends.server.core.AddOperation;

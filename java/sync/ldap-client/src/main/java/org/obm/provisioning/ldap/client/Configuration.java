@@ -29,17 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
-import com.google.inject.AbstractModule;
+import org.apache.directory.api.ldap.model.message.SearchScope;
+import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
 
-public class LdapModule extends AbstractModule {
+public interface Configuration {
 
-	@Override
-	protected void configure() {
-		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
-		bind(LdapManager.Factory.class).to(LdapManagerImpl.Factory.class);
-		bind(LdapService.class).to(LdapServiceImpl.class);
-	}
+	/**
+	 * @return the max number of requests before creating a new underlying connection to the LDAP server
+	 */
+	int maxRequests();
+	LdapConnectionConfig getNetworkConfiguration();
+	Dn getBindDn();
+	String getBindPassword();
+
+	Dn getUserBaseDn();
+	String buildUserFilter(LdapUser.Id userId);
+	SearchScope getUserSearchScope();
+
+	Dn getGroupBaseDn();
+	String buildGroupFilter(LdapGroup.Id groupId);
+	SearchScope getGroupSearchScope();
 
 }

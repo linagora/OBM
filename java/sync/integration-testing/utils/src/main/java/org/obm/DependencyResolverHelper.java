@@ -92,13 +92,13 @@ import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.AuthorizingModule;
 import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.BatchProvider;
-import org.obm.provisioning.Connection;
-import org.obm.provisioning.ConnectionImpl;
+import org.obm.provisioning.ldap.client.Connection;
+import org.obm.provisioning.ldap.client.ConnectionImpl;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
-import org.obm.provisioning.LdapModule;
-import org.obm.provisioning.LdapService;
-import org.obm.provisioning.LdapServiceImpl;
+import org.obm.provisioning.ldap.client.LdapModule;
+import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.ldap.client.LdapServiceImpl;
 import org.obm.provisioning.ObmDomainProvider;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
@@ -112,11 +112,9 @@ import org.obm.provisioning.authorization.AuthorizationException;
 import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapGroupImpl;
-import org.obm.provisioning.bean.LdapUser;
-import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.bean.LdapUserMembershipImpl;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.provisioning.beans.Batch;
@@ -145,8 +143,8 @@ import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-import org.obm.provisioning.exception.ConnectionException;
-import org.obm.provisioning.exception.LdapException;
+import org.obm.provisioning.ldap.client.exception.ConnectionException;
+import org.obm.provisioning.ldap.client.exception.LdapException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
@@ -527,16 +525,14 @@ public class DependencyResolverHelper {
 				LdapModule.class, 
 				LdapService.class,
 				LdapServiceImpl.class, 
-				org.obm.provisioning.Configuration.class, 
+				org.obm.provisioning.ldap.client.Configuration.class, 
 				Connection.class,
 				ConnectionException.class, 
 				ConnectionImpl.class,
 				LdapException.class, 
-				LdapGroup.class, 
-				LdapGroupImpl.class,
+				LdapGroup.class,
 				LdapUser.class, 
 				LdapUserMembership.class,
-				LdapUserMembershipImpl.class
 		};
 	}
 

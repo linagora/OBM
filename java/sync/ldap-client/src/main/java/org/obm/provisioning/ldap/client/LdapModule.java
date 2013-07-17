@@ -29,20 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
-import org.obm.provisioning.exception.ConnectionException;
+import com.google.inject.AbstractModule;
 
-import fr.aliacom.obm.common.user.ObmUser;
+public class LdapModule extends AbstractModule {
 
-public interface LdapManager {
-
-	public interface Factory {
-		public LdapManager create();
+	@Override
+	protected void configure() {
+		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
+		bind(LdapManager.Factory.class).to(LdapManagerImpl.Factory.class);
+		bind(LdapService.class).to(LdapServiceImpl.class);
 	}
-	
-	public abstract void createUser(ObmUser obmUser);
-
-	public abstract void shutdown() throws ConnectionException;
 
 }

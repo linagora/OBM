@@ -29,16 +29,38 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.exception;
+package org.obm.provisioning.ldap.client.bean;
 
-public class LdapException extends RuntimeException {
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-	public LdapException(Throwable exception) {
-		super(exception);
+import com.google.common.collect.ImmutableList;
+
+@RunWith(SlowFilterRunner.class)
+public class BeansTest {
+
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
+	
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
 	}
-
-	public LdapException(String message, Throwable exception) {
-		super(message, exception);
+	
+	@Test
+	public void test() {
+		ImmutableList<Class<?>> list = 
+				ImmutableList.<Class<?>>builder()
+					.add(LdapGroup.class)
+					.add(LdapUser.class)
+					.add(LdapUserMembership.class)
+					.build();
+		equalsVerifierUtilsTest.test(list);
 	}
-
+	
 }

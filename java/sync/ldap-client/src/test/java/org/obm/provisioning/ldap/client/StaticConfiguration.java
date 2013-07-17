@@ -29,30 +29,84 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
+import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapUser;
+import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
 
-public interface Configuration {
+import com.google.common.base.Throwables;
 
-	/**
-	 * @return the max number of requests before creating a new underlying connection to the LDAP server
-	 */
-	int maxRequests();
-	LdapConnectionConfig getNetworkConfiguration();
-	Dn getBindDn();
-	String getBindPassword();
+public class StaticConfiguration implements Configuration {
 
-	Dn getUserBaseDn();
-	String buildUserFilter(LdapUser.Id userId);
-	SearchScope getUserSearchScope();
+	@Override
+	public int maxRequests() {
+		return 0;
+	}
 
-	Dn getGroupBaseDn();
-	String buildGroupFilter(LdapGroup.Id groupId);
-	SearchScope getGroupSearchScope();
+	@Override
+	public LdapConnectionConfig getNetworkConfiguration() {
+		LdapConnectionConfig config = new LdapConnectionConfig();
+		config.setLdapHost("localhost");
+		config.setLdapPort(33389);
+		config.setUseSsl(false);
+		return config;
+	}
+
+	@Override
+	public Dn getBindDn() {
+		try {
+			return new Dn("cn=directory manager");
+		} catch (LdapInvalidDnException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	@Override
+	public String getBindPassword() {
+		return "secret";
+	}
+
+	@Override
+	public Dn getUserBaseDn() {
+		try {
+			return new Dn("ou=users,dc=test.obm.org,dc=local");
+		} catch (LdapInvalidDnException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	@Override
+	public String buildUserFilter(LdapUser.Id userId) {
+		return "(uid=" + userId.get() + ")";
+	}
+
+	@Override
+	public SearchScope getUserSearchScope() {
+		return SearchScope.ONELEVEL;
+	}
+
+	@Override
+	public Dn getGroupBaseDn() {
+		try {
+			return new Dn("ou=groups,dc=test.obm.org,dc=local");
+		} catch (LdapInvalidDnException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	@Override
+	public String buildGroupFilter(LdapGroup.Id groupId) {
+		return "(cn=" + groupId.get() + ")";
+	}
+
+	@Override
+	public SearchScope getGroupSearchScope() {
+		return SearchScope.ONELEVEL;
+	}
 
 }

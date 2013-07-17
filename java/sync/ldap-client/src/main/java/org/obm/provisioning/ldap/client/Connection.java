@@ -29,15 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.ldap.client;
 
 import java.util.List;
 
-import org.obm.provisioning.bean.LdapGroup;
-import org.obm.provisioning.bean.LdapUser;
-import org.obm.provisioning.bean.LdapUserMembership;
-import org.obm.provisioning.exception.ConnectionException;
-import org.obm.provisioning.exception.LdapException;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
+import org.obm.provisioning.ldap.client.exception.ConnectionException;
+import org.obm.provisioning.ldap.client.exception.LdapException;
 
 public interface Connection {
 

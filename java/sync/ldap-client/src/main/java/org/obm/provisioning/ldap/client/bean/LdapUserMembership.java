@@ -29,12 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.bean;
+package org.obm.provisioning.ldap.client.bean;
 
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.api.ldap.model.entry.ModificationOperation;
-import org.obm.provisioning.Configuration;
+import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
