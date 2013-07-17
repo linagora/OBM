@@ -31,15 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import com.google.inject.AbstractModule;
+import org.obm.provisioning.exception.ConnectionException;
 
-public class LdapModule extends AbstractModule {
+import fr.aliacom.obm.common.user.ObmUser;
 
-	@Override
-	protected void configure() {
-		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
-		bind(LdapManager.Factory.class).to(LdapManagerImpl.Factory.class);
-		bind(LdapService.class).to(LdapServiceImpl.class);
+public interface LdapManager {
+
+	public interface Factory {
+		public LdapManager create();
 	}
+	
+	public abstract void createUser(ObmUser obmUser);
+
+	public abstract void shutdown() throws ConnectionException;
 
 }

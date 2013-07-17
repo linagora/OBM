@@ -31,15 +31,55 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import com.google.inject.AbstractModule;
+import org.obm.provisioning.bean.LdapUser;
+import org.obm.provisioning.exception.ConnectionException;
 
-public class LdapModule extends AbstractModule {
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
-	@Override
-	protected void configure() {
-		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
-		bind(LdapManager.Factory.class).to(LdapManagerImpl.Factory.class);
-		bind(LdapService.class).to(LdapServiceImpl.class);
+import fr.aliacom.obm.common.user.ObmUser;
+
+public class LdapManagerImpl implements LdapManager {
+
+	private Connection conn;
+	private Provider<LdapUser.Builder> userBuilderProvider;
+
+	@Singleton
+	public static class Factory implements LdapManager.Factory {
+		private Provider<LdapUser.Builder> userBuilderProvider;
+		private Connection.Factory connectionFactory;
+
+		@Inject
+		public Factory(Provider<LdapUser.Builder> userBuilderProvider,
+				Connection.Factory connectionFactory) {
+			this.userBuilderProvider = userBuilderProvider;
+			this.connectionFactory = connectionFactory;
+		}
+
+		@Override
+		public LdapManager create() {
+			return new LdapManagerImpl(connectionFactory.create(),
+					userBuilderProvider);
+		}
+
 	}
 
+	public LdapManagerImpl(Connection conn,
+			Provider<LdapUser.Builder> userBuilderProvider) {
+		this.conn = conn;
+		this.userBuilderProvider = userBuilderProvider;
+	}
+
+	@Override
+	public void createUser(ObmUser obmUser) {
+		LdapUser ldapUser = userBuilderProvider.get().fromObmUser(obmUser)
+				.build();
+		conn.createUser(ldapUser);
+	}
+
+	@Override
+	public void shutdown() throws ConnectionException {
+		conn.shutdown();
+	}
 }
