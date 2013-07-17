@@ -59,6 +59,9 @@ public class ObmHelper implements DateProvider {
 	public static final String VPARTSTAT = "vpartstat";
 	public static final String VOPACITY = "vopacity";
 	public static final String VKIND = "vkind";
+	public static final String BATCH_STATUS = "batch_status";
+	public static final String BATCH_ENTITY_TYPE = "batch_entity_type";
+	public static final String HTTP_VERB = "http_verb";
 
 	private final DatabaseConnectionProvider dbcp;
 

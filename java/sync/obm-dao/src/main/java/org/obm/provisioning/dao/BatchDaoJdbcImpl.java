@@ -44,6 +44,7 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -100,7 +101,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("INSERT INTO batch (status, domain) VALUES (?, ?)");
 
-			ps.setString(1, batch.getStatus().toString());
+			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, batch.getStatus().toString()));
 			ps.setInt(2, batch.getDomain().getId());
 
 			ps.executeUpdate();
@@ -124,7 +125,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("UPDATE batch SET status = ?, timecommit = ? WHERE id = ?");
 
-			ps.setString(1, batch.getStatus().toString());
+			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, batch.getStatus().toString()));
 
 			Date timecommit = batch.getTimecommit();
 

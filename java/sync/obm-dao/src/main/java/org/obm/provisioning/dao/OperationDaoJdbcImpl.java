@@ -49,6 +49,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -130,11 +131,11 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("INSERT INTO batch_operation (status, url, body, verb, entity_type, batch) VALUES (?, ?, ?, ?, ?, ?)");
 
-			ps.setString(1, operation.getStatus().toString());
+			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, operation.getStatus().toString()));
 			ps.setString(2, operation.getRequest().getUrl());
 			ps.setString(3, operation.getRequest().getBody());
-			ps.setString(4, operation.getRequest().getVerb().toString());
-			ps.setString(5, operation.getEntityType().toString());
+			ps.setObject(4, dbcp.getJdbcObject(ObmHelper.HTTP_VERB, operation.getRequest().getVerb().toString()));
+			ps.setObject(5, dbcp.getJdbcObject(ObmHelper.BATCH_ENTITY_TYPE, operation.getEntityType().toString()));
 			ps.setInt(6, batch.getId().getId());
 
 			ps.executeUpdate();
@@ -162,7 +163,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement("UPDATE batch_operation SET status = ?, timecommit = ?, error = ? WHERE id = ?");
 
-			ps.setString(1, operation.getStatus().toString());
+			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, operation.getStatus().toString()));
 
 			Date timecommit = operation.getTimecommit();
 

@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.beans.Batch;
@@ -57,6 +58,7 @@ import com.google.inject.name.Names;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
+@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(OperationDaoJdbcImplTest.Env.class)
 public class OperationDaoJdbcImplTest {
