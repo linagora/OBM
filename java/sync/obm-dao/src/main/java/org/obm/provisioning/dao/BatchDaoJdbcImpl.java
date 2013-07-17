@@ -38,6 +38,7 @@ import java.sql.Types;
 import java.util.Date;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.Operation;
@@ -49,19 +50,22 @@ import org.obm.utils.ObmHelper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class BatchDaoJdbcImpl implements BatchDao {
 
-	private DatabaseConnectionProvider dbcp;
-	private OperationDao operationDao;
+	public static final String FIELDS = "id, status, timecreate, timecommit, domain_uuid";
+
+	private final DatabaseConnectionProvider dbcp;
+	private final OperationDao operationDao;
+	private final DomainDao domainDao;
 
 	@Inject
-	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp, OperationDao operationDao) {
+	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp, OperationDao operationDao, DomainDao domainDao) {
 		this.dbcp = dbcp;
 		this.operationDao = operationDao;
+		this.domainDao = domainDao;
 	}
 
 	@Override
@@ -72,7 +76,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT * FROM batch b INNER JOIN Domain d ON d.domain_id = b.domain WHERE b.id = ?");
+			ps = connection.prepareStatement("SELECT " + FIELDS + " FROM batch INNER JOIN Domain ON domain_id = domain WHERE id = ?");
 
 			ps.setInt(1, id.getId());
 
@@ -200,18 +204,12 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException {
-		ObmDomain domain = ObmDomain.builder()
-				.id(rs.getInt("domain_id"))
-				.uuid(ObmDomainUuid.of(rs.getString("domain_uuid")))
-				.name(rs.getString("domain_name"))
-				.build();
-
 		Batch.Id batchId = Batch.Id.builder().id(rs.getInt("id")).build();
 
 		return Batch.builder()
 				.id(batchId)
 				.status(BatchStatus.valueOf(rs.getString("status")))
-				.domain(domain)
+				.domain(domainDao.findDomainByUuid(ObmDomainUuid.of(rs.getString("domain_uuid"))))
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))
 				.timecommit(JDBCUtils.getDate(rs, "timecommit"))
 				.operations(operationDao.getByBatchId(batchId))
