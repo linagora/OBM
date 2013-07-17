@@ -37,9 +37,14 @@ import com.google.common.base.Preconditions;
 
 public class ProfileId {
 
+	public static ProfileId valueOf(String strId) {
+		return builder().id(Long.parseLong(strId)).build();
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
+
 	public static class Builder {
 		
 		private Long id;
@@ -83,4 +88,10 @@ public class ProfileId {
 		}		
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(id);
+	}
+
 }

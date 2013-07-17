@@ -88,7 +88,8 @@ public class ProfileIntegrationTest {
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
 		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo(
 				"[{\"id\":1,\"url\":\"/" + obmDomainUuid.get() + "/profiles/1\"}," +
-				"{\"id\":2,\"url\":\"/" + obmDomainUuid.get() + "/profiles/2\"}]");
+				"{\"id\":2,\"url\":\"/" + obmDomainUuid.get() + "/profiles/2\"}," +
+				"{\"id\":4,\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/profiles/4\"}]");
 	}
 	
 	@Test
@@ -105,7 +106,7 @@ public class ProfileIntegrationTest {
 		
 		InputStream content = httpResponse.getEntity().getContent();
 		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
-		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo("[]");
+		assertThat(IOUtils.toString(content, Charsets.UTF_8)).isEqualTo("[{\"id\":4,\"url\":\"/68936f0f-2bb5-447c-87f5-efcd46f58122/profiles/4\"}]");
 	}
 	
 	@Test

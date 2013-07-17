@@ -98,4 +98,13 @@ public class ProfileEntry {
 		}		
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("id", id)
+				.add("url", url)
+				.toString();
+	}
+
 }

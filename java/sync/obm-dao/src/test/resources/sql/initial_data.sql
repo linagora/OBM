@@ -26,12 +26,17 @@ INSERT INTO entity (entity_mailing)
         (true),
         (true),
         (true),
-        (true); // <- Groups
+        (true), // <- Groups
+        (true); // <- Global Domain
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1);
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test2.tlse.lng', '3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf', 'test2.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (2, 2);
+INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global)
+    VALUES
+        ('global.virt', '00000000-1111-2222-3333-444444444444', 'Global', TRUE);
+INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (28, 3);
 
 INSERT INTO host (host_domain_id, host_name, host_ip, host_fqdn)
     VALUES
@@ -44,9 +49,12 @@ INSERT INTO serviceproperty (serviceproperty_service, serviceproperty_property, 
         ('sync', 'obm_sync', 1, 2),
         ('mail', 'smtp_in', 2, 1);
 
-INSERT INTO profile (profile_domain_id, profile_name) VALUES (1, 'admin');
-INSERT INTO profile (profile_domain_id, profile_name) VALUES (1, 'user');
-INSERT INTO profile (profile_domain_id, profile_name) VALUES (2, 'editor');
+INSERT INTO profile (profile_domain_id, profile_name)
+    VALUES
+        (1, 'admin'),
+        (1, 'user'),
+        (2, 'editor'),
+        (3, 'superadmin');
 
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES

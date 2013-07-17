@@ -82,7 +82,7 @@ public class DomainDaoJdbcImplTest {
 			.name("mydomain")
 			.label("my domain");
 		dao.create(domainBuilder.build());
-		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(3).global(false).build());
+		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(4).global(false).build());
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public class DomainDaoJdbcImplTest {
 
 		dao.create(domainBuilder.build());
 
-		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(3).global(false).build());
+		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(4).global(false).build());
 	}
 	
 	@Test
@@ -140,7 +140,14 @@ public class DomainDaoJdbcImplTest {
 			.global(false);
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(3).build(), 
+				domainBuilder.id(4).build(),
+				ObmDomain.builder()
+					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
+					.label("Global")
+					.name("global.virt")
+					.id(3)
+					.global(true)
+					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
 					.label("test2.tlse.lng")
@@ -168,7 +175,14 @@ public class DomainDaoJdbcImplTest {
 			.global(false);
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(3).alias("myalias").build(), 
+				domainBuilder.id(4).alias("myalias").build(), 
+				ObmDomain.builder()
+					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
+					.label("Global")
+					.name("global.virt")
+					.id(3)
+					.global(true)
+					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
 					.label("test2.tlse.lng")
@@ -196,7 +210,14 @@ public class DomainDaoJdbcImplTest {
 			.aliases(ImmutableList.of("myalias1", "myalias2"));
 		dao.create(domainBuilder.build());
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(3).aliases(ImmutableList.of("myalias2", "myalias1")).build(), 
+				domainBuilder.id(4).aliases(ImmutableList.of("myalias2", "myalias1")).build(), 
+				ObmDomain.builder()
+					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
+					.label("Global")
+					.name("global.virt")
+					.id(3)
+					.global(true)
+					.build(),
 				ObmDomain.builder()
 					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
 					.label("test2.tlse.lng")

@@ -3,19 +3,23 @@ package org.obm.provisioning.resources;
 import static org.obm.provisioning.bean.Permissions.profiles_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
+import java.util.Set;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.obm.provisioning.ProfileId;
+import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
+import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,38 +37,30 @@ public class ProfileResource {
 
 	@Context
 	private ObmDomain domain;
-	
+
 	@GET
 	@Path("/")
-	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
-	public Response getProfileEntries() {
+	public Set<ProfileEntry> getProfileEntries() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
-		try {
-			return Response
-					.ok(profileDao.getProfiles(domain.getUuid()))
-					.build();
-		} catch (Exception e) {
-			logger.error("Cannot get profiles for given domain", e);
-			return Response.serverError().build();
-		}
+
+		return profileDao.getProfiles(domain.getUuid());
 	}
-	
+
 	@GET
 	@Path("/{profileId}")
-	@RequiresPermissions(profiles_read)
 	@Produces(JSON_WITH_UTF8)
-	public Response getProfileName(@PathParam("profileId")long profileId) {
+	public ProfileName getProfileName(@PathParam("profileId") ProfileId profileId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
+
 		try {
-			return Response.ok(profileDao.getProfile(domain.getUuid(), ProfileId.builder().id(profileId).build())).build();
-		} catch (ProfileNotFoundException e) {
-			logger.error("Profile not found", e);
-			return Response.status(Status.NOT_FOUND).build();
-		} catch (Exception e) {
-			logger.error("Cannot get profile name for given id", e);
-			return Response.serverError().build();
+			return profileDao.getProfile(domain.getUuid(), profileId);
+		}
+		catch (ProfileNotFoundException e) {
+			logger.error(String.format("Profile %s not found.", profileId), e);
+
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}
-	
+
 }

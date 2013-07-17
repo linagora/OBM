@@ -39,6 +39,7 @@ public class ProfileDaoJdbcImplTest {
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
+
 	}
 
 	@Inject
@@ -48,16 +49,17 @@ public class ProfileDaoJdbcImplTest {
 	@Inject
 	public H2InMemoryDatabase db;
 	
-	ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-	ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+	private final ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+	private final ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 
 	@Test
 	public void testGetProfilesOnNonExistentDomains() throws Exception {
-		Set<ProfileEntry> domainProfiles = dao.getProfiles(ObmDomainUuid.of("892ba641-4ae0-4b40-aa5e-c3fd3acb78bf"));
+		ObmDomainUuid uuid = ObmDomainUuid.of("892ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+		Set<ProfileEntry> domainProfiles = dao.getProfiles(uuid);
 
-		assertThat(domainProfiles).isEmpty();
+		assertThat(domainProfiles).containsOnly(ProfileEntry.builder().domainUuid(uuid).id(4l).build());
 	}
-	
+
 	@Test
 	public void testGetProfilesOnExistingDomains() throws Exception {
 		Set<ProfileEntry> firstDomainProfiles = dao.getProfiles(uuid1);
@@ -65,11 +67,13 @@ public class ProfileDaoJdbcImplTest {
 
 		assertThat(firstDomainProfiles).containsOnly(
 				ProfileEntry.builder().domainUuid(uuid1).id(1l).build(),
-				ProfileEntry.builder().domainUuid(uuid1).id(2l).build());
+				ProfileEntry.builder().domainUuid(uuid1).id(2l).build(),
+				ProfileEntry.builder().domainUuid(uuid1).id(4l).build());
 		assertThat(secondDomainProfiles).containsOnly(
-				ProfileEntry.builder().domainUuid(uuid2).id(3l).build());
+				ProfileEntry.builder().domainUuid(uuid2).id(3l).build(),
+				ProfileEntry.builder().domainUuid(uuid2	).id(4l).build());
 	}
-	
+
 	@Test
 	public void testGetProfileNameByID() throws Exception {
 		ProfileName profileName1 = dao.getProfile(uuid1, ProfileId.builder().id(1).build());
@@ -80,12 +84,12 @@ public class ProfileDaoJdbcImplTest {
 		assertThat(profileName2).isEqualTo(ProfileName.builder().name("user").build());
 		assertThat(profileName3).isEqualTo(ProfileName.builder().name("editor").build());
 	}
-	
+
 	@Test(expected = ProfileNotFoundException.class)
 	public void testGetProfileNameOnNonExistentID() throws Exception {
 		dao.getProfile(uuid1, ProfileId.builder().id(64).build());
 	}
-	
+
 	@Test(expected = ProfileNotFoundException.class)
 	public void testGetProfileNameOnNonExistentDomain() throws Exception {
 		dao.getProfile(ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6"), ProfileId.builder().id(1).build());
