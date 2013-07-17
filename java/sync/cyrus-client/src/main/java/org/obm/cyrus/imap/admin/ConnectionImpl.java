@@ -51,6 +51,14 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
+	public void createUserMailboxes(ImapPath... paths)
+			throws ImapOperationException, ConnectionException {
+		for (ImapPath path : paths) {
+			storeClient.create(path.format());
+		}
+	}
+
+	@Override
 	public void createUserMailboxes(Partition partition, ImapPath... paths)
 			throws ImapOperationException, ConnectionException {
 		for (ImapPath path : paths) {

@@ -68,4 +68,22 @@ public class ConnectionImplTest {
 		control.verify();
 	}
 
+	@Test
+	public void testCreateUserMailboxesNoPartition() {
+		StoreClient mockClient = control.createMock(StoreClient.class);
+		
+				
+		expect(mockClient.create("user/ident4@vm.obm.org")).andReturn(true);
+		expect(mockClient.create("user/ident4@vm.obm.org/Trash")).andReturn(true);
+		
+		control.replay();
+	
+		Connection conn = new ConnectionImpl(mockClient);
+		conn.createUserMailboxes(
+				ImapPath.builder().user("ident4@vm.obm.org").build(),
+				ImapPath.builder().user("ident4@vm.obm.org").pathFragment("Trash").build()
+				);
+		control.verify();
+	}
+
 }

@@ -41,6 +41,9 @@ public interface Connection {
 		Connection create(StoreClient storeClient);
 	}
 	
+	void createUserMailboxes(ImapPath... paths)
+			throws ImapOperationException, ConnectionException;
+
 	void createUserMailboxes(Partition partition, ImapPath... paths) 
 			throws ImapOperationException, ConnectionException;
 	
