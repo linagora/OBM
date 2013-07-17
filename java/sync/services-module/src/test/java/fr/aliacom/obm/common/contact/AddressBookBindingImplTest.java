@@ -85,6 +85,7 @@ public class AddressBookBindingImplTest {
 			bindWithMock(ObmHelper.class);
 			bindWithMock(ContactDao.class);
 			bindWithMock(UserDao.class);
+			bindWithMock(ContactMerger.class);
 			bindWithMock(ContactConfiguration.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(CommitedOperationDao.class);
@@ -105,6 +106,8 @@ public class AddressBookBindingImplTest {
 	private AddressBookBindingImpl binding;
 	@Inject
 	private ContactConfiguration contactConfiguration;
+	@Inject
+	private ContactMerger contactMerger;
 	@Inject
 	private CommitedOperationDao commitedOperationDao;
 	@Inject
@@ -335,6 +338,8 @@ public class AddressBookBindingImplTest {
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
 		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
 		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(true).once();
+		contactMerger.merge(oldContact, newContact);
+		expectLastCall().once();
 		expect(contactDao.modifyContact(token, newContact)).andReturn(newContact).once();
 		mocksControl.replay();
 

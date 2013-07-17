@@ -90,16 +90,18 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ContactDao contactDao;
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
+	private final ContactMerger contactMerger;
 	private final ObmSyncConfigurationService configuration;
 	private final ContactConfiguration contactConfiguration;
 	private final CommitedOperationDao commitedOperationDao;
 
 	@Inject
-	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao,  ObmHelper obmHelper, 
+	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
 			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration,
 			CommitedOperationDao commitedOperationDao) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
+		this.contactMerger = contactMerger;
 		this.obmHelper = obmHelper;
 		this.configuration = configuration;
 		this.contactConfiguration = contactConfiguration;
@@ -253,9 +255,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 			assertHasRightsOnAddressBook(token, previous.getFolderId());
 
-			contact.setEntityId(previous.getEntityId());
-			contact.setFolderId(previous.getFolderId());
-
+			contactMerger.merge(previous, contact);
 			return contactDao.modifyContact(token, contact);
 		} catch (SQLException ex) {
 			throw new ServerFault(ex.getMessage());
