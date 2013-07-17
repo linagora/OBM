@@ -41,6 +41,7 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.obm.provisioning.Configuration;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
@@ -98,6 +99,18 @@ public class LdapUser {
 		}
 	
 		public Builder fromObmUser(ObmUser obmUser) {
+			Preconditions.checkArgument(obmUser.getUidNumber() != null,
+					"The UID number is mandatory");
+			Preconditions.checkArgument(obmUser.getGidNumber() != null,
+					"The GID number is mandatory");
+			Preconditions.checkArgument(obmUser.getDomain().getName() != null,
+					"The domain name is mandatory");
+			if (obmUser.getMailHost() != null) {
+				Preconditions.checkArgument(
+						obmUser.getMailHost().getIp() != null,
+						"The IP of the mail host is mandatory");
+			}
+
 			String displayName = buildDisplayName(obmUser);
 			this.objectClasses = DEFAULT_OBJECT_CLASSES;
 			this.uid = obmUser.getLogin().toLowerCase();
@@ -105,12 +118,16 @@ public class LdapUser {
 			this.gidNumber = obmUser.getGidNumber();
 			this.cn = displayName;
 			this.displayName = displayName;
-			this.sn = Strings.isNullOrEmpty(obmUser.getLastName()) ? obmUser.getLastName() : obmUser.getLogin();
+			this.sn = Strings.isNullOrEmpty(obmUser.getLastName()) ?
+					obmUser.getLastName() :
+					obmUser.getLogin();
 			this.givenName = obmUser.getFirstName();
 			this.homeDirectory = buildHomeDirectory(obmUser);
 			this.userPassword = obmUser.getPassword();
 			this.webAccess = DEFAULT_WEB_ACCESS;
-			this.mailBox = obmUser.getEmailAtDomain();
+			this.mailBox = String.format("%s@%s",
+					obmUser.getLogin().toLowerCase(),
+					obmUser.getDomain().getName());
 			this.mailBoxServer = buildMailboxServer(obmUser);
 			this.mailAccess = DEFAULT_EMAIL_ACCESS;
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
@@ -137,8 +154,11 @@ public class LdapUser {
 		}
 
 		private String buildMailboxServer(ObmUser obmUser) {
-			return String.format("lmtp:%s:%d", obmUser.getMailHost().getIp(),
-					DEFAULT_CYRUS_PORT);
+			return obmUser.getEmail() != null && obmUser.getMailHost() != null ?
+					String.format("lmtp:%s:%d",
+							obmUser.getMailHost().getIp(),
+							DEFAULT_CYRUS_PORT)
+					: null;
 		}
 
 		public Builder objectClasses(String[] objectClasses) {
