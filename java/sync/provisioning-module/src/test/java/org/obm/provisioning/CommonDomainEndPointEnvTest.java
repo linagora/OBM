@@ -44,7 +44,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.ShiroFilter;
 import org.codehaus.jackson.map.InjectableValues;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.easymock.IMocksControl;
@@ -74,11 +73,11 @@ import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -336,25 +335,25 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"id\":\"extId\"," +
 				"\"login\":\"user1\"," +
 				"\"lastname\":\"Doe\"," +
-				"\"profile\":\"Not implemented yet\"," +
+				"\"profile\":\"Utilisateurs\"," +
 				"\"firstname\":\"Jesus\"," +
 				"\"commonname\":\"John Doe\"," +
-				"\"password\":\"Not implemented yet\"," +
-				"\"kind\":\"Not implemented yet\"," +
+				"\"password\":\"password\"," +
+				"\"kind\":\"kind\"," +
 				"\"title\":\"title\"," +
 				"\"description\":\"description\"," +
-				"\"company\":\"Not implemented yet\"," +
+				"\"company\":\"company\"," +
 				"\"service\":\"service\"," +
-				"\"direction\":\"Not implemented yet\"," +
+				"\"direction\":\"direction\"," +
 				"\"addresses\":[\"address1\",\"address2\"]," +
 				"\"town\":\"town\"," +
 				"\"zipcode\":\"zipcode\"," +
-				"\"business_zipcode\":\"Not implemented yet\"," +
-				"\"country\":\"Not implemented yet\"," +
-				"\"phones\":[\"Not implemented yet\"]," +
+				"\"business_zipcode\":\"1234\"," +
+				"\"country\":\"1234\"," +
+				"\"phones\":[\"phone\",\"phone2\"]," +
 				"\"mobile\":\"mobile\"," +
-				"\"faxes\":[\"Not implemented yet\"]," +
-				"\"mail_quota\":\"Not implemented yet\"," +
+				"\"faxes\":[\"fax\",\"fax2\"]," +
+				"\"mail_quota\":\"1234\"," +
 				"\"mail_server\":\"Not implemented yet\"," +
 				"\"mails\":[\"john@domain\"]," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
@@ -368,26 +367,29 @@ public abstract class CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.extId(userExtId("extId"))
 				.login("user1")
+				.password("password")
 				.lastName("Doe")
-				//.profile("Utilisateurs")	// Not implemented yet in ObmUser
+				.profileName(ProfileName.valueOf("Utilisateurs"))	// Not implemented yet in ObmUser
 				.firstName("Jesus")
 				.commonName("John Doe")
-				//.kind("")					// Not implemented yet in ObmUser
+				.kind("kind")					// Not implemented yet in ObmUser
 				.title("title")
 				.description("description")
-				//.company("")				// Not implemented yet in ObmUser
+				.company("company")				// Not implemented yet in ObmUser
 				.service("service")
-				//.direction()				// Not implemented yet in ObmUser
+				.direction("direction")				// Not implemented yet in ObmUser
 				.address1("address1")
 				.address2("address2")
 				.town("town")
 				.zipCode("zipcode")
-				//.business_zipcode()		// Not implemented yet in ObmUser
-				//.country()				// Not implemented yet in ObmUser
-				//.phones()					// Not implemented yet in ObmUser
+				.expresspostal("1234")
+				.countryCode("1234")
+				.phone("phone")
+				.phone2("phone2")
 				.mobile("mobile")
-				//.faxes()					// Not implemented yet in ObmUser
-				//.mail_quota()				// Not implemented yet in ObmUser
+				.fax("fax")
+				.fax2("fax2")
+				.mailQuota(1234)
 				//.mail_server()			// Not implemented yet in ObmUser
 				.emailAndAliases("john@domain")
 				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))

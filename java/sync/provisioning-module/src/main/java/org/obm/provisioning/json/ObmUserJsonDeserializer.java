@@ -149,7 +149,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 				builder.direction(value.asText());
 				break;
 			case FAXES:
-				builder.faxes(getCurrentTokenTextValues(jsonNode));
+				builder.faxes(getCurrentTokenTextValues(value));
 				break;
 			case FIRSTNAME:
 				builder.firstName(value.asText());
@@ -170,7 +170,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 				builder.login(value.asText());
 				break;
 			case MAILS:
-				builder.mails(getCurrentTokenTextValues(jsonNode));
+				builder.mails(getCurrentTokenTextValues(value));
 				break;
 			case MAIL_QUOTA:
 				builder.mailQuota(Integer.parseInt(value.asText()));
@@ -185,6 +185,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 				builder.password(value.asText());
 				break;
 			case PHONES:
+				builder.phones(getCurrentTokenTextValues(value));
 				break;
 			case PROFILE:
 				builder.profileName(ProfileName.valueOf(value.asText()));

@@ -44,13 +44,18 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
+import org.obm.provisioning.processing.BatchProcessor;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
+	
+	@Inject
+	BatchProcessor batchProcessor;
 	
 	@Test
 	public void testSubjectCannotAuthenticateWithNoDomain() {
@@ -163,6 +168,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetBatchWithReadPermission() throws Exception {
 		expectDomain();
 		expectBatch();
+		expect(batchProcessor.getRunningBatch(batchId(1))).andReturn(null);
 		expectAuthenticatingReturns("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("batches:read"));
 		mocksControl.replay();

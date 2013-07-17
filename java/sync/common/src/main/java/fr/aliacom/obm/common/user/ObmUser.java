@@ -56,6 +56,7 @@ public class ObmUser {
 	public static final String EMAIL_FIELD_SEPARATOR = "\r\n";
 	public static final int MAXIMUM_SUPPORTED_ADDRESSES = 3;
 	public static final int MAXIMUM_SUPPORTED_FAXES = 2;
+	public static final int MAXIMUM_SUPPORTED_PHONES = 2;
 
 	public static Builder builder() {
 		return new Builder();
@@ -230,6 +231,14 @@ public class ObmUser {
 		}
 		public Builder phone2(String phone2) {
 			this.phone2 = phone2;
+			return this;
+		}
+		public Builder phones(Iterable<String> phones) {
+			Preconditions.checkNotNull(phones);
+			Preconditions.checkState(Iterables.size(phones) <= MAXIMUM_SUPPORTED_PHONES);
+
+			phone = Iterables.get(phones, 0, null);
+			phone2 = Iterables.get(phones, 1, null);
 			return this;
 		}
 		public Builder fax(String fax) {

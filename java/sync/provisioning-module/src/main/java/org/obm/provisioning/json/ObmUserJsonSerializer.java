@@ -88,26 +88,27 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeObjectField(ID.asSpecificationValue(), value.getExtId());
 		jgen.writeStringField(LOGIN.asSpecificationValue(), value.getLogin());
 		jgen.writeStringField(LASTNAME.asSpecificationValue(), value.getLastName());
-		jgen.writeStringField(PROFILE.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(PROFILE.asSpecificationValue(),
+				value.getProfileName() != null ? value.getProfileName().getName() : null);
 		jgen.writeStringField(FIRSTNAME.asSpecificationValue(), value.getFirstName());
 		jgen.writeStringField(COMMONNAME.asSpecificationValue(), value.getCommonName());
-		jgen.writeStringField(PASSWORD.asSpecificationValue(), NOT_IMPLEMENTED_YET);
-		jgen.writeStringField(KIND.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(PASSWORD.asSpecificationValue(), value.getPassword());
+		jgen.writeStringField(KIND.asSpecificationValue(), value.getKind());
 		jgen.writeStringField(TITLE.asSpecificationValue(), value.getTitle());
 		jgen.writeStringField(DESCRIPTION.asSpecificationValue(), value.getDescription());
-		jgen.writeStringField(COMPANY.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(COMPANY.asSpecificationValue(), value.getCompany());
 		jgen.writeStringField(SERVICE.asSpecificationValue(), value.getService());
-		jgen.writeStringField(DIRECTION.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(DIRECTION.asSpecificationValue(), value.getDirection());
 		writeStringsField(jgen, ADDRESSES.asSpecificationValue(),
 				value.getAddress1(), value.getAddress2(), value.getAddress3());
 		jgen.writeStringField(TOWN.asSpecificationValue(), value.getTown());
 		jgen.writeStringField(ZIPCODE.asSpecificationValue(), value.getZipCode());
-		jgen.writeStringField(BUSINESS_ZIPCODE.asSpecificationValue(), NOT_IMPLEMENTED_YET);
-		jgen.writeStringField(COUNTRY.asSpecificationValue(), NOT_IMPLEMENTED_YET);
-		writeStringsField(jgen, PHONES.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(BUSINESS_ZIPCODE.asSpecificationValue(), value.getExpresspostal());
+		jgen.writeStringField(COUNTRY.asSpecificationValue(), value.getCountryCode());
+		writeStringsField(jgen, PHONES.asSpecificationValue(), value.getPhone(), value.getPhone2());
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
-		writeStringsField(jgen, FAXES.asSpecificationValue(), NOT_IMPLEMENTED_YET);
-		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		writeStringsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
+		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuota()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), NOT_IMPLEMENTED_YET);
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());

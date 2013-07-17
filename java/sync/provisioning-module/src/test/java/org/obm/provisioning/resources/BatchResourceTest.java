@@ -278,7 +278,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode())
 			.body(containsString(
@@ -319,7 +319,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
@@ -336,7 +336,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -356,7 +356,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()
@@ -376,7 +376,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		given()
-			.auth().basic("username", "password").
+			.auth().basic("username@domain", "password").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
