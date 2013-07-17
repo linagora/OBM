@@ -29,26 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.cyrus.imap;
+package org.obm.cyrus.imap.admin;
 
-import org.obm.cyrus.imap.admin.Connection;
-import org.obm.cyrus.imap.admin.ConnectionImpl;
-import org.obm.cyrus.imap.admin.CyrusImapService;
-import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
-import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.cyrus.imap.admin.CyrusManagerImpl;
-import org.obm.push.LinagoraImapModule;
+import org.obm.push.minig.imap.StoreClient;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
-public class CyrusClientModule extends AbstractModule {
+import fr.aliacom.obm.common.user.ObmUser;
+
+public class CyrusManagerImpl implements CyrusManager {
+
+	private final static String TRASH = "Trash";
+	private final static String DRAFTS = "Drafts";
+	private final static String SPAM = "SPAM";
+	private final static String TEMPLATES = "Templates";
+	private final static String SENT = "Sent";
+
+	public static class Factory implements CyrusManager.Factory {
+
+		private Connection.Factory connectionFactory;
+		private StoreClient.Factory storeClientFactory;
+
+		@Inject
+		public Factory(Connection.Factory connectionFactory, StoreClient.Factory storeClientFactory) {
+			this.connectionFactory = connectionFactory;
+			this.storeClientFactory = storeClientFactory;
+		}
+
+		@Override
+		public CyrusManagerImpl create(String hostname, String login, String password) {
+			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
+			return new CyrusManagerImpl(connectionFactory.create(storeClient));
+		}
+		
+	}
+
+	private Connection conn;
+
+	private CyrusManagerImpl(Connection conn) {
+		this.conn = conn;
+	}
 
 	@Override
-	protected void configure() {
-		this.install(new LinagoraImapModule());
-		bind(CyrusImapService.class).to(CyrusImapServiceImpl.class);
-		bind(CyrusManager.Factory.class).to(CyrusManagerImpl.Factory.class);
-		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
+	public void create(ObmUser obmUser) {
+		String user = obmUser.getEmailAtDomain();
+		conn.createUserMailboxes(
+				ImapPath.builder().user(user).build(),
+				ImapPath.builder().user(user).pathFragment(TRASH).build(),
+				ImapPath.builder().user(user).pathFragment(DRAFTS).build(),
+				ImapPath.builder().user(user).pathFragment(SPAM).build(),
+				ImapPath.builder().user(user).pathFragment(TEMPLATES).build(),
+				ImapPath.builder().user(user).pathFragment(SENT).build()
+				);
 	}
 
 }

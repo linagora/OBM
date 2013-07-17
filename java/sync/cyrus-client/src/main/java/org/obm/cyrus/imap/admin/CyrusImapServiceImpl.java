@@ -31,27 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.obm.push.minig.imap.StoreClient;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class CyrusImapServiceImpl implements CyrusImapService {
 
-	private StoreClient.Factory clientFactory;
-	private Connection.Factory connFactory;
+	private CyrusManager.Factory managerFactory;
 	
 	@Inject
-	public CyrusImapServiceImpl(StoreClient.Factory clientFactory, Connection.Factory connFactory) {
-		this.clientFactory = clientFactory;
-		this.connFactory = connFactory;
+	public CyrusImapServiceImpl(CyrusManager.Factory managerFactory) {
+		this.managerFactory = managerFactory;
 	}
 	
 	@Override
-	public Connection login(String hostname, String login, String password) {
-		StoreClient storeClient = clientFactory.create(hostname, login, password);
-		return connFactory.create(storeClient);
+	public CyrusManager buildManager(String hostname, String login, String password) {
+		return managerFactory.create(hostname, login, password);
 	}
 
 }
