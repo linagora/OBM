@@ -49,8 +49,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -58,7 +58,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-public class ProvisioningService extends JerseyServletModule {
+public class ProvisioningService extends ServletModule {
 
 	public static String PROVISIONING_ROOT_PATH = "provisioning/v1";
 	public static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;

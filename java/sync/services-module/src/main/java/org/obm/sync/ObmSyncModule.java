@@ -44,6 +44,7 @@ import org.obm.healthcheck.HealthCheckModule;
 import org.obm.provisioning.ProvisioningService;
 
 import com.google.inject.AbstractModule;
+import com.sun.jersey.guice.JerseyServletModule;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
@@ -74,6 +75,7 @@ public class ObmSyncModule extends AbstractModule {
 		install(new HealthCheckDefaultHandlersModule());
 		install(new DatabaseMetadataModule());
 		install(new ProvisioningService(servletContext));
+		install(new JerseyServletModule());
 	}
 
 	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {

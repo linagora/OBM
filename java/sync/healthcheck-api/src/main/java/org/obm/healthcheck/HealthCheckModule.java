@@ -35,11 +35,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class HealthCheckModule extends JerseyServletModule {
+public class HealthCheckModule extends ServletModule {
 
 	public static String HEALTHCHECK_URL_PREFIX = "/healthcheck";
 	public static String HEALTHCHECK_URL_PATTERN = HEALTHCHECK_URL_PREFIX + "/*";
