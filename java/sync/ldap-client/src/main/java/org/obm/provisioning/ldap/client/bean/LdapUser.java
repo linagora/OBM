@@ -58,7 +58,7 @@ public class LdapUser {
 	private final static int DEFAULT_CYRUS_PORT = 24;
 	private final static boolean DEFAULT_HIDDEN_USER = false;
 	
-	public class Id {
+	public static class Id {
 
 		private final String id;
 		
@@ -69,12 +69,25 @@ public class LdapUser {
 		public String get() {
 			return id;
 		}
+
+		@Override
+		public final boolean equals(Object object){
+			if (!(object instanceof Id))
+				return false;
+			
+			return Objects.equal(id, ((Id)object).id);
+		}
+
+		@Override
+		public final int hashCode(){
+			return Objects.hashCode(id);
+		}
 	}
 	
 	public static class Builder {
 		
 		private String[] objectClasses;
-		private String uid;
+		private Id uid;
 		private int uidNumber;
 		private int gidNumber;
 		private String loginShell;
@@ -114,7 +127,7 @@ public class LdapUser {
 
 			String displayName = buildDisplayName(obmUser);
 			this.objectClasses = DEFAULT_OBJECT_CLASSES;
-			this.uid = obmUser.getLogin().toLowerCase();
+			this.uid = new Id(obmUser.getLogin().toLowerCase());
 			this.uidNumber = obmUser.getUidNumber();
 			this.gidNumber = obmUser.getGidNumber();
 			this.cn = displayName;
@@ -173,7 +186,7 @@ public class LdapUser {
 			return this;
 		}
 		
-		public Builder uid(String uid) {
+		public Builder uid(Id uid) {
 			this.uid = uid;
 			return this;
 		}
@@ -267,7 +280,7 @@ public class LdapUser {
 	
 	private final Dn userBaseDn;
 	private final String[] objectClasses;
-	private final String uid;
+	private final Id uid;
 	private final int uidNumber;
 	private final int gidNumber;
 	private final String loginShell;
@@ -285,7 +298,7 @@ public class LdapUser {
 	private final boolean hiddenUser;
 	private final String obmDomain;
 	
-	private LdapUser(Dn userBaseDn, String[] objectClasses, String uid, int uidNumber, int gidNumber, String loginShell,
+	private LdapUser(Dn userBaseDn, String[] objectClasses, Id uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, String userPassword, String webAccess,
 			String mailBox, String mailBoxServer, String mailAccess, String mail, boolean hiddenUser, String obmDomain) {
 		this.userBaseDn = userBaseDn;
@@ -313,7 +326,7 @@ public class LdapUser {
 		return objectClasses;
 	}
 
-	public String getUid() {
+	public Id getUid() {
 		return uid;
 	}
 
@@ -413,10 +426,6 @@ public class LdapUser {
 		return "uid=" + getUid() + "," + userBaseDn.getName();
 	}
 	
-	public Id getId() {
-		return new Id(getUid());
-	}
-
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(uid, uidNumber, gidNumber, loginShell, cn, displayName, sn, givenName, 

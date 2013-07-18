@@ -175,7 +175,7 @@ public class ConnectionImplTest {
 	public void testCreateUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid("test")
+				.uid(new LdapUser.Id("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
@@ -196,7 +196,7 @@ public class ConnectionImplTest {
 		
 		connection.createUser(ldapUser);
 		
-		assertThat(connection.getUserDnFromUserId(ldapUser.getId())
+		assertThat(connection.getUserDnFromUserId(ldapUser.getUid())
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=users,dc=test.obm.org,dc=local"), 
@@ -224,7 +224,7 @@ public class ConnectionImplTest {
 	public void testDeleteUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid("test")
+				.uid(new LdapUser.Id("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
@@ -246,7 +246,7 @@ public class ConnectionImplTest {
 		connection.createUser(ldapUser);
 		
 		// In order to be sure that user is really inserted
-		Id userId = ldapUser.getId();
+		Id userId = ldapUser.getUid();
 		assertThat(connection.getUserDnFromUserId(userId)
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		
