@@ -59,7 +59,7 @@ public class BeansTest {
 					.add(LdapGroup.class)
 					.add(LdapGroup.Id.class)
 					.add(LdapUser.class)
-					.add(LdapUser.Id.class)
+					.add(LdapUser.Uid.class)
 					.add(LdapUserMembership.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);

@@ -81,7 +81,7 @@ public class StaticConfiguration implements Configuration {
 	}
 
 	@Override
-	public String buildUserFilter(LdapUser.Id userId) {
+	public String buildUserFilter(LdapUser.Uid userId) {
 		return "(uid=" + userId.get() + ")";
 	}
 

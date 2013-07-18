@@ -49,7 +49,7 @@ import org.obm.provisioning.ldap.client.ConnectionImpl;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
-import org.obm.provisioning.ldap.client.bean.LdapUser.Id;
+import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.obm.provisioning.ldap.client.exception.LdapException;
 import org.opends.messages.Message;
@@ -175,7 +175,7 @@ public class ConnectionImplTest {
 	public void testCreateUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid(LdapUser.Id.valueOf("test"))
+				.uid(LdapUser.Uid.valueOf("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
@@ -224,7 +224,7 @@ public class ConnectionImplTest {
 	public void testDeleteUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid(LdapUser.Id.valueOf("test"))
+				.uid(LdapUser.Uid.valueOf("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
@@ -246,7 +246,7 @@ public class ConnectionImplTest {
 		connection.createUser(ldapUser);
 		
 		// In order to be sure that user is really inserted
-		Id userId = ldapUser.getUid();
+		Uid userId = ldapUser.getUid();
 		assertThat(connection.getUserDnFromUserId(userId)
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		

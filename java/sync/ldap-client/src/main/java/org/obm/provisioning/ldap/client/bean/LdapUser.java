@@ -58,40 +58,40 @@ public class LdapUser {
 	private final static int DEFAULT_CYRUS_PORT = 24;
 	private final static boolean DEFAULT_HIDDEN_USER = false;
 	
-	public static class Id {
+	public static class Uid {
 
-		private final String id;
+		private final String uid;
 	
-		public static Id valueOf(String id) {
-			return new Id(id);
+		public static Uid valueOf(String id) {
+			return new Uid(id);
 		}
 		
-		private Id(String id) {
-			this.id = id;
+		private Uid(String uid) {
+			this.uid = uid;
 		}
 		
 		public String get() {
-			return id;
+			return uid;
 		}
 
 		@Override
 		public final boolean equals(Object object){
-			if (!(object instanceof Id))
+			if (!(object instanceof Uid))
 				return false;
 			
-			return Objects.equal(id, ((Id)object).id);
+			return Objects.equal(uid, ((Uid)object).uid);
 		}
 
 		@Override
 		public final int hashCode(){
-			return Objects.hashCode(id);
+			return Objects.hashCode(uid);
 		}
 	}
 	
 	public static class Builder {
 		
 		private String[] objectClasses;
-		private Id uid;
+		private Uid uid;
 		private int uidNumber;
 		private int gidNumber;
 		private String loginShell;
@@ -131,7 +131,7 @@ public class LdapUser {
 
 			String displayName = buildDisplayName(obmUser);
 			this.objectClasses = DEFAULT_OBJECT_CLASSES;
-			this.uid = new Id(obmUser.getLogin().toLowerCase());
+			this.uid = new Uid(obmUser.getLogin().toLowerCase());
 			this.uidNumber = obmUser.getUidNumber();
 			this.gidNumber = obmUser.getGidNumber();
 			this.cn = displayName;
@@ -190,7 +190,7 @@ public class LdapUser {
 			return this;
 		}
 		
-		public Builder uid(Id uid) {
+		public Builder uid(Uid uid) {
 			this.uid = uid;
 			return this;
 		}
@@ -284,7 +284,7 @@ public class LdapUser {
 	
 	private final Dn userBaseDn;
 	private final String[] objectClasses;
-	private final Id uid;
+	private final Uid uid;
 	private final int uidNumber;
 	private final int gidNumber;
 	private final String loginShell;
@@ -302,7 +302,7 @@ public class LdapUser {
 	private final boolean hiddenUser;
 	private final String obmDomain;
 	
-	private LdapUser(Dn userBaseDn, String[] objectClasses, Id uid, int uidNumber, int gidNumber, String loginShell,
+	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, String userPassword, String webAccess,
 			String mailBox, String mailBoxServer, String mailAccess, String mail, boolean hiddenUser, String obmDomain) {
 		this.userBaseDn = userBaseDn;
@@ -330,7 +330,7 @@ public class LdapUser {
 		return objectClasses;
 	}
 
-	public Id getUid() {
+	public Uid getUid() {
 		return uid;
 	}
 

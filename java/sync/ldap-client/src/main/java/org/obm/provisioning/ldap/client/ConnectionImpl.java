@@ -143,7 +143,7 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void deleteUser(LdapUser.Id ldapUserId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void deleteUser(LdapUser.Uid ldapUserId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			connection.delete(getUserDnFromUserId(ldapUserId));
 			incrementAndCheckRequestCounter();
@@ -152,7 +152,7 @@ public class ConnectionImpl implements Connection {
 		}
 	}
 	
-	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Id ldapUserId) throws LdapException {
+	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId) throws LdapException {
 		return getDn(configuration.getUserBaseDn(), configuration.buildUserFilter(ldapUserId), configuration.getUserSearchScope());
 	}
 
