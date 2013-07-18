@@ -101,24 +101,24 @@ public class UserDaoJdbcImplTest {
 	@Test
 	public void testList() throws Exception {
 		List<ObmUser> users = ImmutableList.of(
-				sampleUser(1, 3),
-				sampleUser(2, 4),
-				sampleUser(3, 5),
-				sampleUserWithoutMail(4, 6));
+				sampleUser(1, 3, "1"),
+				sampleUser(2, 4, "2"),
+				sampleUser(3, 5, "3"),
+				sampleUserWithoutMail(4, 6, "4"));
 
 		assertThat(dao.list(domain)).isEqualTo(users);
 	}
 
 	@Test
 	public void testFindUserById() {
-		ObmUser user = sampleUser(1, 3);
+		ObmUser user = sampleUser(1, 3, "1");
 
 		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
 	}
 
 	@Test
 	public void testFindUserByIdWhenUserHasNoMail() {
-		ObmUser user = sampleUserWithoutMail(4, 6);
+		ObmUser user = sampleUserWithoutMail(4, 6, "4");
 
 		assertThat(dao.findUserById(4, domain)).isEqualTo(user);
 	}
@@ -290,7 +290,7 @@ public class UserDaoJdbcImplTest {
 
 	@Test
 	public void testUpdate() throws SQLException, UserNotFoundException {
-		ObmUser user = sampleUserBuilder(1, 3)
+		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.firstName("John")
 				.lastName("Doe")
 				.build();
@@ -300,7 +300,7 @@ public class UserDaoJdbcImplTest {
 
 	@Test
 	public void testUpdateClearingEmailingForUser() throws SQLException, UserNotFoundException {
-		ObmUser user = sampleUserBuilder(1, 3)
+		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.emailAndAliases("")
 				.mailHost(null)
 				.profileName(ProfileName.valueOf("admin"))
@@ -311,7 +311,7 @@ public class UserDaoJdbcImplTest {
 
 	@Test
 	public void testGetAfterUpdate() throws SQLException, UserNotFoundException {
-		ObmUser user = sampleUserBuilder(1, 3)
+		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.firstName("John")
 				.lastName("Doe")
 				.build();
@@ -323,36 +323,29 @@ public class UserDaoJdbcImplTest {
 
 	@Test
 	public void testGetAfterDelete() throws Exception {
-		dao.delete(sampleUser(1, 3));
+		dao.delete(UserExtId.builder().extId("3").build());
 
-		assertThat(dao.findUserById(1, domain)).isNull();
+		assertThat(dao.findUserById(3, domain)).isNull();
 	}
 
 	@Test
 	public void testListAfterDelete() throws Exception {
-		dao.delete(sampleUser(1, 3));
+		dao.delete(UserExtId.valueOf("1"));
 
 		List<ObmUser> users = ImmutableList.of(
-				sampleUser(2, 4),
-				sampleUser(3, 5),
-				sampleUserWithoutMail(4, 6));
+				sampleUser(2, 4, "2"),
+				sampleUser(3, 5, "3"),
+				sampleUserWithoutMail(4, 6, "4"));
 
 		assertThat(dao.list(domain)).isEqualTo(users);
 	}
 
 	@Test(expected = UserNotFoundException.class)
 	public void testDeleteWhenUserDoesntExist() throws Exception {
-		ObmUser user = ObmUser
-				.builder()
-				.uid(666)
-				.login("lucifer")
-				.domain(domain)
-				.build();
-
-		dao.delete(user);
+		dao.delete(UserExtId.builder().extId("666").build());
 	}
 
-	private ObmUser.Builder sampleUserBuilder(int id, int entityId) {
+	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
 				.login("user" + id)
@@ -366,17 +359,18 @@ public class UserDaoJdbcImplTest {
 				.password("user" + id)
 				.uidNumber(1000)
 				.gidNumber(512)
-				.countryCode("0");
+				.countryCode("0")
+				.extId(UserExtId.valueOf(extId));
 	}
-	private ObmUser sampleUser(int id, int entityId) {
-		return sampleUserBuilder(id, entityId)
+	private ObmUser sampleUser(int id, int entityId, String extId) {
+		return sampleUserBuilder(id, entityId, extId)
 				.mailHost(mailHost)
 				.emailAndAliases("user" + id)
 				.build();
 	}
 
-	private ObmUser sampleUserWithoutMail(int id, int entityId) {
-		return sampleUserBuilder(id, entityId)
+	private ObmUser sampleUserWithoutMail(int id, int entityId, String extId) {
+		return sampleUserBuilder(id, entityId, extId)
 				.emailAndAliases("")
 				.build();
 	}

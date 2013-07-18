@@ -17044,14 +17044,14 @@ INSERT INTO profile (profile_domain_id, profile_name)
         (2, 'editor'),
         (3, 'superadmin');
 
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
+INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES
-        (1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
-        (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
-        (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
-        (1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
-        (2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
-        (2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1);
+        (1, 1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
+        (2, 1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
+        (3, 1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
+        (4, 1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
+        (5, 2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
+        (6, 2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1);
         
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     VALUES
