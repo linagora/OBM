@@ -160,7 +160,7 @@ public class LdapUserTest {
 	public void testFromObmUser() {
 		LdapUser expectedLdapUser = ldapUserBuilder
 				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
-				.uid(new LdapUser.Id("richard.sorge"))
+				.uid(LdapUser.Id.valueOf("richard.sorge"))
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.cn("Richard Sorge")
@@ -183,7 +183,7 @@ public class LdapUserTest {
 	public void testFromObmUserNoEmail() {
 		LdapUser expectedLdapUser = ldapUserBuilder
 				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
-				.uid(new LdapUser.Id("richard.sorge"))
+				.uid(LdapUser.Id.valueOf("richard.sorge"))
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.cn("Richard Sorge")

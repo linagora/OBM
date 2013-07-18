@@ -61,8 +61,12 @@ public class LdapUser {
 	public static class Id {
 
 		private final String id;
+	
+		public static Id valueOf(String id) {
+			return new Id(id);
+		}
 		
-		public Id(String id) {
+		private Id(String id) {
 			this.id = id;
 		}
 		

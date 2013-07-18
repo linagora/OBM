@@ -175,7 +175,7 @@ public class ConnectionImplTest {
 	public void testCreateUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid(new LdapUser.Id("test"))
+				.uid(LdapUser.Id.valueOf("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
@@ -224,7 +224,7 @@ public class ConnectionImplTest {
 	public void testDeleteUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()
 				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
-				.uid(new LdapUser.Id("test"))
+				.uid(LdapUser.Id.valueOf("test"))
 				.uidNumber(1008)
 				.gidNumber(1000)
 				.loginShell("/bin/bash")
