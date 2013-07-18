@@ -48,8 +48,12 @@ public class LdapGroup {
 	public static class Id {
 
 		private final String id;
-		
-		public Id(String id) {
+	
+		public static Id valueOf(String id) {
+			return new Id(id);
+		}
+
+		private Id(String id) {
 			this.id = id;
 		}
 		

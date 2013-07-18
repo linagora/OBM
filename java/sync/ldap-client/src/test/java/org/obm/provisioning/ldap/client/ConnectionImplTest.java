@@ -127,7 +127,7 @@ public class ConnectionImplTest {
 	public void testCreateGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -151,7 +151,7 @@ public class ConnectionImplTest {
 	public void testDeleteGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -261,7 +261,7 @@ public class ConnectionImplTest {
 	public void testAddUserToGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -295,7 +295,7 @@ public class ConnectionImplTest {
 	public void testAddUsersToEmptyGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -329,7 +329,7 @@ public class ConnectionImplTest {
 	public void testAddUsersToGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -370,7 +370,7 @@ public class ConnectionImplTest {
 	public void testRemoveUserToGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -410,7 +410,7 @@ public class ConnectionImplTest {
 	public void testRemoveUsersToGroup() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -450,7 +450,7 @@ public class ConnectionImplTest {
 	public void testRemoveUsersToGroupOnlyOneRemaining() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -503,7 +503,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -515,7 +515,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("toGroup"))
+				.cn(LdapGroup.Id.valueOf("toGroup"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("toGroup@test.obm.org")
@@ -540,7 +540,7 @@ public class ConnectionImplTest {
 	public void testRemoveGroupFromGroup() throws Exception {
 		LdapGroup fromGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -561,7 +561,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("subgroup"))
+				.cn(LdapGroup.Id.valueOf("subgroup"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
@@ -595,7 +595,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -607,7 +607,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group2"))
+				.cn(LdapGroup.Id.valueOf("group2"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group2@test.obm.org")
@@ -619,7 +619,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("subgroup"))
+				.cn(LdapGroup.Id.valueOf("subgroup"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
@@ -653,7 +653,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup fromGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -665,7 +665,7 @@ public class ConnectionImplTest {
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("subgroup"))
+				.cn(LdapGroup.Id.valueOf("subgroup"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
@@ -677,7 +677,7 @@ public class ConnectionImplTest {
 
 		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("subgroup2"))
+				.cn(LdapGroup.Id.valueOf("subgroup2"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup2@test.obm.org")
@@ -704,7 +704,7 @@ public class ConnectionImplTest {
 
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group1"))
+				.cn(LdapGroup.Id.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
@@ -712,7 +712,7 @@ public class ConnectionImplTest {
 				.build();
 		LdapGroup ldapGroup2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
-				.cn(new LdapGroup.Id("group2"))
+				.cn(LdapGroup.Id.valueOf("group2"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group2@test.obm.org")
