@@ -35,7 +35,11 @@ import javax.servlet.ServletContext;
 
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
+import org.obm.provisioning.authentication.AuthenticationService;
+import org.obm.provisioning.authentication.AuthenticationServiceImpl;
 import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
+import org.obm.provisioning.authorization.AuthorizationService;
+import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 
 public class AuthorizingModule extends ShiroWebModule {
 
@@ -54,6 +58,8 @@ public class AuthorizingModule extends ShiroWebModule {
 			}
 		
 		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
+		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
+		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 
 		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC);
 		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC);

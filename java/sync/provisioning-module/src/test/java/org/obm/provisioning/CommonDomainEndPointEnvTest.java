@@ -57,10 +57,6 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
-import org.obm.provisioning.authentication.AuthenticationService;
-import org.obm.provisioning.authentication.AuthenticationServiceImpl;
-import org.obm.provisioning.authorization.AuthorizationService;
-import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -127,8 +123,6 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DomainBasedSubResourceForTest.class);
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
-					bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-					bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 					bind(Configuration.class).to(StaticConfiguration.class);

@@ -14,10 +14,6 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
-import org.obm.provisioning.authentication.AuthenticationService;
-import org.obm.provisioning.authentication.AuthenticationServiceImpl;
-import org.obm.provisioning.authorization.AuthorizationService;
-import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.conf.SystemUserLdapConfiguration;
@@ -95,7 +91,6 @@ public class ProvisioningService extends ServletModule {
 		bindDao();
 
 		install(new BatchProcessingModule());
-		bindServices();
 		install(new LdapModule());
 		install(new SatelliteClientModule());
 		
@@ -122,11 +117,6 @@ public class ProvisioningService extends ServletModule {
 
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
-	}
-
-	private void bindServices() {
-		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 	}
 
 	@Provides
