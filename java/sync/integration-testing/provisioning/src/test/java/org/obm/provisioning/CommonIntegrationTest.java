@@ -45,7 +45,7 @@ public class CommonIntegrationTest {
 	public void setUp() {
 		RestAssured.port = 8080;
 	}
-
+	
 	@Deployment
 	public static WebArchive createDeployment() throws Exception {
 		return ProvisioningArchiveUtils.buildWebArchive(

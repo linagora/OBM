@@ -62,7 +62,7 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
-						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of())))
+						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of("itemId", "1"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
@@ -85,7 +85,7 @@ public class UserResourcePatchUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
-						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of())))
+						obmUserToJsonString(), HttpVerb.PATCH, ImmutableMap.<String, String>of("itemId", "1"))))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();

@@ -59,7 +59,8 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "true"))))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
+						ImmutableMap.of("expunge", "true", "itemId", "1"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
@@ -81,7 +82,8 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.of("expunge", "false"))))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
+						ImmutableMap.of("expunge", "false", "itemId", "1"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
@@ -103,7 +105,8 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
+						ImmutableMap.<String, String>of("itemId", "1"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
@@ -124,7 +127,8 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
+						ImmutableMap.<String, String>of("itemId", "1"))))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();

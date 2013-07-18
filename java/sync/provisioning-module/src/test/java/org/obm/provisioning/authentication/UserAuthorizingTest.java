@@ -255,7 +255,8 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:delete")));
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
+						ImmutableMap.<String, String>of("itemId", "1"))))
 				.andReturn(batch);
 		mocksControl.replay();
 		
@@ -276,7 +277,8 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:update")));
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users/1", "", HttpVerb.PUT, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users/1", "", HttpVerb.PUT,
+						ImmutableMap.<String, String>of("itemId", "1"))))
 				.andReturn(batch);
 		mocksControl.replay();
 		
@@ -298,7 +300,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:patch")));
 		expect(batchDao.addOperation(batch.getId(),
 				operation(BatchEntityType.USER, "/batches/1/users/1",
-						"", HttpVerb.PATCH, ImmutableMap.<String, String>of())))
+						"", HttpVerb.PATCH, ImmutableMap.<String, String>of("itemId", "1"))))
 				.andReturn(batch);
 		mocksControl.replay();
 		

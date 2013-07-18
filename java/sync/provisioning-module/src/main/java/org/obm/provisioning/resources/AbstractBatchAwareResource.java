@@ -50,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -90,6 +91,7 @@ public abstract class AbstractBatchAwareResource {
 						.body(entity)
 						.verb(httpVerb)
 						.params(multivaluedMapToMap(uriInfo.getQueryParameters()))
+						.itemId(Iterables.getLast(uriInfo.getPathSegments()).getPath())
 						.build())
 				.build();
 
