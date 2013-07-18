@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 
 public class LdapGroup {
 	
-	public class Id {
+	public static class Id {
 
 		private final String id;
 		
@@ -56,12 +56,25 @@ public class LdapGroup {
 		public String get() {
 			return id;
 		}
+
+		@Override
+		public final boolean equals(Object object){
+			if (!(object instanceof Id))
+				return false;
+			
+			return Objects.equal(id, ((Id)object).id);
+		}
+
+		@Override
+		public final int hashCode(){
+			return Objects.hashCode(id);
+		}
 	}
 	
 	public static class Builder {
 		
 		private String[] objectClasses;
-		private String cn;
+		private Id cn;
 		private int gidNumber;
 		private String mailAccess;
 		private String mail;
@@ -79,7 +92,7 @@ public class LdapGroup {
 			return this;
 		}
 
-		public Builder cn(String cn) {
+		public Builder cn(Id cn) {
 			this.cn = cn;
 			return this;
 		}
@@ -111,13 +124,13 @@ public class LdapGroup {
 	
 	private final Dn groupBaseDn;
 	private final String[] objectClasses;
-	private final String cn;
+	private final Id cn;
 	private final int gidNumber;
 	private final String mailAccess;
 	private final String mail;
 	private final String obmDomain;
 	
-	private LdapGroup(Dn groupBaseDn, String[] objectClasses, String cn, int gidNumber,
+	private LdapGroup(Dn groupBaseDn, String[] objectClasses, Id cn, int gidNumber,
 			String mailAccess, String mail, String obmDomain) {
 		this.groupBaseDn = groupBaseDn;
 		this.objectClasses = objectClasses;
@@ -132,7 +145,7 @@ public class LdapGroup {
 		return objectClasses;
 	}
 
-	public String getCn() {
+	public Id getCn() {
 		return cn;
 	}
 
@@ -170,10 +183,6 @@ public class LdapGroup {
 	
 	private String buildDn() {
 		return "cn=" + getCn() + "," + groupBaseDn.getName();
-	}
-
-	public Id getId() {
-		return new Id(getCn());
 	}
 
 	@Override
