@@ -354,7 +354,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mobile\":\"mobile\"," +
 				"\"faxes\":[\"fax\",\"fax2\"]," +
 				"\"mail_quota\":\"1234\"," +
-				"\"mail_server\":\"Not implemented yet\"," +
+				"\"mail_server\":null," +
 				"\"mails\":[\"john@domain\"]," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +

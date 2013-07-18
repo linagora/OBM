@@ -350,6 +350,7 @@ import org.obm.sync.server.mailer.ErrorMailer;
 import org.obm.sync.server.mailer.EventChangeMailer;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
+import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.IAddressBook;
 import org.obm.sync.services.ICalendar;
@@ -599,7 +600,8 @@ public class DependencyResolverHelper {
 				AuthorizationServiceImpl.class,
 				AuthorizationException.class,
 				PermissionsNotFoundException.class,
-				ResourceAuthorizationHelper.class
+				ResourceAuthorizationHelper.class,
+				ServiceProperty.class
 		};
 	}
 

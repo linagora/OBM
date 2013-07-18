@@ -67,6 +67,7 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
+import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.Sets;
 
@@ -109,7 +110,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
 		writeStringsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
 		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuota()));
-		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
@@ -117,6 +118,12 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeEndObject();
 	}
 	
+	private String getMailHostName(ObmUser user) {
+		ObmHost host = user.getMailHost();
+
+		return host != null ? host.getName() : null;
+	}
+
 	public void writeStringsField(JsonGenerator jgen, String fieldName, String... values)
 			throws JsonGenerationException, IOException {
 		jgen.writeFieldName(fieldName);

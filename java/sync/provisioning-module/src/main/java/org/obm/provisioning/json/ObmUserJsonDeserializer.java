@@ -70,9 +70,13 @@ import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.bean.UserJsonFields;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -84,9 +88,16 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
 	private Builder builder = ObmUser.builder();
 
+	private static final ServiceProperty IMAP_SERVICE_PROPERTY = ServiceProperty
+			.builder()
+			.service("mail")
+			.property("imap")
+			.build();
+
 	@Override
 	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode jsonNode = jp.readValueAsTree();
+
 		addFieldValueToBuilder(jsonNode, ID);
 		addFieldValueToBuilder(jsonNode, LOGIN);
 		addFieldValueToBuilder(jsonNode, LASTNAME);
@@ -109,14 +120,38 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		addFieldValueToBuilder(jsonNode, MOBILE);
 		addFieldValueToBuilder(jsonNode, FAXES);
 		addFieldValueToBuilder(jsonNode, MAIL_QUOTA);
-		addFieldValueToBuilder(jsonNode, MAIL_SERVER);
 		addFieldValueToBuilder(jsonNode, MAILS);
 		addFieldValueToBuilder(jsonNode, TIMECREATE);
 		addFieldValueToBuilder(jsonNode, TIMEUPDATE);
 
+		ObmHost mailHost = null;
+		JsonNode emailsNode = getCurrentTokenTextValue(jsonNode, MAILS);
 		ObmDomain domain = (ObmDomain) ctxt.findInjectableValue(ObmDomain.class.getName(), null, null);
+		Collection<String> mails = emailsNode != null ? getCurrentTokenTextValues(emailsNode) : null;
 
-		return builder.domain(domain).build();
+		if (mails != null && !mails.isEmpty()) {
+			JsonNode serverNode = getCurrentTokenTextValue(jsonNode, MAIL_SERVER);
+
+			mailHost = findMailHostForUser(serverNode != null ? serverNode.asText() : null, domain.getHosts().get(IMAP_SERVICE_PROPERTY));
+		}
+
+		return builder
+				.domain(domain)
+				.mailHost(mailHost)
+				.build();
+	}
+
+	@VisibleForTesting
+	ObmHost findMailHostForUser(String hostName, Collection<ObmHost> domainHosts) {
+		if (hostName != null) {
+			for (ObmHost host : domainHosts) {
+				if (host.getName().equals(hostName)) {
+					return host;
+				}
+			}
+		}
+
+		return Iterables.getFirst(domainHosts, null);
 	}
 
 	private void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields) {
@@ -176,7 +211,6 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 				builder.mailQuota(Integer.parseInt(value.asText()));
 				break;
 			case MAIL_SERVER:
-				// NOT IMPLEMENTED YET
 				break;
 			case MOBILE:
 				builder.mobile(value.asText());
