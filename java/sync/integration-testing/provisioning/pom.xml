@@ -63,6 +63,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>services-integration-testing</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>dbcp</artifactId>
 			<version>${obm.version}</version>
