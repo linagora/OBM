@@ -57,7 +57,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(LdapGroup.class)
-					.add(LdapGroup.Id.class)
+					.add(LdapGroup.Cn.class)
 					.add(LdapUser.class)
 					.add(LdapUser.Uid.class)
 					.add(LdapUserMembership.class)

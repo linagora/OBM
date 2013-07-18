@@ -52,7 +52,7 @@ public interface Configuration {
 	SearchScope getUserSearchScope();
 
 	Dn getGroupBaseDn();
-	String buildGroupFilter(LdapGroup.Id groupId);
+	String buildGroupFilter(LdapGroup.Cn groupCn);
 	SearchScope getGroupSearchScope();
 
 }

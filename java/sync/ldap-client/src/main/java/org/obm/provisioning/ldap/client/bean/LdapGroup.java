@@ -45,40 +45,40 @@ import com.google.inject.Inject;
 
 public class LdapGroup {
 	
-	public static class Id {
+	public static class Cn {
 
-		private final String id;
+		private final String cn;
 	
-		public static Id valueOf(String id) {
-			return new Id(id);
+		public static Cn valueOf(String cn) {
+			return new Cn(cn);
 		}
 
-		private Id(String id) {
-			this.id = id;
+		private Cn(String cn) {
+			this.cn = cn;
 		}
 		
 		public String get() {
-			return id;
+			return cn;
 		}
 
 		@Override
 		public final boolean equals(Object object){
-			if (!(object instanceof Id))
+			if (!(object instanceof Cn))
 				return false;
 			
-			return Objects.equal(id, ((Id)object).id);
+			return Objects.equal(cn, ((Cn)object).cn);
 		}
 
 		@Override
 		public final int hashCode(){
-			return Objects.hashCode(id);
+			return Objects.hashCode(cn);
 		}
 	}
 	
 	public static class Builder {
 		
 		private String[] objectClasses;
-		private Id cn;
+		private Cn cn;
 		private int gidNumber;
 		private String mailAccess;
 		private String mail;
@@ -96,7 +96,7 @@ public class LdapGroup {
 			return this;
 		}
 
-		public Builder cn(Id cn) {
+		public Builder cn(Cn cn) {
 			this.cn = cn;
 			return this;
 		}
@@ -128,13 +128,13 @@ public class LdapGroup {
 	
 	private final Dn groupBaseDn;
 	private final String[] objectClasses;
-	private final Id cn;
+	private final Cn cn;
 	private final int gidNumber;
 	private final String mailAccess;
 	private final String mail;
 	private final String obmDomain;
 	
-	private LdapGroup(Dn groupBaseDn, String[] objectClasses, Id cn, int gidNumber,
+	private LdapGroup(Dn groupBaseDn, String[] objectClasses, Cn cn, int gidNumber,
 			String mailAccess, String mail, String obmDomain) {
 		this.groupBaseDn = groupBaseDn;
 		this.objectClasses = objectClasses;
@@ -149,7 +149,7 @@ public class LdapGroup {
 		return objectClasses;
 	}
 
-	public Id getCn() {
+	public Cn getCn() {
 		return cn;
 	}
 

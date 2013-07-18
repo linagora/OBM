@@ -100,8 +100,8 @@ public class StaticConfiguration implements Configuration {
 	}
 
 	@Override
-	public String buildGroupFilter(LdapGroup.Id groupId) {
-		return "(cn=" + groupId.get() + ")";
+	public String buildGroupFilter(LdapGroup.Cn groupCn) {
+		return "(cn=" + groupCn.get() + ")";
 	}
 
 	@Override
