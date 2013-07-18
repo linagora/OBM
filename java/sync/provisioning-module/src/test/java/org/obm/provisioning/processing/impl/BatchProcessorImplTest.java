@@ -55,6 +55,7 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
@@ -389,6 +390,45 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.timecommit(date)
 				.build())).andReturn(null);
 		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessDeleteUser() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.url("/users/extIdUser1")
+						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.verb(HttpVerb.DELETE)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		userDao.delete(UserExtId.valueOf("extIdUser1"));
+		expectLastCall();
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());

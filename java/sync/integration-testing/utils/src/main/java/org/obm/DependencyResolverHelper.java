@@ -177,6 +177,7 @@ import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -637,6 +638,7 @@ public class DependencyResolverHelper {
 				OperationProcessor.class,
 				Processor.class,
 				CreateUserOperationProcessor.class,
+				DeleteUserOperationProcessor.class,
 				ParallelBatchProcessor.class,
 				HttpVerbBasedOperationProcessor.class,
 				EntityTypeBasedOperationProcessor.class,
