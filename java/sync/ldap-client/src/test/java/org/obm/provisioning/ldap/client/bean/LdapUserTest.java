@@ -4,7 +4,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -13,6 +15,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
+@GuiceModule(EmbeddedLdapModule.class)
 @RunWith(SlowGuiceRunner.class)
 public class LdapUserTest {
 
@@ -162,7 +165,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -186,7 +189,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -232,7 +235,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -253,7 +256,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -274,7 +277,7 @@ public class LdapUserTest {
 				.uidNumber(1895)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -296,7 +299,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -316,7 +319,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -338,7 +341,7 @@ public class LdapUserTest {
 				.gidNumber(1066)
 				.cn("Richard Sorge")
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")
@@ -359,7 +362,7 @@ public class LdapUserTest {
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.displayName("Richard Sorge")
-				.sn("Richard.Sorge")
+				.sn("Sorge")
 				.givenName("Richard")
 				.homeDirectory("/home/richard.sorge")
 				.userPassword("secret password")

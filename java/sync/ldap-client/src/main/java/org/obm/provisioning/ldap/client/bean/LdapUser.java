@@ -138,8 +138,8 @@ public class LdapUser {
 			this.cn = displayName;
 			this.displayName = displayName;
 			this.sn = Strings.isNullOrEmpty(obmUser.getLastName()) ?
-					obmUser.getLastName() :
-					obmUser.getLogin();
+					obmUser.getLogin() :
+					obmUser.getLastName();
 			this.givenName = obmUser.getFirstName();
 			this.homeDirectory = buildHomeDirectory(obmUser);
 			this.userPassword = obmUser.getPassword();
