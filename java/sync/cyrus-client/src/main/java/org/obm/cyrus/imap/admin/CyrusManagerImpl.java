@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import org.obm.push.mail.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
@@ -57,8 +58,9 @@ public class CyrusManagerImpl implements CyrusManager {
 		}
 
 		@Override
-		public CyrusManagerImpl create(String hostname, String login, String password) {
+		public CyrusManagerImpl create(String hostname, String login, String password) throws IMAPException {
 			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
+			storeClient.login(false);
 			return new CyrusManagerImpl(connectionFactory.create(storeClient));
 		}
 		

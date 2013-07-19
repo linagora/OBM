@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import org.obm.push.mail.IMAPException;
+
 public interface CyrusImapService {
 
-	CyrusManager buildManager(String host, String login, String password);
+	CyrusManager buildManager(String host, String login, String password) throws IMAPException;
 	
 }

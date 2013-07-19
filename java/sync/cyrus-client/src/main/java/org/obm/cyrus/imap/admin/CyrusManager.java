@@ -31,12 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import org.obm.push.mail.IMAPException;
+
 import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CyrusManager {
 
 	public interface Factory {
-		CyrusManager create(String hostname, String login, String password);
+		CyrusManager create(String hostname, String login, String password) throws IMAPException;
 	}
 
 	void create(ObmUser obmUser);
