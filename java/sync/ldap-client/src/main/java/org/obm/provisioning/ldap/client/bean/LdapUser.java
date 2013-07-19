@@ -405,7 +405,7 @@ public class LdapUser {
 		for (String objectClass: getObjectClasses()) {
 			attributes.add("objectClass: " + objectClass);
 		}
-		attributes.add("uid: " + getUid());
+		attributes.add("uid: " + getUid().get());
 		attributes.add("uidNumber: " + getUidNumber());
 		attributes.add("gidNumber: " + getGidNumber());
 		attributes.add("loginShell: " + getLoginShell());
@@ -427,7 +427,7 @@ public class LdapUser {
 	}
 	
 	private String buildDn() {
-		return "uid=" + getUid() + "," + userBaseDn.getName();
+		return "uid=" + getUid().get() + "," + userBaseDn.getName();
 	}
 	
 	@Override

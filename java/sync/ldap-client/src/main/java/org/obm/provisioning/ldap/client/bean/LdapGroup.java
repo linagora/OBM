@@ -176,7 +176,7 @@ public class LdapGroup {
 		for (String objectClass: getObjectClasses()) {
 			attributes.add("objectClass: " + objectClass);
 		}
-		attributes.add("cn: " + getCn());
+		attributes.add("cn: " + getCn().get());
 		attributes.add("gidNumber: " + getGidNumber());
 		attributes.add("mailAccess: " + getMailAccess());
 		attributes.add("mail: " + getMail());
@@ -186,7 +186,7 @@ public class LdapGroup {
 	}
 	
 	private String buildDn() {
-		return "cn=" + getCn() + "," + groupBaseDn.getName();
+		return "cn=" + getCn().get() + "," + groupBaseDn.getName();
 	}
 
 	@Override
