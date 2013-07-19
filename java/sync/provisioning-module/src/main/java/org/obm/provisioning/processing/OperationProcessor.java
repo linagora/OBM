@@ -29,10 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing;
 
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.exception.ProcessingException;
 
-public interface OperationProcessor extends Processor<Operation> {
+public interface OperationProcessor {
 
 	boolean acceptsOperation(Operation operation);
+
+	void process(Operation operation, Batch batch) throws ProcessingException;
 
 }

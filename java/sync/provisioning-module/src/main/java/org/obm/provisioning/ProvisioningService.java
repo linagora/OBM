@@ -8,6 +8,7 @@ import org.apache.shiro.web.servlet.ShiroFilter;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.DeserializationConfig.Feature;
+import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
@@ -19,6 +20,7 @@ import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.conf.SystemUserLdapConfiguration;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
@@ -27,6 +29,7 @@ import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.PermissionDaoHardcodedImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
@@ -37,6 +40,7 @@ import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
+import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapModule;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -126,14 +130,17 @@ public class ProvisioningService extends ServletModule {
 	}
 
 	@Provides
+	public static Configuration ldapConfiguration(UserSystemDao userSystemDao) throws DaoException {
+		return new SystemUserLdapConfiguration(userSystemDao.getByLogin("ldapadmin"));
+	}
+
+	@Provides
 	@RequestScoped
 	public static ObmDomain domainInRequest(HttpContext context) {
 		return (ObmDomain) context.getProperties().get(ObmDomainProvider.DOMAIN_KEY);
 	}
 
-	@Provides
-	@Singleton
-	public static ObjectMapper createObjectMapper(Injector injector) {
+	public static ObjectMapper createObjectMapper(Module... modules) {
 		SimpleModule module =
 				new SimpleModule("Serializers", new Version(0, 0, 0, null))
 				.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer())
@@ -143,15 +150,28 @@ public class ProvisioningService extends ServletModule {
 				.addSerializer(Operation.class, new OperationJsonSerializer())
 				.addSerializer(Batch.class, new BatchJsonSerializer())
 				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
-				.addDeserializer(ObmUser.class, injector.getInstance(ObmUserJsonDeserializer.class))
 				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer())
 				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer());
 
-		return new ObjectMapper()
+		ObjectMapper mapper = new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)
 				.configure(Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
 				.withModule(module);
-				
+
+		for (Module m : modules) {
+			mapper.registerModule(m);
+		}
+
+		return mapper;
+	}
+
+	@Provides
+	@Singleton
+	public static ObjectMapper createObjectMapper(Injector injector) {
+		SimpleModule module = new SimpleModule("RequestScoped", new Version(0, 0, 0, null))
+			.addDeserializer(ObmUser.class, injector.getInstance(ObmUserJsonDeserializer.class));
+
+		return createObjectMapper(module);
 	}
 
 	@Provides

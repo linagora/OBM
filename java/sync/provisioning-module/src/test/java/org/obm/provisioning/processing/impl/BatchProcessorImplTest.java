@@ -49,6 +49,8 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
@@ -96,6 +98,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private DateProvider dateProvider;
 	@Inject
 	private SatelliteService satelliteService;
+	@Inject
+	private LdapService ldapService;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -177,14 +181,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 
-		expect(userDao.create(ObmUser
+		ObmUser user = ObmUser
 				.builder()
 				.login("user1")
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
-				.build())).andReturn(null);
+				.build();
+		expect(userDao.create(user)).andReturn(user);
+		expectLdapCreateUser(user);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -243,14 +249,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 
-		expect(userDao.create(ObmUser
+		ObmUser user = ObmUser
 				.builder()
 				.login("user1")
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domain)
-				.build())).andReturn(null);
+				.domain(domainWithMailHost)
+				.build();
+		expect(userDao.create(user)).andReturn(user);
+		expectLdapCreateUser(user);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
 		expect(satelliteService.create(isA(Configuration.class), eq(domainWithMailHost))).andReturn(satelliteConnection);
 		satelliteConnection.updateMTA();
@@ -293,5 +301,15 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(batchDao.addOperation(eq(batchId(1)), isA(Operation.class))).andReturn(batch);
 		expect(batchDao.get(batchId(1))).andReturn(batch);
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+	}
+
+	private void expectLdapCreateUser(ObmUser user) {
+		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
+
+		expect(ldapService.buildManager()).andReturn(ldapManager);
+		ldapManager.createUser(user);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
 	}
 }

@@ -171,7 +171,7 @@ public class BatchProcessorImpl implements BatchProcessor {
 		for (OperationProcessor operationProcessor : operationProcessors) {
 			if (operationProcessor.acceptsOperation(operation)) {
 				try {
-					operationProcessor.process(operation);
+					operationProcessor.process(operation, batch);
 
 					return opBuilder
 							.status(BatchStatus.SUCCESS)

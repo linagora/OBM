@@ -72,12 +72,13 @@ import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
+import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.ldap.client.StaticConfiguration;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
-import org.obm.provisioning.ldap.client.Configuration;
-import org.obm.provisioning.ldap.client.StaticConfiguration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -131,6 +132,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 					bind(Configuration.class).to(StaticConfiguration.class);
+					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
 				}
 			}));
 		}

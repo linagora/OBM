@@ -29,34 +29,45 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl;
 
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.ProvisioningService;
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.json.ObmUserJsonDeserializer;
+import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.ldap.client.LdapService;
 
 import com.google.inject.Inject;
+import com.google.inject.util.Providers;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcessor {
 
 	private final UserDao userDao;
-	private final ObjectMapper objectMapper;
+	private final LdapService ldapService;
 
 	@Inject
-	public CreateUserOperationProcessor(UserDao userDao, ObjectMapper objectMapper) {
+	public CreateUserOperationProcessor(UserDao userDao, LdapService ldapService) {
 		super(BatchEntityType.USER, HttpVerb.POST);
 
 		this.userDao = userDao;
-		this.objectMapper = objectMapper;
+		this.ldapService = ldapService;
 	}
 
 	@Override
-	public void process(Operation operation) throws ProcessingException {
+	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = null;
 		String requestBody = operation.getRequest().getBody();
+		ObjectMapper objectMapper = getObjectMapperForDomain(batch.getDomain());
 
 		try {
 			user = objectMapper.readValue(requestBody, ObmUser.class);
@@ -66,11 +77,29 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		}
 
 		try {
-			userDao.create(user);
+			user = userDao.create(user);
 		}
 		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot insert new user '%' (%s) in database.", user.getLogin(), user.getExtId()), e);
+			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
+		}
+
+		LdapManager ldapManager = ldapService.buildManager();
+
+		try {
+			ldapManager.createUser(user);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+		}
+		finally {
+			ldapManager.shutdown();
 		}
 	}
 
+	private ObjectMapper getObjectMapperForDomain(ObmDomain domain) {
+		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
+			.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain)));
+
+		return ProvisioningService.createObjectMapper(module);
+	}
 }
