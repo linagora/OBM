@@ -143,17 +143,17 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void deleteUser(LdapUser.Uid ldapUserId) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void deleteUser(LdapUser.Uid ldapUserId, String domain) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			connection.delete(getUserDnFromUserId(ldapUserId));
+			connection.delete(getUserDnFromUserId(ldapUserId, domain));
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
-	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId) throws LdapException {
-		return getDn(configuration.getUserBaseDn(), configuration.buildUserFilter(ldapUserId), configuration.getUserSearchScope());
+	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId, String domain) throws LdapException {
+		return getDn(configuration.getUserBaseDn(domain), configuration.buildUserFilter(ldapUserId), configuration.getUserSearchScope());
 	}
 
 	@Override

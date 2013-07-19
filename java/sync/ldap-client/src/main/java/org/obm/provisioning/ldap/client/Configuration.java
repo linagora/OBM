@@ -47,7 +47,7 @@ public interface Configuration {
 	Dn getBindDn();
 	String getBindPassword();
 
-	Dn getUserBaseDn();
+	Dn getUserBaseDn(String domain);
 	String buildUserFilter(LdapUser.Uid userId);
 	SearchScope getUserSearchScope();
 

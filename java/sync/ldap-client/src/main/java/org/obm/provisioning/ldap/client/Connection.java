@@ -47,7 +47,7 @@ public interface Connection {
 
 	void createUser(LdapUser ldapUser) throws LdapException, ConnectionException;
 	
-	void deleteUser(LdapUser.Uid ldapUser) throws LdapException, ConnectionException;
+	void deleteUser(LdapUser.Uid ldapUser, String domain) throws LdapException, ConnectionException;
 	
 	void createGroup(LdapGroup ldapGroup) throws LdapException, ConnectionException;
 	

@@ -276,7 +276,7 @@ public class LdapUser {
 		}
 		
 		public LdapUser build() {
-			return new LdapUser(configuration.getUserBaseDn(), objectClasses, uid, uidNumber, gidNumber, loginShell,
+			return new LdapUser(configuration.getUserBaseDn(obmDomain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
 					mailBox, mailBoxServer, mailAccess, mail, hiddenUser, obmDomain);
 		}

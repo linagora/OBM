@@ -37,6 +37,7 @@ import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 public class LdapUserMembership {
@@ -44,6 +45,7 @@ public class LdapUserMembership {
 	public static class Builder {
 		private String memberUid;
 		private String mailBox;
+		private String obmDomain;
 		
 		private final Configuration configuration;
 
@@ -61,13 +63,21 @@ public class LdapUserMembership {
 			this.mailBox = mailBox;
 			return this;
 		}
-		
-		public LdapUserMembership build() {
-			return new LdapUserMembership(memberUid, buildMember(), mailBox);
+	
+		public Builder obmDomain(String obmDomain) {
+			this.obmDomain = obmDomain;
+			return this;
 		}
 
-		private String buildMember() {
-			return "uid=" + memberUid + "," + configuration.getUserBaseDn().getName();
+		public LdapUserMembership build() {
+			Preconditions.checkState(memberUid != null, "memberUid should not be null");
+			Preconditions.checkState(obmDomain != null, "obmDomain should not be null");
+			Preconditions.checkState(mailBox != null, "mailBox should not be null");
+			return new LdapUserMembership(memberUid, buildMember(obmDomain), mailBox);
+		}
+
+		private String buildMember(String domain) {
+			return "uid=" + memberUid + "," + configuration.getUserBaseDn(domain).getName();
 		}
 	}
 	

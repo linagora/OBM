@@ -72,9 +72,9 @@ public class StaticConfiguration implements Configuration {
 	}
 
 	@Override
-	public Dn getUserBaseDn() {
+	public Dn getUserBaseDn(String domain) {
 		try {
-			return new Dn("ou=users,dc=test.obm.org,dc=local");
+			return new Dn(String.format("ou=users,dc=%s,dc=local", domain));
 		} catch (LdapInvalidDnException e) {
 			throw Throwables.propagate(e);
 		}
