@@ -226,4 +226,152 @@ public class LdapUserTest {
 		ObmUser obmUser = buildObmUserNoMailHostIP();
 		ldapUserBuilder.fromObmUser(obmUser).build();
 	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testNoUid() {
+		ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testNoUidNumber() {
+		ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testNoGidNumber() {
+		ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testNoDomain() {
+		ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testNoObjectClasses() {
+		ldapUserBuilder
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testEmptyObjectClasses() {
+		ldapUserBuilder
+				.objectClasses(new String[]{})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testNoCn() {
+		ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.displayName("Richard Sorge")
+				.sn("Richard.Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.build();
+	}
 }

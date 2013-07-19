@@ -92,8 +92,8 @@ public class LdapUser {
 		
 		private String[] objectClasses;
 		private Uid uid;
-		private int uidNumber;
-		private int gidNumber;
+		private Integer uidNumber;
+		private Integer gidNumber;
 		private String loginShell;
 		private String cn;
 		private String displayName;
@@ -277,6 +277,13 @@ public class LdapUser {
 		}
 		
 		public LdapUser build() {
+			Preconditions.checkState(uid != null, "uid should not be null");
+			Preconditions.checkState(objectClasses != null && objectClasses.length > 0, "objectClasses should not be empty");
+			Preconditions.checkState(uidNumber != null, "uidNumber should not be null");
+			Preconditions.checkState(gidNumber != null, "gidNumber should not be null");
+			Preconditions.checkState(cn != null, "cn should not be null");
+			Preconditions.checkState(domain != null, "domain should not be null");
+	
 			return new LdapUser(configuration.getUserBaseDn(domain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
 					mailBox, mailBoxServer, mailAccess, mail, hiddenUser, domain);
