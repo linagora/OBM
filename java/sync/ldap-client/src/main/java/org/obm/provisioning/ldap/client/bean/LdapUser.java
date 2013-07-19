@@ -429,7 +429,7 @@ public class LdapUser {
 			.attribute(Attribute.valueOf("mailBoxServer", mailBoxServer))
 			.attribute(Attribute.valueOf("mailAccess", mailAccess))
 			.attribute(Attribute.valueOf("mail", mail))
-			.attribute(Attribute.valueOf("hiddenUser", hiddenUser))
+			.attribute(Attribute.valueOf("hiddenUser", Boolean.valueOf(hiddenUser).toString().toUpperCase()))
 			.attribute(Attribute.valueOf("obmDomain", domain.get()))
 			.build();
 		return ldapEntry.toDefaultEntry();

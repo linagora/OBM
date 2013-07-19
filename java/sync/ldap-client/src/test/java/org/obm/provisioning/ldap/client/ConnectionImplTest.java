@@ -217,7 +217,7 @@ public class ConnectionImplTest {
 		assertThat(entry.get(new AttributeType("mailboxserver")).getString()).isEqualTo("lmtp:127.0.0.1:24");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
 		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("test@test.obm.org");
-		assertThat(entry.get(new AttributeType("hiddenuser")).getString()).isEqualTo("false");
+		assertThat(entry.get(new AttributeType("hiddenuser")).getString()).isEqualTo("FALSE");
 		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
 	}
 
