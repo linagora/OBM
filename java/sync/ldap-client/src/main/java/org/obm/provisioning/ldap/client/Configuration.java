@@ -34,6 +34,7 @@ package org.obm.provisioning.ldap.client;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 
@@ -47,7 +48,7 @@ public interface Configuration {
 	Dn getBindDn();
 	String getBindPassword();
 
-	Dn getUserBaseDn(String domain);
+	Dn getUserBaseDn(LdapDomain domain);
 	String buildUserFilter(LdapUser.Uid userId);
 	SearchScope getUserSearchScope();
 

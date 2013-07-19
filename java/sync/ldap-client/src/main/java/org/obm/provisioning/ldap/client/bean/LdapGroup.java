@@ -82,7 +82,7 @@ public class LdapGroup {
 		private int gidNumber;
 		private String mailAccess;
 		private String mail;
-		private String obmDomain;
+		private LdapDomain domain;
 
 		private final Configuration configuration;
 
@@ -116,13 +116,13 @@ public class LdapGroup {
 			return this;
 		}
 
-		public Builder obmDomain(String obmDomain) {
-			this.obmDomain = obmDomain;
+		public Builder domain(LdapDomain domain) {
+			this.domain = domain;
 			return this;
 		}
 		
 		public LdapGroup build() {
-			return new LdapGroup(configuration.getGroupBaseDn(), objectClasses, cn, gidNumber, mailAccess, mail, obmDomain);
+			return new LdapGroup(configuration.getGroupBaseDn(), objectClasses, cn, gidNumber, mailAccess, mail, domain);
 		}
 	}
 	
@@ -132,17 +132,17 @@ public class LdapGroup {
 	private final int gidNumber;
 	private final String mailAccess;
 	private final String mail;
-	private final String obmDomain;
+	private final LdapDomain domain;
 	
 	private LdapGroup(Dn groupBaseDn, String[] objectClasses, Cn cn, int gidNumber,
-			String mailAccess, String mail, String obmDomain) {
+			String mailAccess, String mail, LdapDomain domain) {
 		this.groupBaseDn = groupBaseDn;
 		this.objectClasses = objectClasses;
 		this.cn = cn;
 		this.gidNumber = gidNumber;
 		this.mailAccess = mailAccess;
 		this.mail = mail;
-		this.obmDomain = obmDomain;
+		this.domain = domain;
 	}
 
 	public String[] getObjectClasses() {
@@ -165,8 +165,8 @@ public class LdapGroup {
 		return mail;
 	}
 
-	public String getObmDomain() {
-		return obmDomain;
+	public LdapDomain getDomain() {
+		return domain;
 	}
 	
 	public Entry buildEntry() throws LdapException {
@@ -180,7 +180,7 @@ public class LdapGroup {
 		attributes.add("gidNumber: " + getGidNumber());
 		attributes.add("mailAccess: " + getMailAccess());
 		attributes.add("mail: " + getMail());
-		attributes.add("obmDomain: " + getObmDomain());
+		attributes.add("obmDomain: " + getDomain().get());
 		
 		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
 	}
@@ -191,7 +191,7 @@ public class LdapGroup {
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(cn, gidNumber, mailAccess, mail, obmDomain);
+		return Objects.hashCode(cn, gidNumber, mailAccess, mail, domain);
 	}
 	
 	@Override
@@ -202,7 +202,7 @@ public class LdapGroup {
 				&& Objects.equal(this.gidNumber, that.gidNumber)
 				&& Objects.equal(this.mailAccess, that.mailAccess)
 				&& Objects.equal(this.mail, that.mail)
-				&& Objects.equal(this.obmDomain, that.obmDomain);
+				&& Objects.equal(this.domain, that.domain);
 		}
 		return false;
 	}
@@ -214,7 +214,7 @@ public class LdapGroup {
 			.add("gidNumber", gidNumber)
 			.add("mailAccess", mailAccess)
 			.add("mail", mail)
-			.add("obmDomain", obmDomain)
+			.add("obmDomain", domain)
 			.toString();
 	}
 }

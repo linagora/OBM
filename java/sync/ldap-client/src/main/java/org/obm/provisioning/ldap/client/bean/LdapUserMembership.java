@@ -45,7 +45,7 @@ public class LdapUserMembership {
 	public static class Builder {
 		private String memberUid;
 		private String mailBox;
-		private String obmDomain;
+		private LdapDomain domain;
 		
 		private final Configuration configuration;
 
@@ -64,19 +64,19 @@ public class LdapUserMembership {
 			return this;
 		}
 	
-		public Builder obmDomain(String obmDomain) {
-			this.obmDomain = obmDomain;
+		public Builder domain(LdapDomain domain) {
+			this.domain = domain;
 			return this;
 		}
 
 		public LdapUserMembership build() {
 			Preconditions.checkState(memberUid != null, "memberUid should not be null");
-			Preconditions.checkState(obmDomain != null, "obmDomain should not be null");
+			Preconditions.checkState(domain != null, "domain should not be null");
 			Preconditions.checkState(mailBox != null, "mailBox should not be null");
-			return new LdapUserMembership(memberUid, buildMember(obmDomain), mailBox);
+			return new LdapUserMembership(memberUid, buildMember(domain), mailBox);
 		}
 
-		private String buildMember(String domain) {
+		private String buildMember(LdapDomain domain) {
 			return "uid=" + memberUid + "," + configuration.getUserBaseDn(domain).getName();
 		}
 	}

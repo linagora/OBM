@@ -46,6 +46,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.ConnectionImpl;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
@@ -131,7 +132,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		
@@ -155,7 +156,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		
@@ -191,12 +192,12 @@ public class ConnectionImplTest {
 				.mailAccess("PERMIT")
 				.mail("test@test.obm.org")
 				.hiddenUser(false)
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		connection.createUser(ldapUser);
 		
-		assertThat(connection.getUserDnFromUserId(ldapUser.getUid(), "test.obm.org")
+		assertThat(connection.getUserDnFromUserId(ldapUser.getUid(), LdapDomain.valueOf("test.obm.org"))
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=users,dc=test.obm.org,dc=local"), 
@@ -240,19 +241,19 @@ public class ConnectionImplTest {
 				.mailAccess("PERMIT")
 				.mail("test@test.obm.org")
 				.hiddenUser(false)
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		connection.createUser(ldapUser);
 		
 		// In order to be sure that user is really inserted
 		Uid userId = ldapUser.getUid();
-		assertThat(connection.getUserDnFromUserId(userId, "test.obm.org")
+		assertThat(connection.getUserDnFromUserId(userId, LdapDomain.valueOf("test.obm.org"))
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		
-		connection.deleteUser(userId, "test.obm.org");
+		connection.deleteUser(userId, LdapDomain.valueOf("test.obm.org"));
 		try {
-			connection.getUserDnFromUserId(userId, "test.obm.org");
+			connection.getUserDnFromUserId(userId, LdapDomain.valueOf("test.obm.org"));
 		} catch (IllegalStateException e) {
 		}
 	}
@@ -265,7 +266,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -273,7 +274,7 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUserToGroup(userMembership, groupCn);
 		
@@ -300,7 +301,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -308,12 +309,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
 		
@@ -336,7 +337,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -344,19 +345,19 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUserToGroup(userMembership, groupCn);
 		
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership3 = groupMemberShipProvider.get()
 				.memberUid("test3")
 				.mailBox("test3@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership2, userMembership3), groupCn);
 		
@@ -380,7 +381,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -388,12 +389,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
 		
@@ -422,7 +423,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -430,12 +431,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
 		
@@ -464,7 +465,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -472,17 +473,17 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership3 = groupMemberShipProvider.get()
 				.memberUid("test3")
 				.mailBox("test3@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2, userMembership3), groupCn);
 		
@@ -508,12 +509,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		LdapGroup group = groupBuilderProvider.get()
@@ -522,7 +523,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
@@ -534,7 +535,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("toGroup@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(toGroup);
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
@@ -559,7 +560,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(fromGroup);
 		LdapGroup.Cn fromGroupCn = fromGroup.getCn();
@@ -567,12 +568,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupCn);
 		
@@ -582,7 +583,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
@@ -604,12 +605,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		LdapGroup group = groupBuilderProvider.get()
@@ -618,7 +619,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
@@ -630,7 +631,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group2);
 		LdapGroup.Cn groupCn2 = group2.getCn();
@@ -642,7 +643,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(toGroup);
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
@@ -664,12 +665,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		LdapGroup fromGroup = groupBuilderProvider.get()
@@ -678,7 +679,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(fromGroup);
 		LdapGroup.Cn fromGroupCn = fromGroup.getCn();
@@ -690,7 +691,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
@@ -702,7 +703,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		connection.createGroup(group2);
 		LdapGroup.Cn groupCn2 = group2.getCn();
@@ -729,7 +730,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		LdapGroup ldapGroup2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -737,7 +738,7 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group2@test.obm.org")
-				.obmDomain("test.obm.org")
+				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
 		
 		myConnection.createGroup(ldapGroup);

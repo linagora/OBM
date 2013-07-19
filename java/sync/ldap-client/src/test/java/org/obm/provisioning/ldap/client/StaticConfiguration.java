@@ -36,6 +36,7 @@ import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 
@@ -72,9 +73,9 @@ public class StaticConfiguration implements Configuration {
 	}
 
 	@Override
-	public Dn getUserBaseDn(String domain) {
+	public Dn getUserBaseDn(LdapDomain domain) {
 		try {
-			return new Dn(String.format("ou=users,dc=%s,dc=local", domain));
+			return new Dn(String.format("ou=users,dc=%s,dc=local", domain.get()));
 		} catch (LdapInvalidDnException e) {
 			throw Throwables.propagate(e);
 		}

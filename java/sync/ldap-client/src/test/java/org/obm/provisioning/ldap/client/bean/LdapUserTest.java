@@ -174,6 +174,7 @@ public class LdapUserTest {
 				.mailBoxServer("lmtp:255.255.255.0:24")
 				.mailAccess("PERMIT")
 				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
 				.build();
 		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUser()).build();
 		assertThat(ldapUser).isEqualTo(expectedLdapUser);
@@ -196,6 +197,7 @@ public class LdapUserTest {
 				.mailAccess("REJECT")
 				.mailBox("richard.sorge@gru.gov.ru")
 				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
 				.build();
 		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUserNoEmail()).build();
 		assertThat(ldapUser).isEqualTo(expectedLdapUser);

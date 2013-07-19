@@ -61,6 +61,7 @@ public class BeansTest {
 					.add(LdapUser.class)
 					.add(LdapUser.Uid.class)
 					.add(LdapUserMembership.class)
+					.add(LdapDomain.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

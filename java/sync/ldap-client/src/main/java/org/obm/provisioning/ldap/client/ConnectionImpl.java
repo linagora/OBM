@@ -48,6 +48,7 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
@@ -143,7 +144,7 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void deleteUser(LdapUser.Uid ldapUserId, String domain) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void deleteUser(LdapUser.Uid ldapUserId, LdapDomain domain) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			connection.delete(getUserDnFromUserId(ldapUserId, domain));
 			incrementAndCheckRequestCounter();
@@ -152,7 +153,7 @@ public class ConnectionImpl implements Connection {
 		}
 	}
 	
-	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId, String domain) throws LdapException {
+	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId, LdapDomain domain) throws LdapException {
 		return getDn(configuration.getUserBaseDn(domain), configuration.buildUserFilter(ldapUserId), configuration.getUserSearchScope());
 	}
 

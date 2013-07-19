@@ -107,7 +107,7 @@ public class LdapUser {
 		private String mailAccess;
 		private String mail;
 		private boolean hiddenUser;
-		private String obmDomain;
+		private LdapDomain domain;
 		
 		private final Configuration configuration;
 
@@ -149,6 +149,7 @@ public class LdapUser {
 			this.mailBoxServer = buildMailboxServer(obmUser);
 			this.mailAccess = buildEmailAccess(obmUser);
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
+			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName());
 			return this;
 		}
 	
@@ -270,15 +271,15 @@ public class LdapUser {
 			return this;
 		}
 		
-		public Builder obmDomain(String obmDomain) {
-			this.obmDomain = obmDomain;
+		public Builder domain(LdapDomain domain) {
+			this.domain = domain;
 			return this;
 		}
 		
 		public LdapUser build() {
-			return new LdapUser(configuration.getUserBaseDn(obmDomain), objectClasses, uid, uidNumber, gidNumber, loginShell,
+			return new LdapUser(configuration.getUserBaseDn(domain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
-					mailBox, mailBoxServer, mailAccess, mail, hiddenUser, obmDomain);
+					mailBox, mailBoxServer, mailAccess, mail, hiddenUser, domain);
 		}
 	}
 	
@@ -300,11 +301,11 @@ public class LdapUser {
 	private final String mailAccess;
 	private final String mail;
 	private final boolean hiddenUser;
-	private final String obmDomain;
+	private final LdapDomain domain;
 	
 	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, String userPassword, String webAccess,
-			String mailBox, String mailBoxServer, String mailAccess, String mail, boolean hiddenUser, String obmDomain) {
+			String mailBox, String mailBoxServer, String mailAccess, String mail, boolean hiddenUser, LdapDomain domain) {
 		this.userBaseDn = userBaseDn;
 		this.objectClasses = objectClasses;
 		this.uid = uid;
@@ -323,7 +324,7 @@ public class LdapUser {
 		this.mailAccess = mailAccess;
 		this.mail = mail;
 		this.hiddenUser = hiddenUser;
-		this.obmDomain = obmDomain;
+		this.domain = domain;
 	}
 
 	public String[] getObjectClasses() {
@@ -394,8 +395,8 @@ public class LdapUser {
 		return hiddenUser;
 	}
 
-	public String getObmDomain() {
-		return obmDomain;
+	public LdapDomain getDomain() {
+		return domain;
 	}
 
 	public Entry buildEntry() throws LdapException {
@@ -421,7 +422,7 @@ public class LdapUser {
 		attributes.add("mailAccess: " + getMailAccess());
 		attributes.add("mail: " + getMail());
 		attributes.add("hiddenUser: " + isHiddenUser());
-		attributes.add("obmDomain: " + getObmDomain());
+		attributes.add("obmDomain: " + getDomain().get());
 		
 		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
 	}
@@ -433,7 +434,7 @@ public class LdapUser {
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(uid, uidNumber, gidNumber, loginShell, cn, displayName, sn, givenName, 
-				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, hiddenUser, obmDomain);
+				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, hiddenUser, domain);
 	}
 	
 	@Override
@@ -456,7 +457,7 @@ public class LdapUser {
 				&& Objects.equal(this.mailAccess, that.mailAccess)
 				&& Objects.equal(this.mail, that.mail)
 				&& Objects.equal(this.hiddenUser, that.hiddenUser)
-				&& Objects.equal(this.obmDomain, that.obmDomain);
+				&& Objects.equal(this.domain, that.domain);
 		}
 		return false;
 	}
@@ -480,7 +481,7 @@ public class LdapUser {
 			.add("mailAccess", mailAccess)
 			.add("mail", mail)
 			.add("hiddenUser", hiddenUser)
-			.add("obmDomain", obmDomain)
+			.add("obmDomain", domain)
 			.toString();
 	}
 }
