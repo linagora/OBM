@@ -53,7 +53,9 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.ServletModule;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -76,6 +78,8 @@ public class ProvisioningService extends ServletModule {
 
 	@Override
 	protected void configureServlets() {
+		bind(GuiceContainer.class).to(GuiceProvisioningJerseyServlet.class);
+
 		bind(ShiroFilter.class).in(Singleton.class);
 		filter("/*", "").through(ShiroFilter.class);
 		
@@ -121,8 +125,14 @@ public class ProvisioningService extends ServletModule {
 	}
 
 	@Provides
+	@RequestScoped
+	public static ObmDomain domainInRequest(HttpContext context) {
+		return (ObmDomain) context.getProperties().get(ObmDomainProvider.DOMAIN_KEY);
+	}
+
+	@Provides
 	@Singleton
-	public static ObjectMapper createObjectMapper() {
+	public static ObjectMapper createObjectMapper(Injector injector) {
 		SimpleModule module =
 				new SimpleModule("Serializers", new Version(0, 0, 0, null))
 				.addSerializer(ObmDomainUuid.class, new ObmDomainUuidJsonSerializer())
@@ -132,7 +142,7 @@ public class ProvisioningService extends ServletModule {
 				.addSerializer(Operation.class, new OperationJsonSerializer())
 				.addSerializer(Batch.class, new BatchJsonSerializer())
 				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
-				.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer())
+				.addDeserializer(ObmUser.class, injector.getInstance(ObmUserJsonDeserializer.class))
 				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer())
 				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer());
 

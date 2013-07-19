@@ -78,6 +78,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -86,7 +88,13 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
-	private Builder builder = ObmUser.builder();
+	private final Provider<ObmDomain> domainProvider;
+	private final Builder builder = ObmUser.builder();
+
+	@Inject
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
+		this.domainProvider = domainProvider;
+	}
 
 	private static final ServiceProperty IMAP_SERVICE_PROPERTY = ServiceProperty
 			.builder()
@@ -126,7 +134,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
 		ObmHost mailHost = null;
 		JsonNode emailsNode = getCurrentTokenTextValue(jsonNode, MAILS);
-		ObmDomain domain = (ObmDomain) ctxt.findInjectableValue(ObmDomain.class.getName(), null, null);
+		ObmDomain domain = domainProvider.get();
 		Collection<String> mails = emailsNode != null ? getCurrentTokenTextValues(emailsNode) : null;
 
 		if (mails != null && !mails.isEmpty()) {

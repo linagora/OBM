@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -48,7 +49,7 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
@@ -57,7 +58,9 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.util.Modules;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.system.ObmSystemUser;
@@ -66,17 +69,35 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 
 @RunWith(SlowGuiceRunner.class)
-@GuiceModule(CommonDomainEndPointEnvTest.Env.class)
+@GuiceModule(BatchProcessorImplTest.Env.class)
 public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
+	public static class Env extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			install(Modules.override(new CommonDomainEndPointEnvTest.Env()).with(new AbstractModule() {
+
+				@Override
+				protected void configure() {
+					bind(BatchProcessor.class).to(BatchProcessorImpl.class);
+				}
+
+			}));
+		}
+
+	}
+
 	@Inject
-	private BatchProcessorImpl processor;
+	private BatchProcessor processor;
 	@Inject
 	private UserSystemDao userSystemDao;
 	@Inject
 	private DateProvider dateProvider;
 	@Inject
 	private SatelliteService satelliteService;
+
+	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
 	private final ObmSystemUser obmSatelliteUser = ObmSystemUser
 			.builder()
@@ -92,12 +113,12 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.entityType(BatchEntityType.USER)
-				.request(Request
+				.request(org.obm.provisioning.beans.Request
 						.builder()
 						.url("/users/")
 						.verb(HttpVerb.POST)
 						.body(	"{" +
-										"\"invalid\": \"json\"" +
+									"\"invalid\": \"json\"" +
 								"}")
 						.build());
 		Batch.Builder batchBuilder = Batch
@@ -106,9 +127,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		Date date = DateUtils.date("2013-08-01T12:00:00");
 
-		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.ERROR)
@@ -118,21 +140,23 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+
 		mocksControl.replay();
 
-		processor.process(batchBuilder.build());
+		createBatchWithOneUserAndCommit();
 
 		mocksControl.verify();
 	}
 
 	@Test
 	public void testProcessCreateUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.entityType(BatchEntityType.USER)
-				.request(Request
+				.request(org.obm.provisioning.beans.Request
 						.builder()
 						.url("/users/")
 						.verb(HttpVerb.POST)
@@ -149,9 +173,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		Date date = DateUtils.date("2013-08-01T12:00:00");
 
-		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+
 		expect(userDao.create(ObmUser
 				.builder()
 				.login("user1")
@@ -168,9 +193,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+
 		mocksControl.replay();
 
-		processor.process(batchBuilder.build());
+		createBatchWithOneUserAndCommit();
 
 		mocksControl.verify();
 	}
@@ -195,7 +221,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.id(operationId(1))
 				.status(BatchStatus.IDLE)
 				.entityType(BatchEntityType.USER)
-				.request(Request
+				.request(org.obm.provisioning.beans.Request
 						.builder()
 						.url("/users/")
 						.verb(HttpVerb.POST)
@@ -212,10 +238,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domainWithMailHost)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Connection satelliteConnection = mocksControl.createMock(Connection.class);
 
-		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+
 		expect(userDao.create(ObmUser
 				.builder()
 				.login("user1")
@@ -236,10 +263,35 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+
 		mocksControl.replay();
 
-		processor.process(batchBuilder.build());
+		createBatchWithOneUserAndCommit();
 
 		mocksControl.verify();
+	}
+
+	private void createBatchWithOneUserAndCommit() {
+		given()
+			.auth().basic("username@domain", "password")
+			.post("/batches/");
+		given()
+			.auth().basic("username@domain", "password")
+			.post("/batches/1/users");
+		given()
+            .auth().basic("username@domain", "password")
+            .put("/batches/1");
+	}
+
+	private void expectBatchCreationAndRetrieval(Batch batch) throws Exception {
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+
+		expect(batchDao.create(isA(Batch.class))).andReturn(batch);
+		expect(batchDao.get(batchId(1))).andReturn(batch);
+		expect(batchDao.addOperation(eq(batchId(1)), isA(Operation.class))).andReturn(batch);
+		expect(batchDao.get(batchId(1))).andReturn(batch);
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 	}
 }

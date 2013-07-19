@@ -44,8 +44,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.codehaus.jackson.map.InjectableValues;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -85,6 +83,7 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.util.Modules;
 import com.jayway.restassured.RestAssured;
+import com.sun.jersey.guice.JerseyServletModule;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -106,12 +105,12 @@ public abstract class CommonDomainEndPointEnvTest {
 			
 			context = createContext(server);
 			
-			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new AbstractModule() {
+			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new JerseyServletModule() {
 
 				private IMocksControl mocksControl = createControl();
 
 				@Override
-				protected void configure() {
+				protected void configureServlets() {
 					bind(IMocksControl.class).toInstance(mocksControl);
 					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
@@ -213,8 +212,6 @@ public abstract class CommonDomainEndPointEnvTest {
 	@Inject
 	protected BatchDao batchDao;
 	@Inject
-	protected ObjectMapper objectMapper;
-	@Inject
 	protected ProfileDao profileDao;
 	@Inject
 	protected PermissionDao roleDao;
@@ -232,7 +229,6 @@ public abstract class CommonDomainEndPointEnvTest {
 		serverPort = server.getConnectors()[0].getLocalPort();
 		baseUrl = "http://localhost:" + serverPort + ProvisioningService.PROVISIONING_URL_PREFIX;
 
-		objectMapper.setInjectableValues(new InjectableValues.Std().addValue(ObmDomain.class, domain));
 		SecurityUtils.setSecurityManager(new DefaultWebSecurityManager(realm));
 		RestAssured.baseURI = baseUrl + "/" + domain.getUuid().get();
 		RestAssured.port = serverPort;
@@ -286,13 +282,13 @@ public abstract class CommonDomainEndPointEnvTest {
 								.build())
 						.build();
 		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
-		expect(userDao.findUserByLogin(login, domain)).andReturn(user).once();
+		expect(userDao.findUserByLogin(login, domain)).andReturn(user);
 	}
 	
 	protected void expectAuthorizingReturns(String login, Collection<String> permissions) throws Exception {
-		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(adminProfile).atLeastOnce();
+		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(adminProfile);
 		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
-		expect(roleDao.getPermissionsForProfile(adminProfile, domain)).andReturn(permissions).atLeastOnce();
+		expect(roleDao.getPermissionsForProfile(adminProfile, domain)).andReturn(permissions);
 	}
 	
 	protected void expectSuccessfulAuthenticationAndFullAuthorization() throws Exception {

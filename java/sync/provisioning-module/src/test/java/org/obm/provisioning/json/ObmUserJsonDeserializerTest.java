@@ -59,7 +59,7 @@ public class ObmUserJsonDeserializerTest {
 
 	@Before
 	public void setUp() {
-		testee = new ObmUserJsonDeserializer();
+		testee = new ObmUserJsonDeserializer(null);
 	}
 
 	@Test

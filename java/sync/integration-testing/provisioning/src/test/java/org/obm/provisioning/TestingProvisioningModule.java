@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.name.Names;
+import com.sun.jersey.guice.JerseyServletModule;
 
 public class TestingProvisioningModule extends ProvisioningService {
 
@@ -61,6 +62,7 @@ public class TestingProvisioningModule extends ProvisioningService {
 		super.configureServlets();
 
 		install(new TransactionalModule());
+		install(new JerseyServletModule());
 		
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);

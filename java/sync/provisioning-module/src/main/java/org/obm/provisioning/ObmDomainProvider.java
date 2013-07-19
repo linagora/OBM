@@ -35,8 +35,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Provider;
 
-import org.codehaus.jackson.map.InjectableValues;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.obm.domain.dao.DomainDao;
 
 import com.google.inject.Inject;
@@ -54,15 +52,15 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Provider
 public class ObmDomainProvider extends PerRequestTypeInjectableProvider<Context, ObmDomain> {
 
+	public static final String DOMAIN_KEY = "ObmProvisioningDomain";
+
 	private final DomainDao domainDao;
-	private ObjectMapper mapper;
 
 	@Inject
-	private ObmDomainProvider(DomainDao domainDao, ObjectMapper mapper) {
+	private ObmDomainProvider(DomainDao domainDao) {
 		super(ObmDomain.class);
 
 		this.domainDao = domainDao;
-		this.mapper = mapper;
 	}
 
 	@Override
@@ -84,9 +82,9 @@ public class ObmDomainProvider extends PerRequestTypeInjectableProvider<Context,
 					throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
 				}
 
-				mapper.setInjectableValues(
-						new InjectableValues.Std().addValue(ObmDomain.class, domain));
-				
+				// Store it in the request context so that it can be retrieved by a request-scoped guice provider
+				c.getProperties().put(DOMAIN_KEY, domain);
+
 				return domain;
 			}
 
