@@ -43,6 +43,8 @@ public interface LdapManager {
 	
 	public abstract void createUser(ObmUser obmUser);
 
+	public void deleteUser(ObmUser obmUser);
+
 	public abstract void shutdown() throws ConnectionException;
 
 }

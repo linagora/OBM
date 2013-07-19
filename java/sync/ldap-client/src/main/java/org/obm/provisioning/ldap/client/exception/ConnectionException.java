@@ -33,6 +33,8 @@ package org.obm.provisioning.ldap.client.exception;
 
 public class ConnectionException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	public ConnectionException(Throwable exception) {
 		super(exception);
 	}

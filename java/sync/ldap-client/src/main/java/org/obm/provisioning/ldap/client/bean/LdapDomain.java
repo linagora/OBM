@@ -59,4 +59,9 @@ public class LdapDomain {
 		public final int hashCode(){
 			return Objects.hashCode(domain);
 		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(this).add("domain", domain).toString();
+		}
 }

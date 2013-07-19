@@ -78,6 +78,12 @@ public class LdapManagerImpl implements LdapManager {
 		conn.createUser(ldapUser);
 	}
 
+	public void deleteUser(ObmUser obmUser) {
+		LdapUser ldapUser = userBuilderProvider.get().fromObmUser(obmUser)
+				.build();
+		conn.deleteUser(ldapUser.getUid(), ldapUser.getDomain());
+	}
+	
 	@Override
 	public void shutdown() throws ConnectionException {
 		conn.shutdown();

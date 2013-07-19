@@ -42,7 +42,9 @@ import org.junit.runner.RunWith;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ldap.client.Connection;
 import org.obm.provisioning.ldap.client.LdapManagerImpl;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -61,6 +63,7 @@ public class LdapManagerImplTest {
 		control = createControl();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreate() {
 		Connection mockConnection = control.createMock(Connection.class);
@@ -85,6 +88,40 @@ public class LdapManagerImplTest {
 		control.replay();
 		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider);
 		ldapManager.createUser(obmUser);
+		control.verify();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDelete() {
+		Connection mockConnection = control.createMock(Connection.class);
+		Provider<LdapUser.Builder> mockUserBuilderProvider = control.createMock(Provider.class);
+		LdapUser.Builder mockLdapUserBuilder = control.createMock(LdapUser.Builder.class);
+		LdapUser mockLdapUser = control.createMock(LdapUser.class);
+		expect(mockLdapUser.getUid()).andReturn(Uid.valueOf("richard.sorge"));
+		expect(mockLdapUser.getDomain()).andReturn(LdapDomain.valueOf("gru.gov.ru"));
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1895)
+				.login("richard.sorge")
+				.firstName("Richard")
+				.lastName("Sorge")
+				.domain(ObmDomain
+						.builder()
+						.host(ServiceProperty.builder().build(),
+								ObmHost.builder().build()).name("gru.gov.ru")
+						.build())
+				.build();
+
+		expect(mockUserBuilderProvider.get()).andReturn(mockLdapUserBuilder);
+		expect(mockLdapUserBuilder.fromObmUser(obmUser)).andReturn(mockLdapUserBuilder);
+		expect(mockLdapUserBuilder.build()).andReturn(mockLdapUser);
+		mockConnection.deleteUser(Uid.valueOf("richard.sorge"), LdapDomain.valueOf("gru.gov.ru"));
+		expectLastCall().once();
+
+		control.replay();
+		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider);
+		ldapManager.deleteUser(obmUser);
 		control.verify();
 	}
 }

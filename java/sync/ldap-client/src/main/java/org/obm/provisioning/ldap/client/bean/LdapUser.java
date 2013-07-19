@@ -82,6 +82,11 @@ public class LdapUser {
 		public final int hashCode(){
 			return Objects.hashCode(uid);
 		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(this).add("uid", uid).toString();
+		}
 	}
 	
 	public static class Builder {
