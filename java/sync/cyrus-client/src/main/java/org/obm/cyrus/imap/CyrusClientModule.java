@@ -31,13 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap;
 
+import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.cyrus.imap.admin.Connection;
 import org.obm.cyrus.imap.admin.ConnectionImpl;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.cyrus.imap.admin.CyrusManagerImpl;
-import org.obm.push.LinagoraImapModule;
+import org.obm.push.LinagoraImapClientModule;
 
 import com.google.inject.AbstractModule;
 
@@ -45,10 +47,13 @@ public class CyrusClientModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		this.install(new LinagoraImapModule());
 		bind(CyrusImapService.class).to(CyrusImapServiceImpl.class);
 		bind(CyrusManager.Factory.class).to(CyrusManagerImpl.Factory.class);
 		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
+		
+		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
+		
+		install(new LinagoraImapClientModule());
 	}
 
 }

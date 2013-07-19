@@ -39,7 +39,7 @@ public class ConnectionImpl implements Connection {
 
 	private StoreClient storeClient;
 
-	public class Factory implements Connection.Factory {
+	public static class Factory implements Connection.Factory {
 		@Override
 		public ConnectionImpl create(StoreClient storeClient) {
 			return new ConnectionImpl(storeClient);
@@ -120,8 +120,7 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-		
+		storeClient.logout();
 	}
 
 }

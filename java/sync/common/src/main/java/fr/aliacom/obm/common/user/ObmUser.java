@@ -43,6 +43,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -628,6 +629,10 @@ public class ObmUser {
 
 	public Integer getGidNumber() {
 		return gidNumber;
+	}
+	
+	public boolean isEmailAvailable() {
+		return !Strings.isNullOrEmpty(email) || !Iterables.isEmpty(emailAlias);
 	}
 
 	@Override

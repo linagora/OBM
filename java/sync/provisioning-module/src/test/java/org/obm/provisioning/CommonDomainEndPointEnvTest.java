@@ -52,6 +52,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.DateUtils;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
@@ -75,6 +76,8 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -121,6 +124,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
 					bind(DomainBasedSubResourceForTest.class);
+					bind(CyrusImapService.class).toInstance(mocksControl.createMock(CyrusImapService.class));
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
@@ -155,6 +159,9 @@ public abstract class CommonDomainEndPointEnvTest {
 			.name("domain")
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.host(
+					ServiceProperty.builder().service("mail").property("imap").build(),
+					ObmHost.builder().name("host").build())
 			.build();
 	
 	protected static final ProfileName profileName = ProfileName
@@ -349,7 +356,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mobile\":\"mobile\"," +
 				"\"faxes\":[\"fax\",\"fax2\"]," +
 				"\"mail_quota\":\"1234\"," +
-				"\"mail_server\":null," +
+				"\"mail_server\":\"host\"," +
 				"\"mails\":[\"john@domain\"]," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
@@ -385,7 +392,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.fax("fax")
 				.fax2("fax2")
 				.mailQuota(1234)
-				//.mail_server()			// Not implemented yet in ObmUser
+				.mailHost(ObmHost.builder().name("host").build())			// Not implemented yet in ObmUser
 				.emailAndAliases("john@domain")
 				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
 				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))

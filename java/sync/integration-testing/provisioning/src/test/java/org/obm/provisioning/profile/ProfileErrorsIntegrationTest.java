@@ -73,7 +73,7 @@ public class ProfileErrorsIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWheqnNoTable(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		
 		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));

@@ -35,10 +35,13 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -49,6 +52,9 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
@@ -100,6 +106,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private SatelliteService satelliteService;
 	@Inject
 	private LdapService ldapService;
+	@Inject
+	private CyrusImapService cyrusService;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -107,6 +115,13 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 			.builder()
 			.id(1)
 			.login("obmsatelliterequest")
+			.password("secret")
+			.build();
+	
+	private final ObmSystemUser obmCyrusUser = ObmSystemUser
+			.builder()
+			.id(2)
+			.login("cyrus")
 			.password("secret")
 			.build();
 
@@ -168,7 +183,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
 										"\"profile\": \"user\"," +
-										"\"password\": \"secret\"" +
+										"\"password\": \"secret\"," +
+										"\"mails\":[\"john@domain\"]" +
 								"}")
 						.build());
 		Batch.Builder batchBuilder = Batch
@@ -177,20 +193,24 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-
-		expectDomain();
-		expectBatchCreationAndRetrieval(batchBuilder.build());
-
-		ObmUser user = ObmUser
+		
+		final ObmUser user = ObmUser
 				.builder()
 				.login("user1")
 				.password("secret")
+				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").build())
 				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.create(user)).andReturn(user);
 		expectLdapCreateUser(user);
+		expectCyrusCreateMailbox(user);
+		
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -199,12 +219,21 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-
+		
 		mocksControl.replay();
 
 		createBatchWithOneUserAndCommit();
 
 		mocksControl.verify();
+	}
+
+	private void expectCyrusCreateMailbox(final ObmUser user)
+			throws DaoException {
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(obmCyrusUser);
+		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
+		expect(cyrusService.buildManager("host", "cyrus", "secret")).andReturn(cyrusManager);
+		cyrusManager.create(user);
+		expectLastCall().once();
 	}
 
 	@Test
@@ -311,5 +340,58 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
+	}
+	
+	@Test
+	public void testCreateUserWithNoEmail() throws DaoException, BatchNotFoundException, SQLException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.url("/users/")
+						.verb(HttpVerb.POST)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1\"," +
+										"\"profile\": \"user\"," +
+										"\"password\": \"secret\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		final ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(userDao.create(user)).andReturn(user);
+		expectLdapCreateUser(user);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
 	}
 }

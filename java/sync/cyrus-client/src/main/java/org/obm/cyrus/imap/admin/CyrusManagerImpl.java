@@ -83,4 +83,11 @@ public class CyrusManagerImpl implements CyrusManager {
 				);
 	}
 
+	@Override
+	public void shutdown() {
+		conn.shutdown();
+	}
+	
+	
+
 }

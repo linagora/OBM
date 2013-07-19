@@ -12,6 +12,7 @@ import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.provisioning.beans.Batch;
@@ -89,11 +90,11 @@ public class ProvisioningService extends ServletModule {
 
 		bindRestResources();
 		bindDao();
-
+		
 		install(new BatchProcessingModule());
 		install(new LdapModule());
 		install(new SatelliteClientModule());
-		
+		install(new CyrusClientModule());
 		install(new ShiroAopModule());
 		install(new AuthorizingModule(servletContext));
 	}

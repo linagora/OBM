@@ -29,6 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl;
 
+import static fr.aliacom.obm.common.system.ObmSystemUser.OBM_SATELLITE_REQUEST;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -62,8 +64,6 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 
 @Singleton
 public class BatchProcessorImpl implements BatchProcessor {
-
-	private static final String OBMSATELLITEREQUEST = "obmsatelliterequest";
 
 	private final DateProvider dateProvider;
 	private final SatelliteService satelliteService;
@@ -159,7 +159,7 @@ public class BatchProcessorImpl implements BatchProcessor {
 	}
 
 	private Configuration getSatelliteConfiguration() throws DaoException, SystemUserNotFoundException {
-		return new SystemUserSatelliteConfiguration(userSystemDao.getByLogin(OBMSATELLITEREQUEST));
+		return new SystemUserSatelliteConfiguration(userSystemDao.getByLogin(OBM_SATELLITE_REQUEST));
 	}
 
 	private Operation processOperation(Operation operation, Batch batch) {

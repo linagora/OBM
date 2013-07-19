@@ -33,6 +33,9 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class ObmSystemUser {
+	
+	public final static String OBM_SATELLITE_REQUEST = "obmsatelliterequest";
+	public final static String CYRUS = "cyrus";
 
 	public static Builder builder() {
 		return new Builder();

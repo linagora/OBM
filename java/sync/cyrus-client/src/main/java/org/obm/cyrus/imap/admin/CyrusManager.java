@@ -40,4 +40,5 @@ public interface CyrusManager {
 	}
 
 	void create(ObmUser obmUser);
+	void shutdown();
 }

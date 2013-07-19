@@ -29,12 +29,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl;
 
+import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
+
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -49,51 +54,91 @@ import com.google.inject.Inject;
 import com.google.inject.util.Providers;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcessor {
 
 	private final UserDao userDao;
+	private final CyrusImapService cyrusService;
 	private final LdapService ldapService;
+	private final UserSystemDao userSystemDao;
 
 	@Inject
-	public CreateUserOperationProcessor(UserDao userDao, LdapService ldapService) {
+	public CreateUserOperationProcessor(
+			UserDao userDao, LdapService ldapService, CyrusImapService cyrusService, UserSystemDao userSystemDao) {
 		super(BatchEntityType.USER, HttpVerb.POST);
 
 		this.userDao = userDao;
+		this.cyrusService = cyrusService;
 		this.ldapService = ldapService;
+		this.userSystemDao = userSystemDao;
 	}
 
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
+		ObmUser user = getUserFromRequestBody(operation, batch);
+		ObmUser userFromDao = createUserInDao(user);
+		if (user.isEmailAvailable()) {
+			createUserMailboxes(user);
+		}
+		createUserInLdap(userFromDao);
+	}
+
+	private ObmUser getUserFromRequestBody(Operation operation, Batch batch) {
 		ObmUser user = null;
 		String requestBody = operation.getRequest().getBody();
 		ObjectMapper objectMapper = getObjectMapperForDomain(batch.getDomain());
 
 		try {
 			user = objectMapper.readValue(requestBody, ObmUser.class);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
 		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
-		}
+		
+		return user;
+	}
 
+	private void createUserMailboxes(ObmUser user) {
 		try {
-			user = userDao.create(user);
+			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
+			CyrusManager cyrusManager = cyrusService.buildManager(
+					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+			cyrusManager.create(user);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format(
+							"Cannot create cyrus mailbox for user '%s' (%s).",
+							user.getLogin(), user.getExtId()), e);
+		} finally {
+			
+		}
+	}
+
+	private ObmUser createUserInDao(ObmUser user) {
+		ObmUser userFromDao = null;
+				
+		try {
+			userFromDao = userDao.create(user);
 		}
 		catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
 		}
 
+		return userFromDao;
+	}
+
+	private void createUserInLdap(ObmUser user) {
 		LdapManager ldapManager = ldapService.buildManager();
 
 		try {
 			ldapManager.createUser(user);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
-		}
-		finally {
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+		} finally {
 			ldapManager.shutdown();
 		}
 	}
