@@ -31,10 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client.bean;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
@@ -170,23 +166,26 @@ public class LdapGroup {
 	}
 	
 	public Entry buildEntry() throws LdapException {
-		String dn = buildDn();
+		LdapEntry.Builder builder = LdapEntry.builder().dn(
+				buildDn());
 		
-		List<String> attributes = new ArrayList<String>();
 		for (String objectClass: getObjectClasses()) {
-			attributes.add("objectClass: " + objectClass);
+			builder.attribute(Attribute.valueOf("objectClass", objectClass));
 		}
-		attributes.add("cn: " + getCn().get());
-		attributes.add("gidNumber: " + getGidNumber());
-		attributes.add("mailAccess: " + getMailAccess());
-		attributes.add("mail: " + getMail());
-		attributes.add("obmDomain: " + getDomain().get());
-		
-		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
+		LdapEntry ldapEntry = builder
+				.attribute(Attribute.valueOf("cn", cn.get()))
+				.attribute(Attribute.valueOf("gidNumber", gidNumber))
+				.attribute(Attribute.valueOf("mailAccess", mailAccess))
+				.attribute(Attribute.valueOf("mail", mail))
+				.attribute(Attribute.valueOf("obmDomain", domain.get()))
+				.build();
+				
+		return ldapEntry.toDefaultEntry();
 	}
 	
-	private String buildDn() {
-		return "cn=" + getCn().get() + "," + groupBaseDn.getName();
+	private org.obm.provisioning.ldap.client.bean.Dn buildDn() {
+		return org.obm.provisioning.ldap.client.bean.Dn.valueOf(
+				"cn=" + getCn().get() + "," + groupBaseDn.getName());
 	}
 
 	@Override

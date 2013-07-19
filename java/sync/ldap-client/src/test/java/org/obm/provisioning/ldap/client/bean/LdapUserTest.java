@@ -1,12 +1,10 @@
 package org.obm.provisioning.ldap.client.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
-import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -15,7 +13,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@GuiceModule(EmbeddedLdapModule.class)
 @RunWith(SlowGuiceRunner.class)
 public class LdapUserTest {
 

@@ -31,10 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client.bean;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
@@ -407,35 +403,36 @@ public class LdapUser {
 	}
 
 	public Entry buildEntry() throws LdapException {
-		String dn = buildDn();
-		
-		List<String> attributes = new ArrayList<String>();
+		LdapEntry.Builder builder = LdapEntry.builder()
+				.dn(buildDn());
 		for (String objectClass: getObjectClasses()) {
-			attributes.add("objectClass: " + objectClass);
+			builder.attribute(Attribute.valueOf("objectClass", objectClass));
 		}
-		attributes.add("uid: " + getUid().get());
-		attributes.add("uidNumber: " + getUidNumber());
-		attributes.add("gidNumber: " + getGidNumber());
-		attributes.add("loginShell: " + getLoginShell());
-		attributes.add("cn: " + getCn());
-		attributes.add("displayName: " + getDisplayName());
-		attributes.add("sn: " + getSn());
-		attributes.add("givenName: " + getGivenName());
-		attributes.add("homeDirectory: " + getHomeDirectory());
-		attributes.add("userPassword: " + getUserPassword());
-		attributes.add("webAccess: " + getWebAccess());
-		attributes.add("mailBox: " + getMailBox());
-		attributes.add("mailBoxServer: " + getMailBoxServer());
-		attributes.add("mailAccess: " + getMailAccess());
-		attributes.add("mail: " + getMail());
-		attributes.add("hiddenUser: " + isHiddenUser());
-		attributes.add("obmDomain: " + getDomain().get());
-		
-		return new DefaultEntry(dn, attributes.toArray(new Object[0]));
+		LdapEntry ldapEntry = builder
+			.attribute(Attribute.valueOf("uid", uid.get()))
+			.attribute(Attribute.valueOf("uidNumber", uidNumber))
+			.attribute(Attribute.valueOf("gidNumber", gidNumber))
+			.attribute(Attribute.valueOf("loginShell", loginShell))
+			.attribute(Attribute.valueOf("cn", cn))
+			.attribute(Attribute.valueOf("displayName", displayName))
+			.attribute(Attribute.valueOf("sn", sn))
+			.attribute(Attribute.valueOf("givenName", givenName))
+			.attribute(Attribute.valueOf("homeDirectory", homeDirectory))
+			.attribute(Attribute.valueOf("userPassword", userPassword))
+			.attribute(Attribute.valueOf("webAccess", webAccess))
+			.attribute(Attribute.valueOf("mailBox", mailBox))
+			.attribute(Attribute.valueOf("mailBoxServer", mailBoxServer))
+			.attribute(Attribute.valueOf("mailAccess", mailAccess))
+			.attribute(Attribute.valueOf("mail", mail))
+			.attribute(Attribute.valueOf("hiddenUser", hiddenUser))
+			.attribute(Attribute.valueOf("obmDomain", domain.get()))
+			.build();
+		return ldapEntry.toDefaultEntry();
 	}
 	
-	private String buildDn() {
-		return "uid=" + getUid().get() + "," + userBaseDn.getName();
+	private org.obm.provisioning.ldap.client.bean.Dn buildDn() {
+		return org.obm.provisioning.ldap.client.bean.Dn.valueOf(
+				"uid=" + getUid().get() + "," + userBaseDn.getName());
 	}
 	
 	@Override
