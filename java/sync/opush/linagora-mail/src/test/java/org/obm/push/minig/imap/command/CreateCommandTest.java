@@ -73,13 +73,13 @@ public class CreateCommandTest {
 	@Test
 	public void testCreateMailboxWithPartition() {
 		assertThat(new CreateCommand("user/myusername/mailbox", "partition_name").getImapCommand())
-			.isEqualTo("CREATE \"user/myusername/mailbox\" \"partition_name\"");
+			.isEqualTo("CREATE \"user/myusername/mailbox\" partition_name");
 	}
 
 	@Test
 	public void testCreateMailboxWithPartitionUTF7() {
 		assertThat(new CreateCommand("user/myusername/mailbox", "partition_name_accent_é").getImapCommand())
-			.isEqualTo("CREATE \"user/myusername/mailbox\" \"partition_name_accent_&AOk-\"");
+			.isEqualTo("CREATE \"user/myusername/mailbox\" partition_name_accent_&AOk-");
 	}
 	
 }

@@ -50,8 +50,8 @@ public class CreateCommand extends SimpleCommand<Boolean> {
 		if (Strings.isNullOrEmpty(partition)) {
 			return "";
 		}
-		return " " + toUtf7(partition);
-	}
+		return " " + toUtf7WithoutQuotes(partition);
+	} 
 
 	@Override
 	public boolean isMatching(IMAPResponse response) {

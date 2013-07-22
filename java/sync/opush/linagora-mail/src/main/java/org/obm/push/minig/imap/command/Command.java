@@ -130,6 +130,10 @@ public abstract class Command<T> implements ICommand<T> {
 		b.append("\"");
 		return b.toString();
 	}
+	
+	protected static String toUtf7WithoutQuotes(String partition) {
+		return MailboxNameUTF7Converter.encode(partition);
+	}
 
 	protected boolean isOk(List<IMAPResponse> rs) {
 		return Iterables.getLast(rs).isOk();
