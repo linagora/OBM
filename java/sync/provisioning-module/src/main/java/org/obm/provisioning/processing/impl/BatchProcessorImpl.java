@@ -87,7 +87,6 @@ public class BatchProcessorImpl implements BatchProcessor {
 	}
 
 	@Override
-	@Transactional
 	public void process(Batch batch) throws ProcessingException {
 		Id batchId = batch.getId();
 		Batch.Builder batchBuilder = Batch
@@ -129,7 +128,8 @@ public class BatchProcessorImpl implements BatchProcessor {
 		return batchBuilder != null ? batchBuilder.build() : null;
 	}
 
-	private void persist(Batch batch) {
+	@Transactional
+	void persist(Batch batch) {
 		try {
 			batchDao.update(batch);
 		}

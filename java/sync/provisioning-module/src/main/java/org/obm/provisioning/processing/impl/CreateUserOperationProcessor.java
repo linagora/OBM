@@ -33,6 +33,7 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.Batch;
@@ -64,6 +65,7 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 	}
 
 	@Override
+	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = null;
 		String requestBody = operation.getRequest().getBody();
