@@ -74,14 +74,17 @@ public class CyrusManagerImpl implements CyrusManager {
 
 	@Override
 	public void create(ObmUser obmUser) {
-		String user = obmUser.getEmailAtDomain();
+		final String domain = obmUser.getDomain().getName();
+		String user = obmUser.getLogin();
+		Partition partition = Partition.fromObmDomain(domain);
 		conn.createUserMailboxes(
-				ImapPath.builder().user(user).build(),
-				ImapPath.builder().user(user).pathFragment(TRASH).build(),
-				ImapPath.builder().user(user).pathFragment(DRAFTS).build(),
-				ImapPath.builder().user(user).pathFragment(SPAM).build(),
-				ImapPath.builder().user(user).pathFragment(TEMPLATES).build(),
-				ImapPath.builder().user(user).pathFragment(SENT).build()
+				partition,
+				ImapPath.builder().user(user).domain(domain).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build()
 				);
 	}
 

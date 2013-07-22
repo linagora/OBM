@@ -31,25 +31,45 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.junit.Test;
-
 import static org.fest.assertions.api.Assertions.assertThat;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
+
+@RunWith(SlowFilterRunner.class)
 public class ImapPathTest {
 
 	@Test
 	public void testImapPathFormat() {
-		ImapPath imapPath = ImapPath.builder().user("ident4@vm.obm.org").pathFragment("folder1").pathFragment("folder2").build();
-		assertThat(imapPath.format()).isEqualTo("user/ident4@vm.obm.org/folder1/folder2");
+		ImapPath imapPath = ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("folder1").pathFragment("folder2").build();
+		assertThat(imapPath.format()).isEqualTo("user/ident4/folder1/folder2@vm.obm.org");
+	}
+	
+	@Test
+	public void testImapPathFormatWithOneFragment() {
+		ImapPath imapPath = ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("folder1").build();
+		assertThat(imapPath.format()).isEqualTo("user/ident4/folder1@vm.obm.org");
 	}
 
 	@Test
 	public void testImapPathNoFragmentFormat() {
-		ImapPath imapPath = ImapPath.builder().user("ident4@vm.obm.org").build();
+		ImapPath imapPath = ImapPath.builder().user("ident4").domain("vm.obm.org").build();
 		assertThat(imapPath.format()).isEqualTo("user/ident4@vm.obm.org");
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testImapPathWithSeparatorInFragment() {
 		ImapPath.builder().user("ident4@vm.obm.org").pathFragment("folder1/folder2").build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testImapPathFormatWithNoUser() {
+		ImapPath.builder().domain("vm.obm.org").pathFragment("folder1").build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testImapPathFormatWithNoDomain() {
+		ImapPath.builder().user("user").pathFragment("folder1").build();
 	}
 }

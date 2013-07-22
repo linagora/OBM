@@ -46,4 +46,12 @@ public class Partition {
 	public String getName() {
 		return name;
 	}
+	
+	private static String preparePartitionName(String obmDomainName) {
+		return obmDomainName.replace(".", "_");
+	}
+	
+	public static Partition fromObmDomain(String obmDomainName) {
+		return valueOf(preparePartitionName(obmDomainName));
+	}
 }

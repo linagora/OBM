@@ -56,14 +56,14 @@ public class ConnectionImplTest {
 		
 				
 		expect(mockClient.create("user/ident4@vm.obm.org", "partition")).andReturn(true);
-		expect(mockClient.create("user/ident4@vm.obm.org/Trash", "partition")).andReturn(true);
+		expect(mockClient.create("user/ident4/Trash@vm.obm.org", "partition")).andReturn(true);
 		
 		control.replay();
 	
 		Connection conn = new ConnectionImpl(mockClient);
 		conn.createUserMailboxes(Partition.valueOf("partition"),
-				ImapPath.builder().user("ident4@vm.obm.org").build(),
-				ImapPath.builder().user("ident4@vm.obm.org").pathFragment("Trash").build()
+				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
+				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
 				);
 		control.verify();
 	}
@@ -74,14 +74,14 @@ public class ConnectionImplTest {
 		
 				
 		expect(mockClient.create("user/ident4@vm.obm.org")).andReturn(true);
-		expect(mockClient.create("user/ident4@vm.obm.org/Trash")).andReturn(true);
+		expect(mockClient.create("user/ident4/Trash@vm.obm.org")).andReturn(true);
 		
 		control.replay();
 	
 		Connection conn = new ConnectionImpl(mockClient);
 		conn.createUserMailboxes(
-				ImapPath.builder().user("ident4@vm.obm.org").build(),
-				ImapPath.builder().user("ident4@vm.obm.org").pathFragment("Trash").build()
+				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
+				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
 				);
 		control.verify();
 	}

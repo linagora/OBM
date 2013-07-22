@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import org.parboiled.common.Preconditions;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -38,10 +40,12 @@ import com.google.common.collect.Iterables;
 public class ImapPath {
 
 	public final static String PATH_SEPARATOR = "/";
+	public final static String DOMAIN_SEPARATOR = "@";
 
 	public static class Builder {
 
 		private String user;
+		private String domain;
 		ImmutableList.Builder<String> pathFragments;
 
 		private Builder() {
@@ -50,6 +54,11 @@ public class ImapPath {
 
 		public Builder user(String user) {
 			this.user = user;
+			return this;
+		}
+		
+		public Builder domain(String domain) {
+			this.domain = domain;
 			return this;
 		}
 
@@ -65,7 +74,10 @@ public class ImapPath {
 		}
 
 		public ImapPath build() {
-			return new ImapPath(user, pathFragments.build());
+			Preconditions.checkState(user != null);
+			Preconditions.checkState(domain != null);
+			
+			return new ImapPath(user, domain, pathFragments.build());
 		}
 
 	}
@@ -74,16 +86,22 @@ public class ImapPath {
 		return new Builder();
 	}
 
-	private String user;
-	ImmutableList<String> pathFragments;
+	final private String user;
+	final private String domain;
+	final private ImmutableList<String> pathFragments;
 
-	private ImapPath(String user, ImmutableList<String> pathFragments) {
+	private ImapPath(String user, String domain, ImmutableList<String> pathFragments) {
 		this.user = user;
+		this.domain = domain;
 		this.pathFragments = pathFragments;
 	}
 
 	public String getUser() {
 		return user;
+	}
+	
+	public String getDomain() {
+		return domain;
 	}
 
 	public ImmutableList<String> getPathFragments() {
@@ -92,7 +110,8 @@ public class ImapPath {
 
 	public String format() {
 		return Joiner.on(PATH_SEPARATOR)
-				.join(Iterables.concat(ImmutableList.of("user", user),
-						pathFragments));
+				.join(Iterables.concat(ImmutableList.of("user", user), pathFragments))
+				.concat(DOMAIN_SEPARATOR)
+				.concat(domain);
 	}
 }
