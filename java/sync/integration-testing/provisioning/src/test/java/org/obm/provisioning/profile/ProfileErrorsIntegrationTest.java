@@ -31,74 +31,58 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.profile;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.provisioning.ProvisioningIntegrationTestUtils.profileUrl;
+import static com.jayway.restassured.RestAssured.given;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.domainUrl;
 
 import java.io.File;
 import java.net.URL;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 
-import com.google.common.base.Charsets;
+import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 public class ProfileErrorsIntegrationTest {
-
-	private DefaultHttpClient httpClient;
-
-	@Before
-	public void setUp() {
-		httpClient = new DefaultHttpClient();
-	}
 	
 	@Test
 	@RunAsClient
 	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
-		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid));
-		httpGet.addHeader(
-				BasicScheme.authenticate(
-						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
-						Charsets.UTF_8.name(),
-						false));
-		HttpResponse httpResponse = httpClient.execute(httpGet);
-		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.get("/profiles/");
 	}
 	
 	@Test
 	@RunAsClient
 	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		HttpGet httpGet = new HttpGet(profileUrl(baseURL, obmDomainUuid) + "1");
-		httpGet.addHeader(
-				BasicScheme.authenticate(
-						new UsernamePasswordCredentials("admin0@global.virt", "admin0"),
-						Charsets.UTF_8.name(),
-						false));
-		HttpResponse httpResponse = httpClient.execute(httpGet);
+		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.get("/profiles/1");
 	}
 	
 	@Deployment
