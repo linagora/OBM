@@ -58,6 +58,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.push.mail.IMAPException;
 import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
@@ -228,7 +229,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 
 	private void expectCyrusCreateMailbox(final ObmUser user)
-			throws DaoException {
+			throws DaoException, IMAPException {
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(obmCyrusUser);
 		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
 		expect(cyrusService.buildManager("host", "cyrus", "secret")).andReturn(cyrusManager);

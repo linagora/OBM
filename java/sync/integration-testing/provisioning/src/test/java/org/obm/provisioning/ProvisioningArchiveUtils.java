@@ -66,6 +66,7 @@ public class ProvisioningArchiveUtils {
 				.addClasses(DependencyResolverHelper.projectDBCPClasses())
 				.addClasses(DependencyResolverHelper.projectUtilsClasses())
 				.addClasses(DependencyResolverHelper.projectLdapClientClasses())
+				.addClasses(DependencyResolverHelper.projectCyrusClientClasses())
 				.addClasses(DependencyResolverHelper.projectSatelliteClientClasses())
 				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
 				.addClasses(DependencyResolverHelper.projectProvisioningClasses())

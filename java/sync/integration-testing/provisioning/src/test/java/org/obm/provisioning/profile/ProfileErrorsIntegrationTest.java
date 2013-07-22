@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.profile;
 
-//import static com.jayway.restassured.RestAssured.given;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.profileUrl;
 

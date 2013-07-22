@@ -62,6 +62,16 @@ import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.cyrus.imap.CyrusClientModule;
+import org.obm.cyrus.imap.admin.Acl;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
+import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.cyrus.imap.admin.CyrusManagerImpl;
+import org.obm.cyrus.imap.admin.ImapOperationException;
+import org.obm.cyrus.imap.admin.ImapPath;
+import org.obm.cyrus.imap.admin.Partition;
+import org.obm.cyrus.imap.admin.Quota;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
@@ -174,8 +184,16 @@ import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
+import org.obm.push.LinagoraImapClientModule;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
+import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.imap.MinigStoreClient;
+import org.obm.push.mail.imap.MinigStoreClientImpl;
+import org.obm.push.minig.imap.StoreClient;
+import org.obm.push.minig.imap.StoreClientImpl;
+import org.obm.push.minig.imap.impl.ClientSupport;
+import org.obm.push.minig.imap.impl.IResponseCallback;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.FileUtils;
@@ -520,6 +538,34 @@ public class DependencyResolverHelper {
 				String groupId = input.getCoordinate().getGroupId();
 				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
 			}
+		};
+	}
+	
+	public static Class<?>[] projectCyrusClientClasses() {
+		return new Class<?>[] {
+				CyrusClientModule.class,
+				Acl.class,
+				org.obm.cyrus.imap.admin.Connection.class,
+				org.obm.cyrus.imap.admin.ConnectionException.class,
+				org.obm.cyrus.imap.admin.ConnectionImpl.class,
+				CyrusImapService.class,
+				CyrusImapService.class,
+				CyrusImapServiceImpl.class,
+				CyrusManager.class,
+				CyrusManagerImpl.class,
+				ImapOperationException.class,
+				ImapPath.class,
+				Partition.class,
+				Quota.class,
+				MinigStoreClient.class,
+				MinigStoreClientImpl.class,
+				StoreClient.class,
+				StoreClientImpl.class,
+				IMAPException.class,
+				LinagoraImapClientModule.class,
+				org.obm.push.bean.Resource.class,
+				IResponseCallback.class,
+				ClientSupport.class
 		};
 	}
 
