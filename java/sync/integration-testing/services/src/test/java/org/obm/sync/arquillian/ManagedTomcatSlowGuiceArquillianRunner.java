@@ -34,6 +34,7 @@ package org.obm.sync.arquillian;
 import java.util.List;
 
 import org.jboss.arquillian.junit.Arquillian;
+import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runners.model.InitializationError;
 import org.obm.filter.SlowFilterRunnerDelegation;
@@ -63,7 +64,7 @@ public class ManagedTomcatSlowGuiceArquillianRunner extends Arquillian {
 	}
 
 	@Override
-	protected Object createTest() throws Exception {
-		return guiceRunnerDelegate.createTest(getTestClass(), super.createTest());
+	protected List<MethodRule> rules(Object target) {
+		return guiceRunnerDelegate.rules(getTestClass(), super.rules(target));
 	}
 }

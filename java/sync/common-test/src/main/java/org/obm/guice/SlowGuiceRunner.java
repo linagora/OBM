@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.guice;
 
+import java.util.List;
+
+import org.junit.rules.MethodRule;
 import org.junit.runners.model.InitializationError;
 import org.obm.filter.SlowFilterRunner;
 
@@ -44,7 +47,7 @@ public class SlowGuiceRunner extends SlowFilterRunner {
 	}
 
 	@Override
-	protected Object createTest() throws Exception {
-		return guiceRunnerDelegation.createTest(getTestClass(), super.createTest());
+	protected List<MethodRule> rules(Object target) {
+		return guiceRunnerDelegation.rules(getTestClass(), super.rules(target));
 	}
 }

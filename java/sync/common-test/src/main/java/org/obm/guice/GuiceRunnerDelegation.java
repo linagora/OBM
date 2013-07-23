@@ -31,19 +31,53 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.guice;
 
+import java.util.List;
+
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestClass;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 
 public class GuiceRunnerDelegation {
 
-	public Object createTest(TestClass testClass, Object testInstance) throws Exception {
-		GuiceModule moduleAnnotation = testClass.getJavaClass().getAnnotation(GuiceModule.class);
-		if (moduleAnnotation != null) {
-			Class<? extends Module> module = moduleAnnotation.value();
-			Guice.createInjector(module.newInstance()).injectMembers(testInstance);
+	public List<MethodRule> rules(TestClass testClass, List<MethodRule> rules) {
+		return ImmutableList.<MethodRule>builder()
+				.addAll(rules)
+				.add(createInjectionMethodRule(testClass)).build();
+	}
+
+	private MethodRule createInjectionMethodRule(final TestClass testClass) {
+		return new MethodRule() {
+			@Override
+			public Statement apply(Statement base, FrameworkMethod method, Object target) {
+				GuiceModule moduleAnnotation = testClass.getJavaClass().getAnnotation(GuiceModule.class);
+				if (moduleAnnotation != null) {
+					return new GuiceStatement(moduleAnnotation.value(), target, base);
+				}
+				return base;
+			}
+		};
+	}
+
+	public static class GuiceStatement extends Statement { 
+		private Class<? extends Module> module;
+		private Object target;
+		private Statement next;
+
+		public GuiceStatement(Class<? extends Module> module, Object target, Statement next) {
+			this.module = module;
+			this.target = target;
+			this.next = next;
 		}
-		return testInstance;
+
+		@Override
+		public void evaluate() throws Throwable {
+			Guice.createInjector(module.newInstance()).injectMembers(target);
+			next.evaluate();
+		}
 	}
 }
