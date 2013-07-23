@@ -231,11 +231,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 	private void expectCyrusCreateMailbox(final ObmUser user)
 			throws DaoException, IMAPException {
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(obmCyrusUser);
-		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
-		expect(cyrusService.buildManager("host", "cyrus", "secret")).andReturn(cyrusManager);
+		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.create(user);
 		expectLastCall().once();
+		expectCyrusShutDown(cyrusManager);
 	}
 
 	@Test

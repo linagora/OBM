@@ -103,9 +103,11 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 	}
 
 	private void createUserMailboxes(ObmUser user) {
+		CyrusManager cyrusManager = null;
+		
 		try {
 			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
-			CyrusManager cyrusManager = cyrusService.buildManager(
+			cyrusManager = cyrusService.buildManager(
 					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
 			cyrusManager.create(user);
 		} catch (Exception e) {
@@ -114,7 +116,9 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 							"Cannot create cyrus mailbox for user '%s' (%s).",
 							user.getLogin(), user.getExtId()), e);
 		} finally {
-			
+			if (cyrusManager != null) {
+				cyrusManager.shutdown();
+			}
 		}
 	}
 
