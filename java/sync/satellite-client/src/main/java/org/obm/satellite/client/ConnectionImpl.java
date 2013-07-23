@@ -65,12 +65,7 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void updateMTA() throws SatteliteClientException, ConnectionException {
-		ServiceProperty smtpInProperty = ServiceProperty
-				.builder()
-				.service("mail")
-				.property("smtp_in")
-				.build();
-		ObmHost mtaHost = Iterables.getFirst(domain.getHosts().get(smtpInProperty), null);
+		ObmHost mtaHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.SMTP_IN), null);
 
 		if (mtaHost == null) {
 			throw new SatteliteClientException(String.format("Domain %s doesn't have a linked mail/smtp_in host", domain.getName()));
@@ -85,12 +80,7 @@ public class ConnectionImpl implements Connection {
 			return;
 		}
 
-		ServiceProperty imapProperty = ServiceProperty
-				.builder()
-				.service("mail")
-				.property("imap")
-				.build();
-		ObmHost imapHost = Iterables.getFirst(domain.getHosts().get(imapProperty), null);
+		ObmHost imapHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.IMAP), null);
 
 		if (imapHost == null) {
 			throw new SatteliteClientException(String.format("Domain %s doesn't have a linked mail/imap host", domain.getName()));

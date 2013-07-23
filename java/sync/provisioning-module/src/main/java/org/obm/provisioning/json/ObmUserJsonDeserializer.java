@@ -96,12 +96,6 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.domainProvider = domainProvider;
 	}
 
-	private static final ServiceProperty IMAP_SERVICE_PROPERTY = ServiceProperty
-			.builder()
-			.service("mail")
-			.property("imap")
-			.build();
-
 	@Override
 	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode jsonNode = jp.readValueAsTree();
@@ -140,7 +134,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		if (mails != null && !mails.isEmpty()) {
 			JsonNode serverNode = getCurrentTokenTextValue(jsonNode, MAIL_SERVER);
 
-			mailHost = findMailHostForUser(serverNode != null ? serverNode.asText() : null, domain.getHosts().get(IMAP_SERVICE_PROPERTY));
+			mailHost = findMailHostForUser(serverNode != null ? serverNode.asText() : null, domain.getHosts().get(ServiceProperty.IMAP));
 		}
 
 		return builder

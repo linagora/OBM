@@ -84,12 +84,6 @@ public class DomainDaoTest {
 	@Inject
 	private DomainDao domainDao;
 
-	private ServiceProperty obmSyncServiceProperty = ServiceProperty
-			.builder()
-			.service("sync")
-			.property("obm_sync")
-			.build();
-
 	@After
 	public void tearDown() {
 		mocksControl.verify();
@@ -105,7 +99,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
-		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	
@@ -119,7 +113,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
-		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	
@@ -133,7 +127,7 @@ public class DomainDaoTest {
 		assertThat(d.getLabel()).isEqualTo("label");
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
-		assertThat(d.getHosts().get(obmSyncServiceProperty)).hasSize(1);
+		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.getGlobal()).isEqualTo(false);
 	}
 	

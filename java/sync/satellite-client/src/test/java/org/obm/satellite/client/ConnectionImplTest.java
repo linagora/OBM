@@ -72,8 +72,8 @@ public class ConnectionImplTest {
 	private ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
-			.host(ServiceProperty.builder().service("mail").property("imap").build(), ObmHost.builder().ip("localhost").name("localIMAP").build())
-			.host(ServiceProperty.builder().service("mail").property("smtp_in").build(), ObmHost.builder().ip("localhost").name("localMTA").build())
+			.host(ServiceProperty.IMAP, ObmHost.builder().ip("localhost").name("localIMAP").build())
+			.host(ServiceProperty.SMTP_IN, ObmHost.builder().ip("localhost").name("localMTA").build())
 			.build();
 
 	@Before

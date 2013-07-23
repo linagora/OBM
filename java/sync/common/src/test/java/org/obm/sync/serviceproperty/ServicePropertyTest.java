@@ -30,6 +30,8 @@
 
 package org.obm.sync.serviceproperty;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -45,6 +47,14 @@ public class ServicePropertyTest {
 	@Test(expected = NullPointerException.class)
 	public void testBuildWhenNullPropertyGiven() {
 		ServiceProperty.builder().property(null).build();
+	}
+
+	@Test
+	public void testBuild() {
+		ServiceProperty serviceProperty = ServiceProperty.builder().service("service").property("property").build();
+
+		assertThat(serviceProperty.getService()).isEqualTo("service");
+		assertThat(serviceProperty.getProperty()).isEqualTo("property");
 	}
 
 }

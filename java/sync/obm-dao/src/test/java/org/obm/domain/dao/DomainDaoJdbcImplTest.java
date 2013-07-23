@@ -104,9 +104,9 @@ public class DomainDaoJdbcImplTest {
 				.build();
 		ImmutableMultimap<ServiceProperty, ObmHost> hosts = ImmutableMultimap
 				.<ServiceProperty, ObmHost>builder()
-				.put(ServiceProperty.builder().service("mail").property("smtp_in").build(), mailHost)
-				.put(ServiceProperty.builder().service("mail").property("imap").build(), mailHost)
-				.put(ServiceProperty.builder().service("sync").property("obm_sync").build(), syncHost)
+				.put(ServiceProperty.SMTP_IN, mailHost)
+				.put(ServiceProperty.IMAP, mailHost)
+				.put(ServiceProperty.OBM_SYNC, syncHost)
 				.build();
 
 		assertThat(domain.getHosts()).isEqualTo(hosts);

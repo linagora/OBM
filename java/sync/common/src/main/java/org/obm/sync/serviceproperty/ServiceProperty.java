@@ -35,8 +35,21 @@ import com.google.common.base.Preconditions;
 
 public class ServiceProperty {
 
-	private final String service;
-	private final String property;
+	public static final ServiceProperty IMAP = ServiceProperty
+			.builder()
+			.service("mail")
+			.property("imap")
+			.build();
+	public static final ServiceProperty SMTP_IN = ServiceProperty
+			.builder()
+			.service("mail")
+			.property("smtp_in")
+			.build();
+	public static final ServiceProperty OBM_SYNC = ServiceProperty
+			.builder()
+			.service("sync")
+			.property("obm_sync")
+			.build();
 
 	public static class Builder {
 
@@ -70,6 +83,9 @@ public class ServiceProperty {
 	public static Builder builder() {
 		return new Builder();
 	}
+
+	private final String service;
+	private final String property;
 
 	private ServiceProperty(String service, String property) {
 		this.service = service;

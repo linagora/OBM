@@ -255,11 +255,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ObmDomain domainWithMailHost = ObmDomain
 				.builder()
 				.from(domain)
-				.host(ServiceProperty
-						.builder()
-						.service("mail")
-						.property("smtp_in")
-						.build(), ObmHost
+				.host(ServiceProperty.SMTP_IN, ObmHost
 						.builder()
 						.name("Postfix")
 						.ip("1.2.3.4")

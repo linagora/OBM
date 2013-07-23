@@ -141,16 +141,11 @@ public class BatchProcessorImpl implements BatchProcessor {
 	private void postProcess(Batch batch) {
 		try {
 			ObmDomain domain = batch.getDomain();
-			ServiceProperty mailSmtpIn = ServiceProperty
-					.builder()
-					.service("mail")
-					.property("smtp_in")
-					.build();
 
-			if (Iterables.getFirst(domain.getHosts().get(mailSmtpIn), null) != null) {
+			if (Iterables.getFirst(domain.getHosts().get(ServiceProperty.SMTP_IN), null) != null) {
 				satelliteService.create(getSatelliteConfiguration(), domain).updateMTA();
 			} else {
-				logger.info(String.format("Not updating obm-satellite, the domain %s has no linked %s host.", domain.getName(), mailSmtpIn));
+				logger.info(String.format("Not updating obm-satellite, the domain %s has no linked %s host.", domain.getName(), ServiceProperty.SMTP_IN));
 			}
 		}
 		catch (Exception e) {
