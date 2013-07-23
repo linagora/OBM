@@ -31,49 +31,110 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users;
 
+import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
+
+import java.sql.SQLException;
+
 import org.obm.annotations.transactional.Transactional;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcessor {
 	
 	private final UserDao userDao;
+	private final CyrusImapService cyrusService;
+	private final UserSystemDao userSystemDao;
 
 	@Inject
-	public DeleteUserOperationProcessor(UserDao userDao) {
+	public DeleteUserOperationProcessor(UserDao userDao, CyrusImapService cyrusService, UserSystemDao userSystemDao) {
 		super(BatchEntityType.USER, HttpVerb.DELETE);
 
 		this.userDao = userDao;
+		this.cyrusService = cyrusService;
+		this.userSystemDao = userSystemDao;
 	}
 
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
+		final UserExtId extId = getExtIdFromRequestParams(operation);
+		final Request request = operation.getRequest();
+		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
+		final ObmUser userFromDao = getUserFromDao(batch, extId);
+		
+		
+		deleteUserInDao(extId);
+		if (expunge == true) {
+			deleteUserMailBoxes(userFromDao);
+		}	
+	}
+
+	private ObmUser getUserFromDao(Batch batch, final UserExtId extId) {
+		try {
+			return userDao.getByExtId(extId, batch.getDomain());
+		} catch (SQLException e) {
+			throw new ProcessingException(e);
+		} catch (UserNotFoundException e) {
+			throw new ProcessingException(e);
+		}
+	}
+
+	private void deleteUserInDao(UserExtId extId) {
+		try {
+			userDao.delete(extId);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot delete user with extId '%s' in database.", extId.getExtId()), e);
+		}
+	}
+
+	private UserExtId getExtIdFromRequestParams(Operation operation) {
 		final Request request = operation.getRequest();
 		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
 		UserExtId extId  = UserExtId.valueOf(itemId);
 		
 		if (Strings.isNullOrEmpty(extId.getExtId())) {
 			throw new ProcessingException(
-					String.format("Cannot get id parameter from request url %s.", request.getUrl()));
+					String.format("Cannot get extId parameter from request url %s.", request.getUrl()));
 		}
 		
+		return extId;
+	}
+	
+	private void deleteUserMailBoxes(ObmUser user) {
+		CyrusManager cyrusManager = null;
+		
 		try {
-			userDao.delete(extId);
+			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
+			cyrusManager = cyrusService.buildManager(
+					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+			cyrusManager.delete(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete user with extId '%s' in database.", extId.getExtId()), e);
+					String.format(
+							"Cannot delete cyrus mailbox for user '%s' (%s).",
+							user.getLogin(), user.getExtId()), e);
+		} finally {
+			if (cyrusManager != null) {
+				cyrusManager.shutdown();
+			}
 		}
 	}
 

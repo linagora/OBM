@@ -87,12 +87,19 @@ public class CyrusManagerImpl implements CyrusManager {
 				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build()
 				);
 	}
+	
+	@Override
+	public void delete(ObmUser obmUser) {
+		final String domain = obmUser.getDomain().getName();
+		String user = obmUser.getLogin();
+		conn.delete(ImapPath.builder().user(user).domain(domain).build());
+	}
 
 	@Override
 	public void shutdown() {
 		conn.shutdown();
 	}
 	
-	
+
 
 }

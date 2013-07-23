@@ -398,7 +398,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testProcessDeleteUser() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException {
+	public void testProcessDeleteUserWithFalseExpunge() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -417,9 +417,19 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
+		final ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
-		userDao.delete(UserExtId.valueOf("extIdUser1"));
+		final UserExtId extId = UserExtId.valueOf("extIdUser1");
+		expect(userDao.getByExtId(extId, domain)).andReturn(user);
+		userDao.delete(extId);
 		expectLastCall();
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
@@ -429,10 +439,84 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessDeleteUserWithTrueExpunge()
+			throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, IMAPException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.url("/users/extIdUser1")
+						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.param(Request.EXPUNGE_KEY, "true")
+						.verb(HttpVerb.DELETE)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		final ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").build())
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		final UserExtId extId = UserExtId.valueOf("extIdUser1");
+		expect(userDao.getByExtId(extId, domain)).andReturn(user);
+		userDao.delete(extId);
+		expectLastCall();
+		expectDeleteUserMailbox(user);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	private void expectDeleteUserMailbox(final ObmUser user) throws DaoException, IMAPException {
+		CyrusManager cyrusManager = expectCyrusBuild();
+		cyrusManager.delete(user);
+		expectLastCall().once();
+		expectCyrusShutDown(cyrusManager);
+	}
+
+	private void expectCyrusShutDown(CyrusManager cyrusManager) {
+		cyrusManager.shutdown();
+		expectLastCall().once();
+	}
+
+	private CyrusManager expectCyrusBuild() throws DaoException, IMAPException {
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(obmCyrusUser);
+		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
+		expect(cyrusService.buildManager("host", "cyrus", "secret")).andReturn(cyrusManager);
+		return cyrusManager;
 	}
 }

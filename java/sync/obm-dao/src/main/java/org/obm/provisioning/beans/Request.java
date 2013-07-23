@@ -39,6 +39,7 @@ import com.google.common.collect.ImmutableMap;
 public class Request {
 	
 	public final static String ITEM_ID_KEY = "itemId";
+	public final static String EXPUNGE_KEY = "expunge";
 	
 	public static Builder builder() {
 		return new Builder();

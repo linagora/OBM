@@ -90,8 +90,7 @@ public class ConnectionImpl implements Connection {
 	@Override
 	public void delete(ImapPath path) throws ImapOperationException,
 			ConnectionException {
-		// TODO Auto-generated method stub
-		
+		storeClient.delete(path.format());
 	}
 
 	@Override
