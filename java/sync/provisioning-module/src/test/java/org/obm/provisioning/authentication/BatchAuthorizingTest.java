@@ -45,6 +45,7 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
@@ -55,7 +56,9 @@ import com.google.inject.Inject;
 public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Inject
-	BatchProcessor batchProcessor;
+	private BatchProcessor batchProcessor;
+	@Inject
+	private BatchTracker batchTracker;
 	
 	@Test
 	public void testSubjectCannotAuthenticateWithNoDomain() {
@@ -171,7 +174,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	public void testSubjectCanGetBatchWithReadPermission() throws Exception {
 		expectDomain();
 		expectBatch();
-		expect(batchProcessor.getRunningBatch(batchId(1))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(1))).andReturn(null);
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:read")));
 		mocksControl.replay();

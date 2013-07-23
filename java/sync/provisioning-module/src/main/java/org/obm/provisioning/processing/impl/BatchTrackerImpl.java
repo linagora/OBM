@@ -27,15 +27,62 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing;
+package org.obm.provisioning.processing.impl;
 
+import java.util.Map;
 
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.Batch.Id;
+import org.obm.provisioning.processing.BatchProcessingListener;
+import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public interface BatchProcessor extends Processor<Batch> {
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	void addBatchProcessingListener(BatchProcessingListener listener);
+@Singleton
+public class BatchTrackerImpl implements BatchProcessingListener, BatchTracker {
 
-	void removeBatchProcessingListener(BatchProcessingListener listener);
+	private final Map<Batch.Id, Batch> runningBatches;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Inject
+	public BatchTrackerImpl(BatchProcessor processor) {
+		this.runningBatches = Maps.newConcurrentMap();
+
+		processor.addBatchProcessingListener(this);
+	}
+
+	@Override
+	public void processingStarted(Batch batch) {
+		logger.info(String.format("Processing of batch %s (%d operation(s)) has started.", batch.getId(), batch.getOperationsCount()));
+
+		runningBatches.put(batch.getId(), batch);
+	}
+
+	@Override
+	public void processingProgressed(Batch batch) {
+		logger.debug(String.format("Processing of batch %s: %d/%d operation(s) done.", batch.getId(), batch.getOperationsDoneCount(), batch.getOperationsCount()));
+
+		runningBatches.put(batch.getId(), batch);
+	}
+
+	@Override
+	public void processingComplete(Batch batch, Throwable throwable) {
+		if (throwable == null) {
+			logger.info(String.format("Processing of batch %s is complete.", batch.getId()));
+		} else {
+			logger.error(String.format("The processing of batch %s has failed.", batch.getId()), throwable);
+		}
+
+		runningBatches.remove(batch.getId());
+	}
+
+	@Override
+	public Batch getTrackedBatch(Id id) {
+		return runningBatches.get(id);
+	}
 }

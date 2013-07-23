@@ -31,20 +31,21 @@ package org.obm.provisioning.processing.impl;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.OBM_SATELLITE_REQUEST;
 
-import java.util.Map;
 import java.util.Set;
+
+import javax.swing.event.EventListenerList;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.Batch.Builder;
-import org.obm.provisioning.beans.Batch.Id;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.conf.SystemUserSatelliteConfiguration;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.BatchProcessingListener;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.OperationProcessor;
 import org.obm.satellite.client.Configuration;
@@ -55,12 +56,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.system.ObmSystemUser;
 
 @Singleton
 public class BatchProcessorImpl implements BatchProcessor {
@@ -70,7 +69,7 @@ public class BatchProcessorImpl implements BatchProcessor {
 	private final Set<OperationProcessor> operationProcessors;
 	private final BatchDao batchDao;
 	private final UserSystemDao userSystemDao;
-	private final Map<Batch.Id, Batch.Builder> runningBatches;
+	private final EventListenerList listenerList;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -83,23 +82,24 @@ public class BatchProcessorImpl implements BatchProcessor {
 		this.batchDao = batchDao;
 		this.userSystemDao = userSystemDao;
 
-		this.runningBatches = Maps.newConcurrentMap();
+		this.listenerList = new EventListenerList();
 	}
 
 	@Override
 	public void process(Batch batch) throws ProcessingException {
-		Id batchId = batch.getId();
 		Batch.Builder batchBuilder = Batch
 				.builder()
 				.from(batch)
 				.status(BatchStatus.RUNNING)
 				.timecommit(dateProvider.getDate());
 
-		runningBatches.put(batchId, batchBuilder);
+		fireProcessingStarted(batchBuilder.build());
 
 		try {
 			for (Operation operation : batch.getOperations()) {
 				batchBuilder.operation(processOperation(operation, batch));
+
+				fireProcessingProgressed(batchBuilder.build());
 			}
 
 			Batch newBatch = batchBuilder
@@ -108,24 +108,28 @@ public class BatchProcessorImpl implements BatchProcessor {
 
 			postProcess(newBatch);
 			persist(newBatch);
+
+			fireProcessingComplete(newBatch, null);
 		}
 		catch (Exception e) {
-			logger.error(String.format("Error processing batch %s.", batchId), e);
-
-			persist(batchBuilder
+			Batch newBatch = batchBuilder
 					.status(BatchStatus.ERROR)
-					.build());
-		}
-		finally {
-			runningBatches.remove(batchId);
+					.build();
+
+			persist(newBatch);
+
+			fireProcessingComplete(newBatch, e);
 		}
 	}
 
 	@Override
-	public Batch getRunningBatch(Id id) {
-		Builder batchBuilder = runningBatches.get(id);
+	public void addBatchProcessingListener(BatchProcessingListener listener) {
+		listenerList.add(BatchProcessingListener.class, listener);
+	}
 
-		return batchBuilder != null ? batchBuilder.build() : null;
+	@Override
+	public void removeBatchProcessingListener(BatchProcessingListener listener) {
+		listenerList.remove(BatchProcessingListener.class, listener);
 	}
 
 	@Transactional
@@ -189,39 +193,22 @@ public class BatchProcessorImpl implements BatchProcessor {
 				.build();
 	}
 
-	private static class SystemUserSatelliteConfiguration implements Configuration {
-
-		private final ObmSystemUser systemUser;
-
-		private SystemUserSatelliteConfiguration(ObmSystemUser systemUser) {
-			this.systemUser = systemUser;
+	private void fireProcessingStarted(Batch batch) {
+		for (BatchProcessingListener l : listenerList.getListeners(BatchProcessingListener.class)) {
+			l.processingStarted(batch);
 		}
+	}
 
-		@Override
-		public String getUsername() {
-			return systemUser.getLogin();
+	private void fireProcessingComplete(Batch batch, Throwable throwable) {
+		for (BatchProcessingListener l : listenerList.getListeners(BatchProcessingListener.class)) {
+			l.processingComplete(batch, throwable);
 		}
+	}
 
-		@Override
-		public String getPassword() {
-			return systemUser.getPassword();
+	private void fireProcessingProgressed(Batch batch) {
+		for (BatchProcessingListener l : listenerList.getListeners(BatchProcessingListener.class)) {
+			l.processingProgressed(batch);
 		}
-
-		@Override
-		public boolean isIMAPServerManaged() {
-			return false; // For now...
-		}
-
-		@Override
-		public int getSatellitePort() {
-			return DEFAULT_SATELLITE_PORT;
-		}
-
-		@Override
-		public SatelliteProtocol getSatelliteProtocol() {
-			return SatelliteProtocol.HTTPS;
-		}
-
 	}
 
 }

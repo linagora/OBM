@@ -27,15 +27,43 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing;
+package org.obm.provisioning.conf;
 
+import org.obm.satellite.client.Configuration;
 
-import org.obm.provisioning.beans.Batch;
+import fr.aliacom.obm.common.system.ObmSystemUser;
 
-public interface BatchProcessor extends Processor<Batch> {
+public class SystemUserSatelliteConfiguration implements Configuration {
 
-	void addBatchProcessingListener(BatchProcessingListener listener);
+	private final ObmSystemUser systemUser;
 
-	void removeBatchProcessingListener(BatchProcessingListener listener);
+	public SystemUserSatelliteConfiguration(ObmSystemUser systemUser) {
+		this.systemUser = systemUser;
+	}
+
+	@Override
+	public String getUsername() {
+		return systemUser.getLogin();
+	}
+
+	@Override
+	public String getPassword() {
+		return systemUser.getPassword();
+	}
+
+	@Override
+	public boolean isIMAPServerManaged() {
+		return false; // For now...
+	}
+
+	@Override
+	public int getSatellitePort() {
+		return DEFAULT_SATELLITE_PORT;
+	}
+
+	@Override
+	public SatelliteProtocol getSatelliteProtocol() {
+		return SatelliteProtocol.HTTPS;
+	}
 
 }

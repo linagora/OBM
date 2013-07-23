@@ -30,6 +30,7 @@ import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 
 import com.google.inject.Inject;
 
@@ -44,6 +45,8 @@ public class BatchResource {
 	private BatchDao batchDao;
 	@Inject
 	private BatchProcessor batchProcessor;
+	@Inject
+	private BatchTracker batchTracker;
 
 	@GET
 	@Path("{batchId}")
@@ -51,7 +54,7 @@ public class BatchResource {
 	@Transactional(readOnly = true)
 	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_read);
-		Batch batch = batchProcessor.getRunningBatch(batchId);
+		Batch batch = batchTracker.getTrackedBatch(batchId);
 
 		if (batch != null) {
 			return batch;
@@ -105,7 +108,7 @@ public class BatchResource {
 	@Transactional
 	public Response commit(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_update);
-		Batch batch = batchProcessor.getRunningBatch(batchId);
+		Batch batch = batchTracker.getTrackedBatch(batchId);
 
 		if (batch == null) {
 			batch = batchDao.get(batchId);

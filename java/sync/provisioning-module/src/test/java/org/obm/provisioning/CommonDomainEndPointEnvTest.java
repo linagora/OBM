@@ -73,6 +73,7 @@ import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.ldap.client.StaticConfiguration;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
@@ -131,6 +132,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 					bind(Configuration.class).to(StaticConfiguration.class);
 					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
+					bind(BatchTracker.class).toInstance(mocksControl.createMock(BatchTracker.class));
 				}
 			}));
 		}

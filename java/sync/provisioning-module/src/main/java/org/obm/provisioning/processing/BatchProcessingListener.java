@@ -29,13 +29,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing;
 
+import java.util.EventListener;
 
 import org.obm.provisioning.beans.Batch;
 
-public interface BatchProcessor extends Processor<Batch> {
+public interface BatchProcessingListener extends EventListener {
 
-	void addBatchProcessingListener(BatchProcessingListener listener);
+	void processingStarted(Batch batch);
 
-	void removeBatchProcessingListener(BatchProcessingListener listener);
+	void processingProgressed(Batch batch);
+
+	/**
+	 * Called when a {@link Batch} is done.<br />
+	 * The {@code throwable} argument is {@code null} if the batch was successfully processed.
+	 * 
+	 * @param batch The processed {@link Batch}.
+	 * @param throwable An optional {@link Throwable} if processing ended up in error.
+	 */
+	void processingComplete(Batch batch, Throwable throwable);
 
 }

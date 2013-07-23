@@ -29,13 +29,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing;
 
-
 import org.obm.provisioning.beans.Batch;
 
-public interface BatchProcessor extends Processor<Batch> {
+public interface BatchTracker {
 
-	void addBatchProcessingListener(BatchProcessingListener listener);
-
-	void removeBatchProcessingListener(BatchProcessingListener listener);
+	Batch getTrackedBatch(Batch.Id id);
 
 }

@@ -30,7 +30,9 @@
 package org.obm.provisioning;
 
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 import org.obm.provisioning.processing.OperationProcessor;
+import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
@@ -49,6 +51,7 @@ public class BatchProcessingModule extends AbstractModule {
 
 		bindConstant().annotatedWith(Names.named("nbParallelBatches")).to(NB_PARALLEL_BATCHES);
 		bind(BatchProcessor.class).to(ParallelBatchProcessor.class);
+		bind(BatchTracker.class).to(BatchTrackerImpl.class);
 
 		multibinder.addBinding().to(CreateUserOperationProcessor.class);
 		multibinder.addBinding().to(DeleteUserOperationProcessor.class);

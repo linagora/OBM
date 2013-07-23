@@ -33,8 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.Batch.Id;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.BatchProcessingListener;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +75,13 @@ public class ParallelBatchProcessor implements BatchProcessor {
 	}
 
 	@Override
-	public Batch getRunningBatch(Id id) {
-		return delegate.getRunningBatch(id);
+	public void addBatchProcessingListener(BatchProcessingListener listener) {
+		delegate.addBatchProcessingListener(listener);
+	}
+
+	@Override
+	public void removeBatchProcessingListener(BatchProcessingListener listener) {
+		delegate.removeBatchProcessingListener(listener);
 	}
 
 }

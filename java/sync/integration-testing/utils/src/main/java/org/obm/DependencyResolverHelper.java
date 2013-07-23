@@ -63,6 +63,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.cyrus.imap.CyrusClientModule;
+import org.obm.cyrus.imap.admin.Acl;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
 import org.obm.cyrus.imap.admin.CyrusManager;
@@ -168,10 +169,13 @@ import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.obm.provisioning.ldap.client.exception.LdapException;
+import org.obm.provisioning.processing.BatchProcessingListener;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 import org.obm.provisioning.processing.OperationProcessor;
 import org.obm.provisioning.processing.Processor;
 import org.obm.provisioning.processing.impl.BatchProcessorImpl;
+import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
@@ -188,7 +192,6 @@ import org.obm.push.LinagoraImapClientModule;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.minig.imap.StoreClient;
@@ -652,7 +655,10 @@ public class DependencyResolverHelper {
 				AuthorizationException.class,
 				PermissionsNotFoundException.class,
 				ResourceAuthorizationHelper.class,
-				ServiceProperty.class
+				ServiceProperty.class,
+				BatchTracker.class,
+				BatchTrackerImpl.class,
+				BatchProcessingListener.class
 		};
 	}
 

@@ -59,6 +59,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.utils.DateUtils;
@@ -92,6 +93,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				@Override
 				protected void configure() {
 					bind(BatchProcessor.class).to(BatchProcessorImpl.class);
+					bind(BatchTracker.class).to(BatchTrackerImpl.class);
 				}
 
 			}));

@@ -49,6 +49,7 @@ import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
+import org.obm.provisioning.processing.BatchTracker;
 
 import com.google.inject.Inject;
 
@@ -59,6 +60,8 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 
 	@Inject
 	private BatchProcessor batchProcessor;
+	@Inject
+	private BatchTracker batchTracker;
 
 	@Test
 	public void testDeleteWithUnknownDomain() {
@@ -174,7 +177,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetWithUnknownBatch() throws Exception {
 		expectDomain();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andReturn(null);
 		mocksControl.replay();
@@ -208,7 +211,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetOnError() throws Exception {
 		expectDomain();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
 		mocksControl.replay();
@@ -226,7 +229,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGet() throws Exception {
 		expectDomain();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		mocksControl.replay();
@@ -268,7 +271,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGetWhenBatchIsRunning() throws Exception {
 		expectDomain();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(batch);
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
@@ -309,7 +312,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testCommitWithUnknownBatch() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(null);
 		mocksControl.replay();
 
@@ -327,7 +330,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testCommitWithAlreadyRunningBatch() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(batch);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(batch);
 		mocksControl.replay();
 
 		given()
@@ -344,7 +347,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testCommitOnError() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall().andThrow(new ProcessingException());
@@ -364,7 +367,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	public void testCommit() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchProcessor.getRunningBatch(batchId(12))).andReturn(null);
+		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall();
