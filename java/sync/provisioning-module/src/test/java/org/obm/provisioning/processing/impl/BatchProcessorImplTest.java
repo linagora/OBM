@@ -334,13 +334,26 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 
 	private void expectLdapCreateUser(ObmUser user) {
-		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
-
-		expect(ldapService.buildManager()).andReturn(ldapManager);
+		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.createUser(user);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
+	}
+	
+	private void expectLdapdeleteUser(ObmUser user) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.deleteUser(user);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+
+	private LdapManager expectLdapBuild() {
+		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
+
+		expect(ldapService.buildManager()).andReturn(ldapManager);
+		return ldapManager;
 	}
 	
 	@Test
@@ -430,6 +443,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(userDao.getByExtId(extId, domain)).andReturn(user);
 		userDao.delete(extId);
 		expectLastCall();
+		expectLdapdeleteUser(user);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -484,6 +498,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		userDao.delete(extId);
 		expectLastCall();
 		expectDeleteUserMailbox(user);
+		expectLdapdeleteUser(user);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

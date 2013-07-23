@@ -47,6 +47,8 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 
 import com.google.common.base.Strings;
@@ -60,14 +62,16 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 	
 	private final UserDao userDao;
 	private final CyrusImapService cyrusService;
+	private final LdapService ldapService;
 	private final UserSystemDao userSystemDao;
 
 	@Inject
-	public DeleteUserOperationProcessor(UserDao userDao, CyrusImapService cyrusService, UserSystemDao userSystemDao) {
+	public DeleteUserOperationProcessor(UserDao userDao, LdapService ldapService, CyrusImapService cyrusService, UserSystemDao userSystemDao) {
 		super(BatchEntityType.USER, HttpVerb.DELETE);
 
 		this.userDao = userDao;
 		this.cyrusService = cyrusService;
+		this.ldapService = ldapService;
 		this.userSystemDao = userSystemDao;
 	}
 
@@ -79,11 +83,24 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
 		final ObmUser userFromDao = getUserFromDao(batch, extId);
 		
-		
 		deleteUserInDao(extId);
 		if (expunge == true) {
 			deleteUserMailBoxes(userFromDao);
-		}	
+		}
+		deleteUserInLdap(userFromDao);
+	}
+
+	private void deleteUserInLdap(ObmUser user) {
+		LdapManager ldapManager = ldapService.buildManager();
+		
+		try {
+			ldapManager.deleteUser(user);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot delete new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+		} finally {
+			ldapManager.shutdown();
+		}
 	}
 
 	private ObmUser getUserFromDao(Batch batch, final UserExtId extId) {
