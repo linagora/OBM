@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl;
+package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
@@ -49,6 +49,7 @@ import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 
 import com.google.inject.Inject;
 import com.google.inject.util.Providers;

@@ -31,8 +31,8 @@ package org.obm.provisioning;
 
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.OperationProcessor;
-import org.obm.provisioning.processing.impl.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
+import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
