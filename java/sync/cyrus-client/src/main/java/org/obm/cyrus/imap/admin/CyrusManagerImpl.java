@@ -32,6 +32,7 @@
 package org.obm.cyrus.imap.admin;
 
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
@@ -93,6 +94,16 @@ public class CyrusManagerImpl implements CyrusManager {
 		final String domain = obmUser.getDomain().getName();
 		String user = obmUser.getLogin();
 		conn.delete(ImapPath.builder().user(user).domain(domain).build());
+	}
+	
+	@Override
+	public void setAcl(ObmUser obmUser, String identifier, Acl acl) {
+		final String domain = obmUser.getDomain().getName();
+		String user = obmUser.getLogin();
+		conn.setAcl(
+				ImapPath.builder().user(user).domain(domain).build(),
+				identifier,
+				acl);
 	}
 
 	@Override

@@ -49,11 +49,12 @@ public class AclTest {
 	@Test
 	public void buildAcl() {
 		Acl acl = Acl.builder().user("admin@vm.obm.org").rights("lrswikxtecd").build();
-		assertThat(acl.getUser()).isEqualTo("admin@vm.obm.org");
+
 		Set<Rights> rights = Sets.newHashSet(
 			Rights.Lookup, Rights.Read, Rights.PersistSeenStatus, Rights.Write, Rights.Insert,
 			Rights.Create, Rights.DeleteMailbox, Rights.DeleteMessage, Rights.PerformExpunge,
 			Rights.CreateRFC2086, Rights.DeleteRFC2086);
+		assertThat(acl.getUser()).isEqualTo("admin@vm.obm.org");
 		assertThat(acl.getRights()).isEqualTo(rights);
 	}
 	
@@ -65,5 +66,11 @@ public class AclTest {
 	@Test(expected=IllegalStateException.class)
 	public void buildAclWithNullRights() {
 		Acl.builder().user("admin@vm.obm.org").build();
+	}
+	
+	@Test
+	public void testFormat() {
+		Acl acl = Acl.builder().user("admin@vm.obm.org").rights("lc").build();
+		assertThat(acl.format().toCharArray()).containsOnly('l', 'c');
 	}
 }

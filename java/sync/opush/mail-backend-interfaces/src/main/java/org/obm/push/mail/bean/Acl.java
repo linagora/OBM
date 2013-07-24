@@ -82,6 +82,14 @@ public class Acl {
 		return rights;
 	}
 	
+	public String format() {
+		StringBuilder builder = new StringBuilder();
+		for(Rights right: rights) {
+			builder.append(right.asSpecificationValue());
+		}
+		return builder.toString();
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(user, rights);

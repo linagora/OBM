@@ -33,6 +33,7 @@ package org.obm.cyrus.imap.admin;
 
 import java.util.List;
 
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.minig.imap.StoreClient;
 
 public interface Connection {
@@ -49,7 +50,7 @@ public interface Connection {
 	
 	List<Acl> getAcl(ImapPath path) throws ImapOperationException, ConnectionException;
 	
-	void setAcl(ImapPath path, Acl... acls) throws ImapOperationException, ConnectionException;
+	void setAcl(ImapPath path, String identifier, Acl acl) throws ImapOperationException, ConnectionException;
 	
 	List<ImapPath> listMailboxes(String user) throws ImapOperationException, ConnectionException;
 	

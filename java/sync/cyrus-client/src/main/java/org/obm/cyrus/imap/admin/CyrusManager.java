@@ -32,6 +32,7 @@
 package org.obm.cyrus.imap.admin;
 
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -43,5 +44,6 @@ public interface CyrusManager {
 
 	void create(ObmUser obmUser);
 	void delete(ObmUser obmUser);
+	void setAcl(ObmUser obmUser, String identifier, Acl acl);
 	void shutdown();
 }

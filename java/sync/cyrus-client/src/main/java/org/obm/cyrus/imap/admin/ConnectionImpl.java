@@ -33,6 +33,7 @@ package org.obm.cyrus.imap.admin;
 
 import java.util.List;
 
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.minig.imap.StoreClient;
 
 public class ConnectionImpl implements Connection {
@@ -67,17 +68,15 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public List<Acl> getAcl(ImapPath path) throws ImapOperationException,
-			ConnectionException {
+	public List<Acl> getAcl(ImapPath path) throws ImapOperationException, ConnectionException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setAcl(ImapPath path, Acl... acls)
+	public void setAcl(ImapPath path, String identifier, Acl acl)
 			throws ImapOperationException, ConnectionException {
-		// TODO Auto-generated method stub
-		
+		storeClient.setAcl(path.format(), identifier, acl.format());
 	}
 
 	@Override
