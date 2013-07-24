@@ -50,6 +50,7 @@ import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
+import org.obm.push.mail.bean.Acl;
 
 import com.google.inject.Inject;
 import com.google.inject.util.Providers;
@@ -60,6 +61,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcessor {
 
+	private final String ANYONE_IDENTIFIER = "anyone";
+	
 	private final UserDao userDao;
 	private final CyrusImapService cyrusService;
 	private final LdapService ldapService;
@@ -110,6 +113,13 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 			cyrusManager = cyrusService.buildManager(
 					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
 			cyrusManager.create(user);
+			cyrusManager.setAcl(
+					user,
+					ANYONE_IDENTIFIER,
+					Acl.builder()
+						.user(user.getLogin())
+						.rights(Acl.Rights.Post.asSpecificationValue())
+						.build());
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format(

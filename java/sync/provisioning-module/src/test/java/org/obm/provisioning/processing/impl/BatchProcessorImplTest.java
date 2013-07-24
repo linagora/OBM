@@ -235,6 +235,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.create(user);
 		expectLastCall().once();
+		cyrusManager.setAcl(user, "anyone", Acl.builder().user("user1").rights("p").build());
+		expectLastCall().once();
 		expectCyrusShutDown(cyrusManager);
 	}
 
