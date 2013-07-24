@@ -61,7 +61,7 @@
 
                 <plugin.jar.version>2.4</plugin.jar.version>
                 <plugin.war.version>2.3</plugin.war.version>
-                <plugin.surefire.version>2.14</plugin.surefire.version>
+                <plugin.surefire.version>2.15</plugin.surefire.version>
                 <plugin.compiler.version>3.0</plugin.compiler.version>
                 <plugin.eclipse.version>2.9</plugin.eclipse.version>
                 <plugin.dependency.version>2.6</plugin.dependency.version>
