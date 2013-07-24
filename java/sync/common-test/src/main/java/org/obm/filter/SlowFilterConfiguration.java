@@ -31,67 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.filter;
 
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
+public class SlowFilterConfiguration {
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
-
-public final class SlowFilterRule implements TestRule {
-
-	@VisibleForTesting SlowFilterConfiguration slowFilterConfiguration;
-	
-	public SlowFilterRule() {
-		slowFilterConfiguration = new SlowFilterConfiguration();
-	}
-	
-	@Override
-	public Statement apply(final Statement test, final Description description) {
-		return new Statement() {
-			
-			@Override
-			public void evaluate() throws Throwable {
-				Slow methodAnnotation = description.getAnnotation(Slow.class);
-				if (methodAnnotation == null) {
-					methodAnnotation = description.getTestClass().getAnnotation(Slow.class);
-				}
-				if (hasToRunTest(methodAnnotation)) {
-					test.evaluate();
-				}
-			}
-			
-		};
+	public String getConfigurationValue(String key) {
+		return System.getProperty(key);
 	}
 
-	@VisibleForTesting boolean hasToRunTest(Slow methodAnnotation) {
-		return (fastTest(methodAnnotation) && enableFastTests())
-				|| (slowTest(methodAnnotation) && enableSlowTests());
-	}
-
-	private boolean enableFastTests() {
-		return keyEnabled(Slow.FAST_CONFIGURATION_ENVIRONMENT_KEY, true);
-	}
-
-	private boolean enableSlowTests() {
-		return keyEnabled(Slow.SLOW_CONFIGURATION_ENVIRONMENT_KEY, true);
-	}
-
-	private boolean keyEnabled(String key, boolean defaultValue) {
-		String slowProperty = slowFilterConfiguration.getConfigurationValue(key);
-		if (Strings.isNullOrEmpty(slowProperty)) {
-			return defaultValue;
-		} else {
-			return  Boolean.parseBoolean(slowProperty);
-		}
-	}
-	
-	private boolean fastTest(Slow methodAnnotation) {
-		return methodAnnotation == null;
-	}
-
-	private boolean slowTest(Slow methodAnnotation) {
-		return methodAnnotation != null;
-	}
-	
 }

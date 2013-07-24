@@ -42,6 +42,7 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Slow {
 	
-	public static final String CONFIGURATION_ENVIRONMENT_KEY = "AllowSlowTest"; 
+	public static final String SLOW_CONFIGURATION_ENVIRONMENT_KEY = "RunSlowTest"; 
+	public static final String FAST_CONFIGURATION_ENVIRONMENT_KEY = "RunFastTest";
 	
 }
