@@ -37,14 +37,16 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public interface LdapManager {
 
-	public interface Factory {
-		public LdapManager create();
+	interface Factory {
+		LdapManager create();
 	}
-	
-	public abstract void createUser(ObmUser obmUser);
 
-	public void deleteUser(ObmUser obmUser);
+	void createUser(ObmUser obmUser);
 
-	public abstract void shutdown() throws ConnectionException;
+	void deleteUser(ObmUser obmUser);
+
+	void modifyUser(ObmUser obmUser, ObmUser oldObmUser);
+
+	void shutdown() throws ConnectionException;
 
 }

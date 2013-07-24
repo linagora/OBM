@@ -31,8 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client;
 
+import org.apache.directory.api.ldap.model.entry.Modification;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -44,6 +47,8 @@ public class LdapManagerImpl implements LdapManager {
 
 	private Connection conn;
 	private Provider<LdapUser.Builder> userBuilderProvider;
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Singleton
 	public static class Factory implements LdapManager.Factory {
@@ -83,7 +88,20 @@ public class LdapManagerImpl implements LdapManager {
 				.build();
 		conn.deleteUser(ldapUser.getUid(), ldapUser.getDomain());
 	}
-	
+
+	@Override
+	public void modifyUser(ObmUser obmUser, ObmUser oldObmUser) {
+		LdapUser ldapUser = userBuilderProvider.get().fromObmUser(obmUser).build();
+		LdapUser oldLdapUser = userBuilderProvider.get().fromObmUser(oldObmUser).build();
+		Modification[] modifications = ldapUser.buildDiffModifications(oldLdapUser);
+
+		if (modifications.length > 0) {
+			conn.modifyUser(ldapUser.getUid(), ldapUser.getDomain(), modifications);
+		} else {
+			logger.info(String.format("LDAP attributes of user %s (%s) weren't changed. Doing nothing.", obmUser.getLogin(), obmUser.getExtId())); 
+		}
+	}
+
 	@Override
 	public void shutdown() throws ConnectionException {
 		conn.shutdown();

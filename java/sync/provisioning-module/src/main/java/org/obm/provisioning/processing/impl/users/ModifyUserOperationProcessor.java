@@ -36,53 +36,40 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.push.mail.bean.Acl;
 
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
-public class CreateUserOperationProcessor extends AbstractUserOperationProcessor {
-
-	private final String ANYONE_IDENTIFIER = "anyone";
+public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor {
 
 	@Inject
-	CreateUserOperationProcessor() {
-		super(HttpVerb.POST);
+	ModifyUserOperationProcessor() {
+		super(HttpVerb.PUT);
 	}
 
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = getUserFromRequestBody(operation, batch);
-		ObmUser userFromDao = createUserInDao(user);
+		ObmUser existingUser = getUserFromDao(user.getExtId(), batch.getDomain());
+		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, existingUser));
 
-		if (user.isEmailAvailable()) {
-			createUserMailboxes(userFromDao);
+		if (newUser.isEmailAvailable()) {
+			updateUserMailbox(newUser);
 		}
 
-		createUserInLdap(userFromDao);
+		modifyUserInLdap(newUser, existingUser);
 	}
 
-	private void createUserMailboxes(ObmUser user) {
+	private void updateUserMailbox(ObmUser user) {
 		CyrusManager cyrusManager = null;
-		
+
 		try {
 			cyrusManager = buildCyrusManager(user);
-			cyrusManager.create(user);
 			cyrusManager.applyQuota(user);
-			cyrusManager.setAcl(
-					user,
-					ANYONE_IDENTIFIER,
-					Acl.builder()
-						.user(user.getLogin())
-						.rights(Acl.Rights.Post.asSpecificationValue())
-						.build());
 		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format(
-							"Cannot create cyrus mailbox for user '%s' (%s).",
-							user.getLogin(), user.getExtId()), e);
+			throw new ProcessingException(String.format("Cannot update Cyrus mailbox for user '%s' (%s).", user.getLogin(), user.getExtId()), e);
 		} finally {
 			if (cyrusManager != null) {
 				cyrusManager.shutdown();
@@ -90,24 +77,25 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private ObmUser createUserInDao(ObmUser user) {
+	private ObmUser modifyUserInDao(ObmUser user) {
 		try {
-			return userDao.create(user);
+			return userDao.update(user);
 		}
 		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
+			throw new ProcessingException(String.format("Cannot modify user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
 		}
 	}
 
-	private void createUserInLdap(ObmUser user) {
+	private void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
 		LdapManager ldapManager = ldapService.buildManager();
 
 		try {
-			ldapManager.createUser(user);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
-		} finally {
+			ldapManager.modifyUser(user, oldObmUser);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot modify user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+		}
+		finally {
 			ldapManager.shutdown();
 		}
 	}

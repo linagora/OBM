@@ -2,6 +2,9 @@ package org.obm.provisioning.ldap.client.bean;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.apache.directory.api.ldap.model.entry.DefaultModification;
+import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
@@ -373,5 +376,59 @@ public class LdapUserTest {
 				.hiddenUser(false)
 				.domain(LdapDomain.valueOf("gru.gov.ru"))
 				.build();
+	}
+
+	@Test
+	public void testBuildDiffModifications() {
+		LdapUser.Builder userBuilder = ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"));
+		LdapUser user = userBuilder.build();
+		LdapUser newUser = userBuilder
+				.sn("newSn")
+				.mail("newMail@domain.com")
+				.build();
+
+		assertThat(newUser.buildDiffModifications(user)).isEqualTo(new Modification[] {
+				new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "sn", "newSn"),
+				new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mail", "newMail@domain.com")
+		});
+	}
+
+	@Test
+	public void testBuildDiffModificationsWhenNoModifications() {
+		LdapUser user = ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru")).build();
+
+		assertThat(user.buildDiffModifications(user)).isEqualTo(new Modification[0]);
 	}
 }

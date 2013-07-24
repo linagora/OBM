@@ -593,7 +593,7 @@ public class UserDao {
 								.concat(Collections.singleton(user.getEmail()),
 										user.getEmailAlias())));
 				ps.setInt(idx++, user.getMailHost().getId());
-				ps.setInt(idx++, user.getMailQuota());
+				ps.setInt(idx++, user.getMailQuotaAsInt());
 			} else {
 				ps.setString(idx++, "");
 				ps.setNull(idx++, Types.INTEGER);
@@ -728,7 +728,7 @@ public class UserDao {
 								.concat(Collections.singleton(user.getEmail()),
 										user.getEmailAlias())));
 				ps.setInt(idx++, user.getMailHost().getId());
-				ps.setInt(idx++, user.getMailQuota());
+				ps.setInt(idx++, user.getMailQuotaAsInt());
 			} else {
 				ps.setString(idx++, "");
 				ps.setNull(idx++, Types.INTEGER);

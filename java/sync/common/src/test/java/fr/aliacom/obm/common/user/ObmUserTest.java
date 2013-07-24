@@ -36,11 +36,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.provisioning.ProfileName;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @RunWith(SlowFilterRunner.class)
@@ -291,5 +293,118 @@ public class ObmUserTest {
 			.login("login")
 			.faxes(null)
 			.build();
+	}
+
+	@Test
+	public void testFrom() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.address1("1 OBM Street")
+				.address2("2 OBM Street")
+				.address3("3 OBM Street")
+				.town("OBMCity")
+				.countryCode("OB")
+				.zipCode("OBMZip")
+				.expresspostal("OBMExpressPostal")
+				.phone("+OBM 123456")
+				.phone2("+OBM 789")
+				.mobile("+OBMMobile 123")
+				.fax("+OBMFax 123456")
+				.fax2("+OBMFax 789")
+				.company("Linagora")
+				.service("OBMDev")
+				.direction("LGS")
+				.title("Software Dev")
+				.emailAndAliases("jdoe\r\njohn.doe")
+				.kind("Mr")
+				.mailQuota(500)
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(ObmUser.builder().from(user).build()).isEqualTo(user);
+	}
+
+	@Test
+	public void testQuota0() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.mailQuota(0)
+				.build();
+
+		assertThat(user.getMailQuota()).isNull();
+	}
+
+	@Test
+	public void testQuotaNonNullQuota() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.mailQuota(123)
+				.build();
+
+		assertThat(user.getMailQuota()).isEqualTo(123);
+	}
+
+	@Test
+	public void testQuotaNoQuota() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(user.getMailQuota()).isNull();
+	}
+
+	@Test
+	public void testGetMailQuotaAsIntNoQuota() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(user.getMailQuotaAsInt()).isEqualTo(0);
+	}
+
+	@Test
+	public void testGetMailQuotaAsIntNonNullQuota() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.mailQuota(123)
+				.build();
+
+		assertThat(user.getMailQuotaAsInt()).isEqualTo(123);
+	}
+
+	@Test
+	public void testGetMailQuotaAsInt0() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.mailQuota(0)
+				.build();
+
+		assertThat(user.getMailQuotaAsInt()).isEqualTo(0);
 	}
 }

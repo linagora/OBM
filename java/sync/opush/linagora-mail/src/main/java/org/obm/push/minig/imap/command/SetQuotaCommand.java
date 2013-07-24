@@ -41,7 +41,7 @@ public class SetQuotaCommand extends SimpleCommand<Boolean> {
 	}
 	
 	public SetQuotaCommand(String mailbox, long quotaInKo) {
-		super(String.format("SETQUOTA %s (%d)", toUtf7(mailbox), quotaInKo));
+		super(String.format("SETQUOTA %s (STORAGE %d)", toUtf7(mailbox), quotaInKo));
 	}
 
 	@Override

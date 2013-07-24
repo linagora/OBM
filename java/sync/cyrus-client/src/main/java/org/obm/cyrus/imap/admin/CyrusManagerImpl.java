@@ -107,10 +107,17 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 
 	@Override
+	public void applyQuota(ObmUser obmUser) {
+		conn.setQuota(ImapPath
+				.builder()
+				.user(obmUser.getLogin())
+				.domain(obmUser.getDomain().getName())
+				.build(), Quota.valueOf(obmUser.getMailQuota()));
+	}
+
+	@Override
 	public void shutdown() {
 		conn.shutdown();
 	}
-	
-
 
 }

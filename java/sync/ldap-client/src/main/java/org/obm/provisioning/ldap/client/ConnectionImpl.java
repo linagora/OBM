@@ -52,6 +52,7 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
@@ -125,7 +126,17 @@ public class ConnectionImpl implements Connection {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
-	
+
+	@Override
+	public void modifyUser(Uid ldapUser, LdapDomain domain, Modification... modifications) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+		try {
+			connection.modify(getUserDnFromUserId(ldapUser, domain), modifications);
+			incrementAndCheckRequestCounter();
+		} catch (LdapException e) {
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
+		}
+	}
+
 	@Override
 	public void createGroup(LdapGroup ldapGroup) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {

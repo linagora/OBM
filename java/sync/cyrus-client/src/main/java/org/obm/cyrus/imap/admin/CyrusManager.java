@@ -43,7 +43,13 @@ public interface CyrusManager {
 	}
 
 	void create(ObmUser obmUser);
+
 	void delete(ObmUser obmUser);
+
 	void setAcl(ObmUser obmUser, String identifier, Acl acl);
+
 	void shutdown();
+
+	void applyQuota(ObmUser obmUser);
+
 }

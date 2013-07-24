@@ -31,8 +31,71 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-public interface Quota {
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-	int getLimit();
-	
+public class Quota {
+
+	public static Quota valueOf(String limit) {
+		return valueOf(Integer.parseInt(limit));
+	}
+
+	public static Quota valueOf(Integer limit) {
+		return builder().limit(limit).build();
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private Integer limit;
+
+		public Builder limit(Integer limit) {
+			this.limit = limit;
+			return this;
+		}
+
+		public Quota build() {
+			Preconditions.checkState(limit == null || limit > 0);
+
+			return new Quota(limit);
+		}
+	}
+
+	private final Integer limit;
+
+	private Quota(Integer limit) {
+		this.limit = limit;
+	}
+
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public boolean isLimited() {
+		return limit != null;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("limit", limit).toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(limit);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Quota) {
+			Quota other = (Quota) obj;
+
+			return Objects.equal(limit, other.limit);
+		}
+
+		return false;
+	}
 }

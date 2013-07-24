@@ -109,7 +109,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		writeStringsField(jgen, PHONES.asSpecificationValue(), value.getPhone(), value.getPhone2());
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
 		writeStringsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
-		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuota()));
+		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());

@@ -33,6 +33,7 @@ package org.obm.provisioning.ldap.client;
 
 import java.util.List;
 
+import org.apache.directory.api.ldap.model.entry.Modification;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
@@ -49,7 +50,9 @@ public interface Connection {
 	void createUser(LdapUser ldapUser) throws LdapException, ConnectionException;
 	
 	void deleteUser(LdapUser.Uid ldapUser, LdapDomain domain) throws LdapException, ConnectionException;
-	
+
+	void modifyUser(LdapUser.Uid ldapUser, LdapDomain domain, Modification... modifications) throws LdapException, ConnectionException;
+
 	void createGroup(LdapGroup ldapGroup) throws LdapException, ConnectionException;
 	
 	void deleteGroup(LdapGroup.Cn ldapGroup) throws LdapException, ConnectionException;

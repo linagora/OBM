@@ -27,36 +27,82 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.cyrus.imap.admin;
 
-import org.obm.provisioning.processing.BatchProcessor;
-import org.obm.provisioning.processing.BatchTracker;
-import org.obm.provisioning.processing.OperationProcessor;
-import org.obm.provisioning.processing.impl.BatchTrackerImpl;
-import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
-import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
-import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
-import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public class BatchProcessingModule extends AbstractModule {
+@RunWith(SlowFilterRunner.class)
+public class QuotaTest {
 
-	private static final Integer NB_PARALLEL_BATCHES = 1;
+	@Test
+	public void testBuildWithNoLimit() {
+		Quota quota = Quota.builder().build();
 
-	@Override
-	protected void configure() {
-		Multibinder<OperationProcessor> multibinder = Multibinder.newSetBinder(binder(), OperationProcessor.class);
+		assertThat(quota.getLimit()).isNull();
+	}
 
-		bindConstant().annotatedWith(Names.named("nbParallelBatches")).to(NB_PARALLEL_BATCHES);
-		bind(BatchProcessor.class).to(ParallelBatchProcessor.class);
-		bind(BatchTracker.class).to(BatchTrackerImpl.class);
+	@Test
+	public void testBuild() {
+		Quota quota = Quota.builder().limit(123).build();
 
-		multibinder.addBinding().to(CreateUserOperationProcessor.class);
-		multibinder.addBinding().to(DeleteUserOperationProcessor.class);
-		multibinder.addBinding().to(ModifyUserOperationProcessor.class);
+		assertThat(quota.getLimit()).isEqualTo(123);
+	}
+
+	@Test
+	public void testValueOf() {
+		Quota quota = Quota.valueOf(123);
+
+		assertThat(quota.getLimit()).isEqualTo(123);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testValueOfNaN() {
+		Quota.valueOf("NaN");
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testValueOfEmptyString() {
+		Quota.valueOf("");
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testValueOfNullString() {
+		Quota.valueOf((String) null);
+	}
+
+	@Test
+	public void testValueOfNullInteger() {
+		Quota quota = Quota.valueOf((Integer) null);
+
+		assertThat(quota.getLimit()).isNull();
+	}
+
+	@Test
+	public void testValueOfString() {
+		Quota quota = Quota.valueOf("123");
+
+		assertThat(quota.getLimit()).isEqualTo(123);
+	}
+
+	@Test
+	public void testIsLimitedWhenNotLimited() {
+		Quota quota = Quota.valueOf((Integer) null);
+
+		assertThat(quota.isLimited()).isFalse();
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testBuildWhenNegativeLimit() {
+		Quota.builder().limit(-1).build();
+	}
+
+	@Test
+	public void testIsLimitedWhenLimited() {
+		assertThat(Quota.valueOf(100).isLimited()).isTrue();
 	}
 
 }

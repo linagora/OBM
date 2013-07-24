@@ -249,6 +249,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall().once();
 		cyrusManager.setAcl(user, "anyone", Acl.builder().user("user1").rights("p").build());
 		expectLastCall().once();
+		cyrusManager.applyQuota(user);
+		expectLastCall();
 		expectCyrusShutDown(cyrusManager);
 	}
 
@@ -332,6 +334,18 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
             .put("/batches/1");
 	}
 
+	private void createBatchWithOneUserUpdateAndCommit() {
+		given()
+			.auth().basic("username@domain", "password")
+			.post("/batches/");
+		given()
+			.auth().basic("username@domain", "password")
+			.put("/batches/1/users/1");
+		given()
+            .auth().basic("username@domain", "password")
+            .put("/batches/1");
+	}
+
 	private void expectBatchCreationAndRetrieval(Batch batch) throws Exception {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expectSuccessfulAuthenticationAndFullAuthorization();
@@ -347,6 +361,15 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private void expectLdapCreateUser(ObmUser user) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.createUser(user);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+
+	private void expectLdapModifyUser(ObmUser user, ObmUser oldUser) {
+		LdapManager ldapManager = expectLdapBuild();
+
+		ldapManager.modifyUser(user, oldUser);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -525,6 +548,83 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 		mocksControl.verify();
 	}
+
+	@Test
+	public void testProcessModifyUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.url("/users/1")
+						.verb(HttpVerb.PUT)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1\"," +
+										"\"profile\": \"user\"," +
+										"\"password\": \"secret\"," +
+										"\"mails\":[\"john@domain\"]" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(1)
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").build())
+				.build();
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(1)
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain)).andReturn(userFromDao);
+		expect(userDao.update(user)).andReturn(userFromDao);
+		expectLdapModifyUser(userFromDao, userFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, userFromDao);
+		expectCyrusShutDown(cyrusManager);
+		
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
 	
 	private void expectDeleteUserMailbox(final ObmUser user) throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();
@@ -533,6 +633,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		cyrusManager.delete(user);
 		expectLastCall().once();
 		expectCyrusShutDown(cyrusManager);
+	}
+
+	private void expectApplyQuota(CyrusManager cyrusManager, ObmUser user) {
+		cyrusManager.applyQuota(user);
+		expectLastCall();
 	}
 
 	private void expectCyrusShutDown(CyrusManager cyrusManager) {

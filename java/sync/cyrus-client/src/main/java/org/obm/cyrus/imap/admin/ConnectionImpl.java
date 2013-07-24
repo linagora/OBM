@@ -107,13 +107,16 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void setQuota(ImapPath path, Quota quota) {
-		storeClient.setQuota(path.format(), quota.getLimit());
+		if (quota.isLimited()) {
+			storeClient.setQuota(path.format(), quota.getLimit());
+		} else {
+			storeClient.removeQuota(path.format());
+		}
 	}
 
 	@Override
 	public void removeQuota(ImapPath path) {
-		// TODO Auto-generated method stub
-		
+		storeClient.removeQuota(path.format());
 	}
 
 	@Override

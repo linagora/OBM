@@ -179,8 +179,10 @@ import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
+import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -658,7 +660,9 @@ public class DependencyResolverHelper {
 				ServiceProperty.class,
 				BatchTracker.class,
 				BatchTrackerImpl.class,
-				BatchProcessingListener.class
+				BatchProcessingListener.class,
+				AbstractUserOperationProcessor.class,
+				ModifyUserOperationProcessor.class
 		};
 	}
 

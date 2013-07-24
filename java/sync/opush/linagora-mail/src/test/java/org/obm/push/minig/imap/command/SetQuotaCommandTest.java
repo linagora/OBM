@@ -55,18 +55,18 @@ public class SetQuotaCommandTest {
 	@Test
 	public void testSetQuota() {
 		assertThat(new SetQuotaCommand("mailboxPath", 50).getImapCommand())
-			.isEqualTo("SETQUOTA \"mailboxPath\" (50)");
+			.isEqualTo("SETQUOTA \"mailboxPath\" (STORAGE 50)");
 	}
 
 	@Test
 	public void testSetQuotaZero() {
 		assertThat(new SetQuotaCommand("mailboxPath", 0).getImapCommand())
-			.isEqualTo("SETQUOTA \"mailboxPath\" (0)");
+			.isEqualTo("SETQUOTA \"mailboxPath\" (STORAGE 0)");
 	}
 
 	@Test
 	public void testSetQuotaMax() {
 		assertThat(new SetQuotaCommand("mailboxPath", Long.MAX_VALUE).getImapCommand())
-			.isEqualTo("SETQUOTA \"mailboxPath\" (9223372036854775807)");
+			.isEqualTo("SETQUOTA \"mailboxPath\" (STORAGE 9223372036854775807)");
 	}
 }

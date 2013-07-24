@@ -232,12 +232,12 @@ public class StoreClientImpl implements StoreClient {
 	
 	@Override
 	public boolean removeQuota(String mailbox) {
-		return clientSupport.removeQuota(findMailboxNameWithServerCase(mailbox));
+		return clientSupport.removeQuota(mailbox);
 	}
 
 	@Override
 	public boolean setQuota(String mailbox, long quotaInKb) {
-		return clientSupport.setQuota(findMailboxNameWithServerCase(mailbox), quotaInKb);
+		return clientSupport.setQuota(mailbox, quotaInKb);
 	}
 
 	@Override

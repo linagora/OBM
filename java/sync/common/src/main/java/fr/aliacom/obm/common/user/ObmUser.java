@@ -62,6 +62,7 @@ public class ObmUser {
 	public static Builder builder() {
 		return new Builder();
 	}
+
 	public static class Builder {
 		
 		private Integer uid;
@@ -104,17 +105,58 @@ public class ObmUser {
 		private String phone2;
 		private String fax;
 		private String fax2;
-		private int mailQuota;
+		private Integer mailQuota;
 		private ObmHost mailHost;
 
 		private Integer uidNumber;
 		private Integer gidNumber;
 		
 		private Builder() {
-			super();
 		}
-		
-		public Builder uid(int uid) {
+
+		public Builder from(ObmUser user) {
+			return uid(user.uid)
+					.login(user.login)
+					.email(user.email)
+					.emailAlias(user.emailAlias)
+					.domain(user.domain)
+					.firstName(user.firstName)
+					.lastName(user.lastName)
+					.publicFreeBusy(user.publicFreeBusy)
+					.commonName(user.commonName)
+					.extId(user.extId)
+					.entityId(user.entityId)
+					.password(user.password)
+					.profileName(user.profileName)
+					.kind(user.kind)
+					.title(user.title)
+					.description(user.description)
+					.company(user.company)
+					.service(user.service)
+					.direction(user.direction)
+					.address1(user.address1)
+					.address2(user.address2)
+					.address3(user.address3)
+					.town(user.town)
+					.zipCode(user.zipCode)
+					.expresspostal(user.expresspostal)
+					.countryCode(user.countryCode)
+					.phone(user.phone)
+					.phone2(user.phone2)
+					.mobile(user.mobile)
+					.fax(user.fax)
+					.fax2(user.fax2)
+					.mailQuota(user.mailQuota)
+					.mailHost(user.mailHost)
+					.timeCreate(user.timeCreate)
+					.timeUpdate(user.timeUpdate)
+					.createdBy(user.createdBy)
+					.updatedBy(user.updatedBy)
+					.uidNumber(user.uidNumber)
+					.gidNumber(user.gidNumber);
+		}
+
+		public Builder uid(Integer uid) {
 			this.uid = uid;
 			return this;
 		}
@@ -258,7 +300,7 @@ public class ObmUser {
 			fax2 = Iterables.get(faxes, 1, null);
 			return this;
 		}
-		public Builder mailQuota(int mailQuota) {
+		public Builder mailQuota(Integer mailQuota) {
 			this.mailQuota = mailQuota;
 			return this;
 		}
@@ -288,7 +330,16 @@ public class ObmUser {
 			}
 			return this;
 		}
-		
+
+		public Builder email(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public Builder emailAlias(Iterable<String> emailAlias) {
+			this.emailAlias = Sets.newHashSet(emailAlias);
+			return this;
+		}
 
 		public Builder mails(Iterable<String> mails) {
 			Preconditions.checkNotNull(mails);
@@ -315,11 +366,17 @@ public class ObmUser {
 			this.gidNumber = gidNumber;
 			return this;
 		}
-		
+
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
 			Preconditions.checkState(login != null);
 			Preconditions.checkState(domain != null);
+
+			// The DB model uses 0 in the mail quota column to mean "no quota"
+			// ObmUser uses null internally to mean "no quota"
+			if (mailQuota != null && mailQuota == 0) {
+				mailQuota = null;
+			}
 			
 			return new ObmUser(
 					uid, entityId, login, extId, commonName, lastName, firstName,
@@ -372,7 +429,7 @@ public class ObmUser {
 	private final String phone2;
 	private final String fax;
 	private final String fax2;
-	private final int mailQuota;
+	private final Integer mailQuota;
 	private final ObmHost mailHost;
 
 	private final Integer uidNumber;
@@ -388,7 +445,7 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
 			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
-			int mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber) {
+			Integer mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -611,8 +668,12 @@ public class ObmUser {
 		return fax2;
 	}
 
-	public int getMailQuota() {
+	public Integer getMailQuota() {
 		return mailQuota;
+	}
+
+	public int getMailQuotaAsInt() {
+		return mailQuota != null ? mailQuota : 0;
 	}
 
 	public ObmHost getMailHost() {

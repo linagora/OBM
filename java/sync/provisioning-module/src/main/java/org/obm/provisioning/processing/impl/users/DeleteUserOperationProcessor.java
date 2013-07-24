@@ -33,49 +33,28 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
-import java.sql.SQLException;
-
 import org.obm.annotations.transactional.Transactional;
-import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.provisioning.ldap.client.LdapService;
-import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.push.mail.bean.Acl;
 
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcessor {
+public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor {
 	
 	private final static String DELETE_ACL = "lc";
-	
-	private final UserDao userDao;
-	private final CyrusImapService cyrusService;
-	private final LdapService ldapService;
-	private final UserSystemDao userSystemDao;
 
 	@Inject
-	public DeleteUserOperationProcessor(UserDao userDao, LdapService ldapService, CyrusImapService cyrusService, UserSystemDao userSystemDao) {
-		super(BatchEntityType.USER, HttpVerb.DELETE);
-
-		this.userDao = userDao;
-		this.cyrusService = cyrusService;
-		this.ldapService = ldapService;
-		this.userSystemDao = userSystemDao;
+	DeleteUserOperationProcessor() {
+		super(HttpVerb.DELETE);
 	}
 
 	@Override
@@ -84,7 +63,7 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		final UserExtId extId = getExtIdFromRequestParams(operation);
 		final Request request = operation.getRequest();
 		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
-		final ObmUser userFromDao = getUserFromDao(batch, extId);
+		final ObmUser userFromDao = getUserFromDao(extId, batch.getDomain());
 		
 		deleteUserInDao(extId);
 		if (expunge == true) {
@@ -106,16 +85,6 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		}
 	}
 
-	private ObmUser getUserFromDao(Batch batch, final UserExtId extId) {
-		try {
-			return userDao.getByExtId(extId, batch.getDomain());
-		} catch (SQLException e) {
-			throw new ProcessingException(e);
-		} catch (UserNotFoundException e) {
-			throw new ProcessingException(e);
-		}
-	}
-
 	private void deleteUserInDao(UserExtId extId) {
 		try {
 			userDao.delete(extId);
@@ -125,26 +94,11 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		}
 	}
 
-	private UserExtId getExtIdFromRequestParams(Operation operation) {
-		final Request request = operation.getRequest();
-		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
-		UserExtId extId  = UserExtId.valueOf(itemId);
-		
-		if (Strings.isNullOrEmpty(extId.getExtId())) {
-			throw new ProcessingException(
-					String.format("Cannot get extId parameter from request url %s.", request.getUrl()));
-		}
-		
-		return extId;
-	}
-	
 	private void deleteUserMailBoxes(ObmUser user) {
 		CyrusManager cyrusManager = null;
 		
 		try {
-			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
-			cyrusManager = cyrusService.buildManager(
-					user.getMailHost().getIp(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+			cyrusManager = buildCyrusManager(user);
 			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
 			cyrusManager.delete(user);
 		} catch (Exception e) {

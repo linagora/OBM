@@ -31,7 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client.bean;
 
+import java.util.List;
+
+import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.obm.provisioning.ldap.client.Configuration;
@@ -39,6 +44,7 @@ import org.obm.provisioning.ldap.client.Configuration;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -434,7 +440,59 @@ public class LdapUser {
 			.build();
 		return ldapEntry.toDefaultEntry();
 	}
-	
+
+	public Modification[] buildDiffModifications(LdapUser oldUser) {
+		List<Modification> mods = Lists.newArrayList();
+
+		if (!Objects.equal(uidNumber, oldUser.uidNumber)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "uidNumber", String.valueOf(uidNumber)));
+		}
+		if (!Objects.equal(gidNumber, oldUser.gidNumber)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "gidNumber", String.valueOf(gidNumber)));
+		}
+		if (!Objects.equal(loginShell, oldUser.loginShell)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "loginShell", loginShell));
+		}
+		if (!Objects.equal(cn, oldUser.cn)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "cn", cn));
+		}
+		if (!Objects.equal(givenName, oldUser.givenName)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "givenName", givenName));
+		}
+		if (!Objects.equal(sn, oldUser.sn)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "sn", sn));
+		}
+		if (!Objects.equal(displayName, oldUser.displayName)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "displayName", displayName));
+		}
+		if (!Objects.equal(homeDirectory, oldUser.homeDirectory)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "homeDirectory", homeDirectory));
+		}
+		if (!Objects.equal(userPassword, oldUser.userPassword)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "userPassword", userPassword));
+		}
+		if (!Objects.equal(webAccess, oldUser.webAccess)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "webAccess", webAccess));
+		}
+		if (!Objects.equal(mailBox, oldUser.mailBox)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mailBox", mailBox));
+		}
+		if (!Objects.equal(mailBoxServer, oldUser.mailBoxServer)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mailBoxServer", mailBoxServer));
+		}
+		if (!Objects.equal(mailAccess, oldUser.mailAccess)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mailAccess", mailAccess));
+		}
+		if (!Objects.equal(mail, oldUser.mail)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mail", mail));
+		}
+		if (!Objects.equal(hiddenUser, oldUser.hiddenUser)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "hiddenUser", String.valueOf(hiddenUser).toUpperCase()));
+		}
+
+		return mods.toArray(new Modification[mods.size()]);
+	}
+
 	private org.obm.provisioning.ldap.client.bean.Dn buildDn() {
 		return org.obm.provisioning.ldap.client.bean.Dn.valueOf(
 				"uid=" + getUid().get() + "," + userBaseDn.getName());
