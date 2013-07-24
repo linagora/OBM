@@ -45,6 +45,7 @@ import org.apache.directory.api.ldap.model.entry.Value;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.name.Rdn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
@@ -154,7 +155,9 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@VisibleForTesting Dn getUserDnFromUserId(LdapUser.Uid ldapUserId, LdapDomain domain) throws LdapException {
-		return getDn(configuration.getUserBaseDn(domain), configuration.buildUserFilter(ldapUserId), configuration.getUserSearchScope());
+		return new Dn(
+				new Rdn(String.format("uid=%s", ldapUserId.get())),
+				configuration.getUserBaseDn(domain));
 	}
 
 	@Override
