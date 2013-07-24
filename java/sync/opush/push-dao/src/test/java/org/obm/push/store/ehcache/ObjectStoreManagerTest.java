@@ -40,10 +40,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -51,6 +53,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
+	private BitronixTransactionManager transactionManager;
 
 	public ObjectStoreManagerTest() {
 		super();
@@ -59,13 +62,15 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	@Before
 	public void init() throws IOException {
 		logger = EasyMock.createNiceMock(Logger.class);
-		this.opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger, transactionProvider);
 	}
 
 	@After
 	public void shutdown() {
 		opushCacheManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManager.shutdown();
 	}
 
 	@Test

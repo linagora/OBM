@@ -47,6 +47,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
@@ -77,7 +78,8 @@ public class SnapshotDaoEhcacheImplTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManager = new ObjectStoreManager( initConfigurationServiceMock(), logger);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		objectStoreManager = new ObjectStoreManager( initConfigurationServiceMock(), logger, transactionProvider);
 		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
 	}
 	

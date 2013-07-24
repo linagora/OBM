@@ -35,7 +35,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
+import org.obm.annotations.transactional.LazyTransactionProvider;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
@@ -60,6 +64,8 @@ public class WindowingModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(ConfigurationService.class).toInstance(configuration());
+		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(TransactionProvider.class).to(LazyTransactionProvider.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(WindowingService.class).to(WindowingServiceImpl.class);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);

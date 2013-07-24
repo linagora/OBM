@@ -50,6 +50,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
@@ -59,8 +60,6 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.exception.EhcacheRollbackException;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
@@ -81,6 +80,7 @@ public class EhcacheTransactionalModeTest {
 	}
 
 	@Inject private TestClass xaCacheInstance;
+	@Inject private LazyTransactionProvider transactionProvider;
 	
 	public static class TestClass {
 
@@ -126,9 +126,9 @@ public class EhcacheTransactionalModeTest {
 	}
 	
 	@After
-	public void removeCache() {
+	public void removeCache() throws Exception {
 		manager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionProvider.shutdown();
 	}
 	
 	@Test

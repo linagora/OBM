@@ -89,7 +89,7 @@
                 <dependency>
 			<groupId>javax.transaction</groupId>
                        	<artifactId>jta</artifactId>
-                       	<scope>test</scope>
+                       	<scope>provided</scope>
                </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -106,7 +106,6 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

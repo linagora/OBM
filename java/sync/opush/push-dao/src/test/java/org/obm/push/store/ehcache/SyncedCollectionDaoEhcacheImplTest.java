@@ -44,6 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -70,7 +71,8 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

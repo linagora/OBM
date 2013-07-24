@@ -33,7 +33,9 @@ package org.obm.annotations.transactional;
 
 import javax.transaction.TransactionManager;
 
-public interface TransactionProvider {
+import org.obm.sync.LifecycleListener;
+
+public interface TransactionProvider extends LifecycleListener {
 
 	TransactionManager get();
 

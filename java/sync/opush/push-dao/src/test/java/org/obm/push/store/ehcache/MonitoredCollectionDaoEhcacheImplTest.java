@@ -37,7 +37,6 @@ import java.util.Set;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -45,6 +44,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -56,6 +56,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Sets;
@@ -66,14 +67,15 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	private ObjectStoreManager objectStoreManager;
 	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
@@ -83,7 +85,7 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManager.shutdown();
 	}
 	
 	@Test

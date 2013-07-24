@@ -42,6 +42,7 @@ import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.LifecycleListener;
@@ -68,16 +69,22 @@ public class ObjectStoreManager implements LifecycleListener {
 	private final CacheManager singletonManager;
 
 	@Inject ObjectStoreManager(ConfigurationService configurationService,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger,
+			TransactionProvider transactionProvider) {
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
 		boolean usePersistentCache = configurationService.usePersistentCache();
 		String dataDirectory = configurationService.getDataDirectory();
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
+		forceInitializeTransactionManager(transactionProvider);
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 	}
 
+	private void forceInitializeTransactionManager(TransactionProvider transactionProvider) {
+		transactionProvider.get();
+	}
+	
 	@Override
 	public void shutdown() {
 		this.singletonManager.shutdown();

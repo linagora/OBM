@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
-import javax.transaction.TransactionManager;
-
-import org.obm.annotations.transactional.TransactionProviderImpl;
 import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
@@ -45,10 +42,10 @@ public class TransactionalModule extends AbstractModule{
 	@Override
 	protected void configure() {
 
-		bind(TransactionManager.class).toProvider(TransactionProviderImpl.class);
+		bind(TransactionProvider.class).to(LazyTransactionProvider.class);
 		bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(TransactionProviderImpl.class);
+		lifecycleListeners.addBinding().to(TransactionProvider.class);
 		
 		TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 

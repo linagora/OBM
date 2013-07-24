@@ -45,18 +45,15 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
-import com.google.inject.matcher.Matchers;
-
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.matcher.Matchers;
 
 @RunWith(SlowFilterRunner.class)
 public class TransactionalTest {
@@ -160,12 +157,12 @@ public class TransactionalTest {
 		}
 	}
 	
-	private TestClass createTestClass(final Provider<TransactionManager> provider) {
+	private TestClass createTestClass(final TransactionProvider provider) {
 		Injector injector = Guice.createInjector(new AbstractModule() {
 
 			@Override
 			protected void configure() {
-				bind(TransactionManager.class).toProvider(provider);
+				bind(TransactionProvider.class).toInstance(provider);
 				bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
 				bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
@@ -179,13 +176,18 @@ public class TransactionalTest {
 		return injector.getInstance(TestClass.class);
 	}
 	
-	private <T> Provider<T> getProvider(final T obj) {
-		return new Provider<T>() {
+	private TransactionProvider getProvider(final TransactionManager obj) {
+		return new TransactionProvider() {
 			@Override
-			public T get() {
+			public TransactionManager get() {
 				return obj;
 			}
+			@Override
+			public void shutdown() throws Exception {
+				//nothing to shutdown
+			}
 		};
+
 	}
 	
 	@Test

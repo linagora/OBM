@@ -44,6 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
@@ -71,7 +72,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		this.transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 	}
 	

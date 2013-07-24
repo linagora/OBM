@@ -47,14 +47,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class TransactionalInterceptor implements MethodInterceptor {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionalInterceptor.class);
 	
 	@Inject
-	private Provider<TransactionManager> transactionManagerProvider;
+	private TransactionProvider transactionManagerProvider;
 	
 	@Inject
 	private ITransactionAttributeBinder transactionAttributeBinder;

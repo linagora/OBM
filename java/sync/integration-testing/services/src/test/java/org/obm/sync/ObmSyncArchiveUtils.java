@@ -52,7 +52,7 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.annotations.transactional.TransactionProviderImpl;
+import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalInterceptor;
@@ -507,7 +507,7 @@ public class ObmSyncArchiveUtils {
 				TransactionalModule.class,
 				TransactionException.class,
 				TransactionProvider.class,
-				TransactionProviderImpl.class,
+				LazyTransactionProvider.class,
 				AutoTruncate.class,
 				DatabaseField.class,
 				DatabaseEntity.class
