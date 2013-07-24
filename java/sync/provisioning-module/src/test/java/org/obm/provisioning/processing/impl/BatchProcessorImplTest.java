@@ -207,12 +207,22 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.mailHost(ObmHost.builder().name("host").build())
 				.build();
+		final ObmUser userFromDao = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.build();
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(userDao.create(user)).andReturn(user);
-		expectLdapCreateUser(user);
-		expectCyrusCreateMailbox(user);
+		expect(userDao.create(user)).andReturn(userFromDao);
+		expectLdapCreateUser(userFromDao);
+		expectCyrusCreateMailbox(userFromDao);
 		
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
@@ -492,7 +502,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
-				.mailHost(ObmHost.builder().name("host").build())
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
 				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
@@ -535,7 +545,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private CyrusManager expectCyrusBuild() throws DaoException, IMAPException {
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(obmCyrusUser);
 		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
-		expect(cyrusService.buildManager("host", "cyrus", "secret")).andReturn(cyrusManager);
+		expect(cyrusService.buildManager("127.0.0.1", "cyrus", "secret")).andReturn(cyrusManager);
 		return cyrusManager;
 	}
 }

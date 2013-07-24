@@ -85,7 +85,7 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		ObmUser user = getUserFromRequestBody(operation, batch);
 		ObmUser userFromDao = createUserInDao(user);
 		if (user.isEmailAvailable()) {
-			createUserMailboxes(user);
+			createUserMailboxes(userFromDao);
 		}
 		createUserInLdap(userFromDao);
 	}
@@ -111,7 +111,7 @@ public class CreateUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		try {
 			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
 			cyrusManager = cyrusService.buildManager(
-					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+					user.getMailHost().getIp(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
 			cyrusManager.create(user);
 			cyrusManager.setAcl(
 					user,

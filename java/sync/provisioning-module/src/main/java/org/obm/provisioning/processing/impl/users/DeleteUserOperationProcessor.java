@@ -144,7 +144,7 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 		try {
 			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
 			cyrusManager = cyrusService.buildManager(
-					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+					user.getMailHost().getIp(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
 			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
 			cyrusManager.delete(user);
 		} catch (Exception e) {
