@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,56 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
-import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.LifecycleListener;
-import org.slf4j.Logger;
+public interface TransactionProvider {
 
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.Configuration;
-import bitronix.tm.TransactionManagerServices;
+	TransactionManager get();
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+	void shutdown() throws Exception;
 
-@Singleton
-public class TransactionProvider implements Provider<TransactionManager>, LifecycleListener {
-	
-	private BitronixTransactionManager transactionManager;
-
-	@Inject
-	public TransactionProvider(TransactionConfiguration configuration,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws SystemException {
-		int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
-		configurationLogger.info("Transaction timeout in seconds : {}", transactionTimeOutInSecond);
-		configureBitronix(configuration);
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
-	}
-
-	private void configureBitronix(TransactionConfiguration configuration) {
-		Configuration btConfiguration = TransactionManagerServices.getConfiguration();
-		if (configuration.enableJournal()) {
-			btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
-			btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());	
-		} else {
-			btConfiguration.setJournal("null");
-		}
-		btConfiguration.setDefaultTransactionTimeout(configuration.getTimeOutInSecond());
-	}
-	
-	@Override
-	public TransactionManager get() {
-		return transactionManager;
-	}
-	
-	@Override
-	public void shutdown() throws Exception {
-		transactionManager.shutdown();
-	}
 }

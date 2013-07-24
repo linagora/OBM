@@ -31,29 +31,56 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
-import org.obm.annotations.transactional.TransactionProviderImpl;
+import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.LifecycleListener;
+import org.slf4j.Logger;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.multibindings.Multibinder;
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.Configuration;
+import bitronix.tm.TransactionManagerServices;
 
-public class TransactionalModule extends AbstractModule{
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
-	@Override
-	protected void configure() {
+@Singleton
+public class TransactionProviderImpl implements Provider<TransactionManager>, LifecycleListener, TransactionProvider {
+	
+	private BitronixTransactionManager transactionManager;
 
-		bind(TransactionManager.class).toProvider(TransactionProviderImpl.class);
-		bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(TransactionProviderImpl.class);
-		
-		TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
-		bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), 
-				transactionalInterceptor);
-		requestInjection(transactionalInterceptor);
+	@Inject
+	public TransactionProviderImpl(TransactionConfiguration configuration,
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws SystemException {
+		int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
+		configurationLogger.info("Transaction timeout in seconds : {}", transactionTimeOutInSecond);
+		configureBitronix(configuration);
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
 	}
 
+	private void configureBitronix(TransactionConfiguration configuration) {
+		Configuration btConfiguration = TransactionManagerServices.getConfiguration();
+		if (configuration.enableJournal()) {
+			btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
+			btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());	
+		} else {
+			btConfiguration.setJournal("null");
+		}
+		btConfiguration.setDefaultTransactionTimeout(configuration.getTimeOutInSecond());
+	}
+	
+	@Override
+	public TransactionManager get() {
+		return transactionManager;
+	}
+	
+	@Override
+	public void shutdown() throws Exception {
+		transactionManager.shutdown();
+	}
 }
