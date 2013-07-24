@@ -60,6 +60,7 @@ import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
@@ -517,6 +518,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	private void expectDeleteUserMailbox(final ObmUser user) throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();
+		cyrusManager.setAcl(user, "cyrus", Acl.builder().user("user1").rights("lc").build());
+		expectLastCall().once();
 		cyrusManager.delete(user);
 		expectLastCall().once();
 		expectCyrusShutDown(cyrusManager);

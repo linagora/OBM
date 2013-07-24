@@ -50,6 +50,7 @@ import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
+import org.obm.push.mail.bean.Acl;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
@@ -59,6 +60,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcessor {
+	
+	private final static String DELETE_ACL = "lc";
 	
 	private final UserDao userDao;
 	private final CyrusImapService cyrusService;
@@ -142,6 +145,7 @@ public class DeleteUserOperationProcessor extends HttpVerbBasedOperationProcesso
 			ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
 			cyrusManager = cyrusService.buildManager(
 					user.getMailHost().getName(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
+			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
 			cyrusManager.delete(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
