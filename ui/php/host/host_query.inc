@@ -796,8 +796,8 @@ function check_host_can_delete($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   if ($obm_q->f('count') != 0) {
-    $delete_ok = false;
     $err['msg'] .= $GLOBALS['l_cant_delete'];
+    return false;
   }
 
   $query = "
@@ -809,12 +809,27 @@ function check_host_can_delete($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   if ($obm_q->f('count') != 0) {
-    $delete_ok = $delete_ok && true;
-  } 
+    $err['msg'] .= $GLOBALS['l_cant_delete'];
+    return false;
+  }
+
+  $query = "
+    SELECT count(*) as count FROM ServiceProperty
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'ldap' AND serviceproperty_property IN ('ldap')
+    AND serviceproperty_value = '".$obm_q->escape($id)."'";
+  display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if ($obm_q->f('count') != 0) {
+    $err['msg'] .= $GLOBALS['l_cant_delete'];
+    return false;
+  }
 
   // Check that user has delegation rights for this host
   if (! check_host_update_rights(array('host_id' => $id))) {
-    $delete_ok = false;
+    $err['msg'] .= $GLOBALS['l_cant_delete'];
+    return false;
   }  
 
   return $delete_ok;
