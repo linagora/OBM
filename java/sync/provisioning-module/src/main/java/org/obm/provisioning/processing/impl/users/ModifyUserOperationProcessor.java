@@ -47,6 +47,10 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 	ModifyUserOperationProcessor() {
 		super(HttpVerb.PUT);
 	}
+	
+	ModifyUserOperationProcessor(HttpVerb verb) {
+		super(verb);
+	}
 
 	@Override
 	@Transactional
@@ -62,7 +66,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		modifyUserInLdap(newUser, existingUser);
 	}
 
-	private void updateUserMailbox(ObmUser user) {
+	protected void updateUserMailbox(ObmUser user) {
 		CyrusManager cyrusManager = null;
 
 		try {
@@ -77,7 +81,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private ObmUser modifyUserInDao(ObmUser user) {
+	protected ObmUser modifyUserInDao(ObmUser user) {
 		try {
 			return userDao.update(user);
 		}
@@ -86,7 +90,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
+	protected void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
 		LdapManager ldapManager = buildLdapManager(user);
 
 		try {

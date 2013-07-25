@@ -27,13 +27,12 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.json;
+package org.obm.provisioning.utils;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Collections;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -42,9 +41,7 @@ import org.obm.sync.host.ObmHost;
 import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
-public class ObmUserJsonDeserializerTest {
-
-	private ObmUserJsonDeserializer testee;
+public class SerializationUtilsTest {
 
 	private static final ObmHost HOST_1 = ObmHost
 			.builder()
@@ -57,29 +54,24 @@ public class ObmUserJsonDeserializerTest {
 			.ip("1.2.3.5")
 			.build();
 
-	@Before
-	public void setUp() {
-		testee = new ObmUserJsonDeserializer(null);
-	}
-
 	@Test
 	public void testFindMailHostForUserWhenNoHosts() {
-		assertThat(testee.findMailHostForUser("hostName", Collections.<ObmHost>emptySet())).isNull();
+		assertThat(SerializationUtils.findMailHostForUser("hostName", Collections.<ObmHost>emptySet())).isNull();
 	}
 
 	@Test
 	public void testFindMailHostForUserWhenHostExists() {
-		assertThat(testee.findMailHostForUser("hostName", ImmutableSet.of(HOST_1, HOST_2))).isEqualTo(HOST_1);
+		assertThat(SerializationUtils.findMailHostForUser("hostName", ImmutableSet.of(HOST_1, HOST_2))).isEqualTo(HOST_1);
 	}
 
 	@Test
 	public void testFindMailHostForUserWhenNoHostDoesntExist() {
-		assertThat(testee.findMailHostForUser("nonExistentHost", ImmutableSet.of(HOST_2, HOST_1))).isEqualTo(HOST_2);
+		assertThat(SerializationUtils.findMailHostForUser("nonExistentHost", ImmutableSet.of(HOST_2, HOST_1))).isEqualTo(HOST_2);
 	}
 
 	@Test
 	public void testFindMailHostForUserWhenNoHostNameDefined() {
-		assertThat(testee.findMailHostForUser(null, ImmutableSet.of(HOST_2))).isEqualTo(HOST_2);
+		assertThat(SerializationUtils.findMailHostForUser(null, ImmutableSet.of(HOST_2))).isEqualTo(HOST_2);
 	}
 
 }

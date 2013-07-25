@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -44,38 +44,33 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.sync.host.ObmHost;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.ObmUser.Builder;
 
-public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
-
-	private final Provider<ObmDomain> domainProvider;
-	private final Builder builder = ObmUser.builder();
-
-	@Inject
-	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
-		this.domainProvider = domainProvider;
+public class PatchObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
+	
+	public PatchObmUserJsonDeserializer(ObmUser oldUser) {
+		this.oldUser = oldUser;
 	}
+
+	private final ObmUser oldUser;
 	
 	@Override
 	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		ObmUser.Builder builder = ObmUser.builder().from(oldUser);
+		
 		JsonNode jsonNode = jp.readValueAsTree();
-
+		
 		for(UserJsonFields field: UserJsonFields.fields) {
 			addFieldValueToBuilder(jsonNode, field, builder);
 		}
-
-		ObmDomain domain = domainProvider.get();
 		
-		ObmHost mailHost = getMailHostValue(jsonNode, domain);
+		ObmHost mailHost = getMailHostValue(jsonNode, oldUser.getDomain());
+		
+		if (mailHost != null) {
+			builder.mailHost(mailHost);
+		}
 
-		return builder
-				.domain(domain)
-				.mailHost(mailHost)
-				.build();
+		return builder.build();
 	}
+
 }

@@ -31,6 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.bean;
 
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+
 
 public enum UserJsonFields {
 	ID("id"), LOGIN("login"), LASTNAME("lastname"), PROFILE("profile"), FIRSTNAME("firstname"), COMMONNAME("commonname"),
@@ -56,5 +61,15 @@ public enum UserJsonFields {
 			}
 		}
 		throw new IllegalArgumentException();
+	}
+	
+	public static Set<UserJsonFields> fields;
+	
+	static {
+		Builder<UserJsonFields> builder = ImmutableSet.builder();
+		for (UserJsonFields field : values()) {
+			builder.add(field);
+		}
+		fields = builder.build();
 	}
 }

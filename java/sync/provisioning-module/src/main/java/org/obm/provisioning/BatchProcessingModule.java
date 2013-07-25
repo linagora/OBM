@@ -37,6 +37,7 @@ import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.PatchUserOperationProcessor;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -57,6 +58,7 @@ public class BatchProcessingModule extends AbstractModule {
 		multibinder.addBinding().to(CreateUserOperationProcessor.class);
 		multibinder.addBinding().to(DeleteUserOperationProcessor.class);
 		multibinder.addBinding().to(ModifyUserOperationProcessor.class);
+		multibinder.addBinding().to(PatchUserOperationProcessor.class);
 	}
 
 }

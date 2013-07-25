@@ -64,7 +64,6 @@ import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
 import org.obm.cyrus.imap.CyrusClientEmailConfiguration;
 import org.obm.cyrus.imap.CyrusClientModule;
-import org.obm.cyrus.imap.admin.Acl;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
 import org.obm.cyrus.imap.admin.CyrusManager;
@@ -162,6 +161,7 @@ import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
+import org.obm.provisioning.json.PatchObmUserJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.ldap.client.Connection;
@@ -191,6 +191,7 @@ import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.PatchUserOperationProcessor;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -204,6 +205,7 @@ import org.obm.push.LinagoraImapClientModule;
 import org.obm.push.OptionalVMArguments;
 import org.obm.push.bean.Builder;
 import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.minig.imap.StoreClient;
@@ -680,7 +682,9 @@ public class DependencyResolverHelper {
 				ModifyUserOperationProcessor.class,
 				GroupResource.class,
 				GroupWriteResource.class,
-				SystemUserLdapConfiguration.class
+				SystemUserLdapConfiguration.class,
+				PatchObmUserJsonDeserializer.class,
+				PatchUserOperationProcessor.class
 		};
 	}
 

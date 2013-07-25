@@ -346,6 +346,18 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
             .auth().basic("username@domain", "password")
             .put("/batches/1");
 	}
+	
+	private void createBatchWithOneUserPatchAndCommit() {
+		given()
+			.auth().basic("username@domain", "password")
+			.post("/batches/");
+		given()
+			.auth().basic("username@domain", "password")
+			.patch("/batches/1/users/1");
+		given()
+	        .auth().basic("username@domain", "password")
+	        .put("/batches/1");
+	}
 
 	private void expectBatchCreationAndRetrieval(Batch batch) throws Exception {
 		expectSuccessfulAuthenticationAndFullAuthorization();
@@ -623,6 +635,72 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		mocksControl.replay();
 
 		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessPatchUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.url("/users/extIdUser1")
+						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.verb(HttpVerb.PATCH)
+						.body(	"{" +
+										"\"lastname\": \"user1\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		
+		ObmUser.Builder builder = ObmUser.builder()
+				.uid(1)
+				.entityId(1)
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build());
+		
+		ObmUser user = builder
+				.lastName("user1")
+				.build();
+		
+		ObmUser userFromDao = builder.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain)).andReturn(userFromDao);
+		expect(userDao.update(user)).andReturn(userFromDao);
+		expectLdapModifyUser(userFromDao, userFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, userFromDao);
+		expectCyrusShutDown(cyrusManager);
+		
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		createBatchWithOneUserPatchAndCommit();
 
 		mocksControl.verify();
 	}
