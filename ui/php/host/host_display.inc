@@ -690,6 +690,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $solr = $host_q->f('host_solr');
     $opush = $host_q->f('host_opush');
     $opush_frontend = $host_q->f('host_opush_frontend');
+    $ldap = $host_q->f('host_ldap');
     $imap_frontend = $host_q->f('host_imap_frontend');
     $monitor = $host_q->f('host_monitor');
     $backup_ftp = $host_q->f('host_backup_ftp');
@@ -723,6 +724,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['solr'])) { $solr = $host['solr']; }
   if (isset($host['opush'])) { $opush = $host['opush']; }
   if (isset($host['opush_frontend'])) { $opush_frontend = $host['opush_frontend']; }
+  if (isset($host['ldap'])) { $ldap = $host['ldap']; }
   if (isset($host['imap_frontend'])) { $imap_frontend = $host['imap_frontend']; }
   if (isset($host['monitor'])) { $monitor = $host['monitor']; }
   if (isset($host['backup_ftp'])) { $backup_ftp = $host['backup_ftp']; }
@@ -752,6 +754,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $solr_state  = ($solr ? 'checked' : '');
   $opush_state  = ($opush ? 'checked' : '');
   $opush_frontend_state  = ($opush_frontend ? 'checked' : '');
+  $ldap_state  = ($ldap ? 'checked' : '');
   $imap_frontend_state  = ($imap_frontend ? 'checked' : '');
   $monitor_state  = ($monitor ? 'checked' : '');
   $backup_ftp_state  = ($backup_ftp ? 'checked' : '');
@@ -843,6 +846,14 @@ function html_host_form($action, $host_q, $host, $field='') {
   </td>
   </tr>";
 
+  $block_ldap= "
+  <tr>
+  <th class=\"$class[ldap]\"><label for=\"cb_ldap\">$GLOBALS[l_ldap]</label></th>
+  <td>
+  <input id=\"cb_ldap\" name=\"cb_ldap\" type=\"checkbox\" value=\"1\" $ldap_state>
+  </td>
+  </tr>";
+
   $block_backup_ftp = "
   <tr>
     <th class=\"$class[backup_ftp]\"><label for=\"cb_backup_ftp\">$GLOBALS[l_backup_ftp]</label></th>
@@ -915,6 +926,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_solr
   $block_opush
   $block_opush_frontend
+  $block_ldap
   $block_backup_ftp
    <tr>
      <th class=\"$class[monitor]\"><label for=\"cb_monitor\">$GLOBALS[l_monitor]</label></th>
