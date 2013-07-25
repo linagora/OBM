@@ -194,6 +194,8 @@ function run_query_domain_insert($domain) {
     of_service_insert('solr', $entity_id);
     of_service_property_insert('solr','event', $entity_id, $domain['solr']);
     of_service_property_insert('solr','contact', $entity_id, $domain['solr']);
+    of_service_insert('ldap', $entity_id);
+    of_service_property_insert('ldap','ldap', $entity_id, $domain['ldap']);
     of_service_insert('opush', $entity_id);
     of_service_property_insert('opush','opush', $entity_id, $domain['opush']);
     of_service_insert('opush_frontend', $entity_id);
