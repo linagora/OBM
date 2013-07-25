@@ -64,6 +64,7 @@ function run_query_host_search($host) {
   $solr = $host['solr'];
   $opush = $host['opush'];
   $opush_frontend = $host['opush_frontend'];
+  $ldap = $host['ldap'];
   $imap_frontend = $host['imap_frontend'];
   $monitor = $host['monitor'];
   $imap = $host['imap'];
@@ -106,6 +107,9 @@ function run_query_host_search($host) {
   }
   if ($opush_frontend != '') {
     $where .= ' AND opush_frontend.service_id IS NOT NULL';
+  }
+  if ($ldap != '') {
+    $where .= ' AND ldap.service_id IS NOT NULL';
   }
   if ($imap_frontend != '') {
     $where .= ' AND imap_frontend.service_id IS NOT NULL';
