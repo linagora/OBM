@@ -32,6 +32,7 @@
 package org.obm.push.handler;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.obm.push.backend.IContinuation;
@@ -58,27 +59,40 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	protected final MailProtocol mailProtocol;
 
 	private final Logger mailDataLogger;
+	private final Logger trimmedRequestLogger;
+	private final Logger fullRequestLogger;
 
 	protected abstract void doTheJob(MailRequest mailRequest, UserDataRequest udr) 
 			throws ProcessingEmailException, CollectionNotFoundException, ItemNotFoundException;
 	
-	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol, Logger mailDataLogger) {
+	protected MailRequestHandler(MailBackend mailBackend, IErrorsManager errorManager, MailProtocol mailProtocol, 
+			Logger mailDataLogger, Logger fullRequestLogger, Logger trimmedRequestLogger) {
 		this.mailBackend = mailBackend;
 		this.errorManager = errorManager;
 		this.mailProtocol = mailProtocol;
 		this.mailDataLogger = mailDataLogger;
+		this.fullRequestLogger = fullRequestLogger;
+		this.trimmedRequestLogger = trimmedRequestLogger;
 	}
 
 	@Override
 	public void process(IContinuation continuation, UserDataRequest udr, ActiveSyncRequest request, Responder responder) {
 		try {
 			MailRequest mailRequest = mailProtocol.getRequest(request);
+			logRequest(mailRequest);
 			process(udr, mailRequest);
 		} catch (IOException e) {
 			responder.sendError(HttpStatus.BAD_REQUEST_400);
 			return;
 		} catch (QuotaExceededException e) {
 			notifyUserQuotaExceeded(udr, e);
+		}
+	}
+
+	private void logRequest(MailRequest mailRequest) {
+		for (Logger logger: Arrays.asList(trimmedRequestLogger, fullRequestLogger)) {
+			logger.debug("MailRequest : collection='{}', serverId='{}', saveInSent='{}'", 
+					mailRequest.getCollectionId(), mailRequest.getServerId(), mailRequest.isSaveInSent());
 		}
 	}
 

@@ -51,9 +51,12 @@ public class SmartReplyHandler extends MailRequestHandler {
 
 	@Inject
 	/* package */ SmartReplyHandler(MailBackend mailBackend, IErrorsManager errorManager, 
-			MailProtocol mailProtocol, @Named(LoggerModule.MAIL_DATA)Logger mailDataLogger) {
+			MailProtocol mailProtocol,
+			@Named(LoggerModule.MAIL_DATA)Logger mailDataLogger,
+			@Named(LoggerModule.FULL_REQUEST)Logger fullRequestLogger,
+			@Named(LoggerModule.TRIMMED_REQUEST)Logger trimmedRequestLogger) {
 		
-		super(mailBackend, errorManager, mailProtocol, mailDataLogger);
+		super(mailBackend, errorManager, mailProtocol, mailDataLogger, fullRequestLogger, trimmedRequestLogger);
 	}
 
 	@Override
