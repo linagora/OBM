@@ -58,6 +58,7 @@ $l_solr = 'Solr';
 $l_monitor = 'Monitoring';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush Frontend';
+$l_ldap = 'LDAP';
 $l_fqdn = 'Fully qualified name';
 $l_err_host_fqdn = 'The fully qualified name is not well formed (computername.domaine.name)';
 

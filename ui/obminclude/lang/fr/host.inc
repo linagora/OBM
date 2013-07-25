@@ -70,6 +70,7 @@ $l_imap_frontend = 'IMAP Frontal';
 $l_monitor = 'Supervision';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush Frontal';
+$l_ldap = 'LDAP';
 
 
 $l_fqdn = 'Nom complet de la machine';

@@ -55,6 +55,7 @@ $l_obm_sync = 'OBM同步'; //'OBM Sync'
 $l_imap_frontend = 'IMAP前端'; //'IMAP Frontend'
 $l_solr = 'Solr'; //'Solr'
 $l_monitor = '监控'; //'Monitoring'/
+$l_ldap = 'LDAP';
 $l_fqdn = '符合标准的名称'; //'Fully qualified name'/
 $l_err_host_fqdn = '该名称格式不标准(主机名.域名.用户名)'; //'The fully qualified name is not well formed (computername.domaine.name)'
 
