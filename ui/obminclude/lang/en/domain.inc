@@ -14,6 +14,7 @@ $l_mail_servers = "Mail servers";
 $l_sync_servers = "Synchronization servers";
 $l_solr_servers = "Indexing servers";
 $l_imap_frontend_servers = "IMAP frontend servers";
+$l_ldap_servers = "LDAP servers";
 $l_max_quota = "Max value";
 
 // Mail chooser labels

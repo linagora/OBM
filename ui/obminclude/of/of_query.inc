@@ -708,6 +708,52 @@ function of_domain_get_domain_opushfrontendserver($domain_id = NULL, $entity = "
   return $m;
 }
 
+function of_domain_get_domain_ldapserver($domain_id = NULL, $entity = "") {
+  global $cdg_sql, $obm;
+
+  if (!is_null($domain_id)) {
+    $d = of_domain_get_domain_infos($domain_id);
+    if (! $d['global']) {
+      $domain_id = sql_parse_id($domain_id, true);
+      $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+    }
+  }
+  if ($entity != "") {
+    $where = "AND serviceproperty_property = '$entity'";
+  }
+
+  $query = "SELECT
+  serviceproperty_property,
+  host_id,
+  host_name,
+  host_ip
+  FROM Domain
+  INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
+  LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
+  LEFT JOIN Host ON host_id = #CAST(serviceproperty_value,INTEGER)
+  WHERE
+  serviceproperty_service = 'ldap'
+  AND
+  serviceproperty_property = 'ldap'
+  $where
+  $where_domain
+  GROUP BY serviceproperty_property, host_id, host_name, host_ip";
+
+  display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_ldapserver()');
+  $obm_q = new DB_OBM;
+  $obm_q->xquery($query);
+
+  $m = array();
+  while ($obm_q->next_record()) {
+    $m_id = $obm_q->f('host_id');
+    $role = $obm_q->f('serviceproperty_property');
+    $name = $obm_q->f('host_name');
+    $ip = $obm_q->f('host_ip');
+    $m[$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
+  }
+
+  return $m;
+}
 
 /**
  * Get one domain imap_frontend servers

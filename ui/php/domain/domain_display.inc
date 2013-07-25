@@ -170,11 +170,12 @@ function dis_domain_consult($domain) {
   $solrservers = of_domain_get_domain_solrserver($id);
   $opushservers = of_domain_get_domain_opushserver($id);
   $opushfrontendservers = of_domain_get_domain_opushfrontendserver($id);
+  $ldapservers = of_domain_get_domain_ldapserver($id);
   $imapfrontendservers = of_domain_get_domain_imapfrontendserver($id);
   $backupftpservers = of_domain_get_domain_backupftpserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers, $opushfrontendservers);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers, $opushfrontendservers, $ldapservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -189,8 +190,8 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL, $opushfrontendservers=NULL) {
-  global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers;
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL, $opushfrontendservers=NULL, $ldapservers=NULL) {
+  global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers, $l_ldap_servers;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
@@ -275,7 +276,42 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
       }
     }
   }
+
+  // Domain LDAP servers
+  $block_s = '';
+  if (is_array($ldapservers)) {
+    foreach ($ldapservers as $s_id => $ldapserver_info) {
+      foreach ($ldapserver_info as $server_info) {
+        $name = $server_info['name'];
+        $ip = $server_info['ip'];
+        $role = $server_info['role'];
+        $block_ldapservers .= "
+        <tr>
+        <td>$name</td>
+        <td>$ip</td>
+        <td>$role</td>
+        </tr>";
+      }
+    }
+    if ($block_ldapservers != '') {
+    $block_ldap = "
+    <div class=\"detail infos\">
+    <h1>$l_ldap_servers</h1>
   
+    <table class=\"spreadSheet\">
+    <thead>
+    <tr>
+    <th>$l_host</th>
+    <th>$l_ip</th>
+    <th>$l_role</th>
+    </tr>
+    </thead>
+    $block_ldapservers
+    </table>
+    </div>";
+    }
+  }
+
     // Domain syncservers
     // Get the domain syncservers
   $block_s = '';
@@ -508,6 +544,7 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
   </div>
 $block_ms
 $block_imapfrontend
+$block_ldap
 $block_sync
 $block_solr
 $block_backupftp

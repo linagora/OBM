@@ -14,6 +14,7 @@ $l_mail_servers = "Serveurs de mail";
 $l_sync_servers = "Serveurs de synchronisation";
 $l_solr_servers = "Serveurs d'indexation";
 $l_imap_frontend_servers = "Serveurs IMAP frontaux";
+$l_ldap_servers = "Serveurs LDAP";
 $l_max_quota = "Valeur max";
 $l_update_state = "Etat de mise à jour";
 
