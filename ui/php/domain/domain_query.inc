@@ -517,6 +517,7 @@ function run_query_domain_update($domain_id, $domain) {
   of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
   of_service_property_replace('solr','event', $entity_id, $domain['solr']);
   of_service_property_replace('solr','contact', $entity_id, $domain['solr']);
+  of_service_property_replace('ldap','ldap', $entity_id, $domain['ldap']);
   of_service_property_replace('opush','opush', $entity_id, $domain['opush']);
   of_service_property_replace('opush','opush_frontend', $entity_id, $domain['opush_frontend']);
   of_service_delete('backup', $entity_id);
@@ -1194,6 +1195,44 @@ function get_domain_opushfrontendservers($domain_id= NULL) {
       $m[$id]['id'] = $id;
       $m[$id]['name'] = $obm_q->f('host_name');
       $m[$id]['opush_frontend'] = $obm_q->f('host_opush_frontend');
+  }
+
+  return $m;
+}
+
+function get_domain_ldapservers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain ldap server
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " AND (ldap.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT
+  Host.*,
+  ldap.service_id as host_ldap
+  FROM Host
+  INNER JOIN HostEntity ON hostentity_host_id = host_id
+  LEFT JOIN Domain ON domain_id = host_domain_id
+  LEFT JOIN Service as ldap ON ldap.service_service = 'ldap' AND ldap.service_entity_id = hostentity_entity_id
+  WHERE 1 = 1
+  $where
+  $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_ldapservers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+  $id = $obm_q->f('host_id');
+      $m[$id]['id'] = $id;
+      $m[$id]['name'] = $obm_q->f('host_name');
+      $m[$id]['ldap'] = $obm_q->f('host_ldap');
   }
 
   return $m;

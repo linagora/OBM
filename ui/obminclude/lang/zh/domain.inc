@@ -63,6 +63,7 @@ $l_mailserver_warn = "您首先必须创建一个这种类型的主机";  //"You
 $l_syncserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
 $l_solrserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
 $l_imapfrontendserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create an host of this kind first"
+$l_ldapserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
 
 $l_mailserver = "邮件服务器"; //"Mail server"
 $l_imap = 'IMAP';  //'IMAP'
@@ -70,6 +71,7 @@ $l_smtp_in = 'SMTP进'; //'SMTP in'
 $l_smtp_out = 'SMTP出'; //'SMTP out'
 $l_obm_sync = 'OBM sync'; //'OBM sync'
 $l_solr_calendar = 'Solr'; //'Solr'
+$l_ldap = 'LDAP';
 
 $l_samba = 'Windows服务器'; //'Windows server'
 $l_samba_sid = '域SID'; // 'domain SID'

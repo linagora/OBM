@@ -74,6 +74,7 @@ $l_opushserver_warn = 'Vous devez créer un hôte de ce type';
 $l_opushfrontendserver_warn = 'Vous devez créer un hôte de ce type';
 $l_solrserver_warn = 'Vous devez créer un hôte de ce type';
 $l_imapfrontendserver_warn = 'Vous devez créer un hôte de ce type';
+$l_ldapserver_warn = 'Vous devez créer un hôte de ce type';
 
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
@@ -82,6 +83,7 @@ $l_obm_sync = 'OBM sync';
 $l_solr_calendar = 'Solr';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush frontend';
+$l_ldap = 'LDAP';
 
 $l_samba = 'Serveur windows';
 $l_samba_sid = 'SID du domaine';

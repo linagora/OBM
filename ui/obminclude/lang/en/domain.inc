@@ -66,6 +66,7 @@ $l_solrserver_warn = "You have to create an host of this kind first";
 $l_imapfrontendserver_warn = "You have to create an host of this kind first";
 $l_opushserver_warn = "You have to create an host of this kind first";
 $l_opushfrontendserver_warn = "You have to create an host of this kind first";
+$l_ldapserver_warn = "You have to create an host of this kind first";
 
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';
@@ -75,6 +76,7 @@ $l_obm_sync = 'OBM sync';
 $l_solr_calendar = 'Solr';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush frontend';
+$l_ldap = 'LDAP';
 
 $l_samba = 'Windows server';
 $l_samba_sid = 'domain SID';
