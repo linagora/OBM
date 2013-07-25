@@ -264,6 +264,7 @@ function run_query_host_insert($host) {
   $solr = sql_parse_int($host['solr']);
   $opush = sql_parse_int($host['opush']);
   $opush_frontend = sql_parse_int($host['opush_frontend']);
+  $ldap = sql_parse_int($host['ldap']);
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
@@ -338,6 +339,9 @@ function run_query_host_insert($host) {
   }
   if($opush_frontend > 0) {
     of_service_insert('opush_frontend', $entity_id);
+  }
+  if($ldap > 0) {
+    of_service_insert('ldap', $entity_id);
   }
   if($imap_frontend > 0) {
     of_service_insert('imap_frontend', $entity_id); 
