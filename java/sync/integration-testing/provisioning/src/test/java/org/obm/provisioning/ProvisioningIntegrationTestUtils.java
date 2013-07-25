@@ -37,6 +37,10 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ProvisioningIntegrationTestUtils {
 
+	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {
+		return domainUrl(baseURL, domain) + "/groups/";
+	}
+	
 	public static String profileUrl(URL baseURL, ObmDomainUuid domain) {
 		return domainUrl(baseURL, domain) + "/profiles/";
 	}

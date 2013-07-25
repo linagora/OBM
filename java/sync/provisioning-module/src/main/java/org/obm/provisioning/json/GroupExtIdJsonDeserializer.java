@@ -27,31 +27,21 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.resources;
+package org.obm.provisioning.json;
 
-import javax.ws.rs.Path;
+import java.io.IOException;
 
-@Path("{domain}")
-public class DomainBasedSubResource {
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.obm.provisioning.GroupExtId;
 
-	@Path("users")
-	public Class<UserResource> users() {
-		return UserResource.class;
-	}
+public class GroupExtIdJsonDeserializer extends JsonDeserializer<GroupExtId> {
 
-	@Path("batches")
-	public Class<BatchResource> batches() {
-		return BatchResource.class;
-	}
-
-	@Path("profiles")
-	public Class<ProfileResource> profiles() {
-		return ProfileResource.class;
-	}
-
-	@Path("groups")
-	public Class<GroupResource> groups() {
-		return GroupResource.class;
+	@Override
+	public GroupExtId deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		return GroupExtId.valueOf(jp.readValueAs(String.class));
 	}
 
 }

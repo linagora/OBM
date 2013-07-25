@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2013  Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,45 +29,34 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.json;
 
-import javax.servlet.ServletContext;
+import java.io.IOException;
 
-import org.apache.shiro.guice.web.ShiroWebModule;
-import org.apache.shiro.realm.Realm;
-import org.obm.provisioning.authentication.AuthenticationService;
-import org.obm.provisioning.authentication.AuthenticationServiceImpl;
-import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
-import org.obm.provisioning.authorization.AuthorizationService;
-import org.obm.provisioning.authorization.AuthorizationServiceImpl;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.obm.provisioning.Group;
 
-public class AuthorizingModule extends ShiroWebModule {
 
-	public AuthorizingModule(ServletContext servletContext) {
-		super(servletContext);
-	}
+
+public class GroupJsonSerializer extends JsonSerializer<Group> {
 
 	@Override
-	protected void configureShiroWeb() {
-			try {
-				bindRealm().toConstructor(ObmJDBCAuthorizingRealm.class.getConstructor());
-			} catch (SecurityException e) {
-				throw e;
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException("NoSuchMethodException", e);
-			}
+	public void serialize(Group value, JsonGenerator jgen, SerializerProvider provider)
+			throws IOException, JsonProcessingException {
 		
-		bind(Realm.class).to(ObmJDBCAuthorizingRealm.class);
-		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-
-		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/groups/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/batches/*", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/batches", AUTHC_BASIC);
-		expose(Realm.class);
+		jgen.writeStartObject();
+		jgen.writeObjectField("id", value.getExtId());
+		jgen.writeObjectField("name", value.getName());
+		jgen.writeObjectField("description", value.getDescription());
+		jgen.writeFieldName("members");
+			jgen.writeStartObject();
+			jgen.writeObjectField("users", value.getUsers());
+			jgen.writeObjectField("subgroups", value.getSubgroups());
+			jgen.writeEndObject();
+		jgen.writeEndObject();
 	}
-
+	
 }

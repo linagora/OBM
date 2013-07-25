@@ -20,6 +20,8 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.conf.SystemUserLdapConfiguration;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.OperationDao;
 import org.obm.provisioning.dao.OperationDaoJdbcImpl;
 import org.obm.provisioning.dao.PermissionDao;
@@ -28,6 +30,9 @@ import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.json.BatchJsonSerializer;
+import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
+import org.obm.provisioning.json.GroupExtIdJsonSerializer;
+import org.obm.provisioning.json.GroupJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
@@ -42,6 +47,7 @@ import org.obm.provisioning.ldap.client.LdapModule;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.provisioning.resources.GroupResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
@@ -106,6 +112,7 @@ public class ProvisioningService extends ServletModule {
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
+		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 	}
 
 	private void bindRestResources() {
@@ -115,6 +122,7 @@ public class ProvisioningService extends ServletModule {
 		bind(ProfileResource.class);
 		bind(UserResource.class);
 		bind(UserWriteResource.class);
+		bind(GroupResource.class);
 
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
@@ -142,7 +150,10 @@ public class ProvisioningService extends ServletModule {
 				.addSerializer(Batch.class, new BatchJsonSerializer())
 				.addSerializer(ObmUser.class, new ObmUserJsonSerializer())
 				.addSerializer(UserExtId.class, new UserExtIdJsonSerializer())
-				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer());
+				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer())
+				.addSerializer(GroupExtId.class, new GroupExtIdJsonSerializer())
+				.addDeserializer(GroupExtId.class, new GroupExtIdJsonDeserializer())
+				.addSerializer(Group.class, new GroupJsonSerializer());
 
 		ObjectMapper mapper = new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)

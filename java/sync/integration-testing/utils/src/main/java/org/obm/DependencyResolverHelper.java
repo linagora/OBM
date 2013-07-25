@@ -128,6 +128,7 @@ import org.obm.provisioning.beans.ObmDomainEntry;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.conf.SystemUserLdapConfiguration;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.GroupDao;
@@ -140,7 +141,9 @@ import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.GroupExistsException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
+import org.obm.provisioning.dao.exceptions.GroupRecursionException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
@@ -148,6 +151,9 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.BatchJsonSerializer;
+import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
+import org.obm.provisioning.json.GroupExtIdJsonSerializer;
+import org.obm.provisioning.json.GroupJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
 import org.obm.provisioning.json.ObmDomainUuidJsonDeserializer;
@@ -188,6 +194,7 @@ import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.provisioning.resources.GroupResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
@@ -639,6 +646,9 @@ public class DependencyResolverHelper {
 				ObmDomainEntry.class,
 				UserExtIdJsonDeserializer.class,
 				UserExtIdJsonSerializer.class,
+				GroupExtIdJsonDeserializer.class,
+				GroupExtIdJsonSerializer.class,
+				GroupJsonSerializer.class,
 				BatchProcessingModule.class,
 				BatchProcessor.class,
 				BatchProcessorImpl.class,
@@ -664,7 +674,9 @@ public class DependencyResolverHelper {
 				BatchTrackerImpl.class,
 				BatchProcessingListener.class,
 				AbstractUserOperationProcessor.class,
-				ModifyUserOperationProcessor.class
+				ModifyUserOperationProcessor.class,
+				GroupResource.class,
+				SystemUserLdapConfiguration.class
 		};
 	}
 
@@ -715,7 +727,10 @@ public class DependencyResolverHelper {
 				ObmInfoDao.class,
 				ObmInfoDaoJdbcImpl.class,
 				PermissionDao.class,
-				PermissionDaoHardcodedImpl.class
+				PermissionDaoHardcodedImpl.class,
+				GroupNotFoundException.class,
+				GroupRecursionException.class,
+				GroupExistsException.class
 		};
 	}
 
