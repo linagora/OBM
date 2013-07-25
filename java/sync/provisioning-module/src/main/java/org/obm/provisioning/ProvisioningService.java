@@ -32,6 +32,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
 import org.obm.provisioning.json.GroupExtIdJsonSerializer;
+import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.json.GroupJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
@@ -48,6 +49,7 @@ import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.GroupResource;
+import org.obm.provisioning.resources.GroupWriteResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
@@ -123,7 +125,7 @@ public class ProvisioningService extends ServletModule {
 		bind(UserResource.class);
 		bind(UserWriteResource.class);
 		bind(GroupResource.class);
-
+		bind(GroupWriteResource.class);
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
 	}
@@ -153,7 +155,8 @@ public class ProvisioningService extends ServletModule {
 				.addDeserializer(UserExtId.class, new UserExtIdJsonDeserializer())
 				.addSerializer(GroupExtId.class, new GroupExtIdJsonSerializer())
 				.addDeserializer(GroupExtId.class, new GroupExtIdJsonDeserializer())
-				.addSerializer(Group.class, new GroupJsonSerializer());
+				.addSerializer(Group.class, new GroupJsonSerializer())
+				.addDeserializer(Group.class, new GroupJsonDeserializer());
 
 		ObjectMapper mapper = new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)

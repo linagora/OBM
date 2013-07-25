@@ -33,6 +33,8 @@ package org.obm.provisioning.group;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.batchUrl;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.domainUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
 
 import java.io.File;
@@ -44,7 +46,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -52,6 +53,7 @@ import org.obm.provisioning.ProvisioningArchiveUtils;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.http.ContentType;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -59,10 +61,6 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 public class GroupIntegrationTest {
-
-	@Before
-	public void setUp() {
-	}
 
 	@Test
 	@RunAsClient
@@ -377,6 +375,157 @@ public class GroupIntegrationTest {
 				"}")).
 		when()
 			.get("/GroupWithSubGroup?expandDepth=-1");
+	}
+
+	@Test
+	@RunAsClient
+	public void testCreateGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		String body = "{" +
+				"\"id\":\"CreatedGroup\"," +
+				"\"name\":\"CreatedGroup\"," + 
+				"\"description\":\"Created by provionning Group\"," +
+			"}";
+				
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.content(body).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/groups");
+				
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":["
+						+ "{\"status\":\"IDLE\","
+							+ "\"entityType\":\"GROUP\",\"entity\":{"
+								+ "\"id\":\"CreatedGroup\","
+								+ "\"name\":\"CreatedGroup\","
+								+ "\"description\":\"Created by provionning Group\","
+							+ "},"
+							+ "\"operation\":\"POST\","
+							+ "\"error\":null"
+						+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	@Test
+	@RunAsClient
+	public void testModifyGroupByPutMethod(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		String body = "{" +
+				"\"id\":\"AdminExtId\"," +
+				"\"name\":\"Put Info\","    + 
+				"\"description\":\"Put Info to AdminExtId\","  +
+				"\"members\":{"    +
+				"\"users\":[],"         +
+				"\"subgroups\":[]"	 +
+				"}"  +
+			"}";
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.content(body).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.put("/groups/AdminExtId");
+				
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":["
+						+ "{\"status\":\"IDLE\","
+							+ "\"entityType\":\"GROUP\",\"entity\":{"
+								+ "\"id\":\"AdminExtId\","
+								+ "\"name\":\"Put Info\","
+								+ "\"description\":\"Put Info to AdminExtId\","
+								+ "\"members\":{"
+									+ "\"users\":[],"
+									+ "\"subgroups\":[]"
+								+ "}"
+							+ "},"
+							+ "\"operation\":\"PUT\","
+							+ "\"error\":null"
+						+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	@Test
+	@RunAsClient
+	public void testModifyGroupByPatchMethod(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		String body = "{" + "\"description\":\"Patched AdminExtId group\"" + "}";
+				
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.content(body).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.patch("/groups/AdminExtId");
+				
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":["
+						+ "{\"status\":\"IDLE\","
+							+ "\"entityType\":\"GROUP\",\"entity\":{"
+								+ "\"description\":\"Patched AdminExtId group\""
+							+ "},"
+							+ "\"operation\":\"PATCH\","
+							+ "\"error\":null"
+						+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	
+	private static String getBatchId(@ArquillianResource URL baseURL, ObmDomainUuid obmDomainUuid) {
+		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
+
+		  String batchId =  given()
+				.auth().basic("admin0@global.virt", "admin0")
+			.post("/batches").jsonPath().getString("id");
+
+		return batchId;
 	}
 	
 	private static String getAdminUserJson(){

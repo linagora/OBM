@@ -52,4 +52,8 @@ public class ProvisioningIntegrationTestUtils {
 	public static String baseUrl(URL baseURL) {
 		return baseURL.toExternalForm() + ProvisioningService.PROVISIONING_ROOT_PATH;
 	}
+	
+	public static String batchUrl(URL baseURL, ObmDomainUuid domain, String batchId) {
+		return domainUrl(baseURL, domain) + "/batches/" + batchId;
+	}
 }

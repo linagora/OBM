@@ -132,4 +132,9 @@ public class BatchResource {
 	public Class<UserWriteResource> users() {
 		return UserWriteResource.class;
 	}
+	
+	@Path("{batchId}/groups")
+	public Class<GroupWriteResource> groups() {
+		return GroupWriteResource.class;
+	}
 }

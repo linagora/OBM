@@ -62,6 +62,7 @@ public class AuthorizingModule extends ShiroWebModule {
 		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 
 		addFilterChain("/provisioning/v1/*/batches/*/users/**", AUTHC_BASIC);
+		addFilterChain("/provisioning/v1/*/batches/*/groups/**", AUTHC_BASIC);
 		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC);
 		addFilterChain("/provisioning/v1/*/groups/**", AUTHC_BASIC);
 		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC);

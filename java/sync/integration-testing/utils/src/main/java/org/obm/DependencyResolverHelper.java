@@ -153,6 +153,7 @@ import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
 import org.obm.provisioning.json.GroupExtIdJsonSerializer;
+import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.json.GroupJsonSerializer;
 import org.obm.provisioning.json.MultimapJsonSerializer;
 import org.obm.provisioning.json.ObmDomainJsonSerializer;
@@ -195,6 +196,7 @@ import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.GroupResource;
+import org.obm.provisioning.resources.GroupWriteResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
@@ -648,6 +650,7 @@ public class DependencyResolverHelper {
 				UserExtIdJsonSerializer.class,
 				GroupExtIdJsonDeserializer.class,
 				GroupExtIdJsonSerializer.class,
+				GroupJsonDeserializer.class,
 				GroupJsonSerializer.class,
 				BatchProcessingModule.class,
 				BatchProcessor.class,
@@ -676,6 +679,7 @@ public class DependencyResolverHelper {
 				AbstractUserOperationProcessor.class,
 				ModifyUserOperationProcessor.class,
 				GroupResource.class,
+				GroupWriteResource.class,
 				SystemUserLdapConfiguration.class
 		};
 	}
