@@ -35,10 +35,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.dateUTC;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -52,7 +55,8 @@ import org.obm.sync.items.EventChanges;
 public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test @RunAsClient
-	public void testImportICS() throws Exception {
+	public void testImportICS(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		InputStream icsData = ClassLoader.getSystemClassLoader().getResourceAsStream("importICalendar.sample.ics");
 
@@ -147,5 +151,4 @@ public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 			.usingElementComparator(ignoreDatabaseElementsComparator())
 			.containsOnly(event1, event2, event3, event4);
 	}
-
 }

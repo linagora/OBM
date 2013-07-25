@@ -33,7 +33,11 @@ package org.obm.sync.login;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.net.URL;
+
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -51,7 +55,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testDoLoginSuccess() throws AuthFault {
+	public void testDoLoginSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		AccessToken token = loginClient.login(calendar, "user1");
 		
@@ -61,7 +66,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testDoLoginIsCaseInsensitiveWithDBAuth() throws AuthFault {
+	public void testDoLoginIsCaseInsensitiveWithDBAuth(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "UseR1@domain.org";
 		AccessToken token = loginClient.login(calendar, "user1");
 		
@@ -71,7 +77,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testDoLoginWithoutDomainSuccess() throws AuthFault {
+	public void testDoLoginWithoutDomainSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1";
 		AccessToken token = loginClient.login(calendar, "user1");
 		
@@ -81,7 +88,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testDoLoginWithoutDomainIsCaseInsensitiveWithDBAuth() throws AuthFault {
+	public void testDoLoginWithoutDomainIsCaseInsensitiveWithDBAuth(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "UseR1";
 		AccessToken token = loginClient.login(calendar, "user1");
 		
@@ -91,7 +99,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test(expected=AuthFault.class)
 	@RunAsClient
-	public void testDoLoginFailsWithWrongLogin() throws AuthFault {
+	public void testDoLoginFailsWithWrongLogin(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user@domain.org";
 		try {
 			loginClient.login(calendar, "user1");
@@ -103,7 +112,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test(expected=AuthFault.class)
 	@RunAsClient
-	public void testDoLoginFailsWithWrongPassword() throws AuthFault {
+	public void testDoLoginFailsWithWrongPassword(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1";
 		try {
 			loginClient.login(calendar, "user");
@@ -115,7 +125,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testDoLoginSuccessForUser2onDomain1() throws AuthFault {
+	public void testDoLoginSuccessForUser2onDomain1(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user2@domain.org";
 		AccessToken token = loginClient.login(calendar, "user2");
 		
@@ -124,7 +135,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test(expected=AuthFault.class)
 	@RunAsClient
-	public void testDoLoginFailsForUser2WithoutDomain() throws AuthFault {
+	public void testDoLoginFailsForUser2WithoutDomain(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user2";
 		try {
 			loginClient.login(calendar, "user2");
@@ -136,7 +148,8 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testDoLoginSuccessForUser2onDomain2() throws AuthFault {
+	public void testDoLoginSuccessForUser2onDomain2(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user2@domain2.org";
 		AccessToken token = loginClient.login(calendar, "user2");
 		

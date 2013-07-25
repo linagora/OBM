@@ -32,7 +32,11 @@ package org.obm.sync.calendar;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
+import java.net.URL;
+
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -47,7 +51,8 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testStoreEventCreatesEventIfNotPresent() throws Exception {
+	public void testStoreEventCreatesEventIfNotPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testStoreEventCreatesEventIfNotPresent");
 
@@ -62,7 +67,8 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testStoreEventModifiesEventIfPresent() throws Exception {
+	public void testStoreEventModifiesEventIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testStoreEventModifiesEventIfPresent");
 
@@ -79,7 +85,8 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test(expected = EventAlreadyExistException.class)
 	@RunAsClient
-	public void testCreateEventFailsIfPresent() throws Exception {
+	public void testCreateEventFailsIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testCreateEventFailsIfPresent");
 

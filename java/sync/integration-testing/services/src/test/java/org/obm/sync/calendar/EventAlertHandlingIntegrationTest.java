@@ -34,10 +34,13 @@ package org.obm.sync.calendar;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -54,7 +57,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testCreateEventCreatesAlert() throws Exception {
+	public void testCreateEventCreatesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		Event event = newEventWithAlert(calendar, "1", 30);
 
@@ -67,7 +71,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testCreateEventInDelegationCreatesAlertForBothUsers() throws Exception {
+	public void testCreateEventInDelegationCreatesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "2", 30);
 
@@ -83,7 +88,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testModifyEventModifiesAlert() throws Exception {
+	public void testModifyEventModifiesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String calendar = "user1@domain.org";
 		Event event = newEventWithAlert(calendar, "3", 30);
 
@@ -100,7 +106,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testModifyEventInDelegationModifiesAlertForBothUsers() throws Exception {
+	public void testModifyEventInDelegationModifiesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "4", 30);
 
@@ -120,7 +127,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromId() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "5", 30);
 
@@ -137,7 +145,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSync() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSync(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "6", 30);
 
@@ -156,7 +165,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncWithSortedChanges() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncWithSortedChanges(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "7", 30);
 
@@ -175,7 +185,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromExtId() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromExtId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "8", 30);
 
@@ -193,7 +204,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetListEventsFromIntervalDate() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetListEventsFromIntervalDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "9", 30, "2013-07-01T12:00:00Z");
 
@@ -212,7 +224,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_ModifyEvent() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_ModifyEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "10", 30);
 
@@ -230,7 +243,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithReadOnlyAccessDoesntInheritAlertFromEventOwner() throws Exception {
+	public void testUserWithReadOnlyAccessDoesntInheritAlertFromEventOwner(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "11", 30);
 
@@ -247,7 +261,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
-	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncEventDate() throws Exception {
+	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncEventDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		String user1Calendar = "user1@domain.org";
 		Event event = newEventWithAlert(user1Calendar, "12", 30, "2013-07-01T12:00:00Z");
 
@@ -282,5 +297,4 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
 		return event;
 	}
-
 }

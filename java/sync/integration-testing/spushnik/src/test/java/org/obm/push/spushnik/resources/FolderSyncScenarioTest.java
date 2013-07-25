@@ -47,7 +47,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
+import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -76,12 +78,15 @@ import com.google.inject.Inject;
 @GuiceModule(ScenarioTestModule.class)
 public class FolderSyncScenarioTest {
 
+	private static final String ARCHIVE_NAME = "FolderSyncScenarioTest";
+	
 	@Inject SingleUserFixture singleUserFixture;
 	@Inject OpushServer opushServer;
 	@Inject ClassToInstanceAgregateView<Object> classToInstanceMap;
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	@ArquillianResource Deployer deployer;
 	
 	private DefaultHttpClient httpClient;
 
@@ -89,6 +94,7 @@ public class FolderSyncScenarioTest {
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		Files.delete(configuration.dataDir);
+		deployer.undeploy(ARCHIVE_NAME);
 	}
 	
 	@Before
@@ -98,11 +104,12 @@ public class FolderSyncScenarioTest {
 		mocksControl.replay();
 		opushServer.start();
 		httpClient = new DefaultHttpClient();
+		deployer.deploy(ARCHIVE_NAME);
 	}
 	
 	@Test
 	@RunAsClient
-	public void testFolderSyncScenarioWithNiceCertificate(@ArquillianResource URL baseURL) throws Exception {
+	public void testFolderSyncScenarioWithNiceCertificate(@ArquillianResource @OperateOnDeployment(ARCHIVE_NAME) URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_good.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -112,7 +119,7 @@ public class FolderSyncScenarioTest {
 	
 	@Test
 	@RunAsClient
-	public void testFolderSyncScenarioWithNiceCertificateWrongPwd(@ArquillianResource URL baseURL) throws Exception {
+	public void testFolderSyncScenarioWithNiceCertificateWrongPwd(@ArquillianResource @OperateOnDeployment(ARCHIVE_NAME) URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_wrong_pwd.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -124,7 +131,7 @@ public class FolderSyncScenarioTest {
 	
 	@Test
 	@RunAsClient
-	public void testFolderSyncScenarioWithBadCertificate(@ArquillianResource URL baseURL) throws Exception {
+	public void testFolderSyncScenarioWithBadCertificate(@ArquillianResource @OperateOnDeployment(ARCHIVE_NAME) URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_bad.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -137,7 +144,7 @@ public class FolderSyncScenarioTest {
 	
 	@Test
 	@RunAsClient
-	public void testFolderSyncScenarioWithNullCertificate(@ArquillianResource URL baseURL) throws Exception {
+	public void testFolderSyncScenarioWithNullCertificate(@ArquillianResource @OperateOnDeployment(ARCHIVE_NAME) URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_null.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -147,7 +154,7 @@ public class FolderSyncScenarioTest {
 	
 	@Test
 	@RunAsClient
-	public void testFolderSyncScenarioWithoutCertificate(@ArquillianResource URL baseURL) throws Exception {
+	public void testFolderSyncScenarioWithoutCertificate(@ArquillianResource @OperateOnDeployment(ARCHIVE_NAME) URL baseURL) throws Exception {
 		HttpResponse httpResponse = folderSyncScenarioWithRequest(baseURL, "request_jaures_certificate_none.txt");
 		
 		InputStream content = httpResponse.getEntity().getContent();
@@ -168,7 +175,7 @@ public class FolderSyncScenarioTest {
 		return baseURL.toExternalForm() + "foldersync?serviceUrl=" + SpushnikTestUtils.buildServiceUrl(opushServer.getPort());
 	}
 	
-	@Deployment
+	@Deployment(managed=false, name=ARCHIVE_NAME)
 	public static WebArchive createDeployment() throws Exception {
 		return SpushnikWebArchive.buildInstance();
 	}

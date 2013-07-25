@@ -34,11 +34,14 @@ package org.obm.sync.metadata;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
+import java.net.URL;
 import java.util.UUID;
 
 import javax.naming.NoPermissionException;
 
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -60,7 +63,7 @@ import org.obm.sync.exception.ContactNotFoundException;
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
-	
+
 	private static final int ADDRESSBOOK_ID = 1;
 	
 	private static final int MAX_BYTES_256 = 256;
@@ -78,11 +81,12 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 
 	private AccessToken token;
 	private String calendar;
-	
+
 	@Test
 	@RunAsClient
-	public void testAutoTruncateOnEventCreation()
+	public void testAutoTruncateOnEventCreation(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws ServerFault, EventAlreadyExistException, NotAllowedException, EventNotFoundException, AuthFault {
+		configureTest(baseURL);
 		calendar = "user1@domain.org";
 		token = loginClient.login(calendar, "user1");
 		
@@ -94,8 +98,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testAutoTruncateOnEventModification()
+	public void testAutoTruncateOnEventModification(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws ServerFault, NotAllowedException, EventNotFoundException, AuthFault, EventAlreadyExistException {
+		configureTest(baseURL);
 		calendar = "user1@domain.org";
 		token = loginClient.login(calendar, "user1");
 		
@@ -129,8 +134,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testAutoTruncateOnContactCreation()
+	public void testAutoTruncateOnContactCreation(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
+		configureTest(baseURL);
 		calendar = "user1@domain.org";
 		token = loginClient.login(calendar, "user1");
 		
@@ -142,8 +148,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testAutoTruncateOnContactModification()
+	public void testAutoTruncateOnContactModification(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
+		configureTest(baseURL);
 		calendar = "user1@domain.org";
 		token = loginClient.login(calendar, "user1");
 		

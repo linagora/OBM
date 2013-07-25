@@ -34,9 +34,11 @@ import java.util.Comparator;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
 import org.junit.Before;
 import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
@@ -57,9 +59,12 @@ import com.google.common.base.Objects;
 
 public abstract class ObmSyncIntegrationTest {
 
-	@ArquillianResource
-	protected URL baseURL;
+	public static final String ARCHIVE = "ObmSyncIntegrationTestArchive";
 	
+	@ArquillianResource 
+	protected Deployer deployer;
+	
+	protected ObmSyncConfiguration configuration;
 	protected LoginClient loginClient;
 	protected CalendarClient calendarClient;
 	protected BookClient bookClient;
@@ -71,15 +76,24 @@ public abstract class ObmSyncIntegrationTest {
 	@Before
 	public void setUp() {
 		logger = LoggerFactory.getLogger(ObmSyncIntegrationTest.class);
-		ObmSyncConfiguration configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
+		configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
 		exceptionFactory = new SyncClientException();
-		LocatorService locatorService = arquillianLocatorService();
+		httpClient = new DefaultHttpClient();
+		deployer.deploy(ARCHIVE);
+	}
+	
+	@After
+	public void tearDown() {
+		deployer.undeploy(ARCHIVE);
+	}
+
+	protected void configureTest(URL baseUrl) {
+		LocatorService locatorService = arquillianLocatorService(baseUrl);
 		locator = new Locator(configuration, locatorService) {};
 		
 		CalendarClient.Factory calendarClientFactory = new CalendarClientFactory(exceptionFactory, locator, logger);
 		BookClient.Factory bookClientFactory = new BookClientFactory(exceptionFactory, locator, logger);
 		
-		httpClient = new DefaultHttpClient();
 		loginClient = createLoginClient(configuration, exceptionFactory, locator, logger, httpClient);
 		calendarClient = calendarClientFactory.create(httpClient);
 		bookClient = bookClientFactory.create(httpClient);
@@ -122,7 +136,7 @@ public abstract class ObmSyncIntegrationTest {
 		}
 	}
 	
-	private LocatorService arquillianLocatorService() {
+	private LocatorService arquillianLocatorService(final URL baseURL) {
 		return new LocatorService() {
 			
 			@Override
@@ -173,7 +187,7 @@ public abstract class ObmSyncIntegrationTest {
 		};
 	}
 
-	@Deployment
+	@Deployment(managed=false, name=ARCHIVE)
 	public static WebArchive deployArchive() {
 		return ObmSyncArchiveUtils
 				.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)

@@ -31,12 +31,15 @@ package org.obm.sync.client;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.net.URL;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +62,6 @@ public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 	private CookiesFromClient cookiesFromClient;
 
 	@Before
-	@Override
 	public void setUp() {
 		super.setUp();
 		cookiesFromClient = new CookiesFromClient(exceptionFactory, logger, httpClient);
@@ -67,7 +69,8 @@ public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testClientKeepsCookie() throws Exception {
+	public void testClientKeepsCookie(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
 		AccessToken token = loginClient.login("user1@domain.org", "user1");
 		String sid = cookiesFromClient.getSid();
 		
