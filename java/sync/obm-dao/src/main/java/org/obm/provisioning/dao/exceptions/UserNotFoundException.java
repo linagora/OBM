@@ -61,6 +61,10 @@ public class UserNotFoundException extends Exception {
 		super(message, cause);
 	}
 
+	public UserNotFoundException(String message) {
+		super(message);
+	}
+
 	public UserNotFoundException(Throwable cause) {
 		super(cause);
 	}

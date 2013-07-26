@@ -50,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
+import org.obm.sync.book.AddressBook;
 import org.obm.sync.host.ObmHost;
 import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
@@ -120,15 +121,31 @@ public class UserDao {
 			"host_name, " +
 			"host_fqdn, " +
 			"host_ip";
+	private static final AddressBook CONTACTS_BOOK = AddressBook
+			.builder()
+			.name("contacts")
+			.defaultBook(true)
+			.syncable(true)
+			.origin("provisioning")
+			.build();
+	private static final AddressBook COLLECTED_CONTACTS_BOOK = AddressBook
+			.builder()
+			.name("collected_contacts")
+			.defaultBook(false)
+			.syncable(true)
+			.origin("provisioning")
+			.build();
 
 	private final ObmHelper obmHelper;
 	private final ObmInfoDao obmInfoDao;
+	private final AddressBookDao addressBookDao;
 	
 	@Inject
 	@VisibleForTesting
-	UserDao(ObmHelper obmHelper, ObmInfoDao obmInfoDao) {
+	UserDao(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao) {
 		this.obmHelper = obmHelper;
 		this.obmInfoDao = obmInfoDao;
+		this.addressBookDao = addressBookDao;
 	}
 	
 	public Map<String, String> loadUserProperties(int userObmId) {
@@ -617,7 +634,12 @@ public class UserDao {
 
 			obmHelper.linkEntity(conn, "UserEntity", "user_id", userId);
 
-			return findUserById(userId, user.getDomain());
+			ObmUser createdUser = findUserById(userId, user.getDomain());
+
+			addressBookDao.create(CONTACTS_BOOK, createdUser);
+			addressBookDao.create(COLLECTED_CONTACTS_BOOK, createdUser);
+
+			return createdUser;
 		} finally {
 			obmHelper.cleanup(conn, ps, null);
 		}

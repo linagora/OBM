@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -75,6 +76,7 @@ public class HelperServiceImplTest {
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bindWithMock(ObmInfoDao.class);
+			bindWithMock(AddressBookDao.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(UserService.class).to(UserServiceImpl.class);
 		}

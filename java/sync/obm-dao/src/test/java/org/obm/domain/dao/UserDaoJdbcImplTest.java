@@ -72,6 +72,7 @@ public class UserDaoJdbcImplTest {
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 			bind(DomainDao.class);
 			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
 		}
 
 	}

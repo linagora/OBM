@@ -64,6 +64,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -314,6 +315,7 @@ public class LoginHandlerTest {
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync"));
 			bindMock(ObmInfoDao.class);
+			bindMock(AddressBookDao.class);
 		 	
 			expect(domainService.findDomainByName(isA(String.class))).andAnswer(new IAnswer<ObmDomain>() {
 				@Override

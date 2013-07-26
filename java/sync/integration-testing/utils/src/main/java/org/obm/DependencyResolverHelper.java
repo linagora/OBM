@@ -76,6 +76,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.domain.dao.AddressBookDao;
+import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
@@ -738,7 +740,9 @@ public class DependencyResolverHelper {
 				PermissionDaoHardcodedImpl.class,
 				GroupNotFoundException.class,
 				GroupRecursionException.class,
-				GroupExistsException.class
+				GroupExistsException.class,
+				AddressBookDao.class,
+				AddressBookDaoJdbcImpl.class
 		};
 	}
 

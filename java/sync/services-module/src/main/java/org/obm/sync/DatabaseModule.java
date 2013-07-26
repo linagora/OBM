@@ -35,6 +35,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.domain.dao.AddressBookDao;
+import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 
@@ -54,5 +56,6 @@ public class DatabaseModule extends AbstractModule {
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
 	}
 }
