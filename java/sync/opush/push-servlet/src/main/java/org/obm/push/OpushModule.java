@@ -30,7 +30,10 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
-import org.obm.configuration.ConfigurationFactoryFileImpl;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
@@ -52,14 +55,23 @@ public class OpushModule extends AbstractModule {
 	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
 
 	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
-	private GlobalAppConfiguration globalConfiguration;
+	private final GlobalAppConfiguration<ConfigurationService> globalConfiguration;
 	
 	public OpushModule() {
-		this(new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME));
+		this(buildConfiguration());
 	}
 	
-	public OpushModule(GlobalAppConfiguration globalConfiguration) {
+	public OpushModule(GlobalAppConfiguration<ConfigurationService> globalConfiguration) {
 		this.globalConfiguration = globalConfiguration;
+	}
+	
+	private static GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		return 	GlobalAppConfiguration.builder()
+					.mainConfiguration(configurationService)
+					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
+					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
+					.build();
 	}
 	
 	@Override

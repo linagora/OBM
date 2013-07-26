@@ -37,8 +37,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.ConfigurationFactoryFileImpl;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.DatabaseConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -76,7 +79,7 @@ public class GuiceServletContextListener implements ServletContextListener{
 
 	
 	private Injector createInjector() {
-		final GlobalAppConfiguration globalConfiguration = new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		final GlobalAppConfiguration<ConfigurationService> globalConfiguration = buildConfiguration();
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
@@ -93,6 +96,16 @@ public class GuiceServletContextListener implements ServletContextListener{
             }
         }, new TransactionalModule());
 
+	}
+
+
+	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		return 	GlobalAppConfiguration.<ConfigurationService>builder()
+					.mainConfiguration(configurationService)
+					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
+					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
+					.build();
 	}
 	
     private void failStartup(String message) {

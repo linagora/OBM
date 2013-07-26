@@ -33,6 +33,7 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.IContentsExporter;
@@ -94,9 +95,9 @@ public class OpushImplModule extends AbstractModule {
 	 */
 	private static final int MAX_REQUESTS_PER_CLIENT = 1;
 	private static final String APPLICATION_ORIGIN = "o-push";
-	private GlobalAppConfiguration globalAppConfiguration;
+	private GlobalAppConfiguration<ConfigurationService> globalAppConfiguration;
 	
-	public OpushImplModule(GlobalAppConfiguration globalAppConfiguration) {
+	public OpushImplModule(GlobalAppConfiguration<ConfigurationService> globalAppConfiguration) {
 		this.globalAppConfiguration = globalAppConfiguration;
 	}
 

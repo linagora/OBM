@@ -41,6 +41,7 @@ import org.easymock.IMocksControl;
 import org.obm.Configuration;
 import org.obm.DateUtils;
 import org.obm.StaticConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.EmailConfiguration;
@@ -125,8 +126,12 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	@Override
-	protected GlobalAppConfiguration globalConfiguration() {
-		return new GlobalAppConfiguration(new StaticConfigurationService(configuration), databaseConfiguration(), transactionConfiguration);
+	protected GlobalAppConfiguration<ConfigurationService> globalConfiguration() {
+		return GlobalAppConfiguration.builder()
+					.mainConfiguration(new StaticConfigurationService(configuration))
+					.databaseConfiguration(databaseConfiguration())
+					.transactionConfiguration(transactionConfiguration)
+					.build();
 	}
 	
 	protected DatabaseConfiguration databaseConfiguration() {

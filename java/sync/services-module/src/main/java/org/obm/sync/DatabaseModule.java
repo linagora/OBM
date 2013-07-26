@@ -31,10 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
@@ -52,9 +48,7 @@ public class DatabaseModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 	}

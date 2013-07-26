@@ -36,8 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -67,8 +65,6 @@ import fr.aliacom.obm.common.user.UserServiceImpl;
 import fr.aliacom.obm.freebusy.DatabaseFreeBusyProvider;
 import fr.aliacom.obm.freebusy.FreeBusyPluginModule;
 import fr.aliacom.obm.freebusy.LocalFreeBusyProvider;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.HelperServiceImpl;
 import fr.aliacom.obm.utils.ObmHelper;
@@ -84,8 +80,6 @@ public class ObmSyncServicesModule extends AbstractModule {
         bind(SettingsService.class).to(SettingsServiceImpl.class);
         bind(LocatorService.class).to(LocatorCache.class);
         bind(HelperService.class).to(HelperServiceImpl.class);
-        bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-        bind(ObmSyncConfigurationService.class).to(ObmSyncConfigurationServiceImpl.class);
         bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
         bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
         bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);

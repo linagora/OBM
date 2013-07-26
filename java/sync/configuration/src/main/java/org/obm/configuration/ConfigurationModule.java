@@ -35,9 +35,9 @@ import com.google.inject.AbstractModule;
 
 public class ConfigurationModule extends AbstractModule {
 	
-	private final GlobalAppConfiguration globalAppConfiguration;
+	private final GlobalAppConfiguration<?> globalAppConfiguration;
 
-	public ConfigurationModule(GlobalAppConfiguration globalAppConfiguration) {
+	public ConfigurationModule(GlobalAppConfiguration<?> globalAppConfiguration) {
 		super();
 		this.globalAppConfiguration = globalAppConfiguration;
 	}

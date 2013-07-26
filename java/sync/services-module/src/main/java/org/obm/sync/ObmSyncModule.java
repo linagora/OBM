@@ -32,13 +32,17 @@
 package org.obm.sync;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.ConfigurationFactoryFileImpl;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.DatabaseConfigurationImpl;
+import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 
 import com.google.inject.AbstractModule;
+
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 
 public class ObmSyncModule extends AbstractModule {
 
@@ -47,7 +51,8 @@ public class ObmSyncModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		final GlobalAppConfiguration globalConfiguration = new ConfigurationFactoryFileImpl().buildConfiguration(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
+		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfigurationService());
 		install(new ConfigurationModule(globalConfiguration));
 		install(new ObmSyncServletModule());
 		install(new ObmSyncServicesModule());
@@ -58,5 +63,14 @@ public class ObmSyncModule extends AbstractModule {
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
 		install(new DatabaseMetadataModule());
+	}
+
+	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {
+		ObmSyncConfigurationServiceImpl configurationService = new ObmSyncConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		return GlobalAppConfiguration.<ObmSyncConfigurationService>builder()
+					.mainConfiguration(configurationService)
+					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
+					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
+					.build();
 	}
 }

@@ -31,13 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-public class GlobalAppConfiguration {
+public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationService> {
 
-	private final ConfigurationService configurationService;
+	public static <T extends ConfigurationService> Builder<T> builder() {
+		return new Builder<T>();
+	}
+	
+	public static class Builder<MainConfigurationType extends ConfigurationService> {
+		
+		private MainConfigurationType configurationService;
+		private DatabaseConfiguration databaseConfiguration;
+		private TransactionConfiguration transactionConfiguration;
+
+		private Builder() {}
+		
+		public Builder<MainConfigurationType> mainConfiguration(MainConfigurationType configurationService) {
+			this.configurationService = configurationService;
+			return this;
+		}
+		
+		public Builder<MainConfigurationType> databaseConfiguration(DatabaseConfiguration databaseConfiguration) {
+			this.databaseConfiguration = databaseConfiguration;
+			return this;
+		}
+		
+		public Builder<MainConfigurationType> transactionConfiguration(TransactionConfiguration transactionConfiguration) {
+			this.transactionConfiguration = transactionConfiguration;
+			return this;
+		}
+		
+		public GlobalAppConfiguration<MainConfigurationType> build() {
+			return new GlobalAppConfiguration<MainConfigurationType>(configurationService, databaseConfiguration, transactionConfiguration);
+		}
+		
+	}
+	
+	private final MainConfigurationType configurationService;
 	private final DatabaseConfiguration databaseConfiguration;
 	private final TransactionConfiguration transactionConfiguration;
 
-	public GlobalAppConfiguration(ConfigurationService configurationService, 
+	private GlobalAppConfiguration(MainConfigurationType configurationService, 
 			DatabaseConfiguration databaseConfiguration, 
 			TransactionConfiguration transactionConfiguration) {
 				this.configurationService = configurationService;
@@ -45,7 +78,7 @@ public class GlobalAppConfiguration {
 				this.transactionConfiguration = transactionConfiguration;
 	}
 
-	public ConfigurationService getConfigurationService() {
+	public MainConfigurationType getConfigurationService() {
 		return configurationService;
 	}
 	

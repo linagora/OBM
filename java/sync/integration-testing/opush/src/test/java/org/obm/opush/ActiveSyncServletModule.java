@@ -46,6 +46,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
@@ -69,7 +70,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 	@Inject DOMUtils domUtils;
 	
-	protected abstract GlobalAppConfiguration globalConfiguration();
+	protected abstract GlobalAppConfiguration<ConfigurationService> globalConfiguration();
 	protected abstract Module overrideModule() throws Exception;
 	protected abstract void onModuleInstalled();
 	
