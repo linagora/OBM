@@ -633,6 +633,8 @@ public class UserDao {
 			int userId = obmHelper.lastInsertId(conn);
 
 			obmHelper.linkEntity(conn, "UserEntity", "user_id", userId);
+			obmHelper.linkEntity(conn, "CalendarEntity", "calendar_id", userId);
+			obmHelper.linkEntity(conn, "MailboxEntity", "mailbox_id", userId);
 
 			ObmUser createdUser = findUserById(userId, user.getDomain());
 

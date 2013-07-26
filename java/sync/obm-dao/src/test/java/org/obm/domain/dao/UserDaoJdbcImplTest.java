@@ -31,8 +31,10 @@ package org.obm.domain.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,6 +51,8 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
@@ -73,6 +77,7 @@ public class UserDaoJdbcImplTest {
 			bind(DomainDao.class);
 			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 		}
 
 	}
@@ -349,6 +354,69 @@ public class UserDaoJdbcImplTest {
 						.domain(domain)
 						.build();
 		dao.delete(user);
+	}
+
+	@Test
+	public void testCreateUpdatesUserIndex() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("extIdJDoe"))
+				.login("jdoe")
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.domain(domain)
+				.build();
+
+		ObmUser createdUser = dao.create(user);
+
+		Set<String> patterns = Sets.newHashSet();
+		Set<String> expectedPatterns = ImmutableSet.of("jdoe", "John", "Doe");
+		ResultSet rs = db.execute("SELECT pattern FROM _userpattern WHERE id = ?", createdUser.getUid());
+
+		while (rs.next()) {
+			patterns.add(rs.getString(1));
+		}
+
+		assertThat(patterns).isEqualTo(expectedPatterns);
+	}
+
+	@Test
+	public void testCreateInsertsCalendarEntity() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("extIdJDoe"))
+				.login("jdoe")
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.domain(domain)
+				.build();
+
+		ObmUser createdUser = dao.create(user);
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM CalendarEntity WHERE calendarentity_calendar_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
+	@Test
+	public void testCreateInsertsMailboxEntity() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("extIdJDoe"))
+				.login("jdoe")
+				.lastName("Doe")
+				.firstName("John")
+				.commonName("J. Doe")
+				.domain(domain)
+				.build();
+
+		ObmUser createdUser = dao.create(user);
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM MailboxEntity WHERE mailboxentity_mailbox_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
