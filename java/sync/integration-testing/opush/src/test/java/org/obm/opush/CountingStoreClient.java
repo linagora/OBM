@@ -57,14 +57,14 @@ public class CountingStoreClient extends StoreClientImpl {
 		@Override
 		public CountingStoreClient create(String hostname, String login, String password) {
 			return new CountingStoreClient(counter, hostname, emailConfiguration.imapPort(),
-					login, password, super.createClientSupport());
+					login, password, emailConfiguration.mailboxNameCheckPolicy(), super.createClientSupport());
 		}
 		
 	}
 	
 	private CountingStoreClient(ImapConnectionCounter counter, String hostname, int port,
-			String login, String password, ClientSupport clientSupport) {
-		super(hostname, port, login, password, clientSupport);
+			String login, String password, EmailConfiguration.MailboxNameCheckPolicy mailboxNameCheckPolicy, ClientSupport clientSupport) {
+		super(hostname, port, login, password, mailboxNameCheckPolicy, clientSupport);
 		this.counter = counter;
 	}
 	

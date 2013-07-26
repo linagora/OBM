@@ -32,7 +32,6 @@
 package org.obm.cyrus.imap;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.cyrus.imap.admin.Connection;
 import org.obm.cyrus.imap.admin.ConnectionImpl;
 import org.obm.cyrus.imap.admin.CyrusImapService;
@@ -51,7 +50,7 @@ public class CyrusClientModule extends AbstractModule {
 		bind(CyrusManager.Factory.class).to(CyrusManagerImpl.Factory.class);
 		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
 		
-		bind(EmailConfiguration.class).to(EmailConfigurationImpl.class);
+		bind(EmailConfiguration.class).to(CyrusClientEmailConfiguration.class);
 		
 		install(new LinagoraImapClientModule());
 	}

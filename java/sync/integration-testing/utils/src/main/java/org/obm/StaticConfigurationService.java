@@ -97,6 +97,12 @@ public class StaticConfigurationService implements ConfigurationService {
 		public boolean activateTls() {
 			return configuration.activateTls;
 		}
+
+		@Override
+		public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
+			return MailboxNameCheckPolicy.ALWAYS;
+		}
+
 	}
 
 	private final Configuration configuration;

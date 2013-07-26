@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.bean.Acl;
@@ -87,7 +88,7 @@ public class StoreClientImpl implements StoreClient {
 		}
 		
 		public StoreClientImpl create(String hostname, String login, String password) {
-			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password,
+			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password, emailConfiguration.mailboxNameCheckPolicy(),
 							createClientSupport());
 		}
 
@@ -106,17 +107,19 @@ public class StoreClientImpl implements StoreClient {
 	private final String login;
 	private final int port;
 	private final String hostname;
+	private final MailboxNameCheckPolicy mailboxNameCheckPolicy;
 	@VisibleForTesting String activeMailbox;
 
 	private final ClientSupport clientSupport;
 
-	protected StoreClientImpl(String hostname, int port, String login, String password,
+	protected StoreClientImpl(String hostname, int port, String login, String password, MailboxNameCheckPolicy mailboxNameCheckPolicy,
 			ClientSupport clientSupport) {
 		this.hostname = hostname;
 		this.port = port;
 		this.login = login;
 		this.password = password;
 		this.clientSupport = clientSupport;
+		this.mailboxNameCheckPolicy = mailboxNameCheckPolicy;
 	}
 
 	@Override
@@ -232,12 +235,12 @@ public class StoreClientImpl implements StoreClient {
 	
 	@Override
 	public boolean removeQuota(String mailbox) {
-		return clientSupport.removeQuota(mailbox);
+		return clientSupport.removeQuota(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
 	public boolean setQuota(String mailbox, long quotaInKb) {
-		return clientSupport.setQuota(mailbox, quotaInKb);
+		return clientSupport.setQuota(findMailboxNameWithServerCase(mailbox), quotaInKb);
 	}
 
 	@Override
@@ -329,20 +332,29 @@ public class StoreClientImpl implements StoreClient {
 	public long uidValidity(String mailbox) {
 		return clientSupport.uidValidity(findMailboxNameWithServerCase(mailbox));
 	}
-	
+
 	@Override
 	public String findMailboxNameWithServerCase(String mailboxName) {
 		if (isINBOXSpecificCase(mailboxName)) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
-		
-		ListResult listResult = listAll();
-		for (ListInfo result: listResult) {
-			if (result.getName().toLowerCase().equals(mailboxName.toLowerCase())) {
-				return result.getName();
-			}
+
+		switch (mailboxNameCheckPolicy) {
+			case NEVER:
+				return mailboxName;
+			case ALWAYS:
+				ListResult listResult = listAll();
+
+				for (ListInfo result: listResult) {
+					if (result.getName().toLowerCase().equals(mailboxName.toLowerCase())) {
+						return result.getName();
+					}
+				}
+
+				throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + mailboxName + " ]");
 		}
-		throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + mailboxName + " ]");
+
+		return mailboxName;
 	}
 
 	private boolean isINBOXSpecificCase(String boxName) {

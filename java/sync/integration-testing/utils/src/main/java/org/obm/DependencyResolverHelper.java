@@ -62,6 +62,7 @@ import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.store.StoreNotFoundException;
+import org.obm.cyrus.imap.CyrusClientEmailConfiguration;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.cyrus.imap.admin.Acl;
 import org.obm.cyrus.imap.admin.CyrusImapService;
@@ -571,7 +572,8 @@ public class DependencyResolverHelper {
 				LinagoraImapClientModule.class,
 				org.obm.push.bean.Resource.class,
 				IResponseCallback.class,
-				ClientSupport.class
+				ClientSupport.class,
+				CyrusClientEmailConfiguration.class
 		};
 	}
 

@@ -40,6 +40,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
@@ -49,16 +50,17 @@ import org.obm.push.minig.imap.impl.ClientSupport;
 @RunWith(SlowFilterRunner.class)
 public class StoreClientImplTest {
 
+	private static final int port = 12651;
+
 	private StoreClientImpl storeClientImpl;
 	private IMocksControl mocks;
 	private ClientSupport clientSupport;
 
 	@Before
 	public void setUp() {
-		int port = 12651;
 		mocks = createControl();
 		clientSupport = mocks.createMock(ClientSupport.class);
-		storeClientImpl = new StoreClientImpl(null, port, null, null, clientSupport);
+		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.ALWAYS, clientSupport);
 	}
 
 	@Test
@@ -368,4 +370,25 @@ public class StoreClientImplTest {
 		mocks.replay();
 		storeClientImpl.findMailboxNameWithServerCase("Youpi");
 	}
+
+	@Test
+	public void testFindMailboxNameWithServerCaseWithNeverPolicy() {
+		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
+		mocks.replay();
+
+		assertThat(storeClientImpl.findMailboxNameWithServerCase("mailBOXname")).isEqualTo("mailBOXname");
+
+		mocks.verify();
+	}
+
+	@Test
+	public void testFindMailboxNameWithServerCaseForInboxWithNeverPolicy() {
+		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
+		mocks.replay();
+
+		assertThat(storeClientImpl.findMailboxNameWithServerCase("INbOx")).isEqualTo("INBOX");
+
+		mocks.verify();
+	}
+
 }

@@ -35,6 +35,7 @@ package org.obm.configuration;
 
 import org.obm.push.utils.IniFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -45,6 +46,8 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	private static final int MESSAGE_DEFAULT_MAX_SIZE = 10485760;
 	private static final int BACKEND_IMAP_TIMEOUT_DEFAULT = 5000;
 	private static final int IMAP_FETCH_BLOCK_SIZE = 10240;
+	@VisibleForTesting
+	static final MailboxNameCheckPolicy MAILBOX_NAME_CHECK_POLICY_DEFAULT = MailboxNameCheckPolicy.ALWAYS;
 	
 	private static final String BACKEND_CONF_FILE = "/etc/opush/mail_conf.ini";
 	private static final String BACKEND_IMAP_LOGIN_WITH_DOMAIN = "imap.loginWithDomain";
@@ -56,10 +59,13 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	private static final String BACKEND_IMAP_DRAFTS_PATH = "imap.mailbox.draft";
 	private static final String BACKEND_IMAP_SENT_PATH = "imap.mailbox.sent";
 	private static final String BACKEND_IMAP_TRASH_PATH = "imap.mailbox.trash";
+	@VisibleForTesting
+	static final String BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY = "imap.mailbox.nameCheckPolicy";
+
 	private final IniFile iniFile;
 	
 	@Inject
-	private EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
+	protected EmailConfigurationImpl(IniFile.Factory iniFileFactory) {
 		iniFile = iniFileFactory.build(BACKEND_CONF_FILE);
 	}	
 	
@@ -112,4 +118,16 @@ public class EmailConfigurationImpl implements EmailConfiguration {
 	public String imapMailboxTrash() {
 		return iniFile.getStringValue(BACKEND_IMAP_TRASH_PATH, IMAP_TRASH_NAME);
 	}
+
+	@Override
+	public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
+		String strValue = iniFile.getStringValue(BACKEND_IMAP_MAILBOX_NAME_CHECK_POLICY);
+
+		if (strValue == null) {
+			return MAILBOX_NAME_CHECK_POLICY_DEFAULT;
+		}
+
+		return MailboxNameCheckPolicy.valueOf(strValue.toUpperCase());
+	}
+
 }

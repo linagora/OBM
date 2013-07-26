@@ -91,4 +91,9 @@ public class GreenMailEmailConfiguration implements EmailConfiguration {
 		return IMAP_TRASH_NAME;
 	}
 
+	@Override
+	public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
+		return MailboxNameCheckPolicy.ALWAYS;
+	}
+
 }
