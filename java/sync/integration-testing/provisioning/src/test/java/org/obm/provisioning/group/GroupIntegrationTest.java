@@ -517,7 +517,42 @@ public class GroupIntegrationTest {
 			.get("");
 	}
 
-	
+	@Test
+	@RunAsClient
+	public void testDeleteGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/groups/AdminExtId");
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":[{"
+						+ "\"status\":\"IDLE\","
+						+ "\"entityType\":\"GROUP\","
+						+ "\"entity\":null,"
+						+ "\"operation\":\"DELETE\","
+						+ "\"error\":null"
+					+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
 	private static String getBatchId(@ArquillianResource URL baseURL, ObmDomainUuid obmDomainUuid) {
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 

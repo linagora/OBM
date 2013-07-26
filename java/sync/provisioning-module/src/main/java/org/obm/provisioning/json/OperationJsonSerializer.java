@@ -31,6 +31,7 @@ package org.obm.provisioning.json;
 
 import java.io.IOException;
 
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
@@ -45,10 +46,20 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 		jgen.writeObjectField("status", value.getStatus());
 		jgen.writeObjectField("entityType", value.getEntityType());
 		jgen.writeFieldName("entity");
-		jgen.writeRawValue(value.getRequest().getBody());
+		writeBody(value,  jgen);
 		jgen.writeObjectField("operation", value.getRequest().getVerb());
 		jgen.writeStringField("error", value.getError());
 		jgen.writeEndObject();
+	}
+
+	private void writeBody(Operation value, JsonGenerator jgen) throws JsonGenerationException, IOException{
+		String body = value.getRequest().getBody();
+
+		if (body  != null){
+			jgen.writeRawValue(body);
+		} else{
+			jgen.writeNull();
+		}
 	}
 
 }
