@@ -1453,7 +1453,7 @@ public class ContactDao {
 			while (rs.next()) {
 				ret.add(AddressBook
 						.builder()
-						.uid(rs.getInt(1))
+						.uid(AddressBook.Id.valueOf(rs.getInt(1)))
 						.name(rs.getString(2))
 						.readOnly(false)
 						.build());
@@ -1801,7 +1801,7 @@ public class ContactDao {
 			while (rs.next()) {
 				listAddressBooks.add(AddressBook
 						.builder()
-						.uid(rs.getInt(1))
+						.uid(AddressBook.Id.valueOf(rs.getInt(1)))
 						.name(rs.getString(2))
 						.readOnly(false)
 						.build());

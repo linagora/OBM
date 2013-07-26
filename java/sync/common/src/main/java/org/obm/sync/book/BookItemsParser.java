@@ -60,7 +60,7 @@ public class BookItemsParser extends AbstractItemsParser {
 	public AddressBook parseAddressBook(Element root) {
 		return AddressBook
 				.builder()
-				.uid(Integer.valueOf(root.getAttribute("uid")))
+				.uid(AddressBook.Id.valueOf(root.getAttribute("uid")))
 				.name(root.getAttribute("name"))
 				.build();
 	}

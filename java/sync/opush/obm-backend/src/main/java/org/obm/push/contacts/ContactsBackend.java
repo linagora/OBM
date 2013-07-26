@@ -340,7 +340,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 			try {
 				Integer addressBookCollectionId = mappingService.getCollectionIdFor(udr.getDevice(), collectionPath);
 				if (addressBookCollectionId.intValue() == collectionId.intValue()) {
-					return addressBook.getUid();
+					return addressBook.getUid().getId();
 				}
 			} catch (CollectionNotFoundException e) {
 				logger.warn(e.getMessage());

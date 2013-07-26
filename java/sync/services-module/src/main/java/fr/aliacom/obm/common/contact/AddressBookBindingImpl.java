@@ -130,7 +130,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			List<AddressBook> addressBooks = contactDao.findAddressBooks(token);
 			addressBooks.add(AddressBook
 					.builder()
-					.uid(contactConfiguration.getAddressBookUserId())
+					.uid(AddressBook.Id.valueOf(contactConfiguration.getAddressBookUserId()))
 					.name(contactConfiguration.getAddressBookUsersName())
 					.readOnly(true)
 					.build());

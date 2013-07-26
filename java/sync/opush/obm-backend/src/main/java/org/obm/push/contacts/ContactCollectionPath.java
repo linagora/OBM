@@ -69,7 +69,7 @@ public class ContactCollectionPath {
 	}
 
 	public static String backendName(AddressBook addressBook) {
-		return backendNameFromParts(addressBook.getUid(), addressBook.getName());
+		return backendNameFromParts(addressBook.getUid().getId(), addressBook.getName());
 	}
 
 	public static String backendNameFromParts(int uid, String name) {

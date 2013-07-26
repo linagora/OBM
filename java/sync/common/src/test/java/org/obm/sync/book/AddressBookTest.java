@@ -31,25 +31,41 @@ package org.obm.sync.book;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.DateUtils;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.book.AddressBook.Id;
 
 @RunWith(SlowFilterRunner.class)
 public class AddressBookTest {
 
 	@Test
 	public void testBuild() {
+		Date createDate = DateUtils.date("2013-07-26T12:00:00");
+		Date updateDate = DateUtils.date("2013-07-27T12:00:00");
 		AddressBook book = AddressBook
 				.builder()
 				.name("book")
-				.uid(1)
+				.uid(Id.valueOf(1))
 				.readOnly(true)
+				.syncable(true)
+				.defaultBook(true)
+				.origin("origin")
+				.timecreate(createDate)
+				.timeupdate(updateDate)
 				.build();
 
 		assertThat(book.getName()).isEqualTo("book");
-		assertThat(book.getUid()).isEqualTo(1);
+		assertThat(book.getUid().getId()).isEqualTo(1);
 		assertThat(book.isReadOnly()).isTrue();
+		assertThat(book.isSyncable()).isTrue();
+		assertThat(book.isDefaultBook()).isTrue();
+		assertThat(book.getOrigin()).isEqualTo("origin");
+		assertThat(book.getTimecreate()).isEqualTo(createDate);
+		assertThat(book.getTimeupdate()).isEqualTo(updateDate);
 	}
 
 	@Test
@@ -57,11 +73,11 @@ public class AddressBookTest {
 		AddressBook book = AddressBook
 				.builder()
 				.name("book")
-				.uid(1)
+				.uid(Id.valueOf(1))
 				.build();
 
 		assertThat(book.getName()).isEqualTo("book");
-		assertThat(book.getUid()).isEqualTo(1);
+		assertThat(book.getUid().getId()).isEqualTo(1);
 		assertThat(book.isReadOnly()).isFalse();
 	}
 
@@ -69,8 +85,44 @@ public class AddressBookTest {
 	public void testBuildWithNoName() {
 		AddressBook
 				.builder()
-				.uid(1)
+				.uid(Id.valueOf(1))
 				.build();
+	}
+
+	@Test
+	public void testBuildId() {
+		Id id = Id.builder().id(1).build();
+
+		assertThat(id.getId()).isEqualTo(1);
+	}
+
+	@Test
+	public void testIdValueOfString() {
+		Id id = Id.valueOf("1");
+
+		assertThat(id.getId()).isEqualTo(1);
+	}
+
+	@Test
+	public void testIdValueOf() {
+		Id id = Id.valueOf(1);
+
+		assertThat(id.getId()).isEqualTo(1);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithNull() {
+		Id.valueOf(null);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithEmptyString() {
+		Id.valueOf("");
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithNaN() {
+		Id.valueOf("NaN");
 	}
 
 }

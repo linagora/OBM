@@ -755,7 +755,7 @@ public class SyncHandlerWithBackendTest {
 			.andReturn(ImmutableList.<AddressBook> of(AddressBook
 					.builder()
 					.name(contactCollectionIdAsString)
-					.uid(contactCollectionId)
+					.uid(AddressBook.Id.valueOf(contactCollectionId))
 					.readOnly(false)
 					.build()));
 		expect(collectionDao.getCollectionMapping(user.device, contactCollectionPath + ":" + contactCollectionId))

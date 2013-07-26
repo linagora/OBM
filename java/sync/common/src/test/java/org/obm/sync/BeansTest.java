@@ -46,6 +46,7 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Address;
+import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
@@ -115,7 +116,8 @@ public class BeansTest {
 				ServiceProperty.class,
 				ObmHost.class,
 				ObmDomainUuid.class,
-				ObmSystemUser.class);
+				ObmSystemUser.class,
+				AddressBook.class);
 	}
 	
 	@Test

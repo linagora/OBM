@@ -274,14 +274,14 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private void countContactsInGroup(AccessToken at, Request request, XmlResponder responder) throws SQLException, ServerFault {
 		int groupId = Integer.valueOf(p(request, "group"));
 		AddressBook book = getAddressBookFromUid(at, groupId);
-		int ret = binding.countContactsInGroup(at, book.getUid());
+		int ret = binding.countContactsInGroup(at, book.getUid().getId());
 		responder.sendCountContacts(ret);
 	}
 
 	private AddressBook getAddressBookFromUid(AccessToken at, int uid) throws ServerFault {
 		List<AddressBook> allBooks = binding.listAllBooks(at);
 		for (AddressBook book: allBooks) {
-			if (book.getUid() == uid) {
+			if (AddressBook.Id.valueOf(uid).equals(book.getUid())) {
 				return book;
 			}
 		}

@@ -108,7 +108,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 			c = DOMUtils.createElement(root, "book");
 		}
 
-		c.setAttribute("uid", Integer.toString(book.getUid()));
+		c.setAttribute("uid", Integer.toString(book.getUid().getId()));
 		c.setAttribute("name", book.getName());
 		c.setAttribute("readonly", String.valueOf(book.isReadOnly()));
 	}

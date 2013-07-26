@@ -521,7 +521,7 @@ public class ContactsBackendTest {
 	private AddressBook newAddressBookObject(String name, Integer uid, boolean readOnly) {
 		return AddressBook
 				.builder()
-				.uid(uid)
+				.uid(AddressBook.Id.valueOf(uid))
 				.name(name)
 				.readOnly(readOnly)
 				.build();
@@ -548,9 +548,9 @@ public class ContactsBackendTest {
 		
 		for (AddressBook book : books) {
 			expect(mappingService.getCollectionIdFor(userDataRequest.getDevice(),
-					COLLECTION_CONTACT_PREFIX + backendName(book.getName(), book.getUid()))).andReturn(book.getUid()).anyTimes();
+					COLLECTION_CONTACT_PREFIX + backendName(book.getName(), book.getUid().getId()))).andReturn(book.getUid().getId()).anyTimes();
 
-			expect(mappingService.collectionIdToString(book.getUid())).andReturn(String.valueOf(book.getUid())).anyTimes();
+			expect(mappingService.collectionIdToString(book.getUid().getId())).andReturn(String.valueOf(book.getUid())).anyTimes();
 		}
 	}
 
