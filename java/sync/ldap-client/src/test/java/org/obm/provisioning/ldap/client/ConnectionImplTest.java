@@ -37,6 +37,7 @@ import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,13 +45,11 @@ import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.ldap.client.Configuration;
-import org.obm.provisioning.ldap.client.ConnectionImpl;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
-import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.obm.provisioning.ldap.client.exception.LdapException;
 import org.opends.messages.Message;
@@ -86,7 +85,15 @@ public class ConnectionImplTest {
 		directoryServer.startServer();
 		injectBootstrapData();
 		
-		connection = connectionFactory.create();
+		connection = connectionFactory.create(getNetworkConfiguration());
+	}
+
+	private LdapConnectionConfig getNetworkConfiguration() {
+		LdapConnectionConfig config = new LdapConnectionConfig();
+		config.setLdapHost("localhost");
+		config.setLdapPort(33389);
+		config.setUseSsl(false);
+		return config;
 	}
 	
 	private void injectBootstrapData()throws Exception  {
@@ -722,7 +729,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRestartOnRequestCounterReached() {
-		MyConnection myConnection = new MyConnection(new OneRequestCounterConfiguration());
+		MyConnection myConnection = new MyConnection(new OneRequestCounterConfiguration(), getNetworkConfiguration());
 
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -750,8 +757,8 @@ public class ConnectionImplTest {
 
 		private int shutdownCounter;
 		
-		public MyConnection(Configuration configuration) throws LdapException, ConnectionException {
-			super(configuration);
+		public MyConnection(Configuration configuration, LdapConnectionConfig connectionConfig) throws LdapException, ConnectionException {
+			super(configuration, connectionConfig);
 		}
 		
 		@Override

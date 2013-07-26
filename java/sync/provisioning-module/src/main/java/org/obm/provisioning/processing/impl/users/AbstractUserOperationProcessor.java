@@ -31,6 +31,7 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -49,11 +50,15 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
+import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.push.mail.IMAPException;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.util.Providers;
 
@@ -124,4 +129,20 @@ public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperat
 
 		return ProvisioningService.createObjectMapper(module);
 	}
+
+	protected LdapManager buildLdapManager(ObmUser user) {
+		ObmDomain domain = user.getDomain();
+		LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
+		ObmHost ldapHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.LDAP), null);
+
+		if (ldapHost == null) {
+			throw new ProcessingException(String.format("Domain %s for user %s (%s) has no linked %s host.", domain.getName(), user.getLogin(), user.getExtId(), ServiceProperty.LDAP));
+		}
+
+		connectionConfig.setLdapHost(ldapHost.getIp());
+		connectionConfig.setLdapPort(LdapConnectionConfig.DEFAULT_LDAP_PORT);
+
+		return ldapService.buildManager(connectionConfig);
+	}
+
 }

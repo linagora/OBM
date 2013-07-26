@@ -50,6 +50,11 @@ public class ServiceProperty {
 			.service("sync")
 			.property("obm_sync")
 			.build();
+	public static final ServiceProperty LDAP = ServiceProperty
+			.builder()
+			.service("ldap")
+			.property("ldap")
+			.build();
 
 	public static class Builder {
 

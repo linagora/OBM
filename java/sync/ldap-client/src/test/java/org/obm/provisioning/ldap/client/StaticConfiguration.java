@@ -34,8 +34,6 @@ package org.obm.provisioning.ldap.client;
 import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
@@ -47,15 +45,6 @@ public class StaticConfiguration implements Configuration {
 	@Override
 	public int maxRequests() {
 		return 0;
-	}
-
-	@Override
-	public LdapConnectionConfig getNetworkConfiguration() {
-		LdapConnectionConfig config = new LdapConnectionConfig();
-		config.setLdapHost("localhost");
-		config.setLdapPort(33389);
-		config.setUseSsl(false);
-		return config;
 	}
 
 	@Override

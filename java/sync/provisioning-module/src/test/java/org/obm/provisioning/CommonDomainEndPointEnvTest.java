@@ -162,8 +162,9 @@ public abstract class CommonDomainEndPointEnvTest {
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
 			.host(
-					ServiceProperty.builder().service("mail").property("imap").build(),
+					ServiceProperty.IMAP,
 					ObmHost.builder().name("host").build())
+			.host(ServiceProperty.LDAP, ObmHost.builder().ip("1.2.3.4").build())
 			.build();
 	
 	protected static final ProfileName profileName = ProfileName

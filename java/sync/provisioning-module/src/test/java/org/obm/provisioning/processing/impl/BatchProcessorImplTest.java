@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.isA;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
@@ -386,7 +387,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private LdapManager expectLdapBuild() {
 		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
 
-		expect(ldapService.buildManager()).andReturn(ldapManager);
+		expect(ldapService.buildManager(isA(LdapConnectionConfig.class))).andReturn(ldapManager);
 		return ldapManager;
 	}
 	

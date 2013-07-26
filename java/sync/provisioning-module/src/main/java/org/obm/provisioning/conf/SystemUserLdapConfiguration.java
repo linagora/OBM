@@ -32,7 +32,6 @@ package org.obm.provisioning.conf;
 import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
@@ -53,16 +52,6 @@ public class SystemUserLdapConfiguration implements Configuration {
 	@Override
 	public int maxRequests() {
 		return 1;
-	}
-
-	@Override
-	public LdapConnectionConfig getNetworkConfiguration() {
-		LdapConnectionConfig config = new LdapConnectionConfig();
-
-		config.setLdapHost("localhost"); // TODO Well... Fix this
-		config.setLdapPort(389);
-
-		return config;
 	}
 
 	@Override

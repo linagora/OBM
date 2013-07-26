@@ -33,7 +33,6 @@ package org.obm.provisioning.ldap.client;
 
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
@@ -44,7 +43,6 @@ public interface Configuration {
 	 * @return the max number of requests before creating a new underlying connection to the LDAP server
 	 */
 	int maxRequests();
-	LdapConnectionConfig getNetworkConfiguration();
 	Dn getBindDn();
 	String getBindPassword();
 

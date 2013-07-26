@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client;
 
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -38,7 +39,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 public interface LdapManager {
 
 	interface Factory {
-		LdapManager create();
+		LdapManager create(LdapConnectionConfig connectionConfig);
 	}
 
 	void createUser(ObmUser obmUser);

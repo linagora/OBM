@@ -100,7 +100,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	}
 
 	private void createUserInLdap(ObmUser user) {
-		LdapManager ldapManager = ldapService.buildManager();
+		LdapManager ldapManager = buildLdapManager(user);
 
 		try {
 			ldapManager.createUser(user);

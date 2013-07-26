@@ -87,7 +87,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 	}
 
 	private void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
-		LdapManager ldapManager = ldapService.buildManager();
+		LdapManager ldapManager = buildLdapManager(user);
 
 		try {
 			ldapManager.modifyUser(user, oldObmUser);

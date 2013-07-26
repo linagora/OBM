@@ -73,7 +73,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 	}
 
 	private void deleteUserInLdap(ObmUser user) {
-		LdapManager ldapManager = ldapService.buildManager();
+		LdapManager ldapManager = buildLdapManager(user);
 		
 		try {
 			ldapManager.deleteUser(user);

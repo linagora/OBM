@@ -34,6 +34,7 @@ package org.obm.provisioning.ldap.client;
 import java.util.List;
 
 import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
@@ -44,7 +45,7 @@ import org.obm.provisioning.ldap.client.exception.LdapException;
 public interface Connection {
 
 	public interface Factory {
-		public Connection create();
+		public Connection create(LdapConnectionConfig connectionConfig);
 	}
 
 	void createUser(LdapUser ldapUser) throws LdapException, ConnectionException;

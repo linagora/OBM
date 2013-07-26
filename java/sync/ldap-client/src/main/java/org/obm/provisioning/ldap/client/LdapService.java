@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client;
 
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+
 public interface LdapService {
 
-	LdapManager buildManager();
+	LdapManager buildManager(LdapConnectionConfig connectionConfig);
 	
 }

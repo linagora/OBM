@@ -48,6 +48,7 @@ import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.name.Rdn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.ldap.client.api.LdapConnection;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
@@ -77,8 +78,8 @@ public class ConnectionImpl implements Connection {
 		}
 
 		@Override
-		public ConnectionImpl create() {
-			return new ConnectionImpl(configuration);
+		public ConnectionImpl create(LdapConnectionConfig connectionConfig) {
+			return new ConnectionImpl(configuration, connectionConfig);
 		}
 	}
 	
@@ -87,9 +88,11 @@ public class ConnectionImpl implements Connection {
 	
 	private LdapConnection connection;
 	private AtomicInteger requestCounter;
+	private LdapConnectionConfig connectionConfig;
 
-	protected ConnectionImpl(Configuration configuration) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	protected ConnectionImpl(Configuration configuration, LdapConnectionConfig connectionConfig) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		this.configuration = configuration;
+		this.connectionConfig = connectionConfig;
 		requestCounter = new AtomicInteger();
 		initializeConnection();
 	}
@@ -97,7 +100,7 @@ public class ConnectionImpl implements Connection {
 	private void initializeConnection() throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
 			requestCounter.set(0);
-			connection = new LdapNetworkConnection(configuration.getNetworkConfiguration());
+			connection = new LdapNetworkConnection(connectionConfig);
 			connection.bind(configuration.getBindDn(), configuration.getBindPassword());
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);

@@ -32,6 +32,7 @@
 package org.obm.provisioning.ldap.client;
 
 import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.slf4j.Logger;
@@ -63,9 +64,8 @@ public class LdapManagerImpl implements LdapManager {
 		}
 
 		@Override
-		public LdapManager create() {
-			return new LdapManagerImpl(connectionFactory.create(),
-					userBuilderProvider);
+		public LdapManager create(LdapConnectionConfig connectionConfig) {
+			return new LdapManagerImpl(connectionFactory.create(connectionConfig), userBuilderProvider);
 		}
 
 	}
