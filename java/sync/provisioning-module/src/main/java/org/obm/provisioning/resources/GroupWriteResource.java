@@ -88,4 +88,42 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_patch);
 		return addBatchOperation(group, HttpVerb.PATCH, BatchEntityType.GROUP);
 	}
+
+	@PUT
+	@Path("/{groupId}/users/{userId}")
+	@Consumes(JSON_WITH_UTF8)
+	@Produces(JSON_WITH_UTF8)
+	@Transactional
+	public Response addUsertoGroup() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
+		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP);
+	}
+
+	@DELETE
+	@Path("/{groupId}/users/{userId}")
+	@Produces(JSON_WITH_UTF8)
+	@Transactional
+	public Response deleteUserFromGroup() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
+		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP);
+	}
+
+	@PUT
+	@Path("/{groupId}/subgroups/{groupId}")
+	@Consumes(JSON_WITH_UTF8)
+	@Produces(JSON_WITH_UTF8)
+	@Transactional
+	public Response addSubgrouptoGroup() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
+		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP);
+	}
+
+	@DELETE
+	@Path("/{groupId}/subgroups/{groupId}")
+	@Produces(JSON_WITH_UTF8)
+	@Transactional
+	public Response deleteSubgroupFromGroup() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
+		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP);
+	}
 }

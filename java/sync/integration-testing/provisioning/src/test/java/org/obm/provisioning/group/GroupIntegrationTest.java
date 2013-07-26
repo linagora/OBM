@@ -553,6 +553,150 @@ public class GroupIntegrationTest {
 			.get("");
 	}
 
+	@Test
+	@RunAsClient
+	public void testAddUserToGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.put("/groups/GroupWithUsers/users/User1");
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":[{"
+						+ "\"status\":\"IDLE\","
+						+ "\"entityType\":\"GROUP\","
+						+ "\"entity\":null,"
+						+ "\"operation\":\"PUT\","
+						+ "\"error\":null"
+					+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	@Test
+	@RunAsClient
+	public void testDeleteUserFromGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/groups/GroupWithUsers/users/User1");
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":[{"
+						+ "\"status\":\"IDLE\","
+						+ "\"entityType\":\"GROUP\","
+						+ "\"entity\":null,"
+						+ "\"operation\":\"DELETE\","
+						+ "\"error\":null"
+					+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	@Test
+	@RunAsClient
+	public void testAddSubgroupToGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.put("/groups/GroupWithUsers/subgroups/AdminExtId");
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":[{"
+						+ "\"status\":\"IDLE\","
+						+ "\"entityType\":\"GROUP\","
+						+ "\"entity\":null,"
+						+ "\"operation\":\"PUT\","
+						+ "\"error\":null"
+					+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
+	@Test
+	@RunAsClient
+	public void testDeleteSubgroupFromGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = getBatchId(baseURL, obmDomainUuid);
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.delete("/groups/GroupWithUsers/subgroups/AdminExtId");
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"IDLE\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":[{"
+						+ "\"status\":\"IDLE\","
+						+ "\"entityType\":\"GROUP\","
+						+ "\"entity\":null,"
+						+ "\"operation\":\"DELETE\","
+						+ "\"error\":null"
+					+ "}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+
 	private static String getBatchId(@ArquillianResource URL baseURL, ObmDomainUuid obmDomainUuid) {
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 
@@ -564,14 +708,15 @@ public class GroupIntegrationTest {
 	}
 	
 	private static String getAdminUserJson(){
-		return "{\"id\":null,\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
+		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
 				+ "\"firstname\":\"Firstname\",\"commonname\":\"\",\"password\":\"admin0\","
 				+ "\"kind\":null,\"title\":null,\"description\":null,\"company\":null,\"service\":null,"
 				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
 				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"mail_quota\":\"0\","
-				+ "\"mail_server\":null,\"mails\":[\"user1@test.tlse.lng\"],\"timecreate\":null,\"timeupdate\":null,"
+				+ "\"mail_server\":null,\"mails\":[\"admin0@test.tlse.lng\"],\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"groups\":[\"Not implemented yet\"]}";
 	}
+
 	@Deployment
 	public static WebArchive createDeployment() throws Exception {
 		return ProvisioningArchiveUtils.buildWebArchive(
