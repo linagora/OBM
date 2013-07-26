@@ -752,7 +752,12 @@ public class SyncHandlerWithBackendTest {
 			.andReturn(user.user.getLoginAtDomain());
 		
 		expect(bookClient.listAllBooks(user.accessToken))
-			.andReturn(ImmutableList.<AddressBook> of(new AddressBook(contactCollectionIdAsString, contactCollectionId, false)));
+			.andReturn(ImmutableList.<AddressBook> of(AddressBook
+					.builder()
+					.name(contactCollectionIdAsString)
+					.uid(contactCollectionId)
+					.readOnly(false)
+					.build()));
 		expect(collectionDao.getCollectionMapping(user.device, contactCollectionPath + ":" + contactCollectionId))
 			.andReturn(contactCollectionId);
 		expect(bookClient.listContactsChanged(user.accessToken, firstDate, contactCollectionId))

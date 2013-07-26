@@ -32,18 +32,51 @@
 package org.obm.sync.book;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class AddressBook {
 
-	private String name;
-	private Integer uid;
-	private boolean readOnly;
-
-	public AddressBook() {
-		this(null, null, true);
+	public static Builder builder() {
+		return new Builder();
 	}
-	
-	public AddressBook(String name, Integer uid, boolean readOnly) {
+
+	public static class Builder {
+
+		private int uid;
+		private String name;
+		private boolean readOnly;
+
+		private Builder() {
+		}
+
+		public Builder uid(int uid) {
+			this.uid = uid;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder readOnly(boolean readOnly) {
+			this.readOnly = readOnly;
+			return this;
+		}
+
+		public AddressBook build() {
+			Preconditions.checkState(name != null);
+
+			return new AddressBook(uid, name, readOnly);
+		}
+
+	}
+
+	private final int uid;
+	private final String name;
+	private final boolean readOnly;
+
+	private AddressBook(int uid, String name, boolean readOnly) {
 		this.name = name;
 		this.uid = uid;
 		this.readOnly = readOnly;
@@ -53,22 +86,10 @@ public class AddressBook {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public Integer getUid() {
+	public int getUid() {
 		return uid;
 	}
-	
-	public void setUid(Integer uid) {
-		this.uid = uid;
-	}
 
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
-	
 	public boolean isReadOnly() {
 		return readOnly;
 	}
@@ -77,15 +98,17 @@ public class AddressBook {
 	public int hashCode(){
 		return Objects.hashCode(name, uid, readOnly);
 	}
-	
+
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof AddressBook) {
 			AddressBook that = (AddressBook) object;
+
 			return Objects.equal(this.name, that.name)
 				&& Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.readOnly, that.readOnly);
 		}
+
 		return false;
 	}
 
@@ -97,5 +120,5 @@ public class AddressBook {
 			.add("readOnly", readOnly)
 			.toString();
 	}
-	
+
 }

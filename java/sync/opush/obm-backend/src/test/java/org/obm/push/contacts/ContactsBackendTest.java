@@ -519,7 +519,12 @@ public class ContactsBackendTest {
 	}
 
 	private AddressBook newAddressBookObject(String name, Integer uid, boolean readOnly) {
-		return new AddressBook(name, uid, readOnly);
+		return AddressBook
+				.builder()
+				.uid(uid)
+				.name(name)
+				.readOnly(readOnly)
+				.build();
 	}
 	
 	private void expectLoginBehavior(AccessToken token) throws AuthFault {

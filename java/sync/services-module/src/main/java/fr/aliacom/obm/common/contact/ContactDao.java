@@ -1451,7 +1451,12 @@ public class ContactDao {
 			ps.setInt(idx++, at.getObmId());
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret.add(new AddressBook(rs.getString(2), rs.getInt(1), false));
+				ret.add(AddressBook
+						.builder()
+						.uid(rs.getInt(1))
+						.name(rs.getString(2))
+						.readOnly(false)
+						.build());
 			}
 			return ret;
 		} finally {
@@ -1794,7 +1799,12 @@ public class ContactDao {
 
 			Set<AddressBook> listAddressBooks = new HashSet<AddressBook>();
 			while (rs.next()) {
-				listAddressBooks.add(new AddressBook(rs.getString(2), rs.getInt(1), false));
+				listAddressBooks.add(AddressBook
+						.builder()
+						.uid(rs.getInt(1))
+						.name(rs.getString(2))
+						.readOnly(false)
+						.build());
 			}
 			return listAddressBooks;
 			

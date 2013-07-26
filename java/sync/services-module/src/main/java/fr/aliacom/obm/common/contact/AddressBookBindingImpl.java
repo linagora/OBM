@@ -128,9 +128,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public List<AddressBook> listAllBooks(AccessToken token) throws ServerFault {
 		try {
 			List<AddressBook> addressBooks = contactDao.findAddressBooks(token);
-			addressBooks.add(
-					new AddressBook(contactConfiguration.getAddressBookUsersName(), 
-							contactConfiguration.getAddressBookUserId(), true));
+			addressBooks.add(AddressBook
+					.builder()
+					.uid(contactConfiguration.getAddressBookUserId())
+					.name(contactConfiguration.getAddressBookUsersName())
+					.readOnly(true)
+					.build());
 			return addressBooks;
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage(), e);

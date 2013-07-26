@@ -41,12 +41,12 @@ import java.util.Set;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.push.utils.DOMUtils;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.items.AbstractItemsParser;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
-import org.obm.push.utils.DOMUtils;
 import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,12 +58,13 @@ import com.google.common.base.Strings;
 public class BookItemsParser extends AbstractItemsParser {
 
 	public AddressBook parseAddressBook(Element root) {
-		AddressBook book = new AddressBook();
-		book.setUid(Integer.valueOf(root.getAttribute("uid")));
-		book.setName(root.getAttribute("name"));
-		return book;
+		return AddressBook
+				.builder()
+				.uid(Integer.valueOf(root.getAttribute("uid")))
+				.name(root.getAttribute("name"))
+				.build();
 	}
-	
+
 	public Contact parseContact(Element root) {
 
 		Contact c = new Contact();
