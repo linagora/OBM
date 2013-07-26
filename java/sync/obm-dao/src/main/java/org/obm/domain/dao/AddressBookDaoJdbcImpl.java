@@ -119,6 +119,27 @@ public class AddressBookDaoJdbcImpl implements AddressBookDao {
 		}
 	}
 
+	@Override
+	public void enableAddressBookSynchronization(Id id, ObmUser user) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		String query = "INSERT INTO SyncedAddressbook (user_id, addressbook_id) VALUES (?, ?)";
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+
+			ps.setInt(1, user.getUid());
+			ps.setInt(2, id.getId());
+
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(con, ps, null);
+		}
+	}
+
 	private AddressBook addressBookFromCursor(ResultSet rs) throws SQLException {
 		return AddressBook
 				.builder()

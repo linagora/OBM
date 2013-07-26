@@ -31,6 +31,8 @@ package org.obm.domain.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.ResultSet;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -131,6 +133,25 @@ public class AddressBookDaoJdbcImplTest {
 				.build();
 
 		dao.create(book, owner);
+	}
+
+	@Test
+	public void testEnableAddressBookSynchronization() throws Exception {
+		Builder builder = AddressBook
+				.builder()
+				.name("bookOfUser1")
+				.origin("tests")
+				.syncable(false)
+				.defaultBook(true);
+		ObmUser owner = ToolBox.getDefaultObmUser();
+		AddressBook book = dao.create(builder.build(), owner);
+
+		dao.enableAddressBookSynchronization(book.getUid(), owner);
+
+		ResultSet rs = db.execute("SELECT COUNT(*) FROM SyncedAddressBook WHERE user_id = ? and addressbook_id = ?", owner.getUid(), book.getUid().getId());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 
 }

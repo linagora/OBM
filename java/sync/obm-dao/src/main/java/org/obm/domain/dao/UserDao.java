@@ -636,8 +636,11 @@ public class UserDao {
 
 			ObmUser createdUser = findUserById(userId, user.getDomain());
 
-			addressBookDao.create(CONTACTS_BOOK, createdUser);
-			addressBookDao.create(COLLECTED_CONTACTS_BOOK, createdUser);
+			AddressBook contactsBook = addressBookDao.create(CONTACTS_BOOK, createdUser);
+			AddressBook collectedContactsBook = addressBookDao.create(COLLECTED_CONTACTS_BOOK, createdUser);
+
+			addressBookDao.enableAddressBookSynchronization(contactsBook.getUid(), createdUser);
+			addressBookDao.enableAddressBookSynchronization(collectedContactsBook.getUid(), createdUser);
 
 			return createdUser;
 		} finally {

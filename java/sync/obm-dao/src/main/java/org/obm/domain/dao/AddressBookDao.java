@@ -40,4 +40,6 @@ public interface AddressBookDao {
 
 	AddressBook create(AddressBook book, ObmUser owner) throws DaoException;
 
+	void enableAddressBookSynchronization(AddressBook.Id id, ObmUser user) throws DaoException;
+
 }
