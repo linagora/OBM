@@ -46,6 +46,8 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -81,6 +83,7 @@ public class HelperServiceImplTest {
 			bindWithMock(UserPatternDao.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(UserService.class).to(UserServiceImpl.class);
+			bind(UserDao.class).to(UserDaoJdbcImpl.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {

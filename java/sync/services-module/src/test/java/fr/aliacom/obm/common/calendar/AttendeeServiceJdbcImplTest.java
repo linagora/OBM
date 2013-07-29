@@ -49,6 +49,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -132,7 +133,7 @@ public class AttendeeServiceJdbcImplTest {
 		johnDoe = johnDoe(domain);
 		externalContact = externalContact();
 		resource = resource();
-		userDao = createMockBuilder(UserDao.class)
+		userDao = createMockBuilder(UserDaoJdbcImpl.class)
 				.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class)
 				.withArgs(obmHelper, null, null, null)
 				.addMockedMethod("findUser")

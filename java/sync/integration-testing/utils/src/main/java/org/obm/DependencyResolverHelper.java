@@ -82,6 +82,7 @@ import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.obm.domain.dao.UserSystemDao;
@@ -706,6 +707,7 @@ public class DependencyResolverHelper {
 				OperationDao.class,
 				OperationDaoJdbcImpl.class,
 				UserDao.class,
+				UserDaoJdbcImpl.class,
 				GroupDao.class,
 				GroupDaoJdbcImpl.class,
 				BatchDao.class,
@@ -918,6 +920,7 @@ public class DependencyResolverHelper {
 				ContactUpdates.class,
 				FolderUpdates.class,
 				UserDao.class,
+				UserDaoJdbcImpl.class,
 				DomainCache.class,
 				DomainDao.class,
 				DomainService.class,

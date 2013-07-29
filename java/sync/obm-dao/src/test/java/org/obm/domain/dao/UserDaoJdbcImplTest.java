@@ -83,7 +83,7 @@ public class UserDaoJdbcImplTest {
 	}
 
 	@Inject
-	private UserDao dao;
+	private UserDaoJdbcImpl dao;
 
 	@Rule
 	@Inject

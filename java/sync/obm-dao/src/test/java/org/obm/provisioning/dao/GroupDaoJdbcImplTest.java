@@ -50,6 +50,7 @@ import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.obm.guice.GuiceModule;
@@ -88,6 +89,7 @@ public class GroupDaoJdbcImplTest {
             bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
             bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
             bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+            bind(UserDao.class).to(UserDaoJdbcImpl.class);
         }
 
     }
