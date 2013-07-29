@@ -68,6 +68,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
 
 @Singleton
@@ -287,7 +288,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(2, login);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				obmUser = createUserFromResultSet(domain, rs);
+				obmUser = createUserFromResultSetAndFetchCreators(domain, rs);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -297,10 +298,18 @@ public class UserDaoJdbcImpl implements UserDao {
 		return obmUser;
 	}
 
-	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
+	@VisibleForTesting
+	ObmUser createUserFromResultSetAndFetchCreators(ObmDomain domain, ResultSet rs) throws SQLException {
+		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
+		ObmUser updator = findUserById(rs.getInt("userobm_userupdate"), domain, false);
+
+		return createUserFromResultSet(domain, rs, creator, updator);
+	}
+
+	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, ObmUser creator, ObmUser updator) throws SQLException {
 		String extId = rs.getString("userobm_ext_id");
-		
-		return ObmUser.builder()
+
+		Builder builder = ObmUser.builder()
 				.uid(rs.getInt(1))
 				.login(rs.getString("userobm_login"))
 				.emailAndAliases(rs.getString(2))
@@ -335,11 +344,12 @@ public class UserDaoJdbcImpl implements UserDao {
 				.mailHost(hostFromCursor(rs, domain))
 				.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
 				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
-				.createdBy(findUserById(rs.getInt("userobm_usercreate"), domain))
-				.updatedBy(findUserById(rs.getInt("userobm_userupdate"), domain))
 				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
 				.gidNumber(JDBCUtils.getInteger(rs, "userobm_gid"))
-				.build();
+				.createdBy(creator)
+				.updatedBy(updator);
+
+		return builder.build();
 	}
 
 	private ObmHost hostFromCursor(ResultSet rs, ObmDomain domain) throws SQLException {
@@ -361,6 +371,10 @@ public class UserDaoJdbcImpl implements UserDao {
 	
 	@Override
 	public ObmUser findUserById(int id, ObmDomain domain) {
+		return findUserById(id, domain, true);
+	}
+
+	private ObmUser findUserById(int id, ObmDomain domain, boolean fetchCreators) {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -380,7 +394,11 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setInt(2, id);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				obmUser = createUserFromResultSet(domain, rs);
+				if (fetchCreators) {
+					obmUser = createUserFromResultSetAndFetchCreators(domain, rs);
+				} else {
+					obmUser = createUserFromResultSet(domain, rs, null, null);
+				}
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -471,7 +489,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(2, userExtId.getExtId());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return createUserFromResultSet(domain, rs);
+				return createUserFromResultSetAndFetchCreators(domain, rs);
 			}
 			else {
 				throw new UserNotFoundException(userExtId);
@@ -502,7 +520,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
-				users.add(createUserFromResultSet(domain, rs));
+				users.add(createUserFromResultSetAndFetchCreators(domain, rs));
 			}
 		} finally {
 			obmHelper.cleanup(conn, ps, rs);

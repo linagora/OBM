@@ -60,6 +60,7 @@ import com.google.inject.name.Names;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(SlowGuiceRunner.class)
@@ -120,6 +121,95 @@ public class UserDaoJdbcImplTest {
 		ObmUser user = sampleUser(1, 3, "1");
 
 		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
+	}
+
+	@Test
+	public void testGetByExtIdFetchesOneCreatorLevelOnly() throws Exception {
+		ObmUser creator = dao.findUserById(1, domain);
+		UserExtId extId = UserExtId.valueOf("testExtId");
+		ObmUser user = ObmUser
+				.builder()
+				.login("login")
+				.lastName("lastname")
+				.domain(domain)
+				.extId(extId)
+				.createdBy(creator)
+				.build();
+
+		dao.create(user);
+
+		ObmUser foundUser = dao.getByExtId(extId, domain);
+
+		assertThat(foundUser.getCreatedBy().getUpdatedBy()).isNull();
+		assertThat(foundUser.getCreatedBy().getCreatedBy()).isNull();
+	}
+
+	@Test
+	public void testGetByExtIdFetchesOneUpdatorLevelOnly() throws Exception {
+		ObmUser creator = dao.findUserById(1, domain);
+		UserExtId extId = UserExtId.valueOf("testExtId");
+		Builder userBuilder = ObmUser
+				.builder()
+				.login("login")
+				.lastName("lastname")
+				.domain(domain)
+				.extId(extId)
+				.createdBy(creator);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		dao.update(userBuilder
+				.uid(createdUser.getUid())
+				.updatedBy(creator)
+				.build());
+
+		ObmUser foundUser = dao.getByExtId(extId, domain);
+
+		assertThat(foundUser.getUpdatedBy().getUpdatedBy()).isNull();
+		assertThat(foundUser.getUpdatedBy().getCreatedBy()).isNull();
+	}
+
+	@Test
+	public void testFindUserByIdFetchesOneCreatorLevelOnly() throws Exception {
+		ObmUser creator = dao.findUserById(1, domain);
+		ObmUser user = ObmUser
+				.builder()
+				.login("login")
+				.lastName("lastname")
+				.domain(domain)
+				.extId(UserExtId.valueOf("testExtId"))
+				.createdBy(creator)
+				.build();
+
+		ObmUser createdUser = dao.create(user);
+		ObmUser foundUser = dao.findUserById(createdUser.getUid(), domain);
+
+		assertThat(foundUser.getCreatedBy().getUpdatedBy()).isNull();
+		assertThat(foundUser.getCreatedBy().getCreatedBy()).isNull();
+	}
+
+	@Test
+	public void testFindUserByIdFetchesOneUpdatorLevelOnly() throws Exception {
+		ObmUser creator = dao.findUserById(1, domain);
+		Builder userBuilder = ObmUser
+				.builder()
+				.login("login")
+				.lastName("lastname")
+				.domain(domain)
+				.extId(UserExtId.valueOf("testExtId"))
+				.createdBy(creator);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		dao.update(userBuilder
+				.uid(createdUser.getUid())
+				.updatedBy(creator)
+				.build());
+
+		ObmUser foundUser = dao.findUserById(createdUser.getUid(), domain);
+
+		assertThat(foundUser.getUpdatedBy().getUpdatedBy()).isNull();
+		assertThat(foundUser.getUpdatedBy().getCreatedBy()).isNull();
 	}
 
 	@Test

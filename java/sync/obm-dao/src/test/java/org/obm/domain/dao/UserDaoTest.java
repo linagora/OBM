@@ -350,7 +350,7 @@ public class UserDaoTest {
 		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
 
 		mocksControl.replay();
-		ObmUser obmUser = userDao.createUserFromResultSet(domain, rs);
+		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);
 		mocksControl.verify();
 
 		ObmUser expectedObmUser = ObmUser.builder()
