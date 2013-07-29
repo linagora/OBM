@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -64,16 +65,14 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Singleton
 public class GroupDaoJdbcImpl implements GroupDao {
 
+	private static final String FIELDS = "group_id, group_name, group_desc, group_timecreate, group_timeupdate, " +
+			"group_privacy, group_archive, group_email, group_gid";
+
     /** The first group_gid to use. UI code assumes 1000 here */
     private final int firstGidUser = 1000;
 
-    /** The Database connection provider to use */
     private DatabaseConnectionProvider connectionProvider;
-
-    /** The DAO for accessing user data */
     private final UserDao userDao;
-
-    /** The OBM Helper for various helper functions */
     private final ObmHelper obmHelper;
 
     @Inject
@@ -117,6 +116,8 @@ public class GroupDaoJdbcImpl implements GroupDao {
         PreparedStatement ps = null;
         GroupExtId extId = info.getExtId();
         try {
+        	int idx = 1;
+
             conn =  connectionProvider.getConnection();
             if (extIdExists(conn, extId)) {
                 throw new GroupExistsException(extId);
@@ -125,16 +126,18 @@ public class GroupDaoJdbcImpl implements GroupDao {
             ps = conn.prepareStatement(
                     " INSERT INTO UGroup" +
                     "             (group_domain_id, group_ext_id, group_name," +
-                    "              group_desc, group_gid)" +
+                    "              group_desc, group_gid, group_privacy, group_email)" +
                     "      VALUES " +
                     "             (SELECT domain_id FROM Domain WHERE domain_uuid = ?," +
-                    "              ?, ?, ?, ?)");
+                    "              ?, ?, ?, ?, ?, ?)");
 
-            ps.setString(1, domain.getUuid().get());
-            ps.setString(2, extId.getId());
-            ps.setString(3, info.getName());
-            ps.setString(4, info.getDescription());
-            ps.setInt(5, getNextFreeGid(conn));
+            ps.setString(idx++, domain.getUuid().get());
+            ps.setString(idx++, extId.getId());
+            ps.setString(idx++, info.getName());
+            ps.setString(idx++, info.getDescription());
+            ps.setInt(idx++, getNextFreeGid(conn));
+            ps.setBoolean(idx++, info.isPrivateGroup());
+            ps.setString(idx++, info.getEmail());
             ps.executeUpdate();
 
             // Make sure the linked entity is created
@@ -159,17 +162,23 @@ public class GroupDaoJdbcImpl implements GroupDao {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
+        	int idx = 1;
+
             conn =  connectionProvider.getConnection();
             ps = conn.prepareStatement(
                     "      UPDATE UGroup" +
-                    "         SET group_name = ?, group_desc = ?" +
+                    "         SET group_name = ?, group_desc = ?, group_timeupdate = ?, group_archive = ?, group_privacy = ?, group_email = ?" +
                     "       WHERE group_ext_id = ?" +
                     "         AND group_domain_id = (SELECT domain_id FROM Domain WHERE domain_uuid = ?)");
 
-            ps.setString(1, info.getName());
-            ps.setString(2, info.getDescription());
-            ps.setString(3, info.getExtId().getId());
-            ps.setString(4, domain.getUuid().get());
+            ps.setString(idx++, info.getName());
+            ps.setString(idx++, info.getDescription());
+            ps.setTimestamp(idx++, new Timestamp(obmHelper.selectNow(conn).getTime()));
+            ps.setBoolean(idx++, info.isArchive());
+            ps.setBoolean(idx++, info.isPrivateGroup());
+            ps.setString(idx++, info.getEmail());
+            ps.setString(idx++, info.getExtId().getId());
+            ps.setString(idx++, domain.getUuid().get());
 
             if (ps.executeUpdate() < 1) {
                 throw new GroupNotFoundException(info.getExtId());
@@ -321,7 +330,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
         ResultSet rs = null;
         try {
             ps = conn.prepareStatement(
-                    "      SELECT group_name, group_desc" +
+                    "      SELECT " + FIELDS +
                     "        FROM UGroup " +
                     "  INNER JOIN Domain ON group_domain_id = domain_id" +
                     "       WHERE domain_uuid = ?" +
@@ -330,13 +339,20 @@ public class GroupDaoJdbcImpl implements GroupDao {
             ps.setString(1, domain.getUuid().get());
             ps.setString(2, id.getId());
             rs = ps.executeQuery();
-            Group.Builder groupBuilder = Group.builder();
 
             if (rs.next()) {
-                return groupBuilder
-                            .extId(id)
-                            .name(rs.getString("group_name"))
-                            .description(rs.getString("group_desc"));
+				return Group
+						.builder()
+						.uid(Group.Id.valueOf(rs.getInt("group_id")))
+						.gid(JDBCUtils.getInteger(rs, "group_gid"))
+						.timecreate(JDBCUtils.getDate(rs, "group_timecreate"))
+						.timeupdate(JDBCUtils.getDate(rs, "group_timeupdate"))
+						.archive(rs.getBoolean("group_archive"))
+						.privateGroup(rs.getBoolean("group_privacy"))
+						.email(rs.getString("group_email"))
+						.extId(id)
+						.name(rs.getString("group_name"))
+						.description(rs.getString("group_desc"));
             } else {
                 throw new GroupNotFoundException(id);
             }

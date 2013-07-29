@@ -35,8 +35,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.provisioning.Group;
-import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.Group.Id;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -44,12 +43,37 @@ import fr.aliacom.obm.common.user.ObmUser;
 @RunWith(SlowFilterRunner.class)
 public class GroupTest {
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalStateException.class)
+    public void testBuildWhenNoExtIdAndNoUid() {
+		Group
+			.builder()
+			.name("test")
+			.description("test")
+			.build();
+    }
+
+    @Test
     public void testBuildWhenNoExtId() {
-        Group.builder()
-             .name("test")
-             .description("test")
-             .build();
+		Group group = Group
+				.builder()
+				.name("test")
+				.description("test")
+				.uid(Id.valueOf(1))
+				.build();
+
+		assertThat(group.getUid().getId()).isEqualTo(1);
+    }
+
+    @Test
+    public void testBuildWhenNoUid() {
+		Group group = Group
+			.builder()
+			.name("test")
+			.description("test")
+			.extId(GroupExtId.valueOf("extId"))
+			.build();
+
+		assertThat(group.getExtId().getId()).isEqualTo("extId");
     }
 
     @Test
@@ -79,4 +103,70 @@ public class GroupTest {
         assertThat(group.getUsers()).containsExactly(testuser);
         assertThat(group.getSubgroups()).containsExactly(testsubgroup);
     }
+
+	@Test
+	public void testIdValueOfString() {
+		Id id = Id.valueOf("1");
+
+		assertThat(id.getId()).isEqualTo(1);
+	}
+
+	@Test
+	public void testIdValueOf() {
+		Id id = Id.valueOf(1);
+
+		assertThat(id.getId()).isEqualTo(1);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithNull() {
+		Id.valueOf(null);
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithEmptyString() {
+		Id.valueOf("");
+	}
+
+	@Test(expected = NumberFormatException.class)
+	public void testIdValueOfWithNaN() {
+		Id.valueOf("NaN");
+	}
+
+	@Test
+	public void testBuildWithDefaultPrivateGroup() {
+		Group group = Group
+				.builder()
+				.name("group")
+				.uid(Group.Id.valueOf(1))
+				.build();
+
+		assertThat(group.isPrivateGroup()).isFalse();
+	}
+
+	@Test
+	public void testBuildWithDefaultArchive() {
+		Group group = Group
+				.builder()
+				.name("group")
+				.uid(Group.Id.valueOf(1))
+				.build();
+
+		assertThat(group.isArchive()).isFalse();
+	}
+
+	@Test
+	public void testBuildWithArchiveAndPrivateGroup() {
+		Group group = Group
+				.builder()
+				.name("group")
+				.uid(Group.Id.valueOf(1))
+				.archive(true)
+				.privateGroup(true)
+				.build();
+
+		assertThat(group.isArchive()).isTrue();
+		assertThat(group.isPrivateGroup()).isTrue();
+	}
+
 }

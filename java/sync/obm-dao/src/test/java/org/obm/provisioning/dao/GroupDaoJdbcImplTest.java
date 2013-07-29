@@ -52,10 +52,10 @@ import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
@@ -71,7 +71,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@Slow
+//@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(GroupDaoJdbcImplTest.Env.class)
 public class GroupDaoJdbcImplTest {
@@ -101,12 +101,12 @@ public class GroupDaoJdbcImplTest {
         domain1 = ToolBox.getDefaultObmDomain();
         user1 = userDao.findUserById(1, domain1);
 
-        group4 = generateGroup("existing-nousers-subgroups-child1");
-        group6 = generateGroup("existing-users-subgroups-child1");
-        group7 = generateGroup("existing-users-subgroups-child2");
+        group4 = generateGroup(4, "existing-nousers-subgroups-child1");
+        group6 = generateGroup(6, "existing-users-subgroups-child1");
+        group7 = generateGroup(7, "existing-users-subgroups-child2");
 
         nonexistentUser = generateUser(999);
-        nonexistentGroup = generateGroup("nonexistent");
+        nonexistentGroup = generateGroup(123, "nonexistent");
     }
 
     private ObmUser generateUser(int uid) {
@@ -125,8 +125,9 @@ public class GroupDaoJdbcImplTest {
                       .build();
     }
 
-    private Group generateGroup(String prefix) {
+    private Group generateGroup(int uid, String prefix) {
         return Group.builder()
+        			.uid(Id.valueOf(uid))
                     .extId(GroupExtId.valueOf(prefix))
                     .name(prefix + "-name")
                     .description(prefix + "-description")
@@ -286,7 +287,7 @@ public class GroupDaoJdbcImplTest {
     @Test
     public void testCreateGroup() throws Exception {
         String prefix = "created-group";
-        Group group = generateGroup(prefix);
+        Group group = generateGroup(18, prefix);
         Group createdGroup = dao.create(domain1, group);
         testGroupBase(prefix, createdGroup);
 
@@ -297,7 +298,7 @@ public class GroupDaoJdbcImplTest {
     @Test(expected = GroupExistsException.class)
     public void testDuplicateCreate() throws Exception {
         String prefix = "created-group-duplicate";
-        Group group = generateGroup(prefix);
+        Group group = generateGroup(18, prefix);
 
         // This should work
         Group createdGroup = dao.create(domain1, group);
@@ -373,14 +374,14 @@ public class GroupDaoJdbcImplTest {
 
     @Test(expected = GroupRecursionException.class)
     public void testAddSubgroupRecursion() throws Exception {
-        Group parent = generateGroup("addusersubgroup-group-parent");
+        Group parent = generateGroup(18, "addusersubgroup-group-parent");
         dao.addSubgroup(domain1, parent.getExtId(), parent.getExtId());
     }
 
     @Test
     public void testAddUserSubgroup() throws Exception {
         GroupExtId parentId = GroupExtId.valueOf("addusersubgroup-group-parent");
-        Group childGroup = generateGroup("addusersubgroup-group-child");
+        Group childGroup = generateGroup(18, "addusersubgroup-group-child");
         dao.addUser(domain1, parentId, user1);
         dao.addSubgroup(domain1, parentId, childGroup.getExtId());
 
@@ -410,6 +411,22 @@ public class GroupDaoJdbcImplTest {
         assertThat(parent.getSubgroups()).isEmpty();
         assertThat(parent.getUsers()).isEmpty();
     }
+
+	@Test
+	public void testCreateGroupWithAllFields() throws Exception {
+		Group group = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.privateGroup(true)
+				.email("group@domain")
+				.build();
+
+		Group createdGroup = dao.create(domain1, group);
+
+		assertThat(createdGroup.getUid().getId()).isGreaterThan(0);
+		assertThat(createdGroup.getTimecreate()).isNotNull();
+	}
 
     /**
      * Helper function to make sure the base properties of the groups are correct
