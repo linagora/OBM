@@ -29,7 +29,6 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.provisioning.dao.exceptions;
 
 import org.obm.provisioning.ProfileName;
