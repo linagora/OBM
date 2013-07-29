@@ -4,7 +4,7 @@
         http://jboss.org/schema/arquillian
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
         
-    <container qualifier="tomcat-managed-6" default="true">
+    <container qualifier="tomcat-managed-6" default="true" mode="class">
         <configuration>
             <property name="javaVmArguments"> -Xmx512M -Xms512M -XX:MaxPermSize=512M -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n</property>
             <property name="catalinaHome">${java.io.tmpdir}/tomcat/apache-tomcat-6.0.20</property>
