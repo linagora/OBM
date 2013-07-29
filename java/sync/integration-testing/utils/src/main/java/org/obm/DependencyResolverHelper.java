@@ -82,6 +82,8 @@ import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
+import org.obm.domain.dao.UserPatternDao;
+import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
@@ -742,7 +744,9 @@ public class DependencyResolverHelper {
 				GroupRecursionException.class,
 				GroupExistsException.class,
 				AddressBookDao.class,
-				AddressBookDaoJdbcImpl.class
+				AddressBookDaoJdbcImpl.class,
+				UserPatternDao.class,
+				UserPatternDaoJdbcImpl.class
 		};
 	}
 

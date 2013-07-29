@@ -39,6 +39,8 @@ import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
+import org.obm.domain.dao.UserPatternDao;
+import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 
@@ -57,5 +59,6 @@ public class DatabaseModule extends AbstractModule {
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 	}
 }

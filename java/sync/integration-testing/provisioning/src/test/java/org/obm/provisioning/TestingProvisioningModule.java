@@ -47,6 +47,8 @@ import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
+import org.obm.domain.dao.UserPatternDao;
+import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,7 @@ public class TestingProvisioningModule extends ProvisioningService {
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 		
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
 			.toInstance(LoggerFactory.getLogger(ProvisioningService.class));

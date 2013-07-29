@@ -139,13 +139,15 @@ public class UserDao {
 	private final ObmHelper obmHelper;
 	private final ObmInfoDao obmInfoDao;
 	private final AddressBookDao addressBookDao;
+	private final UserPatternDao userPatternDao;
 	
 	@Inject
 	@VisibleForTesting
-	UserDao(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao) {
+	UserDao(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao, UserPatternDao userPatternDao) {
 		this.obmHelper = obmHelper;
 		this.obmInfoDao = obmInfoDao;
 		this.addressBookDao = addressBookDao;
+		this.userPatternDao = userPatternDao;
 	}
 	
 	public Map<String, String> loadUserProperties(int userObmId) {
@@ -643,6 +645,8 @@ public class UserDao {
 
 			addressBookDao.enableAddressBookSynchronization(contactsBook.getUid(), createdUser);
 			addressBookDao.enableAddressBookSynchronization(collectedContactsBook.getUid(), createdUser);
+
+			userPatternDao.updateUserIndex(createdUser);
 
 			return createdUser;
 		} finally {
