@@ -28,7 +28,7 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.provisioning.beans;
+package org.obm.provisioning;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

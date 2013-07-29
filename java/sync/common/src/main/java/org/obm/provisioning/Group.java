@@ -4,32 +4,27 @@ import java.util.Set;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class Group {
-    protected GroupExtId extId;
-    protected String name;
-    protected String description;
-    protected Set<ObmUser> users;
-    protected Set<Group> subgroups;
 
     public static Builder builder() {
         return new Builder();
     }
+
     public static class Builder {
 
-        protected GroupExtId extId;
-        protected String name;
-        protected String description;
-        protected Set<ObmUser> users;
-        protected Set<Group> subgroups;
+        private GroupExtId extId;
+        private String name;
+        private String description;
+        private ImmutableSet.Builder<ObmUser> users;
+        private ImmutableSet.Builder<Group> subgroups;
 
-        protected Builder() {
-            super();
-            this.users = Sets.newHashSet();
-            this.subgroups = Sets.newHashSet();
+        private Builder() {
+            this.users = ImmutableSet.builder();
+            this.subgroups = ImmutableSet.builder();
         }
 
         public Builder extId(GroupExtId extId) {
@@ -59,18 +54,23 @@ public class Group {
 
         public Group build() {
             Preconditions.checkNotNull(this.extId);
-            Group group = new Group();
-            group.extId = extId;
-            group.name = name;
-            group.description = description;
-            group.users = users;
-            group.subgroups = subgroups;
-            return group;
+
+            return new Group(extId, name, description, users.build(), subgroups.build());
         }
     }
 
-    protected Group() {
-        super();
+    private final GroupExtId extId;
+    private final String name;
+    private final String description;
+    private final Set<ObmUser> users;
+    private final Set<Group> subgroups;
+
+    private Group(GroupExtId extId, String name, String description, Set<ObmUser> users, Set<Group> subgroups) {
+		this.extId = extId;
+		this.name = name;
+		this.description = description;
+		this.users = users;
+		this.subgroups = subgroups;
     }
 
     public GroupExtId getExtId() {
@@ -121,4 +121,5 @@ public class Group {
                       .add("subgroups", subgroups)
                       .toString();
     }
+
 }
