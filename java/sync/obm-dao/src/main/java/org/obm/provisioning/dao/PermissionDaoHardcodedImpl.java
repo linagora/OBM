@@ -49,7 +49,7 @@ public class PermissionDaoHardcodedImpl implements PermissionDao {
 	}
 	
 	private String domainPermission(ObmDomain domain) {
-		if (domain.getGlobal() == true) {
+		if (domain.isGlobal() == true) {
 			return "*";
 		} else {
 			return domain.getUuid().get();

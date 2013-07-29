@@ -53,7 +53,7 @@ public class ObmDomain implements Serializable {
 		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
 		private String label;
-		private Boolean global;
+		private boolean global;
 		private ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		
 		private Builder() {
@@ -119,7 +119,7 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 		
-		public Builder global(Boolean global) {
+		public Builder global(boolean global) {
 			this.global = global;
 			return this;
 		}
@@ -139,9 +139,9 @@ public class ObmDomain implements Serializable {
 	private final Set<String> aliases;
 	private final String label;
 	private final Multimap<ServiceProperty, ObmHost> hosts;
-	private final Boolean global;
+	private final boolean global;
 
-	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts, Boolean global) {
+	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts, boolean global) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
@@ -151,7 +151,7 @@ public class ObmDomain implements Serializable {
 		this.global = global;
 	}
 
-	public Boolean getGlobal() {
+	public boolean isGlobal() {
 		return global;
 	}
 

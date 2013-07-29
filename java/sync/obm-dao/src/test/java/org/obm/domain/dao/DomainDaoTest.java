@@ -100,7 +100,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.getGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isEqualTo(false);
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.getGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isEqualTo(false);
 	}
 	
 	@Test
@@ -128,7 +128,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.getGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isEqualTo(false);
 	}
 	
 	private ObmDomain findDomain(String aliases) throws Exception {
