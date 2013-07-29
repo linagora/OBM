@@ -32,6 +32,7 @@
 package org.obm.domain.dao;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static com.google.common.base.Strings.nullToEmpty;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -308,10 +309,10 @@ public class UserDao {
 				.login(rs.getString("userobm_login"))
 				.emailAndAliases(rs.getString(2))
 				.domain(domain)
-				.firstName(rs.getString("userobm_firstname"))
-				.lastName(rs.getString("userobm_lastname"))
+				.firstName(emptyToNull(rs.getString("userobm_firstname")))
+				.lastName(emptyToNull(rs.getString("userobm_lastname")))
 				.publicFreeBusy(computePublicFreeBusy(5, rs))
-				.commonName(rs.getString("userobm_commonname"))
+				.commonName(emptyToNull(rs.getString("userobm_commonname")))
 				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 				.entityId(rs.getInt("userentity_entity_id"))
 				.password(Strings.emptyToNull(rs.getString("userobm_password")))
@@ -583,9 +584,9 @@ public class UserDao {
 			}
 
 			ps.setString(idx++, user.getKind());
-			ps.setString(idx++, user.getCommonName());
-			ps.setString(idx++, user.getLastName());
-			ps.setString(idx++, user.getFirstName());
+			ps.setString(idx++, nullToEmpty(user.getCommonName()));
+			ps.setString(idx++, nullToEmpty(user.getLastName()));
+			ps.setString(idx++, nullToEmpty(user.getFirstName()));
 			ps.setString(idx++, user.getTitle());
 			ps.setString(idx++, user.getCompany());
 			ps.setString(idx++, user.getDirection());
@@ -730,9 +731,9 @@ public class UserDao {
 			}
 
 			ps.setString(idx++, user.getKind());
-			ps.setString(idx++, user.getCommonName());
-			ps.setString(idx++, user.getLastName());
-			ps.setString(idx++, user.getFirstName());
+			ps.setString(idx++, nullToEmpty(user.getCommonName()));
+			ps.setString(idx++, nullToEmpty(user.getLastName()));
+			ps.setString(idx++, nullToEmpty(user.getFirstName()));
 			ps.setString(idx++, user.getTitle());
 			ps.setString(idx++, user.getCompany());
 			ps.setString(idx++, user.getDirection());

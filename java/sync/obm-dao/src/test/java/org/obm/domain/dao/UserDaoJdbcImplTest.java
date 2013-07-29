@@ -357,6 +357,42 @@ public class UserDaoJdbcImplTest {
 	}
 
 	@Test
+	public void testCreateInsertsEmtpyStringsForNamePartsIfNull() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+		ResultSet rs = db.execute("SELECT userobm_lastname, userobm_firstname, userobm_commonname FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getString("userobm_lastname")).isEmpty();
+		assertThat(rs.getString("userobm_firstname")).isEmpty();
+		assertThat(rs.getString("userobm_commonname")).isEmpty();
+	}
+
+	@Test
+	public void testUpdateInsertsEmtpyStringsForNamePartsIfNull() throws Exception {
+		ObmUser user = sampleUserBuilder(1, 3, "1")
+				.firstName(null)
+				.lastName(null)
+				.commonName(null)
+				.build();
+
+		ObmUser updatedUser = dao.update(user);
+		ResultSet rs = db.execute("SELECT userobm_lastname, userobm_firstname, userobm_commonname FROM UserObm WHERE userobm_id = ?", updatedUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getString("userobm_lastname")).isEmpty();
+		assertThat(rs.getString("userobm_firstname")).isEmpty();
+		assertThat(rs.getString("userobm_commonname")).isEmpty();
+	}
+
+	@Test
 	public void testCreateUpdatesUserIndex() throws Exception {
 		ObmUser user = ObmUser
 				.builder()
@@ -427,7 +463,6 @@ public class UserDaoJdbcImplTest {
 				.entityId(entityId)
 				.lastName("Lastname")
 				.firstName("Firstname")
-				.commonName("")
 				.domain(domain)
 				.profileName(ProfileName.valueOf("user"))
 				.password("user" + id)

@@ -709,7 +709,7 @@ public class GroupIntegrationTest {
 	
 	private static String getAdminUserJson(){
 		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
-				+ "\"firstname\":\"Firstname\",\"commonname\":\"\",\"password\":\"admin0\","
+				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\","
 				+ "\"kind\":null,\"title\":null,\"description\":null,\"company\":null,\"service\":null,"
 				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
 				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"mail_quota\":\"0\","
