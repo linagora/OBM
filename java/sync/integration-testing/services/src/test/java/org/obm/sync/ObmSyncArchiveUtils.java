@@ -36,8 +36,6 @@ import java.util.Arrays;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
@@ -49,14 +47,15 @@ import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalInterceptor;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.ContactConfiguration;
@@ -411,7 +410,7 @@ public class ObmSyncArchiveUtils {
 			
 		return ShrinkWrap
 				.create(WebArchive.class)
-				.addAsWebInfResource(webXml(guiceModule), "web.xml")
+				.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(guiceModule, H2GuiceServletContextListener.class), "web.xml")
 				.addAsLibraries(projectDependencies())
 				.addAsLibraries(wholeObmSyncArchive)
 				.addClasses(
@@ -465,36 +464,6 @@ public class ObmSyncArchiveUtils {
 				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
 			}
 		};
-	}
-
-	private static Asset webXml(Class<? extends Module> guiceModule) {
-		return new StringAsset(
-			"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-			"<!DOCTYPE web-app PUBLIC \"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN\" \"http://java.sun.com/dtd/web-app_2_3.dtd\">" +
-			"<web-app>" +
-			
-	        	"<display-name>OBM Sync integration testing</display-name>" +
-	        	
-	        	"<listener>" +
-	                "<listener-class>org.obm.sync.H2GuiceServletContextListener</listener-class>" +
-                "</listener>" +
-	                
-                "<context-param>" +
-                	"<param-name>guiceModule</param-name>" +
-                	"<param-value>" + guiceModule.getName() +"</param-value>" +
-            	"</context-param>" +
-                	
-                "<filter>" +
-	                "<filter-name>guiceFilter</filter-name>" +
-	                "<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>" +
-                "</filter>" +
-	                
-                "<filter-mapping>" +
-	                "<filter-name>guiceFilter</filter-name>" +
-	                "<url-pattern>/*</url-pattern>" +
-                "</filter-mapping>" +
-					
-			"</web-app>");
 	}
 
 	public static Class<?>[] projectAnnotationsClasses() {
