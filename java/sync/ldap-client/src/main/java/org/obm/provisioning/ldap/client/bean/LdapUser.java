@@ -54,6 +54,7 @@ public class LdapUser {
 	private final static String[] DEFAULT_OBJECT_CLASSES = {
 		"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" };
 
+	private final static String DEFAULT_LOGIN_SHELL = "/bin/bash";
 	private final static String DEFAULT_WEB_ACCESS = "REJECT";
 	private final static String FORBIDDEN_EMAIL_ACCESS = "REJECT";
 	private final static String PERMITTED_EMAIL_ACCESS = "PERMIT";
@@ -157,6 +158,8 @@ public class LdapUser {
 			this.mailAccess = buildEmailAccess(obmUser);
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
 			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName());
+			this.mail = obmUser.getEmail();
+			this.loginShell = DEFAULT_LOGIN_SHELL;
 			return this;
 		}
 	
