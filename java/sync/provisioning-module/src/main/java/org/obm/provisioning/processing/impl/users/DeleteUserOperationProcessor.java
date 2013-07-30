@@ -65,7 +65,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
 		final ObmUser userFromDao = getUserFromDao(extId, batch.getDomain());
 		
-		deleteUserInDao(extId);
+		deleteUserInDao(userFromDao);
 		if (expunge == true) {
 			deleteUserMailBoxes(userFromDao);
 		}
@@ -85,12 +85,12 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void deleteUserInDao(UserExtId extId) {
+	private void deleteUserInDao(ObmUser user) {
 		try {
-			userDao.delete(extId);
+			userDao.delete(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete user with extId '%s' in database.", extId.getExtId()), e);
+					String.format("Cannot delete user with extId '%s' in database.", user.getExtId().getExtId()), e);
 		}
 	}
 

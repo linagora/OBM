@@ -323,14 +323,14 @@ public class UserDaoJdbcImplTest {
 
 	@Test
 	public void testGetAfterDelete() throws Exception {
-		dao.delete(UserExtId.builder().extId("3").build());
+		dao.delete(sampleUser(3, 3, "3"));
 
 		assertThat(dao.findUserById(3, domain)).isNull();
 	}
 
 	@Test
 	public void testListAfterDelete() throws Exception {
-		dao.delete(UserExtId.valueOf("1"));
+		dao.delete(sampleUser(1, 3, "1"));
 
 		List<ObmUser> users = ImmutableList.of(
 				sampleUser(2, 4, "2"),
@@ -342,7 +342,12 @@ public class UserDaoJdbcImplTest {
 
 	@Test(expected = UserNotFoundException.class)
 	public void testDeleteWhenUserDoesntExist() throws Exception {
-		dao.delete(UserExtId.builder().extId("666").build());
+		ObmUser user = ObmUser.builder()
+						.extId(UserExtId.valueOf("666"))
+						.login("lucifer")
+						.domain(domain)
+						.build();
+		dao.delete(user);
 	}
 
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {

@@ -749,20 +749,22 @@ public class UserDao {
 		}
 	}
 
-	public void delete(UserExtId extId) throws SQLException, UserNotFoundException {
+	public void delete(ObmUser user) throws SQLException, UserNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
 		try {
 			connection = obmHelper.getConnection();
-			ps = connection.prepareStatement("DELETE FROM UserObm WHERE userobm_ext_id = ?");
+			ps = connection.prepareStatement("DELETE FROM UserObm WHERE userobm_ext_id = ? AND userobm_domain_id = ?");
 
-			ps.setString(1, extId.getExtId());
+			final String extId = user.getExtId().getExtId();
+			ps.setString(1, extId);
+			ps.setInt(2, user.getDomain().getId());
 
 			int updateCount = ps.executeUpdate();
 
 			if (updateCount != 1) {
-				throw new UserNotFoundException(String.format("No user found with extid %s.", extId.getExtId()));
+				throw new UserNotFoundException(String.format("No user found with extid %s.", extId));
 			}
 		}
 		finally {
