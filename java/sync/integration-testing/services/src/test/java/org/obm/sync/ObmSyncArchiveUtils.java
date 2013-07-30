@@ -32,7 +32,6 @@
 package org.obm.sync;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
@@ -55,6 +54,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalInterceptor;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.arquillian.ArtifactFilters;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
@@ -287,9 +287,6 @@ import org.obm.sync.utils.DateHelper;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
@@ -426,7 +423,7 @@ public class ObmSyncArchiveUtils {
 	}
 
 	private static File[] projectDependencies() {
-		return filterObmDependencies(allObmSyncDependencies());
+		return ArtifactFilters.filterObmDependencies(allObmSyncDependencies());
 	}
 
 	private static MavenResolvedArtifact[] allObmSyncDependencies() {
@@ -437,33 +434,6 @@ public class ObmSyncArchiveUtils {
 			.resolve()
 			.withTransitivity()
 			.asResolvedArtifact();
-	}
-
-	private static File[] filterObmDependencies(MavenResolvedArtifact[] allObmSyncDependencies) {
-		return FluentIterable.from(Arrays.asList(
-				allObmSyncDependencies))
-				.filter(obmDependencyPredicate())
-				.transform(artifactAsFile()).toArray(File.class);
-	}
-
-	private static Function<MavenResolvedArtifact, File> artifactAsFile() {
-		return new Function<MavenResolvedArtifact, File>() {
-			@Override
-			public File apply(MavenResolvedArtifact input) {
-				return input.asFile();
-			}
-		};
-	}
-
-	private static Predicate<MavenResolvedArtifact> obmDependencyPredicate() {
-		return new Predicate<MavenResolvedArtifact>() {
-
-			@Override
-			public boolean apply(MavenResolvedArtifact input) {
-				String groupId = input.getCoordinate().getGroupId();
-				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
-			}
-		};
 	}
 
 	public static Class<?>[] projectAnnotationsClasses() {
