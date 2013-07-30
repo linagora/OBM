@@ -47,6 +47,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.host.ObmHost;
 
@@ -79,6 +81,8 @@ public class UserDaoJdbcImplTest {
 			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
 			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+			bind(UserDao.class).to(UserDaoJdbcImpl.class);
+			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 		}
 
 	}

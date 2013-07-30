@@ -43,6 +43,8 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 
@@ -63,5 +65,6 @@ public class DatabaseModule extends AbstractModule {
 		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
 		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 		bind(UserDao.class).to(UserDaoJdbcImpl.class);
+		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 	}
 }

@@ -99,6 +99,10 @@ INSERT INTO ugroup (group_id, group_domain_id, group_ext_id, group_name, group_d
 
 ALTER SEQUENCE ugroup_group_id_seq RESTART WITH 21;
 
+INSERT INTO ugroup (group_domain_id, group_gid, group_name)
+    VALUES
+        (1, 1000, 'Utilisateurs');
+
 INSERT INTO groupentity (groupentity_entity_id, groupentity_group_id)
     VALUES
         (8, 1),

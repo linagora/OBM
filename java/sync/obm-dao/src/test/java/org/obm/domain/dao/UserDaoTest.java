@@ -54,6 +54,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.date.DateProvider;
@@ -88,6 +89,7 @@ public class UserDaoTest {
 			bindWithMock(ObmInfoDao.class);
 			bindWithMock(AddressBookDao.class);
 			bindWithMock(UserPatternDao.class);
+			bindWithMock(GroupDao.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {

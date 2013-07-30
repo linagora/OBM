@@ -43,6 +43,7 @@ import java.util.Set;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Builder;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
@@ -65,7 +66,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Singleton
 public class GroupDaoJdbcImpl implements GroupDao {
 
-	private static final String FIELDS = "group_id, group_name, group_desc, group_timecreate, group_timeupdate, " +
+	private static final String FIELDS = "group_id, group_ext_id, group_name, group_desc, group_timecreate, group_timeupdate, " +
 			"group_privacy, group_archive, group_email, group_gid";
 
     /** The first group_gid to use. UI code assumes 1000 here */
@@ -82,7 +83,58 @@ public class GroupDaoJdbcImpl implements GroupDao {
         this.obmHelper = obmHelper;
     }
 
-    @Override
+	@Override
+	public void addUser(ObmDomain domain, Group.Id groupId, ObmUser user) throws DaoException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+
+		try {
+			conn = connectionProvider.getConnection();
+			ps = conn.prepareStatement("INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (?,?)");
+
+			ps.setInt(1, groupId.getId());
+			ps.setInt(2, user.getUid());
+
+			ps.executeUpdate();
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			JDBCUtils.cleanup(conn, ps, null);
+		}
+	}
+
+	@Override
+	public Group getByGid(ObmDomain domain, int gid) throws DaoException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT " + FIELDS + " FROM UGroup WHERE group_domain_id = ? AND group_gid = ?";
+
+		try {
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(query);
+
+			ps.setInt(1, domain.getId());
+			ps.setInt(2, gid);
+
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				return groupBuilderFromCursor(rs).build();
+			}
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			obmHelper.cleanup(conn, ps, rs);
+		}
+
+		return null;
+	}
+
+	@Override
     public Group get(ObmDomain domain, GroupExtId id) throws DaoException, GroupNotFoundException {
         Connection conn = null;
         try {
@@ -216,27 +268,22 @@ public class GroupDaoJdbcImpl implements GroupDao {
         }
     }
 
-    @Override
-    public void addUser(ObmDomain domain, GroupExtId id, ObmUser user) throws DaoException, GroupNotFoundException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        try {
-            conn = connectionProvider.getConnection();
-            int internalId = getInternalGroupId(conn, domain, id);
-            ps = conn.prepareStatement(
-                    " INSERT INTO UserObmGroup" +
-                    "              (userobmgroup_group_id, userobmgroup_userobm_id)" +
-                    "      VALUES (?,?)");
+	@Override
+	public void addUser(ObmDomain domain, GroupExtId id, ObmUser user) throws DaoException, GroupNotFoundException {
+		Connection con = null;
 
-            ps.setInt(1, internalId);
-            ps.setInt(2, user.getUid());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        } finally {
-            JDBCUtils.cleanup(conn, ps, null);
-        }
-    }
+		try {
+			con = obmHelper.getConnection();
+
+			addUser(domain, Group.Id.valueOf(getInternalGroupId(con, domain, id)), user);
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
 
     @Override
     public void addSubgroup(ObmDomain domain, GroupExtId group, GroupExtId subgroup) throws DaoException, GroupNotFoundException, GroupRecursionException {
@@ -341,18 +388,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-				return Group
-						.builder()
-						.uid(Group.Id.valueOf(rs.getInt("group_id")))
-						.gid(JDBCUtils.getInteger(rs, "group_gid"))
-						.timecreate(JDBCUtils.getDate(rs, "group_timecreate"))
-						.timeupdate(JDBCUtils.getDate(rs, "group_timeupdate"))
-						.archive(rs.getBoolean("group_archive"))
-						.privateGroup(rs.getBoolean("group_privacy"))
-						.email(rs.getString("group_email"))
-						.extId(id)
-						.name(rs.getString("group_name"))
-						.description(rs.getString("group_desc"));
+				return groupBuilderFromCursor(rs);
             } else {
                 throw new GroupNotFoundException(id);
             }
@@ -360,6 +396,23 @@ public class GroupDaoJdbcImpl implements GroupDao {
             JDBCUtils.cleanup(null, ps, rs);
         }
     }
+
+	private Builder groupBuilderFromCursor(ResultSet rs) throws SQLException {
+		String extId = rs.getString("group_ext_id");
+
+		return Group
+				.builder()
+				.uid(Group.Id.valueOf(rs.getInt("group_id")))
+				.gid(JDBCUtils.getInteger(rs, "group_gid"))
+				.timecreate(JDBCUtils.getDate(rs, "group_timecreate"))
+				.timeupdate(JDBCUtils.getDate(rs, "group_timeupdate"))
+				.archive(rs.getBoolean("group_archive"))
+				.privateGroup(rs.getBoolean("group_privacy"))
+				.email(rs.getString("group_email"))
+				.extId(extId != null ? GroupExtId.valueOf(extId) : null)
+				.name(rs.getString("group_name"))
+				.description(rs.getString("group_desc"));
+	}
 
     /**
      * Builds a group recursively, adding users and subgroups. Basic information

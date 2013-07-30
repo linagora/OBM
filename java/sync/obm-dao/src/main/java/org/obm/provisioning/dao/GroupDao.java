@@ -147,4 +147,8 @@ public interface GroupDao {
      * @throws GroupNotFoundException   If the group is not found.
      */
     void removeSubgroup(ObmDomain domain, GroupExtId extId, GroupExtId subgroup) throws DaoException, GroupNotFoundException;
+
+    void addUser(ObmDomain domain, Group.Id groupId, ObmUser user) throws DaoException;
+
+    Group getByGid(ObmDomain domain, int gid) throws DaoException;
 }

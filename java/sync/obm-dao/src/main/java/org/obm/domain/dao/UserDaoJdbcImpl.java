@@ -533,6 +533,7 @@ public class UserDaoJdbcImpl implements UserDao {
 	public ObmUser create(ObmUser user) throws SQLException, DaoException {
 		Connection conn = null;
 		PreparedStatement ps = null;
+		ObmDomain domain = user.getDomain();
 
 		String q = "INSERT INTO UserObm (" +
 				"userobm_domain_id, " +
@@ -578,7 +579,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			conn = obmHelper.getConnection();
 			ps = conn.prepareStatement(q);
 
-			ps.setInt(idx++, user.getDomain().getId());
+			ps.setInt(idx++, domain.getId());
 
 			if (user.getCreatedBy() != null) {
 				ps.setInt(idx++, user.getCreatedBy().getUid());
@@ -657,7 +658,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			obmHelper.linkEntity(conn, "CalendarEntity", "calendar_id", userId);
 			obmHelper.linkEntity(conn, "MailboxEntity", "mailbox_id", userId);
 
-			ObmUser createdUser = findUserById(userId, user.getDomain());
+			ObmUser createdUser = findUserById(userId, domain);
 
 			AddressBook contactsBook = addressBookDao.create(CONTACTS_BOOK, createdUser);
 			AddressBook collectedContactsBook = addressBookDao.create(COLLECTED_CONTACTS_BOOK, createdUser);

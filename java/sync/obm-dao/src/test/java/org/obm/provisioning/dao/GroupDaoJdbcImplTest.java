@@ -53,11 +53,14 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
+import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Builder;
 import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupRecursionException;
@@ -72,10 +75,12 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-//@Slow
+@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(GroupDaoJdbcImplTest.Env.class)
 public class GroupDaoJdbcImplTest {
+
+	public static final int FIRST_AUTOMATIC_GID = 1001;
 
     public static class Env extends AbstractModule {
 
@@ -428,6 +433,59 @@ public class GroupDaoJdbcImplTest {
 
 		assertThat(createdGroup.getUid().getId()).isGreaterThan(0);
 		assertThat(createdGroup.getTimecreate()).isNotNull();
+	}
+
+	@Test
+	public void testGetByGid() throws Exception {
+		Builder groupBuilder = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.email("group@domain");
+
+		Group createdGroup = dao.create(domain1, groupBuilder.build());
+
+		assertThat(dao.getByGid(domain1, FIRST_AUTOMATIC_GID)).isEqualTo(groupBuilder
+				.uid(createdGroup.getUid())
+				.gid(FIRST_AUTOMATIC_GID)
+				.build());
+	}
+
+	@Test
+	public void testGetByGidWhenGroupDoesntExist() throws Exception {
+		assertThat(dao.getByGid(domain1, 123)).isNull();
+	}
+
+	@Test
+	public void testAddUserByGroupId() throws Exception {
+		Builder groupBuilder = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.privateGroup(true)
+				.email("group@domain");
+
+		Group createdGroup = dao.create(domain1, groupBuilder.build());
+
+		dao.addUser(domain1, createdGroup.getUid(), user1);
+
+		Group updatedGroup = dao.getRecursive(domain1, createdGroup.getExtId(), true, -1);
+
+		assertThat(updatedGroup).isEqualTo(groupBuilder
+				.uid(createdGroup.getUid())
+				.gid(FIRST_AUTOMATIC_GID)
+				.user(user1)
+				.build());
+	}
+
+	@Test(expected = DaoException.class)
+	public void testAddUserByGroupIdWhenGroupDoesntExist() throws Exception {
+		dao.addUser(domain1, Group.Id.valueOf(123), user1);
+	}
+
+	@Test(expected = DaoException.class)
+	public void testAddUserByGroupIdWhenUserDoesntExist() throws Exception {
+		dao.addUser(domain1, group4.getUid(), nonexistentUser);
 	}
 
     /**

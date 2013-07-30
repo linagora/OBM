@@ -51,6 +51,8 @@ import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.date.DateProvider;
@@ -84,6 +86,7 @@ public class HelperServiceImplTest {
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(UserService.class).to(UserServiceImpl.class);
 			bind(UserDao.class).to(UserDaoJdbcImpl.class);
+			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {

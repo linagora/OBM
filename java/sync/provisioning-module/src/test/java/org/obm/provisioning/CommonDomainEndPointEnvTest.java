@@ -65,6 +65,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -115,6 +116,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				@Override
 				protected void configureServlets() {
 					bind(IMocksControl.class).toInstance(mocksControl);
+					bind(GroupDao.class).toInstance(mocksControl.createMock(GroupDao.class));
 					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
 					bind(BatchDao.class).toInstance(mocksControl.createMock(BatchDao.class));

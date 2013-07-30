@@ -43,10 +43,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -54,6 +56,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
@@ -114,6 +117,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private LdapService ldapService;
 	@Inject
 	private CyrusImapService cyrusService;
+	@Inject
+	private GroupDao groupDao;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -129,6 +134,12 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 			.id(2)
 			.login("cyrus")
 			.password("secret")
+			.build();
+	private final Group usersGroup = Group
+			.builder()
+			.uid(Group.Id.valueOf(1))
+			.gid(UserDao.DEFAULT_GID)
+			.name("Users")
 			.build();
 
 	@Test
@@ -224,6 +235,9 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.create(user)).andReturn(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
+		expectLastCall();
 		expectLdapCreateUser(userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
 		
@@ -236,6 +250,77 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.timecommit(date)
 				.build())).andReturn(null);
 		
+		mocksControl.replay();
+
+		createBatchWithOneUserAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessCreateUserWhenDefaultGroupDoesntExist() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.resourcePath("/users/")
+						.verb(HttpVerb.POST)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1\"," +
+										"\"profile\": \"user\"," +
+										"\"password\": \"secret\"," +
+										"\"mails\":[\"john@domain\"]" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").build())
+				.build();
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.create(user)).andReturn(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(null);
+		expectLastCall();
+
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.ERROR)
+						.error("org.obm.provisioning.exception.ProcessingException: Default group with GID 1000 not found for domain domain.")
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+
 		mocksControl.replay();
 
 		createBatchWithOneUserAndCommit();
@@ -302,6 +387,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domainWithMailHost)
 				.build();
 		expect(userDao.create(user)).andReturn(user);
+		expect(groupDao.getByGid(domainWithMailHost, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		groupDao.addUser(domainWithMailHost, usersGroup.getUid(), user);
+		expectLastCall();
+
 		expectLdapCreateUser(user);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
 		expect(satelliteService.create(isA(Configuration.class), eq(domainWithMailHost))).andReturn(satelliteConnection);
@@ -439,6 +528,9 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 		expect(userDao.create(user)).andReturn(user);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		groupDao.addUser(domain, usersGroup.getUid(), user);
+		expectLastCall();
 		expectLdapCreateUser(user);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder

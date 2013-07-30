@@ -31,20 +31,28 @@ package org.obm.provisioning.processing.impl.users;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.push.mail.bean.Acl;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class CreateUserOperationProcessor extends AbstractUserOperationProcessor {
 
 	private final String ANYONE_IDENTIFIER = "anyone";
+
+	@Inject
+	private GroupDao groupDao;
 
 	@Inject
 	CreateUserOperationProcessor() {
@@ -56,6 +64,8 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = getUserFromRequestBody(operation, batch);
 		ObmUser userFromDao = createUserInDao(user);
+
+		addUserInDefaultGroup(userFromDao);
 
 		if (user.isEmailAvailable()) {
 			createUserMailboxes(userFromDao);
@@ -96,6 +106,23 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 		catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
+		}
+	}
+
+	private void addUserInDefaultGroup(ObmUser user) {
+		ObmDomain domain = user.getDomain();
+
+		try {
+			Group defaultGroup = groupDao.getByGid(domain, UserDao.DEFAULT_GID);
+
+			if (defaultGroup == null) {
+				throw new ProcessingException(String.format("Default group with GID %s not found for domain %s.", UserDao.DEFAULT_GID, domain.getName()));
+			}
+
+			groupDao.addUser(domain, defaultGroup.getUid(), user);
+		}
+		catch (DaoException e) {
+			throw new ProcessingException(String.format("Cannot add user '%s' (%s) in the default group.", user.getLogin(), user.getExtId()), e);
 		}
 	}
 
