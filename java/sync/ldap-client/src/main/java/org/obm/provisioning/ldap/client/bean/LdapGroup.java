@@ -118,7 +118,7 @@ public class LdapGroup {
 		}
 		
 		public LdapGroup build() {
-			return new LdapGroup(configuration.getGroupBaseDn(), objectClasses, cn, gidNumber, mailAccess, mail, domain);
+			return new LdapGroup(configuration.getGroupBaseDn(domain), objectClasses, cn, gidNumber, mailAccess, mail, domain);
 		}
 	}
 	

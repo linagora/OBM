@@ -50,7 +50,7 @@ public interface Configuration {
 	String buildUserFilter(LdapUser.Uid userId);
 	SearchScope getUserSearchScope();
 
-	Dn getGroupBaseDn();
+	Dn getGroupBaseDn(LdapDomain domain);
 	String buildGroupFilter(LdapGroup.Cn groupCn);
 	SearchScope getGroupSearchScope();
 

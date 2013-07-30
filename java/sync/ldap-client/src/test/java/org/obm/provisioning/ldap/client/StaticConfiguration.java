@@ -81,7 +81,7 @@ public class StaticConfiguration implements Configuration {
 	}
 
 	@Override
-	public Dn getGroupBaseDn() {
+	public Dn getGroupBaseDn(LdapDomain domain) {
 		try {
 			return new Dn("ou=groups,dc=test.obm.org,dc=local");
 		} catch (LdapInvalidDnException e) {

@@ -175,21 +175,19 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void deleteGroup(LdapGroup.Cn ldapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void deleteGroup(LdapGroup.Cn ldapGroupCn, LdapDomain domain) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			connection.delete(getGroupDnFromGroupCn(ldapGroupCn));
+			connection.delete(getGroupDnFromGroupCn(ldapGroupCn, domain));
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
-	@VisibleForTesting Dn getGroupDnFromGroupCn(LdapGroup.Cn ldapGroupCn) throws LdapException {
-		return getDn(configuration.getGroupBaseDn(), configuration.buildGroupFilter(ldapGroupCn), configuration.getGroupSearchScope());
-	}
-	
-	private Dn getDn(Dn baseDn, String filter, SearchScope scope) throws LdapException {
-		return getEntry(baseDn, filter, scope).getDn();
+	@VisibleForTesting Dn getGroupDnFromGroupCn(LdapGroup.Cn ldapGroupCn, LdapDomain domain) throws LdapException {
+		return new Dn(
+				new Rdn(String.format("cn=%s", ldapGroupCn.get())),
+				configuration.getGroupBaseDn(domain));
 	}
 	
 	@VisibleForTesting Entry getEntry(Dn baseDn, String filter, SearchScope scope) throws LdapException {
@@ -202,22 +200,24 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
-		modifyGroup(ldapGroupCn, ldapUserMembership.buildAddModifications());
+	public void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+		modifyGroup(ldapGroupCn, ldapUserMembership.buildAddModifications(), ldapDomain);
 	}
 	
 	@Override
-	public void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		Modification[] modifications = new Modification[0];
 		for (LdapUserMembership ldapUserMembership: ldapUserMemberships) {
 			modifications = ObjectArrays.concat(modifications, ldapUserMembership.buildAddModifications(), Modification.class);
 		}
-		modifyGroup(ldapGroupCn, modifications);
+		modifyGroup(ldapGroupCn, modifications, ldapDomain);
 	}
 	
-	private void modifyGroup(LdapGroup.Cn ldapGroupCn, Modification[] modifications) throws org.obm.provisioning.ldap.client.exception.LdapException {
+	private void modifyGroup(LdapGroup.Cn ldapGroupCn, Modification[] modifications, LdapDomain ldapDomain) throws org.obm.provisioning.ldap.client.exception.LdapException {
 		try {
-			Dn group = getGroupDnFromGroupCn(ldapGroupCn);
+			Dn group = getGroupDnFromGroupCn(ldapGroupCn, ldapDomain);
 			connection.modify(group, modifications);
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
@@ -226,17 +226,19 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
-		modifyGroup(ldapGroupCn, ldapUserMembership.buildRemoveModifications());
+	public void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+		modifyGroup(ldapGroupCn, ldapUserMembership.buildRemoveModifications(), ldapDomain);
 	}
 
 	@Override
-	public void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		Modification[] modifications = new Modification[0];
 		for (LdapUserMembership ldapUserMembership: ldapUserMemberships) {
 			modifications = ObjectArrays.concat(modifications, ldapUserMembership.buildRemoveModifications(), Modification.class);
 		}
-		modifyGroup(ldapGroupCn, modifications);
+		modifyGroup(ldapGroupCn, modifications, ldapDomain);
 	}
 
 	@Override
@@ -249,10 +251,11 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void addGroupToGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn toLdapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void addGroupToGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn toLdapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			Entry entry = getGroupEntry(ldapGroupCn);
-			Entry toEntry = getGroupEntry(toLdapGroupCn);
+			Entry entry = getGroupEntry(ldapGroupCn, ldapDomain);
+			Entry toEntry = getGroupEntry(toLdapGroupCn, ldapDomain);
 			
 			modifyGroupByGroup(toEntry, entry, ModificationOperation.ADD_ATTRIBUTE);
 		} catch (LdapException e) {
@@ -261,10 +264,11 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void removeGroupFromGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn fromLdapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void removeGroupFromGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn fromLdapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			Entry entry = getGroupEntry(ldapGroupCn);
-			Entry fromEntry = getGroupEntry(fromLdapGroupCn);
+			Entry entry = getGroupEntry(ldapGroupCn, ldapDomain);
+			Entry fromEntry = getGroupEntry(fromLdapGroupCn, ldapDomain);
 			
 			modifyGroupByGroup(fromEntry, entry, ModificationOperation.REMOVE_ATTRIBUTE);
 		} catch (LdapException e) {
@@ -288,40 +292,42 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void addGroupsToGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn toLdapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void addGroupsToGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn toLdapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			modifyMembersFromGroups(ldapGroupCns, toLdapGroupCn, ModificationOperation.ADD_ATTRIBUTE);
+			modifyMembersFromGroups(ldapGroupCns, toLdapGroupCn, ModificationOperation.ADD_ATTRIBUTE, ldapDomain);
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 
 	@Override
-	public void removeGroupsFromGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn fromLdapGroupCn) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void removeGroupsFromGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn fromLdapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			modifyMembersFromGroups(ldapGroupCns, fromLdapGroupCn, ModificationOperation.REMOVE_ATTRIBUTE);
+			modifyMembersFromGroups(ldapGroupCns, fromLdapGroupCn, ModificationOperation.REMOVE_ATTRIBUTE, ldapDomain);
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		}
 	}
 	
 	private void modifyMembersFromGroups(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn modifiedLdapGroupCn, 
-			ModificationOperation modificationOperation) throws LdapException {
+			ModificationOperation modificationOperation, LdapDomain ldapDomain) throws LdapException {
 		
 		List<Modification> modifications = Lists.newArrayList();
 		for (LdapGroup.Cn ldapGroupCn : ldapGroupCns) {
-			Entry entry = getGroupEntry(ldapGroupCn);
+			Entry entry = getGroupEntry(ldapGroupCn, ldapDomain);
 			
 			modifications.addAll(memberModificationsFromEntry(entry, modificationOperation));
 		}
 		
-		Entry fromEntry = getGroupEntry(modifiedLdapGroupCn);
+		Entry fromEntry = getGroupEntry(modifiedLdapGroupCn, ldapDomain);
 		connection.modify(fromEntry.getDn(), modifications.toArray(new Modification[] {}));
 		incrementAndCheckRequestCounter();
 	}
 	
-	private Entry getGroupEntry(LdapGroup.Cn ldapGroupCn) throws LdapException {
-		return getEntry(configuration.getGroupBaseDn(),
+	private Entry getGroupEntry(LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain) throws LdapException {
+		return getEntry(configuration.getGroupBaseDn(ldapDomain),
 				configuration.buildGroupFilter(ldapGroupCn), 
 				configuration.getGroupSearchScope());
 	}

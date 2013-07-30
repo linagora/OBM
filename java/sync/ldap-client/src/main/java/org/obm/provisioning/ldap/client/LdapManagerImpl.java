@@ -33,6 +33,9 @@ package org.obm.provisioning.ldap.client;
 
 import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.ldap.client.bean.LdapDomain;
+import org.obm.provisioning.ldap.client.bean.LdapGroup.Cn;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.slf4j.Logger;
@@ -42,6 +45,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class LdapManagerImpl implements LdapManager {
@@ -100,6 +104,11 @@ public class LdapManagerImpl implements LdapManager {
 		} else {
 			logger.info(String.format("LDAP attributes of user %s (%s) weren't changed. Doing nothing.", obmUser.getLogin(), obmUser.getExtId())); 
 		}
+	}
+	
+	@Override
+	public void deleteGroup(ObmDomain domain, Group group) {
+		conn.deleteGroup(Cn.valueOf(group.getName()), LdapDomain.valueOf(domain.getName()));
 	}
 
 	@Override

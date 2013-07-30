@@ -52,27 +52,36 @@ public interface Connection {
 	
 	void deleteUser(LdapUser.Uid ldapUser, LdapDomain domain) throws LdapException, ConnectionException;
 
-	void modifyUser(LdapUser.Uid ldapUser, LdapDomain domain, Modification... modifications) throws LdapException, ConnectionException;
+	void modifyUser(LdapUser.Uid ldapUser, LdapDomain domain, Modification... modifications)
+			throws LdapException, ConnectionException;
 
 	void createGroup(LdapGroup ldapGroup) throws LdapException, ConnectionException;
 	
-	void deleteGroup(LdapGroup.Cn ldapGroup) throws LdapException, ConnectionException;
+	void deleteGroup(LdapGroup.Cn ldapGroup, LdapDomain domain) throws LdapException, ConnectionException;
 	
-	void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn) throws LdapException, ConnectionException;
+	void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 	
-	void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn) throws LdapException, ConnectionException;
+	void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 
-	void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn) throws LdapException, ConnectionException;
+	void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 	
-	void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn) throws LdapException, ConnectionException;
+	void removeUsersFromGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 
-	void addGroupToGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn toLdapGroupCn) throws LdapException, ConnectionException;
+	void addGroupToGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn toLdapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 	
-	void removeGroupFromGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn fromLdapGroupCn) throws LdapException, ConnectionException;
+	void removeGroupFromGroup(LdapGroup.Cn ldapGroupCn, LdapGroup.Cn fromLdapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 
-	void addGroupsToGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn toLdapGroupCn) throws LdapException, ConnectionException;
+	void addGroupsToGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn toLdapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 	
-	void removeGroupsFromGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn fromLdapGroupCn) throws LdapException, ConnectionException;
+	void removeGroupsFromGroup(List<LdapGroup.Cn> ldapGroupCns, LdapGroup.Cn fromLdapGroupCn, LdapDomain domain)
+			throws LdapException, ConnectionException;
 	
 	void shutdown() throws ConnectionException;
 	

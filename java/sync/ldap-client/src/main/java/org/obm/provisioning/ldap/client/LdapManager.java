@@ -32,8 +32,10 @@
 package org.obm.provisioning.ldap.client;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public interface LdapManager {
@@ -48,6 +50,8 @@ public interface LdapManager {
 
 	void modifyUser(ObmUser obmUser, ObmUser oldObmUser);
 
+	void deleteGroup(ObmDomain domain, Group group);
+	
 	void shutdown() throws ConnectionException;
 
 }

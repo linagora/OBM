@@ -79,6 +79,7 @@ public class ConnectionImplTest {
 	@Inject Provider<LdapUser.Builder> userBuilderProvider;
 	@Inject Provider<LdapUserMembership.Builder> groupMemberShipProvider;
 	private ConnectionImpl connection;
+	private LdapDomain ldapDomain;
 	
 	@Before
 	public void setup() throws Exception {
@@ -86,6 +87,8 @@ public class ConnectionImplTest {
 		injectBootstrapData();
 		
 		connection = connectionFactory.create(getNetworkConfiguration());
+		
+		ldapDomain = LdapDomain.valueOf("test.obm.org");
 	}
 
 	private LdapConnectionConfig getNetworkConfiguration() {
@@ -139,11 +142,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		
-		assertThat(connection.getGroupDnFromGroupCn(ldapGroup.getCn())
+		assertThat(connection.getGroupDnFromGroupCn(ldapGroup.getCn(), ldapDomain)
 			.equals(new Dn("cn=group1,ou=groups,dc=test.obm.org,dc=local"))).isTrue();
 		
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
@@ -157,24 +160,25 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testDeleteGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		
 		// In order to be sure that group is really inserted
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
-		assertThat(connection.getGroupDnFromGroupCn(groupCn)
+		assertThat(connection.getGroupDnFromGroupCn(groupCn, ldapDomain)
 			.equals(new Dn("cn=group1,ou=groups,dc=test.obm.org,dc=local"))).isTrue();
 		
-		connection.deleteGroup(groupCn);
+		connection.deleteGroup(groupCn, ldapDomain);
 		try {
-			connection.getGroupDnFromGroupCn(groupCn);
+			connection.getGroupDnFromGroupCn(groupCn, ldapDomain);
 		} catch (IllegalStateException e) {
 		}
 	}
@@ -267,13 +271,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUserToGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -281,9 +286,9 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUserToGroup(userMembership, groupCn);
+		connection.addUserToGroup(userMembership, groupCn, ldapDomain);
 		
 		Attribute attribute = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL)
@@ -302,13 +307,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUsersToEmptyGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -316,14 +322,14 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
@@ -338,13 +344,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddUsersToGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -352,21 +359,21 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUserToGroup(userMembership, groupCn);
+		connection.addUserToGroup(userMembership, groupCn, ldapDomain);
 		
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership3 = groupMemberShipProvider.get()
 				.memberUid("test3")
 				.mailBox("test3@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership2, userMembership3), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership2, userMembership3), groupCn, ldapDomain);
 		
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
@@ -382,13 +389,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUserToGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -396,14 +404,14 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
 		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
@@ -411,7 +419,7 @@ public class ConnectionImplTest {
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
-		connection.removeUserFromGroup(userMembership, groupCn);
+		connection.removeUserFromGroup(userMembership, groupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
@@ -424,13 +432,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUsersToGroup() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -438,14 +447,14 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
 		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
@@ -453,7 +462,7 @@ public class ConnectionImplTest {
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
-		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
@@ -466,13 +475,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveUsersToGroupOnlyOneRemaining() throws Exception {
+		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(ldapGroup);
 		LdapGroup.Cn groupCn = ldapGroup.getCn();
@@ -480,19 +490,19 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership3 = groupMemberShipProvider.get()
 				.memberUid("test3")
 				.mailBox("test3@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2, userMembership3), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2, userMembership3), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
 		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
@@ -500,7 +510,7 @@ public class ConnectionImplTest {
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
-		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
@@ -513,15 +523,16 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddGroupToGroup() throws Exception {
+		
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		
 		LdapGroup group = groupBuilderProvider.get()
@@ -530,11 +541,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -542,12 +553,12 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("toGroup@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(toGroup);
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
 		
-		connection.addGroupToGroup(groupCn, toGroupCn);
+		connection.addGroupToGroup(groupCn, toGroupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
@@ -561,13 +572,14 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRemoveGroupFromGroup() throws Exception {
+		
 		LdapGroup fromGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(fromGroup);
 		LdapGroup.Cn fromGroupCn = fromGroup.getCn();
@@ -575,14 +587,14 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupCn, ldapDomain);
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -590,13 +602,13 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
-		connection.removeGroupFromGroup(groupCn, fromGroupCn);
+		connection.removeGroupFromGroup(groupCn, fromGroupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
@@ -609,15 +621,16 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testAddGroupsToGroup() throws Exception {
+		
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		
 		LdapGroup group = groupBuilderProvider.get()
@@ -626,11 +639,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership), groupCn, ldapDomain);
 		
 		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -638,11 +651,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group2);
 		LdapGroup.Cn groupCn2 = group2.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupCn2);
+		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupCn2, ldapDomain);
 		
 		LdapGroup toGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -650,12 +663,12 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(toGroup);
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
 		
-		connection.addGroupsToGroup(ImmutableList.of(groupCn, groupCn2), toGroupCn);
+		connection.addGroupsToGroup(ImmutableList.of(groupCn, groupCn2), toGroupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=subgroup)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("subgroup");
@@ -672,12 +685,12 @@ public class ConnectionImplTest {
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
 				.mailBox("test2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		
 		LdapGroup fromGroup = groupBuilderProvider.get()
@@ -686,11 +699,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("group1@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(fromGroup);
 		LdapGroup.Cn fromGroupCn = fromGroup.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), fromGroupCn, ldapDomain);
 		
 		LdapGroup group = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -698,11 +711,11 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group);
 		LdapGroup.Cn groupCn = group.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership), groupCn);
+		connection.addUsersToGroup(ImmutableList.of(userMembership), groupCn, ldapDomain);
 
 		LdapGroup group2 = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -710,13 +723,13 @@ public class ConnectionImplTest {
 				.gidNumber(1001)
 				.mailAccess("PERMIT")
 				.mail("subgroup2@test.obm.org")
-				.domain(LdapDomain.valueOf("test.obm.org"))
+				.domain(ldapDomain)
 				.build();
 		connection.createGroup(group2);
 		LdapGroup.Cn groupCn2 = group2.getCn();
-		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupCn2);
+		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupCn2, ldapDomain);
 
-		connection.removeGroupsFromGroup(ImmutableList.of(groupCn, groupCn2), fromGroupCn);
+		connection.removeGroupsFromGroup(ImmutableList.of(groupCn, groupCn2), fromGroupCn, ldapDomain);
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
 				"(cn=group1)", SearchScope.ONELEVEL);
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");

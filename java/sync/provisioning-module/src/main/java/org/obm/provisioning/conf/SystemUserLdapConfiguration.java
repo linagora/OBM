@@ -90,9 +90,9 @@ public class SystemUserLdapConfiguration implements Configuration {
 	}
 
 	@Override
-	public Dn getGroupBaseDn() {
+	public Dn getGroupBaseDn(LdapDomain domain) {
 		try {
-			return new Dn("ou=groups,dc=test.obm.org,dc=local"); // TODO: This si dependant on the Domain
+			return new Dn(String.format("ou=groups,dc=%s,dc=local", domain.get())); // TODO: This si dependant on the Domain
 		}
 		catch (LdapInvalidDnException e) {
 			throw Throwables.propagate(e);
