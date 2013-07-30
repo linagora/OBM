@@ -566,12 +566,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_email, " +
 				"userobm_mail_server_id, " +
 				"userobm_mail_quota," +
+				"userobm_mail_perms, " +
 				"userobm_uid," +
 				"userobm_gid" +
 				") VALUES (" +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
 				")";
 
 		try {
@@ -633,9 +634,11 @@ public class UserDaoJdbcImpl implements UserDao {
 										user.getEmailAlias())));
 				ps.setInt(idx++, user.getMailHost().getId());
 				ps.setInt(idx++, user.getMailQuotaAsInt());
+				ps.setInt(idx++, 1);
 			} else {
 				ps.setString(idx++, "");
 				ps.setNull(idx++, Types.INTEGER);
+				ps.setInt(idx++, 0);
 				ps.setInt(idx++, 0);
 			}
 
@@ -719,7 +722,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_description = ?, " +
                     "userobm_email = ?, " +
                     "userobm_mail_server_id = ?, " +
-                    "userobm_mail_quota = ? " +
+                    "userobm_mail_quota = ?, " +
+                    "userobm_mail_perms = ? " +
                     "WHERE userobm_id = ?";
 
 		try {
@@ -781,9 +785,11 @@ public class UserDaoJdbcImpl implements UserDao {
 										user.getEmailAlias())));
 				ps.setInt(idx++, user.getMailHost().getId());
 				ps.setInt(idx++, user.getMailQuotaAsInt());
+				ps.setInt(idx++, 1);
 			} else {
 				ps.setString(idx++, "");
 				ps.setNull(idx++, Types.INTEGER);
+				ps.setInt(idx++, 0);
 				ps.setInt(idx++, 0);
 			}
 

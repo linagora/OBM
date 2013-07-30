@@ -549,6 +549,84 @@ public class UserDaoJdbcImplTest {
 		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 
+	@Test
+	public void testCreateUserWithNoMailWrites0AsMailPerms() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(0);
+	}
+
+	@Test
+	public void testUpdateUserWithNoMailWrites0AsMailPerms() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.email("jdoe")
+				.mailHost(mailHost)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		dao.update(userBuilder
+				.uid(createdUser.getUid())
+				.mailHost(null)
+				.email(null)
+				.build());
+
+		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(0);
+	}
+
+	@Test
+	public void testCreateUserWithMailWrites1AsMailPerms() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.email("jdoe")
+				.mailHost(mailHost)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
+	@Test
+	public void testUpdateUserWithMailWrites1AsMailPerms() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		dao.update(userBuilder
+				.uid(createdUser.getUid())
+				.mailHost(mailHost)
+				.email("jdoe")
+				.build());
+
+		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
