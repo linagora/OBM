@@ -31,7 +31,6 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -45,20 +44,13 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
-import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.provisioning.ldap.client.LdapService;
-import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
+import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.push.mail.IMAPException;
-import org.obm.sync.host.ObmHost;
-import org.obm.sync.serviceproperty.ServiceProperty;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.util.Providers;
 
@@ -67,17 +59,15 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperationProcessor {
+public abstract class AbstractUserOperationProcessor extends AbstractOperationProcessor {
 
-	@Inject
-	protected UserDao userDao;
 	@Inject
 	protected CyrusImapService cyrusService;
 	@Inject
-	protected LdapService ldapService;
+	protected UserDao userDao;
 	@Inject
 	protected UserSystemDao userSystemDao;
-
+	
 	protected AbstractUserOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.USER, verb);
 	}
@@ -91,18 +81,7 @@ public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperat
 	protected ObmUser inheritDatabaseIdentifiers(ObmUser user, ObmUser existingUser) {
 		return ObmUser.builder().from(user).uid(existingUser.getUid()).entityId(existingUser.getEntityId()).build();
 	}
-
-	protected UserExtId getExtIdFromRequestParams(Operation operation) {
-		final Request request = operation.getRequest();
-		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
-
-		if (Strings.isNullOrEmpty(itemId)) {
-			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getResourcePath()));
-		}
-
-		return UserExtId.valueOf(itemId);
-	}
-
+	
 	protected ObmUser getUserFromDao(UserExtId extId, ObmDomain domain) {
 		try {
 			return userDao.getByExtId(extId, domain);
@@ -110,6 +89,10 @@ public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperat
 		catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot fetch existing user %s from database.", extId), e);
 		}
+	}
+	
+	protected UserExtId getUserExtIdFromRequest(Operation operation) {
+		return UserExtId.valueOf(getItemIdFromRequest(operation));
 	}
 
 	protected ObmUser getUserFromRequestBody(Operation operation, Batch batch) {
@@ -129,20 +112,4 @@ public abstract class AbstractUserOperationProcessor extends HttpVerbBasedOperat
 
 		return ProvisioningService.createObjectMapper(module);
 	}
-
-	protected LdapManager buildLdapManager(ObmUser user) {
-		ObmDomain domain = user.getDomain();
-		LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
-		ObmHost ldapHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.LDAP), null);
-
-		if (ldapHost == null) {
-			throw new ProcessingException(String.format("Domain %s for user %s (%s) has no linked %s host.", domain.getName(), user.getLogin(), user.getExtId(), ServiceProperty.LDAP));
-		}
-
-		connectionConfig.setLdapHost(ldapHost.getIp());
-		connectionConfig.setLdapPort(LdapConnectionConfig.DEFAULT_LDAP_PORT);
-
-		return ldapService.buildManager(connectionConfig);
-	}
-
 }

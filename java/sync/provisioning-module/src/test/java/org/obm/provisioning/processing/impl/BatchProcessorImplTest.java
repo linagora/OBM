@@ -52,6 +52,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.Batch;
@@ -63,6 +64,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -881,5 +883,47 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		CyrusManager cyrusManager = mocksControl.createMock(CyrusManager.class);
 		expect(cyrusService.buildManager("127.0.0.1", "cyrus", "secret")).andReturn(cyrusManager);
 		return cyrusManager;
+	}
+	
+	@Test
+	public void testProcessDeleteGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1")
+						.param(Request.ITEM_ID_KEY, "extIdGroup1")
+						.verb(HttpVerb.DELETE)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		groupDao.delete(domain, extId);
+		expectLastCall();
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
 	}
 }

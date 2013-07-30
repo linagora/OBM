@@ -29,88 +29,38 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl.users;
-
-import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
+package org.obm.provisioning.processing.impl.groups;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.push.mail.bean.Acl;
 
-import com.google.inject.Inject;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserExtId;
+public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcessor {
 
-public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor {
-	
-	private final static String DELETE_ACL = "lc";
-
-	@Inject
-	DeleteUserOperationProcessor() {
+	protected DeleteGroupOperationProcessor() {
 		super(HttpVerb.DELETE);
 	}
 
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final UserExtId extId = getUserExtIdFromRequest(operation);
-		final Request request = operation.getRequest();
-		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
-		final ObmUser userFromDao = getUserFromDao(extId, batch.getDomain());
+		GroupExtId extId = getGroupExtIdFromRequest(operation);
+		ObmDomain domain = batch.getDomain();
 		
-		deleteUserInDao(userFromDao);
-		if (expunge == true) {
-			deleteUserMailBoxes(userFromDao);
-		}
-		deleteUserInLdap(userFromDao);
+		deleteGroupInDao(domain, extId);
 	}
 
-	private void deleteUserInLdap(ObmUser user) {
-		LdapManager ldapManager = buildLdapManager(user.getDomain());
-		
+	public void deleteGroupInDao(ObmDomain domain,GroupExtId extId) {
 		try {
-			ldapManager.deleteUser(user);
+			groupDao.delete(domain, extId);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
-		} finally {
-			ldapManager.shutdown();
+					String.format("Cannot delete group with extId '%s' in database.", extId.getId()), e);
 		}
 	}
-
-	private void deleteUserInDao(ObmUser user) {
-		try {
-			userDao.delete(user);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot delete user with extId '%s' in database.", user.getExtId().getExtId()), e);
-		}
-	}
-
-	private void deleteUserMailBoxes(ObmUser user) {
-		CyrusManager cyrusManager = null;
-		
-		try {
-			cyrusManager = buildCyrusManager(user);
-			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
-			cyrusManager.delete(user);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format(
-							"Cannot delete cyrus mailbox for user '%s' (%s).",
-							user.getLogin(), user.getExtId()), e);
-		} finally {
-			if (cyrusManager != null) {
-				cyrusManager.shutdown();
-			}
-		}
-	}
-
 }

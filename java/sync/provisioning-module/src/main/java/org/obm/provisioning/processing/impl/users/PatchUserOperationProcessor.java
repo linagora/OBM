@@ -59,7 +59,7 @@ public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final UserExtId extId = getExtIdFromRequestParams(operation);
+		final UserExtId extId = getUserExtIdFromRequest(operation);
 		ObmUser oldUser = getUserFromDao(extId, batch.getDomain());
 		ObmUser user = getUserFromRequestBody(operation, batch, oldUser);
 		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, oldUser));

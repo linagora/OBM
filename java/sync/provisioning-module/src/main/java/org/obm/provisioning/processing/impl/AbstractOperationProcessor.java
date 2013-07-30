@@ -27,81 +27,60 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl.users;
+package org.obm.provisioning.processing.impl;
 
-import org.obm.annotations.transactional.Transactional;
-import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.provisioning.beans.Batch;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor {
+public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationProcessor {
 
 	@Inject
-	ModifyUserOperationProcessor() {
-		super(HttpVerb.PUT);
-	}
-	
-	ModifyUserOperationProcessor(HttpVerb verb) {
-		super(verb);
+	protected LdapService ldapService;
+
+	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
+		super(entityType, verb);
 	}
 
-	@Override
-	@Transactional
-	public void process(Operation operation, Batch batch) throws ProcessingException {
-		ObmUser user = getUserFromRequestBody(operation, batch);
-		ObmUser existingUser = getUserFromDao(user.getExtId(), batch.getDomain());
-		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, existingUser));
+	protected String getItemIdFromRequest(Operation operation) {
+		final Request request = operation.getRequest();
+		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
 
-		if (newUser.isEmailAvailable()) {
-			updateUserMailbox(newUser);
+		if (Strings.isNullOrEmpty(itemId)) {
+			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getResourcePath()));
 		}
-
-		modifyUserInLdap(newUser, existingUser);
+		
+		return itemId;
 	}
 
-	protected void updateUserMailbox(ObmUser user) {
-		CyrusManager cyrusManager = null;
+	protected LdapManager buildLdapManager(ObmDomain domain) {
+		LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
+		ObmHost ldapHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.LDAP), null);
 
-		try {
-			cyrusManager = buildCyrusManager(user);
-			cyrusManager.applyQuota(user);
-		} catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot update Cyrus mailbox for user '%s' (%s).", user.getLogin(), user.getExtId()), e);
-		} finally {
-			if (cyrusManager != null) {
-				cyrusManager.shutdown();
-			}
+		if (ldapHost == null) {
+			throw new ProcessingException(
+					String.format("Domain %s has no linked %s host.",
+							domain.getName(),
+							ServiceProperty.LDAP));
 		}
-	}
 
-	protected ObmUser modifyUserInDao(ObmUser user) {
-		try {
-			return userDao.update(user);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot modify user '%s' (%s) in database.", user.getLogin(), user.getExtId()), e);
-		}
-	}
+		connectionConfig.setLdapHost(ldapHost.getIp());
+		connectionConfig.setLdapPort(LdapConnectionConfig.DEFAULT_LDAP_PORT);
 
-	protected void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
-		LdapManager ldapManager = buildLdapManager(user.getDomain());
-
-		try {
-			ldapManager.modifyUser(user, oldObmUser);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot modify user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
-		}
-		finally {
-			ldapManager.shutdown();
-		}
+		return ldapService.buildManager(connectionConfig);
 	}
 
 }

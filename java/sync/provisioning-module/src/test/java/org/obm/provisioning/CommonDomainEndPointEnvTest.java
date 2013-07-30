@@ -225,6 +225,8 @@ public abstract class CommonDomainEndPointEnvTest {
 	@Inject
 	protected UserDao userDao;
 	@Inject
+	protected GroupDao groupDao;
+	@Inject
 	protected BatchDao batchDao;
 	@Inject
 	protected ProfileDao profileDao;
