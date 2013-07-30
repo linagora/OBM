@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,49 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.locator;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
+import org.obm.configuration.module.LoggerModule;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
+public class LocatorModule extends AbstractModule {
 
-public class ObmSyncModule extends AbstractModule {
-
-	private static final String APPLICATION_NAME = "sync";
 	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
+	private static final String APPLICATION_NAME = "obm-locator";
 	
 	@Override
 	protected void configure() {
-		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
-		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfigurationService());
-		install(new ConfigurationModule(globalConfiguration));
-		install(new ObmSyncServletModule());
-		install(new ObmSyncServicesModule());
-		install(new MessageQueueModule());
+		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+		
+		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+
+		install(new ConfigurationModule(buildConfiguration()));
 		install(new TransactionalModule());
-		install(new DatabaseModule());
-		install(new SolrJmsModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		install(new DatabaseMetadataModule());
+		install(new LocatorServletModule());
 	}
 
-	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {
-		ObmSyncConfigurationServiceImpl configurationService = new ObmSyncConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
-		return GlobalAppConfiguration.<ObmSyncConfigurationService>builder()
+	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		return GlobalAppConfiguration.builder()
 					.mainConfiguration(configurationService)
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
 					.build();
 	}
+
+	
 }

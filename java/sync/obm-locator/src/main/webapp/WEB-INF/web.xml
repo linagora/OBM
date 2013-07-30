@@ -3,6 +3,13 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app> 
+	<display-name>OBM Locator</display-name>
+	
+	<context-param>
+		<param-name>guiceModule</param-name>
+		<param-value>org.obm.locator.LocatorModule</param-value>
+	</context-param>
+
 	<listener>
 		<listener-class>org.obm.locator.GuiceServletContextListener</listener-class>
 	</listener>

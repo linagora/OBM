@@ -31,58 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.locator;
 
-import java.util.Collections;
-import java.util.TimeZone;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
-import org.obm.sync.XTrustProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obm.dbcp.DatabaseConnectionProvider;
 
-import com.google.inject.CreationException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.spi.Message;
+import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
+import com.google.common.io.Resources;
 
-public class GuiceServletContextListener implements ServletContextListener {
+public class H2GuiceServletContextListener extends GuiceServletContextListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
-
-	protected Injector injector;
-
+	public static final String INITIAL_DB_SCRIPT = "db-schema.sql";
+	
+	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		super.contextInitialized(servletContextEvent);
+		initializeH2Database();
+	}
+
+	private void initializeH2Database() {
 		try {
-			injector = createInjector(servletContextEvent.getServletContext());
-			if (injector == null) {
-				failStartup("Could not create injector: createInjector() returned null");
-			}
-			XTrustProvider.install();
-			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			failStartup(e.getMessage());
+			Connection connection = getH2Connection();
+			connection.prepareStatement(getInitialDBScript()).executeUpdate();
+		} catch (SQLException e) {
+			Throwables.propagate(e);
+		} catch (IOException e) {
+			Throwables.propagate(e);
 		}
 	}
 
-	private Injector createInjector(final ServletContext servletContext) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		return Guice.createInjector(applicationModule(servletContext));
+	private String getInitialDBScript() throws IOException {
+		URL initialDbScriptUrl = Resources.getResource(INITIAL_DB_SCRIPT);
+		return Resources.toString(initialDbScriptUrl, Charsets.UTF_8);
 	}
 
-	private Module applicationModule(ServletContext servletContext) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
-		return (Module) Class.forName(guiceModuleClassName).newInstance();
+	private Connection getH2Connection() throws SQLException {
+		return injector.getInstance(DatabaseConnectionProvider.class).getConnection();
 	}
-
 	
-	private void failStartup(String message) {
-		throw new CreationException(Collections.nCopies(1, new Message(this, message)));
-	}
-
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-	}
-
 }

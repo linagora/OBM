@@ -61,7 +61,7 @@ import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener{
 
-	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
+	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
 	private static final String APPLICATION_NAME = "obm-autoconf";
 
 	@Override

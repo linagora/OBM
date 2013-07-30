@@ -57,7 +57,7 @@ public class HostLocationServlet extends HttpServlet {
 	private LocatorDbHelper locatorDbHelper;
 	
 	@Inject
-	protected HostLocationServlet(LocatorDbHelper locatorDbHelper){
+	protected HostLocationServlet(LocatorDbHelper locatorDbHelper) {
 		this.locatorDbHelper = locatorDbHelper;
 	}
 	
@@ -75,9 +75,9 @@ public class HostLocationServlet extends HttpServlet {
 			return;
 		}
 
-		String service = split[2];
-		String property = split[3];
-		String loginAtDomain = split[4];
+		String service = split[1];
+		String property = split[2];
+		String loginAtDomain = split[3];
 
 		Set<String> ips = locatorDbHelper.findDomainHost(
 				loginAtDomain, service, property);
@@ -139,7 +139,7 @@ public class HostLocationServlet extends HttpServlet {
 			throws Exception {
 
 		String[] split = uri.split("/");
-		if (split.length != 5) {
+		if (split.length != 4) {
 			sendErrorResponse(
 					resp,
 					HttpServletResponse.SC_FORBIDDEN,

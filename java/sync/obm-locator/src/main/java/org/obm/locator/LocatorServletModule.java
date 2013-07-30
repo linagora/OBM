@@ -40,7 +40,7 @@ public class LocatorServletModule extends ServletModule{
 	    protected void configureServlets() {
 	        super.configureServlets();
 
-	        serve("/*").with(HostLocationServlet.class);
+	        serve("/location/*").with(HostLocationServlet.class);
 
 	    }
 }

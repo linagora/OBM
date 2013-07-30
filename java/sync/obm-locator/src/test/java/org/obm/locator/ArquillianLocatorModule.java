@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,71 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliasource.obm.utils;
+package org.obm.locator;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Set;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
+import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.dbcp.DatabaseConfigurationFixtureH2;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
 
-import org.obm.configuration.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.io.Files;
+import com.google.inject.AbstractModule;
+import com.google.inject.util.Modules;
 
-/**
- * Service pour des constantes basé sur le fichier
- * <code>/etc/obm/obm_conf.ini</code>.
- * 
- * 
- */
-public class ConstantService {
-	private static final Logger logger = LoggerFactory.getLogger(ConstantService.class);
+public class ArquillianLocatorModule extends AbstractModule {
 
-	private static ConstantService cs = new ConstantService();
+	private Configuration configuration;
+	private TestTransactionConfiguration transactionConfiguration;
 
-	public static ConstantService getInstance() {
-		return cs;
+	public ArquillianLocatorModule() {
+		configuration = new Configuration();
+		configuration.dataDir = Files.createTempDir();
+		transactionConfiguration = new TestTransactionConfiguration();
 	}
-
-	private Properties props;
-
-	private ConstantService() {
-		props = new Properties();
-		try {
-			props.load(new FileInputStream(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH));
-		} catch (IOException e) {
-			logger.error("Problem while trying to read obm_conf.ini", e);
-		}
+	
+	@Override
+	protected void configure() {
+		install(
+			Modules.override(new LocatorModule())
+				.with(new AbstractModule() {
+					@Override
+					protected void configure() {
+						install(
+							new ConfigurationModule(GlobalAppConfiguration.builder()
+									.mainConfiguration(new StaticConfigurationService(configuration))
+									.databaseConfiguration(new DatabaseConfigurationFixtureH2())
+									.transactionConfiguration(transactionConfiguration)
+									.build()));
+						bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+					}
+				})
+			);
 	}
-
-	public Set<Object> getKeySet() {
-		return props.keySet();
-	}
-
-	public String getStringValue(String prop) {
-		String val = props.getProperty(prop);
-		if (val != null && val.startsWith("\"") && val.endsWith("\"")) {
-			val = val.replace("\"", "");
-		}
-		return val;
-	}
-
-	public Boolean getBooleanValue(String prop) {
-		String val = getStringValue(prop);
-		if (val == null) {
-			logger.warn("No value for property "+prop);
-			return null;
-		}
-		return Boolean.valueOf(val);
-	}
-
-	public Integer getIntValue(String prop) {
-		String val = getStringValue(prop);
-		if (val == null) {
-			logger.warn("No value for property "+prop);
-			return null;
-		}
-		return Integer.parseInt(val);
-	}
-
 }

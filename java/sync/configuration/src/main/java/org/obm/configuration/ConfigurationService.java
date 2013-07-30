@@ -40,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.ConfigurationException;
 
 public interface ConfigurationService {
+	
+	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
 
 	String getLocatorUrl() throws ConfigurationException;
 

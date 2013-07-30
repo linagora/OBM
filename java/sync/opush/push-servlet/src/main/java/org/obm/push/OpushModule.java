@@ -52,7 +52,7 @@ public class OpushModule extends AbstractModule {
 
 	private final static String JAVA_MAIL_MODULE = "javaMail";
 	private static final String APPLICATION_NAME = "opush";
-	private static final String GLOBAL_CONFIGURATION_FILE = "/etc/obm/obm_conf.ini";
+	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
 
 	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
 	private final GlobalAppConfiguration<ConfigurationService> globalConfiguration;
