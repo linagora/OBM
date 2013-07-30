@@ -79,7 +79,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			ldapManager.deleteUser(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
 		} finally {
 			ldapManager.shutdown();
 		}

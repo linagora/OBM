@@ -536,6 +536,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
+	
+	private void expectLdapDeleteGroup(Group group) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.deleteGroup(domain, group);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
 
 	private LdapManager expectLdapBuild() {
 		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
@@ -907,10 +915,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		groupDao.delete(domain, extId);
 		expectLastCall();
+		expectLdapDeleteGroup(groupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

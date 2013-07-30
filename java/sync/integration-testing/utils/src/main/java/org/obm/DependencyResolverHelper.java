@@ -189,11 +189,14 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 import org.obm.provisioning.processing.OperationProcessor;
 import org.obm.provisioning.processing.Processor;
+import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.provisioning.processing.impl.BatchProcessorImpl;
 import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
+import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
@@ -698,7 +701,10 @@ public class DependencyResolverHelper {
 				PatchUserOperationProcessor.class,
 				Module.class,
 				Profile.class,
-				ModuleCheckBoxStates.class
+				ModuleCheckBoxStates.class,
+				DeleteGroupOperationProcessor.class,
+				AbstractOperationProcessor.class,
+				AbstractGroupOperationProcessor.class
 		};
 	}
 

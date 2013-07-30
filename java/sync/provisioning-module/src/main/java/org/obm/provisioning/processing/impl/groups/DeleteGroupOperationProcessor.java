@@ -32,11 +32,13 @@
 package org.obm.provisioning.processing.impl.groups;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.ldap.client.LdapManager;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -51,8 +53,10 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		GroupExtId extId = getGroupExtIdFromRequest(operation);
 		ObmDomain domain = batch.getDomain();
+		Group groupFromDao = getGroupFromDao(extId, domain);
 		
 		deleteGroupInDao(domain, extId);
+		deleteGroupInLdap(domain, groupFromDao);
 	}
 
 	public void deleteGroupInDao(ObmDomain domain,GroupExtId extId) {
@@ -61,6 +65,19 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format("Cannot delete group with extId '%s' in database.", extId.getId()), e);
+		}
+	}
+	
+	public void deleteGroupInLdap(ObmDomain domain, Group group) {
+		LdapManager ldapManager = buildLdapManager(domain);
+		
+		try {
+			ldapManager.deleteGroup(domain, group);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot delete group with extId '%s' in LDAP.", group.getExtId().getId()), e);
+		} finally {
+			ldapManager.shutdown();
 		}
 	}
 }

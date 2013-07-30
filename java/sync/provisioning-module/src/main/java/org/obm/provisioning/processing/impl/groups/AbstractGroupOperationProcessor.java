@@ -31,14 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 
 import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public abstract class AbstractGroupOperationProcessor extends AbstractOperationProcessor {
 
@@ -51,5 +55,14 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 
 	protected GroupExtId getGroupExtIdFromRequest(Operation operation) {
 		return GroupExtId.valueOf(getItemIdFromRequest(operation));
+	}
+
+	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
+		try {
+			return groupDao.get(domain, extId);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot fetch existing group with extId '%s' from database.", extId), e);
+		}
 	}
 }

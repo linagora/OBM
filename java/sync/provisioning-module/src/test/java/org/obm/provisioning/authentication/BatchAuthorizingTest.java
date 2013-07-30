@@ -44,7 +44,6 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
-import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 
 import com.google.common.collect.ImmutableSet;
@@ -55,8 +54,6 @@ import com.google.inject.Inject;
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
-	@Inject
-	private BatchProcessor batchProcessor;
 	@Inject
 	private BatchTracker batchTracker;
 	
