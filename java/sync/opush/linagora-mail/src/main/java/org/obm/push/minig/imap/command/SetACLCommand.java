@@ -26,4 +26,8 @@ public class SetACLCommand extends SimpleCommand<Boolean> {
 		data = response.isOk();
 	}
 
+	@Override
+	public void setDataInitialValue() {
+		data = false;
+	}
 }
