@@ -67,12 +67,12 @@ sub new {
     $self->{'rightDefinition'} = {
         none => 'none',
         read => 'lrs',
-        readAdmin => 'lrsc',
+        readAdmin => 'lrscd',
         writeonly => 'li',
-        writeonlyAdmin => 'lic',
+        writeonlyAdmin => 'licd',
         write => 'lrswid',
-        writeAdmin => 'lrswidc',
-        admin => 'lc',
+        writeAdmin => 'lrswicd',
+        admin => 'lcd',
         post => 'p'
     };
 
@@ -757,6 +757,8 @@ sub _imapSetMailboxAcl {
     if( ($boxRightUser eq 'anyone') && ($boxRight ne 'none') ) {
         $imapRight .= $definedRight->{'post'};
     }
+
+    $self->_log( 'SETACLMAILBOX ' . $boxName . ' ' . $boxRightUser . ' ' . $imapRight, 4 );
 
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
     if( $cyrusSrvConn->error() ) {
