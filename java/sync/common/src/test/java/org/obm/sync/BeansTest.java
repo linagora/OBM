@@ -68,6 +68,8 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
+import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.trust.TrustToken;
@@ -117,7 +119,9 @@ public class BeansTest {
 				ObmHost.class,
 				ObmDomainUuid.class,
 				ObmSystemUser.class,
-				AddressBook.class);
+				AddressBook.class,
+				ModuleCheckBoxStates.class,
+				Profile.class);
 	}
 	
 	@Test
