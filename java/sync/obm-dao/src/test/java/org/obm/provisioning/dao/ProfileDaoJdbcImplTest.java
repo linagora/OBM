@@ -32,6 +32,7 @@ import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
@@ -175,6 +176,78 @@ public class ProfileDaoJdbcImplTest {
 				.build();
 
 		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
+	}
+
+	@Test(expected = UserNotFoundException.class)
+	public void testGetUserProfileWhenUserNotFound() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(666)
+				.login("lucifer")
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		dao.getUserProfile(user);
+	}
+
+	@Test
+	public void testGetUserProfile() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("user1")
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+		Profile profile = Profile
+				.builder()
+				.id(ProfileId.valueOf("2"))
+				.name(ProfileName.valueOf("user"))
+				.domain(ToolBox.getDefaultObmDomain())
+				.level(9)
+				.managePeers(false)
+				.accessRestriction(AccessRestriction.ALLOW_ALL)
+				.accessExceptions("")
+				.adminRealm(AdminRealm.DOMAIN)
+				.defaultMailQuota(0)
+				.maxMailQuota(0)
+				.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CALENDAR)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILBOX)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILSHARE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILSHARE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.RESOURCE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.RESOURCE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.CONTACTS, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CONTACTS)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.build();
+
+		assertThat(dao.getUserProfile(user)).isEqualTo(profile);
 	}
 
 }

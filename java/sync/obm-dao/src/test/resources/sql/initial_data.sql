@@ -65,7 +65,15 @@ INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, p
         (1, 'admin_realm', 'domain'),
         (1, 'default_right', '1,-1,-2,0,0,0,0,0,0,0,0,0,0,0,0'),
         (1, 'mail_quota_max', '0'),
-        (1, 'mail_quota_default', '0');
+        (1, 'mail_quota_default', '0'),
+        (2, 'level', '9'),
+        (2, 'level_managepeers', '0'),
+        (2, 'access_restriction', 'ALLOW_ALL'),
+        (2, 'access_exceptions', ''),
+        (2, 'admin_realm', 'domain'),
+        (2, 'default_right', '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'),
+        (2, 'mail_quota_max', '0'),
+        (2, 'mail_quota_default', '0');
 
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES

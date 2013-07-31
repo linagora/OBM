@@ -63,6 +63,7 @@ import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
 public class ProfileDaoJdbcImpl implements ProfileDao {
@@ -229,6 +230,42 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Profile getUserProfile(ObmUser user) throws DaoException, UserNotFoundException {
+		try {
+			return get(getUserProfileId(user), user.getDomain());
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private ProfileId getUserProfileId(ObmUser user) throws SQLException, UserNotFoundException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement(
+					"SELECT profile_id " +
+					"FROM Profile " +
+					"INNER JOIN UserObm ON userobm_perms = profile_name " +
+					"WHERE userobm_id = ?");
+
+			ps.setInt(1, user.getUid());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return ProfileId.builder().id(rs.getInt("profile_id")).build();
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+
+		throw new UserNotFoundException(user.getLogin());
 	}
 
 	private Profile.Builder fetchProfileProperties(Connection con, ProfileId id, Profile.Builder builder) throws SQLException {
