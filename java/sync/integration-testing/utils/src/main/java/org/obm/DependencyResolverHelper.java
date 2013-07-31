@@ -196,6 +196,7 @@ import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
@@ -704,7 +705,8 @@ public class DependencyResolverHelper {
 				ModuleCheckBoxStates.class,
 				DeleteGroupOperationProcessor.class,
 				AbstractOperationProcessor.class,
-				AbstractGroupOperationProcessor.class
+				AbstractGroupOperationProcessor.class,
+				AddUserToGroupOperationProcessor.class
 		};
 	}
 

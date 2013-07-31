@@ -544,6 +544,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
+	
+	private void expectLdapAddUserToGroup(Group group, ObmUser userToAdd) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.addUserToGroup(domain, group, userToAdd);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
 
 	private LdapManager expectLdapBuild() {
 		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
@@ -925,6 +933,62 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.delete(domain, extId);
 		expectLastCall();
 		expectLdapDeleteGroup(groupFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessAddUserToGroup()
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1/users/extIdUser1")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.param(Request.USERS_ID_KEY, "extIdUser1")
+						.verb(HttpVerb.PUT)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
+		final ObmUser userFromDao = ObmUser.builder()
+										.extId(UserExtId.valueOf("extIdUser1"))
+										.domain(domain)
+										.login("log")
+										.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain)).andReturn(userFromDao);
+		groupDao.addUser(domain, extId, userFromDao);
+		expectLastCall();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expectLdapAddUserToGroup(groupFromDao, userFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

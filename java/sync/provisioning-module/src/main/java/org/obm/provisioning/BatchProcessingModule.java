@@ -34,6 +34,7 @@ import org.obm.provisioning.processing.BatchTracker;
 import org.obm.provisioning.processing.OperationProcessor;
 import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
+import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
@@ -61,6 +62,7 @@ public class BatchProcessingModule extends AbstractModule {
 		multibinder.addBinding().to(ModifyUserOperationProcessor.class);
 		multibinder.addBinding().to(PatchUserOperationProcessor.class);
 		multibinder.addBinding().to(DeleteGroupOperationProcessor.class);
+		multibinder.addBinding().to(AddUserToGroupOperationProcessor.class);
 	}
 
 }
