@@ -34,16 +34,14 @@ import java.util.Comparator;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.After;
 import org.junit.Before;
 import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
 import org.obm.sync.calendar.Event;
@@ -61,9 +59,6 @@ public abstract class ObmSyncIntegrationTest {
 
 	public static final String ARCHIVE = "ObmSyncIntegrationTestArchive";
 	
-	@ArquillianResource 
-	protected Deployer deployer;
-	
 	protected ObmSyncConfiguration configuration;
 	protected LoginClient loginClient;
 	protected CalendarClient calendarClient;
@@ -79,12 +74,6 @@ public abstract class ObmSyncIntegrationTest {
 		configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
 		exceptionFactory = new SyncClientException();
 		httpClient = new DefaultHttpClient();
-		deployer.deploy(ARCHIVE);
-	}
-	
-	@After
-	public void tearDown() {
-		deployer.undeploy(ARCHIVE);
 	}
 
 	protected void configureTest(URL baseUrl) {
@@ -187,8 +176,9 @@ public abstract class ObmSyncIntegrationTest {
 		};
 	}
 
-	@Deployment(managed=false, name=ARCHIVE)
-	public static WebArchive deployArchive() {
+	@DeployForEachTests
+	@Deployment(managed=false, name=ARCHIVE) 
+	public static WebArchive createDeployment() {
 		return ObmSyncArchiveUtils
 				.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)
 				.addAsResource("sql/org/obm/sync/calendar/h2.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT)
