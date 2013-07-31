@@ -65,7 +65,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException {
+	public Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -100,7 +100,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public ProfileName getProfile(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException {
+	public ProfileName getProfileName(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -131,7 +131,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	}
 
 	@Override
-	public ProfileName getProfileForUser(String login, ObmDomainUuid domainId)
+	public ProfileName getUserProfileName(String login, ObmDomainUuid domainId)
 			throws DaoException, UserNotFoundException {
 		Connection conn = null;
 		PreparedStatement ps = null;

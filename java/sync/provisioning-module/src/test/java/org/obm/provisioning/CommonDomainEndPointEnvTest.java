@@ -263,12 +263,12 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 	
 	protected void expectProfiles() throws DaoException {
-		expect(profileDao.getProfiles(domain.getUuid())).andReturn(
+		expect(profileDao.getProfileEntries(domain.getUuid())).andReturn(
 				ImmutableSet.of(profileEntry, profileEntry));
 	}
 	
 	protected void expectProfile() throws DaoException, ProfileNotFoundException {
-		expect(profileDao.getProfile(domain.getUuid(),
+		expect(profileDao.getProfileName(domain.getUuid(),
 				ProfileId.builder().id(profileEntry.getId()).build())).andReturn(profileName);
 	}
 
@@ -297,7 +297,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 	
 	protected void expectAuthorizingReturns(String login, Collection<String> permissions) throws Exception {
-		expect(profileDao.getProfileForUser(login, domain.getUuid())).andReturn(adminProfile);
+		expect(profileDao.getUserProfileName(login, domain.getUuid())).andReturn(adminProfile);
 		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
 		expect(roleDao.getPermissionsForProfile(adminProfile, domain)).andReturn(permissions);
 	}

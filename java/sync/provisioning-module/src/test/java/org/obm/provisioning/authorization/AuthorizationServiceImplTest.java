@@ -99,7 +99,7 @@ public class AuthorizationServiceImplTest {
 		DaoException daoEx = new DaoException();
 		
 		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
-		expect(profileDao.getProfileForUser("user1", dummyUuid)).andThrow(daoEx).once();
+		expect(profileDao.getUserProfileName("user1", dummyUuid)).andThrow(daoEx).once();
 		mocksControl.replay();
 		
 		try {
@@ -119,7 +119,7 @@ public class AuthorizationServiceImplTest {
 		DaoException daoEx = new DaoException();
 		
 		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
-		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile).once();
+		expect(profileDao.getUserProfileName("user1", dummyUuid)).andReturn(adminProfile).once();
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andThrow(daoEx).once();
 		mocksControl.replay();
 		
@@ -140,7 +140,7 @@ public class AuthorizationServiceImplTest {
 		UserNotFoundException userEx = new UserNotFoundException("user1", dummyUuid);
 		
 		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
-		expect(profileDao.getProfileForUser("user1", dummyUuid)).andThrow(userEx).once();
+		expect(profileDao.getUserProfileName("user1", dummyUuid)).andThrow(userEx).once();
 		mocksControl.replay();
 		
 		try {
@@ -160,7 +160,7 @@ public class AuthorizationServiceImplTest {
 		PermissionsNotFoundException permEx = new PermissionsNotFoundException(adminProfile, dummyDomain);
 		
 		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
-		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile).once();
+		expect(profileDao.getUserProfileName("user1", dummyUuid)).andReturn(adminProfile).once();
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andThrow(permEx).once();
 		mocksControl.replay();
 		
@@ -178,7 +178,7 @@ public class AuthorizationServiceImplTest {
 	@Test
 	public void testGetPermissions() throws Exception	{
 		expect(domainDao.findDomainByName(dummyDomain.getName())).andReturn(dummyDomain).atLeastOnce();
-		expect(profileDao.getProfileForUser("user1", dummyUuid)).andReturn(adminProfile);
+		expect(profileDao.getUserProfileName("user1", dummyUuid)).andReturn(adminProfile);
 		expect(permissionsDao.getPermissionsForProfile(adminProfile, dummyDomain)).andReturn(adminRoles);
 		mocksControl.replay();
 		Collection<String> roles = authService.getPermissions("user1", dummyDomain.getName());

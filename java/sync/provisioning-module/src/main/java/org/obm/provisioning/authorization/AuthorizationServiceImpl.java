@@ -65,7 +65,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 		ObmDomain domain = null;
 		try {
 			domain = domainDao.findDomainByName(domainName);
-			ProfileName profile = profileDao.getProfileForUser(login, domain.getUuid());
+			ProfileName profile = profileDao.getUserProfileName(login, domain.getUuid());
 			return permissionDao.getPermissionsForProfile(profile, domain);
 		} catch (DaoException e) {
 			throw new AuthorizationException(login, domain, true, e);

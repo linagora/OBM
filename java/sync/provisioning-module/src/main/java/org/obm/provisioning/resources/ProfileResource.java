@@ -46,7 +46,7 @@ public class ProfileResource {
 	public Set<ProfileEntry> getProfileEntries() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 
-		return profileDao.getProfiles(domain.getUuid());
+		return profileDao.getProfileEntries(domain.getUuid());
 	}
 
 	@GET
@@ -57,7 +57,7 @@ public class ProfileResource {
 		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
 
 		try {
-			return profileDao.getProfile(domain.getUuid(), profileId);
+			return profileDao.getProfileName(domain.getUuid(), profileId);
 		}
 		catch (ProfileNotFoundException e) {
 			logger.error(String.format("Profile %s not found.", profileId), e);

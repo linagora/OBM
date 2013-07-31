@@ -65,7 +65,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfilesWithEmptyList() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfiles(domain.getUuid())).andReturn(Collections.<ProfileEntry> emptySet());
+		expect(dao.getProfileEntries(domain.getUuid())).andReturn(Collections.<ProfileEntry> emptySet());
 		mocksControl.replay();
 
 		given()
@@ -83,7 +83,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfiles() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfiles(domain.getUuid())).andReturn(ImmutableSet.of(ProfileEntry
+		expect(dao.getProfileEntries(domain.getUuid())).andReturn(ImmutableSet.of(ProfileEntry
 				.builder()
 				.domainUuid(domain.getUuid())
 				.id(1)
@@ -111,7 +111,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfilesOnError() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfiles(domain.getUuid())).andThrow(new DaoException());
+		expect(dao.getProfileEntries(domain.getUuid())).andThrow(new DaoException());
 		mocksControl.replay();
 
 		given()
@@ -144,7 +144,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfile() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfile(domain.getUuid(), ProfileId.valueOf("123"))).andReturn(ProfileName.valueOf("profile1"));
+		expect(dao.getProfileName(domain.getUuid(), ProfileId.valueOf("123"))).andReturn(ProfileName.valueOf("profile1"));
 		mocksControl.replay();
 
 		given()
@@ -162,7 +162,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfileOnNonExistentProfile() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfile(domain.getUuid(), ProfileId.valueOf("123"))).andThrow(new ProfileNotFoundException());
+		expect(dao.getProfileName(domain.getUuid(), ProfileId.valueOf("123"))).andThrow(new ProfileNotFoundException());
 		mocksControl.replay();
 
 		given()
@@ -195,7 +195,7 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	public void testGetProfileOnError() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(dao.getProfile(domain.getUuid(), ProfileId.valueOf("123"))).andThrow(new DaoException());
+		expect(dao.getProfileName(domain.getUuid(), ProfileId.valueOf("123"))).andThrow(new DaoException());
 		mocksControl.replay();
 
 		given()

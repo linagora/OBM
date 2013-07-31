@@ -53,17 +53,17 @@ public class ProfileDaoJdbcImplTest {
 	private final ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 
 	@Test
-	public void testGetProfilesOnNonExistentDomains() throws Exception {
+	public void testGetProfileNamesOnNonExistentDomains() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("892ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
-		Set<ProfileEntry> domainProfiles = dao.getProfiles(uuid);
+		Set<ProfileEntry> domainProfiles = dao.getProfileEntries(uuid);
 
 		assertThat(domainProfiles).containsOnly(ProfileEntry.builder().domainUuid(uuid).id(4l).build());
 	}
 
 	@Test
-	public void testGetProfilesOnExistingDomains() throws Exception {
-		Set<ProfileEntry> firstDomainProfiles = dao.getProfiles(uuid1);
-		Set<ProfileEntry> secondDomainProfiles = dao.getProfiles(uuid2);
+	public void testGetProfileNamesOnExistingDomains() throws Exception {
+		Set<ProfileEntry> firstDomainProfiles = dao.getProfileEntries(uuid1);
+		Set<ProfileEntry> secondDomainProfiles = dao.getProfileEntries(uuid2);
 
 		assertThat(firstDomainProfiles).containsOnly(
 				ProfileEntry.builder().domainUuid(uuid1).id(1l).build(),
@@ -75,10 +75,10 @@ public class ProfileDaoJdbcImplTest {
 	}
 
 	@Test
-	public void testGetProfileNameByID() throws Exception {
-		ProfileName profileName1 = dao.getProfile(uuid1, ProfileId.builder().id(1).build());
-		ProfileName profileName2 = dao.getProfile(uuid1, ProfileId.builder().id(2).build());
-		ProfileName profileName3 = dao.getProfile(uuid2, ProfileId.builder().id(3).build());
+	public void testGetProfileNameNameByID() throws Exception {
+		ProfileName profileName1 = dao.getProfileName(uuid1, ProfileId.builder().id(1).build());
+		ProfileName profileName2 = dao.getProfileName(uuid1, ProfileId.builder().id(2).build());
+		ProfileName profileName3 = dao.getProfileName(uuid2, ProfileId.builder().id(3).build());
 		
 		assertThat(profileName1).isEqualTo(ProfileName.builder().name("admin").build());
 		assertThat(profileName2).isEqualTo(ProfileName.builder().name("user").build());
@@ -86,26 +86,27 @@ public class ProfileDaoJdbcImplTest {
 	}
 
 	@Test(expected = ProfileNotFoundException.class)
-	public void testGetProfileNameOnNonExistentID() throws Exception {
-		dao.getProfile(uuid1, ProfileId.builder().id(64).build());
+	public void testGetProfileNameNameOnNonExistentID() throws Exception {
+		dao.getProfileName(uuid1, ProfileId.builder().id(64).build());
 	}
 
 	@Test(expected = ProfileNotFoundException.class)
-	public void testGetProfileNameOnNonExistentDomain() throws Exception {
-		dao.getProfile(ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6"), ProfileId.builder().id(1).build());
+	public void testGetProfileNameNameOnNonExistentDomain() throws Exception {
+		dao.getProfileName(ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6"), ProfileId.builder().id(1).build());
 	}
 	
 	@Test
-	public void testGetProfileForUser() throws Exception {
-		ProfileName userProfile = dao.getProfileForUser("user2", uuid1);
-		ProfileName adminProfile = dao.getProfileForUser("user2", uuid2);
+	public void testGetProfileNameForUser() throws Exception {
+		ProfileName userProfile = dao.getUserProfileName("user2", uuid1);
+		ProfileName adminProfile = dao.getUserProfileName("user2", uuid2);
 		
 		assertThat(userProfile).isEqualTo(ProfileName.builder().name("user").build());
 		assertThat(adminProfile).isEqualTo(ProfileName.builder().name("admin").build());
 	}
 	
 	@Test(expected = UserNotFoundException.class)
-	public void testGetProfileForNonExistentUser() throws Exception {
-		dao.getProfileForUser("non-existent-user", uuid1);
+	public void testGetProfileNameForNonExistentUser() throws Exception {
+		dao.getUserProfileName("non-existent-user", uuid1);
 	}
+
 }

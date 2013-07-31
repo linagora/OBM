@@ -45,10 +45,10 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ProfileDao {
 
-	ProfileName getProfile(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	ProfileName getProfileName(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
 	
-	ProfileName getProfileForUser(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
+	ProfileName getUserProfileName(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
 
-	Set<ProfileEntry> getProfiles(ObmDomainUuid domainUuid) throws DaoException;
+	Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException;
 
 }
