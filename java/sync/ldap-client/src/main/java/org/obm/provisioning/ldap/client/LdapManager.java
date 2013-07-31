@@ -58,6 +58,8 @@ public interface LdapManager {
 
 	void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup);
 	
+	void removeSubgroupFromGroup(ObmDomain domain, Group group, Group subgroup);
+	
 	void shutdown() throws ConnectionException;
 
 }

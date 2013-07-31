@@ -199,6 +199,7 @@ import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcess
 import org.obm.provisioning.processing.impl.groups.AddSubgroupToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
@@ -710,7 +711,8 @@ public class DependencyResolverHelper {
 				AbstractGroupOperationProcessor.class,
 				AddUserToGroupOperationProcessor.class,
 				DeleteUserFromGroupOperationProcessor.class,
-				AddSubgroupToGroupOperationProcessor.class
+				AddSubgroupToGroupOperationProcessor.class,
+				DeleteSubgroupFromGroupOperationProcessor.class
 		};
 	}
 

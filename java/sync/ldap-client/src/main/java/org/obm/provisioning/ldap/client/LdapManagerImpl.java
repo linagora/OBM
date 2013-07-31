@@ -140,6 +140,14 @@ public class LdapManagerImpl implements LdapManager {
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}
+	
+	@Override
+	public void removeSubgroupFromGroup(ObmDomain domain, Group group, Group subgroup) {
+		conn.removeGroupFromGroup(
+				Cn.valueOf(subgroup.getName()),
+				Cn.valueOf(group.getName()),
+				LdapDomain.valueOf(domain.getName()));
+	}
 
 	@Override
 	public void shutdown() throws ConnectionException {

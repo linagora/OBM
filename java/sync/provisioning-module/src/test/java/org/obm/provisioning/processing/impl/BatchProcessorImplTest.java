@@ -569,6 +569,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
+	
+	private void expectLdapRemoveGroupFromGroup(Group group, Group subgroup) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.removeSubgroupFromGroup(domain, group, subgroup);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
 
 	private LdapManager expectLdapBuild() {
 		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
@@ -1118,6 +1126,62 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		expect(groupDao.get(domain, subgroupExtId)).andReturn(subgroupFromDao);
 		expectLdapAddGroupToGroup(groupFromDao, subgroupFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessRemoveGroupFromGroup()
+			throws DaoException, BatchNotFoundException, GroupNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP_MEMBERSHIP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1/subgroups/extIdGroup2")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.param(Request.SUBGROUPS_ID_KEY, "extIdGroup2")
+						.verb(HttpVerb.DELETE)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
+		final GroupExtId subgroupExtId = GroupExtId.valueOf("extIdGroup2");
+		final Group subgroupFromDao = Group.builder()
+				.name("group2")
+				.extId(subgroupExtId)
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		groupDao.removeSubgroup(domain, extId, subgroupExtId);
+		expectLastCall();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(groupDao.get(domain, subgroupExtId)).andReturn(subgroupFromDao);
+		expectLdapRemoveGroupFromGroup(groupFromDao, subgroupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
