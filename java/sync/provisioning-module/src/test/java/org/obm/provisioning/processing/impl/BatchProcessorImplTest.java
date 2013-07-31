@@ -65,6 +65,7 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
+import org.obm.provisioning.dao.exceptions.GroupRecursionException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -556,6 +557,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private void expectLdapDeleteUserFromGroup(Group group, ObmUser userToAdd) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.removeUserFromGroup(domain, group, userToAdd);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+	
+	private void expectLdapAddGroupToGroup(Group group, Group subgroup) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.addSubgroupToGroup(domain, group, subgroup);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -1053,6 +1062,62 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		expectLdapDeleteUserFromGroup(groupFromDao, userFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessAddGroupToGroup()
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, GroupRecursionException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP_MEMBERSHIP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1/subgroups/extIdGroup2")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.param(Request.SUBGROUPS_ID_KEY, "extIdGroup2")
+						.verb(HttpVerb.PUT)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
+		final GroupExtId subgroupExtId = GroupExtId.valueOf("extIdGroup2");
+		final Group subgroupFromDao = Group.builder()
+				.name("group2")
+				.extId(subgroupExtId)
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		groupDao.addSubgroup(domain, extId, subgroupExtId);
+		expectLastCall();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(groupDao.get(domain, subgroupExtId)).andReturn(subgroupFromDao);
+		expectLdapAddGroupToGroup(groupFromDao, subgroupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

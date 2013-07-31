@@ -92,6 +92,7 @@ public class LdapManagerImpl implements LdapManager {
 		conn.createUser(ldapUser);
 	}
 
+	@Override
 	public void deleteUser(ObmUser obmUser) {
 		LdapUser ldapUser = userBuilderProvider.get().fromObmUser(obmUser)
 				.build();
@@ -128,6 +129,14 @@ public class LdapManagerImpl implements LdapManager {
 	public void removeUserFromGroup(ObmDomain domain, Group group, ObmUser user) {
 		conn.removeUserFromGroup(
 				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				Cn.valueOf(group.getName()),
+				LdapDomain.valueOf(domain.getName()));
+	}
+	
+	@Override
+	public void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup) {
+		conn.addGroupToGroup(
+				Cn.valueOf(subgroup.getName()),
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}

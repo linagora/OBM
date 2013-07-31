@@ -31,47 +31,59 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
-
-import com.google.inject.Inject;
+import org.obm.provisioning.ldap.client.LdapManager;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public abstract class AbstractGroupOperationProcessor extends AbstractOperationProcessor {
+public class AddSubgroupToGroupOperationProcessor extends AbstractGroupOperationProcessor {
 
-	@Inject
-	protected GroupDao groupDao;
-	
-	protected AbstractGroupOperationProcessor(HttpVerb verb) {
-		super(BatchEntityType.GROUP, verb);
-	}
-	
-	protected AbstractGroupOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
-		super(entityType, verb);
+	protected AddSubgroupToGroupOperationProcessor() {
+		super(BatchEntityType.GROUP_MEMBERSHIP, HttpVerb.PUT);
 	}
 
-	protected GroupExtId getGroupExtIdFromRequest(Operation operation) {
-		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.GROUPS_ID_KEY));
+	@Override
+	@Transactional
+	public void process(Operation operation, Batch batch) throws ProcessingException {
+		GroupExtId groupExtId = getGroupExtIdFromRequest(operation);
+		ObmDomain domain = batch.getDomain();
+		GroupExtId subgroupExtId = getSubgroupExtIdFromRequest(operation);
+		
+		addSubgroupToGroupInDao(domain, groupExtId, subgroupExtId);
+		addSubgroupToGroupInLdap(domain, groupExtId, subgroupExtId);
 	}
-	
-	protected GroupExtId getSubgroupExtIdFromRequest(Operation operation) {
-		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.SUBGROUPS_ID_KEY));
-	}
-	
-	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
+
+	private void addSubgroupToGroupInDao(ObmDomain domain, GroupExtId groupExtId, GroupExtId subgroupExtId) {
 		try {
-			return groupDao.get(domain, extId);
+			groupDao.addSubgroup(domain, groupExtId, subgroupExtId);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot fetch existing group with extId '%s' from database.", extId), e);
+					String.format("Cannot add group with extId '%s' to group with extId '%s' in database.",
+							subgroupExtId.getId(), groupExtId.getId()), e);
 		}
 	}
+	
+	private void addSubgroupToGroupInLdap(ObmDomain domain, GroupExtId groupExtId, GroupExtId subgroupExtId) {
+		LdapManager ldapManager = buildLdapManager(domain);
+		Group group = getGroupFromDao(groupExtId, domain);
+		Group subgroup = getGroupFromDao(subgroupExtId, domain);
+		
+		try {
+			ldapManager.addSubgroupToGroup(domain, group, subgroup);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot add group with extId '%s' to group with extId '%s' in ldap.",
+							subgroupExtId.getId(), groupExtId.getId()), e);
+		} finally {
+			ldapManager.shutdown();
+		}
+	}
+
 }

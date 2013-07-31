@@ -55,6 +55,8 @@ public interface LdapManager {
 	void addUserToGroup(ObmDomain domain, Group group, ObmUser userToAdd);
 
 	void removeUserFromGroup(ObmDomain domain, Group group, ObmUser userToRemove);
+
+	void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup);
 	
 	void shutdown() throws ConnectionException;
 

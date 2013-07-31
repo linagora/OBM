@@ -196,6 +196,7 @@ import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.AddSubgroupToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
@@ -708,7 +709,8 @@ public class DependencyResolverHelper {
 				AbstractOperationProcessor.class,
 				AbstractGroupOperationProcessor.class,
 				AddUserToGroupOperationProcessor.class,
-				DeleteUserFromGroupOperationProcessor.class
+				DeleteUserFromGroupOperationProcessor.class,
+				AddSubgroupToGroupOperationProcessor.class
 		};
 	}
 

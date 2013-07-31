@@ -39,6 +39,7 @@ public class Request {
 	
 	public final static String USERS_ID_KEY = "userId";
 	public final static String GROUPS_ID_KEY = "groupId";
+	public final static String SUBGROUPS_ID_KEY = "subgroupId";
 	public final static String BATCHS_ID_KEY = "batchId";
 	public final static String EXPUNGE_KEY = "expunge";
 	

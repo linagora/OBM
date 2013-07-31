@@ -109,7 +109,7 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@PUT
-	@Path("/{groupId}/subgroups/{groupId}")
+	@Path("/{groupId}/subgroups/{subgroupId}")
 	@Consumes(JSON_WITH_UTF8)
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
@@ -119,7 +119,7 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	}
 
 	@DELETE
-	@Path("/{groupId}/subgroups/{groupId}")
+	@Path("/{groupId}/subgroups/{subgroupId}")
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response deleteSubgroupFromGroup() throws DaoException {
