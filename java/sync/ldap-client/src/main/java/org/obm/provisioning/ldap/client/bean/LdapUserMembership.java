@@ -40,6 +40,8 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.ObmUser;
+
 public class LdapUserMembership {
 
 	public static class Builder {
@@ -52,6 +54,14 @@ public class LdapUserMembership {
 		@Inject
 		private Builder(Configuration configuration) {
 			this.configuration = configuration;
+		}
+		
+		public Builder fromObmUser(ObmUser obmUser) {
+			this.memberUid = obmUser.getLogin();
+			this.mailBox = obmUser.getLoginAtDomain();
+			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName()); 
+
+			return this;
 		}
 		
 		public Builder memberUid(String memberUid) {

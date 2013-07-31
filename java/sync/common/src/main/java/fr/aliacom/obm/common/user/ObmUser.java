@@ -593,6 +593,10 @@ public class ObmUser {
 	public String getEmailAtDomain() {
 		return appendDomainToEmailIfRequired(email);
 	}
+	
+	public String getLoginAtDomain() {
+		return login + "@" + domain.getName();
+	}
 
 	private String appendDomainToEmailIfRequired(String emailAddress) {
 		return appendDomainToEmailIfRequired(emailAddress, domain.getName());

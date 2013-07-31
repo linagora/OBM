@@ -37,6 +37,7 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup.Cn;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,32 +53,36 @@ public class LdapManagerImpl implements LdapManager {
 
 	private Connection conn;
 	private Provider<LdapUser.Builder> userBuilderProvider;
+	private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Singleton
 	public static class Factory implements LdapManager.Factory {
 		private Provider<LdapUser.Builder> userBuilderProvider;
+		private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
 		private Connection.Factory connectionFactory;
 
 		@Inject
-		public Factory(Provider<LdapUser.Builder> userBuilderProvider,
+		public Factory(Provider<LdapUser.Builder> userBuilderProvider,  Provider<LdapUserMembership.Builder> userMembershipBuilderProvider,
 				Connection.Factory connectionFactory) {
 			this.userBuilderProvider = userBuilderProvider;
+			this.userMembershipBuilderProvider = userMembershipBuilderProvider;
 			this.connectionFactory = connectionFactory;
 		}
 
 		@Override
 		public LdapManager create(LdapConnectionConfig connectionConfig) {
-			return new LdapManagerImpl(connectionFactory.create(connectionConfig), userBuilderProvider);
+			return new LdapManagerImpl(connectionFactory.create(connectionConfig), userBuilderProvider, userMembershipBuilderProvider);
 		}
 
 	}
 
-	public LdapManagerImpl(Connection conn,
-			Provider<LdapUser.Builder> userBuilderProvider) {
+	public LdapManagerImpl(Connection conn, Provider<LdapUser.Builder> userBuilderProvider,
+			Provider<LdapUserMembership.Builder> userMembershipBuilderProvider) {
 		this.conn = conn;
 		this.userBuilderProvider = userBuilderProvider;
+		this.userMembershipBuilderProvider = userMembershipBuilderProvider;
 	}
 
 	@Override
@@ -109,6 +114,14 @@ public class LdapManagerImpl implements LdapManager {
 	@Override
 	public void deleteGroup(ObmDomain domain, Group group) {
 		conn.deleteGroup(Cn.valueOf(group.getName()), LdapDomain.valueOf(domain.getName()));
+	}
+	
+	@Override
+	public void addUserToGroup(ObmDomain domain, Group group, ObmUser user) {
+		conn.addUserToGroup(
+				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				Cn.valueOf(group.getName()),
+				LdapDomain.valueOf(domain.getName()));
 	}
 
 	@Override
