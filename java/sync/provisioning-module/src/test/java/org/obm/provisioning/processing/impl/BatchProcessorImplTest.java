@@ -41,7 +41,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
@@ -965,7 +964,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.builder()
 				.id(operationId(1))
 				.status(BatchStatus.IDLE)
-				.entityType(BatchEntityType.GROUP)
+				.entityType(BatchEntityType.USER_MEMBERSHIP)
 				.request(Request
 						.builder()
 						.resourcePath("/groups/extIdGroup1/users/extIdUser1")
@@ -1014,7 +1013,6 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 	}
 	
-	@Ignore("Conflict with DeleteGroupOperationProcessor")
 	@Test
 	public void testProcessDeleteUserFromGroup()
 			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException {
@@ -1022,7 +1020,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.builder()
 				.id(operationId(1))
 				.status(BatchStatus.IDLE)
-				.entityType(BatchEntityType.GROUP)
+				.entityType(BatchEntityType.USER_MEMBERSHIP)
 				.request(Request
 						.builder()
 						.resourcePath("/groups/extIdGroup1/users/extIdUser1")

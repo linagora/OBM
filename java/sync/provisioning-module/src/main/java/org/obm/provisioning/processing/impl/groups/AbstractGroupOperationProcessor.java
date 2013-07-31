@@ -53,6 +53,10 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 	protected AbstractGroupOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.GROUP, verb);
 	}
+	
+	protected AbstractGroupOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
+		super(entityType, verb);
+	}
 
 	protected GroupExtId getGroupExtIdFromRequest(Operation operation) {
 		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.GROUPS_ID_KEY));

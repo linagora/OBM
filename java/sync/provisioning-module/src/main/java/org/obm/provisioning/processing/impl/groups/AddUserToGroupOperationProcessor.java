@@ -35,6 +35,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
@@ -47,7 +48,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProcessor {
 	
 	protected AddUserToGroupOperationProcessor() {
-		super(HttpVerb.PUT);
+		super(BatchEntityType.USER_MEMBERSHIP, HttpVerb.PUT);
 	}
 
 	@Override

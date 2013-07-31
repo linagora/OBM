@@ -96,7 +96,7 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response addUsertoGroup() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
-		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP);
+		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.USER_MEMBERSHIP);
 	}
 
 	@DELETE
@@ -105,7 +105,7 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response deleteUserFromGroup() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
-		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP);
+		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER_MEMBERSHIP);
 	}
 
 	@PUT
@@ -115,7 +115,7 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response addSubgrouptoGroup() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
-		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP);
+		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP_MEMBERSHIP);
 	}
 
 	@DELETE
@@ -124,6 +124,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response deleteSubgroupFromGroup() throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
-		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP);
+		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP_MEMBERSHIP);
 	}
 }

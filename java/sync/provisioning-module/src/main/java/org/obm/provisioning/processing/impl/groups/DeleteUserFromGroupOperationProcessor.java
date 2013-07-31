@@ -35,6 +35,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
@@ -46,7 +47,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 public class DeleteUserFromGroupOperationProcessor extends AbstractGroupOperationProcessor {
 
 	protected DeleteUserFromGroupOperationProcessor() {
-		super(HttpVerb.DELETE);
+		super(BatchEntityType.USER_MEMBERSHIP, HttpVerb.DELETE);
 	}
 
 	@Override

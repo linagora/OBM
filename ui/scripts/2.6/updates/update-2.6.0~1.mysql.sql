@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `batch_operation`
   `resource_path` text NOT NULL,
   `body` text,
   `verb` ENUM('PUT', 'PATCH', 'GET', 'POST', 'DELETE') NOT NULL,
-  `entity_type` ENUM('GROUP', 'USER') NOT NULL,
+  `entity_type` ENUM('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP') NOT NULL,
   `batch` int(8) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `batch_operation_batch_fkey` FOREIGN KEY (`batch`)

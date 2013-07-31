@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TYPE batch_status AS ENUM ('IDLE', 'RUNNING', 'ERROR', 'SUCCESS');
-CREATE TYPE batch_entity_type AS ENUM ('GROUP', 'USER');
+CREATE TYPE batch_entity_type AS ENUM ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP');
 CREATE TYPE http_verb AS ENUM ('PUT', 'PATCH', 'GET', 'POST', 'DELETE');
 
 CREATE TABLE batch
