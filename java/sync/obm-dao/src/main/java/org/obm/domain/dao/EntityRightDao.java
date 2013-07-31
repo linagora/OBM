@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,8 +27,23 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.domain.dao;
 
-public enum Right {
-	ACCESS, READ, WRITE, ADMIN
+import java.util.Set;
+
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.sync.Right;
+
+public interface EntityRightDao {
+
+	Set<Right> getRights(Integer entityId, Integer consumerId) throws DaoException;
+
+	Set<Right> getPublicRights(Integer entityId) throws DaoException;
+
+	void grantRights(Integer entityId, Integer consumerId, Set<Right> rights) throws DaoException;
+
+	void deleteRights(Integer entityId, Integer consumerId) throws DaoException;
+
+	void deletePublicRights(Integer entityId) throws DaoException;
+
 }
