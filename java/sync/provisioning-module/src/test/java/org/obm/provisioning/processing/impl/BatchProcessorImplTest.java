@@ -628,7 +628,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.request(Request
 						.builder()
 						.resourcePath("/users/extIdUser1")
-						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.param(Request.USERS_ID_KEY, "extIdUser1")
 						.verb(HttpVerb.DELETE)
 						.build());
 		Batch.Builder batchBuilder = Batch
@@ -680,7 +680,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.request(Request
 						.builder()
 						.resourcePath("/users/extIdUser1")
-						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.param(Request.USERS_ID_KEY, "extIdUser1")
 						.param(Request.EXPUNGE_KEY, "true")
 						.verb(HttpVerb.DELETE)
 						.build());
@@ -812,7 +812,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.request(org.obm.provisioning.beans.Request
 						.builder()
 						.resourcePath("/users/extIdUser1")
-						.param(Request.ITEM_ID_KEY, "extIdUser1")
+						.param(Request.USERS_ID_KEY, "extIdUser1")
 						.verb(HttpVerb.PATCH)
 						.body(	"{" +
 										"\"lastname\": \"user1\"" +
@@ -903,7 +903,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.request(Request
 						.builder()
 						.resourcePath("/groups/extIdGroup1")
-						.param(Request.ITEM_ID_KEY, "extIdGroup1")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
 						.verb(HttpVerb.DELETE)
 						.build());
 		Batch.Builder batchBuilder = Batch

@@ -30,6 +30,7 @@
 package org.obm.provisioning.processing.impl;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -45,25 +46,33 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationProcessor {
 
 	@Inject
 	protected LdapService ldapService;
+	@Inject
+	protected UserDao userDao;
 
 	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
 		super(entityType, verb);
 	}
 
-	protected String getItemIdFromRequest(Operation operation) {
+	protected String getItemIdFromRequest(Operation operation, String paramsKey) {
 		final Request request = operation.getRequest();
-		final String itemId = request.getParams().get(Request.ITEM_ID_KEY);
+		final String itemId = request.getParams().get(paramsKey);
 
 		if (Strings.isNullOrEmpty(itemId)) {
 			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getResourcePath()));
 		}
 		
 		return itemId;
+	}
+	
+	protected UserExtId getUserExtIdFromRequest(Operation operation) {
+		return UserExtId.valueOf(getItemIdFromRequest(operation, Request.USERS_ID_KEY));
 	}
 
 	protected LdapManager buildLdapManager(ObmDomain domain) {
@@ -82,5 +91,13 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 
 		return ldapService.buildManager(connectionConfig);
 	}
-
+	
+	protected ObmUser getUserFromDao(UserExtId extId, ObmDomain domain) {
+		try {
+			return userDao.getByExtId(extId, domain);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot fetch existing user %s from database.", extId), e);
+		}
+	}
 }

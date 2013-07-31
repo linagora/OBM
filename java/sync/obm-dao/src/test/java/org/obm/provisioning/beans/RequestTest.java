@@ -31,7 +31,6 @@ package org.obm.provisioning.beans;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -54,26 +53,6 @@ public class RequestTest {
 		Request request = Request.builder().verb(HttpVerb.GET).resourcePath("/url").build();
 		
 		assertThat(request.getVerb()).isEqualTo(HttpVerb.GET);
-		assertThat(request.getParams()).isEmpty();
-	}
-	
-	@Test
-	public void testBuildWithItemId() {
-		Request request = Request.builder().verb(HttpVerb.GET).itemId("1").resourcePath("/url/1").build();
-		
-		assertThat(request.getParams()).contains(MapEntry.entry("itemId", "1"));
-	}
-	
-	@Test
-	public void testBuildWithItemIdAndPostVerb() {
-		Request request = Request.builder().verb(HttpVerb.POST).itemId("1").resourcePath("/url/1").build();
-		
-		assertThat(request.getParams()).isEmpty();
-	}
-	
-	@Test public void testBuildWithEmptyItemId() {
-		Request request = Request.builder().verb(HttpVerb.GET).itemId("").resourcePath("/url/1").build();
-		
 		assertThat(request.getParams()).isEmpty();
 	}
 }

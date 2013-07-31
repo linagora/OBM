@@ -61,7 +61,8 @@ public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST,
+						ImmutableMap.<String, String>of("domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1"))))
 				.andReturn(batch);
 		
 		mocksControl.replay();
@@ -83,7 +84,8 @@ public class UserResourceCreateUserTest extends CommonDomainEndPointEnvTest {
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.addOperation(batch.getId(),
-				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST, ImmutableMap.<String, String>of())))
+				operation(BatchEntityType.USER, "/batches/1/users", obmUserToJsonString(), HttpVerb.POST,
+						ImmutableMap.<String, String>of("domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1"))))
 				.andThrow(new DaoException());
 		
 		mocksControl.replay();

@@ -36,6 +36,7 @@ import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
@@ -54,9 +55,9 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 	}
 
 	protected GroupExtId getGroupExtIdFromRequest(Operation operation) {
-		return GroupExtId.valueOf(getItemIdFromRequest(operation));
+		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.GROUPS_ID_KEY));
 	}
-
+	
 	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
 		try {
 			return groupDao.get(domain, extId);

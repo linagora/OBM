@@ -33,12 +33,13 @@ import java.util.Map;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public class Request {
 	
-	public final static String ITEM_ID_KEY = "itemId";
+	public final static String USERS_ID_KEY = "userId";
+	public final static String GROUPS_ID_KEY = "groupId";
+	public final static String BATCHS_ID_KEY = "batchId";
 	public final static String EXPUNGE_KEY = "expunge";
 	
 	public static Builder builder() {
@@ -51,7 +52,6 @@ public class Request {
 		private HttpVerb verb;
 		private ImmutableMap.Builder<String, String> params;
 		private String body;
-		private String itemId;
 		
 		private Builder() {
 			this.params = ImmutableMap.builder();
@@ -82,23 +82,11 @@ public class Request {
 			return this;
 		}
 		
-		public Builder itemId(String itemId) {
-			this.itemId = itemId;
-			return this;
-		}
-		
 		public Request build() {
 			Preconditions.checkState(resourcePath != null, "'resourcePath' should be set");
 			Preconditions.checkState(verb != null, "'verb' should be set");
-			addItemIdToParams();
 			
 			return new Request(resourcePath, verb, params.build(), body);
-		}
-		
-		private void addItemIdToParams() {
-			if (!verb.equals(HttpVerb.POST) && !Strings.isNullOrEmpty(itemId)) {
-				params.put(ITEM_ID_KEY, itemId);
-			}
 		}
 	}
 	

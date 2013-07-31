@@ -37,7 +37,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.Batch;
@@ -57,14 +56,11 @@ import com.google.inject.util.Providers;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserExtId;
 
 public abstract class AbstractUserOperationProcessor extends AbstractOperationProcessor {
 
 	@Inject
 	protected CyrusImapService cyrusService;
-	@Inject
-	protected UserDao userDao;
 	@Inject
 	protected UserSystemDao userSystemDao;
 	
@@ -80,19 +76,6 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 
 	protected ObmUser inheritDatabaseIdentifiers(ObmUser user, ObmUser existingUser) {
 		return ObmUser.builder().from(user).uid(existingUser.getUid()).entityId(existingUser.getEntityId()).build();
-	}
-	
-	protected ObmUser getUserFromDao(UserExtId extId, ObmDomain domain) {
-		try {
-			return userDao.getByExtId(extId, domain);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot fetch existing user %s from database.", extId), e);
-		}
-	}
-	
-	protected UserExtId getUserExtIdFromRequest(Operation operation) {
-		return UserExtId.valueOf(getItemIdFromRequest(operation));
 	}
 
 	protected ObmUser getUserFromRequestBody(Operation operation, Batch batch) {
