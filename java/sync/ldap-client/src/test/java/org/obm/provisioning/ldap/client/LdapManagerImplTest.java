@@ -45,6 +45,7 @@ import org.obm.provisioning.ldap.client.LdapManagerImpl;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
+import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -68,6 +69,7 @@ public class LdapManagerImplTest {
 	public void testCreate() {
 		Connection mockConnection = control.createMock(Connection.class);
 		Provider<LdapUser.Builder> mockUserBuilderProvider = control.createMock(Provider.class);
+		Provider<LdapUserMembership.Builder> mockUserMembershipProvider = control.createMock(Provider.class);
 		LdapUser.Builder mockLdapUserBuilder = control.createMock(LdapUser.Builder.class);
 		LdapUser mockLdapUser = control.createMock(LdapUser.class);
 		
@@ -86,7 +88,7 @@ public class LdapManagerImplTest {
 		expectLastCall().once();
 
 		control.replay();
-		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider);
+		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, mockUserMembershipProvider);
 		ldapManager.createUser(obmUser);
 		control.verify();
 	}
@@ -96,6 +98,7 @@ public class LdapManagerImplTest {
 	public void testDelete() {
 		Connection mockConnection = control.createMock(Connection.class);
 		Provider<LdapUser.Builder> mockUserBuilderProvider = control.createMock(Provider.class);
+		Provider<LdapUserMembership.Builder> mockUserMembershipProvider = control.createMock(Provider.class);
 		LdapUser.Builder mockLdapUserBuilder = control.createMock(LdapUser.Builder.class);
 		LdapUser mockLdapUser = control.createMock(LdapUser.class);
 		expect(mockLdapUser.getUid()).andReturn(Uid.valueOf("richard.sorge"));
@@ -120,7 +123,7 @@ public class LdapManagerImplTest {
 		expectLastCall().once();
 
 		control.replay();
-		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider);
+		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, mockUserMembershipProvider);
 		ldapManager.deleteUser(obmUser);
 		control.verify();
 	}
