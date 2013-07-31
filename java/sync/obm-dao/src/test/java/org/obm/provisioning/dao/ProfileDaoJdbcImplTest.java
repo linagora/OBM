@@ -18,12 +18,20 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.sync.Right;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
 
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.profile.CheckBoxState;
+import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
+import fr.aliacom.obm.common.profile.Profile;
+import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
+import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
@@ -107,6 +115,66 @@ public class ProfileDaoJdbcImplTest {
 	@Test(expected = UserNotFoundException.class)
 	public void testGetProfileNameForNonExistentUser() throws Exception {
 		dao.getUserProfileName("non-existent-user", uuid1);
+	}
+
+	@Test
+	public void testGetWhenProfileDoesntExist() throws Exception {
+		assertThat(dao.get(ProfileId.valueOf("666"), ToolBox.getDefaultObmDomain())).isNull();
+	}
+
+	@Test
+	public void testGet() throws Exception {
+		ProfileId id = ProfileId.valueOf("1");
+		Profile profile = Profile
+				.builder()
+				.id(id)
+				.name(ProfileName.valueOf("admin"))
+				.domain(ToolBox.getDefaultObmDomain())
+				.level(0)
+				.managePeers(true)
+				.accessRestriction(AccessRestriction.ALLOW_ALL)
+				.accessExceptions("")
+				.adminRealm(AdminRealm.DOMAIN)
+				.defaultMailQuota(0)
+				.maxMailQuota(0)
+				.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CALENDAR)
+						.checkBoxState(Right.ACCESS, CheckBoxState.CHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.DISABLED_CHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.DISABLED_UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILBOX)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILSHARE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILSHARE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.RESOURCE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.RESOURCE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.CONTACTS, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CONTACTS)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.build();
+
+		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
 	}
 
 }

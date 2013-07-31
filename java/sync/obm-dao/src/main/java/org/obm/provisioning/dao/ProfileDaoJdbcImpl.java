@@ -36,6 +36,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -46,16 +47,45 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.Right;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.profile.CheckBoxState;
+import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
+import fr.aliacom.obm.common.profile.Profile;
+import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
+import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 
 @Singleton
 public class ProfileDaoJdbcImpl implements ProfileDao {
+
+	private static final String LEVEL = "level";
+	private static final String MANAGE_PEERS = "level_managepeers";
+	private static final String ACCESS_RESTRICTION = "access_restriction";
+	private static final String ACCESS_EXCEPTIONS = "access_exceptions";
+	private static final String ADMIN_REALM = "admin_realm";
+	private static final String DEFAULT_RIGHT = "default_right";
+	private static final String MAX_MAIL_QUOTA = "mail_quota_max";
+	private static final String DEFAULT_MAIL_QUOTA = "mail_quota_default";
+
+	/**
+	 * Modules, in order, appearing in the "default rights" profile property
+	 */
+	private static final Module[] defaultRightModules = {
+		Module.CALENDAR,
+		Module.MAILBOX,
+		Module.MAILSHARE,
+		Module.RESOURCE,
+		Module.CONTACTS
+	};
 
 	private DatabaseConnectionProvider connectionProvider;
 
@@ -161,4 +191,100 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 			JDBCUtils.cleanup(conn, ps, rs);
 		}
 	}
+
+	@Override
+	public Profile get(ProfileId id, ObmDomain domain) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement(
+					"SELECT profile_name, profile_timecreate, profile_timeupdate " +
+					"FROM Profile " +
+					"WHERE profile_id = ?");
+
+			ps.setLong(1, id.getId());
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				Profile.Builder profileBuilder = Profile
+						.builder()
+						.id(id)
+						.domain(domain)
+						.name(ProfileName.valueOf(rs.getString("profile_name")))
+						.timecreate(JDBCUtils.getDate(rs, "profile_timecreate"))
+						.timeupdate(JDBCUtils.getDate(rs, "profile_timeupdate"));
+
+				return fetchProfileProperties(con, id, profileBuilder).build();
+			}
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+
+		return null;
+	}
+
+	private Profile.Builder fetchProfileProperties(Connection con, ProfileId id, Profile.Builder builder) throws SQLException {
+		builder.level(Integer.parseInt(fetchProfileProperty(con, id, LEVEL)));
+		builder.managePeers(Integer.parseInt(fetchProfileProperty(con, id, MANAGE_PEERS)) == 1);
+		builder.accessRestriction(AccessRestriction.valueOf(fetchProfileProperty(con, id, ACCESS_RESTRICTION).toUpperCase()));
+		builder.accessExceptions(fetchProfileProperty(con, id, ACCESS_EXCEPTIONS));
+		builder.adminRealm(AdminRealm.valueOf(fetchProfileProperty(con, id, ADMIN_REALM).toUpperCase()));
+		builder.defaultMailQuota(Integer.parseInt(fetchProfileProperty(con, id, DEFAULT_MAIL_QUOTA)));
+		builder.maxMailQuota(Integer.parseInt(fetchProfileProperty(con, id, MAX_MAIL_QUOTA)));
+
+		fetchDefaultCheckBoxStates(con, id, builder);
+
+		return builder;
+	}
+
+	private String fetchProfileProperty(Connection con, ProfileId id, String name) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = con.prepareStatement(
+					"SELECT profileproperty_value " +
+					"FROM ProfileProperty " +
+					"WHERE profileproperty_profile_id = ? AND profileproperty_name = ?");
+
+			ps.setLong(1, id.getId());
+			ps.setString(2, name);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getString("profileproperty_value");
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(null, ps, rs);
+		}
+
+		return null;
+	}
+
+	private Profile.Builder fetchDefaultCheckBoxStates(Connection con, ProfileId id, Profile.Builder builder) throws SQLException {
+		String defaultRightsStr = fetchProfileProperty(con, id, DEFAULT_RIGHT);
+		Iterator<String> defaultRights = Splitter.on(',').split(defaultRightsStr).iterator();
+
+		for (Module module : defaultRightModules) {
+			builder.defaultCheckBoxState(module, ModuleCheckBoxStates
+					.builder()
+					.module(module)
+					.checkBoxState(Right.ACCESS, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
+					.checkBoxState(Right.READ, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
+					.checkBoxState(Right.WRITE, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
+					.build());
+		}
+
+		return builder;
+	}
+
 }

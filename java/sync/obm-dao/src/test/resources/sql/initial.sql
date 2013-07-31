@@ -17044,6 +17044,17 @@ INSERT INTO profile (profile_domain_id, profile_name)
         (2, 'editor'),
         (3, 'superadmin');
 
+INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, profileproperty_value)
+    VALUES
+        (1, 'level', '0'),
+        (1, 'level_managepeers', '1'),
+        (1, 'access_restriction', 'ALLOW_ALL'),
+        (1, 'access_exceptions', ''),
+        (1, 'admin_realm', 'domain'),
+        (1, 'default_right', '1,-1,-2,0,0,0,0,0,0,0,0,0,0,0,0'),
+        (1, 'mail_quota_max', '0'),
+        (1, 'mail_quota_default', '0');
+
 INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES
         (1, 1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),

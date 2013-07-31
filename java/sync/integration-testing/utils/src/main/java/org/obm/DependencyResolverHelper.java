@@ -482,6 +482,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.mailingList.MailingListBindingImpl;
 import fr.aliacom.obm.common.mailingList.MailingListHome;
+import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.resource.ResourceDao;
 import fr.aliacom.obm.common.session.SessionManagement;
@@ -689,7 +691,9 @@ public class DependencyResolverHelper {
 				GroupWriteResource.class,
 				SystemUserLdapConfiguration.class,
 				PatchObmUserJsonDeserializer.class,
-				PatchUserOperationProcessor.class
+				PatchUserOperationProcessor.class,
+				Module.class,
+				Profile.class
 		};
 	}
 

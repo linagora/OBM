@@ -41,7 +41,9 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.profile.Profile;
 
 public interface ProfileDao {
 
@@ -50,5 +52,7 @@ public interface ProfileDao {
 	ProfileName getUserProfileName(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
 
 	Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException;
+
+	Profile get(ProfileId id, ObmDomain domain) throws DaoException;
 
 }
