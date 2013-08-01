@@ -98,6 +98,21 @@ public class Group {
             this.subgroups = ImmutableSet.builder();
         }
 
+        public Builder from(Group group) {
+        	return uid(group.uid)
+        			.gid(group.gid)
+        			.email(group.email)
+        			.timecreate(group.timecreate)
+        			.timeupdate(group.timeupdate)
+        			.privateGroup(group.privateGroup)
+        			.archive(group.archive)
+        			.extId(group.extId)
+        			.name(group.name)
+        			.description(group.description)
+        			.users(group.users)
+        			.subgroups(group.subgroups);
+        }
+        
         public Builder uid(Id uid) {
             this.uid = uid;
             return this;
@@ -152,11 +167,21 @@ public class Group {
             this.users.add(user);
             return this;
         }
+        
+		public Builder users(Iterable<ObmUser> users) {
+			this.users.addAll(users);
+			return this;
+		}
 
         public Builder subgroup(Group group) {
             this.subgroups.add(group);
             return this;
         }
+        
+		public Builder subgroups(Iterable<Group> groups) {
+			this.subgroups.addAll(groups);
+			return this;
+		}
 
         public Group build() {
             Preconditions.checkState(uid != null || extId != null);

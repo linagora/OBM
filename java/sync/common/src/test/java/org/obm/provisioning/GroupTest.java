@@ -32,16 +32,30 @@ package org.obm.provisioning;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.Group.Id;
+
+import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @RunWith(SlowFilterRunner.class)
 public class GroupTest {
+	
+    private final static ObmUser testuser = ObmUser.builder()
+                              .uid(2)
+                              .login("testuser")
+                              .domain(ObmDomain.builder().id(3).build())
+                              .build();
+    
+    private final static Group testsubgroup = Group.builder()
+                              .extId(GroupExtId.valueOf("groupExtId"))
+                              .build();
 
     @Test(expected = IllegalStateException.class)
     public void testBuildWhenNoExtIdAndNoUid() {
@@ -78,16 +92,6 @@ public class GroupTest {
 
     @Test
     public void testBuild() {
-        ObmUser testuser = ObmUser.builder()
-                                  .uid(2)
-                                  .login("testuser")
-                                  .domain(ObmDomain.builder().id(3).build())
-                                  .build();
-
-        Group testsubgroup = Group.builder()
-                                  .extId(GroupExtId.valueOf("groupExtId"))
-                                  .build();
-
         Group group = Group.builder()
                            .extId(GroupExtId.valueOf("testId"))
                            .name("name")
@@ -169,4 +173,23 @@ public class GroupTest {
 		assertThat(group.isPrivateGroup()).isTrue();
 	}
 
+	@Test
+	public void testCopy() {
+		Group group = Group.builder()
+						.uid(Id.valueOf(1))
+						.gid(1)
+						.email("email")
+						.timecreate(new Date())
+						.timeupdate(new Date())
+						.privateGroup(true)
+						.archive(false)
+						.extId(GroupExtId.valueOf("extId"))
+						.name("name")
+						.description("description")
+						.users(ImmutableSet.of(testuser))
+						.subgroups(ImmutableSet.of(testsubgroup))
+						.build();
+		
+		assertThat(Group.builder().from(group).build()).isEqualTo(group);
+	}
 }
