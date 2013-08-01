@@ -32,6 +32,7 @@ package org.obm.provisioning.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.sql.ResultSet;
 import java.util.Set;
 
 import junit.framework.AssertionFailedError;
@@ -67,6 +68,7 @@ import org.obm.provisioning.dao.exceptions.GroupRecursionException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
@@ -489,6 +491,122 @@ public class GroupDaoJdbcImplTest {
 		dao.addUser(domain1, group4.getUid(), nonexistentUser);
 	}
 
+	@Test
+	public void testAddUserUpdatesInternalMappings() throws Exception {
+		Builder groupBuilder = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.privateGroup(true)
+				.email("group@domain");
+
+		Group createdGroup = dao.create(domain1, groupBuilder.build());
+		Group.Id createdGroupId = createdGroup.getUid();
+
+		dao.addUser(domain1, createdGroupId, user1);
+
+		assertThat(getUserGroupsFromInternalMapping(user1.getUid())).isEqualTo(ImmutableSet.of(
+				createdGroupId.getId()
+		));
+	}
+
+	@Test
+	public void testAddSubGroupUpdatesInternalMappings() throws Exception {
+		Group group = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.email("group@domain")
+				.build();
+		Group subGroup = Group
+				.builder()
+				.name("subgroup")
+				.extId(GroupExtId.valueOf("extIdSubGroup"))
+				.email("subgroup@domain")
+				.build();
+
+		Group createdGroup = dao.create(domain1, group);
+		Group.Id createdGroupId = createdGroup.getUid();
+		Group createdSubGroup = dao.create(domain1, subGroup);
+		Group.Id createdSubGroupId = createdSubGroup.getUid();
+
+		dao.addUser(domain1, createdSubGroupId, user1);
+		dao.addSubgroup(domain1, group.getExtId(), subGroup.getExtId());
+
+		assertThat(getUserGroupsFromInternalMapping(user1.getUid())).isEqualTo(ImmutableSet.of(
+				createdGroupId.getId(),
+				createdSubGroupId.getId()
+		));
+	}
+
+	@Test
+	public void testRemoveSubGroupUpdatesInternalMappings() throws Exception {
+		Group group = Group
+				.builder()
+				.name("group")
+				.extId(GroupExtId.valueOf("extIdGroup"))
+				.email("group@domain")
+				.build();
+		Group subGroup = Group
+				.builder()
+				.name("subgroup")
+				.extId(GroupExtId.valueOf("extIdSubGroup"))
+				.email("subgroup@domain")
+				.build();
+
+		dao.create(domain1, group);
+
+		Group createdSubGroup = dao.create(domain1, subGroup);
+		Group.Id createdSubGroupId = createdSubGroup.getUid();
+
+		dao.addUser(domain1, createdSubGroupId, user1);
+		dao.addSubgroup(domain1, group.getExtId(), subGroup.getExtId());
+		dao.removeSubgroup(domain1, group.getExtId(), subGroup.getExtId());
+
+		assertThat(getUserGroupsFromInternalMapping(user1.getUid())).isEqualTo(ImmutableSet.of(
+				createdSubGroupId.getId()
+		));
+	}
+
+	@Test
+	public void testRemoveUserUpdatesInternalMappings() throws Exception {
+		Group group1 = Group
+				.builder()
+				.name("group1")
+				.extId(GroupExtId.valueOf("extIdGroup1"))
+				.email("group1@domain")
+				.build();
+		Group group2 = Group
+				.builder()
+				.name("group2")
+				.extId(GroupExtId.valueOf("extIdGroup2"))
+				.email("group2@domain")
+				.build();
+
+		Group createdGroup1 = dao.create(domain1, group1);
+		Group createdGroup2 = dao.create(domain1, group2);
+		Group.Id createdGroup1Id = createdGroup1.getUid();
+		Group.Id createdGroup2Id = createdGroup2.getUid();
+
+		dao.addUser(domain1, createdGroup1Id, user1);
+		dao.addUser(domain1, createdGroup2Id, user1);
+		dao.removeUser(domain1, createdGroup1.getExtId(), user1);
+
+		assertThat(getUserGroupsFromInternalMapping(user1.getUid())).isEqualTo(ImmutableSet.of(
+				createdGroup2Id.getId()
+		));
+	}
+
+	private Set<Integer> getUserGroupsFromInternalMapping(int userId) throws Exception {
+		ImmutableSet.Builder<Integer> groupIds = ImmutableSet.builder();
+		ResultSet rs = db.execute("SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id = ?", userId);
+
+		while (rs.next()) {
+			groupIds.add(rs.getInt(1));
+		}
+
+		return groupIds.build();
+	}
     /**
      * Helper function to make sure the base properties of the groups are correct
      *

@@ -53,6 +53,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -96,6 +97,8 @@ public class GroupDaoJdbcImpl implements GroupDao {
 			ps.setInt(2, user.getUid());
 
 			ps.executeUpdate();
+
+			updateGroupMappingsHierarchy(conn, groupId);
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -275,7 +278,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		try {
 			con = obmHelper.getConnection();
 
-			addUser(domain, Group.Id.valueOf(getInternalGroupId(con, domain, id)), user);
+			addUser(domain, getInternalGroupId(con, domain, id), user);
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -303,9 +306,13 @@ public class GroupDaoJdbcImpl implements GroupDao {
                     "             (groupgroup_parent_id, groupgroup_child_id)" +
                     "      VALUES (?,?)");
 
-            ps.setInt(1, getInternalGroupId(conn, domain, group));
-            ps.setInt(2, getInternalGroupId(conn, domain, subgroup));
+            Group.Id groupId = getInternalGroupId(conn, domain, group);
+
+            ps.setInt(1, groupId.getId());
+            ps.setInt(2, getInternalGroupId(conn, domain, subgroup).getId());
             ps.executeUpdate();
+
+            updateGroupMappingsHierarchy(conn, groupId);
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
@@ -319,19 +326,22 @@ public class GroupDaoJdbcImpl implements GroupDao {
         PreparedStatement ps = null;
         try {
             conn = connectionProvider.getConnection();
-            int internalId = getInternalGroupId(conn, domain, id);
             ps = conn.prepareStatement(
                     " DELETE FROM UserObmGroup" +
                     "        WHERE userobmgroup_group_id = ?" +
                     "         AND userobmgroup_userobm_id = ?");
 
-            ps.setInt(1, internalId);
+            Group.Id internalId = getInternalGroupId(conn, domain, id);
+
+            ps.setInt(1, internalId.getId());
             ps.setInt(2, user.getUid());
             if (ps.executeUpdate() < 1) {
                 // The GroupNotFound case is already handled in
                 // getInternalGroupId
                 throw new UserNotFoundException(user.getExtId());
             }
+
+            updateGroupMappingsHierarchy(conn, internalId);
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
@@ -345,15 +355,18 @@ public class GroupDaoJdbcImpl implements GroupDao {
         PreparedStatement ps = null;
         try {
             conn = connectionProvider.getConnection();
-            int internalId = getInternalGroupId(conn, domain, extId);
             ps = conn.prepareStatement(
                     " DELETE FROM GroupGroup" +
                     "        WHERE groupgroup_parent_id = ?" +
                     "         AND groupgroup_child_id = ?");
 
-            ps.setInt(1, internalId);
-            ps.setInt(2, getInternalGroupId(conn, domain, subgroup));
+            Group.Id internalId = getInternalGroupId(conn, domain, extId);
+
+            ps.setInt(1, internalId.getId());
+            ps.setInt(2, getInternalGroupId(conn, domain, subgroup).getId());
             ps.executeUpdate();
+
+            updateGroupMappingsHierarchy(conn, internalId);
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
@@ -433,7 +446,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
-        int internalGroupId = getInternalGroupId(conn, domain, id);
+        Group.Id internalGroupId = getInternalGroupId(conn, domain, id);
         recursedGroups.add(id);
 
         if (includeUsers) {
@@ -445,7 +458,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
                          "  INNER JOIN Domain  ON group_domain_id = domain_id" +
                          "       WHERE group_id = ?" +
                          "         AND domain_uuid = ?");
-                ps.setInt(1, internalGroupId);
+                ps.setInt(1, internalGroupId.getId());
                 ps.setString(2, domain.getUuid().get());
                 rs = ps.executeQuery();
 
@@ -475,7 +488,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
                          "    ORDER BY cgroup.group_ext_id" +
                          (groupDepth > 0 ? " LIMIT " + String.valueOf(groupDepth) : ""));
 
-                 ps.setInt(1, internalGroupId);
+                 ps.setInt(1, internalGroupId.getId());
                  ps.setString(2, domain.getUuid().get());
                  rs = ps.executeQuery();
 
@@ -609,7 +622,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
      * @throws SQLException                 If an SQL error occurred
      * @throws GroupNotFoundException       If the group was not found
      */
-    private int getInternalGroupId(Connection conn, ObmDomain domain, GroupExtId extId) throws SQLException, GroupNotFoundException {
+    private Group.Id getInternalGroupId(Connection conn, ObmDomain domain, GroupExtId extId) throws SQLException, GroupNotFoundException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -625,7 +638,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
             ps.setString(2, domain.getUuid().get());
             rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt("group_id");
+                return Group.Id.valueOf(rs.getInt("group_id"));
             } else {
                 throw new GroupNotFoundException(extId);
             }
@@ -697,4 +710,108 @@ public class GroupDaoJdbcImpl implements GroupDao {
         // Nothing found, looks like we are good.
         return null;
     }
+
+	private void updateGroupMappingsHierarchy(Connection con, Group.Id groupId) throws SQLException {
+		Set<Group.Id> parentGroupIds = getAllParentGroupIdsOfGroup(con, groupId);
+
+		for (Group.Id id : parentGroupIds) {
+			updateGroupMappings(con, id);
+		}
+	}
+
+	private Set<Group.Id> getAllParentGroupIdsOfGroup(Connection con, Group.Id groupId) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ImmutableSet.Builder<Group.Id> groups = ImmutableSet.builder();
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement("SELECT groupgroup_parent_id FROM GroupGroup WHERE groupgroup_child_id = ?");
+
+			ps.setInt(1, groupId.getId());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				groups.addAll(getAllParentGroupIdsOfGroup(con, Group.Id.valueOf(rs.getInt("groupgroup_parent_id"))));
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(null, ps, rs);
+		}
+
+		return groups
+				.add(groupId)
+				.build();
+	}
+
+	private void updateGroupMappings(Connection con, Group.Id groupId) throws SQLException {
+		PreparedStatement ps = null;
+		Set<Integer> userIds = getAllUserIdsOfGroup(con, groupId);
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement("DELETE FROM of_usergroup WHERE of_usergroup_group_id = ?");
+
+			ps.setInt(1, groupId.getId());
+
+			ps.executeUpdate();
+			ps.close();
+
+			if (!userIds.isEmpty()) {
+				ps = con.prepareStatement("INSERT INTO of_usergroup (of_usergroup_group_id, of_usergroup_user_id) VALUES (?, ?)");
+
+				for (Integer userId : userIds) {
+					ps.setInt(1, groupId.getId());
+					ps.setInt(2, userId);
+
+					ps.addBatch();
+				}
+
+				ps.executeBatch();
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(null, ps, null);
+		}
+	}
+
+	private Set<Integer> getAllUserIdsOfGroup(Connection con, Group.Id groupId) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		ImmutableSet.Builder<Integer> users = ImmutableSet.builder();
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement("SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id = ?");
+
+			ps.setInt(1, groupId.getId());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				users.addAll(getAllUserIdsOfGroup(con, Group.Id.valueOf(rs.getInt("groupgroup_child_id"))));
+			}
+			ps.close();
+
+			ps = con.prepareStatement(
+					"SELECT userobmgroup_userobm_id FROM UserObmGroup " +
+					"LEFT JOIN UserObm ON userobm_id = userobmgroup_userobm_id " +
+					"WHERE userobmgroup_group_id = ? AND userobm_archive = 0");
+
+			ps.setInt(1, groupId.getId());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				users.add(rs.getInt("userobmgroup_userobm_id"));
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(null, ps, rs);
+		}
+
+		return users.build();
+	}
+
 }
