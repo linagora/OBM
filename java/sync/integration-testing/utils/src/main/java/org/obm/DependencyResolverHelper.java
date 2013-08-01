@@ -168,6 +168,7 @@ import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
+import org.obm.provisioning.json.PatchGroupJsonDeserializer;
 import org.obm.provisioning.json.PatchObmUserJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
@@ -202,6 +203,7 @@ import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor
 import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.ModifyGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.PatchGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
@@ -714,7 +716,9 @@ public class DependencyResolverHelper {
 				DeleteUserFromGroupOperationProcessor.class,
 				AddSubgroupToGroupOperationProcessor.class,
 				DeleteSubgroupFromGroupOperationProcessor.class,
-				ModifyGroupOperationProcessor.class
+				ModifyGroupOperationProcessor.class,
+				PatchGroupJsonDeserializer.class,
+				PatchGroupOperationProcessor.class
 		};
 	}
 

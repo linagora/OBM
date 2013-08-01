@@ -226,8 +226,8 @@ public class GroupDaoJdbcImpl implements GroupDao {
             ps.setString(idx++, info.getName());
             ps.setString(idx++, info.getDescription());
             ps.setTimestamp(idx++, new Timestamp(obmHelper.selectNow(conn).getTime()));
-            ps.setBoolean(idx++, info.isArchive());
-            ps.setBoolean(idx++, info.isPrivateGroup());
+            ps.setInt(idx++, info.isArchive() ? 1 : 0);
+            ps.setInt(idx++, info.isPrivateGroup() ? 1 : 0);
             ps.setString(idx++, info.getEmail());
             ps.setString(idx++, info.getExtId().getId());
             ps.setString(idx++, domain.getUuid().get());

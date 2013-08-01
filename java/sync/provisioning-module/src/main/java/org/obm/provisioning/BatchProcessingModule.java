@@ -40,6 +40,7 @@ import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor
 import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.ModifyGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.PatchGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
@@ -71,6 +72,7 @@ public class BatchProcessingModule extends AbstractModule {
 		multibinder.addBinding().to(AddSubgroupToGroupOperationProcessor.class);
 		multibinder.addBinding().to(DeleteSubgroupFromGroupOperationProcessor.class);
 		multibinder.addBinding().to(ModifyGroupOperationProcessor.class);
+		multibinder.addBinding().to(PatchGroupOperationProcessor.class);
 	}
 
 }

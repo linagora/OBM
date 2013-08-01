@@ -52,6 +52,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
@@ -1015,6 +1016,68 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.name("newName")
 				.extId(extId)
 				.description("description")
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(groupDao.update(domain, newGroup)).andReturn(newGroup);
+		expectLdapModifyGroup(newGroup, groupFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessPatchGroup() throws Exception {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.verb(HttpVerb.PATCH)
+						.body(
+								"{" +
+										"\"name\": \"newName\"," +
+										"\"description\": \"newDescription\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.gid(1)
+										.uid(Id.valueOf(1))
+										.description("description")
+										.extId(extId)
+										.build();
+		final Group newGroup = Group.builder()
+				.name("newName")
+				.gid(1)
+				.uid(Id.valueOf(1))
+				.description("newDescription")
+				.extId(extId)
 				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
