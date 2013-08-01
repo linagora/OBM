@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -50,17 +49,15 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.LifecycleListener;
+import org.obm.sync.LifecycleListenerHelper;
 
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.ServletModule;
 import com.google.inject.util.Modules;
@@ -75,7 +72,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	protected abstract void onModuleInstalled();
 	
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(new OpushModule(globalConfiguration()), new PendingQueryFilterModule());
+		OverriddenModuleBuilder override = Modules.override(new OpushModule(globalConfiguration(), noDatabase()), new PendingQueryFilterModule());
 		try {
 			install(override.with(overrideModule()));
 			onModuleInstalled();
@@ -91,6 +88,10 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 			filter("/*").through(PendingQueryFilter.class);
 		}
 		
+	}
+	
+	private Module noDatabase() {
+		return Modules.EMPTY_MODULE;
 	}
 	
 	@Provides @Singleton
@@ -128,14 +129,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 				@Override
 				public void contextDestroyed(ServletContextEvent sce) {
-				   	Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
-			    	for (LifecycleListener listener: listeners) {
-			    		try {
-			    			listener.shutdown();
-			    		} catch (Throwable t) {
-			    			Throwables.propagate(t);
-			    		}
-			    	}
+					LifecycleListenerHelper.shutdownListeners(injector);
 				}
 			};
 		}

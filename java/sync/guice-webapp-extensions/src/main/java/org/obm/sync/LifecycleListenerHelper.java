@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,31 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.jdbc;
+package org.obm.sync;
 
-import org.obm.push.store.CalendarDao;
-import org.obm.push.store.CollectionDao;
-import org.obm.push.store.DeviceDao;
-import org.obm.push.store.FolderSnapshotDao;
-import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.ItemTrackingDao;
-import org.obm.sync.date.DateProvider;
+import java.util.Collections;
+import java.util.Set;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.internal.Errors;
+import com.google.inject.spi.Message;
 
-public class JdbcDaoModule extends AbstractModule{
+public class LifecycleListenerHelper {
 
-	@Override
-	protected void configure() {
-		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
-		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(HeartbeatDao.class).to(HeartbeatDaoJdbcDaoImpl.class);
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
-		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
-		bind(ItemTrackingDao.class).to(ItemTrackingDaoJdbcImpl.class);
-		bind(DateProvider.class).to(TransactionDateProvider.class);
+	public static void shutdownListeners(Injector injector) {
+		if (injector != null) {
+			Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+			Errors errors = new Errors();
+			for (LifecycleListener listener: listeners) {
+				try {
+					listener.shutdown();
+				} catch (Throwable t) {
+					errors.addMessage(new Message(Collections.emptyList(), "Error during listener shutdown", t));
+				}
+			}
+			errors.throwConfigurationExceptionIfErrorsExist();
+		}
 	}
-
+	
 }

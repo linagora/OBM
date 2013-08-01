@@ -37,6 +37,7 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.dbcp.DatabaseModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.push.java.mail.ImapModule;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 public class OpushModule extends AbstractModule {
@@ -57,13 +59,15 @@ public class OpushModule extends AbstractModule {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
 	private final GlobalAppConfiguration<ConfigurationService> globalConfiguration;
+	private Module databaseModule;
 	
 	public OpushModule() {
-		this(buildConfiguration());
+		this(buildConfiguration(), new DatabaseModule());
 	}
 	
-	public OpushModule(GlobalAppConfiguration<ConfigurationService> globalConfiguration) {
+	public OpushModule(GlobalAppConfiguration<ConfigurationService> globalConfiguration, Module databaseModule) {
 		this.globalConfiguration = globalConfiguration;
+		this.databaseModule = databaseModule;
 	}
 	
 	private static GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
@@ -85,8 +89,9 @@ public class OpushModule extends AbstractModule {
 		install(new OpushCrashModule());
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
-		install(new JdbcDaoModule());
 		install(new EhCacheDaoModule());
+		install(new JdbcDaoModule());
+		install(databaseModule);
 		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
  	}
 
