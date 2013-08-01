@@ -35,6 +35,7 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
+import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -48,6 +49,10 @@ public class DatabaseModule extends AbstractModule {
 		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
 		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
+
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(DatabaseConnectionProviderImpl.class);
+
 	}
 	
 }

@@ -65,8 +65,8 @@ public class DatabaseConnectionProviderInitTest {
 	}
 
 	@After
-	public void teardown() {
-		testee.cleanup();
+	public void teardown() throws Exception {
+		testee.shutdown();
 	}
 	
 	private DatabaseConnectionProviderImpl newDatabaseConnectionProviderImpl(DatabaseConfiguration databaseConfiguration) {
