@@ -33,6 +33,8 @@ package org.obm.sync.calendar;
 
 import java.io.Serializable;
 
+import org.obm.sync.dao.EntityId;
+
 import com.google.common.base.Objects;
 
 public abstract class Attendee implements Cloneable, Serializable {
@@ -85,7 +87,7 @@ public abstract class Attendee implements Cloneable, Serializable {
 			return this;
 		}
 		
-		public Builder<T> entityId(Integer entityId) {
+		public Builder<T> entityId(EntityId entityId) {
 			attendee.entityId = entityId;
 			return this;
 		}
@@ -104,7 +106,7 @@ public abstract class Attendee implements Cloneable, Serializable {
 	/* package */ int percent;
 	/* package */ boolean organizer;
 	/* package */ boolean canWriteOnCalendar;
-	/* package */ Integer entityId;
+	/* package */ EntityId entityId;
 	
 	public Attendee() {
 	}
@@ -184,11 +186,11 @@ public abstract class Attendee implements Cloneable, Serializable {
 		canWriteOnCalendar = b;
 	}
 	
-	public Integer getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 
-	public void setEntityId(Integer entityId) {
+	public void setEntityId(EntityId entityId) {
 		this.entityId = entityId;
 	}
 

@@ -69,6 +69,7 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
@@ -149,6 +150,7 @@ public class SolrManagerTest {
 		Attendee attendee = UserAttendee.builder().email("Test").participationRole(ParticipationRole.REQ).build();
 		
 		// We only set the fields that aren't simple types to verify that they're all Serializable
+		event.setEntityId(EntityId.valueOf(1));
 		event.setUid(new EventObmId(1));
 		event.setExtId(new EventExtId("1"));
 		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday));
@@ -176,6 +178,7 @@ public class SolrManagerTest {
 		
 		// We only set the fields that aren't simple types to verify that they're all Serializable
 		contact.setUid(1);
+		contact.setEntityId(EntityId.valueOf(1));
 		contact.setBirthdayId(new EventObmId(1));
 		contact.addAddress("Test", new Address("", "", "", "", "", ""));
 		contact.addEmail("Test", EmailAddress.loginAtDomain("login@domain"));

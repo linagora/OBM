@@ -45,6 +45,7 @@ import java.util.Set;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.push.utils.collection.Sets;
 import org.obm.push.utils.index.Indexed;
+import org.obm.sync.dao.EntityId;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -90,7 +91,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 	private Integer percent;
 	private EventOpacity opacity;
 
-	private Integer entityId;
+	private EntityId entityId;
 	private Date timeUpdate;
 	private Date timeCreate;
 
@@ -351,11 +352,11 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		this.meetingStatus = meetingStatus;
 	}
 
-	public Integer getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 	
-	public void setEntityId(Integer entityId) {
+	public void setEntityId(EntityId entityId) {
 		this.entityId = entityId;
 	}
 	

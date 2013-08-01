@@ -31,7 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
@@ -47,6 +50,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.solr.SolrHelper.Factory;
 import org.obm.utils.ObmHelper;
 
@@ -75,10 +79,10 @@ public class ContactDaoTest {
 		Contact contact1 = new Contact();
 		Contact contact2 = new Contact();
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
@@ -99,10 +103,10 @@ public class ContactDaoTest {
 		Contact contact2 = new Contact();
 		contact2.addEmail("INTERNET;X-OBM-Ref2", EmailAddress.loginAtDomain("user2@domain"));
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
@@ -124,10 +128,10 @@ public class ContactDaoTest {
 		Contact contact2 = new Contact();
 		contact2.addEmail("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user1@domain"));
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
@@ -147,10 +151,10 @@ public class ContactDaoTest {
 		Contact contact1 = new Contact();
 		Contact contact2 = new Contact();
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
@@ -169,10 +173,10 @@ public class ContactDaoTest {
 		Contact contact1 = new Contact();
 		Contact contact2 = new Contact();
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
@@ -191,10 +195,10 @@ public class ContactDaoTest {
 		Contact contact1 = new Contact();
 		Contact contact2 = new Contact();
 		Contact contact3 = new Contact();
-		Map<Integer, Contact> contacts = ImmutableMap.of(
-				1, contact1, 
-				2, contact2,
-				3, contact3);
+		Map<EntityId, Contact> contacts = ImmutableMap.of(
+				EntityId.valueOf(1), contact1, 
+				EntityId.valueOf(2), contact2,
+				EntityId.valueOf(3), contact3);
 
 		ResultSet rs = createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);

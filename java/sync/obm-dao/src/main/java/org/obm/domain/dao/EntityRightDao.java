@@ -33,17 +33,18 @@ import java.util.Set;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.Right;
+import org.obm.sync.dao.EntityId;
 
 public interface EntityRightDao {
 
-	Set<Right> getRights(Integer entityId, Integer consumerId) throws DaoException;
+	Set<Right> getRights(EntityId entityId, EntityId consumerId) throws DaoException;
 
-	Set<Right> getPublicRights(Integer entityId) throws DaoException;
+	Set<Right> getPublicRights(EntityId entityId) throws DaoException;
 
-	void grantRights(Integer entityId, Integer consumerId, Set<Right> rights) throws DaoException;
+	void grantRights(EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException;
 
-	void deleteRights(Integer entityId, Integer consumerId) throws DaoException;
+	void deleteRights(EntityId entityId, EntityId consumerId) throws DaoException;
 
-	void deletePublicRights(Integer entityId) throws DaoException;
+	void deletePublicRights(EntityId entityId) throws DaoException;
 
 }

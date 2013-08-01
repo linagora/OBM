@@ -42,6 +42,7 @@ import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Objects;
@@ -75,7 +76,7 @@ public class Contact implements Serializable {
 	private String manager;
 	private String spouse;
 
-	private Integer entityId;
+	private EntityId entityId;
 	private Integer folderId;
 
 	private boolean collected;
@@ -251,11 +252,11 @@ public class Contact implements Serializable {
 		emails.put(lbl, email);
 	}
 
-	public Integer getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 
-	public void setEntityId(Integer entityId) {
+	public void setEntityId(EntityId entityId) {
 		this.entityId = entityId;
 	}
 

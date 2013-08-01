@@ -31,31 +31,83 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.utils;
 
+import org.obm.sync.dao.EntityId;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+
 public class LinkedEntity {
 
-	public LinkedEntity(int linkId, int entityId) {
-		super();
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private Integer linkId;
+		private EntityId entityId;
+
+		private Builder() {
+		}
+
+		public Builder linkId(int linkId) {
+			this.linkId = linkId;
+			return this;
+		}
+
+		public Builder entityId(EntityId entityId) {
+			this.entityId = entityId;
+			return this;
+		}
+
+		public LinkedEntity build() {
+			Preconditions.checkState(linkId != null && linkId > 0, "'linkId' must be set to a positive integer");
+			Preconditions.checkState(entityId != null, "'entityId' must be set");
+
+			return new LinkedEntity(linkId, entityId);
+		}
+	}
+
+	private LinkedEntity(int linkId, EntityId entityId) {
 		this.linkId = linkId;
 		this.entityId = entityId;
 	}
 
-	private int linkId;
-	private int entityId;
+	private final int linkId;
+	private final EntityId entityId;
 
 	public int getLinkId() {
 		return linkId;
 	}
 
-	public void setLinkId(int linkId) {
-		this.linkId = linkId;
-	}
-
-	public int getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(linkId, entityId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof LinkedEntity) {
+			LinkedEntity other = (LinkedEntity) obj;
+
+			return Objects.equal(linkId, other.linkId)
+					&& Objects.equal(entityId, other.entityId);
+		}
+
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(this)
+				.add("linkId", linkId)
+				.add("entityId", entityId)
+				.toString();
 	}
 
 }

@@ -56,6 +56,7 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -225,7 +226,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			}
 			
 			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
-			Integer entityId = createdContact.getEntityId();
+			EntityId entityId = createdContact.getEntityId();
 			if (clientId != null && entityId != null) {
 				commitedOperationDao.store(token, 
 						CommitedElement.builder()

@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.Right;
+import org.obm.sync.dao.EntityId;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableSet;
@@ -58,7 +59,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	}
 
 	@Override
-	public Set<Right> getPublicRights(Integer entityId) throws DaoException {
+	public Set<Right> getPublicRights(EntityId entityId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -69,7 +70,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 					"SELECT " + FIELDS + " FROM EntityRight " +
 					"WHERE entityright_entity_id = ? AND entityright_consumer_id IS NULL");
 
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 
 			rs = ps.executeQuery();
 
@@ -88,7 +89,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	}
 
 	@Override
-	public Set<Right> getRights(Integer entityId, Integer consumerId) throws DaoException {
+	public Set<Right> getRights(EntityId entityId, EntityId consumerId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -99,8 +100,8 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 					"SELECT " + FIELDS + " FROM EntityRight " +
 					"WHERE entityright_entity_id = ? AND entityright_consumer_id = ?");
 
-			ps.setInt(1, entityId);
-			ps.setInt(2, consumerId);
+			ps.setInt(1, entityId.getId());
+			ps.setInt(2, consumerId.getId());
 
 			rs = ps.executeQuery();
 
@@ -138,7 +139,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	}
 
 	@Override
-	public void grantRights(Integer entityId, Integer consumerId, Set<Right> rights) throws DaoException {
+	public void grantRights(EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -150,9 +151,9 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 					"INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, " + FIELDS + ") " +
 					"VALUES (?, ?, ?, ?, ?, ?)");
 
-			ps.setInt(idx++, entityId);
+			ps.setInt(idx++, entityId.getId());
 			if (consumerId != null) {
-				ps.setInt(idx++, consumerId);
+				ps.setInt(idx++, consumerId.getId());
 			} else {
 				ps.setNull(idx++, Types.INTEGER);
 			}
@@ -172,7 +173,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	}
 
 	@Override
-	public void deleteRights(Integer entityId, Integer consumerId) throws DaoException {
+	public void deleteRights(EntityId entityId, EntityId consumerId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -182,8 +183,8 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 					"DELETE FROM EntityRight " +
 					"WHERE entityright_entity_id = ? AND entityright_consumer_id = ?");
 
-			ps.setInt(1, entityId);
-			ps.setInt(2, consumerId);
+			ps.setInt(1, entityId.getId());
+			ps.setInt(2, consumerId.getId());
 
 			ps.executeUpdate();
 		}
@@ -196,7 +197,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	}
 
 	@Override
-	public void deletePublicRights(Integer entityId) throws DaoException {
+	public void deletePublicRights(EntityId entityId) throws DaoException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -206,7 +207,7 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 					"DELETE FROM EntityRight " +
 					"WHERE entityright_entity_id = ? AND entityright_consumer_id IS NULL");
 
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 
 			ps.executeUpdate();
 		}

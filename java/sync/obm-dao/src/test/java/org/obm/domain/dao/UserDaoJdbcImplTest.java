@@ -50,6 +50,7 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableList;
@@ -237,7 +238,7 @@ public class UserDaoJdbcImplTest {
 		ObmUser createdUser = dao.create(userBuilder.build());
 
 		assertThat(createdUser.getUid()).isGreaterThan(0);
-		assertThat(createdUser.getEntityId()).isGreaterThan(0);
+		assertThat(createdUser.getEntityId().getId()).isGreaterThan(0);
 		assertThat(userBuilder
 				.uid(createdUser.getUid())
 				.entityId(createdUser.getEntityId())
@@ -324,7 +325,7 @@ public class UserDaoJdbcImplTest {
 		ObmUser createdUser = dao.create(userBuilder.build());
 
 		assertThat(createdUser.getUid()).isGreaterThan(0);
-		assertThat(createdUser.getEntityId()).isGreaterThan(0);
+		assertThat(createdUser.getEntityId().getId()).isGreaterThan(0);
 		assertThat(userBuilder
 				.uid(createdUser.getUid())
 				.entityId(createdUser.getEntityId())
@@ -632,7 +633,7 @@ public class UserDaoJdbcImplTest {
 				.builder()
 				.login("user" + id)
 				.uid(id)
-				.entityId(entityId)
+				.entityId(EntityId.valueOf(entityId))
 				.lastName("Lastname")
 				.firstName("Firstname")
 				.domain(domain)

@@ -50,16 +50,17 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.utils.ObmHelper;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -231,7 +232,8 @@ public class AddressBookBindingImplTest {
 
 	@Test
 	public void testCreateContactWithCommitedOperation() throws Exception {
-		Integer addressBookId = 1, entityId = 984;
+		Integer addressBookId = 1;
+		EntityId entityId = EntityId.valueOf(984);
 		Contact contact = new Contact(), expectedContact = new Contact();
 		String clientId = "6547";
 
@@ -276,7 +278,7 @@ public class AddressBookBindingImplTest {
 		Integer addressBookId = 1, entityId = 984;
 		Contact contact = new Contact(), expectedContact = new Contact();
 
-		expectedContact.setEntityId(entityId);
+		expectedContact.setEntityId(EntityId.valueOf(entityId));
 		
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
 		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);

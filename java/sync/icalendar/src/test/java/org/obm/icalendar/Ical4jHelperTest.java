@@ -127,6 +127,7 @@ import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.UnidentifiedAttendee;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.obm.sync.services.AttendeeService;
@@ -1656,7 +1657,7 @@ public class Ical4jHelperTest {
 		String name = "attendee";
 		String email = "attendee@obm.com";
 		ObmDomain domain = getDefaultObmDomain();
-		Attendee attendee = UnidentifiedAttendee.builder().email(email).entityId(1).build();
+		Attendee attendee = UnidentifiedAttendee.builder().email(email).entityId(EntityId.valueOf(1)).build();
 		AttendeeService service = createMock(AttendeeService.class);
 		Ical4jHelper helper = new Ical4jHelper(dateProvider, eventExtIdFactory, service);
 		
@@ -1678,7 +1679,7 @@ public class Ical4jHelperTest {
 		String name = "attendee";
 		String email = "attendee@obm.com";
 		ObmDomain domain = getDefaultObmDomain();
-		ResourceAttendee attendee = ResourceAttendee.builder().email(email).entityId(1).build();
+		ResourceAttendee attendee = ResourceAttendee.builder().email(email).entityId(EntityId.valueOf(1)).build();
 		AttendeeService service = createMock(AttendeeService.class);
 		Ical4jHelper helper = new Ical4jHelper(dateProvider, eventExtIdFactory, service);
 		
@@ -1695,7 +1696,7 @@ public class Ical4jHelperTest {
 		String name = "attendee";
 		String email = "attendee@obm.com";
 		ObmDomain domain = getDefaultObmDomain();
-		ResourceAttendee attendee = ResourceAttendee.builder().email(email).entityId(1).build();
+		ResourceAttendee attendee = ResourceAttendee.builder().email(email).entityId(EntityId.valueOf(1)).build();
 		AttendeeService service = createMock(AttendeeService.class);
 		Ical4jHelper helper = new Ical4jHelper(dateProvider, eventExtIdFactory, service);
 		
@@ -1721,7 +1722,7 @@ public class Ical4jHelperTest {
 		String name = "attendee";
 		String email = "attendee@obm.com";
 		ObmDomain domain = getDefaultObmDomain();
-		UserAttendee attendee = UserAttendee.builder().email(email).entityId(1).build();
+		UserAttendee attendee = UserAttendee.builder().email(email).entityId(EntityId.valueOf(1)).build();
 		AttendeeService service = createMock(AttendeeService.class);
 		Ical4jHelper helper = new Ical4jHelper(dateProvider, eventExtIdFactory, service);
 		
@@ -1738,7 +1739,7 @@ public class Ical4jHelperTest {
 		String name = "attendee";
 		String email = "attendee@obm.com";
 		ObmDomain domain = getDefaultObmDomain();
-		ContactAttendee attendee = ContactAttendee.builder().email(email).entityId(1).build();
+		ContactAttendee attendee = ContactAttendee.builder().email(email).entityId(EntityId.valueOf(1)).build();
 		AttendeeService service = createMock(AttendeeService.class);
 		Ical4jHelper helper = new Ical4jHelper(dateProvider, eventExtIdFactory, service);
 		

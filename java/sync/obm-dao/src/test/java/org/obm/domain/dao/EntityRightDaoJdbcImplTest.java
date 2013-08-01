@@ -43,6 +43,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.Right;
+import org.obm.sync.dao.EntityId;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -74,50 +75,50 @@ public class EntityRightDaoJdbcImplTest {
 
 	@Test(expected = DaoException.class)
 	public void testGrantRightsWhenEntityIdDoesntExist() throws Exception {
-		dao.grantRights(666, null, ImmutableSet.<Right> of());
+		dao.grantRights(EntityId.valueOf(666), null, ImmutableSet.<Right> of());
 	}
 
 	@Test(expected = DaoException.class)
 	public void testGrantRightsWhenConsumerIdDoesntExist() throws Exception {
-		dao.grantRights(1, 666, ImmutableSet.<Right> of());
+		dao.grantRights(EntityId.valueOf(1), EntityId.valueOf(666), ImmutableSet.<Right> of());
 	}
 
 	@Test
 	public void testGetAfterSetPublicRights() throws Exception {
 		ImmutableSet<Right> rights = ImmutableSet.of(Right.ACCESS, Right.READ);
 
-		dao.grantRights(1, null, rights);
+		dao.grantRights(EntityId.valueOf(1), null, rights);
 
-		assertThat(dao.getPublicRights(1)).isEqualTo(rights);
+		assertThat(dao.getPublicRights(EntityId.valueOf(1))).isEqualTo(rights);
 	}
 
 	@Test
 	public void testGetAfterSetRights() throws Exception {
 		ImmutableSet<Right> rights = ImmutableSet.of(Right.ACCESS, Right.READ, Right.ADMIN);
 
-		dao.grantRights(1, 2, rights);
+		dao.grantRights(EntityId.valueOf(1), EntityId.valueOf(2), rights);
 
-		assertThat(dao.getRights(1, 2)).isEqualTo(rights);
+		assertThat(dao.getRights(EntityId.valueOf(1), EntityId.valueOf(2))).isEqualTo(rights);
 	}
 
 	@Test
 	public void testGetAfterDeletePublicRights() throws Exception {
 		ImmutableSet<Right> rights = ImmutableSet.of(Right.ACCESS, Right.READ);
 
-		dao.grantRights(1, null, rights);
-		dao.deletePublicRights(1);
+		dao.grantRights(EntityId.valueOf(1), null, rights);
+		dao.deletePublicRights(EntityId.valueOf(1));
 
-		assertThat(dao.getPublicRights(1)).isEmpty();
+		assertThat(dao.getPublicRights(EntityId.valueOf(1))).isEmpty();
 	}
 
 	@Test
 	public void testGetAfterDeleteRights() throws Exception {
 		ImmutableSet<Right> rights = ImmutableSet.of(Right.ACCESS, Right.READ, Right.ADMIN);
 
-		dao.grantRights(1, 2, rights);
-		dao.deleteRights(1, 2);
+		dao.grantRights(EntityId.valueOf(1), EntityId.valueOf(2), rights);
+		dao.deleteRights(EntityId.valueOf(1), EntityId.valueOf(2));
 
-		assertThat(dao.getRights(1, 2)).isEmpty();
+		assertThat(dao.getRights(EntityId.valueOf(1), EntityId.valueOf(2))).isEmpty();
 	}
 
 }

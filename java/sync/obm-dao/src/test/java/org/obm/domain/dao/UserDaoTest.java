@@ -57,6 +57,7 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.utils.ObmHelper;
@@ -357,7 +358,7 @@ public class UserDaoTest {
 
 		ObmUser expectedObmUser = ObmUser.builder()
 			.uid(5)
-			.entityId(6)
+			.entityId(EntityId.valueOf(6))
 			.login("login")
 			.domain(domain)
 			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))

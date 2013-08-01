@@ -36,6 +36,7 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.sync.dao.EntityId;
 
 import com.linagora.obm.sync.Producer;
 
@@ -58,7 +59,7 @@ public class ServicesToolBox {
 	public static ObmUser getDefaultObmUser(){
 		return ObmUser.builder()
 			.uid(1)
-			.entityId(2)
+			.entityId(EntityId.valueOf(2))
 			.login("user")
 			.domain(getDefaultObmDomain())
 			.emailAndAliases("user@test")
@@ -70,7 +71,7 @@ public class ServicesToolBox {
 	public static ObmUser getSpecificObmUserFrom(String email, String firstName, String lastName) {
 		return ObmUser.builder()
 			.uid(1)
-			.entityId(2)
+			.entityId(EntityId.valueOf(2))
 			.login("user")
 			.domain(getDefaultObmDomain())
 			.emailAndAliases(email)

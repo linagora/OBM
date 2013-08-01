@@ -81,6 +81,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.AttendeeService;
@@ -667,7 +668,7 @@ public class CalendarBindingImpl implements ICalendar {
 				}
 			}
 			
-			Integer entityId = ev.getEntityId();
+			EntityId entityId = ev.getEntityId();
 			if (clientId != null && entityId != null) {
 				commitedOperationDao.store(token, 
 						CommitedElement.builder()

@@ -41,6 +41,7 @@ import java.util.Set;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.IMergeable;
 import org.obm.sync.book.Website;
+import org.obm.sync.dao.EntityId;
 import org.obm.utils.ObmHelper;
 
 import com.google.inject.Inject;
@@ -66,8 +67,7 @@ public class ContactMerger {
 	public void merge(Contact actualC, Contact updateC) throws SQLException {
 		// TODO fix merge to not delete values not provided by sync client
 		if (actualC.getEntityId() == null) {
-			Integer entityId = obmHelper.fetchEntityId("Contact", actualC
-					.getUid());
+			EntityId entityId = obmHelper.fetchEntityId("Contact", actualC.getUid());
 			actualC.setEntityId(entityId);
 		}
 

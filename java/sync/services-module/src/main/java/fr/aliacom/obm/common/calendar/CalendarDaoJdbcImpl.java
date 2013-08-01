@@ -92,6 +92,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
@@ -782,8 +783,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 						ps = con.prepareStatement(fb);
 
 						int idx = 1;
-						ps.setInt(idx++, organizer.getEntityId());
-						ps.setInt(idx++, attendee.getEntityId());
+						ps.setInt(idx++, organizer.getEntityId().getId());
+						ps.setInt(idx++, attendee.getEntityId().getId());
 						ps.setObject(idx++, obmHelper.getDBCP()
 								.getJdbcObject(ObmHelper.VCOMPONENT, EventType.VEVENT.toString()));
 						ps.setTimestamp(idx++, new Timestamp(fbr.getStart()
@@ -1896,7 +1897,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			
 			for (Attendee at : toRemove) {
 				ps.setInt(1, ev.getObmId().getObmId());
-				ps.setInt(2, at.getEntityId());
+				ps.setInt(2, at.getEntityId().getId());
 				ps.addBatch();
 			}
 			
@@ -2078,13 +2079,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			
 			final int eventObmId = ev.getObmId().getObmId();
 			final Set<Attendee> listAttendee = removeDuplicateAttendee(attendees);
-			Set<Integer> alreadyAddedAttendees = Sets.newHashSet();
+			Set<EntityId> alreadyAddedAttendees = Sets.newHashSet();
 			
 			for (final Attendee at : listAttendee) {
 				boolean isOrganizer = Objects.firstNonNull(at.isOrganizer(), false);
 				
 				String attendeeEmail = at.getEmail();
-				Integer userEntity = at.getEntityId();
+				EntityId userEntity = at.getEntityId();
 
 				// There must be only one organizer in a given event
 				if (isOrganizer) {
@@ -2098,7 +2099,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				}
 				
 				ps.setInt(1, eventObmId);
-				ps.setInt(2, userEntity);
+				ps.setInt(2, userEntity.getId());
 				ps.setObject(3, getJdbcObjectParticipation(at));
 				ps.setObject(4, getJdbcObjectParticipationRole(at));
 				ps.setInt(5, at.getPercent());
@@ -2163,7 +2164,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps = con.prepareStatement(q);
 
 			for (Attendee at : event.getAttendees()) {
-				Integer userEntity = at.getEntityId();
 				int idx = 1;
 				
 				ps.setObject(idx++, obmHelper.getDBCP()
@@ -2174,7 +2174,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(idx++, at.getPercent());
 				ps.setBoolean(idx++, at.isOrganizer());
 				ps.setInt(idx++, event.getObmId().getObmId());
-				ps.setInt(idx++, userEntity);
+				ps.setInt(idx++, at.getEntityId().getId());
 				ps.addBatch();
 				mightInsert.add(at);
 			}

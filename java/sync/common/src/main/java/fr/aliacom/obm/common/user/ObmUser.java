@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.provisioning.ProfileName;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.utils.DisplayNameUtils;
 
@@ -66,7 +67,7 @@ public class ObmUser {
 	public static class Builder {
 		
 		private Integer uid;
-		private int entityId;
+		private EntityId entityId;
 		private UserExtId extId;
 		private String login;
 		private String commonName;
@@ -160,7 +161,7 @@ public class ObmUser {
 			this.uid = uid;
 			return this;
 		}
-		public Builder entityId(int entityId) {
+		public Builder entityId(EntityId entityId) {
 			this.entityId = entityId;
 			return this;
 		}
@@ -390,7 +391,7 @@ public class ObmUser {
 	}
 	
 	private final Integer uid;
-	private final int entityId;
+	private final EntityId entityId;
 	private final String login;
 	private final UserExtId extId;
 	private final String commonName;
@@ -435,7 +436,7 @@ public class ObmUser {
 	private final Integer uidNumber;
 	private final Integer gidNumber;
 	
-	public ObmUser(Integer uid, int entityId, String login, UserExtId extId, String commonName,
+	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
 			String address3, String expresspostal,
@@ -491,7 +492,7 @@ public class ObmUser {
 		return uid;
 	}
 
-	public int getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 

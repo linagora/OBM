@@ -79,6 +79,7 @@ import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.solr.SolrManager;
@@ -212,7 +213,7 @@ public class CalendarDaoJdbcImplTest {
 	}
 	
 	private Attendee getAttendee(String email, Integer entityId) {
-		return UserAttendee.builder().email(email).entityId(entityId).build();
+		return UserAttendee.builder().email(email).entityId(EntityId.valueOf(entityId)).build();
 	}
 
 	private void expectgetJDBCObjects() throws Exception {
@@ -281,7 +282,7 @@ public class CalendarDaoJdbcImplTest {
 		expectgetJDBCObjects();
 		expectPreparedStatementDatabaseObjectsCalls(connection, ps);
 		
-		int expectedEntityId = 531;
+		EntityId expectedEntityId = EntityId.valueOf(531);
 		expectLastInsertId(ps, obmId);
 		expectLinkEntity(ps, expectedEntityId);
 		
@@ -385,14 +386,14 @@ public class CalendarDaoJdbcImplTest {
 		expectLastCall();
 	}
 
-	private void expectLinkEntity(PreparedStatement ps, Integer entityId) throws SQLException {
+	private void expectLinkEntity(PreparedStatement ps, EntityId entityId) throws SQLException {
 		ResultSet resultSet = mocksControl.createMock(ResultSet.class);
 		expect(ps.executeQuery(anyObject(String.class)))
 			.andReturn(resultSet).once();
 		expect(resultSet.next())
 			.andReturn(true).once();
 		expect(resultSet.getInt(1))
-			.andReturn(entityId).once();
+			.andReturn(entityId.getId()).once();
 		resultSet.close();
 		expectLastCall();
 	}

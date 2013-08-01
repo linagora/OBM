@@ -61,6 +61,7 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
@@ -121,7 +122,8 @@ public class BeansTest {
 				ObmSystemUser.class,
 				AddressBook.class,
 				ModuleCheckBoxStates.class,
-				Profile.class);
+				Profile.class,
+				EntityId.class);
 	}
 	
 	@Test

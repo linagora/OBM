@@ -74,6 +74,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
 import org.obm.satellite.client.SatelliteService;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -288,11 +289,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 	private void expectSetDefaultRights(ObmUser user) throws Exception {
 		expect(profileDao.getUserProfile(user)).andReturn(profile);
-		expect(obmHelper.fetchEntityId("Calendar", 1)).andReturn(2);
-		expect(obmHelper.fetchEntityId("Mailbox", 1)).andReturn(3);
-		entityRightDao.grantRights(eq(2), isNull(Integer.class), isA(Set.class));
+		expect(obmHelper.fetchEntityId("Calendar", 1)).andReturn(EntityId.valueOf(2));
+		expect(obmHelper.fetchEntityId("Mailbox", 1)).andReturn(EntityId.valueOf(3));
+		entityRightDao.grantRights(eq(EntityId.valueOf(2)), isNull(EntityId.class), isA(Set.class));
 		expectLastCall();
-		entityRightDao.grantRights(eq(3), isNull(Integer.class), isA(Set.class));
+		entityRightDao.grantRights(eq(EntityId.valueOf(3)), isNull(EntityId.class), isA(Set.class));
 		expectLastCall();
 	}
 	
@@ -743,7 +744,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.entityId(1)
+				.entityId(EntityId.valueOf(1))
 				.login("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
@@ -755,7 +756,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ObmUser userFromDao = ObmUser
 				.builder()
 				.uid(1)
-				.entityId(1)
+				.entityId(EntityId.valueOf(1))
 				.login("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
@@ -816,7 +817,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		
 		ObmUser.Builder builder = ObmUser.builder()
 				.uid(1)
-				.entityId(1)
+				.entityId(EntityId.valueOf(1))
 				.login("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")

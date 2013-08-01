@@ -104,6 +104,7 @@ import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
@@ -1262,7 +1263,7 @@ public class CalendarBindingImplTest {
 
 		ObmUser obmUser = ObmUser.builder()
 			.uid(1)
-			.entityId(2)
+			.entityId(EntityId.valueOf(2))
 			.login("user")
 			.domain(defaultUser.getDomain())
 			.emailAndAliases(email)
@@ -2050,7 +2051,7 @@ public class CalendarBindingImplTest {
 	public void testGetSyncDoesNotMoveConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
 		String calendar = "user@test.tlse.lng";
 		ObmUser user =
-				ObmUser.builder().uid(1).entityId(2).login("user").domain(ToolBox.getDefaultObmDomain())
+				ObmUser.builder().uid(1).entityId(EntityId.valueOf(2)).login("user").domain(ToolBox.getDefaultObmDomain())
 				.emailAndAliases("user@test.tlse.lng").firstName("Obm").lastName("User")
 				.build();
 

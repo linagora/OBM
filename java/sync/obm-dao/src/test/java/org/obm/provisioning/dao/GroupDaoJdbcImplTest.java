@@ -65,6 +65,7 @@ import org.obm.provisioning.dao.exceptions.GroupExistsException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupRecursionException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.sync.dao.EntityId;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -124,7 +125,7 @@ public class GroupDaoJdbcImplTest {
                       .commonName("")
                       .lastName("")
                       .firstName("")
-                      .entityId(uid)
+                      .entityId(EntityId.valueOf(uid))
                       .extId(UserExtId.valueOf("user" + stringUid))
                       .emailAndAliases("user" + stringUid + "@test.tlse.lng")
                       .publicFreeBusy(true)

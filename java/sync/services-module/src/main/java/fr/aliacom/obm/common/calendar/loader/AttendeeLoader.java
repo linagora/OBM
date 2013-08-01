@@ -15,6 +15,7 @@ import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 import org.obm.utils.DBUtils;
@@ -275,7 +276,7 @@ public class AttendeeLoader {
 		return rs.getBoolean("eventlink_is_organizer");
 	}
 	
-	private int getAttendeeEntityId(ResultSet rs) throws SQLException {
-		return rs.getInt("attendee_entity_id");
+	private EntityId getAttendeeEntityId(ResultSet rs) throws SQLException {
+		return EntityId.valueOf(rs.getInt("attendee_entity_id"));
 	}
 }

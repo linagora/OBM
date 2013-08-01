@@ -47,6 +47,7 @@ import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.push.mail.bean.Acl;
 import org.obm.sync.Right;
+import org.obm.sync.dao.EntityId;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.base.Predicate;
@@ -110,7 +111,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 
 	private void setDefaultUserRightsOnModule(ObmUser user, Profile profile, Module module, String entityType) {
 		try {
-			Integer entityId = obmHelper.fetchEntityId(entityType, user.getUid());
+			EntityId entityId = obmHelper.fetchEntityId(entityType, user.getUid());
 			Set<Right> defaultRights = computeRightsFromDefaultCheckBoxStates(profile.getDefaultCheckBoxStates().get(module));
 
 			entityRightDao.grantRights(entityId, null, defaultRights);

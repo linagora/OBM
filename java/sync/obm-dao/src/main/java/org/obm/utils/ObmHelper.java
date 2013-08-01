@@ -41,6 +41,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Throwables;
@@ -106,7 +107,7 @@ public class ObmHelper implements DateProvider {
 	/**
 	 * Allocate a new entity id in the obm 2.2 entity table
 	 */
-	private int allocateEntityId(Connection con) throws SQLException {
+	private EntityId allocateEntityId(Connection con) throws SQLException {
 		Statement st = null;
 		try {
 			st = con.createStatement();
@@ -115,7 +116,7 @@ public class ObmHelper implements DateProvider {
 		} finally {
 			cleanup(null, st, null);
 		}
-		return lastInsertId(con);
+		return EntityId.valueOf(lastInsertId(con));
 	}
 
 	/**
@@ -126,12 +127,17 @@ public class ObmHelper implements DateProvider {
 			String targetField, int targetId) throws SQLException {
 		Statement st = null;
 
-		Integer existing = fetchEntityId(con, linkTable.replace("Entity", ""),
-				targetId);
-		if (existing != null && existing > 0) {
-			return new LinkedEntity(targetId, existing);
+		EntityId existing = fetchEntityId(con, linkTable.replace("Entity", ""), targetId);
+
+		if (existing != null) {
+			return LinkedEntity
+					.builder()
+					.linkId(targetId)
+					.entityId(existing)
+					.build();
 		}
-		int eid = allocateEntityId(con);
+
+		EntityId eid = allocateEntityId(con);
 
 		try {
 			st = con.createStatement();
@@ -142,7 +148,12 @@ public class ObmHelper implements DateProvider {
 		} finally {
 			cleanup(null, st, null);
 		}
-		return new LinkedEntity(targetId, eid);
+
+		return LinkedEntity
+				.builder()
+				.linkId(targetId)
+				.entityId(eid)
+				.build();
 	}
 
 	public Date selectNow(Connection con) throws SQLException {
@@ -158,7 +169,7 @@ public class ObmHelper implements DateProvider {
 		}
 	}
 
-	private Integer fetchEntityId(Connection con, String tt, Integer uid)
+	private EntityId fetchEntityId(Connection con, String tt, Integer uid)
 			throws SQLException {
 		Statement st = null;
 		ResultSet rs = null;
@@ -169,7 +180,7 @@ public class ObmHelper implements DateProvider {
 					+ tt.toLowerCase() + "entity_" + tt.toLowerCase() + "_id="
 					+ uid);
 			if (rs.next()) {
-				return rs.getInt(1);
+				return EntityId.valueOf(rs.getInt(1));
 			}
 			return null;
 		} finally {
@@ -177,7 +188,7 @@ public class ObmHelper implements DateProvider {
 		}
 	}
 
-	public Integer fetchEntityId(String tt, Integer uid)
+	public EntityId fetchEntityId(String tt, Integer uid)
 			throws SQLException {
 		Connection con = null;
 		try {

@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.utils.LinkedEntity;
 
 @RunWith(SlowFilterRunner.class)
 public class BeansTest {
@@ -51,7 +52,8 @@ public class BeansTest {
                 Operation.class,
                 Request.class,
                 ObmDomainEntry.class,
-                ProfileEntry.class);
+                ProfileEntry.class,
+                LinkedEntity.class);
     }
 
 }

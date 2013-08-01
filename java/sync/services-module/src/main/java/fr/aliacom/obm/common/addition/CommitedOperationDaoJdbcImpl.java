@@ -85,7 +85,7 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 					+ "VALUES (?, ?, ?) ");
 			int idx = 1;
 			ps.setString(idx++, commitedElement.getClientId());
-			ps.setInt(idx++, commitedElement.getEntityId());
+			ps.setInt(idx++, commitedElement.getEntityId().getId());
 			ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
 
 			ps.executeUpdate();

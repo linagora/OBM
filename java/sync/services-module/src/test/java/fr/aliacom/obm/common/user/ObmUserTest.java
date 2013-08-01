@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.sync.dao.EntityId;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
@@ -64,7 +65,7 @@ public class ObmUserTest {
 		String email = "user1";
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(email)
@@ -78,7 +79,7 @@ public class ObmUserTest {
 		String email = "user1@obmsync.test";
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(email)
@@ -93,7 +94,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(emails)
@@ -108,7 +109,7 @@ public class ObmUserTest {
 		String email = "user1";
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(email)
@@ -122,7 +123,7 @@ public class ObmUserTest {
 		String email = "user1@obmsync.test";
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(email)
@@ -136,7 +137,7 @@ public class ObmUserTest {
 		String emails = Joiner.on(EMAIL_FIELD_SEPARATOR).join("user1@obmsync.test", "user2@obmsync.test", "user3");
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domain)
 				.emailAndAliases(emails)
@@ -151,7 +152,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenNull() {
 		ObmUser.builder()
 			.uid(5)
-			.entityId(6)
+			.entityId(EntityId.valueOf(6))
 			.login("any")
 			.domain(ObmDomain.builder().id(1).name("obm.org").build())
 			.emailAndAliases(null)
@@ -162,7 +163,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenEmpty() {
 		ObmUser obmUser = ObmUser.builder()
 			.uid(5)
-			.entityId(6)
+			.entityId(EntityId.valueOf(6))
 			.login("any")
 			.domain(ObmDomain.builder().id(1).name("obm.org").build())
 			.emailAndAliases("")
@@ -176,7 +177,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenOne() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases("one")
@@ -190,7 +191,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenTwo() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two"))
@@ -204,7 +205,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenThree() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases(Joiner.on(EMAIL_FIELD_SEPARATOR).join("one", "two", "three"))
@@ -218,7 +219,7 @@ public class ObmUserTest {
 	public void testSetEmailsWhenOneWithDomain() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases("one@anotherdomain.org")
@@ -235,7 +236,7 @@ public class ObmUserTest {
 		
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases(dbEmails)
@@ -253,7 +254,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(ObmDomain.builder().id(1).name("obm.org").build())
 				.emailAndAliases(dbEmails)
@@ -273,7 +274,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domainWithAliases)
 				.emailAndAliases("user1")
@@ -294,7 +295,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domainWithAliases)
 				.emailAndAliases("user1")
@@ -317,7 +318,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domainWithAliases)
 				.emailAndAliases(dbEmails)
@@ -342,7 +343,7 @@ public class ObmUserTest {
 
 		ObmUser obmUser = ObmUser.builder()
 				.uid(5)
-				.entityId(6)
+				.entityId(EntityId.valueOf(6))
 				.login("any")
 				.domain(domainWithAliases)
 				.emailAndAliases(dbEmails)

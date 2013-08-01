@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,104 +27,72 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.resource;
+package org.obm.sync.dao;
 
-import org.obm.sync.dao.EntityId;
+import java.io.Serializable;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-public class Resource {
-	
-	private final Integer id;
-	private final EntityId entityId;
-	private final String name;
-	private final String email;
-	
-	public static class Builder {
-		private Integer id;
-		private EntityId entityId;
-		private String name;
-		private String mail;
+public class EntityId implements Serializable {
 
-		public Builder id(Integer id) {
-			this.id = id;
-			return this;
-		}
-		
-		public Builder entityId(EntityId entityId) {
-			this.entityId = entityId;
-			return this;
-		}
-
-		public Builder name(String name) {
-			this.name = name;
-			return this;
-		}
-
-		public Builder mail(String mail) {
-			this.mail = mail;
-			return this;
-		}
-
-		public Resource build() {
-			return new Resource(id, entityId, name, mail);
-		}
+	public static EntityId valueOf(int id) {
+		return EntityId.builder().id(id).build();
 	}
 
 	public static Builder builder() {
 		return new Builder();
 	}
-	
-	private Resource(Integer id, EntityId entityId, String name, String email) {
+
+	public static class Builder {
+
+		private Integer id;
+
+		private Builder() {
+		}
+
+		public Builder id(int id) {
+			this.id = id;
+			return this;
+		}
+
+		public EntityId build() {
+			Preconditions.checkState(id != null && id > 0, "'id' must be set to a positive integer");
+
+			return new EntityId(id);
+		}
+
+	}
+
+	private final int id;
+
+	private EntityId(int id) {
 		this.id = id;
-		this.entityId = entityId;
-		this.name = name;
-		this.email = email;
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
-	}
-
-	public EntityId getEntityId() {
-		return entityId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getEmail() {
-		return email;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id, email, entityId, name);
+		return Objects.hashCode(id);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Resource)) {
-			return false;
+		if (obj instanceof EntityId) {
+			EntityId other = (EntityId) obj;
+
+			return Objects.equal(id, other.id);
 		}
-		
-		Resource other = (Resource) obj;
-		
-		return Objects.equal(id, other.id)
-				&& Objects.equal(email, other.email)
-				&& Objects.equal(entityId, other.entityId)
-				&& Objects.equal(name, other.name);
+
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return Objects
-				.toStringHelper(this)
-				.add("id", id)
-				.add("name", name)
-				.add("email", email)
-				.toString();
+		return String.valueOf(id);
 	}
-	
+
 }

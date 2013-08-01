@@ -34,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.obm.sync.dao.EntityId;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -128,7 +129,7 @@ public class ResourceDao {
 				.builder()
 				.id(rs.getInt("resource_id"))
 				.name(rs.getString("resource_name"))
-				.entityId(rs.getInt("resourceentity_entity_id"))
+				.entityId(EntityId.valueOf(rs.getInt("resourceentity_entity_id")))
 				.mail(rs.getString("resource_email"))
 				.build();
 	}

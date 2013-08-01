@@ -61,6 +61,7 @@ import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.solr.SolrHelper;
@@ -162,7 +163,7 @@ public class AttendeeServiceJdbcImplTest {
 	private Resource resource() {
 		return Resource
 				.builder()
-				.entityId(2)
+				.entityId(EntityId.valueOf(2))
 				.id(1)
 				.mail("res-1@test.tlse.lng")
 				.name("Res")
@@ -172,7 +173,7 @@ public class AttendeeServiceJdbcImplTest {
 	private ObmUser johnDoe(ObmDomain userDomain) {
 		return ObmUser.builder()
 				.uid(1)
-				.entityId(2)
+				.entityId(EntityId.valueOf(2))
 				.login("johndoe@test.tlse.lng")
 				.domain(userDomain)
 				.emailAndAliases("johndoe@test.tlse.lng")
@@ -185,7 +186,7 @@ public class AttendeeServiceJdbcImplTest {
 		contact.setUid(1);
 		contact.addEmail("label", EmailAddress.loginAtDomain("external.to@my.domain"));
 		contact.setCommonname("external");
-		contact.setEntityId(2);
+		contact.setEntityId(EntityId.valueOf(2));
 		
 		return  contact;
 	}
@@ -209,7 +210,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull();
 		assertThat(attendee.getEmail()).isEqualTo("johndoe@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -221,7 +222,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull();
 		assertThat(attendee.getEmail()).isEqualTo("external.to@my.domain");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -266,7 +267,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull();
 		assertThat(attendee.getEmail()).isEqualTo("external.to@my.domain");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -278,7 +279,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull();
 		assertThat(attendee.getEmail()).isEqualTo("res-1@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -302,7 +303,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull();
 		assertThat(attendee.getEmail()).isEqualTo("res-1@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -314,7 +315,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull().isInstanceOf(UserAttendee.class);
 		assertThat(attendee.getEmail()).isEqualTo("johndoe@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -327,7 +328,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull().isInstanceOf(ResourceAttendee.class);
 		assertThat(attendee.getEmail()).isEqualTo("res-1@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -342,7 +343,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull().isInstanceOf(ContactAttendee.class);
 		assertThat(attendee.getEmail()).isEqualTo("external.to@my.domain");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 	
 	@Test
@@ -358,7 +359,7 @@ public class AttendeeServiceJdbcImplTest {
 		
 		assertThat(attendee).isNotNull().isInstanceOf(ContactAttendee.class);
 		assertThat(attendee.getEmail()).isEqualTo("external.to@my.domain");
-		assertThat(attendee.getEntityId()).isEqualTo(2);
+		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
 
 }

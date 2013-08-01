@@ -91,6 +91,7 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
@@ -100,7 +101,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -134,6 +137,15 @@ public class ContactDao {
 	private final ObmHelper obmHelper;
 	private final ContactConfiguration contactConfiguration;
 	private final EventExtId.Factory eventExtIdFactory;
+
+	private final Function<EntityId, Integer> entityIdToIntegerFunction = new Function<EntityId, Integer>() {
+
+		@Override
+		public Integer apply(EntityId entityId) {
+			return entityId.getId();
+		}
+
+	};
 
 	@Inject
 	@VisibleForTesting
@@ -215,7 +227,7 @@ public class ContactDao {
 			ps.setTimestamp(idx++, new Timestamp(timestamp.getTime()));
 			rs = ps.executeQuery();
 
-			Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
+			Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
 			while (rs.next()) {
 				boolean archived = rs.getBoolean("contact_archive");
 				Contact c = contactFromCursor(rs);
@@ -249,7 +261,7 @@ public class ContactDao {
 	}
 
 	private void loadBirthday(Connection con,
-			Map<Integer, Contact> entityContact) {
+			Map<EntityId, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
@@ -284,7 +296,7 @@ public class ContactDao {
 	}
 
 	private void loadAnniversary(Connection con,
-			Map<Integer, Contact> entityContact) {
+			Map<EntityId, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
@@ -324,7 +336,7 @@ public class ContactDao {
 		c.setUid(rs.getInt(1));
 		c.setFirstname(rs.getString(2));
 		c.setLastname(rs.getString(3));
-		c.setEntityId(rs.getInt(4));
+		c.setEntityId(EntityId.valueOf(rs.getInt(4)));
 		c.setAka(rs.getString(5));
 		c.setCompany(rs.getString(6));
 		c.setTitle(rs.getString(7));
@@ -560,7 +572,7 @@ public class ContactDao {
 		return null;
 	}
 
-	private void createOrUpdateIMIdentifiers(Connection con, int entityId,
+	private void createOrUpdateIMIdentifiers(Connection con, EntityId entityId,
 			Map<String, InstantMessagingId> imIdentifiers) throws SQLException {
 		PreparedStatement ps = null;
 		try {
@@ -568,7 +580,7 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
 					+ imIds.asPlaceHolders() + ")");
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 			imIds.insertValues(ps, 2);
 			ps.executeUpdate();
 
@@ -577,7 +589,7 @@ public class ContactDao {
 			.prepareStatement("INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) "
 					+ "VALUES (?, ?, ?, ?)");
 			for (Entry<String, InstantMessagingId> entry: imIdentifiers.entrySet()) {
-				ps.setInt(1, entityId);
+				ps.setInt(1, entityId.getId());
 				ps.setString(2, entry.getKey());
 				ps.setString(3, entry.getValue().getProtocol());
 				ps.setString(4, entry.getValue().getId());
@@ -595,7 +607,7 @@ public class ContactDao {
 			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(c.listWebSitesLabel());
 			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN (" + 
 					labels.asPlaceHolders() + ")");
-			ps.setInt(1, c.getEntityId());
+			ps.setInt(1, c.getEntityId().getId());
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
@@ -615,12 +627,12 @@ public class ContactDao {
 
 	}
 
-	private void insertWebSite(Connection con, int entityId, String label, String url) throws SQLException {
+	private void insertWebSite(Connection con, EntityId entityId, String label, String url) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = con.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) VALUES (?, ?, ?)");
 			if (!StringUtils.isEmpty(url)) {
-				ps.setInt(1, entityId);
+				ps.setInt(1, entityId.getId());
 				ps.setString(2, label);
 				ps.setString(3, url);
 				ps.executeUpdate();
@@ -630,7 +642,7 @@ public class ContactDao {
 		}
 	}
 
-	private void createOrUpdateAddresses(Connection con, int entityId,
+	private void createOrUpdateAddresses(Connection con, EntityId entityId,
 			Map<String, Address> addresses) throws SQLException {
 		PreparedStatement ps = null;
 		try {
@@ -638,7 +650,7 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
 					+ labels.asPlaceHolders() + ")");
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
@@ -649,7 +661,7 @@ public class ContactDao {
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 			for (Entry<String, Address> entry: addresses.entrySet()) {
 				Address ad = entry.getValue();
-				ps.setInt(1, entityId);
+				ps.setInt(1, entityId.getId());
 				ps.setString(2, entry.getKey());
 				ps.setString(3, ad.getStreet());
 				ps.setString(4, ad.getZipCode());
@@ -667,7 +679,7 @@ public class ContactDao {
 	}
 
 
-	private void createOrUpdateEmails(Connection con, int entityId,
+	private void createOrUpdateEmails(Connection con, EntityId entityId,
 			Map<String, EmailAddress> emails) throws SQLException {
 		PreparedStatement ps = null;
 		try {
@@ -675,7 +687,7 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
 					+ emailStrings.asPlaceHolders() + ")");
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 			emailStrings.insertValues(ps, 2);
 			ps.executeUpdate();
 
@@ -684,7 +696,7 @@ public class ContactDao {
 			.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
 					+ "VALUES (?, ?, ?)");
 			for (Entry<String, EmailAddress> entry: emails.entrySet()) {
-				ps.setInt(1, entityId);
+				ps.setInt(1, entityId.getId());
 				ps.setString(2, entry.getKey());
 				ps.setString(3, entry.getValue().get());
 				ps.addBatch();
@@ -695,7 +707,7 @@ public class ContactDao {
 		}
 	}
 
-	private void createOrUpdatePhones(Connection con, int entityId,
+	private void createOrUpdatePhones(Connection con, EntityId entityId,
 			Map<String, Phone> phones) throws SQLException {
 		PreparedStatement ps = null;
 		try {
@@ -703,7 +715,7 @@ public class ContactDao {
 			ps = con
 			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
 					+ labels.asPlaceHolders() + ")");
-			ps.setInt(1, entityId);
+			ps.setInt(1, entityId.getId());
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
@@ -712,7 +724,7 @@ public class ContactDao {
 			.prepareStatement("INSERT INTO Phone (phone_entity_id, phone_label, phone_number) "
 					+ "VALUES (?, ?, ?)");
 			for (Entry<String, Phone> entry: phones.entrySet()) {
-				ps.setInt(1, entityId);
+				ps.setInt(1, entityId.getId());
 				ps.setString(2, entry.getKey());
 				ps.setString(3, entry.getValue().getNumber());
 				ps.addBatch();
@@ -939,7 +951,7 @@ public class ContactDao {
 			Contact ret = null;
 			if (rs.next()) {
 				ret = contactFromCursor(rs);
-				Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
+				Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
 				entityContact.put(ret.getEntityId(), ret);
 				loadPhones(con, entityContact);
 				loadIMIdentifiers(con, entityContact);
@@ -992,7 +1004,7 @@ public class ContactDao {
 				Contact contact = new Contact();
 				
 				contact.setUid(rs.getInt("contact_id"));
-				contact.setEntityId(rs.getInt("contactentity_entity_id"));
+				contact.setEntityId(EntityId.valueOf(rs.getInt("contactentity_entity_id")));
 				contact.addEmail(rs.getString("email_label"), EmailAddress.loginAtDomain(email));
 				contact.setCommonname(rs.getString("contact_commonname"));
 				contact.setFirstname(rs.getString("contact_firstname"));
@@ -1010,8 +1022,8 @@ public class ContactDao {
 	/**
 	 * bulk loads all emails of the given entities (contacts)
 	 */
-	private void loadEmails(Connection con, Map<Integer, Contact> entityContact) {
-		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
+	private void loadEmails(Connection con, Map<EntityId, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(Collections2.transform(entityContact.keySet(), entityIdToIntegerFunction));
 		String q = "select email_entity_id, email_label, email_address FROM Email where email_entity_id IN ("
 			+ contactIds.asPlaceHolders() + ")";
 		PreparedStatement st = null;
@@ -1030,8 +1042,8 @@ public class ContactDao {
 		}
 	}
 
-	@VisibleForTesting void loadEmailInContact(Map<Integer, Contact> entityContact, ResultSet rs) throws SQLException {
-		Contact contact = entityContact.get(rs.getInt(1));
+	@VisibleForTesting void loadEmailInContact(Map<EntityId, Contact> entityContact, ResultSet rs) throws SQLException {
+		Contact contact = entityContact.get(EntityId.valueOf(rs.getInt(1)));
 		String contactEmailLabel = rs.getString(2);
 		String contactEmail = rs.getString(3);
 		if (!Strings.isNullOrEmpty(contactEmailLabel) && EmailAddress.isEmailAddress(contactEmail)) {
@@ -1043,8 +1055,8 @@ public class ContactDao {
 	}
 
 	private void loadAddresses(AccessToken token, Connection con,
-			Map<Integer, Contact> entityContact) {
-		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
+			Map<EntityId, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(Collections2.transform(entityContact.keySet(), entityIdToIntegerFunction));
 		String q = "select address_entity_id, address_label, "
 			+ "address_street, address_zipcode, address_expresspostal, address_town, address_country, address_state "
 			+ "FROM Address where address_entity_id IN ("
@@ -1069,8 +1081,8 @@ public class ContactDao {
 		}
 	}
 
-	private void loadWebsites(Connection con, Map<Integer, Contact> entityContact) {
-		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
+	private void loadWebsites(Connection con, Map<EntityId, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(Collections2.transform(entityContact.keySet(), entityIdToIntegerFunction));
 		String q = "select website_entity_id, website_label, website_url FROM Website where website_entity_id IN ("
 			+ contactIds.asPlaceHolders() + ")";
 		PreparedStatement st = null;
@@ -1096,8 +1108,8 @@ public class ContactDao {
 	}
 
 	private void loadIMIdentifiers(Connection con,
-			Map<Integer, Contact> entityContact) {
-		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(entityContact.keySet());
+			Map<EntityId, Contact> entityContact) {
+		IntegerSQLCollectionHelper contactIds = new IntegerSQLCollectionHelper(Collections2.transform(entityContact.keySet(), entityIdToIntegerFunction));
 		String q = "select im_entity_id, im_label, im_address, im_protocol FROM IM where im_entity_id IN ("
 			+ contactIds.asPlaceHolders() + ")";
 		PreparedStatement st = null;
@@ -1119,8 +1131,8 @@ public class ContactDao {
 		}
 	}
 	
-	private void loadPhones(Connection con, Map<Integer, Contact> entityContact) {
-		IntegerSQLCollectionHelper phoneIds = new IntegerSQLCollectionHelper(entityContact.keySet());
+	private void loadPhones(Connection con, Map<EntityId, Contact> entityContact) {
+		IntegerSQLCollectionHelper phoneIds = new IntegerSQLCollectionHelper(Collections2.transform(entityContact.keySet(), entityIdToIntegerFunction));
 		String q = "select phone_entity_id, phone_label, phone_number FROM Phone where phone_entity_id IN ("
 			+ phoneIds.asPlaceHolders() + ")";
 		PreparedStatement st = null;
@@ -1374,7 +1386,7 @@ public class ContactDao {
 			}
 
 			rs = ps.executeQuery();
-			Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
+			Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
 
 			while (rs.next()) {
 				int entity = rs.getInt("contactentity_entity_id");
@@ -1536,7 +1548,7 @@ public class ContactDao {
 			ps = con.prepareStatement(q);
 			eventIds.insertValues(ps, 1);
 			rs = ps.executeQuery();
-			Map<Integer, Contact> entityContact = new HashMap<Integer, Contact>();
+			Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
 
 			int i = 0;
 			while (rs.next() && i < limit) {

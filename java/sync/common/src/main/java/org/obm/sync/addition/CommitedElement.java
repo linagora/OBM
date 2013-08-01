@@ -33,6 +33,8 @@ package org.obm.sync.addition;
 
 import java.io.Serializable;
 
+import org.obm.sync.dao.EntityId;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -45,7 +47,7 @@ public class CommitedElement implements Serializable {
 	public static class Builder {
 		
 		private String clientId;
-		private Integer entityId;
+		private EntityId entityId;
 		private Kind kind;
 		
 		private Builder() {
@@ -57,7 +59,7 @@ public class CommitedElement implements Serializable {
 			return this;
 		}
 		
-		public Builder entityId(Integer entityId) {
+		public Builder entityId(EntityId entityId) {
 			this.entityId = entityId;
 			return this;
 		}
@@ -76,10 +78,10 @@ public class CommitedElement implements Serializable {
 	}
 	
 	private final String clientId;
-	private final Integer entityId;
+	private final EntityId entityId;
 	private final Kind kind;
 	
-	private CommitedElement(String clientId, Integer entityId, Kind kind) {
+	private CommitedElement(String clientId, EntityId entityId, Kind kind) {
 		this.clientId = clientId;
 		this.entityId = entityId;
 		this.kind = kind;
@@ -89,7 +91,7 @@ public class CommitedElement implements Serializable {
 		return clientId;
 	}
 
-	public Integer getEntityId() {
+	public EntityId getEntityId() {
 		return entityId;
 	}
 

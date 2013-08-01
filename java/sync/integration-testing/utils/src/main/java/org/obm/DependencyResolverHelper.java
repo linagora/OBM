@@ -339,6 +339,7 @@ import org.obm.sync.calendar.UnidentifiedAttendee;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.client.CalendarType;
 import org.obm.sync.client.login.LoginService;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.dao.TableDescription;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.ContactNotFoundException;
@@ -1163,7 +1164,8 @@ public class DependencyResolverHelper {
 				DisplayNameUtils.class,
 				MailUtils.class,
 				XTrustProvider.class,
-				ObmSystemUser.class
+				ObmSystemUser.class,
+				EntityId.class
 		};
 	}
 }

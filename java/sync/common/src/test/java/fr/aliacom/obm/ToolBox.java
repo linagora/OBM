@@ -55,6 +55,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.dao.EntityId;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -132,7 +133,7 @@ public class ToolBox {
 	private static Builder buildCommonObmUser() {
 		return ObmUser.builder()
 			.uid(1)
-			.entityId(2)
+			.entityId(EntityId.valueOf(2))
 			.login("user")
 			.domain(getDefaultObmDomain())
 			.emailAndAliases("user@test")
@@ -216,7 +217,7 @@ public class ToolBox {
 		c.setMiddlename("Middle");
 		c.setBirthday(DateUtils.date("2000-01-01T00:00:00"));
 		c.setUid(id);
-		c.setEntityId(id);
+		c.setEntityId(EntityId.valueOf(id));
 		c.setAka("Aka");
 		c.setTitle("Title");
 		c.setManager("Manager");

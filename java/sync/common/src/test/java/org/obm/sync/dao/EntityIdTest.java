@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,104 +27,54 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.resource;
+package org.obm.sync.dao;
 
-import org.obm.sync.dao.EntityId;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.common.base.Objects;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-public class Resource {
-	
-	private final Integer id;
-	private final EntityId entityId;
-	private final String name;
-	private final String email;
-	
-	public static class Builder {
-		private Integer id;
-		private EntityId entityId;
-		private String name;
-		private String mail;
+@RunWith(SlowFilterRunner.class)
+public class EntityIdTest {
 
-		public Builder id(Integer id) {
-			this.id = id;
-			return this;
-		}
-		
-		public Builder entityId(EntityId entityId) {
-			this.entityId = entityId;
-			return this;
-		}
+	@Test
+	public void testBuild() {
+		EntityId id = EntityId.builder().id(1).build();
 
-		public Builder name(String name) {
-			this.name = name;
-			return this;
-		}
-
-		public Builder mail(String mail) {
-			this.mail = mail;
-			return this;
-		}
-
-		public Resource build() {
-			return new Resource(id, entityId, name, mail);
-		}
+		assertThat(id.getId()).isEqualTo(1);
 	}
 
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	private Resource(Integer id, EntityId entityId, String name, String email) {
-		this.id = id;
-		this.entityId = entityId;
-		this.name = name;
-		this.email = email;
+	@Test(expected = IllegalStateException.class)
+	public void testBuildWithNoId() {
+		EntityId.builder().build();
 	}
 
-	public Integer getId() {
-		return id;
+	@Test(expected = IllegalStateException.class)
+	public void testBuildWith0() {
+		EntityId.builder().id(0).build();
 	}
 
-	public EntityId getEntityId() {
-		return entityId;
+	@Test(expected = IllegalStateException.class)
+	public void testBuildWithNoNegativeValue() {
+		EntityId.builder().id(-1).build();
 	}
 
-	public String getName() {
-		return name;
+	@Test
+	public void testValueOf() {
+		EntityId id = EntityId.valueOf(1);
+
+		assertThat(id.getId()).isEqualTo(1);
 	}
 
-	public String getEmail() {
-		return email;
+	@Test(expected = IllegalStateException.class)
+	public void testValueOfWith0() {
+		EntityId.valueOf(0);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(id, email, entityId, name);
+	@Test(expected = IllegalStateException.class)
+	public void testValueOfWithNegativeValue() {
+		EntityId.valueOf(-1);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Resource)) {
-			return false;
-		}
-		
-		Resource other = (Resource) obj;
-		
-		return Objects.equal(id, other.id)
-				&& Objects.equal(email, other.email)
-				&& Objects.equal(entityId, other.entityId)
-				&& Objects.equal(name, other.name);
-	}
-
-	@Override
-	public String toString() {
-		return Objects
-				.toStringHelper(this)
-				.add("id", id)
-				.add("name", name)
-				.add("email", email)
-				.toString();
-	}
-	
 }

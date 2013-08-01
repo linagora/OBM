@@ -50,6 +50,7 @@ import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
@@ -319,7 +320,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				.publicFreeBusy(computePublicFreeBusy(5, rs))
 				.commonName(emptyToNull(rs.getString("userobm_commonname")))
 				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
-				.entityId(rs.getInt("userentity_entity_id"))
+				.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
 				.password(Strings.emptyToNull(rs.getString("userobm_password")))
 				.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
 				.kind(rs.getString("userobm_kind"))
