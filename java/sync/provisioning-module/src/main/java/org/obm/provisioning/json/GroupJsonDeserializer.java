@@ -31,26 +31,22 @@ package org.obm.provisioning.json;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.Group;
-import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.utils.SerializationUtils;
 
 public class GroupJsonDeserializer extends JsonDeserializer<Group> {
 
 	@Override
 	public Group deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		JsonNode root = jp.readValueAsTree();
+		Group.Builder builder = Group.builder();
+		
+		SerializationUtils.readJsonGroup(jp, builder);
 
-		return Group
-				.builder()
-				.extId(GroupExtId.valueOf(root.findValue("id").asText()))
-				.name(root.findValue("name").asText())
-				.description(root.findValue("description").asText())
-				.build();
+		return builder.build();
 	}
 
 }

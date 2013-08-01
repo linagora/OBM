@@ -35,10 +35,15 @@ import static org.obm.provisioning.bean.UserJsonFields.MAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
 import static org.obm.push.utils.DateUtils.date;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.sync.host.ObmHost;
@@ -193,6 +198,27 @@ public class SerializationUtils {
 			case ZIPCODE:
 				toBuild.zipCode(value.asText());
 				break;
+		}
+	}
+	
+
+
+	public static void readJsonGroup(JsonParser jp, Group.Builder builder) throws IOException, JsonProcessingException {
+		JsonNode root = jp.readValueAsTree();
+
+		JsonNode at = root.findValue("id");
+		if (at != null) {
+			builder.extId(GroupExtId.valueOf(at.asText()));
+		}
+		
+		at = root.findValue("name");
+		if (at != null) {
+			builder.name(root.findValue("name").asText());
+		}
+		
+		at = root.findValue("description");
+		if (at != null) {
+			builder.description(at.asText());
 		}
 	}
 }

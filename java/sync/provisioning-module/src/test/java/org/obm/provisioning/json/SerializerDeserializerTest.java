@@ -31,18 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.json;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.core.StringContains.containsString;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.Charsets;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -50,35 +43,91 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
+import com.jayway.restassured.http.ContentType;
+
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
-public class ObmUserSerializerDeserializerTest extends CommonDomainEndPointEnvTest {
+public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testObmUserDeserializer() throws Exception {
+	public void testObmUserDeserializerAndSerializer() throws Exception {
 		expectDomain();
 		mocksControl.replay();
 		
-		HttpResponse httpResponse = post("/do/tests/on/serialization", "user", "password", obmUserToJson());
-		EntityUtils.consume(httpResponse.getEntity());
+		given()
+			.auth().basic("user", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(obmUserToJsonString())).
+		when()
+			.post("/do/tests/on/serialization/of/user");
 		
 		mocksControl.verify();
+	}
+	
+	@Test
+	public void testGroupDeserializerAndSerializerWithFullJson() {
+		expectDomain();
+		mocksControl.replay();
 		
-		assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(Status.OK.getStatusCode());
-		assertThat(ContentType.get(httpResponse.getEntity()).getCharset()).isEqualTo(Charsets.UTF_8);
-		assertThat(EntityUtils.toString(httpResponse.getEntity())).isEqualTo(obmUserToJsonString());
+		given()
+			.auth().basic("user", "password")
+			.content(
+					"{" +
+						"\"id\":\"groupExtId\"," +
+						"\"name\":\"group1\"," +
+						"\"description\":\"description\"" +
+					"}")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(
+					"{" +
+						"\"id\":\"groupExtId\"," +
+						"\"name\":\"group1\"," +
+						"\"description\":\"description\"," +
+						"\"members\":" +
+							"{" +
+								"\"users\":[]," +
+								"\"subgroups\":[]" +	
+							"}" +
+					"}")).
+		when()
+			.post("/do/tests/on/serialization/of/group");
+		
+		mocksControl.verify();
 	}
 	
-	private HttpResponse post(String path, String username, String password, StringEntity content) throws Exception {
-		return createPostRequestWithAuth(path, username, password, content).execute().returnResponse();
-	}
-	
-	private Request createPostRequestWithAuth(String path, String username, String password, StringEntity content) {
-		final Request request = Request.Post(baseUrl + "/" + domain.getUuid().get() + path).body(content);
-		request.addHeader(
-				BasicScheme.authenticate(
-						new UsernamePasswordCredentials(username, password), "UTF-8", false));
-		return request;
+	@Test
+	public void testGroupDeserializerAndSerializerWithPartialJson() {
+		expectDomain();
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user", "password")
+			.content(
+					"{" +
+						"\"id\":\"groupExtId\"" +
+					"}")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(
+					"{" +
+						"\"id\":\"groupExtId\"," +
+						"\"name\":null," +
+						"\"description\":null," +
+						"\"members\":" +
+							"{" +
+								"\"users\":[]," +
+								"\"subgroups\":[]" +	
+							"}" +
+					"}")).
+		when()
+			.post("/do/tests/on/serialization/of/group");
+		
+		mocksControl.verify();
 	}
 }

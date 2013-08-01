@@ -48,11 +48,18 @@ public class ResourceForTest {
 	ObmDomain domain;
 	
 	@POST
-	@Path("/serialization")
+	@Path("/serialization/of/user")
 	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
 	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
 	public ObmUser create(ObmUser user) {
 		return user;
 	}
-	
+
+	@POST
+	@Path("serialization/of/group")
+	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	public Group create(Group group) {
+		return group;
+	}
 }

@@ -34,13 +34,9 @@ package org.obm.provisioning;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-
-import org.apache.http.entity.StringEntity;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -335,13 +331,7 @@ public abstract class CommonDomainEndPointEnvTest {
 						.build())
 				.build();
 	}
-
-	protected StringEntity obmUserToJson() throws UnsupportedEncodingException {
-		final StringEntity userToJson = new StringEntity(obmUserToJsonString());
-		userToJson.setContentType(MediaType.APPLICATION_JSON);
-		return  userToJson;
-	}
-
+	
 	protected String obmUserToJsonString() {
 		return 	
 			"{" +
@@ -382,15 +372,15 @@ public abstract class CommonDomainEndPointEnvTest {
 				.login("user1")
 				.password("password")
 				.lastName("Doe")
-				.profileName(ProfileName.valueOf("Utilisateurs"))	// Not implemented yet in ObmUser
+				.profileName(ProfileName.valueOf("Utilisateurs"))
 				.firstName("Jesus")
 				.commonName("John Doe")
-				.kind("kind")					// Not implemented yet in ObmUser
+				.kind("kind")
 				.title("title")
 				.description("description")
-				.company("company")				// Not implemented yet in ObmUser
+				.company("company")
 				.service("service")
-				.direction("direction")				// Not implemented yet in ObmUser
+				.direction("direction")
 				.address1("address1")
 				.address2("address2")
 				.town("town")
@@ -403,7 +393,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.fax("fax")
 				.fax2("fax2")
 				.mailQuota(1234)
-				.mailHost(ObmHost.builder().name("host").build())			// Not implemented yet in ObmUser
+				.mailHost(ObmHost.builder().name("host").build())
 				.emailAndAliases("john@domain")
 				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
 				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
