@@ -88,7 +88,7 @@ public class LdapManagerImplTest {
 		expectLastCall().once();
 
 		control.replay();
-		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, mockUserMembershipProvider);
+		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, null, mockUserMembershipProvider);
 		ldapManager.createUser(obmUser);
 		control.verify();
 	}
@@ -123,7 +123,7 @@ public class LdapManagerImplTest {
 		expectLastCall().once();
 
 		control.replay();
-		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, mockUserMembershipProvider);
+		LdapManagerImpl ldapManager = new LdapManagerImpl(mockConnection, mockUserBuilderProvider, null, mockUserMembershipProvider);
 		ldapManager.deleteUser(obmUser);
 		control.verify();
 	}

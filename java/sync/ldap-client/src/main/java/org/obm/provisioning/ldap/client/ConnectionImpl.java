@@ -149,6 +149,17 @@ public class ConnectionImpl implements Connection {
 		}
 	}
 	
+	@Override
+	public void modifyGroup(LdapGroup.Cn ldapGroupCn, LdapDomain domain, Modification... modifications)
+			throws org.obm.provisioning.ldap.client.exception.LdapException {
+		try {
+			connection.modify(getGroupDnFromGroupCn(ldapGroupCn, domain), modifications);
+			incrementAndCheckRequestCounter();
+		} catch (LdapException e) {
+			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
+		}
+	}
+	
 	private void createEntry(Entry entry) throws org.obm.provisioning.ldap.client.exception.LdapException {
 		try {
 			connection.add(entry);

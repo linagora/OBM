@@ -35,6 +35,7 @@ import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
+import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapGroup.Cn;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
@@ -53,6 +54,7 @@ public class LdapManagerImpl implements LdapManager {
 
 	private Connection conn;
 	private Provider<LdapUser.Builder> userBuilderProvider;
+	private Provider<LdapGroup.Builder> groupBuilderProvider;
 	private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -60,28 +62,37 @@ public class LdapManagerImpl implements LdapManager {
 	@Singleton
 	public static class Factory implements LdapManager.Factory {
 		private Provider<LdapUser.Builder> userBuilderProvider;
+		private Provider<LdapGroup.Builder> groupBuilderProvider;
 		private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
 		private Connection.Factory connectionFactory;
 
 		@Inject
-		public Factory(Provider<LdapUser.Builder> userBuilderProvider,  Provider<LdapUserMembership.Builder> userMembershipBuilderProvider,
+		public Factory(Provider<LdapUser.Builder> userBuilderProvider, Provider<LdapGroup.Builder> groupBuilderProvider,
+				Provider<LdapUserMembership.Builder> userMembershipBuilderProvider,
 				Connection.Factory connectionFactory) {
 			this.userBuilderProvider = userBuilderProvider;
 			this.userMembershipBuilderProvider = userMembershipBuilderProvider;
+			this.groupBuilderProvider = groupBuilderProvider;
 			this.connectionFactory = connectionFactory;
 		}
 
 		@Override
 		public LdapManager create(LdapConnectionConfig connectionConfig) {
-			return new LdapManagerImpl(connectionFactory.create(connectionConfig), userBuilderProvider, userMembershipBuilderProvider);
+			return new LdapManagerImpl(
+					connectionFactory.create(connectionConfig),
+					userBuilderProvider,
+					groupBuilderProvider,
+					userMembershipBuilderProvider);
 		}
 
 	}
 
 	public LdapManagerImpl(Connection conn, Provider<LdapUser.Builder> userBuilderProvider,
+			Provider<LdapGroup.Builder> groupBuilderProvider,
 			Provider<LdapUserMembership.Builder> userMembershipBuilderProvider) {
 		this.conn = conn;
 		this.userBuilderProvider = userBuilderProvider;
+		this.groupBuilderProvider = groupBuilderProvider;
 		this.userMembershipBuilderProvider = userMembershipBuilderProvider;
 	}
 
@@ -147,6 +158,22 @@ public class LdapManagerImpl implements LdapManager {
 				Cn.valueOf(subgroup.getName()),
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
+	}
+	
+	@Override
+	public void modifyGroup(Group group, Group oldGroup) {
+		LdapGroup ldapGroup = groupBuilderProvider.get().fromObmGroup(group).build();
+		LdapGroup oldLdapGroup = groupBuilderProvider.get().fromObmGroup(oldGroup).build();
+		Modification[] modifications = ldapGroup.buildDiffModifications(oldLdapGroup);
+
+		if (modifications.length > 0) {
+			conn.modifyGroup(ldapGroup.getCn(), ldapGroup.getDomain(), modifications);
+		} else {
+			logger.info(String.format(
+							"LDAP attributes of group %s (%s) weren't changed. Doing nothing.",
+							group.getName(),
+							group.getExtId())); 
+		}
 	}
 
 	@Override

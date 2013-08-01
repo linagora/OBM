@@ -31,12 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.ldap.client.bean;
 
+import java.util.List;
+
+import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 public class LdapGroup {
@@ -85,6 +92,10 @@ public class LdapGroup {
 		@Inject
 		private Builder(Configuration configuration) {
 			this.configuration = configuration;
+		}
+
+		public Builder fromObmGroup(Group group) {
+			return this;
 		}
 		
 		public Builder objectClasses(String[] objectClasses) {
@@ -187,7 +198,29 @@ public class LdapGroup {
 		return org.obm.provisioning.ldap.client.bean.Dn.valueOf(
 				"cn=" + getCn().get() + "," + groupBaseDn.getName());
 	}
-
+	
+	public Modification[] buildDiffModifications(LdapGroup oldGroup) {
+		List<Modification> mods = Lists.newArrayList();
+		
+		if (!Objects.equal(cn, oldGroup.cn)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "cn", cn.get()));
+		}
+		if (!Objects.equal(gidNumber, oldGroup.gidNumber)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "gidNumber", String.valueOf(gidNumber)));
+		}
+		if (!Objects.equal(mailAccess, oldGroup.mailAccess)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mailAccess", mailAccess));
+		}
+		if (!Objects.equal(mail, oldGroup.mail)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "mail", mail));
+		}
+		if (!Objects.equal(domain, oldGroup.domain)) {
+			mods.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "obmDomain", domain.get()));
+		}
+		
+		return mods.toArray(new Modification[mods.size()]);
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(cn, gidNumber, mailAccess, mail, domain);

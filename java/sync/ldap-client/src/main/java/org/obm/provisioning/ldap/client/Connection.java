@@ -37,6 +37,7 @@ import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
+import org.obm.provisioning.ldap.client.bean.LdapGroup.Cn;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
@@ -56,6 +57,9 @@ public interface Connection {
 			throws LdapException, ConnectionException;
 
 	void createGroup(LdapGroup ldapGroup) throws LdapException, ConnectionException;
+
+	void modifyGroup(Cn ldapGroupCn, LdapDomain domain, Modification... modifications)
+			throws LdapException;
 	
 	void deleteGroup(LdapGroup.Cn ldapGroup, LdapDomain domain) throws LdapException, ConnectionException;
 	
