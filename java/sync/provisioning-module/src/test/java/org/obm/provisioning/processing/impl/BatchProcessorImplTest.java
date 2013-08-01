@@ -61,7 +61,6 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
@@ -129,8 +128,6 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private LdapService ldapService;
 	@Inject
 	private CyrusImapService cyrusService;
-	@Inject
-	private GroupDao groupDao;
 	@Inject
 	private EntityRightDao entityRightDao;
 	@Inject
@@ -541,6 +538,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private void expectLdapDeleteGroup(Group group) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.deleteGroup(domain, group);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+	
+	private void expectLdapModifyGroup(Group group, Group oldGroup) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.modifyGroup(group, oldGroup);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -958,6 +963,64 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.delete(domain, extId);
 		expectLastCall();
 		expectLdapDeleteGroup(groupFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessModifyGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.verb(HttpVerb.PUT)
+						.body(
+								"{" +
+										"\"id\": \"extIdGroup1\"," +
+										"\"name\": \"newName\"," +
+										"\"description\": \"description\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
+		final Group newGroup = Group.builder()
+				.name("newName")
+				.extId(extId)
+				.description("description")
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(groupDao.update(domain, newGroup)).andReturn(newGroup);
+		expectLdapModifyGroup(newGroup, groupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

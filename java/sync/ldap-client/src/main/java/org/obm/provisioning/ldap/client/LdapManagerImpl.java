@@ -167,7 +167,7 @@ public class LdapManagerImpl implements LdapManager {
 		Modification[] modifications = ldapGroup.buildDiffModifications(oldLdapGroup);
 
 		if (modifications.length > 0) {
-			conn.modifyGroup(ldapGroup.getCn(), ldapGroup.getDomain(), modifications);
+			conn.modifyGroup(oldLdapGroup.getCn(), ldapGroup.getDomain(), modifications);
 		} else {
 			logger.info(String.format(
 							"LDAP attributes of group %s (%s) weren't changed. Doing nothing.",

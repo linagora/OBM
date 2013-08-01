@@ -31,14 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.map.Module;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
+import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 
 import com.google.inject.Inject;
@@ -66,6 +72,10 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.SUBGROUPS_ID_KEY));
 	}
 	
+	protected Group inheritDatabaseIdentifiers(Group group, Group oldgroup) {
+		return Group.builder().from(group).uid(oldgroup.getUid()).gid(oldgroup.getGid()).build();
+	}
+	
 	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
 		try {
 			return groupDao.get(domain, extId);
@@ -73,5 +83,24 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 			throw new ProcessingException(
 					String.format("Cannot fetch existing group with extId '%s' from database.", extId), e);
 		}
+	}
+	
+	protected Group getGroupFromRequestBody(Operation operation) {
+		String requestBody = operation.getRequest().getBody();
+		ObjectMapper objectMapper = getObjectMapperForDomain();
+
+		try {
+			return objectMapper.readValue(requestBody, Group.class);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot parse Group object from request body %s.", requestBody), e);
+		}
+	}
+
+	private ObjectMapper getObjectMapperForDomain() {
+		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
+			.addDeserializer(Group.class, new GroupJsonDeserializer());
+
+		return ProvisioningService.createObjectMapper(module);
 	}
 }
