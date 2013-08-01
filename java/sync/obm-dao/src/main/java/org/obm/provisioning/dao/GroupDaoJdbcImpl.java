@@ -180,7 +180,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
                     "             (group_domain_id, group_ext_id, group_name," +
                     "              group_desc, group_gid, group_privacy, group_email)" +
                     "      VALUES " +
-                    "             (SELECT domain_id FROM Domain WHERE domain_uuid = ?," +
+                    "             ((SELECT domain_id FROM Domain WHERE domain_uuid = ?)," +
                     "              ?, ?, ?, ?, ?, ?)");
 
             ps.setString(idx++, domain.getUuid().get());
@@ -188,7 +188,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
             ps.setString(idx++, info.getName());
             ps.setString(idx++, info.getDescription());
             ps.setInt(idx++, getNextFreeGid(conn));
-            ps.setBoolean(idx++, info.isPrivateGroup());
+            ps.setInt(idx++, info.isPrivateGroup() ? 1 : 0);
             ps.setString(idx++, info.getEmail());
             ps.executeUpdate();
 

@@ -75,7 +75,7 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 		LdapManager ldapManager = buildLdapManager(domain);
 		
 		try {
-			ldapManager.modifyGroup(group, oldGroup);
+			ldapManager.modifyGroup(domain, group, oldGroup);
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format("Cannot modify group '%s' (%s) in ldap.", group.getName(), group.getExtId()), e);

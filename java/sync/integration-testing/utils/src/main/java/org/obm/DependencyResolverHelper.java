@@ -199,6 +199,7 @@ import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddSubgroupToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.CreateGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
@@ -718,7 +719,8 @@ public class DependencyResolverHelper {
 				DeleteSubgroupFromGroupOperationProcessor.class,
 				ModifyGroupOperationProcessor.class,
 				PatchGroupJsonDeserializer.class,
-				PatchGroupOperationProcessor.class
+				PatchGroupOperationProcessor.class,
+				CreateGroupOperationProcessor.class
 		};
 	}
 

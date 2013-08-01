@@ -98,15 +98,15 @@ public abstract class CommonDomainEndPointEnvTest {
 
 		private Server server;
 		private Context context;
-		
+
 		@Override
 		protected void configure() {
-			
+
 			server = createServer();
 			bind(Server.class).toInstance(server);
-			
+
 			context = createContext(server);
-			
+
 			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new JerseyServletModule() {
 
 				private IMocksControl mocksControl = createControl();
@@ -138,22 +138,22 @@ public abstract class CommonDomainEndPointEnvTest {
 				}
 			}));
 		}
-		
+
 		private Context createContext(Server server) {
 			Context root = new Context(server, "/", Context.SESSIONS);
 
 			root.addFilter(GuiceFilter.class, "/*", 0);
 			root.addServlet(DefaultServlet.class, "/*");
-			
+
 			return root;
 		}
-		
+
 		private Server createServer() {
 			Server server = new Server(0);
 			return server;
 		}
 	}
-	
+
 	protected static final ProfileName adminProfile = ProfileName.builder().name("admin").build();
 
 	protected static final ProfileName userProfile = ProfileName.builder().name("user").build();
@@ -168,18 +168,18 @@ public abstract class CommonDomainEndPointEnvTest {
 					ObmHost.builder().name("host").build())
 			.host(ServiceProperty.LDAP, ObmHost.builder().ip("1.2.3.4").build())
 			.build();
-	
+
 	protected static final ProfileName profileName = ProfileName
 			.builder()
 			.name("profile")
 			.build();
-	
+
 	protected static final ProfileEntry profileEntry = ProfileEntry
 			.builder()
 			.domainUuid(domain.getUuid())
 			.id(1)
 			.build();
-	
+
 	protected static final Batch batch = Batch
 			.builder()
 			.id(batchId(1))
@@ -263,12 +263,12 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected void expectBatch() throws DaoException {
 		expect(batchDao.get(batch.getId())).andReturn(batch);
 	}
-	
+
 	protected void expectProfiles() throws DaoException {
 		expect(profileDao.getProfileEntries(domain.getUuid())).andReturn(
 				ImmutableSet.of(profileEntry, profileEntry));
 	}
-	
+
 	protected void expectProfile() throws DaoException, ProfileNotFoundException {
 		expect(profileDao.getProfileName(domain.getUuid(),
 				ProfileId.builder().id(profileEntry.getId()).build())).andReturn(profileName);
@@ -281,7 +281,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected void expectNoBatch() throws DaoException {
 		expect(batchDao.get(batch.getId())).andReturn(null);
 	}
-	
+
 	protected void expectSuccessfulAuthentication(String login, String password) {
 		ObmUser user = ObmUser.builder()
 						.login(login)
@@ -297,18 +297,18 @@ public abstract class CommonDomainEndPointEnvTest {
 		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
 		expect(userDao.findUserByLogin(login, domain)).andReturn(user);
 	}
-	
+
 	protected void expectAuthorizingReturns(String login, Collection<String> permissions) throws Exception {
 		expect(profileDao.getUserProfileName(login, domain.getUuid())).andReturn(adminProfile);
 		expect(domainDao.findDomainByName(domain.getName())).andReturn(domain);
 		expect(roleDao.getPermissionsForProfile(adminProfile, domain)).andReturn(permissions);
 	}
-	
+
 	protected void expectSuccessfulAuthenticationAndFullAuthorization() throws Exception {
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of("*"));
 	}
-	
+
 	public static Batch.Id batchId(Integer id) {
 		return Batch.Id.builder().id(id).build();
 	}
@@ -333,7 +333,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 	
 	protected String obmUserToJsonString() {
-		return 	
+		return
 			"{" +
 				"\"id\":\"extId\"," +
 				"\"login\":\"user1\"," +
@@ -364,7 +364,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"groups\":[\"Not implemented yet\"]" +
 			"}";
 	}
-	
+
 	protected ObmUser fakeUser() {
 		return ObmUser.builder()
 				.domain(domain)

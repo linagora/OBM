@@ -535,7 +535,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
-	
+
 	private void expectLdapDeleteGroup(Group group) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.deleteGroup(domain, group);
@@ -546,7 +546,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	private void expectLdapModifyGroup(Group group, Group oldGroup) {
 		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.modifyGroup(group, oldGroup);
+		ldapManager.modifyGroup(domain, group, oldGroup);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();

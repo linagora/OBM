@@ -122,7 +122,7 @@ public class LdapManagerImpl implements LdapManager {
 			logger.info(String.format("LDAP attributes of user %s (%s) weren't changed. Doing nothing.", obmUser.getLogin(), obmUser.getExtId())); 
 		}
 	}
-	
+
 	@Override
 	public void deleteGroup(ObmDomain domain, Group group) {
 		conn.deleteGroup(Cn.valueOf(group.getName()), LdapDomain.valueOf(domain.getName()));
@@ -161,9 +161,9 @@ public class LdapManagerImpl implements LdapManager {
 	}
 	
 	@Override
-	public void modifyGroup(Group group, Group oldGroup) {
-		LdapGroup ldapGroup = groupBuilderProvider.get().fromObmGroup(group).build();
-		LdapGroup oldLdapGroup = groupBuilderProvider.get().fromObmGroup(oldGroup).build();
+	public void modifyGroup(ObmDomain domain, Group group, Group oldGroup) {
+		LdapGroup ldapGroup = groupBuilderProvider.get().fromObmGroup(group, domain).build();
+		LdapGroup oldLdapGroup = groupBuilderProvider.get().fromObmGroup(oldGroup, domain).build();
 		Modification[] modifications = ldapGroup.buildDiffModifications(oldLdapGroup);
 
 		if (modifications.length > 0) {
@@ -174,6 +174,12 @@ public class LdapManagerImpl implements LdapManager {
 							group.getName(),
 							group.getExtId())); 
 		}
+	}
+	
+	@Override
+	public void createGroup(Group group, ObmDomain domain) {
+		LdapGroup ldapGroup = groupBuilderProvider.get().fromObmGroup(group, domain).build();
+		conn.createGroup(ldapGroup);
 	}
 
 	@Override

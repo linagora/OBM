@@ -41,12 +41,20 @@ import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.LdapEntity;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class LdapGroup {
+	
+	private static final String[] DEFAULT_OBJECT_CLASSES = {
+		"posixGroup", "obmGroup"
+	};
 	
 	public static class Cn {
 
@@ -93,10 +101,6 @@ public class LdapGroup {
 		private Builder(Configuration configuration) {
 			this.configuration = configuration;
 		}
-
-		public Builder fromObmGroup(Group group) {
-			return this;
-		}
 		
 		public Builder objectClasses(String[] objectClasses) {
 			this.objectClasses = objectClasses;
@@ -130,6 +134,24 @@ public class LdapGroup {
 		
 		public LdapGroup build() {
 			return new LdapGroup(configuration.getGroupBaseDn(domain), objectClasses, cn, gidNumber, mailAccess, mail, domain);
+		}
+
+		public Builder fromObmGroup(Group group,  ObmDomain domain) {
+			Preconditions.checkArgument(group.getGid() > 0, "The GID number is mandatory");
+			Preconditions.checkArgument(domain != null, "The domain name is mandatory");
+
+			this.objectClasses = DEFAULT_OBJECT_CLASSES;
+			this.cn = Cn.valueOf(group.getName());
+			this.domain = LdapDomain.valueOf(domain.getName());
+			this.gidNumber = group.getGid();
+			this.mail = group.getEmail();
+			if ( this.mail != null) {
+				this.mailAccess = LdapEntity.PERMITTED_EMAIL_ACCESS;
+			} else {
+				this.mailAccess = LdapEntity.FORBIDDEN_EMAIL_ACCESS;
+			}
+
+			return this;
 		}
 	}
 	
