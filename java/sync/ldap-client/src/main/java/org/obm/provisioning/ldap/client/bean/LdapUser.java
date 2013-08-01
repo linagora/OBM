@@ -158,7 +158,7 @@ public class LdapUser {
 			this.mailAccess = buildEmailAccess(obmUser);
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
 			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName());
-			this.mail = obmUser.getEmail();
+			this.mail = obmUser.getEmailAtDomain();
 			this.loginShell = DEFAULT_LOGIN_SHELL;
 			return this;
 		}

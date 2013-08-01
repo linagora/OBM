@@ -179,7 +179,7 @@ public class LdapUserTest {
 				.hiddenUser(false)
 				.domain(LdapDomain.valueOf("gru.gov.ru"))
 				.loginShell("/bin/bash")
-				.mail("Richard.Sorge")
+				.mail("Richard.Sorge@gru.gov.ru")
 				.build();
 		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUser()).build();
 		assertThat(ldapUser).isEqualTo(expectedLdapUser);
