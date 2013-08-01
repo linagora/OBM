@@ -79,6 +79,8 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.EntityRightDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
@@ -483,6 +485,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.mailingList.MailingListBindingImpl;
 import fr.aliacom.obm.common.mailingList.MailingListHome;
 import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.resource.ResourceDao;
@@ -693,7 +696,8 @@ public class DependencyResolverHelper {
 				PatchObmUserJsonDeserializer.class,
 				PatchUserOperationProcessor.class,
 				Module.class,
-				Profile.class
+				Profile.class,
+				ModuleCheckBoxStates.class
 		};
 	}
 
@@ -752,7 +756,9 @@ public class DependencyResolverHelper {
 				AddressBookDao.class,
 				AddressBookDaoJdbcImpl.class,
 				UserPatternDao.class,
-				UserPatternDaoJdbcImpl.class
+				UserPatternDaoJdbcImpl.class,
+				EntityRightDao.class,
+				EntityRightDaoJdbcImpl.class
 		};
 	}
 

@@ -13,6 +13,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.CyrusClientModule;
+import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.EntityRightDaoJdbcImpl;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.provisioning.beans.Batch;
@@ -115,6 +117,7 @@ public class ProvisioningService extends ServletModule {
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
 		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+		bind(EntityRightDao.class).to(EntityRightDaoJdbcImpl.class);
 	}
 
 	private void bindRestResources() {

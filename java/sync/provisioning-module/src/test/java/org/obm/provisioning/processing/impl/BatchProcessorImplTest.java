@@ -34,21 +34,25 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.isNull;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -73,12 +77,16 @@ import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.util.Modules;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
+import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
@@ -119,6 +127,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private CyrusImapService cyrusService;
 	@Inject
 	private GroupDao groupDao;
+	@Inject
+	private EntityRightDao entityRightDao;
+	@Inject
+	private ObmHelper obmHelper;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -140,6 +152,21 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 			.uid(Group.Id.valueOf(1))
 			.gid(UserDao.DEFAULT_GID)
 			.name("Users")
+			.build();
+	private final Profile profile = Profile
+			.builder()
+			.id(ProfileId.valueOf("1"))
+			.name(ProfileName.valueOf("user"))
+			.level(0)
+			.domain(domain)
+			.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
+					.builder()
+					.module(Module.CALENDAR)
+					.build())
+			.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
+					.builder()
+					.module(Module.MAILBOX)
+					.build())
 			.build();
 
 	@Test
@@ -223,6 +250,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.build();
 		final ObmUser userFromDao = ObmUser
 				.builder()
+				.uid(1)
 				.login("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
@@ -238,6 +266,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
 		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
 		expectLastCall();
+		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
 		
@@ -257,6 +286,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 	}
 
+	private void expectSetDefaultRights(ObmUser user) throws Exception {
+		expect(profileDao.getUserProfile(user)).andReturn(profile);
+		expect(obmHelper.fetchEntityId("Calendar", 1)).andReturn(2);
+		expect(obmHelper.fetchEntityId("Mailbox", 1)).andReturn(3);
+		entityRightDao.grantRights(eq(2), isNull(Integer.class), isA(Set.class));
+		expectLastCall();
+		entityRightDao.grantRights(eq(3), isNull(Integer.class), isA(Set.class));
+		expectLastCall();
+	}
+	
 	@Test
 	public void testProcessCreateUserWhenDefaultGroupDoesntExist() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
@@ -386,12 +425,22 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithMailHost)
 				.build();
-		expect(userDao.create(user)).andReturn(user);
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithMailHost)
+				.build();
+		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domainWithMailHost, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		groupDao.addUser(domainWithMailHost, usersGroup.getUid(), user);
+		groupDao.addUser(domainWithMailHost, usersGroup.getUid(), userFromDao);
 		expectLastCall();
+		expectSetDefaultRights(userFromDao);
 
-		expectLdapCreateUser(user);
+		expectLdapCreateUser(userFromDao);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
 		expect(satelliteService.create(isA(Configuration.class), eq(domainWithMailHost))).andReturn(satelliteConnection);
 		satelliteConnection.updateMTA();
@@ -493,7 +542,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testCreateUserWithNoEmail() throws DaoException, BatchNotFoundException, SQLException {
+	public void testCreateUserWithNoEmail() throws Exception {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -525,13 +574,23 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
 				.build();
+		final ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
-		expect(userDao.create(user)).andReturn(user);
+		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		groupDao.addUser(domain, usersGroup.getUid(), user);
+		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
 		expectLastCall();
-		expectLdapCreateUser(user);
+		expectSetDefaultRights(userFromDao);
+		expectLdapCreateUser(userFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

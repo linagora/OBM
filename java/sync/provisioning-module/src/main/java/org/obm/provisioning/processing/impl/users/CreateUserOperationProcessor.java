@@ -29,22 +29,35 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.push.mail.bean.Acl;
+import org.obm.sync.Right;
+import org.obm.utils.ObmHelper;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.profile.CheckBoxState;
+import fr.aliacom.obm.common.profile.Module;
+import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
+import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class CreateUserOperationProcessor extends AbstractUserOperationProcessor {
@@ -53,6 +66,12 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 
 	@Inject
 	private GroupDao groupDao;
+	@Inject
+	private ProfileDao profileDao;
+	@Inject
+	private EntityRightDao entityRightDao;
+	@Inject
+	private ObmHelper obmHelper;
 
 	@Inject
 	CreateUserOperationProcessor() {
@@ -66,12 +85,58 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		ObmUser userFromDao = createUserInDao(user);
 
 		addUserInDefaultGroup(userFromDao);
+		setDefaultUserRights(userFromDao);
 
 		if (user.isEmailAvailable()) {
 			createUserMailboxes(userFromDao);
 		}
 
 		createUserInLdap(userFromDao);
+	}
+
+	private void setDefaultUserRights(ObmUser user) {
+		Profile profile = null;
+
+		try {
+			profile = profileDao.getUserProfile(user);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot fetch user profile %s from the database.", user.getProfileName()), e);
+		}
+
+		setDefaultUserRightsOnModule(user, profile, Module.CALENDAR, "Calendar");
+		setDefaultUserRightsOnModule(user, profile, Module.MAILBOX, "Mailbox");
+	}
+
+	private void setDefaultUserRightsOnModule(ObmUser user, Profile profile, Module module, String entityType) {
+		try {
+			Integer entityId = obmHelper.fetchEntityId(entityType, user.getUid());
+			Set<Right> defaultRights = computeRightsFromDefaultCheckBoxStates(profile.getDefaultCheckBoxStates().get(module));
+
+			entityRightDao.grantRights(entityId, null, defaultRights);
+		}
+		catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot set default user rights on module %s for user %s.", module, user.getLogin()), e);
+		}
+	}
+
+	private Set<Right> computeRightsFromDefaultCheckBoxStates(final ModuleCheckBoxStates states) {
+		return FluentIterable
+				.from(Arrays.asList(Right.values()))
+				.filter(new Predicate<Right>() {
+
+					@Override
+					public boolean apply(Right input) {
+						return isRightEnabled(states, input);
+					}
+
+				}).toSet();
+	}
+
+	private boolean isRightEnabled(ModuleCheckBoxStates states, Right right) {
+		CheckBoxState state = states.getCheckBoxState(right);
+
+		return CheckBoxState.CHECKED.equals(state) || CheckBoxState.DISABLED_CHECKED.equals(state);
 	}
 
 	private void createUserMailboxes(ObmUser user) {

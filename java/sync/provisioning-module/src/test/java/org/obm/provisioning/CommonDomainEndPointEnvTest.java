@@ -56,6 +56,7 @@ import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
@@ -80,6 +81,7 @@ import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -116,6 +118,8 @@ public abstract class CommonDomainEndPointEnvTest {
 				@Override
 				protected void configureServlets() {
 					bind(IMocksControl.class).toInstance(mocksControl);
+					bind(ObmHelper.class).toInstance(mocksControl.createMock(ObmHelper.class));
+					bind(EntityRightDao.class).toInstance(mocksControl.createMock(EntityRightDao.class));
 					bind(GroupDao.class).toInstance(mocksControl.createMock(GroupDao.class));
 					bind(UserDao.class).toInstance(mocksControl.createMock(UserDao.class));
 					bind(DomainDao.class).toInstance(mocksControl.createMock(DomainDao.class));
