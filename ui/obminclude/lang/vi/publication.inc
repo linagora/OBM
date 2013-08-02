@@ -1,0 +1,91 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Tiếng Việt                                               //
+//     - File     : publication.inc                                          //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
+$l_publication_title = "Tiêu đề công bố";
+$l_type = "Loại";
+$l_market = "Quản lý marketing";
+$l_header_new_auto = "Làm mới";
+$l_type_manage = "Quản lý loại ấn phẩm";
+$l_type_exist = "Các loại hiện có";
+$l_type_new = "Loại mới";
+$l_publication_orig = "Xuất ra từ ấn phẩm";
+$l_publication_dest = "Xuất bản";
+$l_subscription = "Thuê bao";
+$l_insert = "Chèn Xuất bản"; 
+$l_update = "Cập nhật xuất bản"; 
+$l_checkdelete = "Kiểm tra hoặc xóa ấn phẩm"; 
+$l_delete = "Xóa ấn phẩm"; 
+$l_type_update = "Cập nhật Loại";
+$l_type_checkdelete = "Kiểm tra hoặc xóa loại";
+$l_type_delete = "Xóa loại";
+$l_type_insert = "Chèn loại";
+$l_no_display = "Điền vào các trường tìm kiếm và nhấn <Tìm> để lấy các ấn phẩm"; 
+$l_found = "Các ấn phẩm được tìm thấy.";
+$l_no_found = "Không xuất bản phù hợp với truy vấn đã được tìm thấy!"; 
+$l_check_samepublication = "Những ấn phẩm này có vẻ giống với mục nhập mới này !";
+$l_link_contact = "Những địa chỉ liên lạc có mục đăng ký để ấn phẩm này";
+$l_link_contact_no = "Không có liên hệ nào đăng ký ấn phẩm này";
+$l_cant_delete = "Ấn phẩm không có thể xóa !"; 
+$l_can_delete = " Ấn phẩm có thể xóa.";
+$l_type_link_publication = "Công ty này được tham chiếu như";
+$l_type_link_publication_no = "Không có xuất bản được tham chiếu như";
+$l_type_cant_delete = "Loại không thể xóa !"; 
+$l_type_can_delete = "Loại có thể xóa.";
+$l_fill_title = "Bạn phải điền tiêu đề trước khi gửi."; 
+$l_delete_confirm = "Xóa ấn phẩm?"; 
+$l_j_check_year = "Năm không hợp lệ."; 
+$l_j_fill_lang = "Bạn phải nhập ngôn ngữ trước khi gửi."; 
+$l_j_check_lang = "Ngôn ngữ không hợp lệ."; 
+$l_j_check_fax = "Số fax không hợp lệ.";
+$l_j_type_delete = "Bạn phải chọn một loại để kiểm tra hoặc xóa nó!";
+$l_j_type_update = "Bạn phải chọn một loại và nhập tên mới để cập nhật nó!";
+$l_j_type_create = "Bạn phải nhập tên loại mới để tạo nó!";
+$l_publication_display = "Tùy chọn hiển thị cho các danh sách ấn phẩm ";
+$l_renew = "Gia hạn tự động";
+$l_auto_sub = "Thuê bao tự động";
+$l_contact_category1 = "Danh bạ 1";
+$l_recept = "Chế độ tiếp nhận";
+$l_reception = "Chế độ tiếp nhận";
+$l_quantity = "Số lượng";
+$l_recept_manage = "Quản lý chế độ tiếp nhận";
+$l_recept_exist = "Chế độ tiếp nhận hiện tại";
+$l_recept_new = "Chế độ tiếp nhận mới";
+$l_insert_sub = "Chèn thuê bao"; 
+$l_update_sub = "Cập nhật thuê bao"; 
+$l_checkdelete_sub = "Xác minh hoặc xóa thuê bao"; 
+$l_delete_sub = "Xóa thuê bao"; 
+$l_renew_update = "Cập nhật chế độ làm mới";
+$l_renew_checkdelete = "Xác minh hoặc xóa chế độ làm mới";
+$l_renew_delete = "Xóa chế độ làm mới";
+$l_renew_insert = "Chèn chế độ làm mới";
+$l_recept_update = "Cập nhật chế độ tiếp nhận"; 
+$l_recept_checkdelete = "Xác minh hoặc xóa chế độ tiếp nhận";
+$l_recept_delete = "Xóa chế độ tiếp nhận";
+$l_recept_insert = "Chèn chế độ tiếp nhận";
+$l_recept_link_publication = "Những ấn phẩm lấy từ chế độ tiếp nhận ";
+$l_recept_link_publication_no = "Không có ấn phẩm liên quan đến chế độ tiếp nhận này";
+$l_recept_cant_delete = "Chế độ này không thể xóa!";
+$l_recept_can_delete = "Chế độ này có thể xóa!";
+$l_j_recept_delete = "Chọn một chế độ tiếp nhận!";
+$l_j_recept_update = "Chọn một chế độ tiếp nhận và cập nhật trước khi gửi!"; 
+$l_j_recept_create = "Nhập một nhãn hiệu cho chế độ tiếp nhận!";
+$l_j_select_publication = "Bạn phải chọn một ấn phẩm !";
+$l_j_fill_quantity = "Chỉ định một số lượng";
+$l_j_check_quantity = "Nhập một số lượng hợp lệ";
+$l_publication_type = "Loại ấn phẩm"; 
+$l_j_renew_create = "Bạn phải nhập một loại nhãn làm mới để tạo nó!"; 
+$l_renew_cant_delete = "Loại làm mới không thể xóa!"; 
+$l_renew_can_delete = "Loại làm mới có thể xóa."; 
+$l_j_renew_delete = "Chọn một loại làm mới để xác minh hoặc xóa!"; 
+$l_renew_link_publication_no = "Không có ấn phẩm liên quan đến loại làm mới."; 
+$l_renew_exist = "Loại làm mới đã tồn tại"; 
+$l_j_renew_update = "Bạn phải chọn một loại làm mới và cập nhật trước khi gửi!"; 
+$l_renew_new = "Loại làm mới mới"; 
+$l_renew_manage = "Quản lý việc làm mới "; 
+$l_renew_link_publication = "Ấn phẩm này có liên quan đến loại làm mới"; 
+
