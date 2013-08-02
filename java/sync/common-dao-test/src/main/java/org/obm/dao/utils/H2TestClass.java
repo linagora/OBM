@@ -31,32 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dao.utils;
 
-import static org.easymock.EasyMock.createControl;
+public interface H2TestClass {
 
-import org.easymock.IMocksControl;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.DatabaseConnectionProvider;
-
-import com.google.inject.AbstractModule;
-
-public class DaoTestModule extends AbstractModule {
+	H2InMemoryDatabase getDb();
 	
-	final IMocksControl control = createControl();
-	
-	@Override
-	protected void configure() {
-		bind(IMocksControl.class).toInstance(control);
-		bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-		configureImpl();
-	}
-	
-	protected void configureImpl() {
-		// to override if needed
-	}
-
-	protected <T> void bindWithMock(Class<T> cls) {
-		bind(cls).toInstance(control.createMock(cls));
-	}
 }

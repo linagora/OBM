@@ -39,11 +39,10 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
@@ -56,7 +55,6 @@ import org.obm.sync.host.ObmHost;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -67,14 +65,20 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
-public class UserDaoJdbcImplTest {
+public class UserDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends AbstractModule {
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
+	@Inject H2InMemoryDatabase db;
+
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
+	
+	public static class Env extends DaoTestModule {
 
 		@Override
-		protected void configure() {
-			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
-			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+		protected void configureImpl() {
 			bind(DomainDao.class);
 			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
@@ -87,9 +91,6 @@ public class UserDaoJdbcImplTest {
 
 	@Inject
 	private UserDaoJdbcImpl dao;
-
-	@Rule
-	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	private final ObmDomain domain = ObmDomain
 			.builder()

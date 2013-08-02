@@ -34,9 +34,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -46,7 +47,6 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -55,23 +55,27 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(DomainDaoJdbcImplTest.Env.class)
-public class DomainDaoJdbcImplTest {
+public class DomainDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends AbstractModule {
+	public static class Env extends DaoTestModule {
 
 		@Override
-		protected void configure() {
-			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
+		protected void configureImpl() {
 			bind(DomainDao.class);
 		}
 
 	}
+	
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
+	@Inject H2InMemoryDatabase db;
+
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
 
 	@Inject
 	private DomainDao dao;
-
-	@Rule
-	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 	
 	@Test
 	public void testCreateThenGet() {

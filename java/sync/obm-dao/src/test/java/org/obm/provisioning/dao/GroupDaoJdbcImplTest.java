@@ -41,11 +41,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
@@ -69,7 +68,6 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
@@ -81,16 +79,14 @@ import fr.aliacom.obm.common.user.UserExtId;
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(GroupDaoJdbcImplTest.Env.class)
-public class GroupDaoJdbcImplTest {
+public class GroupDaoJdbcImplTest implements H2TestClass {
 
 	public static final int FIRST_AUTOMATIC_GID = 1001;
 
-    public static class Env extends AbstractModule {
+    public static class Env extends DaoTestModule {
 
         @Override
-        protected void configure() {
-            bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
-            bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+        protected void configureImpl() {
             bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
             bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
             bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
@@ -99,6 +95,14 @@ public class GroupDaoJdbcImplTest {
         }
 
     }
+    
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
+	@Inject H2InMemoryDatabase db;
+
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
 
     private ObmDomain domain1, domain2;
     private ObmUser user1, nonexistentUser;
@@ -154,9 +158,6 @@ public class GroupDaoJdbcImplTest {
 
     @Inject
     private UserDao userDao;
-
-    @Rule
-    public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
     @Test(expected = GroupNotFoundException.class)
     public void testGetNonexistantGroup() throws Exception {

@@ -35,10 +35,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
 import org.obm.dao.utils.TestUtils;
-import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.PGroupDao;
 import org.obm.domain.dao.PGroupDaoJdbcImpl;
 import org.obm.filter.Slow;
@@ -46,30 +47,33 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.Group;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(PGroupDaoJdbcImplTest.Env.class)
-public class PGroupDaoJdbcImplTest {
+public class PGroupDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends AbstractModule {
+	public static class Env extends DaoTestModule {
 
 		@Override
-		protected void configure() {
-			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
+		protected void configureImpl() {
 			bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
 		}
 
 	}
 
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
+	@Inject H2InMemoryDatabase db;
+	
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
+	
 	@Inject
 	private PGroupDao dao;
-
-	@Rule
-	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");;
 
 	@Inject
 	private TestUtils utils;

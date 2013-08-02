@@ -55,10 +55,9 @@ import com.google.inject.Singleton;
  * Typical usage is to instantiate it and annotate it with a {@link Rule} annotation.
  */
 @Singleton
-public class H2InMemoryDatabase extends ExternalResource {
+public class H2InMemoryDatabase {
 	public static final String DB_URL = "jdbc:h2:mem:daotest";
 
-	private final String schema;
 	private final Set<Connection> openedConnections;
 
 	static {
@@ -76,27 +75,14 @@ public class H2InMemoryDatabase extends ExternalResource {
 	 * @param initialSql The initial SQL script to load when the DB is started.
 	 */
 	@Inject
-	public H2InMemoryDatabase(String initialSql) {
-		this.schema = initialSql;
+	public H2InMemoryDatabase() {
 		this.openedConnections = new HashSet<Connection>();
-	}
-
-	@Override
-	protected void before() throws Throwable {
-		resetDatabase();
-		if (schema != null)
-			importSchema();
-	}
-
-	@Override
-	protected void after() {
-		closeConnections();
 	}
 
 	/**
 	 * Closes all opened connections to the in-memory database.
 	 */
-	private void closeConnections() {
+	public void closeConnections() {
 		Iterator<Connection> connections = openedConnections.iterator();
 
 		// Close all opened db connections
@@ -112,7 +98,7 @@ public class H2InMemoryDatabase extends ExternalResource {
 		}
 	}
 
-	private void resetDatabase() throws Exception {
+	public void resetDatabase() throws Exception {
 		Statement stat = getConnection().createStatement();
 		try {
 			stat.execute("DROP ALL OBJECTS");
@@ -128,7 +114,7 @@ public class H2InMemoryDatabase extends ExternalResource {
 	 * 
 	 * @throws Exception If an error occurs while importing the schema.
 	 */
-	protected void importSchema() throws Exception {
+	public void importSchema(String schema) throws Exception {
 		Closer closer = Closer.create();
 		Reader reader = null;
 		InputStream stream = closer.register(getClass().getClassLoader().getResourceAsStream(schema));

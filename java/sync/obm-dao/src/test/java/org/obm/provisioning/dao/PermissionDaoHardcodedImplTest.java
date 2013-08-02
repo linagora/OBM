@@ -4,36 +4,21 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(PermissionDaoHardcodedImplTest.Env.class)
+@RunWith(SlowFilterRunner.class)
 public class PermissionDaoHardcodedImplTest {
-	
-	public static class Env extends AbstractModule {
-
-		@Override
-		protected void configure() {
-			bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
-		}
-	}
-
-	@Inject
-	private PermissionDao dao;
 	
 	ObmDomain localDomain = ObmDomain.builder().name("dummydomain.obm.org")
 			.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
@@ -68,10 +53,19 @@ public class PermissionDaoHardcodedImplTest {
 	Collection<String> localEditorPerms = ImmutableList.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6:users:read",
 															"ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6:groups:read",
 															"ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6:profiles:*");
+
+
+	@Inject PermissionDao dao;
+	
+	@Before
+	public void setUp() {
+		dao = new PermissionDaoHardcodedImpl();
+	}
 	
 	@Test(expected = PermissionsNotFoundException.class)
 	public void testGetPermissionsForNonExistentProfile() throws Exception {
 		dao.getPermissionsForProfile(dummyProfile, localDomain);
+		assertThat(true).isFalse();
 	}
 	
 	@Test

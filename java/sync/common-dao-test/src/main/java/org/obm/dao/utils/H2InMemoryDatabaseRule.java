@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2013  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -23,57 +23,32 @@
  *
  * You should have received a copy of the GNU Affero General Public License and
  * its applicable Additional Terms for OBM along with this program. If not, see
- * <http://www.gnu.org/licenses/> for the GNU Affero General   Public License
+ * <http://www.gnu.org/licenses/> for the GNU Affero General Public License
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.domain.dao;
+package org.obm.dao.utils;
 
-import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dao.utils.H2InMemoryDatabaseRule;
-import org.obm.dao.utils.H2TestClass;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
-import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
+public class H2InMemoryDatabaseRule extends MethodExternalResource {
 
-import com.google.inject.Inject;
+	private final String schema;
+	private final H2TestClass h2testClass;
 
-import fr.aliacom.obm.common.system.ObmSystemUser;
-
-@RunWith(SlowGuiceRunner.class)
-@GuiceModule(UserDaoJdbcImplTest.Env.class)
-public class UserSystemDaoJdbcImplTest implements H2TestClass {
-
-	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
-	@Inject H2InMemoryDatabase db;
-
-	@Override
-	public H2InMemoryDatabase getDb() {
-		return db;
+	public H2InMemoryDatabaseRule(H2TestClass h2testClass, String schema) {
+		this.h2testClass = h2testClass;
+		this.schema = schema;
 	}
 	
-	@Inject
-	private UserSystemDaoJdbcImpl dao;
-
-	@Test
-	public void testGetByLogin() throws Exception {
-		ObmSystemUser systemUser = ObmSystemUser
-				.builder()
-				.id(1)
-				.login("obmsatelliterequest")
-				.password("osrpassword")
-				.build();
-
-		assertThat(dao.getByLogin("obmsatelliterequest")).isEqualTo(systemUser);
+	@Override
+	protected void before() throws Throwable {
+		h2testClass.getDb().resetDatabase();
+		if (schema != null)
+			h2testClass.getDb().importSchema(schema);
 	}
 
-	@Test(expected = SystemUserNotFoundException.class)
-	public void testGetByLoginWhenUserDoesntExist() throws Exception {
-		dao.getByLogin("lucifer");
+	@Override
+	protected void after() {
+		h2testClass.getDb().closeConnections();
 	}
 }

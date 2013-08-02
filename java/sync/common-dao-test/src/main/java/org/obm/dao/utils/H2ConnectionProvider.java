@@ -72,7 +72,7 @@ public class H2ConnectionProvider implements DatabaseConnectionProvider {
 
 	@Override
 	public Object getJdbcObject(String dbFieldName, String dbFieldValue) throws SQLException {
-		throw new UnsupportedOperationException();
+		return dbFieldValue;
 	}
 
 	public H2InMemoryDatabase geth2Instance() {

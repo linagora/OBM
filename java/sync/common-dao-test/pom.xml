@@ -42,6 +42,12 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>dbcp</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>compile</scope>
