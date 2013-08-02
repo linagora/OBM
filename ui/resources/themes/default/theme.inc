@@ -177,6 +177,7 @@ $flag_it            = "$theme_path/flag_it.gif";
 $flag_no_ny         = "$theme_path/flag_no_ny.gif";
 $flag_ro            = "$theme_path/flag_ro.gif";
 $flag_zh            = "$theme_path/flag_zh.gif";
+$flag_vi            = "$theme_path/flag_vi.png";
 $preview_default    = "$theme_path/preview_theme.gif";
 $img_home           = "$theme_path/home_obm.png";
 
