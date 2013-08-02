@@ -89,7 +89,8 @@ public class GroupIntegrationTest {
 			.body(containsString(
 				"{" +
 					  "\"id\":\"AdminExtId\"," +
-					  "\"name\":\"Admin\","    + 
+					  "\"name\":\"Admin\","    +
+					  "\"email\":\"group_admin@obm.org\","    + 
 					  "\"description\":\"Admin Group Desc\","  +
 					  "\"members\":{"    +
 					  "\"users\":[],"         +
@@ -114,6 +115,7 @@ public class GroupIntegrationTest {
 				"{" +
 					"\"id\":\"GroupWithUsers\"," +
 					"\"name\":\"GroupWithUsers\"," +
+					"\"email\":\"group_with_user@obm.org\"," +
 					"\"description\":\"Group With Users\"," +
 					"\"members\":{" +
 						"\"users\":[" +
@@ -199,6 +201,7 @@ public class GroupIntegrationTest {
 				"[{" +
 					"\"id\":\"GroupWithUsers\"," +
 					"\"name\":\"GroupWithUsers\"," +
+					"\"email\":\"group_with_user@obm.org\"," +
 					"\"description\":\"Group With Users\"," +
 					"\"members\":{" +
 						"\"users\":[" +
@@ -224,7 +227,8 @@ public class GroupIntegrationTest {
 			.body(containsString(
 				"{" +
 					"\"id\":\"GroupWhoSubgroupHaveUser\"," +
-					"\"name\":\"GroupWhoSubgroupHaveUser\"," + 
+					"\"name\":\"GroupWhoSubgroupHaveUser\"," +
+					"\"email\":\"group_with_subgroup@obm.org\"," +
 					"\"description\":\"Group Who Subgroup Have User\"," +
 					"\"members\":{" +
 						"\"users\":[]," +
@@ -248,14 +252,16 @@ public class GroupIntegrationTest {
 			.body(containsString(
 				"{" +
 					"\"id\":\"GroupWhoSubgroupHaveUser\"," +
-					"\"name\":\"GroupWhoSubgroupHaveUser\"," + 
+					"\"name\":\"GroupWhoSubgroupHaveUser\"," +
+					"\"email\":\"group_with_subgroup@obm.org\"," +
 					"\"description\":\"Group Who Subgroup Have User\"," +
 					"\"members\":{" +
 					"\"users\":[]," +
 					"\"subgroups\":[" +
 							"{" +
 							"\"id\":\"GroupWithUsers\"," +
-							"\"name\":\"GroupWithUsers\"," + 
+							"\"name\":\"GroupWithUsers\"," +
+							"\"email\":\"group_with_user@obm.org\"," +
 							"\"description\":\"Group With Users\"," +
 							"\"members\":{" +
 								"\"users\":[" +
@@ -284,14 +290,16 @@ public class GroupIntegrationTest {
 			.body(containsString(
 				"{" +
 					"\"id\":\"GroupWhoSubgroupHaveUser\"," +
-					"\"name\":\"GroupWhoSubgroupHaveUser\"," + 
+					"\"name\":\"GroupWhoSubgroupHaveUser\"," +
+					"\"email\":\"group_with_subgroup@obm.org\"," +
 					"\"description\":\"Group Who Subgroup Have User\"," +
 					"\"members\":{" +
 						"\"users\":[]," +
 						"\"subgroups\":[" +
 							"{" +
 								"\"id\":\"GroupWithUsers\"," +
-								"\"name\":\"GroupWithUsers\"," + 
+								"\"name\":\"GroupWithUsers\"," +
+								"\"email\":\"group_with_user@obm.org\"," +
 								"\"description\":\"Group With Users\"," +
 								"\"members\":{" +
 									"\"users\":[" +
@@ -321,6 +329,7 @@ public class GroupIntegrationTest {
 				"{" +
 					"\"id\":\"GroupWhoSubgroupHaveUser\"," +
 					"\"name\":\"GroupWhoSubgroupHaveUser\"," +
+					"\"email\":\"group_with_subgroup@obm.org\"," +
 					"\"description\":\"Group Who Subgroup Have User\"," +
 						"\"members\":{" +
 							"\"users\":[]," +
@@ -328,6 +337,7 @@ public class GroupIntegrationTest {
 							"{" +
 								"\"id\":\"GroupWithUsers\"," +
 								"\"name\":\"GroupWithUsers\"," +
+								"\"email\":\"group_with_user@obm.org\"," +
 								"\"description\":\"Group With Users\"," +
 								"\"members\":{" +
 									"\"users\":[" +
@@ -357,13 +367,15 @@ public class GroupIntegrationTest {
 				"{" +
 					"\"id\":\"GroupWithSubGroup\"," +
 					"\"name\":\"GroupWithSubGroup\","    + 
+					"\"email\":\"group_with_subgroup@obm.org\"," +
 					"\"description\":\"Group With SubGroup\","  +
 					"\"members\":{"    +
 					"\"users\":[],"         +
 					"\"subgroups\":[" +
 							"{" +
 								"\"id\":\"AdminExtId\"," +
-								"\"name\":\"Admin\"," + 
+								"\"name\":\"Admin\"," +
+								"\"email\":\"group_admin@obm.org\"," +
 								"\"description\":\"Admin Group Desc\"," +
 								"\"members\":{" +
 									"\"users\":[]," +

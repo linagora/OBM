@@ -216,6 +216,11 @@ public class SerializationUtils {
 			builder.name(root.findValue("name").asText());
 		}
 		
+		at = root.findValue("email");
+		if (at != null) {
+			builder.email(at.asText());
+		}
+		
 		at = root.findValue("description");
 		if (at != null) {
 			builder.description(at.asText());

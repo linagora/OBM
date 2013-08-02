@@ -78,6 +78,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 					"{" +
 						"\"id\":\"groupExtId\"," +
 						"\"name\":\"group1\"," +
+						"\"email\":\"group1@domain\"," +
 						"\"description\":\"description\"" +
 					"}")
 			.contentType(ContentType.JSON).
@@ -87,6 +88,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 					"{" +
 						"\"id\":\"groupExtId\"," +
 						"\"name\":\"group1\"," +
+						"\"email\":\"group1@domain\"," +
 						"\"description\":\"description\"," +
 						"\"members\":" +
 							"{" +
@@ -118,6 +120,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 					"{" +
 						"\"id\":\"groupExtId\"," +
 						"\"name\":null," +
+						"\"email\":null," +
 						"\"description\":null," +
 						"\"members\":" +
 							"{" +

@@ -50,6 +50,7 @@ public class GroupJsonSerializer extends JsonSerializer<Group> {
 		jgen.writeStartObject();
 		jgen.writeObjectField("id", value.getExtId());
 		jgen.writeObjectField("name", value.getName());
+		jgen.writeObjectField("email", value.getEmail());
 		jgen.writeObjectField("description", value.getDescription());
 		jgen.writeFieldName("members");
 			jgen.writeStartObject();
