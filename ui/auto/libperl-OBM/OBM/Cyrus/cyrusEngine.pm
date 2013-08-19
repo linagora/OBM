@@ -67,13 +67,14 @@ sub new {
     $self->{'rightDefinition'} = {
         none => 'none',
         read => 'lrs',
-        readAdmin => 'lrscd',
+        readAdmin => 'lrsc',
         writeonly => 'li',
-        writeonlyAdmin => 'licd',
+        writeonlyAdmin => 'lic',
         write => 'lrswid',
         writeAdmin => 'lrswicd',
-        admin => 'lcd',
-        post => 'p'
+        admin => 'lc',
+        post => 'p',
+        nodelete => '-x'
     };
 
     return $self;
@@ -494,6 +495,12 @@ sub _imapSetMailboxAcls {
                 if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
                     if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $userName, $right ) ) {
                         $errors++;
+                    }
+
+                    # The first mailbox is the root one, we need to remove the 'x' right to prevent
+                    # accidental deletion of mailshares by the user. This should only be done through OBM.
+                    if (defined($entity->{'entityDesc'}) && defined($entity->{'entityDesc'}->{'mailshare_id'}) && $i == 0) {
+                    	$self->_imapSetMailboxAcl($boxStruct[$i][0], $userName, 'nodelete');
                     }
                 }
 
