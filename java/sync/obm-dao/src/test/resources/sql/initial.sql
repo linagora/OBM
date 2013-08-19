@@ -5046,7 +5046,7 @@ CREATE TABLE p_userobm (
     userobm_userupdate integer,
     userobm_usercreate integer,
     userobm_local integer,
-    userobm_ext_id character varying(16),
+    userobm_ext_id character(16) NOT NULL,
     userobm_system integer,
     userobm_archive smallint NOT NULL,
     userobm_status userstatus,
@@ -6533,7 +6533,7 @@ CREATE TABLE userobm (
     userobm_userupdate integer,
     userobm_usercreate integer,
     userobm_local integer DEFAULT 1,
-    userobm_ext_id character varying(16),
+    userobm_ext_id character(36) NOT NULL,
     userobm_system integer DEFAULT 0,
     userobm_archive smallint DEFAULT 0 NOT NULL,
     userobm_status userstatus DEFAULT 'VALID',
@@ -9001,13 +9001,25 @@ ALTER TABLE updatedlinks
 ALTER TABLE userentity
     ADD CONSTRAINT userentity_pkey PRIMARY KEY (userentity_entity_id, userentity_user_id);
 
-
 --
 -- Name: userobm_pkey; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace: 
 --
-
 ALTER TABLE userobm
     ADD CONSTRAINT userobm_pkey PRIMARY KEY (userobm_id);
+
+--
+-- Name: userobm_ext_id_unique_idx; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace:
+--
+
+ALTER TABLE userobm
+    ADD CONSTRAINT userobm_ext_id_unique_idx UNIQUE (userobm_domain_id, userobm_ext_id);
+
+--
+-- Name: userobm_ext_id_unique_idx; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace:
+--
+
+ALTER TABLE p_userobm
+    ADD CONSTRAINT p_userobm_ext_id_unique_idx UNIQUE (userobm_domain_id, userobm_ext_id);
 
 
 --

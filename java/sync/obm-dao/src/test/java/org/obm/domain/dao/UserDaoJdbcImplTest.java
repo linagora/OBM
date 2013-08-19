@@ -251,7 +251,6 @@ public class UserDaoJdbcImplTest {
 	public void testCreateMultipleUsersIncrementsUid() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()
-				.extId(UserExtId.valueOf("JohnDoeExtId"))
 				.login("jdoe")
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
@@ -280,9 +279,9 @@ public class UserDaoJdbcImplTest {
 				.mailQuota(500)
 				.domain(domain);
 
-		ObmUser createdUser1 = dao.create(userBuilder.build());
-		ObmUser createdUser2 = dao.create(userBuilder.build());
-		ObmUser createdUser3 = dao.create(userBuilder.build());
+		ObmUser createdUser1 = dao.create(userBuilder.extId(UserExtId.valueOf("JohnDoeExtI1")).build());
+		ObmUser createdUser2 = dao.create(userBuilder.extId(UserExtId.valueOf("JohnDoeExtI2")).build());
+		ObmUser createdUser3 = dao.create(userBuilder.extId(UserExtId.valueOf("JohnDoeExtI3")).build());
 
 		assertThat(createdUser1.getUidNumber()).isEqualTo(UserDao.FIRST_UID);
 		assertThat(createdUser2.getUidNumber()).isEqualTo(UserDao.FIRST_UID + 1);
