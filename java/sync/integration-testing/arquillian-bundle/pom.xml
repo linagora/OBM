@@ -16,7 +16,7 @@
 	<version>2.6.0-SNAPSHOT</version>
 
 	<properties>
-		<version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+		<version.shrinkwrap.resolvers>2.0.0-beta-2</version.shrinkwrap.resolvers>
 	</properties>
 
 	<dependencyManagement>

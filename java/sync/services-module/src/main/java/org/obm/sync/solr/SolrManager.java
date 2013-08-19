@@ -44,6 +44,7 @@ import javax.jms.Session;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.configuration.ConfigurationService;
+import org.obm.sync.LifecycleListener;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
@@ -57,7 +58,7 @@ import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
 @Singleton
-public class SolrManager {
+public class SolrManager implements LifecycleListener {
 	private static final String CONTACT_CLIENT_ID = "solrManagerContactClientId";
 	private static final String EVENT_CLIENT_ID = "solrManagerEventClientId";
 	private static final String CONNECTION_CLIENT_ID = "solrManagerConnectionClientId";
@@ -217,7 +218,7 @@ public class SolrManager {
 
 	}
 	
-	public void stop() throws JMSException {
-		jmsConnection.stop();
+	public void shutdown() throws Exception {
+		jmsConnection.close();
 	}
 }

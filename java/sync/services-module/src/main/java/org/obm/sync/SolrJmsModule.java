@@ -29,16 +29,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import org.obm.sync.solr.SolrManager;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.DefaultCommandConverter;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 public class SolrJmsModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
 		bind(CommandConverter.class).to(DefaultCommandConverter.class);
+
+		Multibinder.newSetBinder(binder(), LifecycleListener.class).addBinding().to(SolrManager.class);
 	}
 
 }

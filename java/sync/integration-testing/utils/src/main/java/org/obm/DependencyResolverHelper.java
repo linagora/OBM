@@ -40,6 +40,7 @@ import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Propagation;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.TransactionProvider;
@@ -266,6 +267,7 @@ import org.obm.satellite.client.exceptions.SatteliteClientException;
 import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
 import org.obm.sync.GuiceServletContextListener;
+import org.obm.sync.LifecycleListener;
 import org.obm.sync.MessageQueueModule;
 import org.obm.sync.Messages;
 import org.obm.sync.NotAllowedException;
@@ -274,6 +276,7 @@ import org.obm.sync.ObmSmtpConfImpl;
 import org.obm.sync.ObmSmtpProvider;
 import org.obm.sync.ObmSyncModule;
 import org.obm.sync.ObmSyncServicesModule;
+import org.obm.sync.ObmSyncServletModule;
 import org.obm.sync.Right;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.SolrJmsModule;
@@ -449,6 +452,7 @@ import org.obm.utils.ObmHelper;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
 
@@ -720,7 +724,8 @@ public class DependencyResolverHelper {
 				ModifyGroupOperationProcessor.class,
 				PatchGroupJsonDeserializer.class,
 				PatchGroupOperationProcessor.class,
-				CreateGroupOperationProcessor.class
+				CreateGroupOperationProcessor.class,
+				LifecycleListener.class
 		};
 	}
 
@@ -797,7 +802,8 @@ public class DependencyResolverHelper {
 				TransactionProvider.class,
 				AutoTruncate.class,
 				DatabaseField.class,
-				DatabaseEntity.class
+				DatabaseEntity.class,
+				LazyTransactionProvider.class
 		};
 	}
 
@@ -871,6 +877,7 @@ public class DependencyResolverHelper {
 		return new Class<?>[] {
 				Producer.class,
 				QueueManager.class,
+				HornetQConfiguration.class
 		};
 	}
 	
@@ -1009,6 +1016,7 @@ public class DependencyResolverHelper {
 				ObmSmtpConf.class,
 				ObmSmtpProvider.class,
 				ObmSyncModule.class,
+				ObmSyncServletModule.class,
 				ObmSyncServicesModule.class,
 				ResourceServlet.class,
 				AuthentificationServiceFactory.class,
@@ -1056,7 +1064,7 @@ public class DependencyResolverHelper {
 				SolrRequest.class,
 				SolrService.class,
 				SolrJmsModule.class,
-				DatabaseModule.class,
+				DatabaseModule.class
 		};
 	}
 	
