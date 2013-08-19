@@ -296,8 +296,8 @@ form {
 
 .spreadLove {
   font-family: sans-serif;
-  border-bottom: 1px solid #777;
-  border-right: 1px solid #777;
+  border-bottom: 1px solid #BBB;
+  border-right: 1px solid #BBB;
   border-bottom-right-radius: 15px;
   font-weight: normal;
   margin: 0;
@@ -317,7 +317,7 @@ form {
   left: 0;
   padding-left: 105px;
   font-size: 0.9em;
-  z-index: 1;
+  z-index: 9;
 }
 
 .spreadLove a {  color: #368397; font-weight: bolder; }
@@ -2238,3 +2238,43 @@ form.button-to input {
 
 #loginForm input, #loginForm select { width: 155px; }
 
+/* ------------------------------------------------------------------------- */ 
+/* Popin Top menu
+ * ------------------------------------------------------------------------- */
+
+.popintopbar {
+  height:37px; 
+  margin: 0px;
+  border-bottom: 1px solid #BBB;
+  border-left: 1px solid #BBB;
+  background-color: #FFF;
+  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
+  box-shadow: 0px 0px 10px #AAA;
+  -o-box-shadow: 0px 0px 10px #AAA;
+  -moz-box-shadow: 0px 0px 10px #AAA;
+  -webkit-box-shadow: 0px 0px 10px #AAA;
+  box-shadow: 0px 0px 10px #AAA;
+  font-size: 1.2em; 
+  z-index: 1; 
+  position: absolute; 
+  top: 33px; 
+  right: 0px;
+  padding-left: 20px;
+  border-radius: 0 0 0 15px;
+  width: auto;
+}
+
+.popintopbar #popintopbar-form {
+  float: right;
+  padding-right:5px;
+}
+.popintopbar #popintopbar-form .popintopbar-message {
+  color: #333;
+  vertical-align: middle;
+  padding-top: 27px;
+  font-weight: bold;
+}

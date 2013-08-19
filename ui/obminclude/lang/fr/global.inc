@@ -618,3 +618,8 @@ $l_service_get_ftp_backups = "Récupération des archives disponibles sur le ser
 $l_my_calendar_share = "Partage de mon agenda";
 
 $l_resource_found_error = "ressource(s) de ce type trouvée(s), vous devez au préalable les supprimer.";
+
+// New top bar activation popin
+$l_popin_message = "OBM 3 a un nouveau menu! Voulez-vous l'essayer ?";
+$l_popin_activation_button = "Essayer";
+$l_close_popin_button = "Je ne suis pas interressé.";

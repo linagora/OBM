@@ -1042,12 +1042,39 @@ function display_outframe(&$display) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Function used to know if we have to show the topmenu popin
+// Parameters:
+//   none
+///////////////////////////////////////////////////////////////////////////////
+
+function show_topmenupopin() {
+	if ($_SESSION['set_top_bar'] != 'yes') {
+		if (!isset($_SESSION['displayed_popin']) OR $_SESSION['displayed_popin'] != 1) {
+				return true;
+		}
+	} 
+	return false;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display: XHTML Head
 // Parameters:
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module, $standard=true) {
-
+	if (isset($GLOBALS['_GET']['action_popin']) AND !empty($GLOBALS['_GET']['action_popin'])) {
+		if ($GLOBALS['_GET']['action_popin'] == 'stop_popin') {
+			update_user_pref($_SESSION['obm']['uid'], "displayed_popin", "1");
+			$_SESSION['displayed_popin'] = 1;
+		} else if ($GLOBALS['_GET']['action_popin'] == 'change_topmenu') {
+			update_user_pref($_SESSION['obm']['uid'], "displayed_popin", "1");
+			update_user_pref($_SESSION['obm']['uid'], "set_top_bar", "yes");
+			$_SESSION['displayed_popin'] = 1;
+			$_SESSION['set_top_bar'] = 'yes';
+		}
+	}
+	
   // If a theme specif function is provided
   if (function_exists('display_head_theme')) {
     return display_head_theme($module);
@@ -1056,6 +1083,7 @@ function display_head($p_module, $standard=true) {
   global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
+  global $l_popin_message, $l_popin_activation_button, $l_close_popin_button;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
   global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path, $params;
   global $ico_html, $ico_ical;
@@ -1123,6 +1151,24 @@ function display_head($p_module, $standard=true) {
   ."</div><div class=\"supportUs\">"
   .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
   ."</div></h2>";
+  
+  if (show_topmenupopin()) {
+		// load Mustache Engine
+		$m = new Mustache_Engine(array(
+			'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/mustache"),
+			'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . '/mustache/partials'),
+		));
+		// we create the data for mustache
+		$data_mustache['popinmessage'] = $l_popin_message;
+		$data_mustache['button_msg'] = $l_popin_activation_button;
+		$data_mustache['quit_msg'] = $l_close_popin_button;
+
+		// Render the popin mustache template with the correct data : $data_mustache
+		$block = $m->render('popintopbar',$data_mustache);
+		$supportOBMBanner .= $block;  
+	}
+  
+  
 
   return "$headers_e
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     

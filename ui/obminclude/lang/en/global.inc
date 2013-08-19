@@ -534,3 +534,8 @@ $l_service_get_ftp_backups = "Get available archives from the FTP server";
 $l_my_calendar_share = "Sharing my calendar";
 
 $l_resource_found_error = "resource(s) of this type found, you should first remove them.";
+
+// New top bar activation popin
+$l_popin_message = "Hey ! New top bar is awesome, try it ?";
+$l_popin_activation_button = "New Top Bar";
+$l_close_popin_button = "Don't show this again.";
