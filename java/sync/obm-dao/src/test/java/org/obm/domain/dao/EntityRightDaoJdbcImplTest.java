@@ -71,7 +71,7 @@ public class EntityRightDaoJdbcImplTest {
 
 	@Rule
 	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	@Test(expected = DaoException.class)
 	public void testGrantRightsWhenEntityIdDoesntExist() throws Exception {

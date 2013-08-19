@@ -93,7 +93,7 @@ public class UserDaoJdbcImplTest {
 
 	@Rule
 	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	private final ObmDomain domain = ObmDomain
 			.builder()

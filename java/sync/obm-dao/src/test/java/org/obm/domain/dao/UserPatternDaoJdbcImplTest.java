@@ -75,7 +75,7 @@ public class UserPatternDaoJdbcImplTest {
 
 	@Rule
 	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	@Test
 	public void testGetUserPatterns() {
