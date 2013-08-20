@@ -159,7 +159,7 @@ public class CalendarBackendTest {
 		this.lastKnownState = buildFolderSyncState(new SyncKey("1234567890a"));
 		this.outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
-		this.userCalendarCollectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
+		this.userCalendarCollectionPath = new CalendarCollectionPath(rootCalendarPath, "test");
 
 		mockControl = createControl();
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
@@ -238,7 +238,7 @@ public class CalendarBackendTest {
 	
 	@Test
 	public void testNoCalendarChanges() throws Exception {
-		String calendarDisplayName = user.getLoginAtDomain();
+		String calendarDisplayName = user.getLogin();
 		String defaultCalendarName = rootCalendarPath + user.getLogin();
 		
 		int collectionMappingId = 1;
@@ -553,11 +553,11 @@ public class CalendarBackendTest {
 		
 		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, 11, 12, 21, 22);
 		
-		expect(calendarClient.getSync(token, "test@test", currentDate))
+		expect(calendarClient.getSync(token, "test", currentDate))
 			.andReturn(eventChanges).once();
 		
 		expect(calendarClient.getUserEmail(token))
-			.andReturn("test@test").anyTimes();
+			.andReturn("test").anyTimes();
 
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
 		
@@ -592,7 +592,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
 		
 		EventChanges eventChanges = expectTwoDeletedAndTwoUpdatedEventChanges(currentDate, 11, 12, 21, 22);
-		expect(calendarClient.getSync(token, "test@test", currentDate)).andReturn(eventChanges).once();
+		expect(calendarClient.getSync(token, "test", currentDate)).andReturn(eventChanges).once();
 		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
 		
@@ -634,7 +634,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
 		
 		EventChanges eventChanges = expectTwoUpdatedEventChanges(currentDate, 21, 22);
-		expect(calendarClient.getFirstSync(token, "test@test", currentDate)).andReturn(eventChanges).once();
+		expect(calendarClient.getFirstSync(token, "test", currentDate)).andReturn(eventChanges).once();
 		expect(calendarClient.getUserEmail(token)).andReturn("test@test").anyTimes();
 		expectConvertUpdatedEventsToMSEvents(eventChanges);
 		
@@ -732,14 +732,14 @@ public class CalendarBackendTest {
 		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		expect(eventService.getEventExtIdFor(creatingMSEvent.getUid(), device)).andReturn(eventExtId);
-		expect(calendarClient.getEventFromExtId(token, "test@test", eventExtId))
+		expect(calendarClient.getEventFromExtId(token, "test", eventExtId))
 			.andReturn(oldEvent).once();
 		
 		expect(eventConverter.isInternalEvent(oldEvent, eventExtId)).andReturn(eventIsResolvedAsInternal);
 		expect(eventConverter.convert(user, oldEvent, creatingMSEvent, eventIsResolvedAsInternal))
 			.andReturn(creatingEvent).once();
 
-		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(creatingEvent), eq(true), anyObject(String.class)))
+		expect(calendarClient.createEvent(eq(token), eq("test"), eq(creatingEvent), eq(true), anyObject(String.class)))
 			.andReturn(new EventObmId(createdObmId));
 		
 		mockControl.replay();
@@ -782,7 +782,7 @@ public class CalendarBackendTest {
 		eventService.trackEventExtIdMSEventUidTranslation(generatedEventExtID, creatingMSEvent.getUid(), device);
 		expectLastCall();
 		
-		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(creatingEvent), eq(true), anyObject(String.class)))
+		expect(calendarClient.createEvent(eq(token), eq("test"), eq(creatingEvent), eq(true), anyObject(String.class)))
 			.andReturn(new EventObmId(createdObmId));
 		
 		mockControl.replay();
@@ -805,6 +805,7 @@ public class CalendarBackendTest {
 		Event oldEvent = new Event();
 		oldEvent.setUid(new EventObmId(itemId));
 		oldEvent.setInternalEvent(true);
+		oldEvent.setOwner("test");
 		oldEvent.setOwnerEmail("test@test");
 		Event updatingEvent = new Event();
 		updatingEvent.setUid(new EventObmId(itemId));
@@ -822,14 +823,14 @@ public class CalendarBackendTest {
 		
 		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
-		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
+		expect(calendarClient.getEventFromId(token, "test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
 		
 		expect(eventConverter.isInternalEvent(oldEvent, eventExtId)).andReturn(eventIsResolvedAsInternal);
 		expect(eventConverter.convert(user, oldEvent, updatingMSEvent, eventIsResolvedAsInternal))
 			.andReturn(updatingEvent).once();
 
-		expect(calendarClient.modifyEvent(token, "test@test", updatingEvent, true, true))
+		expect(calendarClient.modifyEvent(token, "test", updatingEvent, true, true))
 			.andReturn(updatedEvent);
 		
 		mockControl.replay();
@@ -865,11 +866,11 @@ public class CalendarBackendTest {
 		
 		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
-		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
+		expect(calendarClient.getEventFromId(token, "test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
 		
 		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT)).andReturn(Participation.accepted());
-		expect(calendarClient.changeParticipationState(token, "test@test", eventExtId, Participation.accepted(), 4, true))
+		expect(calendarClient.changeParticipationState(token, "test", eventExtId, Participation.accepted(), 4, true))
 			.andReturn(true);
 		
 		mockControl.replay();
@@ -903,11 +904,11 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
 		
 		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
-		expect(calendarClient.getEventFromExtId(token, "test@test", eventExtId))
+		expect(calendarClient.getEventFromExtId(token, "test", eventExtId))
 			.andReturn(oldEvent).once();
 		
 		expect(eventConverter.getParticipation(AttendeeStatus.ACCEPT)).andReturn(Participation.accepted());
-		expect(calendarClient.changeParticipationState(token, "test@test", eventExtId, Participation.accepted(), 4, true))
+		expect(calendarClient.changeParticipationState(token, "test", eventExtId, Participation.accepted(), 4, true))
 			.andReturn(true);
 		
 		mockControl.replay();
@@ -930,6 +931,7 @@ public class CalendarBackendTest {
 		Event oldEvent = new Event();
 		oldEvent.setUid(new EventObmId(itemId));
 		oldEvent.setInternalEvent(true);
+		oldEvent.setOwner("test");
 		oldEvent.setOwnerEmail("test@test");
 		boolean eventIsResolvedAsInternal = false;
 
@@ -946,13 +948,13 @@ public class CalendarBackendTest {
 		
 		expect(eventService.getEventExtIdFor(updatingMSEvent.getUid(), device)).andReturn(eventExtId);
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(itemId);
-		expect(calendarClient.getEventFromId(token, "test@test", new EventObmId(itemId)))
+		expect(calendarClient.getEventFromId(token, "test", new EventObmId(itemId)))
 			.andReturn(oldEvent).once();
 		
 		expect(eventConverter.isInternalEvent(oldEvent, eventExtId)).andReturn(eventIsResolvedAsInternal);
 
 		expect(eventConverter.convert(user, oldEvent, updatingMSEvent, eventIsResolvedAsInternal)).andReturn(updatingEvent);
-		expect(calendarClient.modifyEvent(token, "test@test", updatingEvent, true, true)).andReturn(updatingEvent);
+		expect(calendarClient.modifyEvent(token, "test", updatingEvent, true, true)).andReturn(updatingEvent);
 		
 		mockControl.replay();
 		String serverIdFor = calendarBackend.createOrUpdate(userDataRequest, collectionId, serverId, clientId, updatingMSEvent);
@@ -990,10 +992,10 @@ public class CalendarBackendTest {
 		EventObmId eventObmId = new EventObmId(itemId);
 		Event event = new Event();
 		event.setUid(eventObmId);
-		expect(calendarClient.getEventFromId(token, "test@test", eventObmId))
+		expect(calendarClient.getEventFromId(token, "test", eventObmId))
 			.andReturn(event).once();
 		
-		calendarClient.removeEventById(token, "test@test", event.getObmId(), event.getSequence(), true);
+		calendarClient.removeEventById(token, "test", event.getObmId(), event.getSequence(), true);
 		expectLastCall();
 	}
 	
@@ -1202,7 +1204,7 @@ public class CalendarBackendTest {
 		EventObmId eventObmId = new EventObmId(itemId);
 		Event event = new Event();
 		event.setUid(eventObmId);
-		expect(calendarClient.getEventFromId(token, "test@test", eventObmId))
+		expect(calendarClient.getEventFromId(token, "test", eventObmId))
 			.andReturn(event).once();
 		
 		return event;
@@ -1281,7 +1283,7 @@ public class CalendarBackendTest {
 		expect(collectionPathBuilder.fullyQualifiedCollectionPath(userCalendarCollectionPath.collectionPath())).andReturn(collectionPathBuilder);
 		expect(collectionPathBuilder.build()).andReturn(userCalendarCollectionPath);
 		
-		expect(calendarClient.getSync(token, "test@test", currentDate))
+		expect(calendarClient.getSync(token, "test", currentDate))
 			.andThrow(new NotAllowedException("Not Allowed")).once();
 		
 		mockControl.replay();
@@ -1316,7 +1318,7 @@ public class CalendarBackendTest {
 		expect(mappingService.getServerIdFor(collectionId, itemId)).andReturn(serverId).once();
 		expect(mappingService.getItemIdFromServerId(serverId)).andReturn(Integer.valueOf(itemId)).once();
 		
-		expect(calendarClient.getEventFromId(token, user.getLoginAtDomain(), new EventObmId(itemId)))
+		expect(calendarClient.getEventFromId(token, user.getLogin(), new EventObmId(itemId)))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 
 		mockControl.replay();
@@ -1346,13 +1348,14 @@ public class CalendarBackendTest {
 		
 		Event event = new Event();
 		event.setUid(new EventObmId(itemId));
+		event.setOwner("test");
 		event.setOwnerEmail("test@test");
-		expect(calendarClient.getEventFromId(token, user.getLoginAtDomain(), new EventObmId(itemId)))
+		expect(calendarClient.getEventFromId(token, user.getLogin(), new EventObmId(itemId)))
 			.andReturn(event).once();
 
 		expect(eventConverter.isInternalEvent(event, eventExtId)).andReturn(false);
 		
-		expect(calendarClient.modifyEvent(token, "test@test", event, true, true))
+		expect(calendarClient.modifyEvent(token, "test", event, true, true))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 
 		expectEventConvertion(event);
@@ -1380,10 +1383,10 @@ public class CalendarBackendTest {
 		expect(clientIdService.hash(userDataRequest, clientId)).andReturn(clientIdHash);
 		
 		expect(eventService.getEventExtIdFor(msEvent.getUid(), device)).andReturn(eventExtId).once();
-		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
+		expect(calendarClient.getEventFromExtId(token, user.getLogin(), eventExtId))
 			.andReturn(null).once();
 	
-		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(event), eq(true), anyObject(String.class)))
+		expect(calendarClient.createEvent(eq(token), eq("test"), eq(event), eq(true), anyObject(String.class)))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 
 		expect(eventConverter.isInternalEvent(null, eventExtId)).andReturn(false).once();
@@ -1421,13 +1424,13 @@ public class CalendarBackendTest {
 		expect(eventService.getEventExtIdFor(msEvent.getUid(), device))
 			.andReturn(eventExtId).once();
 
-		expect(calendarClient.getEventFromExtId(token, user.getLoginAtDomain(), eventExtId))
+		expect(calendarClient.getEventFromExtId(token, user.getLogin(), eventExtId))
 			.andReturn(null).once();
 	
-		expect(calendarClient.createEvent(eq(token), eq("test@test"), eq(event), eq(true), anyObject(String.class)))
+		expect(calendarClient.createEvent(eq(token), eq("test"), eq(event), eq(true), anyObject(String.class)))
 			.andThrow(new EventAlreadyExistException("Already exist")).once();
 
-		expect(calendarClient.getEventObmIdFromExtId(token, "test@test", eventExtId))
+		expect(calendarClient.getEventObmIdFromExtId(token, "test", eventExtId))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 		
 		expect(eventConverter.isInternalEvent(null, eventExtId))
@@ -1503,7 +1506,7 @@ public class CalendarBackendTest {
 		EventObmId eventObmId = new EventObmId(itemId);
 		Event event = new Event();
 		event.setUid(eventObmId);
-		expect(calendarClient.getEventFromId(token, "test@test", eventObmId))
+		expect(calendarClient.getEventFromId(token, "test", eventObmId))
 			.andThrow(new NotAllowedException("Not allowed")).once();
 		
 		mockControl.replay();
@@ -1516,25 +1519,25 @@ public class CalendarBackendTest {
 	
 	@Test
 	public void testIsParticipationChangeUpdateWhenOldEventIsNull() {
-		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
+		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "calendarName");
 		Event oldEvent = null;
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isFalse();
 	}
 
 	@Test
 	public void testIsParticipationChangeUpdateWhenOldEventNotBelongsToCalendar() {
-		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
+		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "calendarName");
 		Event oldEvent = new Event();
-		oldEvent.setOwnerEmail("other@test");
+		oldEvent.setOwner("otherCalendarName");
 		
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isTrue();
 	}
 
 	@Test
 	public void testIsParticipationChangeUpdateWhenOldEventBelongsToCalendar() {
-		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
+		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "calendarName");
 		Event oldEvent = new Event();
-		oldEvent.setOwnerEmail("test@test");
+		oldEvent.setOwner("calendarName");
 
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isFalse();
 	}
@@ -1552,49 +1555,49 @@ public class CalendarBackendTest {
 	}
 
 	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsNull() {
+	public void testBelongsToCalendarWhenOwnerIsNull() {
 		Event event = new Event();
-		event.setOwnerEmail(null);
+		event.setOwner(null);
 		
-		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isFalse();
+		assertThat(calendarBackend.belongsToCalendar(event, "owner")).isFalse();
 	}
 	
 	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsEmpty() {
+	public void testBelongsToCalendarWhenOwnerIsEmpty() {
 		Event event = new Event();
-		event.setOwnerEmail("");
+		event.setOwner("");
 		
-		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isFalse();
+		assertThat(calendarBackend.belongsToCalendar(event, "owner")).isFalse();
 	}
 	
 	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsDifferent() {
+	public void testBelongsToCalendarWhenOwnerIsDifferent() {
 		Event event = new Event();
-		event.setOwnerEmail("owner@email.com");
+		event.setOwner("owner");
 		
 		assertThat(calendarBackend.belongsToCalendar(event, "user@email.com")).isFalse();
 	}
 
 	@Test
-	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmail() {
+	public void testBelongsToCalendarWhenCalendarEqualsOwner() {
 		Event event = new Event();
-		event.setOwnerEmail("owner@email.com");
+		event.setOwner("owner");
 		
-		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isTrue();
+		assertThat(calendarBackend.belongsToCalendar(event, "owner")).isTrue();
 	}
 
 	@Test
-	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmailDifferentCase() {
+	public void testBelongsToCalendarWhenCalendarEqualsOwnerDifferentCase() {
 		Event event = new Event();
-		event.setOwnerEmail("OWNER@email.com");
+		event.setOwner("OWNER");
 		
-		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isTrue();
+		assertThat(calendarBackend.belongsToCalendar(event, "owner")).isTrue();
 	}
 	
 	@Test
-	public void testBelongsToCalendarWhenCalendarNotEqualsOwnerEmailButCreator() {
+	public void testBelongsToCalendarWhenCalendarNotEqualsOwnerButCreator() {
 		Event event = new Event();
-		event.setOwnerEmail("owner@email.com");
+		event.setOwner("owner");
 		event.setCreatorEmail("creator@email.com");
 		
 		assertThat(calendarBackend.belongsToCalendar(event, "creator@email.com")).isFalse();
