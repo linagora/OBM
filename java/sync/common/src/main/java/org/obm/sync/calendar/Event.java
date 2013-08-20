@@ -844,11 +844,6 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		attendees.add(newAttendee);
 	}
 
-	public boolean belongsToCalendar(String calendarName) {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendarName));
-		return calendarName.equalsIgnoreCase(ownerEmail);
-	}
-
 	public Event withOrganizerIfNone(Attendee organizerFallback) {
 		Preconditions.checkNotNull(organizerFallback);
 		Preconditions.checkArgument(organizerFallback.isOrganizer(), "the given attendee is not an organizer");
