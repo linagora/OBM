@@ -38,11 +38,13 @@ import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.push.mail.bean.Acl;
@@ -55,6 +57,8 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor {
 	
 	private final static String DELETE_ACL = "lc";
+	@Inject
+	private PUserDao pUserDao;
 
 	@Inject
 	DeleteUserOperationProcessor() {
@@ -77,6 +81,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			archiveUserInDao(userFromDao);
 		}
 		deleteUserInLdap(userFromDao);
+		deleteUserFromPTables(userFromDao);
 	}
 
 	private void archiveUserInDao(ObmUser user) {
@@ -140,4 +145,11 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
+	private void deleteUserFromPTables(ObmUser user) throws ProcessingException {
+		try {
+			pUserDao.delete(user);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+	}
 }

@@ -55,6 +55,7 @@ import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.beans.Batch;
@@ -125,6 +126,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(UserSystemDao.class).toInstance(mocksControl.createMock(UserSystemDao.class));
 					bind(ProfileDao.class).toInstance(mocksControl.createMock(ProfileDao.class));
 					bind(PermissionDao.class).toInstance(mocksControl.createMock(PermissionDao.class));
+					bind(PUserDao.class).toInstance(mocksControl.createMock(PUserDao.class));
 					bind(ResourceForTest.class);
 					bind(SatelliteService.class).toInstance(mocksControl.createMock(SatelliteService.class));
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));

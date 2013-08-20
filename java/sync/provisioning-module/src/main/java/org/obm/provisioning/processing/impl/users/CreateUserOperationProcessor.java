@@ -35,6 +35,7 @@ import java.util.Set;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
@@ -69,6 +70,8 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	private EntityRightDao entityRightDao;
 	@Inject
 	private ObmHelper obmHelper;
+	@Inject
+	private PUserDao pUserDao;
 
 	@Inject
 	CreateUserOperationProcessor() {
@@ -91,6 +94,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 
 		createUserInLdap(userFromDao, defaultGroup);
+		createUserInPTables(userFromDao);
 	}
 
 	private void setDefaultUserRights(ObmUser user) {
@@ -206,4 +210,11 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
+	private void createUserInPTables(ObmUser user) throws ProcessingException {
+		try {
+			pUserDao.insert(user);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+	}
 }

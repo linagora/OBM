@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
@@ -135,6 +136,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private EntityRightDao entityRightDao;
 	@Inject
 	private ObmHelper obmHelper;
+	@Inject
+	private PUserDao pUserDao;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -306,6 +309,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		expectPUserDaoInsert(userFromDao);
 		
 		mocksControl.replay();
 
@@ -321,6 +325,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		entityRightDao.grantRights(eq(EntityId.valueOf(2)), isNull(EntityId.class), isA(Set.class));
 		expectLastCall();
 		entityRightDao.grantRights(eq(EntityId.valueOf(3)), isNull(EntityId.class), isA(Set.class));
+		expectLastCall();
+	}
+
+	private void expectPUserDaoDelete(ObmUser user) throws DaoException  {
+		pUserDao.delete(user);
+		expectLastCall();
+	}
+
+	private void expectPUserDaoInsert(ObmUser user) throws DaoException  {
+		pUserDao.insert(user);
 		expectLastCall();
 	}
 	
@@ -486,6 +500,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		expectPUserDaoInsert(userFromDao);
 
 		mocksControl.replay();
 
@@ -687,6 +702,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		expectPUserDaoInsert(userFromDao);
 		
 		mocksControl.replay();
 
@@ -740,6 +756,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		expectPUserDaoDelete(user);
 		
 		mocksControl.replay();
 
@@ -797,6 +814,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
+		expectPUserDaoDelete(user);
 		
 		mocksControl.replay();
 
@@ -867,6 +885,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		expectApplyQuota(cyrusManager, userFromDao);
 		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(userFromDao);
+		expectPUserDaoInsert(userFromDao);
 		
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder

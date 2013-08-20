@@ -31,9 +31,11 @@ package org.obm.provisioning.processing.impl.users;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
@@ -43,6 +45,8 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor {
+	@Inject
+	private PUserDao pUserDao;
 
 	@Inject
 	ModifyUserOperationProcessor() {
@@ -78,6 +82,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 
 		modifyUserInLdap(newUser, existingUser);
+		updateUserInPTables(newUser);
 	}
 
 	protected void updateUserMailbox(ObmUser user) {
@@ -118,4 +123,12 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
+	private void updateUserInPTables(ObmUser user) throws ProcessingException {
+		try {
+			pUserDao.delete(user);
+			pUserDao.insert(user);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+	}
 }
