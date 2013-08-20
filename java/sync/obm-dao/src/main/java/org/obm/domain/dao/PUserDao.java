@@ -29,12 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
-import java.util.Collection;
-
 import org.obm.provisioning.dao.exceptions.DaoException;
 
-public interface PUserDao {
-    void insertByUserExtIds(Collection<String> userIds) throws DaoException;
+import fr.aliacom.obm.common.user.ObmUser;
 
-    void deleteByUserExtIds(Collection<String> userIds) throws DaoException;
+public interface PUserDao {
+    void insert(ObmUser user) throws DaoException;
+
+    void delete(ObmUser user) throws DaoException;
 }

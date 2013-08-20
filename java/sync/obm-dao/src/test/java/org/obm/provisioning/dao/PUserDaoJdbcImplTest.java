@@ -46,10 +46,13 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 
-import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
@@ -172,7 +175,11 @@ public class PUserDaoJdbcImplTest {
 
 	@Test
 	public void testInsertByUserExtIds() throws Exception {
-		dao.insertByUserExtIds(Lists.newArrayList("1", "2", "3", "4", "5"));
+		dao.insert(obmUser(1, "1"));
+		dao.insert(obmUser(2, "2"));
+		dao.insert(obmUser(3, "3"));
+		dao.insert(obmUser(4, "4"));
+		dao.insert(obmUser(5, "5"));
 
 		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(5);
 		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(5);
@@ -338,7 +345,12 @@ public class PUserDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO P_CategoryLink SELECT * FROM CategoryLink");
 		db.executeUpdate("INSERT INTO P_Field SELECT * FROM Field");
 
-		dao.deleteByUserExtIds(Lists.newArrayList("1", "2", "3", "4", "5"));
+		dao.delete(obmUser(1, "1"));
+		dao.delete(obmUser(2, "2"));
+		dao.delete(obmUser(3, "3"));
+		dao.delete(obmUser(4, "4"));
+		dao.delete(obmUser(5, "5"));
+
 
 		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(1);
 		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(1);
@@ -348,6 +360,15 @@ public class PUserDaoJdbcImplTest {
 		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
 	}
 
+	private ObmUser obmUser(int id, String extId) {
+		return ObmUser.builder()
+				.login("dummy")
+				.uid(id)
+				.extId(UserExtId.valueOf(extId))
+				.domain(ObmDomain.builder().build())
+				.build();
+	}
+	
 	private int getIntFromQuery(String query, Object... params) throws Exception {
 		ResultSet rs = db.execute(query, params);
 		if (rs.next()) {

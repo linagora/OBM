@@ -31,9 +31,7 @@ package org.obm.domain.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -41,7 +39,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 
-import com.google.common.collect.ImmutableList;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class PUserDaoJdbcImpl implements PUserDao {
 
@@ -53,12 +51,11 @@ public class PUserDaoJdbcImpl implements PUserDao {
 	}
 
 	@Override
-	public void insertByUserExtIds(Collection<String> userExtIds) throws DaoException {
+	public void insert(ObmUser user) throws DaoException {
 		Connection conn = null;
 
 		try {
 			conn = dbcp.getConnection();
-			Collection<Integer> userIds = mapExtIdsToUserIds(conn, userExtIds);
 			String userObmQuery = "INSERT INTO P_UserObm " +
 					"(userobm_id, " +
 					"userobm_domain_id, " +
@@ -208,8 +205,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 					"userobm_photo_id " +
 					"FROM UserObm " +
 					"WHERE userobm_id=?";
-			batchQueryByUserIds(conn, userObmQuery, userIds);
-			batchQueryByUserIds(conn,
+			userQuery(conn, userObmQuery, user);
+			userQuery(conn,
 					"INSERT INTO P_UserEntity " +
 							"(   userentity_entity_id, " +
 							"    userentity_user_id " +
@@ -217,8 +214,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"            userentity_user_id " +
 							"  FROM UserEntity " +
 							"  WHERE userentity_user_id=?",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"INSERT INTO P_CategoryLink " +
 							"(   categorylink_category_id, " +
 							"   categorylink_entity_id, " +
@@ -230,8 +227,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"  WHERE categorylink_entity_id=(SELECT userentity_entity_id " +
 							"                                FROM UserEntity " +
 							"                                WHERE userentity_user_id = ?)",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"INSERT INTO P_field " +
 							"(   id, " +
 							"    entity_id, " +
@@ -245,8 +242,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"  WHERE entity_id=(SELECT userentity_entity_id " +
 							"                                FROM UserEntity " +
 							"                                WHERE userentity_user_id = ?)",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"INSERT INTO P_MailboxEntity " +
 							"(   mailboxentity_entity_id, " +
 							"    mailboxentity_mailbox_id " +
@@ -254,8 +251,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"            mailboxentity_mailbox_id " +
 							"  FROM MailboxEntity " +
 							"  WHERE mailboxentity_mailbox_id = ?",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"INSERT INTO P_EntityRight " +
 							"(   entityright_id, " +
 							"    entityright_entity_id, " +
@@ -275,7 +272,7 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"  WHERE entityright_entity_id=(SELECT mailboxentity_entity_id " +
 							"                                FROM MailboxEntity " +
 							"                                WHERE mailboxentity_mailbox_id = ?)",
-					userIds);
+					user);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -284,38 +281,37 @@ public class PUserDaoJdbcImpl implements PUserDao {
 	}
 
 	@Override
-	public void deleteByUserExtIds(Collection<String> userExtIds)
+	public void delete(ObmUser user)
 			throws DaoException {
 		Connection conn = null;
 		try {
 			conn = dbcp.getConnection();
-			Collection<Integer> userIds = mapExtIdsToUserIds(conn, userExtIds);
-			batchQueryByUserIds(conn,
+			userQuery(conn,
 					"DELETE FROM P_EntityRight " +
 							"WHERE entityright_entity_id=(SELECT mailboxentity_entity_id " +
 							"                                FROM P_MailboxEntity " +
 							"                                WHERE mailboxentity_mailbox_id = ?)",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"DELETE FROM P_MailboxEntity WHERE mailboxentity_mailbox_id = ?",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"DELETE FROM P_CategoryLink " +
 							"WHERE categorylink_entity_id=(SELECT userentity_entity_id " +
 							"                                FROM UserEntity " +
 							"                                WHERE userentity_user_id = ?)",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"DELETE FROM P_field " +
 							"WHERE entity_id=(SELECT userentity_entity_id " +
 							"                                FROM UserEntity " +
 							"                                WHERE userentity_user_id = ?)",
-					userIds);
-			batchQueryByUserIds(conn,
+					user);
+			userQuery(conn,
 					"DELETE FROM P_UserEntity WHERE userentity_user_id=?",
-					userIds);
-			batchQueryByUserIds(conn,
-					"DELETE FROM P_UserObm WHERE userobm_id=?", userIds);
+					user);
+			userQuery(conn,
+					"DELETE FROM P_UserObm WHERE userobm_id=?", user);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
@@ -323,42 +319,16 @@ public class PUserDaoJdbcImpl implements PUserDao {
 		}
 	}
 
-	private void batchQueryByUserIds(Connection conn, String query, Collection<Integer> userIds)
+	private void userQuery(Connection conn, String query, ObmUser user)
 			throws SQLException {
 		PreparedStatement statement = null;
 		try {
 			statement = conn.prepareStatement(query);
-			for (Integer userId : userIds) {
-				statement.setInt(1, userId);
-				statement.addBatch();
-			}
-			statement.executeBatch();
+			statement.setInt(1, user.getUid());
+			statement.executeUpdate();
 		} finally {
 			JDBCUtils.cleanup(null, statement, null);
 		}
-	}
-	
-	private Collection<Integer> mapExtIdsToUserIds(Connection conn, Collection<String> userExtIds) throws SQLException, DaoException {
-		PreparedStatement statement = null;
-		try {
-			statement = conn.prepareStatement("SELECT userobm_id FROM UserObm WHERE userobm_ext_id=?");
-			ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-			for (String userExtId : userExtIds) {
-				statement.setString(1, userExtId);
-				ResultSet rs = statement.executeQuery();
-				if (rs.next()) {
-					builder.add(rs.getInt(1));
-				}
-				else {
-					throw new DaoException(String.format("The extid %s is missing from the database", userExtId));
-				}
-				rs.close();
-			}
-			return builder.build();
-		} finally {
-			JDBCUtils.cleanup(null, statement, null);
-		}
-		
 	}
 
 }
