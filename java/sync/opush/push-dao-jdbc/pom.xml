@@ -116,5 +116,11 @@
 			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-testsuite</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
