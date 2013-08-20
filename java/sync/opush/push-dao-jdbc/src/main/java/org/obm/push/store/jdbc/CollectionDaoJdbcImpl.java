@@ -319,40 +319,6 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return syncState;
 	}
 
-	@Override
-	public FolderSyncState lastKnownFolderSyncState(Integer collectionId) throws DaoException {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement(
-					"SELECT " + SYNC_STATE_FOLDER_FIELDS + " FROM "+ SYNC_STATE_FOLDER_TABLE + " " +
-					"INNER JOIN opush_folder_sync_state ON opush_folder_sync_state.id = folder_sync_state_id " +
-					"WHERE opush_folder_mapping.id = ? ORDER BY last_sync DESC LIMIT 1");
-			ps.setInt(1, collectionId);
-
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				return buildFolderSyncState(rs);
-			}
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
-		}
-		return null;
-	}
-	
-	private FolderSyncState buildFolderSyncState(ResultSet rs) throws SQLException {
-		SyncKey syncKey = new SyncKey(rs.getString("sync_key"));
-		FolderSyncState syncState = FolderSyncState.builder()
-				.syncKey(syncKey)
-				.id(rs.getInt("id"))
-				.build();
-		return syncState;
-	}
-
 	public Integer getCollectionMapping(Device device, String collection) throws DaoException {
 		Integer devDbId = device.getDatabaseId();
 		Integer ret = null;
