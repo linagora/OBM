@@ -257,6 +257,10 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected void expectDomain() {
+		expectDomain(domain);
+	}
+
+	protected void expectDomain(ObmDomain domain) {
 		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain).atLeastOnce();
 	}
 

@@ -37,6 +37,7 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -52,11 +53,24 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		super(verb);
 	}
 
+	@VisibleForTesting void validateUserChanges(ObmUser modifiedUser, ObmUser existingUser) {
+
+		if (!modifiedUser.getMailHost().equals(existingUser.getMailHost())) {
+			throw new ProcessingException("Cannot change user mail host");
+		}
+		if (!modifiedUser.getLogin().equals(existingUser.getLogin())) {
+			throw new ProcessingException("Cannot change user login");
+		}
+	}
+
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = getUserFromRequestBody(operation, batch);
 		ObmUser existingUser = getUserFromDao(user.getExtId(), batch.getDomain());
+		
+		validateUserChanges(user, existingUser);
+		
 		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, existingUser));
 
 		if (newUser.isEmailAvailable()) {

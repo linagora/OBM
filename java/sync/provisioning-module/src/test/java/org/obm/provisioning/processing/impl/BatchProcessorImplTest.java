@@ -88,6 +88,7 @@ import com.google.inject.Inject;
 import com.google.inject.util.Modules;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.profile.Module;
 import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
@@ -168,6 +169,28 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 			.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
 					.builder()
 					.module(Module.MAILBOX)
+					.build())
+			.build();
+
+	private final ObmDomain domainWithImapAndLdap = ObmDomain
+			.builder()
+			.name("domain")
+			.id(1)
+			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.host(ServiceProperty.IMAP, ObmHost
+					.builder()
+					.name("Cyrus")
+					.ip("127.0.0.1")
+					.build())
+			.host(ServiceProperty.IMAP, ObmHost
+					.builder()
+					.name("NewCyrus")
+					.ip("127.0.0.1")
+					.build())
+			.host(ServiceProperty.LDAP, ObmHost
+					.builder()
+					.name("OpenLDAP")
+					.ip("127.0.0.1")
 					.build())
 			.build();
 
@@ -383,15 +406,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testProcessCreateUserAndUpdateSatellite() throws Exception {
-		ObmDomain domainWithMailHost = ObmDomain
-				.builder()
-				.from(domain)
+
+		ObmDomain domainWithSmtpIn = ObmDomain.builder()
+				.from(domainWithImapAndLdap)
 				.host(ServiceProperty.SMTP_IN, ObmHost
 						.builder()
 						.name("Postfix")
-						.ip("1.2.3.4")
+						.ip("127.0.0.1")
 						.build())
 				.build();
+
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -411,7 +435,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		Batch.Builder batchBuilder = Batch
 				.builder()
 				.id(batchId(1))
-				.domain(domainWithMailHost)
+				.domain(domainWithSmtpIn)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Connection satelliteConnection = mocksControl.createMock(Connection.class);
@@ -425,7 +449,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domainWithMailHost)
+				.domain(domainWithSmtpIn)
 				.build();
 		ObmUser userFromDao = ObmUser
 				.builder()
@@ -434,17 +458,17 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domainWithMailHost)
+				.domain(domainWithSmtpIn)
 				.build();
 		expect(userDao.create(user)).andReturn(userFromDao);
-		expect(groupDao.getByGid(domainWithMailHost, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		groupDao.addUser(domainWithMailHost, usersGroup.getUid(), userFromDao);
+		expect(groupDao.getByGid(domainWithSmtpIn, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		groupDao.addUser(domainWithSmtpIn, usersGroup.getUid(), userFromDao);
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
 
 		expectLdapCreateUser(userFromDao);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
-		expect(satelliteService.create(isA(Configuration.class), eq(domainWithMailHost))).andReturn(satelliteConnection);
+		expect(satelliteService.create(isA(Configuration.class), eq(domainWithSmtpIn))).andReturn(satelliteConnection);
 		satelliteConnection.updateMTA();
 		expectLastCall();
 		expect(batchDao.update(batchBuilder
@@ -786,7 +810,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		Batch.Builder batchBuilder = Batch
 				.builder()
 				.id(batchId(1))
-				.domain(domain)
+				.domain(domainWithImapAndLdap)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		
@@ -799,8 +823,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domain)
-				.mailHost(ObmHost.builder().name("host").build())
+				.domain(domainWithImapAndLdap)
+				.mailHost(ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
 				.build();
 		ObmUser userFromDao = ObmUser
 				.builder()
@@ -811,13 +835,13 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domain)
-				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.domain(domainWithImapAndLdap)
+				.mailHost(ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
 				.build();
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain)).andReturn(userFromDao);
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
 		expect(userDao.update(user)).andReturn(userFromDao);
 		expectLdapModifyUser(userFromDao, userFromDao);
 		CyrusManager cyrusManager = expectCyrusBuild();
@@ -840,6 +864,130 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 	}
 	
+	@Test
+	public void testProcessModifyUserCannotChangeLogin() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.resourcePath("/users/1")
+						.verb(HttpVerb.PUT)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1new\"," +
+										"\"profile\": \"user\"," +
+										"\"password\": \"secret\"," +
+										"\"mails\":[\"john@domain\"]," +
+										"\"mail_server\":\"Cyrus\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domainWithImapAndLdap)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.ERROR)
+						.timecommit(date)
+						.error("org.obm.provisioning.exception.ProcessingException: Cannot change user login")
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessModifyUserCannotChangeMailHost() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.resourcePath("/users/1")
+						.verb(HttpVerb.PUT)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1\"," +
+										"\"profile\": \"user\"," +
+										"\"password\": \"secret\"," +
+										"\"mails\":[\"john@domain\"]," +
+										"\"mail_server\":\"NewCyrus\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domainWithImapAndLdap)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.ERROR)
+						.timecommit(date)
+						.error("org.obm.provisioning.exception.ProcessingException: Cannot change user mail host")
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
 	@Test
 	public void testProcessPatchUser() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
