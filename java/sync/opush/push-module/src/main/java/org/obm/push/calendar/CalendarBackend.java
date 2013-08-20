@@ -483,7 +483,12 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	@VisibleForTesting boolean isParticipationChangeUpdate(CollectionPath collectionPath, Event oldEvent) {
-		return oldEvent != null && !oldEvent.belongsToCalendar(collectionPath.backendName());
+		return oldEvent != null && !belongsToCalendar(oldEvent, collectionPath.backendName());
+	}
+
+	@VisibleForTesting boolean belongsToCalendar(Event oldEvent, String calendarName) {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendarName));
+		return calendarName.equalsIgnoreCase(oldEvent.getOwnerEmail());
 	}
 
 	private void updateEvent(AccessToken token, UserDataRequest udr, 

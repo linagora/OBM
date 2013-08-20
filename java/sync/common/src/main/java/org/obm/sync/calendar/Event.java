@@ -52,7 +52,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -842,10 +841,4 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 		}
 		attendees.add(newAttendee);
 	}
-
-	public boolean belongsToCalendar(String calendarName) {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendarName));
-		return calendarName.equalsIgnoreCase(ownerEmail);
-	}
-	
 }

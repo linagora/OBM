@@ -1554,68 +1554,7 @@ public class EventTest {
 
 		publicEvent.addOrReplaceAttendee("user@domain", null);
 	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testBelongsToCalendarWhenNullCalendar() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.belongsToCalendar(null);
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testBelongsToCalendarWhenEmptyCalendar() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.belongsToCalendar("");
-	}
-
-	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsNull() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail(null);
-		
-		assertThat(event.belongsToCalendar("owner@email.com")).isFalse();
-	}
 	
-	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsEmpty() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail("");
-		
-		assertThat(event.belongsToCalendar("owner@email.com")).isFalse();
-	}
-	
-	@Test
-	public void testBelongsToCalendarWhenOwnerEmailIsDifferent() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail("owner@email.com");
-		
-		assertThat(event.belongsToCalendar("user@email.com")).isFalse();
-	}
-
-	@Test
-	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmail() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail("owner@email.com");
-		
-		assertThat(event.belongsToCalendar("owner@email.com")).isTrue();
-	}
-
-	@Test
-	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmailDifferentCase() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail("OWNER@email.com");
-		
-		assertThat(event.belongsToCalendar("owner@email.com")).isTrue();
-	}
-	
-	@Test
-	public void testBelongsToCalendarWhenCalendarNotEqualsOwnerEmailButCreator() {
-		Event event = createNonRecurrentEventWithMostFields();
-		event.setOwnerEmail("owner@email.com");
-		event.setCreatorEmail("creator@email.com");
-		
-		assertThat(event.belongsToCalendar("creator@email.com")).isFalse();
-	}
-
 	@Test
 	public void testFindOwner() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();

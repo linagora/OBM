@@ -1524,22 +1524,80 @@ public class CalendarBackendTest {
 	@Test
 	public void testIsParticipationChangeUpdateWhenOldEventNotBelongsToCalendar() {
 		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
-		Event oldEvent = mockControl.createMock(Event.class);
-		expect(oldEvent.belongsToCalendar("test@test")).andReturn(false);
+		Event oldEvent = new Event();
+		oldEvent.setOwnerEmail("other@test");
 		
-		mockControl.replay();
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isTrue();
-		mockControl.verify();
 	}
 
 	@Test
 	public void testIsParticipationChangeUpdateWhenOldEventBelongsToCalendar() {
 		CalendarCollectionPath collectionPath = new CalendarCollectionPath(rootCalendarPath, "test@test");
-		Event oldEvent = mockControl.createMock(Event.class);
-		expect(oldEvent.belongsToCalendar("test@test")).andReturn(true);
+		Event oldEvent = new Event();
+		oldEvent.setOwnerEmail("test@test");
 
-		mockControl.replay();
 		assertThat(calendarBackend.isParticipationChangeUpdate(collectionPath, oldEvent)).isFalse();
-		mockControl.verify();
 	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testBelongsToCalendarWhenNullCalendar() {
+		Event event = new Event();
+		calendarBackend.belongsToCalendar(event, null);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testBelongsToCalendarWhenEmptyCalendar() {
+		Event event = new Event();
+		calendarBackend.belongsToCalendar(event, "");
+	}
+
+	@Test
+	public void testBelongsToCalendarWhenOwnerEmailIsNull() {
+		Event event = new Event();
+		event.setOwnerEmail(null);
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isFalse();
+	}
+	
+	@Test
+	public void testBelongsToCalendarWhenOwnerEmailIsEmpty() {
+		Event event = new Event();
+		event.setOwnerEmail("");
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isFalse();
+	}
+	
+	@Test
+	public void testBelongsToCalendarWhenOwnerEmailIsDifferent() {
+		Event event = new Event();
+		event.setOwnerEmail("owner@email.com");
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "user@email.com")).isFalse();
+	}
+
+	@Test
+	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmail() {
+		Event event = new Event();
+		event.setOwnerEmail("owner@email.com");
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isTrue();
+	}
+
+	@Test
+	public void testBelongsToCalendarWhenCalendarEqualsOwnerEmailDifferentCase() {
+		Event event = new Event();
+		event.setOwnerEmail("OWNER@email.com");
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "owner@email.com")).isTrue();
+	}
+	
+	@Test
+	public void testBelongsToCalendarWhenCalendarNotEqualsOwnerEmailButCreator() {
+		Event event = new Event();
+		event.setOwnerEmail("owner@email.com");
+		event.setCreatorEmail("creator@email.com");
+		
+		assertThat(calendarBackend.belongsToCalendar(event, "creator@email.com")).isFalse();
+	}
+
 }
