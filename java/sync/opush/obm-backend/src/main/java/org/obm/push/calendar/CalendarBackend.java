@@ -503,7 +503,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 
 	@VisibleForTesting boolean belongsToCalendar(Event oldEvent, String calendarName) {
 		Preconditions.checkArgument(!Strings.isNullOrEmpty(calendarName));
-		return calendarName.equalsIgnoreCase(oldEvent.getOwnerEmail());
+		return calendarName.equalsIgnoreCase(oldEvent.getOwner());
 	}
 
 	private void updateEvent(AccessToken token, UserDataRequest udr, 
