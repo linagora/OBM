@@ -44,6 +44,7 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.date.DateProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,9 +52,12 @@ import com.google.inject.Singleton;
 @Singleton
 public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl implements FolderSyncStateBackendMappingDao {
 
+	private final DateProvider dateProvider;
+
 	@Inject
-	private FolderSyncStateBackendMappingDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	private FolderSyncStateBackendMappingDaoJdbcImpl(DatabaseConnectionProvider dbcp, DateProvider dateProvider) {
 		super(dbcp);
+		this.dateProvider = dateProvider;
 	}
 
 	@Override
@@ -93,7 +97,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 						"(data_type, folder_sync_state_id, last_sync) VALUES (?, ?, ?)");
 			ps.setObject(1, dbcp.getJdbcObject(dataType.getDbFieldName(), dataType.getDbValue()));
 			ps.setInt(2, folderSyncState.getId());
- 			ps.setTimestamp(3, DateUtils.toTimestamp(DateUtils.getCurrentDate()));
+ 			ps.setTimestamp(3, DateUtils.toTimestamp(dateProvider.getDate()));
 			if (ps.executeUpdate() == 0) {
 				throw new DaoException("No SyncState inserted");
 			} 
