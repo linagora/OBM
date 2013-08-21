@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -100,30 +99,6 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		}
 	}
 
-	@Override
-	public Set<ServerId> getSyncedServerIds(final ItemSyncState itemSyncState, Set<ServerId> serverIds) throws DaoException {
-		HashSet<ServerId> filteredSet = new HashSet<ServerId>();
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			con = dbcp.getConnection();
-			
-			PreparedStatement select = selectServerId(con);
-		
-			for (ServerId serverId: serverIds) {
-				checkServerId(serverId);
-				if (isServerIdSynced(select, itemSyncState, serverId)) {
-					filteredSet.add(serverId);
-				}
-			}
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
-		}
-		return filteredSet;
-	}
 
 	private PreparedStatement selectServerId(Connection con)
 			throws SQLException {

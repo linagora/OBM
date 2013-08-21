@@ -43,8 +43,6 @@ public interface ItemTrackingDao {
 	
 	void markAsDeleted(ItemSyncState itemSyncState, Set<ServerId> serverIds) throws DaoException;
 	
-	Set<ServerId> getSyncedServerIds(ItemSyncState itemSyncState, Set<ServerId> serverIds) throws DaoException;
-	
 	boolean isServerIdSynced(ItemSyncState itemSyncState, ServerId serverId) throws DaoException;
 	
 }
