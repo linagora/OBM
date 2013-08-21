@@ -86,7 +86,7 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
@@ -329,7 +329,7 @@ public class PingHandlerTest {
 	private void mockForPingNeeds() throws DaoException {
 		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		mockMonitoredCollectionDao(monitoredCollectionDao);
-		HearbeatDao heartbeatDao = classToInstanceMap.get(HearbeatDao.class);
+		HeartbeatDao heartbeatDao = classToInstanceMap.get(HeartbeatDao.class);
 		mockHeartbeatDao(heartbeatDao);
 	}
 	
@@ -448,8 +448,8 @@ public class PingHandlerTest {
 		});
 	}
 
-	private void mockHeartbeatDao(HearbeatDao heartbeatDao) throws DaoException {
-		heartbeatDao.updateLastHearbeat(anyObject(Device.class), anyLong());
+	private void mockHeartbeatDao(HeartbeatDao heartbeatDao) throws DaoException {
+		heartbeatDao.updateLastHeartbeat(anyObject(Device.class), anyLong());
 		expectLastCall().anyTimes();
 	}
 	

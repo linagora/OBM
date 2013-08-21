@@ -39,22 +39,22 @@ import java.sql.SQLException;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HearbeatDao{
+public class HeartbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HeartbeatDao{
 
 	@Inject
-	private HearbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
+	private HeartbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 
 	@Override
-	public Long findLastHearbeat(Device device) throws DaoException {
+	public Long findLastHeartbeat(Device device) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		
 		Connection con = null;
@@ -79,7 +79,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 	}
 
 	@Override
-	public void updateLastHearbeat(Device device, long hearbeat) throws DaoException {
+	public void updateLastHeartbeat(Device device, long heartbeat) throws DaoException {
 		final Integer devDbId = device.getDatabaseId();
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -92,7 +92,7 @@ public class HearbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements Hearbeat
 			ps.close();
 			ps = con.prepareStatement("INSERT INTO opush_ping_heartbeat (device_id, last_heartbeat) VALUES (?, ?)");
 			ps.setInt(1, devDbId);
-			ps.setLong(2, hearbeat);
+			ps.setLong(2, heartbeat);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new DaoException(e);

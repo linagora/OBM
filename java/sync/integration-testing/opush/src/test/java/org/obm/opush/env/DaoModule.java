@@ -38,7 +38,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
@@ -55,7 +55,7 @@ public class DaoModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		bindWithMock(CollectionDao.class);
 		bindWithMock(DeviceDao.class);
-		bindWithMock(HearbeatDao.class);
+		bindWithMock(HeartbeatDao.class);
 		bindWithMock(MonitoredCollectionDao.class);
 		bindWithMock(SyncedCollectionDao.class);
 		bindUnsynchronizedItemDao();

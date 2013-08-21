@@ -47,15 +47,15 @@ public class PingCommand extends AbstractCommand<PingResponse> {
 	
 	private final PingProtocol pingProtocol;
 
-	public PingCommand(PingProtocol pingProtocol, final String collectionId, final long hearbeat) throws SAXException, IOException {
+	public PingCommand(PingProtocol pingProtocol, final String collectionId, final long heartbeat) throws SAXException, IOException {
 		super(NS.Ping, "Ping", new TemplateDocument("PingRequest.xml") {
 
 			@Override
 			protected void customize(Document document, AccountInfos accountInfos) {
 				Element collection = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.COLLECTION_ID.getName());
 				collection.setTextContent(collectionId);
-				Element hearbeatElement = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.HEARTBEAT_INTERVAL.getName());
-				hearbeatElement.setTextContent(String.valueOf(hearbeat));
+				Element heartbeatElement = DOMUtils.getUniqueElement(document.getDocumentElement(), PingRequestFields.HEARTBEAT_INTERVAL.getName());
+				heartbeatElement.setTextContent(String.valueOf(heartbeat));
 			}});
 		this.pingProtocol = pingProtocol;
 	}

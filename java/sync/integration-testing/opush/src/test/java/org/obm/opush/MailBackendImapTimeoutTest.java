@@ -87,7 +87,7 @@ import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
@@ -128,7 +128,7 @@ public class MailBackendImapTimeoutTest {
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
 	private UnsynchronizedItemDao unsynchronizedItemDao;
-	private HearbeatDao hearbeatDao;
+	private HeartbeatDao heartbeatDao;
 	private MonitoredCollectionDao monitoredCollectionDao;
 	private DateService dateService;
 
@@ -160,7 +160,7 @@ public class MailBackendImapTimeoutTest {
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
 		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		hearbeatDao = classToInstanceMap.get(HearbeatDao.class);
+		heartbeatDao = classToInstanceMap.get(HeartbeatDao.class);
 		monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
@@ -390,7 +390,7 @@ public class MailBackendImapTimeoutTest {
 	@Ignore("Waiting for push mode in order to be checked")
 	@Test
 	public void testPingHandler() throws Exception {
-		long hearbeat = 5;
+		long heartbeat = 5;
 		SyncKey syncKey = new SyncKey("123");
 		int stateId = 3;
 		
@@ -403,7 +403,7 @@ public class MailBackendImapTimeoutTest {
 				.id(stateId)
 				.build();
 		
-		hearbeatDao.updateLastHearbeat(user.device, hearbeat);
+		heartbeatDao.updateLastHeartbeat(user.device, heartbeat);
 		expectLastCall();
 		
 		monitoredCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Set.class));
@@ -417,7 +417,7 @@ public class MailBackendImapTimeoutTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		greenMail.lockGreenmailAndReleaseAfter(20);
-		PingResponse pingResponse = opClient.ping(pingProtocol, inboxCollectionIdAsString, hearbeat);
+		PingResponse pingResponse = opClient.ping(pingProtocol, inboxCollectionIdAsString, heartbeat);
 		
 		mocksControl.verify();
 		assertThat(pingResponse.getPingStatus()).isEqualTo(PingStatus.SERVER_ERROR);

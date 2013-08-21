@@ -208,8 +208,8 @@ public abstract class OPClient {
 		return run(new MeetingResponseCommand(collectionId, serverId));
 	}
 
-	public PingResponse ping(PingProtocol pingProtocol, String inboxCollectionIdAsString, long hearbeat) throws Exception {
-		return run(new PingCommand(pingProtocol, inboxCollectionIdAsString, hearbeat));
+	public PingResponse ping(PingProtocol pingProtocol, String inboxCollectionIdAsString, long heartbeat) throws Exception {
+		return run(new PingCommand(pingProtocol, inboxCollectionIdAsString, heartbeat));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)

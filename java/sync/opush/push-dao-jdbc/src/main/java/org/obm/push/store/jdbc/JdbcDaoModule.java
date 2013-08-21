@@ -36,7 +36,7 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
@@ -52,7 +52,7 @@ public class JdbcDaoModule extends AbstractModule{
 
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
+		bind(HeartbeatDao.class).to(HeartbeatDaoJdbcDaoImpl.class);
 		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);

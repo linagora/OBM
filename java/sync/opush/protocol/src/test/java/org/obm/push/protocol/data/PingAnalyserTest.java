@@ -59,7 +59,7 @@ import org.obm.push.protocol.bean.AnalysedPingRequest;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DateUtils;
 
@@ -75,7 +75,7 @@ public class PingAnalyserTest {
 	
 	private IMocksControl mocks;
 	private CollectionDao collectionDao;
-	private HearbeatDao heartbeatDao;
+	private HeartbeatDao heartbeatDao;
 	private MonitoredCollectionDao monitoredCollectionDao;
 	private ICollectionPathHelper collectionPathHelper;
 	private StateMachine stateMachine;
@@ -94,7 +94,7 @@ public class PingAnalyserTest {
 
 		mocks = createControl();
 		collectionDao = mocks.createMock(CollectionDao.class);
-		heartbeatDao = mocks.createMock(HearbeatDao.class);
+		heartbeatDao = mocks.createMock(HeartbeatDao.class);
 		monitoredCollectionDao = mocks.createMock(MonitoredCollectionDao.class);
 		collectionPathHelper = mocks.createMock(ICollectionPathHelper.class);
 		stateMachine = mocks.createMock(StateMachine.class);
@@ -113,7 +113,7 @@ public class PingAnalyserTest {
 				.build();
 		
 		long heartbeat = 100;
-		expect(heartbeatDao.findLastHearbeat(device))
+		expect(heartbeatDao.findLastHeartbeat(device))
 			.andReturn(heartbeat).once();
 
 		expect(collectionDao.getCollectionPath(collectionId))
@@ -151,7 +151,7 @@ public class PingAnalyserTest {
 						.build())
 				.build();
 		
-		expect(heartbeatDao.findLastHearbeat(device))
+		expect(heartbeatDao.findLastHeartbeat(device))
 			.andReturn(null).once();
 		
 		mocks.replay();
@@ -176,7 +176,7 @@ public class PingAnalyserTest {
 				.heartbeatInterval(heartbeat)
 				.build();
 		
-		heartbeatDao.updateLastHearbeat(device, PingAnalyser.MIN_SANE_HEARTBEAT_VALUE);
+		heartbeatDao.updateLastHeartbeat(device, PingAnalyser.MIN_SANE_HEARTBEAT_VALUE);
 		expectLastCall().once();
 		
 		expect(collectionDao.getCollectionPath(collectionId))
@@ -215,7 +215,7 @@ public class PingAnalyserTest {
 				.build();
 		
 		long heartbeat = 100;
-		expect(heartbeatDao.findLastHearbeat(device))
+		expect(heartbeatDao.findLastHeartbeat(device))
 			.andReturn(heartbeat).once();
 
 		expect(collectionDao.getCollectionPath(collectionId))
@@ -264,7 +264,7 @@ public class PingAnalyserTest {
 				.build();
 		
 		long heartbeat = 100;
-		expect(heartbeatDao.findLastHearbeat(device))
+		expect(heartbeatDao.findLastHeartbeat(device))
 			.andReturn(heartbeat).once();
 
 		expect(collectionDao.getCollectionPath(collectionId))

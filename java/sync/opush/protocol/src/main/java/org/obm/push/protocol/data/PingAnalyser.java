@@ -46,7 +46,7 @@ import org.obm.push.protocol.bean.AnalysedPingRequest;
 import org.obm.push.protocol.bean.PingRequest;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
-import org.obm.push.store.HearbeatDao;
+import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 
 import com.google.common.collect.Sets;
@@ -59,17 +59,17 @@ public class PingAnalyser {
 	protected static final long MIN_SANE_HEARTBEAT_VALUE = 5L;
 	
 	private final CollectionDao collectionDao;
-	private final HearbeatDao hearbeatDao;
+	private final HeartbeatDao heartbeatDao;
 	private final MonitoredCollectionDao monitoredCollectionDao;
 	private final ICollectionPathHelper collectionPathHelper;
 	private final StateMachine stateMachine;
 
 	@Inject
-	protected PingAnalyser(CollectionDao collectionDao, HearbeatDao hearbeatDao, MonitoredCollectionDao monitoredCollectionDao,
+	protected PingAnalyser(CollectionDao collectionDao, HeartbeatDao heartbeatDao, MonitoredCollectionDao monitoredCollectionDao,
 			ICollectionPathHelper collectionPathHelper, StateMachine stateMachine) {
 		
 		this.collectionDao = collectionDao;
-		this.hearbeatDao = hearbeatDao;
+		this.heartbeatDao = heartbeatDao;
 		this.monitoredCollectionDao = monitoredCollectionDao;
 		this.collectionPathHelper = collectionPathHelper;
 		this.stateMachine = stateMachine;
@@ -88,14 +88,14 @@ public class PingAnalyser {
 			throws DaoException, MissingRequestParameterException {
 		
 		if (pingRequest.getHeartbeatInterval() == null) {
-			Long heartbeatInterval = hearbeatDao.findLastHearbeat(udr.getDevice());
+			Long heartbeatInterval = heartbeatDao.findLastHeartbeat(udr.getDevice());
 			if (heartbeatInterval == null) {
 				throw new MissingRequestParameterException();
 			}
 			return heartbeatInterval;
 		} else {
 			long heartbeatInterval = Math.max(MIN_SANE_HEARTBEAT_VALUE, pingRequest.getHeartbeatInterval());
-			hearbeatDao.updateLastHearbeat(udr.getDevice(), heartbeatInterval);
+			heartbeatDao.updateLastHeartbeat(udr.getDevice(), heartbeatInterval);
 			return heartbeatInterval;
 		}
 	}
