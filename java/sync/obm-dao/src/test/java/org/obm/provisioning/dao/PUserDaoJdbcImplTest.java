@@ -31,14 +31,13 @@ package org.obm.provisioning.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.sql.ResultSet;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.TestUtils;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.PUserDaoJdbcImpl;
@@ -77,6 +76,9 @@ public class PUserDaoJdbcImplTest {
 	@Rule
 	@Inject
 	public H2InMemoryDatabase db;
+
+	@Inject
+	private TestUtils utils;
 
 	@Before
 	public void setUp() throws Exception {
@@ -181,12 +183,12 @@ public class PUserDaoJdbcImplTest {
 		dao.insert(obmUser(4, "4"));
 		dao.insert(obmUser(5, "5"));
 
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(5);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(5);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(5);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(5);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
 	}
 
 	@Test
@@ -352,12 +354,12 @@ public class PUserDaoJdbcImplTest {
 		dao.delete(obmUser(5, "5"));
 
 
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
-		assertThat(getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
 	}
 
 	private ObmUser obmUser(int id, String extId) {
@@ -367,15 +369,5 @@ public class PUserDaoJdbcImplTest {
 				.extId(UserExtId.valueOf(extId))
 				.domain(ObmDomain.builder().build())
 				.build();
-	}
-	
-	private int getIntFromQuery(String query, Object... params) throws Exception {
-		ResultSet rs = db.execute(query, params);
-		if (rs.next()) {
-			return rs.getInt(1);
-		}
-		else {
-			throw new RuntimeException("Expected single integer result, got no result instead");
-		}
 	}
 }
