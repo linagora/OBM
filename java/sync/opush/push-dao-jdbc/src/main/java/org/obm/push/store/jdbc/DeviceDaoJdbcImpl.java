@@ -130,7 +130,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT policy FROM opush_sync_perms "
-					+ "INNER JOIN UserObm u ON owner=userobm_id "
+					+ "INNER JOIN UserObm u ON opush_sync_perms.owner=userobm_id "
 					+ "INNER JOIN Domain d ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device od ON device_id=id "
 					+ "WHERE od.identifier=? AND u.userobm_login=? AND d.domain_name=?");
@@ -159,7 +159,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement("SELECT policy FROM opush_sync_perms "
-					+ "INNER JOIN UserObm ON owner=userobm_id "
+					+ "INNER JOIN UserObm ON opush_sync_perms.owner=userobm_id "
 					+ "INNER JOIN Domain ON userobm_domain_id=domain_id "
 					+ "INNER JOIN opush_device ON device_id=id "
 					+ "WHERE identifier=? AND userobm_login=? AND domain_name=? "
@@ -182,7 +182,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		return null;
 	}
 	
-	private boolean policyStatusToPendingAccept(PolicyStatus policyStatus) {
+	protected static boolean policyStatusToPendingAccept(PolicyStatus policyStatus) {
 		switch (policyStatus) {
 		case ACCEPTED:
 			return false;
