@@ -32,11 +32,13 @@
 package org.obm.provisioning.processing.impl.groups;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -58,7 +60,9 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 		ObmUser userFromDao = getUserFromDao(userExtId, domain);
 		
 		addUserToGroupInDao(domain, groupExtId, userFromDao);
-		addUserToGroupInLdap(domain, getGroupFromDao(groupExtId, domain), userFromDao);
+		Group groupFromDao = getGroupFromDao(groupExtId, domain);
+		addUserToGroupInLdap(domain, groupFromDao, userFromDao);
+		updateGroupInPTables(groupFromDao);
 	}
 
 	private void addUserToGroupInDao(ObmDomain domain, GroupExtId groupExtId, ObmUser userFromDao) {
@@ -70,5 +74,13 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 							userFromDao.getExtId().getExtId(), groupExtId.getId()), e);
 		}
 	}
-
+	
+	private void updateGroupInPTables(Group group) {
+		try {
+			pGroupDao.delete(group);
+			pGroupDao.insert(group);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+	}
 }

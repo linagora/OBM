@@ -15,6 +15,8 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.EntityRightDaoJdbcImpl;
+import org.obm.domain.dao.PGroupDao;
+import org.obm.domain.dao.PGroupDaoJdbcImpl;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.PUserDaoJdbcImpl;
 import org.obm.domain.dao.UserSystemDao;
@@ -122,6 +124,7 @@ public class ProvisioningService extends ServletModule {
 		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 		bind(EntityRightDao.class).to(EntityRightDaoJdbcImpl.class);
 		bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
+		bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
 	}
 
 	private void bindRestResources() {

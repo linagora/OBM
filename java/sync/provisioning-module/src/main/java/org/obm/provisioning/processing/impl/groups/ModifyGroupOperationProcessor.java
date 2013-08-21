@@ -36,6 +36,7 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
@@ -64,6 +65,7 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 
 		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, oldGroup));
 		modifyGroupInLdap(domain, newGroup, oldGroup);
+		modifyGroupInPTables(newGroup);
 	}
 
 	private void validateGroupChanges(Group group, Group oldGroup) {
@@ -91,6 +93,15 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 					String.format("Cannot modify group '%s' (%s) in ldap.", group.getName(), group.getExtId()), e);
 		} finally {
 			ldapManager.shutdown();
+		}
+	}
+	
+	private void modifyGroupInPTables(Group group) {
+		try {
+			pGroupDao.delete(group);
+			pGroupDao.insert(group);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
 		}
 	}
 }

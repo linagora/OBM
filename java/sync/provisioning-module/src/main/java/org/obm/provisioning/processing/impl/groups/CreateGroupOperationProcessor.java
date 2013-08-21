@@ -34,6 +34,7 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
@@ -55,6 +56,7 @@ public class CreateGroupOperationProcessor extends AbstractGroupOperationProcess
 		Group groupFromDao = createGroupInDao(group, batch.getDomain());
 
 		createGroupInLdap(groupFromDao, batch.getDomain());
+		createGroupInPTables(groupFromDao);
 	}
 
 	private void createGroupInLdap(Group group, ObmDomain domain) {
@@ -75,6 +77,14 @@ public class CreateGroupOperationProcessor extends AbstractGroupOperationProcess
 			return groupDao.create(domain, group);
 		} catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot insert new Group '%s' (%s) in database.", group.getName(), group.getExtId().getId()), e);
+		}
+	}
+	
+	private void createGroupInPTables(Group group) {
+		try {
+			pGroupDao.insert(group);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
 		}
 	}
 

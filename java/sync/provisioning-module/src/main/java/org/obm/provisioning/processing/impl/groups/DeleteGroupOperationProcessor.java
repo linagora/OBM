@@ -37,6 +37,7 @@ import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
@@ -57,9 +58,10 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 		
 		deleteGroupInDao(domain, extId);
 		deleteGroupInLdap(domain, groupFromDao);
+		deleteGroupInPTables(groupFromDao);
 	}
 
-	public void deleteGroupInDao(ObmDomain domain,GroupExtId extId) {
+	private void deleteGroupInDao(ObmDomain domain,GroupExtId extId) {
 		try {
 			groupDao.delete(domain, extId);
 		} catch (Exception e) {
@@ -68,7 +70,7 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 		}
 	}
 	
-	public void deleteGroupInLdap(ObmDomain domain, Group group) {
+	private void deleteGroupInLdap(ObmDomain domain, Group group) {
 		LdapManager ldapManager = buildLdapManager(domain);
 		
 		try {
@@ -78,6 +80,14 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 					String.format("Cannot delete group with extId '%s' in LDAP.", group.getExtId().getId()), e);
 		} finally {
 			ldapManager.shutdown();
+		}
+	}
+	
+	private void deleteGroupInPTables(Group group) {
+		try {
+			pGroupDao.delete(group);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
 		}
 	}
 }

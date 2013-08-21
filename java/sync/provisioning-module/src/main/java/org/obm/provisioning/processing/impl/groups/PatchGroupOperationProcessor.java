@@ -42,6 +42,7 @@ import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.PatchGroupJsonDeserializer;
 
@@ -66,6 +67,7 @@ public class PatchGroupOperationProcessor extends ModifyGroupOperationProcessor 
 		
 		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, oldGroup));
 		modifyGroupInLdap(domain, newGroup, oldGroup);
+		modifyGroupInPTables(group);
 	}
 
 	private Group getGroupFromRequestBody(Operation operation, Group oldGroup) {
@@ -85,5 +87,14 @@ public class PatchGroupOperationProcessor extends ModifyGroupOperationProcessor 
 			.addDeserializer(Group.class, new PatchGroupJsonDeserializer(oldGroup));
 
 		return ProvisioningService.createObjectMapper(module);
+	}
+
+	private void modifyGroupInPTables(Group group) {
+		try {
+			pGroupDao.delete(group);
+			pGroupDao.insert(group);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
 	}
 }

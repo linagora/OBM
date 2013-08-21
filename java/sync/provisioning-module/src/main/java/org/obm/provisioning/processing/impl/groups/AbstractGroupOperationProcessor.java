@@ -35,6 +35,7 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.domain.dao.PGroupDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProvisioningService;
@@ -42,12 +43,20 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 
+import com.google.inject.Inject;
+
 public abstract class AbstractGroupOperationProcessor extends AbstractOperationProcessor {
 
+	@Inject
+	protected GroupDao groupDao;
+	@Inject
+	protected PGroupDao pGroupDao;
+	
 	protected AbstractGroupOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.GROUP, verb);
 	}

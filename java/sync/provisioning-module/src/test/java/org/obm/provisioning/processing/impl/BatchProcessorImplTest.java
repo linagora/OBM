@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.EntityRightDao;
+import org.obm.domain.dao.PGroupDao;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
@@ -138,6 +139,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	private ObmHelper obmHelper;
 	@Inject
 	private PUserDao pUserDao;
+	@Inject
+	private PGroupDao pGroupDao;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -335,6 +338,16 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 	private void expectPUserDaoInsert(ObmUser user) throws DaoException  {
 		pUserDao.insert(user);
+		expectLastCall();
+	}
+	
+	private void expectPGroupDaoDelete(Group group) throws DaoException  {
+		pGroupDao.delete(group);
+		expectLastCall();
+	}
+
+	private void expectPGroupDaoInsert(Group group) throws DaoException  {
+		pGroupDao.insert(group);
 		expectLastCall();
 	}
 	
@@ -587,6 +600,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 	}
 
+	private void expectLdapCreateGroup(Group group) {
+		LdapManager ldapManager = expectLdapBuild();
+		ldapManager.createGroup(group, domain);
+		expectLastCall();
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+	
 	private void expectLdapDeleteGroup(Group group) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.deleteGroup(domain, group);
@@ -1154,6 +1175,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.delete(domain, extId);
 		expectLastCall();
 		expectLdapDeleteGroup(groupFromDao);
+		expectPGroupDaoDelete(groupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -1212,6 +1234,68 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		expect(groupDao.update(domain, newGroup)).andReturn(newGroup);
 		expectLdapModifyGroup(newGroup, groupFromDao);
+		expectPGroupDaoDelete(newGroup);
+		expectPGroupDaoInsert(newGroup);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessCreateGroup() throws Exception {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/")
+						.verb(HttpVerb.POST)
+						.body(
+								"{" +
+										"\"id\": \"newGroupExtId\"," +
+										"\"name\": \"newGroup\"," +
+										"\"description\": \"description\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		
+		final GroupExtId extId = GroupExtId.valueOf("newGroupExtId");
+		final Group groupFromDao = Group.builder()
+										.name("newGroup")
+										.gid(1)
+										.uid(Id.valueOf(1))
+										.description("description")
+										.extId(extId)
+										.build();
+		final Group newGroup = Group.builder()
+				.name("newGroup")
+				.description("description")
+				.extId(extId)
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.create(domain, newGroup)).andReturn(groupFromDao);
+		expectLdapCreateGroup(groupFromDao);
+		expectPGroupDaoInsert(groupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -1326,6 +1410,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		expect(groupDao.update(domain, newGroup)).andReturn(newGroup);
 		expectLdapModifyGroup(newGroup, groupFromDao);
+		expectPGroupDaoDelete(newGroup);
+		expectPGroupDaoInsert(newGroup);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -1382,6 +1468,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
 		expectLdapAddUserToGroup(groupFromDao, userFromDao);
+		expectPGroupDaoDelete(groupFromDao);
+		expectPGroupDaoInsert(groupFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
