@@ -319,6 +319,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 		return syncState;
 	}
 
+	@Override
 	public Integer getCollectionMapping(Device device, String collection) throws DaoException {
 		Integer devDbId = device.getDatabaseId();
 		Integer ret = null;

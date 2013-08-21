@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,47 +29,38 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.store.jdbc;
 
-import java.util.Date;
-import java.util.List;
+import org.junit.Rule;
+import org.obm.dao.utils.DaoTestModule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
+import org.obm.guice.GuiceModule;
+import org.obm.push.dao.testsuite.CollectionDaoTest;
+import org.obm.push.store.CollectionDao;
+import org.obm.push.store.FolderSnapshotDao;
 
-import org.obm.push.bean.ChangedCollections;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.FolderSyncState;
-import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.exception.DaoException;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
+import com.google.inject.Inject;
 
-public interface CollectionDao {
+@GuiceModule(CollectionDaoJdbcImplTest.Env.class)
+public class CollectionDaoJdbcImplTest extends CollectionDaoTest implements H2TestClass {
 
-	int addCollectionMapping(Device device, String collection) throws DaoException;
-
-	Integer getCollectionMapping(Device device, String collection) throws DaoException;
-
-	String getCollectionPath(Integer collectionId)
-			throws CollectionNotFoundException, DaoException;
-
-	void resetCollection(Device device, Integer collectionId) throws DaoException;
+	public static class Env extends DaoTestModule {
+		@Override
+		protected void configureImpl() {
+			bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
+			bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
+		}
+	}
 	
-	/**
-	 * Create a new SyncState entry in database and returns its unique id
-	 * @return SyncState database unique id
-	 */
-	ItemSyncState updateState(Device device, Integer collectionId, SyncKey syncKey, Date syncDate) throws DaoException;
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initialCollectionSchema.sql");
 
-	FolderSyncState allocateNewFolderSyncState(Device device, SyncKey newSyncKey) throws DaoException;
+	@Inject H2InMemoryDatabase db;
 	
-	ItemSyncState findItemStateForKey(SyncKey syncKey) throws DaoException ;
-	
-	FolderSyncState findFolderStateForKey(SyncKey syncKey) throws DaoException ;
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
 
-	ChangedCollections getCalendarChangedCollections(Date lastSync) throws DaoException;
-
-	ChangedCollections getContactChangedCollections(Date lastSync) throws DaoException;
-
-	ItemSyncState lastKnownState(Device device, Integer collectionId) throws DaoException;
-
-	List<String> getUserCollections(FolderSyncState folderSyncState) throws DaoException;
 }
