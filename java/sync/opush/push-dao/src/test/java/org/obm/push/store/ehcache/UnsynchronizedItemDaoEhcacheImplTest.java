@@ -42,9 +42,12 @@ import javax.transaction.TransactionManager;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
@@ -57,8 +60,10 @@ import bitronix.tm.TransactionManagerServices;
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
+public class UnsynchronizedItemDaoEhcacheImplTest {
 
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
 	private TransactionManager transactionManager;
@@ -73,7 +78,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		this.transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		this.objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 	}
 	

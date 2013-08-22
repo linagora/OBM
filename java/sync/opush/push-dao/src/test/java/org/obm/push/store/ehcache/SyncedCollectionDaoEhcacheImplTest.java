@@ -42,9 +42,12 @@ import javax.transaction.TransactionManager;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -59,8 +62,10 @@ import org.slf4j.Logger;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
+public class SyncedCollectionDaoEhcacheImplTest {
 
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
@@ -72,7 +77,8 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		this.objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

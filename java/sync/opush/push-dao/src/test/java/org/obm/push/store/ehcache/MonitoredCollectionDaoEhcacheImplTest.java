@@ -42,9 +42,12 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -62,7 +65,9 @@ import bitronix.tm.TransactionManagerServices;
 import com.google.common.collect.Sets;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
+public class MonitoredCollectionDaoEhcacheImplTest {
+
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 
 	private ObjectStoreManager objectStoreManager;
 	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionStoreServiceImpl;
@@ -75,7 +80,8 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger, transactionProvider);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		this.objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
@@ -116,16 +122,15 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 		
 	}
 	
-	private void containsCollectionWithId(
-		Collection<AnalysedSyncCollection> syncCollections, Integer id) {
-	boolean find = false;
-	for(AnalysedSyncCollection col : syncCollections){
-		if(col.getCollectionId() == id){
-			find = true;
+	private void containsCollectionWithId(Collection<AnalysedSyncCollection> syncCollections, Integer id) {
+		boolean find = false;
+		for(AnalysedSyncCollection col : syncCollections){
+			if(col.getCollectionId() == id){
+				find = true;
+			}
 		}
+		Assert.assertTrue(find);
 	}
-	Assert.assertTrue(find);
-}
 
 	private Set<AnalysedSyncCollection> buildListCollection(Integer... ids) {
 		Set<AnalysedSyncCollection> cols = Sets.newHashSet();

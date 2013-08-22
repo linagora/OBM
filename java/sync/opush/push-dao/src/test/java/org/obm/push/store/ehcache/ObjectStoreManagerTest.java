@@ -38,9 +38,12 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
@@ -49,8 +52,10 @@ import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
+public class ObjectStoreManagerTest {
 
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
 	private BitronixTransactionManager transactionManager;
@@ -64,7 +69,8 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		transactionManager = TransactionManagerServices.getTransactionManager();
-		opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger, transactionProvider);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		opushCacheManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
 	}
 
 	@After

@@ -35,16 +35,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.easymock.EasyMock;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.obm.configuration.ConfigurationService;
 
-public class StoreManagerConfigurationTest {
-
-	@Rule 
-	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
+public class EhCacheConfigurationService {
 	
-	protected ConfigurationService initConfigurationServiceMock() throws IOException {
+	public ConfigurationService mock(TemporaryFolder temporaryFolder) throws IOException {
 		File dataDir = temporaryFolder.newFolder();
 		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
 		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
