@@ -34,7 +34,6 @@ package org.obm.push.impl;
 import net.sf.ehcache.Element;
 
 import org.obm.push.ContinuationTransactionMap;
-import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.store.ehcache.AbstractEhcacheDao;
@@ -43,7 +42,7 @@ import org.obm.push.store.ehcache.ObjectStoreManager;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
-public class ContinuationTransactionMapImpl extends AbstractEhcacheDao implements ContinuationTransactionMap {
+public class ContinuationTransactionMapImpl<T> extends AbstractEhcacheDao implements ContinuationTransactionMap<T> {
 
 	@Inject  
 	@VisibleForTesting ContinuationTransactionMapImpl(ObjectStoreManager objectStoreManager) {
@@ -56,16 +55,16 @@ public class ContinuationTransactionMapImpl extends AbstractEhcacheDao implement
 	}
 	
 	@Override
-	public IContinuation getContinuationForDevice(Device device) throws ElementNotFoundException {
+	public T getContinuationForDevice(Device device) throws ElementNotFoundException {
 		Element element = store.get(device);
 		if (element == null) {
 			throw new ElementNotFoundException();
 		}
-		return (IContinuation) element.getObjectValue();
+		return (T) element.getObjectValue();
 	}
 	
 	@Override
-	public boolean putContinuationForDevice(Device device, IContinuation continuation) {
+	public boolean putContinuationForDevice(Device device, T continuation) {
 		Element previousElement = store.get(device);
 		store.put(new Element(device, continuation));
 		return previousElement != null;

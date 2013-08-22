@@ -47,10 +47,10 @@ public class ContinuationServiceImpl implements ContinuationService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private final ContinuationTransactionMap continuationTransactionMap;
+	private final ContinuationTransactionMap<IContinuation> continuationTransactionMap;
 	
 	@Inject
-	@VisibleForTesting ContinuationServiceImpl(ContinuationTransactionMap continuationTransactionMap) {
+	@VisibleForTesting ContinuationServiceImpl(ContinuationTransactionMap<IContinuation> continuationTransactionMap) {
 		this.continuationTransactionMap = continuationTransactionMap;
 	}
 

@@ -31,18 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.ElementNotFoundException;
 
-public interface ContinuationTransactionMap {
+public interface ContinuationTransactionMap<CONTINUATION_TYPE> {
 	
-	IContinuation getContinuationForDevice(Device device) throws ElementNotFoundException ;
+	CONTINUATION_TYPE getContinuationForDevice(Device device) throws ElementNotFoundException ;
 	
 	/**
-	 * @return whether there already was a previous entry for the couple device-continuation 
+	 * @return whether there already was a previous entry for the couple device-continuation_type 
 	 */
-	boolean putContinuationForDevice(Device device, IContinuation continuation) ;
+	boolean putContinuationForDevice(Device device, CONTINUATION_TYPE continuation) ;
 	
 	void delete(Device device);
 }

@@ -65,7 +65,7 @@ public class ContinuationServiceImplTest {
 	public void testSuspend() {
 		IContinuation continuation = mockContinuation();
 		
-		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(false);
 		
 		replay(continuationTransactionMap);
@@ -79,7 +79,7 @@ public class ContinuationServiceImplTest {
 	public void testSuspendOnAlreadyCachedContinuation() {
 		IContinuation continuation = mockContinuation();
 		
-		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(true);
 		
 		replay(continuationTransactionMap);
@@ -101,7 +101,7 @@ public class ContinuationServiceImplTest {
 		continuation.resume();
 		expectLastCall();
 		
-		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.getContinuationForDevice(device))
 			.andReturn(continuation);
 		continuationTransactionMap.delete(device);
@@ -123,7 +123,7 @@ public class ContinuationServiceImplTest {
 		continuation.error(error);
 		expectLastCall();
 		
-		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.getContinuationForDevice(device))
 			.andReturn(continuation);
 		continuationTransactionMap.delete(device);
@@ -136,8 +136,8 @@ public class ContinuationServiceImplTest {
 		verify(continuationTransactionMap, continuation);
 	}
 
-	private ContinuationTransactionMap mockContinuationTransactionMap() {
-		ContinuationTransactionMap continuationTransactionMap = createMock(ContinuationTransactionMap.class);
+	private ContinuationTransactionMap<IContinuation> mockContinuationTransactionMap() {
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = createMock(ContinuationTransactionMap.class);
 		return continuationTransactionMap;
 	}
 
@@ -146,7 +146,7 @@ public class ContinuationServiceImplTest {
 		return continuation;
 	}
 
-	private ContinuationServiceImpl continuationService(ContinuationTransactionMap continuationTransactionMap) {
+	private ContinuationServiceImpl continuationService(ContinuationTransactionMap<IContinuation> continuationTransactionMap) {
 		return new ContinuationServiceImpl(continuationTransactionMap);
 	}
 }

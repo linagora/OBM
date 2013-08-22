@@ -48,7 +48,6 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.ProtocolVersion;
-import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.exception.ElementNotFoundException;
@@ -70,15 +69,16 @@ public class ContinuationTransactionMapImplTest {
 		Cache cache = buildCache();
 		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
 		
-		PushContinuation expectedContinuation = mockContinuation();
+		TestingContinuation expectedContinuation = new TestingContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(objectStoreManager);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
-		IContinuation continuationForDevice = continuationTransactionMap.getContinuationForDevice(device);
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
+		TestingContinuation continuationForDevice = continuationTransactionMap.getContinuationForDevice(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(objectStoreManager);
 		assertThat(continuationForDevice).isEqualTo(expectedContinuation);
 	}
 	
@@ -89,7 +89,8 @@ public class ContinuationTransactionMapImplTest {
 		
 		replay(objectStoreManager);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		continuationTransactionMap.getContinuationForDevice(device);
 	}
 	
@@ -98,16 +99,17 @@ public class ContinuationTransactionMapImplTest {
 	public void testPutContinuationForDevice() {
 		Cache cache = buildCache();
 		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		PushContinuation expectedContinuation = mockContinuation();
+
+		TestingContinuation expectedContinuation = new TestingContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(objectStoreManager);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(objectStoreManager);
 		assertThat(hasPreviousElement).isTrue();
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
@@ -117,15 +119,16 @@ public class ContinuationTransactionMapImplTest {
 	public void testPutContinuationForDeviceNoCachedElement() {
 		Cache cache = buildCache();
 		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		PushContinuation expectedContinuation = mockContinuation();
-		
-		replay(objectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		TestingContinuation expectedContinuation = new TestingContinuation();
+		
+		replay(objectStoreManager);
+
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(objectStoreManager);
 		assertThat(hasPreviousElement).isFalse();
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
@@ -135,16 +138,17 @@ public class ContinuationTransactionMapImplTest {
 	public void testDelete() {
 		Cache cache = buildCache();
 		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		PushContinuation expectedContinuation = mockContinuation();
+
+		TestingContinuation expectedContinuation = new TestingContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(objectStoreManager);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		continuationTransactionMap.delete(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(objectStoreManager);
 		assertThat(cache.getKeys()).isEmpty();
 	}
 	
@@ -153,21 +157,15 @@ public class ContinuationTransactionMapImplTest {
 	public void testDeleteNotCachedElement() {
 		Cache cache = buildCache();
 		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		PushContinuation expectedContinuation = mockContinuation();
-		
-		replay(objectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		replay(objectStoreManager);
+
+		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
+				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		continuationTransactionMap.delete(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(objectStoreManager);
 		assertThat(cache.getKeys()).isEmpty();
-	}
-
-	private PushContinuation mockContinuation() {
-		PushContinuation pushContinuation = createMock(PushContinuation.class);
-		return pushContinuation;
 	}
 	
 	private CacheConfiguration cacheConfigurationForContinuation() {
@@ -192,4 +190,6 @@ public class ContinuationTransactionMapImplTest {
 		cache.initialise();
 		return cache;
 	}
+	
+	public static class TestingContinuation {}
 }
