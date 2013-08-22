@@ -334,6 +334,32 @@ public class UserDaoJdbcImplTest {
 	}
 
 	@Test
+	public void testCreateInsertsAddressBooks() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("Doe")
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		ResultSet rs = db.execute("SELECT is_default FROM AddressBook WHERE owner = ? AND name = 'contacts'", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getBoolean("is_default")).isTrue();
+		rs.close();
+
+		rs = db.execute("SELECT is_default FROM AddressBook WHERE owner = ? AND name = 'collected_contacts'", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getBoolean("is_default")).isTrue();
+		rs.close();
+	}
+
+	@Test
 	public void testGetAfterCreate() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()

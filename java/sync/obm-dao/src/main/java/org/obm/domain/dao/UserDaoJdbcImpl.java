@@ -128,7 +128,7 @@ public class UserDaoJdbcImpl implements UserDao {
 	private static final AddressBook COLLECTED_CONTACTS_BOOK = AddressBook
 			.builder()
 			.name("collected_contacts")
-			.defaultBook(false)
+			.defaultBook(true)
 			.syncable(true)
 			.origin("provisioning")
 			.build();
