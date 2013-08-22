@@ -31,165 +31,48 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.io.IOException;
 
-import java.util.Properties;
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
-import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
-
+import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.obm.push.ElementNotFoundException;
-import org.obm.push.ProtocolVersion;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
+import org.obm.push.dao.testsuite.ContinuationTransactionMapTest;
+import org.slf4j.Logger;
 
-public class ContinuationTransactionMapImplTest {
-	
-	public final static String PENDING_CONTINUATIONS = "pendingContinuation";
-	public final static String KEY_ID_REQUEST = "key_id_request";
-	private Device device;
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
+
+public class ContinuationTransactionMapImplTest extends ContinuationTransactionMapTest {
+
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+
+	private ObjectStoreManager objectStoreManager;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
-	public void setUp() {
-		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
+	public void init() throws NotSupportedException, SystemException, IOException {
+		Logger logger = EasyMock.createNiceMock(Logger.class);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		continuationTransactionMap = new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
+		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
-	@Test
-	public void testGetContinuationForDevice() throws ElementNotFoundException {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		TestingContinuation expectedContinuation = new TestingContinuation();
-		cache.putIfAbsent(new Element(device, expectedContinuation));
-		
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		TestingContinuation continuationForDevice = continuationTransactionMap.getContinuationForDevice(device);
-		
-		verify(objectStoreManager);
-		assertThat(continuationForDevice).isEqualTo(expectedContinuation);
+	@After
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
+		objectStoreManager.shutdown();
+		transactionManager.shutdown();
 	}
-	
-	@Test (expected=ElementNotFoundException.class)
-	public void testGetContinuationForDeviceElementNotFound() throws ElementNotFoundException {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-		
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		continuationTransactionMap.getContinuationForDevice(device);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testPutContinuationForDevice() {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-
-		TestingContinuation expectedContinuation = new TestingContinuation();
-		cache.putIfAbsent(new Element(device, expectedContinuation));
-		
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
-		
-		verify(objectStoreManager);
-		assertThat(hasPreviousElement).isTrue();
-		assertThat(cache.getKeys()).containsOnly(device);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testPutContinuationForDeviceNoCachedElement() {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-
-		TestingContinuation expectedContinuation = new TestingContinuation();
-		
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
-		
-		verify(objectStoreManager);
-		assertThat(hasPreviousElement).isFalse();
-		assertThat(cache.getKeys()).containsOnly(device);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testDelete() {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-
-		TestingContinuation expectedContinuation = new TestingContinuation();
-		cache.putIfAbsent(new Element(device, expectedContinuation));
-		
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		continuationTransactionMap.delete(device);
-		
-		verify(objectStoreManager);
-		assertThat(cache.getKeys()).isEmpty();
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testDeleteNotCachedElement() {
-		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
-
-		replay(objectStoreManager);
-
-		ContinuationTransactionMapImpl<TestingContinuation> continuationTransactionMap = 
-				new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
-		continuationTransactionMap.delete(device);
-		
-		verify(objectStoreManager);
-		assertThat(cache.getKeys()).isEmpty();
-	}
-	
-	private CacheConfiguration cacheConfigurationForContinuation() {
-		return new CacheConfiguration()
-			.maxElementsInMemory(0)
-			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
-			.transactionalMode(TransactionalMode.OFF)
-			.eternal(false)
-			.name(PENDING_CONTINUATIONS);
-	}
-	
-	private ObjectStoreManager mockObjectStoreManager(Cache cache) {
-		ObjectStoreManager objectStoreManager = createMock(ObjectStoreManager.class);
-		expect(objectStoreManager.getStore(PENDING_CONTINUATIONS))
-			.andReturn(cache).anyTimes();
-		
-		return objectStoreManager;
-	}
-
-	private Cache buildCache() {
-		Cache cache = new Cache(cacheConfigurationForContinuation());
-		cache.initialise();
-		return cache;
-	}
-	
-	public static class TestingContinuation {}
 }
