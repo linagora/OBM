@@ -39,6 +39,8 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
+import com.google.common.base.Objects;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcessor {
@@ -55,11 +57,19 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		Group group = getGroupFromRequestBody(operation);
-		final ObmDomain domain = batch.getDomain();
+		ObmDomain domain = batch.getDomain();
 		Group oldGroup = getGroupFromDao(group.getExtId(), domain);
-		
+
+		validateGroupChanges(group, oldGroup);
+
 		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, oldGroup));
 		modifyGroupInLdap(domain, newGroup, oldGroup);
+	}
+
+	private void validateGroupChanges(Group group, Group oldGroup) {
+		if (!Objects.equal(group.getName(), oldGroup.getName())) {
+			throw new ProcessingException("Cannot rename a group.");
+		}
 	}
 
 	protected Group modifyGroupInDao(ObmDomain domain, Group group) {

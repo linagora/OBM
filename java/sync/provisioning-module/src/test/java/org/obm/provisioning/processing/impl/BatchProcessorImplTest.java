@@ -1162,8 +1162,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(
 								"{" +
 										"\"id\": \"extIdGroup1\"," +
-										"\"name\": \"newName\"," +
-										"\"description\": \"description\"" +
+										"\"name\": \"group1\"," +
+										"\"description\": \"newDescription\"" +
 								"}")
 						.build());
 		Batch.Builder batchBuilder = Batch
@@ -1180,9 +1180,9 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 										.extId(extId)
 										.build();
 		final Group newGroup = Group.builder()
-				.name("newName")
+				.name("group1")
 				.extId(extId)
-				.description("description")
+				.description("newDescription")
 				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
@@ -1204,7 +1204,59 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 		mocksControl.verify();
 	}
-	
+
+	@Test
+	public void testProcessRenameGroup() throws Exception {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(Request
+						.builder()
+						.resourcePath("/groups/extIdGroup1")
+						.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+						.verb(HttpVerb.PUT)
+						.body(
+								"{" +
+										"\"id\": \"extIdGroup1\"," +
+										"\"name\": \"newName\"," +
+										"\"description\": \"description\"" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+
+		GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		Group groupFromDao = Group.builder()
+										.name("group1")
+										.extId(extId)
+										.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.ERROR)
+						.error("org.obm.provisioning.exception.ProcessingException: Cannot rename a group.")
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+
 	@Test
 	public void testProcessPatchGroup() throws Exception {
 		Operation.Builder opBuilder = Operation
