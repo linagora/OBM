@@ -32,59 +32,45 @@
 package org.obm.push.store.ehcache;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.User;
-import org.obm.push.bean.User.Factory;
+import org.obm.push.dao.testsuite.MonitoredCollectionDaoTest;
 import org.slf4j.Logger;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
-import com.google.common.collect.Sets;
-
 @RunWith(SlowFilterRunner.class) @Slow
-public class MonitoredCollectionDaoEhcacheImplTest {
+public class MonitoredCollectionDaoEhcacheImplTest extends MonitoredCollectionDaoTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 
 	private ObjectStoreManager objectStoreManager;
-	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionStoreServiceImpl;
-	private Credentials credentials;
 	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
-		this.objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
-		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
-		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
-		this.credentials = new Credentials(user, "password");
+
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		monitoredCollectionDao = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
+		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
 	@After
@@ -92,58 +78,5 @@ public class MonitoredCollectionDaoEhcacheImplTest {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
 		transactionManager.shutdown();
-	}
-	
-	@Test
-	public void testList() {
-		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
-		Assert.assertNotNull(syncCollections);
-	}
-	
-	@Test
-	public void testSimplePut() {
-		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
-		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
-		Assert.assertNotNull(syncCollections);
-		Assert.assertEquals(1, syncCollections.size());
-		containsCollectionWithId(syncCollections, 1);
-	}
-	
-	@Test
-	public void testPutNewItems() {
-		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(1));
-		monitoredCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildListCollection(2, 3));
-
-		Collection<AnalysedSyncCollection> syncCollections = monitoredCollectionStoreServiceImpl.list(credentials, getFakeDeviceId());
-		Assert.assertNotNull(syncCollections);
-		Assert.assertEquals(2, syncCollections.size());
-		containsCollectionWithId(syncCollections, 2);
-		containsCollectionWithId(syncCollections, 3);
-		
-	}
-	
-	private void containsCollectionWithId(Collection<AnalysedSyncCollection> syncCollections, Integer id) {
-		boolean find = false;
-		for(AnalysedSyncCollection col : syncCollections){
-			if(col.getCollectionId() == id){
-				find = true;
-			}
-		}
-		Assert.assertTrue(find);
-	}
-
-	private Set<AnalysedSyncCollection> buildListCollection(Integer... ids) {
-		Set<AnalysedSyncCollection> cols = Sets.newHashSet();
-		for(Integer id : ids){
-			cols.add(AnalysedSyncCollection.builder()
-					.collectionId(id)
-					.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
-					.build());
-		}
-		return cols;
-	}
-	
-	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 }
