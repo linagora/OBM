@@ -40,7 +40,6 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
@@ -65,8 +64,6 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 
 	private final String ANYONE_IDENTIFIER = "anyone";
 
-	@Inject
-	private GroupDao groupDao;
 	@Inject
 	private ProfileDao profileDao;
 	@Inject
@@ -93,6 +90,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 
 		createUserInLdap(userFromDao);
+		addUserInDefaultGroupInLdap(userFromDao);
 	}
 
 	private void setDefaultUserRights(ObmUser user) {
@@ -202,6 +200,23 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 					String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
 		} finally {
 			ldapManager.shutdown();
+		}
+	}
+
+	private void addUserInDefaultGroupInLdap(ObmUser user) {
+		ObmDomain domain = user.getDomain();
+
+		try {
+			Group defaultGroup = groupDao.getByGid(domain, UserDao.DEFAULT_GID);
+
+			if (defaultGroup == null) {
+				throw new ProcessingException(String.format("Default group with GID %s not found for domain %s.", UserDao.DEFAULT_GID, domain.getName()));
+			}
+
+			addUserToGroupInLdap(domain, defaultGroup, user);
+		}
+		catch (DaoException e) {
+			throw new ProcessingException(String.format("Cannot add user '%s' (%s) in his/her default group in LDAP.", user.getLogin(), user.getExtId()), e);
 		}
 	}
 

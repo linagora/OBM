@@ -293,6 +293,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapAddUserToGroup(usersGroup, userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
 		
 		expect(batchDao.update(batchBuilder
@@ -467,6 +469,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectSetDefaultRights(userFromDao);
 
 		expectLdapCreateUser(userFromDao);
+		expect(groupDao.getByGid(domainWithSmtpIn, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapAddUserToGroup(usersGroup, userFromDao);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
 		expect(satelliteService.create(isA(Configuration.class), eq(domainWithSmtpIn))).andReturn(satelliteConnection);
 		satelliteConnection.updateMTA();
@@ -578,7 +582,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	private void expectLdapAddUserToGroup(Group group, ObmUser userToAdd) {
 		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.addUserToGroup(domain, group, userToAdd);
+		ldapManager.addUserToGroup(userToAdd.getDomain(), group, userToAdd);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -665,6 +669,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapAddUserToGroup(usersGroup, userFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

@@ -32,14 +32,12 @@
 package org.obm.provisioning.processing.impl.groups;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.ldap.client.LdapManager;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -60,7 +58,7 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 		ObmUser userFromDao = getUserFromDao(userExtId, domain);
 		
 		addUserToGroupInDao(domain, groupExtId, userFromDao);
-		addUserToGroupInLdap(domain, groupExtId, userFromDao);
+		addUserToGroupInLdap(domain, getGroupFromDao(groupExtId, domain), userFromDao);
 	}
 
 	private void addUserToGroupInDao(ObmDomain domain, GroupExtId groupExtId, ObmUser userFromDao) {
@@ -72,19 +70,5 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 							userFromDao.getExtId().getExtId(), groupExtId.getId()), e);
 		}
 	}
-	
-	private void addUserToGroupInLdap(ObmDomain domain, GroupExtId groupExtId, ObmUser userToAdd) {
-		LdapManager ldapManager = buildLdapManager(domain);
-		Group group = getGroupFromDao(groupExtId, domain);
-		
-		try {
-			ldapManager.addUserToGroup(domain, group, userToAdd);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot add user with extId '%s' to group with extId '%s' in ldap.",
-							userToAdd.getExtId().getExtId(), groupExtId.getId()), e);
-		} finally {
-			ldapManager.shutdown();
-		}
-	}
+
 }

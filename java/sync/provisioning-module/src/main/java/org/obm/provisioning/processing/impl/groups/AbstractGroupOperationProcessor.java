@@ -42,20 +42,12 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
-import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 
-import com.google.inject.Inject;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
-
 public abstract class AbstractGroupOperationProcessor extends AbstractOperationProcessor {
 
-	@Inject
-	protected GroupDao groupDao;
-	
 	protected AbstractGroupOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.GROUP, verb);
 	}
@@ -74,15 +66,6 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 	
 	protected Group inheritDatabaseIdentifiers(Group group, Group oldgroup) {
 		return Group.builder().from(group).uid(oldgroup.getUid()).gid(oldgroup.getGid()).build();
-	}
-	
-	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
-		try {
-			return groupDao.get(domain, extId);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot fetch existing group with extId '%s' from database.", extId), e);
-		}
 	}
 	
 	protected Group getGroupFromRequestBody(Operation operation) {

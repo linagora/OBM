@@ -31,10 +31,13 @@ package org.obm.provisioning.processing.impl;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -55,6 +58,8 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 	protected LdapService ldapService;
 	@Inject
 	protected UserDao userDao;
+	@Inject
+	protected GroupDao groupDao;
 
 	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
 		super(entityType, verb);
@@ -100,4 +105,28 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 			throw new ProcessingException(String.format("Cannot fetch existing user %s from database.", extId), e);
 		}
 	}
+
+	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
+		try {
+			return groupDao.get(domain, extId);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot fetch existing group with extId '%s' from database.", extId), e);
+		}
+	}
+
+	protected void addUserToGroupInLdap(ObmDomain domain, Group group, ObmUser userToAdd) {
+		LdapManager ldapManager = buildLdapManager(domain);
+
+		try {
+			ldapManager.addUserToGroup(domain, group, userToAdd);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot add user with extId '%s' to group with extId '%s' in ldap.",
+							userToAdd.getExtId().getExtId(), group.getExtId()), e);
+		} finally {
+			ldapManager.shutdown();
+		}
+	}
+
 }
