@@ -51,7 +51,7 @@ import com.jayway.restassured.http.ContentType;
 public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testObmUserDeserializerAndSerializer() throws Exception {
+	public void testObmUserDeserializerAndSerializer() {
 		expectDomain();
 		mocksControl.replay();
 		

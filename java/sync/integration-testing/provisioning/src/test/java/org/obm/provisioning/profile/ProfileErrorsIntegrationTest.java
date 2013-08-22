@@ -59,7 +59,7 @@ public class ProfileErrorsIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -73,7 +73,7 @@ public class ProfileErrorsIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		

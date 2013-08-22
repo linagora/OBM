@@ -48,6 +48,7 @@ public class AuthorizingModule extends ShiroWebModule {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void configureShiroWeb() {
 			try {
 				bindRealm().toConstructor(ObmJDBCAuthorizingRealm.class.getConstructor());

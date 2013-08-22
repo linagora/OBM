@@ -57,7 +57,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenDomainExists(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWhenDomainExists(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -75,7 +75,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenDomainExistsButNoProfile(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWhenDomainExistsButNoProfile(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("68936f0f-2bb5-447c-87f5-efcd46f58122");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -91,7 +91,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -105,7 +105,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenProfileExists(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfileNameWhenProfileExists(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -121,7 +121,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenProfileExistsInAnotherDomain(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfileNameWhenProfileExistsInAnotherDomain(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -135,7 +135,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) throws Exception {
+	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		

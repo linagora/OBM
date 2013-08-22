@@ -49,7 +49,7 @@ import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
 public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 	
-	public CalendarBindingImplIntegrationTestModule(ServletContext servletContext) {
+	public CalendarBindingImplIntegrationTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		final UserExtId extId = getUserExtIdFromRequest(operation);
 		ObmUser oldUser = getUserFromDao(extId, batch.getDomain());
-		ObmUser user = getUserFromRequestBody(operation, batch, oldUser);
+		ObmUser user = getUserFromRequestBody(operation, oldUser);
 		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, oldUser));
 
 		if (newUser.isEmailAvailable()) {
@@ -71,7 +71,7 @@ public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
 		modifyUserInLdap(newUser, oldUser);
 	}
 	
-	private ObmUser getUserFromRequestBody(Operation operation, Batch batch, ObmUser oldUser) {
+	private ObmUser getUserFromRequestBody(Operation operation, ObmUser oldUser) {
 		String requestBody = operation.getRequest().getBody();
 		ObjectMapper objectMapper = getObjectMapperForDomain(oldUser);
 

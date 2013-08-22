@@ -65,7 +65,7 @@ public class DeleteUserFromGroupOperationProcessor extends AbstractGroupOperatio
 		try {
 			groupDao.removeUser(domain, groupExtId, userToDelete);
 		} catch (Exception e) {
-			new ProcessingException(
+			throw new ProcessingException(
 					String.format("Cannot delete user with extId '%s' to group with extId '%s' in database.",
 							userToDelete.getExtId().getExtId(), groupExtId.getId()), e);
 		}

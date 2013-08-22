@@ -64,6 +64,7 @@ public class EmailReaderTest {
 		assertThat(CharStreams.toString(testee)).isEqualTo("data®¥þðØ¿¶");
 	}
 	
+	@SuppressWarnings("resource")
 	@Test(expected=IllegalStateException.class)
 	public void testToInputStreamIsDenyWhenAlreadyReadSomething() throws Exception {
 		EmailReader testee = new EmailReader(new StringReader("0123456789"));
@@ -94,6 +95,7 @@ public class EmailReaderTest {
 		}
 	}
 	
+	@SuppressWarnings("resource")
 	@Test(expected=IllegalStateException.class)
 	public void testToInputStreamIsDenyWhenCallTwice() throws Exception {
 		EmailReader testee = new EmailReader(new StringReader("0123456789"));
@@ -107,6 +109,7 @@ public class EmailReaderTest {
 		}
 	}
 	
+	@SuppressWarnings("resource")
 	@Test(expected=IllegalStateException.class)
 	public void testReadIsDenyWhenCallToInputStreamHasBeenDone() throws Exception {
 		EmailReader testee = new EmailReader(new StringReader("0123456789"));
@@ -140,6 +143,7 @@ public class EmailReaderTest {
 	}
 	
 	@Test
+	@SuppressWarnings("resource")
 	public void testToInputStreamIsAllowedAfterMarkAndReset() throws Exception {
 		EmailReader testee = new EmailReader(new StringReader("0123456789"));
 		

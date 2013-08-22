@@ -62,7 +62,6 @@ public class LdapManagerImplTest {
 		control = createControl();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreate() {
 		Connection mockConnection = control.createMock(Connection.class);
@@ -91,7 +90,6 @@ public class LdapManagerImplTest {
 		control.verify();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testDelete() {
 		Connection mockConnection = control.createMock(Connection.class);
