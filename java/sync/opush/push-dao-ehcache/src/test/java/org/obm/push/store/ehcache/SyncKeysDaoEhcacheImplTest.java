@@ -31,11 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
@@ -44,49 +40,37 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncKeysKey;
+import org.obm.push.dao.testsuite.SyncKeysDaoTest;
 import org.slf4j.Logger;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class SyncKeysDaoEhcacheImplTest {
+public class SyncKeysDaoEhcacheImplTest extends SyncKeysDaoTest {
 
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
-	
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+
 	private ObjectStoreManager objectStoreManager;
-	private SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl;
 	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), logger, transactionProvider);
-		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
-	}
-	
-	private ConfigurationService initConfigurationServiceMock() throws IOException {
-		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true);
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		return configurationService;
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		syncKeysDao = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
 	@After
@@ -94,142 +78,5 @@ public class SyncKeysDaoEhcacheImplTest {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
 		transactionManager.shutdown();
-	}
-	
-	@Test
-	public void getNull() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		int collectionId = 1;
-		
-		List<SyncKey> syncKeys = syncKeysDaoEhcacheImpl.get(deviceId, collectionId);
-		
-		assertThat(syncKeys).isNull();
-	}
-	
-	@Test
-	public void put() {
-		SyncKey syncKey = new SyncKey("synckey");
-		DeviceId deviceId = new DeviceId("deviceId");
-		int collectionId = 1;
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-	}
-	
-	@Test
-	public void get() {
-		SyncKey syncKey = new SyncKey("synckey");
-		DeviceId deviceId = new DeviceId("deviceId");
-		int collectionId = 1;
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		List<SyncKey> syncKeys = syncKeysDaoEhcacheImpl.get(deviceId, collectionId);
-		
-		assertThat(syncKeys).containsOnly(syncKey);
-	}
-	
-	@Test
-	public void putMultipleDifferentKeys() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		DeviceId deviceId2 = new DeviceId("deviceId2");
-		SyncKey syncKey = new SyncKey("synckey");
-		SyncKey syncKey2 = new SyncKey("synckey2");
-		int collectionId = 1;
-		int collectionId2 = 2;
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		syncKeysDaoEhcacheImpl.put(deviceId2, collectionId2, syncKey2);
-		List<SyncKey> syncKeys = syncKeysDaoEhcacheImpl.get(deviceId, collectionId);
-		List<SyncKey> syncKeys2 = syncKeysDaoEhcacheImpl.get(deviceId2, collectionId2);
-		
-		assertThat(syncKeys).containsOnly(syncKey);
-		assertThat(syncKeys2).containsOnly(syncKey2);
-	}
-	
-	@Test
-	public void putMultipleSameKey() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		SyncKey syncKey = new SyncKey("synckey");
-		SyncKey syncKey2 = new SyncKey("synckey2");
-		int collectionId = 1;
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey2);
-		List<SyncKey> syncKeys = syncKeysDaoEhcacheImpl.get(deviceId, collectionId);
-		
-		assertThat(syncKeys).containsOnly(syncKey, syncKey2);
-	}
-	
-	@Test
-	public void delete() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		DeviceId deviceId2 = new DeviceId("deviceId2");
-		SyncKey syncKey = new SyncKey("synckey");
-		SyncKey syncKey2 = new SyncKey("synckey2");
-		int collectionId = 1;
-		int collectionId2 = 2;
-		
-		SyncKeysKey expectedSyncKeysKey = SyncKeysKey.builder()
-				.deviceId(deviceId2)
-				.collectionId(collectionId2)
-				.build();
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		syncKeysDaoEhcacheImpl.put(deviceId2, collectionId2, syncKey2);
-		syncKeysDaoEhcacheImpl.delete(deviceId, collectionId);
-		
-		List<SyncKeysKey> keys = objectStoreManager.getStore(syncKeysDaoEhcacheImpl.getStoreName()).getKeys();
-		assertThat(keys).containsOnly(expectedSyncKeysKey);
-	}
-	
-	@Test
-	public void deleteWithMultipleSyncKeys() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		DeviceId deviceId2 = new DeviceId("deviceId2");
-		SyncKey syncKey = new SyncKey("synckey");
-		SyncKey syncKey2 = new SyncKey("synckey2");
-		SyncKey syncKey3 = new SyncKey("synckey3");
-		int collectionId = 1;
-		int collectionId2 = 2;
-		
-		SyncKeysKey expectedSyncKeysKey = SyncKeysKey.builder()
-				.deviceId(deviceId2)
-				.collectionId(collectionId2)
-				.build();
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		syncKeysDaoEhcacheImpl.put(deviceId2, collectionId2, syncKey2);
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey3);
-		syncKeysDaoEhcacheImpl.delete(deviceId, collectionId);
-		
-		List<SyncKeysKey> keys = objectStoreManager.getStore(syncKeysDaoEhcacheImpl.getStoreName()).getKeys();
-		assertThat(keys).containsOnly(expectedSyncKeysKey);
-	}
-
-	@Test
-	public void deleteWithMultipleCollectionId() {
-		DeviceId deviceId = new DeviceId("deviceId");
-		DeviceId deviceId2 = new DeviceId("deviceId2");
-		SyncKey syncKey = new SyncKey("synckey");
-		SyncKey syncKey2 = new SyncKey("synckey2");
-		int collectionId = 1;
-		int collectionId2 = 2;
-		int collectionId3 = 3;
-		
-		SyncKeysKey expectedSyncKeysKey = SyncKeysKey.builder()
-				.deviceId(deviceId2)
-				.collectionId(collectionId2)
-				.build();
-		SyncKeysKey expectedSyncKeysKey2 = SyncKeysKey.builder()
-				.deviceId(deviceId)
-				.collectionId(collectionId3)
-				.build();
-		
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId, syncKey);
-		syncKeysDaoEhcacheImpl.put(deviceId2, collectionId2, syncKey2);
-		syncKeysDaoEhcacheImpl.put(deviceId, collectionId3, syncKey2);
-		syncKeysDaoEhcacheImpl.delete(deviceId, collectionId);
-		
-		List<SyncKeysKey> keys = objectStoreManager.getStore(syncKeysDaoEhcacheImpl.getStoreName()).getKeys();
-		assertThat(keys).containsOnly(expectedSyncKeysKey, expectedSyncKeysKey2);
 	}
 }
