@@ -31,103 +31,52 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.User;
-import org.obm.push.bean.User.Factory;
+import org.obm.push.dao.testsuite.SyncedCollectionDaoTest;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
-public class SyncedCollectionDaoEhcacheImplTest {
+public class SyncedCollectionDaoEhcacheImplTest extends SyncedCollectionDaoTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
-	
+
 	private ObjectStoreManager objectStoreManager;
-	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
-	private Credentials credentials;
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
-		this.objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
-		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
-		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
-		this.credentials = new Credentials(user, "password");
+
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		syncedCollectionDao = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
+		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManager.shutdown();
 	}
-	
-	@Test
-	public void get() {
-		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		assertThat(syncCollection).isNull();
-	}
-	
-	@Test
-	public void put() {
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), buildCollection(1, SyncKey.INITIAL_FOLDER_SYNC_KEY));
-		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		assertThat(syncCollection).isNotNull();
-		assertThat(syncCollection.getCollectionId()).isEqualTo(1);
-	}
-	
-	@Test
-	public void putUpdatedCollection() {
-		SyncKey expectedSyncKey = new SyncKey("123");
-		AnalysedSyncCollection col = buildCollection(1, SyncKey.INITIAL_FOLDER_SYNC_KEY);
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
-		col = buildCollection(1, expectedSyncKey);
-		syncedCollectionStoreServiceImpl.put(credentials, getFakeDeviceId(), col);
-		
-		AnalysedSyncCollection syncCollection = syncedCollectionStoreServiceImpl.get(credentials, getFakeDeviceId(), 1);
-		assertThat(syncCollection).isNotNull();
-		assertThat(syncCollection.getCollectionId()).isEqualTo(1);
-		assertThat(syncCollection.getSyncKey()).isEqualTo(expectedSyncKey);
-	}
-
-	private AnalysedSyncCollection buildCollection(Integer id, SyncKey syncKey) {
-		return AnalysedSyncCollection.builder()
-				.collectionId(id)
-				.syncKey(syncKey)
-				.build();
-	}
-	
-	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
-	}
-	
 }
