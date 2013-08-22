@@ -39,8 +39,6 @@ import static org.easymock.EasyMock.verify;
 
 import java.util.Properties;
 
-import net.sf.ehcache.Element;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.ContinuationTransactionMap;
@@ -68,8 +66,7 @@ public class ContinuationServiceImplTest {
 		IContinuation continuation = mockContinuation();
 		
 		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
-		expect(continuationTransactionMap.putContinuationForDevice(device, continuation))
-			.andReturn(null);
+		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(false);
 		
 		replay(continuationTransactionMap);
 		
@@ -80,13 +77,10 @@ public class ContinuationServiceImplTest {
 	
 	@Test
 	public void testSuspendOnAlreadyCachedContinuation() {
-		IContinuation previousContinuation = mockContinuation();
-		Element previousElement = new Element(device, previousContinuation);
 		IContinuation continuation = mockContinuation();
 		
 		ContinuationTransactionMap continuationTransactionMap = mockContinuationTransactionMap();
-		expect(continuationTransactionMap.putContinuationForDevice(device, continuation))
-			.andReturn(previousElement);
+		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(true);
 		
 		replay(continuationTransactionMap);
 		

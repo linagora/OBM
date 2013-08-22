@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import net.sf.ehcache.Element;
-
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.ElementNotFoundException;
@@ -41,7 +39,10 @@ public interface ContinuationTransactionMap {
 	
 	IContinuation getContinuationForDevice(Device device) throws ElementNotFoundException ;
 	
-	Element putContinuationForDevice(Device device, IContinuation continuation) ;
+	/**
+	 * @return whether there already was a previous entry for the couple device-continuation 
+	 */
+	boolean putContinuationForDevice(Device device, IContinuation continuation) ;
 	
 	void delete(Device device);
 }

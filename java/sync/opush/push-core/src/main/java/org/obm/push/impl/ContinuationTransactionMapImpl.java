@@ -65,10 +65,10 @@ public class ContinuationTransactionMapImpl extends AbstractEhcacheDao implement
 	}
 	
 	@Override
-	public Element putContinuationForDevice(Device device, IContinuation continuation) {
+	public boolean putContinuationForDevice(Device device, IContinuation continuation) {
 		Element previousElement = store.get(device);
 		store.put(new Element(device, continuation));
-		return previousElement;
+		return previousElement != null;
 	}
 	
 	@Override

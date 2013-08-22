@@ -101,15 +101,14 @@ public class ContinuationTransactionMapImplTest {
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
-		Element expectedElement = new Element(device, expectedContinuation);
 		
 		replay(objectStoreManager, expectedContinuation);
 
 		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
-		Element element = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
+		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
 		verify(objectStoreManager, expectedContinuation);
-		assertThat(element).isEqualTo(expectedElement);
+		assertThat(hasPreviousElement).isTrue();
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
 	
@@ -124,10 +123,10 @@ public class ContinuationTransactionMapImplTest {
 		replay(objectStoreManager, expectedContinuation);
 
 		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
-		Element element = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
+		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
 		verify(objectStoreManager, expectedContinuation);
-		assertThat(element).isNull();
+		assertThat(hasPreviousElement).isFalse();
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
 	

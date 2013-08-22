@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.impl;
 
-import net.sf.ehcache.Element;
-
 import org.obm.push.ContinuationService;
 import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.IContinuation;
@@ -60,8 +58,8 @@ public class ContinuationServiceImpl implements ContinuationService {
 	public void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout) {
 		logger.debug("suspend {} {}", userDataRequest.getDevice(), secondsTimeout);
 		
-		Element previousElement = continuationTransactionMap.putContinuationForDevice(userDataRequest.getDevice(), continuation);
-		if (null != previousElement) {
+		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(userDataRequest.getDevice(), continuation);
+		if (hasPreviousElement) {
 			logger.error("Continuation was already cached for device {}", userDataRequest.getDevice());
 		}
 		continuation.suspend(userDataRequest, secondsTimeout);
