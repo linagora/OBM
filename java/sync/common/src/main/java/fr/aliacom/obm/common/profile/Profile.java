@@ -29,7 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.profile;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.obm.provisioning.ProfileId;
@@ -38,6 +40,7 @@ import org.obm.provisioning.ProfileName;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -66,13 +69,14 @@ public class Profile {
 		private Boolean managePeers;
 		private AccessRestriction accessRestriction;
 		private String accessExceptions;
-		private AdminRealm adminRealm;
+		private List<AdminRealm> adminRealms;
 		private Integer maxMailQuota;
 		private Integer defaultMailQuota;
 		private ImmutableMap.Builder<Module, ModuleCheckBoxStates> defaultCheckBoxStates;
 
 		private Builder() {
 			defaultCheckBoxStates = ImmutableMap.builder();
+			adminRealms = Lists.newArrayList();
 		}
 
 		public Builder id(ProfileId id) {
@@ -120,8 +124,10 @@ public class Profile {
 			return this;
 		}
 
-		public Builder adminRealm(AdminRealm adminRealm) {
-			this.adminRealm = adminRealm;
+		public Builder adminRealms(AdminRealm... adminRealms) {
+			for (AdminRealm adminRealm : adminRealms) {
+				this.adminRealms.add(adminRealm);
+			}
 			return this;
 		}
 
@@ -148,12 +154,12 @@ public class Profile {
 
 			managePeers = Objects.firstNonNull(managePeers, false);
 			accessRestriction = Objects.firstNonNull(accessRestriction, AccessRestriction.ALLOW_ALL);
-			adminRealm = Objects.firstNonNull(adminRealm, AdminRealm.DOMAIN);
 			maxMailQuota = Objects.firstNonNull(maxMailQuota, 0);
 			defaultMailQuota = Objects.firstNonNull(defaultMailQuota, 0);
+			AdminRealm adminRealmsArr[] = {};
 
 			return new Profile(id, name, domain, timecreate, timeupdate, level, managePeers, accessRestriction, accessExceptions,
-					adminRealm, maxMailQuota, defaultMailQuota, defaultCheckBoxStates.build());
+					adminRealms.toArray(adminRealmsArr), maxMailQuota, defaultMailQuota, defaultCheckBoxStates.build());
 		}
 	}
 
@@ -166,13 +172,13 @@ public class Profile {
 	private final boolean managePeers;
 	private final AccessRestriction accessRestriction;
 	private final String accessExceptions;
-	private final AdminRealm adminRealm;
+	private final AdminRealm adminRealms[];
 	private final int maxMailQuota;
 	private final int defaultMailQuota;
 	private final Map<Module, ModuleCheckBoxStates> defaultCheckBoxStates;
 
 	private Profile(ProfileId id, ProfileName name, ObmDomain domain, Date timecreate, Date timeupdate, int level, boolean managePeers, AccessRestriction accessRestriction, String accessExceptions,
-			AdminRealm adminRealm, int maxMailQuota, int defaultMailQuota, Map<Module, ModuleCheckBoxStates> defaultCheckBoxStates) {
+			AdminRealm adminRealms[], int maxMailQuota, int defaultMailQuota, Map<Module, ModuleCheckBoxStates> defaultCheckBoxStates) {
 		this.id = id;
 		this.domain = domain;
 		this.timecreate = timecreate;
@@ -182,7 +188,7 @@ public class Profile {
 		this.managePeers = managePeers;
 		this.accessRestriction = accessRestriction;
 		this.accessExceptions = accessExceptions;
-		this.adminRealm = adminRealm;
+		this.adminRealms = adminRealms;
 		this.maxMailQuota = maxMailQuota;
 		this.defaultMailQuota = defaultMailQuota;
 		this.defaultCheckBoxStates = defaultCheckBoxStates;
@@ -224,8 +230,8 @@ public class Profile {
 		return accessExceptions;
 	}
 
-	public AdminRealm getAdminRealm() {
-		return adminRealm;
+	public AdminRealm[] getAdminRealms() {
+		return adminRealms;
 	}
 
 	public int getMaxMailQuota() {
@@ -243,7 +249,7 @@ public class Profile {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id, name, domain, level, managePeers, accessRestriction, accessExceptions,
-				adminRealm, maxMailQuota, defaultMailQuota, defaultCheckBoxStates);
+				Arrays.hashCode(adminRealms), maxMailQuota, defaultMailQuota, defaultCheckBoxStates);
 	}
 
 	@Override
@@ -258,7 +264,7 @@ public class Profile {
 					&& Objects.equal(managePeers, other.managePeers)
 					&& Objects.equal(accessRestriction, other.accessRestriction)
 					&& Objects.equal(accessExceptions, other.accessExceptions)
-					&& Objects.equal(adminRealm, other.adminRealm)
+					&& Arrays.equals(adminRealms, other.adminRealms)
 					&& Objects.equal(maxMailQuota, other.maxMailQuota)
 					&& Objects.equal(defaultMailQuota, other.defaultMailQuota)
 					&& Objects.equal(defaultCheckBoxStates, other.defaultCheckBoxStates);
@@ -278,7 +284,7 @@ public class Profile {
 				.add("managePeers", managePeers)
 				.add("accessRestriction", accessRestriction)
 				.add("accessExceptions", accessExceptions)
-				.add("adminRealm", adminRealm)
+				.add("adminRealms", adminRealms)
 				.add("defaultMailQuota", defaultMailQuota)
 				.add("maxMailQuota", maxMailQuota)
 				.add("timecreate", timecreate)

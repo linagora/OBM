@@ -64,7 +64,7 @@ INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, p
         (1, 'level_managepeers', '1'),
         (1, 'access_restriction', 'ALLOW_ALL'),
         (1, 'access_exceptions', ''),
-        (1, 'admin_realm', 'domain'),
+        (1, 'admin_realm', 'domain,delegation'),
         (1, 'default_right', '1,-1,-2,0,0,0,0,0,0,0,0,0,0,0,0'),
         (1, 'mail_quota_max', '0'),
         (1, 'mail_quota_default', '0'),
@@ -72,7 +72,7 @@ INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, p
         (2, 'level_managepeers', '0'),
         (2, 'access_restriction', 'ALLOW_ALL'),
         (2, 'access_exceptions', ''),
-        (2, 'admin_realm', 'domain'),
+        (2, 'admin_realm', 'domain,user'),
         (2, 'default_right', '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0'),
         (2, 'mail_quota_max', '0'),
         (2, 'mail_quota_default', '0');

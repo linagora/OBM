@@ -37,6 +37,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -49,9 +50,12 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.Right;
 
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -273,13 +277,32 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		builder.managePeers(Integer.parseInt(fetchProfileProperty(con, id, MANAGE_PEERS)) == 1);
 		builder.accessRestriction(AccessRestriction.valueOf(fetchProfileProperty(con, id, ACCESS_RESTRICTION).toUpperCase()));
 		builder.accessExceptions(fetchProfileProperty(con, id, ACCESS_EXCEPTIONS));
-		builder.adminRealm(AdminRealm.valueOf(fetchProfileProperty(con, id, ADMIN_REALM).toUpperCase()));
+		builder.adminRealms(parseAdminRealms(fetchProfileProperty(con, id, ADMIN_REALM).toUpperCase()));
 		builder.defaultMailQuota(Integer.parseInt(fetchProfileProperty(con, id, DEFAULT_MAIL_QUOTA)));
 		builder.maxMailQuota(Integer.parseInt(fetchProfileProperty(con, id, MAX_MAIL_QUOTA)));
 
 		fetchDefaultCheckBoxStates(con, id, builder);
 
 		return builder;
+	}
+
+	private AdminRealm[] parseAdminRealms(String adminRealmsStr) {
+		List<String> adminRealmsStrs;
+		
+		if (Strings.isNullOrEmpty(adminRealmsStr)) {
+			return new AdminRealm[0];
+		}
+		
+		adminRealmsStrs = Lists.newArrayList(adminRealmsStr.split(","));
+		List<AdminRealm> realms =  Lists.transform(adminRealmsStrs, new Function<String, AdminRealm>() {
+			@Override
+			public AdminRealm apply(String input) {
+				return AdminRealm.valueOf(input);
+			}
+			
+		});
+		
+		return realms.toArray(new AdminRealm[realms.size()]);
 	}
 
 	private String fetchProfileProperty(Connection con, ProfileId id, String name) throws SQLException {

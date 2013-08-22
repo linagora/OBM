@@ -59,7 +59,7 @@ public class ProfileTest {
 				.domain(ToolBox.getDefaultObmDomain())
 				.level(0)
 				.managePeers(true)
-				.adminRealm(AdminRealm.USER)
+				.adminRealms(AdminRealm.USER, AdminRealm.DOMAIN)
 				.accessRestriction(AccessRestriction.DENY_ALL)
 				.accessExceptions("usera")
 				.defaultMailQuota(10)
@@ -80,7 +80,7 @@ public class ProfileTest {
 		assertThat(profile.getTimeupdate()).isEqualTo(date);
 		assertThat(profile.getLevel()).isEqualTo(0);
 		assertThat(profile.isManagePeers()).isTrue();
-		assertThat(profile.getAdminRealm()).isEqualTo(AdminRealm.USER);
+		assertThat(profile.getAdminRealms()).containsOnly(AdminRealm.USER, AdminRealm.DOMAIN);
 		assertThat(profile.getAccessRestriction()).isEqualTo(AccessRestriction.DENY_ALL);
 		assertThat(profile.getAccessExceptions()).isEqualTo("usera");
 		assertThat(profile.getDefaultMailQuota()).isEqualTo(10);

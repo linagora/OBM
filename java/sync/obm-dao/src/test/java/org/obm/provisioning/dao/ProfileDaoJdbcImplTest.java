@@ -131,7 +131,7 @@ public class ProfileDaoJdbcImplTest {
 				.managePeers(true)
 				.accessRestriction(AccessRestriction.ALLOW_ALL)
 				.accessExceptions("")
-				.adminRealm(AdminRealm.DOMAIN)
+				.adminRealms(AdminRealm.DOMAIN, AdminRealm.DELEGATION)
 				.defaultMailQuota(0)
 				.maxMailQuota(0)
 				.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
@@ -203,7 +203,7 @@ public class ProfileDaoJdbcImplTest {
 				.managePeers(false)
 				.accessRestriction(AccessRestriction.ALLOW_ALL)
 				.accessExceptions("")
-				.adminRealm(AdminRealm.DOMAIN)
+				.adminRealms(AdminRealm.DOMAIN, AdminRealm.USER)
 				.defaultMailQuota(0)
 				.maxMailQuota(0)
 				.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
