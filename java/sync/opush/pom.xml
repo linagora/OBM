@@ -35,6 +35,7 @@
 		<module>technical-log-bean</module>
 		<module>push-dao</module>
 		<module>push-dao-jdbc</module>
+		<module>push-dao-ehcache</module>
 		<module>push-dao-mail</module>
 		<module>push-dao-testsuite</module>
 		<module>push-bean</module>
