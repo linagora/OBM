@@ -64,12 +64,23 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		final Request request = operation.getRequest();
 		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
 		final ObmUser userFromDao = getUserFromDao(extId, batch.getDomain());
-		
-		deleteUserInDao(userFromDao);
+
 		if (expunge == true) {
+			deleteUserInDao(userFromDao);
 			deleteUserMailBoxes(userFromDao);
 		}
+		else {
+			archiveUserInDao(userFromDao);
+		}
 		deleteUserInLdap(userFromDao);
+	}
+
+	private void archiveUserInDao(ObmUser user) {
+		try {
+			userDao.archive(user);
+		} catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot archive user '%s' (%s) in database", user.getLogin(), user.getExtId().getExtId()), e);
+		}
 	}
 
 	private void deleteUserInLdap(ObmUser user) {
@@ -79,7 +90,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			ldapManager.deleteUser(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId().getExtId()), e);
 		} finally {
 			ldapManager.shutdown();
 		}
@@ -90,7 +101,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			userDao.delete(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete user with extId '%s' in database.", user.getExtId().getExtId()), e);
+					String.format("Cannot delete user with extId '%s' (%s) in database.", user.getExtId().getExtId(), user.getLogin()), e);
 		}
 	}
 
@@ -105,7 +116,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			throw new ProcessingException(
 					String.format(
 							"Cannot delete cyrus mailbox for user '%s' (%s).",
-							user.getLogin(), user.getExtId()), e);
+							user.getLogin(), user.getExtId().getExtId()), e);
 		} finally {
 			if (cyrusManager != null) {
 				cyrusManager.shutdown();

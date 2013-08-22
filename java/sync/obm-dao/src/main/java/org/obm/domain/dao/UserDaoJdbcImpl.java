@@ -865,8 +865,7 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	@Override
-	public void archive(ObmUser user) throws SQLException,
-			UserNotFoundException {
+	public void archive(ObmUser user) throws SQLException, UserNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -889,5 +888,4 @@ public class UserDaoJdbcImpl implements UserDao {
 			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
-
 }

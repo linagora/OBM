@@ -728,7 +728,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 		final UserExtId extId = UserExtId.valueOf("extIdUser1");
 		expect(userDao.getByExtId(extId, domain)).andReturn(user);
-		userDao.delete(user);
+		userDao.archive(user);
 		expectLastCall();
 		expectLdapdeleteUser(user);
 		expect(batchDao.update(batchBuilder

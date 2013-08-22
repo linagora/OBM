@@ -672,6 +672,24 @@ public class UserDaoJdbcImplTest {
 		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 
+	public void testArchiveUser() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("JohnDoeExtId"))
+				.login("jdoe")
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		dao.archive(createdUser);
+
+		ResultSet rs = db.execute("SELECT userobm_archive FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getBoolean(1)).isTrue();
+	}
+
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
