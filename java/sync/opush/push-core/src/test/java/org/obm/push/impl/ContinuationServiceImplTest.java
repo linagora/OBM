@@ -42,6 +42,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.ElementNotFoundException;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
@@ -50,7 +51,6 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ElementNotFoundException;
 
 public class ContinuationServiceImplTest {
 	

@@ -29,36 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push;
 
-import java.util.Properties;
-
-import org.junit.Test;
-import org.obm.push.ProtocolVersion;
-import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.User;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 
-import com.google.common.testing.SerializableTester;
-
-public class SerializableTest {
-
-	@Test
-	public void unsynchronizedItemDaoEhcacheImplKey() {
-		UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4 key = new UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4(
-				new SyncKey("132"), UnsynchronizedItemType.ADD);
-		SerializableTester.reserializeAndAssert(key);
-	}
-
-	@Test
-	public void monitoredCollectionDaoEhcacheImplKey() {
-		Key key = new MonitoredCollectionDaoEhcacheImpl.Key(
-				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
-				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), ProtocolVersion.V120));
-		
-		SerializableTester.reserializeAndAssert(key);
-	}
+public interface ContinuationTransactionMap<CONTINUATION_TYPE> {
+	
+	CONTINUATION_TYPE getContinuationForDevice(Device device) throws ElementNotFoundException ;
+	
+	/**
+	 * @return whether there already was a previous entry for the couple device-continuation_type 
+	 */
+	boolean putContinuationForDevice(Device device, CONTINUATION_TYPE continuation) ;
+	
+	void delete(Device device);
 }

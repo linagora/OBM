@@ -100,9 +100,9 @@ import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
-import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.SnapshotKey;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemType;
@@ -422,6 +422,11 @@ public class SerializableCompatibilityTest {
 						.collectionId(15)
 						.deviceId(deviceId)
 						.syncKey(syncKey)
+						.build())
+				.put("org.obm.push.store.ehcache.SnapshotKey", SnapshotKey.builder()
+						.collectionId(20)
+						.deviceId(new DeviceId("the device id"))
+						.syncKey(new SyncKey("987"))
 						.build())
 				.put("org.obm.push.mail.bean.Snapshot", buildCompatibleSnapshot(deviceId, syncKey, email))
 				.put("org.obm.push.bean.Device", device)

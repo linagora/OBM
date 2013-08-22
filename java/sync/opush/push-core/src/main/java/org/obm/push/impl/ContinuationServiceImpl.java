@@ -33,10 +33,10 @@ package org.obm.push.impl;
 
 import org.obm.push.ContinuationService;
 import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.ElementNotFoundException;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.ElementNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +49,9 @@ public class ContinuationServiceImpl implements ContinuationService {
 
 	private final ContinuationTransactionMap<IContinuation> continuationTransactionMap;
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Inject
-	@VisibleForTesting ContinuationServiceImpl(ContinuationTransactionMap<IContinuation> continuationTransactionMap) {
+	@VisibleForTesting ContinuationServiceImpl(ContinuationTransactionMap continuationTransactionMap) {
 		this.continuationTransactionMap = continuationTransactionMap;
 	}
 

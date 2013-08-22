@@ -31,19 +31,49 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Properties;
+
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
+import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.mail.bean.WindowingIndexKey;
+import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 
 import com.google.common.testing.SerializableTester;
 
-@RunWith(SlowFilterRunner.class)
 public class SerializableTest {
+	
+	private ObjectOutputStream objectOutputStream;
 
+	@Before
+	public void buildOutputStream() throws IOException {
+		objectOutputStream = new ObjectOutputStream(new ByteArrayOutputStream());	
+	}
+	
+	@Test
+	public void unsynchronizedItemDaoEhcacheImplKey() {
+		UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4 key = new UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4(
+				new SyncKey("132"), UnsynchronizedItemType.ADD);
+		SerializableTester.reserializeAndAssert(key);
+	}
+
+	@Test
+	public void monitoredCollectionDaoEhcacheImplKey() {
+		Key key = new MonitoredCollectionDaoEhcacheImpl.Key(
+				new Credentials(User.Factory.create().createUser("email@domain", "email@domain", "User"), "password"),
+				new Device(1, "devType", new DeviceId("deviceId"), new Properties(), ProtocolVersion.V120));
+		
+		SerializableTester.reserializeAndAssert(key);
+	}
+	
 	@Test
 	public void testWindowingIndex() {
 		SerializableTester.reserializeAndAssert(new WindowingDaoEhcacheImpl.WindowingIndex(5, new SyncKey("123")));
@@ -54,5 +84,16 @@ public class SerializableTest {
 		User user = User.Factory.create().createUser("user@email.org", "user@email.org", "display name");
 		WindowingIndexKey windowingIndexKey = new WindowingIndexKey(user, new DeviceId("564"), 456);
 		SerializableTester.reserializeAndAssert(new WindowingDaoEhcacheImpl.ChunkKey(windowingIndexKey, 5));
-	}	
+	}
+	
+	@Test
+	public void testSnapshotKey() throws IOException {
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId(new DeviceId("deviceId"))
+				.syncKey(new SyncKey("syncKey"))
+				.collectionId(1)
+				.build();
+		objectOutputStream.writeObject(snapshotKey);
+	}
+
 }

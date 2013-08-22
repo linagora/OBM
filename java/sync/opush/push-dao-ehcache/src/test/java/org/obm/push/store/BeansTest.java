@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.SnapshotKey;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -55,6 +56,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(MonitoredCollectionDaoEhcacheImpl.Key.class)
+					.add(SnapshotKey.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

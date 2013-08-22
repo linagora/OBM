@@ -31,53 +31,75 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.bean;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.io.Serializable;
 
-import org.junit.Test;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.mail.bean.SnapshotKey;
 
-public class SnapshotKeyTest {
+import com.google.common.base.Objects;
+
+/*
+ * This legacy class mustn't be used.
+ * It's only in use for cache deserialization comptability.
+ */
+@Deprecated
+public class SnapshotKey implements Serializable{
+
+	private static final long serialVersionUID = 1978530090812057347L;
 	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullSyncKey() {
-		SnapshotKey.builder()
-			.deviceId(new DeviceId("deviceId"))
-			.collectionId(1)
-			.build();
+	private final SyncKey syncKey;
+	private final DeviceId deviceId;
+	private final Integer collectionId;
+
+	private SnapshotKey(SyncKey syncKey, DeviceId deviceId, Integer collectionId) {
+		this.syncKey = syncKey;
+		this.deviceId = deviceId;
+		this.collectionId = collectionId;
 	}
 	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullDeviceId() {
-		SnapshotKey.builder()
-			.syncKey(new SyncKey("syncKey"))
-			.collectionId(1)
-			.build();
-	}
-	
-	@Test (expected=IllegalArgumentException.class)
-	public void testNullCollectionId() {
-		SnapshotKey.builder()
-			.deviceId(new DeviceId("deviceId"))
-			.syncKey(new SyncKey("syncKey"))
-			.build();
-	}
-	
-	@Test
-	public void testBuilder() {
-		SyncKey syncKey = new SyncKey("synckey");
-		DeviceId deviceId = new DeviceId("deviceId");
-		Integer collectionId = 1;
-		
-		SnapshotKey snapshotKey = SnapshotKey.builder()
-				.deviceId(deviceId)
-				.syncKey(syncKey)
-				.collectionId(collectionId)
+	private Object readResolve() {
+		return org.obm.push.store.ehcache.SnapshotKey.builder()
+				.collectionId(getCollectionId())
+				.deviceId(getDeviceId())
+				.syncKey(getSyncKey())
 				.build();
-		
-		assertThat(snapshotKey.getSyncKey()).isEqualTo(syncKey);
-		assertThat(snapshotKey.getDeviceId()).isEqualTo(deviceId);
-		assertThat(snapshotKey.getCollectionId()).isEqualTo(collectionId);
 	}
+
+	public SyncKey getSyncKey() {
+		return syncKey;
+	}
+
+	public DeviceId getDeviceId() {
+		return deviceId;
+	}
+
+	public Integer getCollectionId() {
+		return collectionId;
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(syncKey, deviceId, collectionId);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SnapshotKey) {
+			SnapshotKey that = (SnapshotKey) object;
+			return Objects.equal(this.syncKey, that.syncKey)
+				&& Objects.equal(this.deviceId, that.deviceId)
+				&& Objects.equal(this.collectionId, that.collectionId);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("syncKey", syncKey)
+			.add("deviceId", deviceId)
+			.add("collectionId", collectionId)
+			.toString();
+	}
+	
 }

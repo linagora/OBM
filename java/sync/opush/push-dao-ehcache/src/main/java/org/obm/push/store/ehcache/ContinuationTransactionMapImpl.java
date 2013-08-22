@@ -29,15 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.store.ehcache;
 
 import net.sf.ehcache.Element;
 
 import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.ElementNotFoundException;
 import org.obm.push.bean.Device;
-import org.obm.push.exception.ElementNotFoundException;
-import org.obm.push.store.ehcache.AbstractEhcacheDao;
-import org.obm.push.store.ehcache.ObjectStoreManager;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;

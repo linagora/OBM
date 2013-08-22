@@ -57,12 +57,6 @@ import org.obm.push.mail.transformer.HtmlToText;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.service.SmtpSender;
-import org.obm.push.store.SnapshotDao;
-import org.obm.push.store.SyncKeysDao;
-import org.obm.push.store.WindowingDao;
-import org.obm.push.store.ehcache.SnapshotDaoEhcacheImpl;
-import org.obm.push.store.ehcache.SyncKeysDaoEhcacheImpl;
-import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -89,9 +83,6 @@ public class OpushMailModule extends AbstractModule {
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
 		transformers.addBinding().to(HtmlToText.Factory.class);
-		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
-		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
-		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
 		bind(ErrorsManager.class).to(MailErrorsManager.class);
 	}
 

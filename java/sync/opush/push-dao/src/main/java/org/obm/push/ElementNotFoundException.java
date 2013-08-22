@@ -29,19 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push;
 
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
-
-import com.google.inject.AbstractModule;
-
-public class DaoModule extends AbstractModule{
-
-	@Override
-	protected void configure() {
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
-	}
+public class ElementNotFoundException extends Exception {
 
 }

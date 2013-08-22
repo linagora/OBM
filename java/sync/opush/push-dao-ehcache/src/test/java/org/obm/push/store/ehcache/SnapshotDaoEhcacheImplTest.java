@@ -56,7 +56,6 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
-import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.utils.DateUtils;
 import org.slf4j.Logger;
 

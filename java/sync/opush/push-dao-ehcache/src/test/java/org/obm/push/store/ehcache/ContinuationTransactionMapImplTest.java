@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.store.ehcache;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -47,10 +47,10 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.ElementNotFoundException;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
-import org.obm.push.exception.ElementNotFoundException;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 
 public class ContinuationTransactionMapImplTest {

@@ -38,7 +38,6 @@ import net.sf.ehcache.Element;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
-import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.store.SnapshotDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -19,7 +20,7 @@
 			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
 		</license>
 	</licenses>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -45,6 +46,18 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
 			<version>${obm.version}</version>
@@ -52,6 +65,11 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-dao</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-mail</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
@@ -78,26 +96,26 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.google.guiceberry</groupId>
-		    <artifactId>guiceberry</artifactId>
-		    <version>3.1.0</version>
-		    <scope>test</scope>
+			<groupId>com.google.guiceberry</groupId>
+			<artifactId>guiceberry</artifactId>
+			<version>3.1.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-                       <groupId>org.codehaus.btm</groupId>
-                       <artifactId>btm</artifactId>
-                       <scope>test</scope>
-                </dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
-                       <groupId>org.codehaus.btm</groupId>
-                       <artifactId>btm-jdbc4</artifactId>
-                       <scope>test</scope>
-                </dependency>
-                <dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm-jdbc4</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.transaction</groupId>
-                       	<artifactId>jta</artifactId>
-                       	<scope>test</scope>
-               </dependency>
+			<artifactId>jta</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
@@ -109,7 +127,6 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${obm.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>

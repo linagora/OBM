@@ -29,19 +29,29 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
-import org.obm.push.bean.Device;
-import org.obm.push.exception.ElementNotFoundException;
+import org.obm.push.ContinuationTransactionMap;
+import org.obm.push.store.MonitoredCollectionDao;
+import org.obm.push.store.SnapshotDao;
+import org.obm.push.store.SyncKeysDao;
+import org.obm.push.store.SyncedCollectionDao;
+import org.obm.push.store.UnsynchronizedItemDao;
+import org.obm.push.store.WindowingDao;
 
-public interface ContinuationTransactionMap<CONTINUATION_TYPE> {
-	
-	CONTINUATION_TYPE getContinuationForDevice(Device device) throws ElementNotFoundException ;
-	
-	/**
-	 * @return whether there already was a previous entry for the couple device-continuation_type 
-	 */
-	boolean putContinuationForDevice(Device device, CONTINUATION_TYPE continuation) ;
-	
-	void delete(Device device);
+import com.google.inject.AbstractModule;
+
+public class EhCacheDaoModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
+		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
+		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
+		bind(ContinuationTransactionMap.class).to(ContinuationTransactionMapImpl.class);
+		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
+		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
+		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
+	}
+
 }

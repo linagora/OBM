@@ -38,8 +38,6 @@ import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
@@ -53,7 +51,6 @@ public class JdbcDaoModule extends AbstractModule{
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(HeartbeatDao.class).to(HeartbeatDaoJdbcDaoImpl.class);
-		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
 		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);

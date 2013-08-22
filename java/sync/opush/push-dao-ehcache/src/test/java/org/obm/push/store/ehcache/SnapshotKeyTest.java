@@ -29,8 +29,54 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.exception;
+package org.obm.push.store.ehcache;
 
-public class ElementNotFoundException extends Exception {
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.junit.Test;
+import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.SyncKey;
+
+public class SnapshotKeyTest {
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullSyncKey() {
+		SnapshotKey.builder()
+			.deviceId(new DeviceId("deviceId"))
+			.collectionId(1)
+			.build();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullDeviceId() {
+		SnapshotKey.builder()
+			.syncKey(new SyncKey("syncKey"))
+			.collectionId(1)
+			.build();
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testNullCollectionId() {
+		SnapshotKey.builder()
+			.deviceId(new DeviceId("deviceId"))
+			.syncKey(new SyncKey("syncKey"))
+			.build();
+	}
+	
+	@Test
+	public void testBuilder() {
+		SyncKey syncKey = new SyncKey("synckey");
+		DeviceId deviceId = new DeviceId("deviceId");
+		Integer collectionId = 1;
+		
+		SnapshotKey snapshotKey = SnapshotKey.builder()
+				.deviceId(deviceId)
+				.syncKey(syncKey)
+				.collectionId(collectionId)
+				.build();
+		
+		assertThat(snapshotKey.getSyncKey()).isEqualTo(syncKey);
+		assertThat(snapshotKey.getDeviceId()).isEqualTo(deviceId);
+		assertThat(snapshotKey.getCollectionId()).isEqualTo(collectionId);
+	}
 }
