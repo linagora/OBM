@@ -112,6 +112,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.AuthorizingModule;
 import org.obm.provisioning.BatchProcessingModule;
 import org.obm.provisioning.BatchProvider;
+import org.obm.provisioning.GlobalExceptionMapper;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ObmDomainProvider;
@@ -119,6 +120,7 @@ import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.ProvisioningContextListener;
 import org.obm.provisioning.ProvisioningService;
+import org.obm.provisioning.WebApplicationExceptionMapper;
 import org.obm.provisioning.annotations.PATCH;
 import org.obm.provisioning.authentication.AuthenticationService;
 import org.obm.provisioning.authentication.AuthenticationServiceImpl;
@@ -161,6 +163,7 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.BatchJsonSerializer;
+import org.obm.provisioning.json.ExceptionJsonSerializer;
 import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
 import org.obm.provisioning.json.GroupExtIdJsonSerializer;
 import org.obm.provisioning.json.GroupJsonDeserializer;
@@ -730,7 +733,10 @@ public class DependencyResolverHelper {
 				PatchGroupOperationProcessor.class,
 				CreateGroupOperationProcessor.class,
 				LifecycleListener.class,
-				GroupIdentifier.class
+				GroupIdentifier.class,
+				ExceptionJsonSerializer.class,
+				GlobalExceptionMapper.class,
+				WebApplicationExceptionMapper.class
 		};
 	}
 

@@ -104,7 +104,7 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testListOnError() throws Exception {
-		expect(domainDao.list()).andThrow(new RuntimeException());
+		expect(domainDao.list()).andThrow(new RuntimeException("foo"));
 		mocksControl.replay();
 
 		HttpResponse response = get("/domains");
@@ -112,6 +112,11 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 
 		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+				"{" +
+						"\"message\":\"foo\"," +
+						"\"type\":\"java.lang.RuntimeException\"" +
+				"}");
 	}
 
 	@Test

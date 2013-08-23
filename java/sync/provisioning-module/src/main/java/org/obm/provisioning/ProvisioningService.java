@@ -132,6 +132,7 @@ public class ProvisioningService extends ServletModule {
 		bind(GroupWriteResource.class);
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
+		bind(WebApplicationExceptionMapper.class);
 		bind(GlobalExceptionMapper.class);
 	}
 
