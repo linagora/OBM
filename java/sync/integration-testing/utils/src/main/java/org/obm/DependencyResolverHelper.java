@@ -86,6 +86,10 @@ import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.EntityRightDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
+import org.obm.domain.dao.PGroupDao;
+import org.obm.domain.dao.PGroupDaoJdbcImpl;
+import org.obm.domain.dao.PUserDao;
+import org.obm.domain.dao.PUserDaoJdbcImpl;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
@@ -797,7 +801,11 @@ public class DependencyResolverHelper {
 				UserPatternDao.class,
 				UserPatternDaoJdbcImpl.class,
 				EntityRightDao.class,
-				EntityRightDaoJdbcImpl.class
+				EntityRightDaoJdbcImpl.class,
+				PUserDao.class,
+				PUserDaoJdbcImpl.class,
+				PGroupDao.class,
+				PGroupDaoJdbcImpl.class
 		};
 	}
 
