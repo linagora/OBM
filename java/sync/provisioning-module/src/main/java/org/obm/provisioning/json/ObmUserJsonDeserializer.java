@@ -44,6 +44,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.sync.host.ObmHost;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -72,10 +73,14 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		ObmDomain domain = domainProvider.get();
 		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
-
-		return builder
+		ObmUser user = builder
 				.domain(domain)
 				.mailHost(mailHost)
 				.build();
+
+		Preconditions.checkArgument(user.getProfileName() != null, UserJsonFields.PROFILE.asSpecificationValue() + " is required.");
+		Preconditions.checkArgument(user.getLastName() != null, UserJsonFields.LASTNAME.asSpecificationValue() + " is required.");
+
+		return user;
 	}
 }

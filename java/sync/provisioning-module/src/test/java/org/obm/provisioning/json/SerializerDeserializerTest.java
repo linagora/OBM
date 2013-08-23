@@ -66,7 +66,55 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
+	@Test
+	public void testObmUserDeserializerWithMinimalRepresentation() {
+		expectDomain();
+		mocksControl.replay();
+
+		given()
+			.auth().basic("user", "password")
+			.content(minimalObmUserJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/do/tests/on/serialization/of/user");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testObmUserDeserializerWhenNoLastName() {
+		expectDomain();
+		mocksControl.replay();
+
+		given()
+			.auth().basic("user", "password")
+			.content(obmUserJsonStringWithoutLastName()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.post("/do/tests/on/serialization/of/user");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testObmUserDeserializerWhenNoProfile() {
+		expectDomain();
+		mocksControl.replay();
+
+		given()
+			.auth().basic("user", "password")
+			.content(obmUserJsonStringWithoutProfile()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.post("/do/tests/on/serialization/of/user");
+
+		mocksControl.verify();
+	}
+
 	@Test
 	public void testGroupDeserializerAndSerializerWithFullJson() {
 		expectDomain();

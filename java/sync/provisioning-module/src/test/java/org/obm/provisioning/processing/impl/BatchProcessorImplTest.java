@@ -251,6 +251,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"," +
 										"\"mails\":[\"john@domain\"]" +
@@ -266,6 +267,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		final ObmUser user = ObmUser
 				.builder()
 				.login("user1")
+				.lastName("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -338,6 +340,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"," +
 										"\"mails\":[\"john@domain\"]" +
@@ -353,6 +356,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ObmUser user = ObmUser
 				.builder()
 				.login("user1")
+				.lastName("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -430,6 +434,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"" +
 								"}")
@@ -448,6 +453,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ObmUser user = ObmUser
 				.builder()
 				.login("user1")
+				.lastName("user1")
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -634,6 +640,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"" +
 								"}")
@@ -648,6 +655,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		final ObmUser user = ObmUser
 				.builder()
 				.login("user1")
+				.lastName("user1")
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -809,6 +817,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"," +
 										"\"mails\":[\"john@domain\"]" +
@@ -826,6 +835,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
 				.login("user1")
+				.lastName("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -886,6 +896,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1new\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"," +
 										"\"mails\":[\"john@domain\"]," +
@@ -948,6 +959,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 						.body(	"{" +
 										"\"id\": \"extIdUser1\"," +
 										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
 										"\"profile\": \"user\"," +
 										"\"password\": \"secret\"," +
 										"\"mails\":[\"john@domain\"]," +

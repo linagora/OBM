@@ -368,6 +368,34 @@ public abstract class CommonDomainEndPointEnvTest {
 			"}";
 	}
 
+	protected String minimalObmUserJsonString() {
+		return
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"lastname\":\"Doe\"," +
+				"\"profile\":\"Utilisateurs\"" +
+			"}";
+	}
+
+	protected String obmUserJsonStringWithoutLastName() {
+		return
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"profile\":\"Utilisateurs\"" +
+			"}";
+	}
+
+	protected String obmUserJsonStringWithoutProfile() {
+		return
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"lastname\":\"Doe\"" +
+			"}";
+	}
+
 	protected ObmUser fakeUser() {
 		return ObmUser.builder()
 				.domain(domain)
