@@ -75,6 +75,7 @@ import com.google.inject.name.Names;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
@@ -102,13 +103,20 @@ public class GroupDaoJdbcImplTest {
 
     }
 
-    private ObmDomain domain1;
+    private ObmDomain domain1, domain2;
     private ObmUser user1, nonexistentUser;
     private Group group4, group6, group7, nonexistentGroup;
 
     @Before
     public void init() {
         domain1 = ToolBox.getDefaultObmDomain();
+		domain2 = ObmDomain
+				.builder()
+				.id(2)
+				.name("test2.tlse.lng")
+				.uuid(ObmDomainUuid.valueOf("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
+				.label("test2.tlse.lng")
+				.build();
         user1 = userDao.findUserById(1, domain1);
 
         group4 = generateGroup(4, "existing-nousers-subgroups-child1");
@@ -595,6 +603,30 @@ public class GroupDaoJdbcImplTest {
 		assertThat(getUserGroupsFromInternalMapping(user1.getUid())).isEqualTo(ImmutableSet.of(
 				createdGroup2Id.getId()
 		));
+	}
+
+	@Test
+	public void testListPublicGroups() throws Exception {
+		Set<Group> groups = dao.listPublicGroups(domain2);
+		Set<Group> expectedGroups = ImmutableSet
+				.<Group>builder()
+				.add(Group
+						.builder()
+						.uid(Group.Id.valueOf(22))
+						.name("group1")
+						.description("group1-description")
+						.extId(GroupExtId.valueOf("group1-id"))
+						.build())
+				.add(Group
+						.builder()
+						.uid(Group.Id.valueOf(23))
+						.name("group2")
+						.description("group2-description")
+						.extId(GroupExtId.valueOf("group2-id"))
+						.build())
+				.build();
+
+		assertThat(groups).isEqualTo(expectedGroups);
 	}
 
 	private Set<Integer> getUserGroupsFromInternalMapping(int userId) throws Exception {

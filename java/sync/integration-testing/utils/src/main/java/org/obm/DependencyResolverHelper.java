@@ -125,6 +125,7 @@ import org.obm.provisioning.authorization.AuthorizationException;
 import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
+import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.bean.UserJsonFields;
 import org.obm.provisioning.beans.Batch;
@@ -725,7 +726,8 @@ public class DependencyResolverHelper {
 				PatchGroupJsonDeserializer.class,
 				PatchGroupOperationProcessor.class,
 				CreateGroupOperationProcessor.class,
-				LifecycleListener.class
+				LifecycleListener.class,
+				GroupIdentifier.class
 		};
 	}
 

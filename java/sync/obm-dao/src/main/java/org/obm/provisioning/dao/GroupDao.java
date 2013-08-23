@@ -32,6 +32,8 @@
 
 package org.obm.provisioning.dao;
 
+import java.util.Set;
+
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -151,4 +153,7 @@ public interface GroupDao {
     void addUser(ObmDomain domain, Group.Id groupId, ObmUser user) throws DaoException;
 
     Group getByGid(ObmDomain domain, int gid) throws DaoException;
+
+    Set<Group> listPublicGroups(ObmDomain domain) throws DaoException;
+
 }

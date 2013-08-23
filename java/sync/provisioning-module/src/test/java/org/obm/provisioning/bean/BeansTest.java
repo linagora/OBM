@@ -54,6 +54,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(UserIdentifier.class)
+					.add(GroupIdentifier.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

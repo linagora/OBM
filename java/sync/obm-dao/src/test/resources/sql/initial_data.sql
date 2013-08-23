@@ -27,7 +27,9 @@ INSERT INTO entity (entity_mailing)
         (true),
         (true),
         (true), // <- Groups
-        (true); // <- Global Domain
+        (true), // <- Global Domain
+        (true),
+        (true); // <- Groups
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1);
@@ -121,6 +123,11 @@ ALTER SEQUENCE ugroup_group_id_seq RESTART WITH 21;
 INSERT INTO ugroup (group_domain_id, group_gid, group_name)
     VALUES
         (1, 1000, 'Utilisateurs');
+
+INSERT INTO ugroup (group_domain_id, group_ext_id, group_name, group_desc)
+    VALUES
+        (2, 'group1-id', 'group1', 'group1-description'),
+        (2, 'group2-id', 'group2', 'group2-description');
 
 INSERT INTO groupentity (groupentity_entity_id, groupentity_group_id)
     VALUES

@@ -709,6 +709,39 @@ public class GroupIntegrationTest {
 			.get("");
 	}
 
+	@Test
+	@RunAsClient
+	public void testListPublicGroups(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(
+				"[" +
+					"{" +
+						"\"id\":\"AdminExtId\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/AdminExtId\"" +
+					"}," +
+					"{" +
+						"\"id\":\"GroupWithSubGroup\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupWithSubGroup\"" +
+					"}," +
+					"{" +
+						"\"id\":\"GroupWhoSubgroupHaveUser\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupWhoSubgroupHaveUser\"" +
+					"}," +
+					"{" +
+						"\"id\":\"GroupWithUsers\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupWithUsers\"" +
+					"}" +
+				"]")).
+		when()
+			.get("/");
+	}
+
 	private static String getBatchId(@ArquillianResource URL baseURL, ObmDomainUuid obmDomainUuid) {
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 

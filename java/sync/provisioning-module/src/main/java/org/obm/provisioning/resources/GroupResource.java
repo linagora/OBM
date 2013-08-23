@@ -32,6 +32,8 @@ package org.obm.provisioning.resources;
 import static org.obm.provisioning.bean.Permissions.groups_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
@@ -44,16 +46,20 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
+import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -68,6 +74,28 @@ public class GroupResource {
 
 	@Context
 	private ObmDomain domain;
+
+	@GET
+	@Produces(JSON_WITH_UTF8)
+	@Transactional(readOnly = true)
+	public Collection<GroupIdentifier> listPublicGroups() throws DaoException {
+		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
+
+		Set<Group> groups = groupDao.listPublicGroups(domain);
+
+		if (groups == null) {
+			return Collections.emptySet();
+		}
+
+		return Collections2.transform(groups, new Function<Group, GroupIdentifier>() {
+
+			@Override
+			public GroupIdentifier apply(Group group) {
+				return GroupIdentifier.builder().id(group.getExtId()).domainUuid(domain.getUuid()).build();
+			}
+
+		});
+	}
 
 	@GET
 	@Path("/{groupExtId}")

@@ -374,6 +374,35 @@ public class GroupDaoJdbcImpl implements GroupDao {
         }
     }
 
+    @Override
+    public Set<Group> listPublicGroups(ObmDomain domain) throws DaoException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Set<Group> groups = Sets.newHashSet();
+        String query = "SELECT " + FIELDS + " FROM UGroup WHERE group_domain_id = ? AND group_privacy = 0";
+
+        try {
+            conn = obmHelper.getConnection();
+            ps = conn.prepareStatement(query);
+
+            ps.setInt(1, domain.getId());
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                groups.add(groupBuilderFromCursor(rs).build());
+            }
+        }
+        catch (SQLException e) {
+            throw new DaoException(e);
+        }
+        finally {
+            obmHelper.cleanup(conn, ps, rs);
+        }
+
+        return groups;
+    }
+
     /**
      * Creates a builder with the basic group information set. Can be used to
      * build subgroups and users for a group.
