@@ -31,6 +31,8 @@ import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -47,6 +49,8 @@ public class BatchResource {
 	private BatchProcessor batchProcessor;
 	@Inject
 	private BatchTracker batchTracker;
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@GET
 	@Path("{batchId}")
@@ -117,11 +121,15 @@ public class BatchResource {
 				throw new WebApplicationException(Status.NOT_FOUND);
 			}
 
-			try {
-				batchProcessor.process(batch);
-			}
-			catch (Exception e) {
-				throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+			if (BatchStatus.IDLE.equals(batch.getStatus())) {
+				try {
+					batchProcessor.process(batch);
+				}
+				catch (Exception e) {
+					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+				}
+			} else {
+				logger.info("Not commiting batch {} in status {}.", batch.getId(), batch.getStatus());
 			}
 		}
 
@@ -129,12 +137,23 @@ public class BatchResource {
 	}
 
 	@Path("{batchId}/users")
-	public Class<UserWriteResource> users() {
+	public Class<UserWriteResource> users(@Context Batch batch) {
+		assertBatchIsIdle(batch);
+
 		return UserWriteResource.class;
 	}
 	
 	@Path("{batchId}/groups")
-	public Class<GroupWriteResource> groups() {
+	public Class<GroupWriteResource> groups(@Context Batch batch) {
+		assertBatchIsIdle(batch);
+
 		return GroupWriteResource.class;
 	}
+
+	private void assertBatchIsIdle(Batch batch) {
+		if (!BatchStatus.IDLE.equals(batch.getStatus())) {
+			throw new WebApplicationException(Status.CONFLICT);
+		}
+	}
+
 }

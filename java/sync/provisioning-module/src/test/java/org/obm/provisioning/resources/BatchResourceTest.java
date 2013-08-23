@@ -241,23 +241,23 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 			.body(containsString(
 						"{" +
 							"\"id\":1," +
-							"\"status\":\"ERROR\"," +
+							"\"status\":\"IDLE\"," +
 							"\"operationCount\":2," +
-							"\"operationDone\":1," +
+							"\"operationDone\":0," +
 							"\"operations\":[" +
 								"{" +
-									"\"status\":\"SUCCESS\"," +
+									"\"status\":\"IDLE\"," +
 									"\"entityType\":\"USER\"," +
 									"\"entity\":{\"id\":123456}," +
 									"\"operation\":\"POST\"," +
 									"\"error\":null" +
 								"}," +
 								"{" +
-									"\"status\":\"ERROR\"," +
+									"\"status\":\"IDLE\"," +
 									"\"entityType\":\"USER\"," +
 									"\"entity\":{}," +
 									"\"operation\":\"PATCH\"," +
-									"\"error\":\"Invalid User\"" +
+									"\"error\":null" +
 								"}" +
 							"]" +
 						"}")).
@@ -282,23 +282,23 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 			.body(containsString(
 						"{" +
 							"\"id\":1," +
-							"\"status\":\"ERROR\"," +
+							"\"status\":\"IDLE\"," +
 							"\"operationCount\":2," +
-							"\"operationDone\":1," +
+							"\"operationDone\":0," +
 							"\"operations\":[" +
 								"{" +
-									"\"status\":\"SUCCESS\"," +
+									"\"status\":\"IDLE\"," +
 									"\"entityType\":\"USER\"," +
 									"\"entity\":{\"id\":123456}," +
 									"\"operation\":\"POST\"," +
 									"\"error\":null" +
 								"}," +
 								"{" +
-									"\"status\":\"ERROR\"," +
+									"\"status\":\"IDLE\"," +
 									"\"entityType\":\"USER\"," +
 									"\"entity\":{}," +
 									"\"operation\":\"PATCH\"," +
-									"\"error\":\"Invalid User\"" +
+									"\"error\":null" +
 								"}" +
 							"]" +
 						"}")).

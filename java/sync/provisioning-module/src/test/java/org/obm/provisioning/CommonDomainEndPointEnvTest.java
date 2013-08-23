@@ -184,11 +184,11 @@ public abstract class CommonDomainEndPointEnvTest {
 			.builder()
 			.id(batchId(1))
 			.domain(domain)
-			.status(BatchStatus.ERROR)
+			.status(BatchStatus.IDLE)
 			.operation(Operation
 					.builder()
 					.id(operationId(1))
-					.status(BatchStatus.SUCCESS)
+					.status(BatchStatus.IDLE)
 					.entityType(BatchEntityType.USER)
 					.request(org.obm.provisioning.beans.Request
 							.builder()
@@ -200,9 +200,8 @@ public abstract class CommonDomainEndPointEnvTest {
 			.operation(Operation
 					.builder()
 					.id(operationId(2))
-					.status(BatchStatus.ERROR)
+					.status(BatchStatus.IDLE)
 					.entityType(BatchEntityType.USER)
-					.error("Invalid User")
 					.request(org.obm.provisioning.beans.Request
 							.builder()
 							.resourcePath("/users/1")
@@ -265,7 +264,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected void expectBatch() throws DaoException {
-		expect(batchDao.get(batch.getId())).andReturn(batch);
+		expect(batchDao.get(batch.getId())).andReturn(batch).atLeastOnce();
 	}
 
 	protected void expectProfiles() throws DaoException {
