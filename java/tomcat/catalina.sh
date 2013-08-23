@@ -3,7 +3,7 @@
 export TZ="GMT"
 
 if [ -f '/etc/obm/tomcat_conf.ini' ] ; then
-  source /etc/obm/tomcat_conf.ini
+  . /etc/obm/tomcat_conf.ini
 else
   MEM=512
 fi
