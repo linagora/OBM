@@ -55,7 +55,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Names;
 
 
-//@Slow
+@Slow
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(PGroupDaoJdbcImplTest.Env.class)
 public class PGroupDaoJdbcImplTest {
