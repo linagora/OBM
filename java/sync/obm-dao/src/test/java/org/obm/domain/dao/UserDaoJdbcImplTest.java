@@ -175,6 +175,25 @@ public class UserDaoJdbcImplTest {
 	}
 
 	@Test
+	public void testGetByExtIdWithGroups() throws Exception {
+		ObmUser creator = dao.findUserById(1, domain);
+		UserExtId extId = UserExtId.valueOf("testExtId");
+		Builder userBuilder = ObmUser
+				.builder()
+				.login("login")
+				.lastName("lastname")
+				.domain(domain)
+				.extId(extId)
+				.createdBy(creator);
+
+		dao.create(userBuilder.build());
+
+		ObmUser foundUser = dao.getByExtIdWithGroups(extId, domain);
+
+		assertThat(foundUser.getGroups()).isNotNull();
+	}
+
+	@Test
 	public void testFindUserByIdFetchesOneCreatorLevelOnly() throws Exception {
 		ObmUser creator = dao.findUserById(1, domain);
 		ObmUser user = ObmUser

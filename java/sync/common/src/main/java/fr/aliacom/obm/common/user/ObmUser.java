@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
@@ -74,7 +75,7 @@ public class ObmUser {
 		private String lastName;
 		private String firstName;
 		private String email;
-		private Set<String> emailAlias;
+		private ImmutableSet.Builder<String> emailAlias;
 		
 		private String address1;
 		private String address2;
@@ -112,7 +113,11 @@ public class ObmUser {
 		private Integer uidNumber;
 		private Integer gidNumber;
 		
+		private ImmutableSet.Builder<Group> groups;
+
 		private Builder() {
+			emailAlias = ImmutableSet.builder();
+			groups = ImmutableSet.builder();
 		}
 
 		public Builder from(ObmUser user) {
@@ -154,7 +159,8 @@ public class ObmUser {
 					.createdBy(user.createdBy)
 					.updatedBy(user.updatedBy)
 					.uidNumber(user.uidNumber)
-					.gidNumber(user.gidNumber);
+					.gidNumber(user.gidNumber)
+					.groups(user.groups);
 		}
 
 		public Builder uid(Integer uid) {
@@ -314,8 +320,8 @@ public class ObmUser {
 			return this;
 		}
 		public Builder emailAndAliases(String emailAndAliases) {
+			Preconditions.checkNotNull(emailAndAliases);
 			email = null;
-			emailAlias = Sets.newHashSet();
 
 			Iterable<String> emailAndAlias = Splitter
 					.on(EMAIL_FIELD_SEPARATOR)
@@ -338,15 +344,15 @@ public class ObmUser {
 		}
 
 		public Builder emailAlias(Iterable<String> emailAlias) {
-			this.emailAlias = Sets.newHashSet(emailAlias);
+			Preconditions.checkNotNull(emailAlias);
+			this.emailAlias.addAll(emailAlias);
 			return this;
 		}
 
 		public Builder mails(Iterable<String> mails) {
 			Preconditions.checkNotNull(mails);
 			email = Iterables.getFirst(mails, null);
-			emailAlias = Sets.newHashSet();
-			Iterables.addAll(emailAlias, Iterables.skip(mails, 1));
+			emailAlias.addAll(Iterables.skip(mails, 1));
 			return this;
 		}
 		
@@ -368,6 +374,12 @@ public class ObmUser {
 			return this;
 		}
 
+		public Builder groups(Iterable<Group> groups) {
+			Preconditions.checkNotNull(groups);
+			this.groups.addAll(groups);
+			return this;
+		}
+
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
 			Preconditions.checkState(login != null);
@@ -381,11 +393,11 @@ public class ObmUser {
 			
 			return new ObmUser(
 					uid, entityId, login, extId, commonName, lastName, firstName,
-					email, Objects.firstNonNull(emailAlias, ImmutableSet.<String>of()),
+					email, emailAlias.build(),
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
-					phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber);
+					phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber, groups.build());
 		}
 		
 	}
@@ -436,6 +448,8 @@ public class ObmUser {
 	private final Integer uidNumber;
 	private final Integer gidNumber;
 	
+	private Set<Group> groups;
+
 	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
@@ -446,7 +460,7 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
 			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
-			Integer mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber) {
+			Integer mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -486,6 +500,7 @@ public class ObmUser {
 		this.password = password;
 		this.uidNumber = uidNumber;
 		this.gidNumber = gidNumber;
+		this.groups = groups;
 	}
 
 	public int getUid() {
@@ -697,6 +712,10 @@ public class ObmUser {
 		return gidNumber;
 	}
 	
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
 	public boolean isEmailAvailable() {
 		return !Strings.isNullOrEmpty(email) || !Iterables.isEmpty(emailAlias);
 	}
@@ -706,7 +725,7 @@ public class ObmUser {
 		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
 				emailAlias, address1, address2, address3, expresspostal, mobile,
 				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
-				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber);
+				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -749,7 +768,8 @@ public class ObmUser {
 				&& Objects.equal(this.mailHost, that.mailHost)
 				&& Objects.equal(this.password, that.password)
 				&& Objects.equal(this.uidNumber, that.uidNumber)
-				&& Objects.equal(this.gidNumber, that.gidNumber);
+				&& Objects.equal(this.gidNumber, that.gidNumber)
+				&& Objects.equal(this.groups, that.groups);
 		}
 		return false;
 	}
@@ -795,6 +815,7 @@ public class ObmUser {
 			.add("mailHost", mailHost)
 			.add("uidNumber", uidNumber)
 			.add("gidNumber", gidNumber)
+			.add("groups", groups)
 			.toString();
 	}
 }

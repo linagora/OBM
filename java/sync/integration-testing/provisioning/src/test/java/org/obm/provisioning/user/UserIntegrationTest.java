@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,82 +29,55 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.bean;
+package org.obm.provisioning.user;
 
-import org.obm.provisioning.GroupExtId;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJsonWithGroup;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.userUrl;
+
+import java.io.File;
+import java.net.URL;
+
+import javax.ws.rs.core.Response.Status;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.Slow;
+import org.obm.provisioning.ProvisioningArchiveUtils;
+import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+
+import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class GroupIdentifier {
+@Slow
+@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+public class UserIntegrationTest {
 
-	public static Builder builder() {
-		return new Builder();
-	}
-
-	public static class Builder {
-		private GroupExtId id;
-		private ObmDomainUuid domainUuid;
-
-		public Builder id(GroupExtId id) {
-			this.id = id;
-			return this;
-		}
-
-		public Builder domainUuid(ObmDomainUuid domainUuid) {
-			this.domainUuid = domainUuid;
-			return this;
-		}
-
-		public GroupIdentifier build() {
-			Preconditions.checkState(id != null);
-			Preconditions.checkState(domainUuid != null);
-
-			return new GroupIdentifier(id, "/" + domainUuid.get() + "/groups/" + id.getId());
-		}
-	}
-
-	private GroupExtId id;
-	private String url;
-	
-	private GroupIdentifier(GroupExtId id, String url) {
-		this.id = id;
-		this.url = url;
+	@Test
+	@RunAsClient
+	public void testGetUserWithGroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("123456789");
+		RestAssured.baseURI = userUrl(baseURL, obmDomainUuid);
+		
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(getAdminUserJsonWithGroup())).
+		when()
+			.get("/Admin0ExtId");
 	}
 	
-	public GroupExtId getId() {
-		return id;
+	@Deployment
+	public static WebArchive createDeployment() throws Exception {
+		return ProvisioningArchiveUtils.buildWebArchive(
+				new File(ClassLoader.getSystemResource("dbInitialScriptUser.sql").toURI()));
 	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(id, url);
-	}
-	
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof GroupIdentifier) {
-			GroupIdentifier that = (GroupIdentifier) object;
-
-			return Objects.equal(this.id, that.id) 
-					&& Objects.equal(this.url, that.url);
-		}
-
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-				.add("id", id)
-				.add("url", url)
-				.toString();
-	}
-
 }

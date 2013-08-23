@@ -53,7 +53,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
-
+	
 	private final Provider<ObmDomain> domainProvider;
 	private final Builder builder = ObmUser.builder();
 
@@ -73,6 +73,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		ObmDomain domain = domainProvider.get();
 		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
+
 		ObmUser user = builder
 				.domain(domain)
 				.mailHost(mailHost)

@@ -36,6 +36,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.batchUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.domainUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJson;
 
 import java.io.File;
 import java.net.URL;
@@ -752,15 +753,6 @@ public class GroupIntegrationTest {
 		return batchId;
 	}
 	
-	private static String getAdminUserJson(){
-		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
-				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\","
-				+ "\"kind\":null,\"title\":null,\"description\":null,\"company\":null,\"service\":null,"
-				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
-				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"mail_quota\":\"0\","
-				+ "\"mail_server\":null,\"mails\":[\"admin0@test.tlse.lng\"],\"timecreate\":null,\"timeupdate\":null,"
-				+ "\"groups\":[\"Not implemented yet\"]}";
-	}
 
 	@Deployment
 	public static WebArchive createDeployment() throws Exception {

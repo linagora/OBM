@@ -75,7 +75,7 @@ public class UserResource {
 	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		try {
-			return userDao.getByExtId(userExtId, domain);
+			return userDao.getByExtIdWithGroups(userExtId, domain);
 		}
 		catch (UserNotFoundException e) {
 			throw new WebApplicationException(Status.NOT_FOUND);

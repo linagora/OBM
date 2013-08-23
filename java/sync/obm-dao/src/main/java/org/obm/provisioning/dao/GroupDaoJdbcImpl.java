@@ -60,6 +60,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 /**
  * A JDBC backed implementation of the GroupDao.
@@ -841,6 +842,47 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		}
 
 		return users.build();
+	}
+
+    @Override
+	public Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection con;
+		ImmutableSet.Builder<Group> userGroups = ImmutableSet.builder();
+
+		try {
+			con = connectionProvider.getConnection();
+
+			String query =
+					"     SELECT " + FIELDS +
+					"       FROM UGroup " +
+					" INNER JOIN of_usergroup " +
+					"         ON of_usergroup_group_id = group_id " +
+					" INNER JOIN UserObm " +
+					"         ON userobm_id = of_usergroup_user_id " +
+					"      WHERE userobm_ext_id = ? " +
+					"        AND userobm_domain_id = ? ";
+
+			ps = con.prepareStatement(query);
+
+			ps.setString(1, userExtId.getExtId());
+			ps.setInt(2, domain.getId());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				userGroups.add(groupBuilderFromCursor(rs).build());
+			}
+
+			ps.close();
+
+		}
+		finally {
+			JDBCUtils.cleanup(null, ps, null);
+		}
+
+		return userGroups.build();
 	}
 
 }

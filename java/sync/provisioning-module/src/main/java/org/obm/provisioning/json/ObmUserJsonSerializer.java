@@ -67,16 +67,18 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.sync.host.ObmHost;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 
 public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
-	
-	private final static String NOT_IMPLEMENTED_YET = "Not implemented yet";
 
 	@Override
 	public void serialize(ObmUser value, JsonGenerator jgen, SerializerProvider provider)
@@ -100,21 +102,21 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeStringField(COMPANY.asSpecificationValue(), value.getCompany());
 		jgen.writeStringField(SERVICE.asSpecificationValue(), value.getService());
 		jgen.writeStringField(DIRECTION.asSpecificationValue(), value.getDirection());
-		writeStringsField(jgen, ADDRESSES.asSpecificationValue(),
+		writeObjectsField(jgen, ADDRESSES.asSpecificationValue(),
 				value.getAddress1(), value.getAddress2(), value.getAddress3());
 		jgen.writeStringField(TOWN.asSpecificationValue(), value.getTown());
 		jgen.writeStringField(ZIPCODE.asSpecificationValue(), value.getZipCode());
 		jgen.writeStringField(BUSINESS_ZIPCODE.asSpecificationValue(), value.getExpresspostal());
 		jgen.writeStringField(COUNTRY.asSpecificationValue(), value.getCountryCode());
-		writeStringsField(jgen, PHONES.asSpecificationValue(), value.getPhone(), value.getPhone2());
+		writeObjectsField(jgen, PHONES.asSpecificationValue(), value.getPhone(), value.getPhone2());
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
-		writeStringsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
+		writeObjectsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
 		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
-		writeStringsField(jgen, GROUPS.asSpecificationValue(), NOT_IMPLEMENTED_YET);
+		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeEndObject();
 	}
 	
@@ -124,16 +126,33 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		return host != null ? host.getName() : null;
 	}
 
-	public void writeStringsField(JsonGenerator jgen, String fieldName, String... values)
+	private void writeObjectsField(JsonGenerator jgen, String fieldName, Object... values)
 			throws JsonGenerationException, IOException {
 		jgen.writeFieldName(fieldName);
 		jgen.writeStartArray();
-		for(String value: values) {
+		for(Object value: values) {
 			if (value != null) {
-				jgen.writeString(value);
+				jgen.writeObject(value);
 			}
 		}
 		jgen.writeEndArray();
 	}
 	
-}
+	private Set<GroupIdentifier> extractGroupIdentifiers(Set<Group> groups, ObmDomain domain) {
+		if(groups == null) {
+			return ImmutableSet.of();
+		}
+		
+		Set<GroupIdentifier> identifiers = Sets.newHashSet();
+		for(Group group: groups) {
+			GroupIdentifier identifier = 
+					GroupIdentifier.builder()
+								.id(group.getExtId())
+								.domainUuid(domain.getUuid())
+								.build();
+			identifiers.add(identifier);
+		}
+		
+		return identifiers;
+	}
+ }

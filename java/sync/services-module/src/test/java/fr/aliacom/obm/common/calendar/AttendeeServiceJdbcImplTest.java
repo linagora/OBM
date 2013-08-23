@@ -53,6 +53,7 @@ import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
@@ -135,8 +136,8 @@ public class AttendeeServiceJdbcImplTest {
 		externalContact = externalContact();
 		resource = resource();
 		userDao = createMockBuilder(UserDaoJdbcImpl.class)
-				.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class)
-				.withArgs(obmHelper, null, null, null)
+				.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class, GroupDao.class)
+				.withArgs(obmHelper, null, null, null, null)
 				.addMockedMethod("findUser")
 				.createMock(mocksControl);
 		contactDao = createMockBuilder(ContactDao.class)

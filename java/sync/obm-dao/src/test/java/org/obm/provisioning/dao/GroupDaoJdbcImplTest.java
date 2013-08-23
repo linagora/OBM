@@ -412,6 +412,7 @@ public class GroupDaoJdbcImplTest {
     public void testRemoveUserNonexistentGroup() throws Exception {
         dao.removeUser(domain1, nonexistentGroup.getExtId(), user1);
     }
+
     @Test(expected = UserNotFoundException.class)
     public void testRemoveUserNonexistentUser() throws Exception {
         GroupExtId parentId = GroupExtId.valueOf("removeusersubgroup-group-parent");
@@ -627,6 +628,36 @@ public class GroupDaoJdbcImplTest {
 				.build();
 
 		assertThat(groups).isEqualTo(expectedGroups);
+	}
+	
+	@Test
+	public void testGetAllGroupsForUserExtId() throws Exception {
+		Group group1 = dao.create(user1.getDomain(),
+				Group.builder()
+				.name("group1")
+				.extId(GroupExtId.valueOf("extIdGroup1"))
+				.privateGroup(true)
+				.email("group1@domain").build());
+
+		Group group2 = dao.create(user1.getDomain(),
+				Group.builder()
+				.name("group2")
+				.extId(GroupExtId.valueOf("extIdGroup2"))
+				.privateGroup(true)
+				.email("group2@domain").build());
+
+		ImmutableSet.Builder<Group> expectedGroupsBuilder = ImmutableSet.builder();
+
+		expectedGroupsBuilder
+				.add(group1)
+				.add(group2);
+
+		dao.addUser(domain1, group1.getUid(), user1);
+		dao.addUser(domain1, group2.getUid(), user1);
+
+		Set<Group> groups = dao.getAllGroupsForUserExtId(user1.getDomain(), user1.getExtId());
+
+		assertThat(groups).isEqualTo(expectedGroupsBuilder.build());
 	}
 
 	private Set<Integer> getUserGroupsFromInternalMapping(int userId) throws Exception {

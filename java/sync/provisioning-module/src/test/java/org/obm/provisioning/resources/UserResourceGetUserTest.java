@@ -70,7 +70,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	public void testGetAUser() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
 		mocksControl.replay();
 		
 		given()
@@ -104,7 +104,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	public void testGetNonExistingUser() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.getByExtId(userExtId("123"), domain)).andReturn(null);
+		expect(userDao.getByExtIdWithGroups(userExtId("123"), domain)).andReturn(null);
 		mocksControl.replay();
 
 		given()
@@ -121,7 +121,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	public void testGetUserThrowError() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.getByExtId(userExtId("123"), domain)).andThrow(new RuntimeException("bad things happen"));
+		expect(userDao.getByExtIdWithGroups(userExtId("123"), domain)).andThrow(new RuntimeException("bad things happen"));
 		mocksControl.replay();
 
 		given()

@@ -195,7 +195,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read")));
-		expect(userDao.getByExtId(userExtId("1"), domain)).andReturn(fakeUser());
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
 		
 		mocksControl.replay();
 		

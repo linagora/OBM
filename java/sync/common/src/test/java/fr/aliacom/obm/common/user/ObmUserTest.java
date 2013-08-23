@@ -179,6 +179,42 @@ public class ObmUserTest {
 			.build();
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void testNullEmailAlias() {
+		ObmUser
+				.builder()
+				.domain(ObmDomain.builder().build())
+				.uid(1)
+				.login("login")
+				.mails(Sets.newHashSet("1"))
+				.emailAlias(null)
+				.build();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testNullGroups() {
+		ObmUser
+				.builder()
+				.domain(ObmDomain.builder().build())
+				.uid(1)
+				.login("login")
+				.mails(Sets.newHashSet("1"))
+				.groups(null)
+				.build();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testNullEmailAndAliases() {
+		ObmUser
+				.builder()
+				.domain(ObmDomain.builder().build())
+				.uid(1)
+				.login("login")
+				.mails(Sets.newHashSet("1"))
+				.emailAndAliases(null)
+				.build();
+	}
+	
 	@Test
 	public void testOneMailBuilder() {
 		ObmUser user = ObmUser

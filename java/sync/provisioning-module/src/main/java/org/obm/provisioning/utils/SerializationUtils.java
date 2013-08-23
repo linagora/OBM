@@ -146,7 +146,6 @@ public class SerializationUtils {
 				toBuild.firstName(value.asText());
 				break;
 			case GROUPS:
-				// NOT IMPLEMENTED YET
 				break;
 			case ID:
 				toBuild.extId(UserExtId.builder().extId(value.asText()).build());
@@ -200,8 +199,6 @@ public class SerializationUtils {
 				break;
 		}
 	}
-	
-
 
 	public static void readJsonGroup(JsonParser jp, Group.Builder builder) throws IOException, JsonProcessingException {
 		JsonNode root = jp.readValueAsTree();

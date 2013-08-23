@@ -35,7 +35,9 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.Realm;
@@ -154,6 +156,9 @@ public abstract class CommonDomainEndPointEnvTest {
 		}
 	}
 
+	private static Date TIMECREATE = DateUtils.date("2013-06-11T14:00:00");
+	private static Date TIMEUPDATE = DateUtils.date("2013-06-11T15:00:00");
+	
 	protected static final ProfileName adminProfile = ProfileName.builder().name("admin").build();
 
 	protected static final ProfileName userProfile = ProfileName.builder().name("user").build();
@@ -335,6 +340,40 @@ public abstract class CommonDomainEndPointEnvTest {
 				.build();
 	}
 	
+	protected String obmUserToJsonStringWithoutGroup() {
+		return
+				"{" +
+					"\"id\":\"extId\"," +
+					"\"login\":\"user1\"," +
+					"\"lastname\":\"Doe\"," +
+					"\"profile\":\"Utilisateurs\"," +
+					"\"firstname\":\"Jesus\"," +
+					"\"commonname\":\"John Doe\"," +
+					"\"password\":\"password\"," +
+					"\"kind\":\"kind\"," +
+					"\"title\":\"title\"," +
+					"\"description\":\"description\"," +
+					"\"company\":\"company\"," +
+					"\"service\":\"service\"," +
+					"\"direction\":\"direction\"," +
+					"\"addresses\":[\"address1\",\"address2\"]," +
+					"\"town\":\"town\"," +
+					"\"zipcode\":\"zipcode\"," +
+					"\"business_zipcode\":\"1234\"," +
+					"\"country\":\"1234\"," +
+					"\"phones\":[\"phone\",\"phone2\"]," +
+					"\"mobile\":\"mobile\"," +
+					"\"faxes\":[\"fax\",\"fax2\"]," +
+					"\"mail_quota\":\"1234\"," +
+					"\"mail_server\":\"host\"," +
+					"\"mails\":[\"john@domain\"]," +
+					"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
+					"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
+					"\"groups\":" +
+						"[]" +
+				"}";
+	}
+	
 	protected String obmUserToJsonString() {
 		return
 			"{" +
@@ -364,7 +403,15 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mails\":[\"john@domain\"]," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
-				"\"groups\":[\"Not implemented yet\"]" +
+				"\"groups\":" +
+					"[" +
+						"{" +
+							"\"id\":\"group1\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/groups/group1\"" +
+						"}," +
+						"{" +
+							"\"id\":\"group2\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/groups/group2\"" +
+						"}" +
+					"]" +
 			"}";
 	}
 
@@ -426,12 +473,24 @@ public abstract class CommonDomainEndPointEnvTest {
 				.mailQuota(1234)
 				.mailHost(ObmHost.builder().name("host").build())
 				.emailAndAliases("john@domain")
-				.timeCreate(DateUtils.date("2013-06-11T14:00:00"))
-				.timeUpdate(DateUtils.date("2013-06-11T15:00:00"))
-				//.groups()					// Not implemented yet in ObmUser
+				.timeCreate(TIMECREATE)
+				.timeUpdate(TIMEUPDATE)
+				.groups(fakeGroups())
 				.build();
 	}
-
+	
+	protected static final Group group1 = Group.builder()
+			.extId(GroupExtId.valueOf("group1"))
+			.build();
+		
+	protected static final Group group2 = Group.builder()
+				.extId(GroupExtId.valueOf("group2"))
+				.build();
+	
+	protected Set<Group> fakeGroups() {
+		return ImmutableSet.of(group1, group2);
+	}
+	
 	protected UserExtId userExtId(String extId) {
 		return UserExtId.builder().extId(extId).build();
 	}

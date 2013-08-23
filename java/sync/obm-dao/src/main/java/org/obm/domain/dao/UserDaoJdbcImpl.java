@@ -42,8 +42,11 @@ import java.sql.Types;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
+import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
@@ -58,6 +61,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -135,16 +139,18 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	private final ObmHelper obmHelper;
 	private final ObmInfoDao obmInfoDao;
+	private final GroupDao groupDao;
 	private final AddressBookDao addressBookDao;
 	private final UserPatternDao userPatternDao;
 	
 	@Inject
 	@VisibleForTesting
-	UserDaoJdbcImpl(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao, UserPatternDao userPatternDao) {
+	UserDaoJdbcImpl(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao, UserPatternDao userPatternDao, GroupDao groupDao) {
 		this.obmHelper = obmHelper;
 		this.obmInfoDao = obmInfoDao;
 		this.addressBookDao = addressBookDao;
 		this.userPatternDao = userPatternDao;
+		this.groupDao = groupDao;
 	}
 	
 	public Map<String, String> loadUserProperties(int userObmId) {
@@ -304,10 +310,20 @@ public class UserDaoJdbcImpl implements UserDao {
 		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
 		ObmUser updator = findUserById(rs.getInt("userobm_userupdate"), domain, false);
 
-		return createUserFromResultSet(domain, rs, creator, updator);
+		return createUserFromResultSet(domain, rs, creator, updator, null);
 	}
 
-	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, ObmUser creator, ObmUser updator) throws SQLException {
+	@VisibleForTesting
+	ObmUser createUserFromResultSetAndFetchCreatorsAndGroups(ObmDomain domain, ResultSet rs) throws SQLException {
+		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
+		ObmUser updator = findUserById(rs.getInt("userobm_userupdate"), domain, false);
+
+		Set<Group> groups = groupDao.getAllGroupsForUserExtId(domain, UserExtId.builder().extId(rs.getString("userobm_ext_id")).build());
+
+		return createUserFromResultSet(domain, rs, creator, updator, groups);
+	}
+
+	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, ObmUser creator, ObmUser updator, Set<Group> groups) throws SQLException {
 		String extId = rs.getString("userobm_ext_id");
 
 		Builder builder = ObmUser.builder()
@@ -348,7 +364,8 @@ public class UserDaoJdbcImpl implements UserDao {
 				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
 				.gidNumber(JDBCUtils.getInteger(rs, "userobm_gid"))
 				.createdBy(creator)
-				.updatedBy(updator);
+				.updatedBy(updator)
+				.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET));
 
 		return builder.build();
 	}
@@ -398,7 +415,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				if (fetchCreators) {
 					obmUser = createUserFromResultSetAndFetchCreators(domain, rs);
 				} else {
-					obmUser = createUserFromResultSet(domain, rs, null, null);
+					obmUser = createUserFromResultSet(domain, rs, null, null, null);
 				}
 			}
 		} catch (SQLException e) {
@@ -449,6 +466,7 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 	
 	public Integer userIdFromEmail(Connection con, String email, Integer domainId) throws SQLException {
+
 		String[] parts = email.split("@");
 		EmailLogin login = new EmailLogin(parts[0]);
 		DomainName domain = new DomainName("-");
@@ -469,9 +487,18 @@ public class UserDaoJdbcImpl implements UserDao {
 		
 		return ownerId;
 	}
-	
+
 	@Override
 	public ObmUser getByExtId(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException {
+		return getByExtIdWithOptionalGroups(userExtId, domain, false);
+	}
+
+	@Override
+	public ObmUser getByExtIdWithGroups(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException {
+		return getByExtIdWithOptionalGroups(userExtId, domain, true);
+	}
+
+	private ObmUser getByExtIdWithOptionalGroups(UserExtId userExtId, ObmDomain domain, boolean fetchGroups) throws SQLException, UserNotFoundException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -490,7 +517,11 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(2, userExtId.getExtId());
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return createUserFromResultSetAndFetchCreators(domain, rs);
+				if (!fetchGroups) {
+					return createUserFromResultSetAndFetchCreators(domain, rs);
+				} else {
+					return createUserFromResultSetAndFetchCreatorsAndGroups(domain, rs);
+				}
 			}
 			else {
 				throw new UserNotFoundException(userExtId);
@@ -819,6 +850,32 @@ public class UserDaoJdbcImpl implements UserDao {
 
 			String extId = user.getExtId().getExtId();
 
+			ps.setString(1, extId);
+			ps.setInt(2, user.getDomain().getId());
+
+			int updateCount = ps.executeUpdate();
+
+			if (updateCount != 1) {
+				throw new UserNotFoundException(String.format("No user found with extid %s.", extId));
+			}
+		}
+		finally {
+			JDBCUtils.cleanup(connection, ps, null);
+		}
+	}
+
+	@Override
+	public void archive(ObmUser user) throws SQLException,
+			UserNotFoundException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+
+		try {
+			connection = obmHelper.getConnection();
+
+			ps = connection.prepareStatement("UPDATE UserObm SET userobm_archive = 1 WHERE userobm_ext_id = ? AND userobm_domain_id = ?");
+
+			String extId = user.getExtId().getExtId();
 			ps.setString(1, extId);
 			ps.setInt(2, user.getDomain().getId());
 

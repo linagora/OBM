@@ -55,6 +55,8 @@ public interface UserDao {
 
 	ObmUser getByExtId(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException;
 
+	ObmUser getByExtIdWithGroups(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException;
+
 	List<ObmUser> list(ObmDomain domain) throws SQLException;
 
 	ObmUser create(ObmUser user) throws SQLException, DaoException;
@@ -62,6 +64,8 @@ public interface UserDao {
 	ObmUser update(ObmUser user) throws SQLException, UserNotFoundException;
 
 	void delete(ObmUser user) throws SQLException, UserNotFoundException;
+
+	void archive(ObmUser user) throws SQLException, UserNotFoundException;
 
 	Map<String, String> loadUserProperties(int userObmId);
 

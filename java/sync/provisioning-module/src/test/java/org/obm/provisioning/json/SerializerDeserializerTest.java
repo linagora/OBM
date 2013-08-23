@@ -60,7 +60,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 			.content(obmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode())
-			.content(containsString(obmUserToJsonString())).
+			.content(containsString(obmUserToJsonStringWithoutGroup())).
 		when()
 			.post("/do/tests/on/serialization/of/user");
 		

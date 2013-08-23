@@ -37,8 +37,31 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ProvisioningIntegrationTestUtils {
 
+	public static String getAdminUserJson(){
+		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
+				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\","
+				+ "\"kind\":null,\"title\":null,\"description\":null,\"company\":null,\"service\":null,"
+				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
+				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"mail_quota\":\"0\","
+				+ "\"mail_server\":null,\"mails\":[\"admin0@test.tlse.lng\"],\"timecreate\":null,\"timeupdate\":null,"
+				+ "\"groups\":[]}";
+	}
+	
+	public static String getAdminUserJsonWithGroup(){
+		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
+				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\",\"kind\":null,\"title\":null,"
+				+ "\"description\":null,\"company\":null,\"service\":null,\"direction\":null,\"addresses\":[],\"town\":null,"
+				+ "\"zipcode\":null,\"business_zipcode\":null,\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],"
+				+ "\"mail_quota\":\"0\",\"mail_server\":null,\"mails\":[\"admin0@global.virt\"],\"timecreate\":null,\"timeupdate\":null,"
+				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/123456789/groups/GroupWithUsers\"}]}";
+	}
+
 	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {
 		return domainUrl(baseURL, domain) + "/groups/";
+	}
+
+	public static String userUrl(URL baseURL, ObmDomainUuid domain) {
+		return domainUrl(baseURL, domain) + "/users/";
 	}
 	
 	public static String profileUrl(URL baseURL, ObmDomainUuid domain) {

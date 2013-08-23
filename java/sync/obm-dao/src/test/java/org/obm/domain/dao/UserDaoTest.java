@@ -109,6 +109,8 @@ public class UserDaoTest {
 	private AddressBookDao addressBookDao;
 	@Inject
 	private UserPatternDao userPatternDao;
+	@Inject
+	private GroupDao groupDao;
 
 	@Rule
 	@Inject
@@ -119,8 +121,8 @@ public class UserDaoTest {
 	@Before
 	public void setUp() {
 		userDao = createMockBuilder(UserDaoJdbcImpl.class)
-					.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class)
-					.withArgs(obmHelper, obmInfoDao, addressBookDao, userPatternDao)
+					.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class, GroupDao.class)
+					.withArgs(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao)
 					.addMockedMethod("userIdFromEmailQuery")
 					.addMockedMethod("userIdFromLogin")
 					.createMock(mocksControl);
@@ -178,7 +180,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, login.get(), domain, null);
@@ -194,7 +196,7 @@ public class UserDaoTest {
 		String domain = "obm.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domain, null);
@@ -213,7 +215,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, null);
@@ -232,7 +234,7 @@ public class UserDaoTest {
 				.join("rasta.rocket", "tEst.cOm", "obm.org");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, domainFromDbAliases);
@@ -248,7 +250,7 @@ public class UserDaoTest {
 		DomainName domain = new DomainName("test.com");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 0);
 		
@@ -263,7 +265,7 @@ public class UserDaoTest {
 		String domain = "test.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
 		
 		expectEmailQueryCalls(connection, rs, 4);
 		expectMatchingUserOfEmailQuery(rs, 1, "useraa", domain, null);

@@ -32,6 +32,7 @@
 
 package org.obm.provisioning.dao;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.provisioning.Group;
@@ -44,6 +45,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public interface GroupDao {
     /**
@@ -156,4 +158,5 @@ public interface GroupDao {
 
     Set<Group> listPublicGroups(ObmDomain domain) throws DaoException;
 
+    Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException;
 }
