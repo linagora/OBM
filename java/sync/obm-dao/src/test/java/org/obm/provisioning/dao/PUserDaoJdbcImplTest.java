@@ -47,7 +47,6 @@ import org.obm.guice.SlowGuiceRunner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -62,8 +61,6 @@ public class PUserDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
 		}
@@ -74,8 +71,7 @@ public class PUserDaoJdbcImplTest {
 	private PUserDao dao;
 
 	@Rule
-	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");;
 
 	@Inject
 	private TestUtils utils;

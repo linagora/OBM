@@ -31,8 +31,6 @@ package org.obm.provisioning.dao;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.sql.ResultSet;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,8 +41,6 @@ import org.obm.dao.utils.TestUtils;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.PGroupDao;
 import org.obm.domain.dao.PGroupDaoJdbcImpl;
-import org.obm.domain.dao.PUserDao;
-import org.obm.domain.dao.PUserDaoJdbcImpl;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -52,7 +48,6 @@ import org.obm.provisioning.Group;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 
 @Slow
@@ -64,8 +59,6 @@ public class PGroupDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
 		}
@@ -76,8 +69,7 @@ public class PGroupDaoJdbcImplTest {
 	private PGroupDao dao;
 
 	@Rule
-	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");;
 
 	@Inject
 	private TestUtils utils;

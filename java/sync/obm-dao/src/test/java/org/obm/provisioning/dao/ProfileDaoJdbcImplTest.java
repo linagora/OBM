@@ -54,7 +54,7 @@ public class ProfileDaoJdbcImplTest {
 	private ProfileDao dao;
 
 	@Rule
-	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 	
 	private final ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 	private final ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
