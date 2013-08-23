@@ -434,4 +434,36 @@ public class LdapUserTest {
 
 		assertThat(user.buildDiffModifications(user)).isEqualTo(new Modification[0]);
 	}
+
+	@Test
+	public void testBuildDiffModificationsWhenRemovingAnAttribute() {
+		LdapUser.Builder userBuilder = ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword("secret password")
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailBoxServer("lmtp:255.255.255.0:24")
+				.mailAccess("PERMIT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"));
+		LdapUser user = userBuilder.build();
+		LdapUser newUser = userBuilder
+				.sn(null)
+				.cn("newCn")
+				.build();
+
+		assertThat(newUser.buildDiffModifications(user)).isEqualTo(new Modification[] {
+				new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, "cn", "newCn"),
+				new DefaultModification(ModificationOperation.REMOVE_ATTRIBUTE, "sn"),
+		});
+	}
+
 }
