@@ -30,6 +30,7 @@
 package org.obm.provisioning.json;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -37,6 +38,10 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.processing.impl.OperationUtils;
+
+import com.google.common.collect.Lists;
 
 public class OperationJsonSerializer extends JsonSerializer<Operation> {
 
@@ -55,10 +60,52 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 	private void writeBody(Operation value, JsonGenerator jgen) throws JsonGenerationException, IOException{
 		String body = value.getRequest().getBody();
 
-		if (body  != null){
-			jgen.writeRawValue(body);
-		} else{
-			jgen.writeNull();
+		switch (value.getRequest().getVerb()) {
+			case POST:
+			case PUT:
+			case PATCH:
+				if (body != null) {
+					jgen.writeRawValue(body);
+				} else {
+					jgen.writeNull();
+				}
+				break;
+			case GET:
+			case DELETE:
+				List<String[]> params = Lists.newArrayList();
+
+				switch (value.getEntityType()) {
+					case USER:
+						params.add(
+								new String[]{"id", Request.USERS_ID_KEY});
+						break;
+					case GROUP:
+						params.add(
+								new String[]{"id", Request.GROUPS_ID_KEY});
+						break;
+					case USER_MEMBERSHIP:
+						params.add(
+								new String[]{"userId", Request.USERS_ID_KEY});
+						params.add(
+								new String[]{"groupId", Request.GROUPS_ID_KEY});
+						break;
+					case GROUP_MEMBERSHIP:
+						params.add(
+								new String[]{"subgroupId", Request.SUBGROUPS_ID_KEY});
+						params.add(
+								new String[]{"groupId", Request.GROUPS_ID_KEY});
+						break;
+				}
+
+				jgen.writeStartObject();
+				for (String[] paramData : params) {
+					String jsonFieldName = paramData[0];
+					String requestKey = paramData[1];
+					String paramValue = OperationUtils.getItemIdFromRequest(value, requestKey);
+					jgen.writeObjectField(jsonFieldName, paramValue);
+				}
+				jgen.writeEndObject();
+			break;
 		}
 	}
 

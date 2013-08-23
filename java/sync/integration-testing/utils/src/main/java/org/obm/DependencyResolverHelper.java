@@ -206,6 +206,7 @@ import org.obm.provisioning.processing.impl.BatchProcessorImpl;
 import org.obm.provisioning.processing.impl.BatchTrackerImpl;
 import org.obm.provisioning.processing.impl.EntityTypeBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
+import org.obm.provisioning.processing.impl.OperationUtils;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddSubgroupToGroupOperationProcessor;
@@ -740,7 +741,8 @@ public class DependencyResolverHelper {
 				GroupIdentifier.class,
 				ExceptionJsonSerializer.class,
 				GlobalExceptionMapper.class,
-				WebApplicationExceptionMapper.class
+				WebApplicationExceptionMapper.class,
+				OperationUtils.class
 		};
 	}
 

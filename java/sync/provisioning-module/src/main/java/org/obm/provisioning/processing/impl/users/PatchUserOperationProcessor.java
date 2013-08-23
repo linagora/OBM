@@ -42,6 +42,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.PatchObmUserJsonDeserializer;
+import org.obm.provisioning.processing.impl.OperationUtils;
 
 import com.google.inject.Inject;
 
@@ -59,7 +60,7 @@ public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final UserExtId extId = getUserExtIdFromRequest(operation);
+		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
 		ObmUser oldUser = getUserFromDao(extId, batch.getDomain());
 		ObmUser user = getUserFromRequestBody(operation, oldUser);
 		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, oldUser));

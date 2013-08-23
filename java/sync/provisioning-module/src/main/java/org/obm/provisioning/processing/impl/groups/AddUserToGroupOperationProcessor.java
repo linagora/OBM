@@ -40,6 +40,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.impl.OperationUtils;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -56,7 +57,7 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		GroupExtId groupExtId = getGroupExtIdFromRequest(operation);
 		ObmDomain domain = batch.getDomain();
-		UserExtId userExtId = getUserExtIdFromRequest(operation);
+		UserExtId userExtId = OperationUtils.getUserExtIdFromRequest(operation);
 		ObmUser userFromDao = getUserFromDao(userExtId, domain);
 		
 		addUserToGroupInDao(domain, groupExtId, userFromDao);

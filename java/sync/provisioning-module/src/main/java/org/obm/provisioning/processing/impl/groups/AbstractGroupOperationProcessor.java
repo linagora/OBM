@@ -47,6 +47,7 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.GroupJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
+import org.obm.provisioning.processing.impl.OperationUtils;
 
 import com.google.inject.Inject;
 
@@ -66,11 +67,11 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 	}
 
 	protected GroupExtId getGroupExtIdFromRequest(Operation operation) {
-		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.GROUPS_ID_KEY));
+		return GroupExtId.valueOf(OperationUtils.getItemIdFromRequest(operation, Request.GROUPS_ID_KEY));
 	}
 	
 	protected GroupExtId getSubgroupExtIdFromRequest(Operation operation) {
-		return GroupExtId.valueOf(getItemIdFromRequest(operation, Request.SUBGROUPS_ID_KEY));
+		return GroupExtId.valueOf(OperationUtils.getItemIdFromRequest(operation, Request.SUBGROUPS_ID_KEY));
 	}
 	
 	protected Group inheritDatabaseIdentifiers(Group group, Group oldgroup) {

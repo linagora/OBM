@@ -35,8 +35,6 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
@@ -45,7 +43,6 @@ import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
@@ -64,21 +61,6 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 
 	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
 		super(entityType, verb);
-	}
-
-	protected String getItemIdFromRequest(Operation operation, String paramsKey) {
-		final Request request = operation.getRequest();
-		final String itemId = request.getParams().get(paramsKey);
-
-		if (Strings.isNullOrEmpty(itemId)) {
-			throw new ProcessingException(String.format("Cannot get extId parameter from request url %s.", request.getResourcePath()));
-		}
-		
-		return itemId;
-	}
-	
-	protected UserExtId getUserExtIdFromRequest(Operation operation) {
-		return UserExtId.valueOf(getItemIdFromRequest(operation, Request.USERS_ID_KEY));
 	}
 
 	protected LdapManager buildLdapManager(ObmDomain domain) {

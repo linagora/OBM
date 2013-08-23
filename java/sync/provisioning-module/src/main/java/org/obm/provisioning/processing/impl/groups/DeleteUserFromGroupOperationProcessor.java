@@ -40,6 +40,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.processing.impl.OperationUtils;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -55,7 +56,7 @@ public class DeleteUserFromGroupOperationProcessor extends AbstractGroupOperatio
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmDomain domain = batch.getDomain();
 		GroupExtId groupExtid = getGroupExtIdFromRequest(operation);
-		ObmUser userToDelete = getUserFromDao(getUserExtIdFromRequest(operation), domain);
+		ObmUser userToDelete = getUserFromDao(OperationUtils.getUserExtIdFromRequest(operation), domain);
 		
 		deleteUserFromGroupInDao(domain, groupExtid, userToDelete);
 		deleteUserFromGroupInLdap(domain, groupExtid, userToDelete);

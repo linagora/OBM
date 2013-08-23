@@ -47,6 +47,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.processing.impl.OperationUtils;
 import org.obm.push.mail.bean.Acl;
 
 import com.google.inject.Inject;
@@ -68,7 +69,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final UserExtId extId = getUserExtIdFromRequest(operation);
+		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
 		final Request request = operation.getRequest();
 		final boolean expunge = Boolean.valueOf(request.getParams().get(Request.EXPUNGE_KEY));
 		final ObmUser userFromDao = getUserFromDao(extId, batch.getDomain());
