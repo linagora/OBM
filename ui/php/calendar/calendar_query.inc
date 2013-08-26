@@ -7138,23 +7138,6 @@ Class CalendarView {
     }
   }
 
-  public function get_new_organizer_of_new_event() {
-    global $obm;
-
-    $uid = $obm['uid'];
-    if ($this->users_count() == 1) {
-      $users = $this->get_users();
-      $value = array_shift($users);
-
-      $writable_cal = OBM_Acl::getAllowedEntities($uid, 'calendar', 'write');
-      if (array_key_exists($value, $writable_cal)) {
-        return $value;
-      } else {
-        return $uid;
-      }
-    }
-    return $uid;
-  }
 
   /**
    * standard id getter,
